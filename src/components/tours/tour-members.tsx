@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore } from '@/stores'
@@ -9,6 +9,10 @@ import { _Input } from '@/components/ui/input'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { Trash2, GripVertical, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { supabase as supabaseClient } from '@/lib/supabase/client'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase = supabaseClient as any
 
 interface TourMembersProps {
   tour: Tour
@@ -57,6 +61,87 @@ export const TourMembers = React.memo(function TourMembers({
   const [draggedRow, setDraggedRow] = useState<number | null>(null)
   const [_isNavigating, setIsNavigating] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // 房間分配資訊: member_id -> 房間名稱
+  const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
+
+  // 載入房間分配資訊
+  const loadRoomAssignments = useCallback(async () => {
+    if (!tour.id) return
+
+    try {
+      // 取得這個團的所有房間
+      const { data: rooms } = await supabase
+        .from('tour_rooms')
+        .select('id, room_type, hotel_name, room_number')
+        .eq('tour_id', tour.id)
+
+      if (!rooms || rooms.length === 0) return
+
+      // 取得所有分配記錄
+      const roomIds = rooms.map((r: { id: string }) => r.id)
+      const { data: assignments } = await supabase
+        .from('tour_room_assignments')
+        .select('room_id, order_member_id')
+        .in('room_id', roomIds)
+
+      if (!assignments || assignments.length === 0) return
+
+      // 建立 room_id -> 房間資訊 的映射
+      const roomMap: Record<string, { room_type: string; hotel_name: string | null; room_number: string | null }> = {}
+      rooms.forEach((room: { id: string; room_type: string; hotel_name: string | null; room_number: string | null }) => {
+        roomMap[room.id] = {
+          room_type: room.room_type,
+          hotel_name: room.hotel_name,
+          room_number: room.room_number,
+        }
+      })
+
+      // 計算每種房型的編號
+      const roomCounters: Record<string, number> = {}
+      const roomNumbers: Record<string, number> = {}
+      rooms.forEach((room: { id: string; room_type: string; hotel_name: string | null }) => {
+        const roomKey = `${room.hotel_name || ''}_${room.room_type}`
+        if (!roomCounters[roomKey]) {
+          roomCounters[roomKey] = 1
+        }
+        roomNumbers[room.id] = roomCounters[roomKey]++
+      })
+
+      // 建立 member_id -> 房間名稱 的映射
+      const assignmentMap: Record<string, string> = {}
+      assignments.forEach((a: { room_id: string; order_member_id: string }) => {
+        const room = roomMap[a.room_id]
+        if (room) {
+          const roomTypeLabel = getRoomTypeLabel(room.room_type)
+          const variant = room.hotel_name ? `${room.hotel_name} ` : ''
+          const roomNum = roomNumbers[a.room_id] || 1
+          assignmentMap[a.order_member_id] = `${variant}${roomTypeLabel} ${roomNum}`
+        }
+      })
+
+      setRoomAssignments(assignmentMap)
+    } catch (err) {
+      logger.error('載入房間分配失敗:', err)
+    }
+  }, [tour.id])
+
+  // 房型標籤轉換
+  const getRoomTypeLabel = (roomType: string): string => {
+    const labels: Record<string, string> = {
+      single: '單人房',
+      double: '雙人房',
+      triple: '三人房',
+      quad: '四人房',
+      suite: '套房',
+    }
+    return labels[roomType] || roomType
+  }
+
+  // 載入分配資訊
+  useEffect(() => {
+    loadRoomAssignments()
+  }, [loadRoomAssignments])
 
   // 定義可編輯欄位的順序（用於左右鍵導航）
   const editableFields: (keyof EditingMember)[] = [
@@ -327,7 +412,8 @@ export const TourMembers = React.memo(function TourMembers({
     } else if (field === 'age') {
       value = member.age > 0 ? `${member.age}歲` : ''
     } else if (field === 'assignedRoom') {
-      value = member.assignedRoom || '未分房'
+      // 優先使用從資料庫載入的分房資訊
+      value = (member.id && roomAssignments[member.id]) || member.assignedRoom || '未分房'
     }
 
     if (isEditing) {

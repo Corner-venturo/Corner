@@ -129,7 +129,8 @@ export interface TourCountry {
 // - gemini: 緊湊底部對齊（莫蘭迪金色）
 // - nature: 綠色慢旅風格（垂直文字 + 重疊圖片卡）
 // - serene: 藍色靜謐風格（日期浮水印效果）
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+// - luxury: 奢華質感風格（左右分欄 + 襯線字體 + 深色酒店區塊）
+export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury'
 
 // 航班卡片風格類型：
 // - original: 經典莫蘭迪金色風格

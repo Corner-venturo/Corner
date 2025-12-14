@@ -99,6 +99,13 @@ export function CustomerDetailDialog({
             </div>
           </div>
         </div>
+        {/* 飲食禁忌 - 獨立一行 */}
+        <div className="py-2">
+          <label className="text-xs text-gray-500">飲食禁忌</label>
+          <div className={customer.dietary_restrictions ? 'text-amber-700 bg-amber-50 px-2 py-1 rounded' : ''}>
+            {customer.dietary_restrictions || '-'}
+          </div>
+        </div>
         <div className="flex justify-end gap-2 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             關閉

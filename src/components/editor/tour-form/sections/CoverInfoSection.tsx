@@ -210,7 +210,7 @@ export function CoverInfoSection({
     }
   }
 
-  // 封面風格選項（四種款式）
+  // 封面風格選項（五種款式）
   const coverStyleOptions: { value: CoverStyleType; label: string; description: string; color: string }[] = [
     {
       value: 'original',
@@ -235,6 +235,12 @@ export function CoverInfoSection({
       label: '浮水印風',
       description: '藍色寧靜風，大型日期浮水印，優雅字體',
       color: '#4a6fa5', // serene blue
+    },
+    {
+      value: 'luxury',
+      label: '奢華質感',
+      description: '左右分欄佈局，襯線字體，深綠金色系',
+      color: '#2C5F4D', // luxury green
     },
   ]
 

@@ -9,11 +9,15 @@ import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSe
 import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
 import { TourHeroSerene } from '@/features/tours/components/sections/TourHeroSerene'
+import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
+import { TourFlightSectionLuxury } from '@/features/tours/components/sections/TourFlightSectionLuxury'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
+import { TourItinerarySectionLuxury } from '@/features/tours/components/sections/TourItinerarySectionLuxury'
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
+import { TourHotelsSectionLuxury } from '@/features/tours/components/sections/TourHotelsSectionLuxury'
 import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
 import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
 import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
@@ -78,9 +82,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section - 根據 coverStyle 切換四種風格 */}
+      {/* Hero Section - 根據 coverStyle 切換五種風格 */}
       <div id="top">
-        {data.coverStyle === 'gemini' ? (
+        {data.coverStyle === 'luxury' ? (
+          <TourHeroLuxury data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'gemini' ? (
           <TourHeroGemini data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'nature' ? (
           <TourHeroNature data={data} viewMode={viewMode} />
@@ -98,7 +104,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Flight Section */}
       <div id="flight">
-        <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        {data.coverStyle === 'luxury' ? (
+          <TourFlightSectionLuxury data={data} viewMode={viewMode} />
+        ) : (
+          <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        )}
       </div>
 
       {/* Features Section - 只有當 features 有資料時才顯示 */}
@@ -124,14 +134,24 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Itinerary Section */}
       <div id="itinerary">
-        <TourItinerarySection
-          data={data}
-          viewMode={viewMode}
-          activeDayIndex={activeDayIndex}
-          dayRefs={dayRefs}
-          handleDayNavigate={handleDayNavigate}
-          coverStyle={data.coverStyle}
-        />
+        {data.coverStyle === 'luxury' ? (
+          <TourItinerarySectionLuxury
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+          />
+        ) : (
+          <TourItinerarySection
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+            coverStyle={data.coverStyle}
+          />
+        )}
       </div>
 
       {/* Divider */}
@@ -158,7 +178,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Hotels Section */}
       {data.showHotels !== false && data.hotels && data.hotels.length > 0 && (
         <div id="hotels">
-          <TourHotelsSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          {data.coverStyle === 'luxury' ? (
+            <TourHotelsSectionLuxury data={data} viewMode={viewMode} />
+          ) : (
+            <TourHotelsSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          )}
         </div>
       )}
 

@@ -42,6 +42,7 @@ export interface Customer extends BaseEntity {
   total_spent?: number | null // 總消費金額（統計用）
   last_order_date?: string | null // 最後訂單日期（統計用）
   verification_status: VerificationStatus // 人工驗證狀態
+  dietary_restrictions?: string | null // 飲食禁忌/特殊飲食需求
 }
 
 // ============================================
@@ -124,6 +125,7 @@ export interface CreateCustomerData {
   total_spent?: number
   total_orders?: number
   verification_status?: VerificationStatus
+  dietary_restrictions?: string // 飲食禁忌
 }
 
 /**
@@ -156,6 +158,7 @@ export interface UpdateCustomerData {
   notes?: string | null
   is_active?: boolean | null
   verification_status?: VerificationStatus
+  dietary_restrictions?: string | null // 飲食禁忌
 }
 
 // ============================================

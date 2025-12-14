@@ -995,6 +995,7 @@ export default function CustomersPage() {
       national_id: customer.national_id || '',
       passport_number: customer.passport_number || '',
       passport_expiry_date: customer.passport_expiry_date || '',
+      dietary_restrictions: customer.dietary_restrictions || '',
     })
     // 重置圖片縮放狀態
     setImageZoom(1)
@@ -1124,6 +1125,16 @@ export default function CustomersPage() {
             {customer.date_of_birth
               ? new Date(customer.date_of_birth).toLocaleDateString('zh-TW')
               : '-'}
+          </div>
+        ),
+      },
+      {
+        key: 'dietary_restrictions',
+        label: '飲食禁忌',
+        sortable: false,
+        render: (_value, customer: Customer) => (
+          <div className={`text-xs ${customer.dietary_restrictions ? 'text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}>
+            {customer.dietary_restrictions || '-'}
           </div>
         ),
       },
@@ -1994,6 +2005,18 @@ export default function CustomersPage() {
                     <option value="F">女</option>
                   </select>
                 </div>
+              </div>
+
+              {/* 飲食禁忌 */}
+              <div>
+                <label className="block text-xs font-medium text-morandi-secondary mb-1">飲食禁忌</label>
+                <input
+                  type="text"
+                  value={verifyFormData.dietary_restrictions || ''}
+                  onChange={e => setVerifyFormData({ ...verifyFormData, dietary_restrictions: e.target.value })}
+                  placeholder="如：素食、不吃牛、過敏食物等"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold bg-amber-50/30"
+                />
               </div>
             </div>
           </div>

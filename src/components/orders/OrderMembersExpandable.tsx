@@ -1103,8 +1103,8 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   護照效期
                 </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  特殊餐食
+                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-amber-50/50">
+                  飲食禁忌
                 </th>
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   訂房代號
@@ -1214,8 +1214,8 @@ export function OrderMembersExpandable({
                     })()}
                   </td>
 
-                  {/* 特殊餐食 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                  {/* 飲食禁忌 */}
+                  <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50">
                     <input
                       type="text"
                       value={member.special_meal || ''}
