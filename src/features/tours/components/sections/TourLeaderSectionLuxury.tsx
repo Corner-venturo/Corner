@@ -26,6 +26,10 @@ interface TourLeaderSectionLuxuryProps {
       domesticPhone?: string | null
       overseasPhone?: string | null
     } | null
+    meetingInfo?: {
+      time?: string | null
+      location?: string | null
+    } | null
     meetingPoints?: MeetingPoint[] | null
     departureDate?: string | null
     showLeaderMeeting?: boolean
@@ -37,10 +41,12 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
   const isMobile = viewMode === 'mobile'
   const leader = data.leader
   const meetingPoints = data.meetingPoints || []
+  const meetingInfo = data.meetingInfo
 
   // 如果沒有領隊資訊也沒有集合資訊，不顯示此區塊
   const hasLeaderInfo = leader?.name || leader?.domesticPhone || leader?.overseasPhone
-  const hasMeetingInfo = meetingPoints.length > 0
+  // 支援兩種資料格式：meetingPoints (陣列) 或 meetingInfo (單一物件)
+  const hasMeetingInfo = meetingPoints.length > 0 || !!(meetingInfo?.time || meetingInfo?.location)
 
   if (data.showLeaderMeeting === false || (!hasLeaderInfo && !hasMeetingInfo)) return null
 
@@ -191,57 +197,63 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
                     Meeting Point
                   </span>
 
-                  {/* 第一個集合點（主要） */}
-                  {meetingPoints[0] && (
-                    <>
-                      <h3
-                        className={`font-bold mb-4 ${isMobile ? 'text-lg' : 'text-xl'}`}
-                        style={{
-                          color: LUXURY.text,
-                          fontFamily: "'Noto Serif TC', serif"
-                        }}
-                      >
-                        {meetingPoints[0].location || '待定'}
-                      </h3>
+                  {/* 集合點資訊 - 支援 meetingPoints 陣列或 meetingInfo 單一物件 */}
+                  {(() => {
+                    // 優先使用 meetingPoints，其次是 meetingInfo
+                    const primaryLocation = meetingPoints[0]?.location || meetingInfo?.location || '待定'
+                    const primaryTime = meetingPoints[0]?.time || meetingInfo?.time || '待定'
 
-                      <div className="space-y-2">
-                        {/* 日期 */}
-                        <div className="flex items-center gap-3">
-                          <Calendar size={16} style={{ color: LUXURY.muted }} />
-                          <span
-                            className="text-sm font-medium"
-                            style={{ color: LUXURY.text }}
-                          >
-                            {formattedDate} {weekday}
-                          </span>
+                    return (
+                      <>
+                        <h3
+                          className={`font-bold mb-4 ${isMobile ? 'text-lg' : 'text-xl'}`}
+                          style={{
+                            color: LUXURY.text,
+                            fontFamily: "'Noto Serif TC', serif"
+                          }}
+                        >
+                          {primaryLocation}
+                        </h3>
+
+                        <div className="space-y-2">
+                          {/* 日期 */}
+                          <div className="flex items-center gap-3">
+                            <Calendar size={16} style={{ color: LUXURY.muted }} />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: LUXURY.text }}
+                            >
+                              {formattedDate} {weekday}
+                            </span>
+                          </div>
+
+                          {/* 時間 */}
+                          <div className="flex items-center gap-3">
+                            <Clock size={16} style={{ color: LUXURY.muted }} />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: LUXURY.text }}
+                            >
+                              {primaryTime}
+                            </span>
+                          </div>
+
+                          {/* 地點 */}
+                          <div className="flex items-center gap-3">
+                            <MapPin size={16} style={{ color: LUXURY.muted }} />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: LUXURY.text }}
+                            >
+                              {primaryLocation}
+                            </span>
+                          </div>
                         </div>
+                      </>
+                    )
+                  })()}
 
-                        {/* 時間 */}
-                        <div className="flex items-center gap-3">
-                          <Clock size={16} style={{ color: LUXURY.muted }} />
-                          <span
-                            className="text-sm font-medium"
-                            style={{ color: LUXURY.text }}
-                          >
-                            {meetingPoints[0].time || '待定'}
-                          </span>
-                        </div>
-
-                        {/* 地點 */}
-                        <div className="flex items-center gap-3">
-                          <MapPin size={16} style={{ color: LUXURY.muted }} />
-                          <span
-                            className="text-sm font-medium"
-                            style={{ color: LUXURY.text }}
-                          >
-                            {meetingPoints[0].location || '待定'}
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* 其他集合點 */}
+                  {/* 其他集合點 (只有當 meetingPoints 有多個時才顯示) */}
                   {meetingPoints.length > 1 && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <p

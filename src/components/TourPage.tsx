@@ -23,6 +23,7 @@ import { TourLeaderSectionLuxury } from '@/features/tours/components/sections/To
 import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
 import { TourPricingSectionLuxury } from '@/features/tours/components/sections/TourPricingSectionLuxury'
 import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
+import { TourPriceTiersSectionLuxury } from '@/features/tours/components/sections/TourPriceTiersSectionLuxury'
 import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
 import { TourNoticesSection } from '@/features/tours/components/sections/TourNoticesSection'
 import { TourNavigation } from '@/features/tours/components/sections/TourNavigation'
@@ -206,7 +207,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Price Tiers Section (4人、6人、8人包團) */}
       <div id="price-tiers">
-        <TourPriceTiersSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        {data.coverStyle === 'luxury' ? (
+          <TourPriceTiersSectionLuxury data={data} viewMode={viewMode} />
+        ) : (
+          <TourPriceTiersSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        )}
       </div>
 
       {/* Divider - Pricing Details */}
