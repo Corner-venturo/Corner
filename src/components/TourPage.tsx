@@ -141,14 +141,24 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Itinerary Section */}
       <div id="itinerary">
-        <TourItinerarySection
-          data={data}
-          viewMode={viewMode}
-          activeDayIndex={activeDayIndex}
-          dayRefs={dayRefs}
-          handleDayNavigate={handleDayNavigate}
-          coverStyle={data.coverStyle}
-        />
+        {data.coverStyle === 'luxury' ? (
+          <TourItinerarySectionLuxury
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+          />
+        ) : (
+          <TourItinerarySection
+            data={data}
+            viewMode={viewMode}
+            activeDayIndex={activeDayIndex}
+            dayRefs={dayRefs}
+            handleDayNavigate={handleDayNavigate}
+            coverStyle={data.coverStyle}
+          />
+        )}
       </div>
 
       {/* Divider */}
