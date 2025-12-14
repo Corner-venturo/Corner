@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2 } from 'lucide-react'
+import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2, Files } from 'lucide-react'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { generateUUID } from '@/lib/utils/uuid'
 
@@ -49,7 +49,9 @@ interface PublishButtonProps {
 export function PublishButton({ data, currentVersionIndex, onVersionChange }: PublishButtonProps) {
   const [saving, setSaving] = useState(false)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [showSaveAsNewDialog, setShowSaveAsNewDialog] = useState(false)
   const [versionNote, setVersionNote] = useState('')
+  const [newFileName, setNewFileName] = useState('')
   const [copied, setCopied] = useState(false)
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
   const { create, update } = useItineraryStore()
@@ -190,6 +192,35 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     }
   }
 
+  // 另存新檔（創建全新的行程表，有新的 ID 和連結）
+  const saveAsNewFile = async () => {
+    setSaving(true)
+    try {
+      const convertedData = convertData()
+
+      // 創建全新的行程表
+      const newItinerary = await create({
+        ...convertedData,
+        title: newFileName || `${data.title || '行程表'} (複本)`,
+        created_by: user?.id || undefined,
+        version_records: [], // 新檔案不繼承版本記錄
+      } as Parameters<typeof create>[0])
+
+      if (newItinerary?.id) {
+        setShowSaveAsNewDialog(false)
+        setNewFileName('')
+        // 導航到新的行程表
+        router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
+        await alert('已成功另存為新檔案！新的分享連結已更新。', 'success')
+      }
+    } catch (error) {
+      console.error('另存新檔失敗:', error)
+      await alert('另存新檔失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   // 載入版本
   const handleVersionSelect = (value: string) => {
     const index = parseInt(value, 10)
@@ -264,16 +295,44 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
 
         {/* 2. 另存按鈕（編輯模式才顯示）*/}
         {isEditMode && (
-          <Button
-            onClick={() => setShowSaveDialog(true)}
-            disabled={saving}
-            size="sm"
-            variant="outline"
-            className="h-8 px-3 border-morandi-container hover:bg-morandi-container/30"
-          >
-            <FilePlus size={14} className="mr-1.5" />
-            另存
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                disabled={saving}
+                size="sm"
+                variant="outline"
+                className="h-8 px-3 border-morandi-container hover:bg-morandi-container/30"
+              >
+                <FilePlus size={14} className="mr-1.5" />
+                另存
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                className="flex items-center gap-2 py-2 cursor-pointer"
+                onClick={() => setShowSaveDialog(true)}
+              >
+                <FilePlus size={14} className="text-morandi-secondary" />
+                <div className="flex flex-col">
+                  <span className="font-medium">另存新版本</span>
+                  <span className="text-xs text-morandi-secondary">相同連結，不同版本</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center gap-2 py-2 cursor-pointer"
+                onClick={() => {
+                  setNewFileName(`${data.title || '行程表'} (複本)`)
+                  setShowSaveAsNewDialog(true)
+                }}
+              >
+                <Files size={14} className="text-morandi-secondary" />
+                <div className="flex flex-col">
+                  <span className="font-medium">另存新檔</span>
+                  <span className="text-xs text-morandi-secondary">創建新連結</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* 3. 版本選擇器（編輯模式就顯示）*/}
@@ -426,6 +485,45 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
             </Button>
             <Button
               onClick={saveAsNewVersion}
+              disabled={saving}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            >
+              {saving ? '儲存中...' : '確認另存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 另存新檔 Dialog */}
+      <Dialog open={showSaveAsNewDialog} onOpenChange={setShowSaveAsNewDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Files size={18} />
+              另存新檔
+            </DialogTitle>
+            <DialogDescription>
+              將創建一個全新的行程表，有獨立的分享連結。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="new-file-name" className="text-sm font-medium">
+              新檔案名稱
+            </Label>
+            <Input
+              id="new-file-name"
+              value={newFileName}
+              onChange={(e) => setNewFileName(e.target.value)}
+              placeholder={`${data.title || '行程表'} (複本)`}
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveAsNewDialog(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={saveAsNewFile}
               disabled={saving}
               className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >

@@ -859,6 +859,27 @@ export function DailyItinerarySection({
             />
           </div>
 
+          {/* Luxury 模板專用：地點標籤 */}
+          {data.coverStyle === 'luxury' && (
+            <div>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">
+                <span className="inline-flex items-center gap-2">
+                  地點標籤
+                  <span className="px-1.5 py-0.5 text-[10px] bg-morandi-secondary/20 text-morandi-secondary rounded">
+                    Luxury 專用
+                  </span>
+                </span>
+              </label>
+              <input
+                type="text"
+                value={day.locationLabel || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'locationLabel', e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="如：京都、大阪、由布院（顯示在 Luxury 模板的每日卡片上）"
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
             <textarea

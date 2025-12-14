@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { MutableRefObject, useState } from 'react'
-import { Plane, Hotel, UtensilsCrossed, MapPin, X, Star, Sparkles, ArrowRight } from 'lucide-react'
+import { MapPin, Star, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { TourFormData } from '@/components/editor/tour-form/types'
 
 // Luxury 配色
@@ -54,15 +54,32 @@ function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[]
   return labels
 }
 
-// 格式化日期為 Dec 24 格式
+// 格式化日期為 DEC 24 格式（大寫月份）
 function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return '--'
+  if (!dateStr) return ''
   try {
     const date = new Date(dateStr)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    if (isNaN(date.getTime())) return ''
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
     return `${months[date.getMonth()]} ${date.getDate()}`
   } catch {
-    return dateStr
+    return ''
+  }
+}
+
+// 根據出發日期和實際天數（非 index）計算該天的日期
+// actualDayNumber 是從 1 開始的實際天數，建議行程不增加天數
+function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {
+  if (!departureDate || actualDayNumber < 1) return ''
+  try {
+    const date = new Date(departureDate)
+    if (isNaN(date.getTime())) return ''
+    // actualDayNumber 從 1 開始，所以 Day 1 = 出發日，Day 2 = 出發日 +1
+    date.setDate(date.getDate() + (actualDayNumber - 1))
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    return `${months[date.getMonth()]} ${date.getDate()}`
+  } catch {
+    return ''
   }
 }
 
@@ -94,6 +111,40 @@ export function TourItinerarySectionLuxury({
     description?: string
     image?: string
   } | null>(null)
+
+  // 圖片瀏覽器狀態
+  const [imageGallery, setImageGallery] = useState<{
+    images: string[]
+    currentIndex: number
+    title?: string
+  } | null>(null)
+
+  // 開啟圖片瀏覽器
+  const openImageGallery = (images: string[], startIndex: number, title?: string) => {
+    setImageGallery({ images, currentIndex: startIndex, title })
+  }
+
+  // 切換上一張
+  const prevImage = () => {
+    if (!imageGallery) return
+    setImageGallery({
+      ...imageGallery,
+      currentIndex: imageGallery.currentIndex > 0
+        ? imageGallery.currentIndex - 1
+        : imageGallery.images.length - 1
+    })
+  }
+
+  // 切換下一張
+  const nextImage = () => {
+    if (!imageGallery) return
+    setImageGallery({
+      ...imageGallery,
+      currentIndex: imageGallery.currentIndex < imageGallery.images.length - 1
+        ? imageGallery.currentIndex + 1
+        : 0
+    })
+  }
 
   return (
     <section
@@ -144,10 +195,13 @@ export function TourItinerarySectionLuxury({
           {dailyItinerary.map((day, index) => {
             const dayColor = DAY_COLORS[index % DAY_COLORS.length]
             const dayNumber = dayLabels[index].replace('Day ', '')
-            const hasImages = day.images && day.images.length > 0
-            const mainImage = hasImages
-              ? (typeof day.images![0] === 'string' ? day.images![0] : day.images![0].url)
-              : null
+            // 檢查圖片來源：1. day.images 2. activities 裡的 image
+            const dayImages = day.images && day.images.length > 0 ? day.images : []
+            const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
+            // 合併所有圖片來源，統一轉換為 string 格式
+            const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
+            const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
+            const hasImages = allImages.length > 0
 
             return (
               <article
@@ -182,11 +236,20 @@ export function TourItinerarySectionLuxury({
                       </div>
 
                       <div>
-                        <span
-                          className="inline-block px-2 py-1 mb-2 border border-white/30 text-[10px] tracking-widest uppercase"
-                        >
-                          {formatDateShort(day.date)}
-                        </span>
+                        {/* 日期標籤 - DEC 25 格式 */}
+                        {/* 使用 dayNumber（從 dayLabel 提取）而非 index，這樣建議行程會使用正確的天數 */}
+                        {(() => {
+                          // 從 dayNumber 提取數字部分（如 "5" 或 "5-B" → 5）
+                          const numericDay = parseInt(dayNumber.split('-')[0], 10)
+                          const dateDisplay = formatDateShort(day.date) || calculateDayDate(data.departureDate, numericDay)
+                          return dateDisplay ? (
+                            <span
+                              className="inline-block px-3 py-1.5 mb-3 bg-white/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest"
+                            >
+                              {dateDisplay}
+                            </span>
+                          ) : null
+                        })()}
                         <h3
                           className="text-5xl font-medium"
                           style={{ fontFamily: "'Noto Serif TC', serif" }}
@@ -203,7 +266,7 @@ export function TourItinerarySectionLuxury({
                           className="font-medium text-lg"
                           style={{ color: day.isAlternative ? '#fff' : LUXURY.secondary }}
                         >
-                          {day.title?.split(' ')[0] || '探索'}
+                          {day.locationLabel || day.title?.split(' ')[0] || '探索'}
                         </div>
                       </div>
                     </div>
@@ -250,101 +313,162 @@ export function TourItinerarySectionLuxury({
                         </p>
                       )}
 
-                      {/* 圖片區 */}
-                      {mainImage && (
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div className="relative h-48 overflow-hidden rounded-sm">
-                            <img
-                              src={mainImage}
-                              alt={day.title || '行程圖片'}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                            <div className="absolute bottom-4 left-4 text-white">
-                              <span className="block text-sm font-medium">
-                                {day.title?.split(' ')[0] || ''}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Highlight 區塊 */}
-                          {day.activities && day.activities.length > 0 && (
-                            <div
-                              className="flex flex-col justify-center p-6"
-                              style={{ backgroundColor: LUXURY.background }}
-                            >
-                              <h4
-                                className="text-lg mb-2"
-                                style={{
-                                  color: LUXURY.primary,
-                                  fontFamily: "'Noto Serif TC', serif"
-                                }}
+                      {/* 圖片區 - 有圖片時顯示圖片，無圖片時顯示景點列表 */}
+                      {hasImages ? (
+                        <div className="mb-6">
+                          {/* 單張圖片：左圖右文 */}
+                          {allImages.length === 1 && (
+                            <div className="grid grid-cols-2 gap-6">
+                              {/* 左側圖片 */}
+                              <div
+                                className="relative h-56 overflow-hidden rounded-sm cursor-pointer group/img"
+                                onClick={() => openImageGallery(allImages, 0, day.title)}
                               >
-                                Highlight
-                              </h4>
-                              <ul className="space-y-2">
-                                {day.activities.slice(0, 3).map((activity, actIdx) => (
-                                  <li
-                                    key={actIdx}
-                                    className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80"
-                                    style={{ color: LUXURY.muted }}
-                                    onClick={() => setSelectedActivity({
-                                      title: activity.title || '',
-                                      description: activity.description,
-                                      image: activity.image
-                                    })}
-                                  >
-                                    <span
-                                      className="w-1 h-1 rounded-full"
-                                      style={{ backgroundColor: LUXURY.secondary }}
-                                    />
-                                    {activity.title}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* 無圖片時直接顯示活動列表 */}
-                      {!mainImage && day.activities && day.activities.length > 0 && (
-                        <div className="space-y-3">
-                          {day.activities.map((activity, actIdx) => (
-                            <div
-                              key={actIdx}
-                              className="flex items-start gap-4 p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                              onClick={() => setSelectedActivity({
-                                title: activity.title || '',
-                                description: activity.description,
-                                image: activity.image
-                              })}
-                            >
-                              <MapPin
-                                className="w-5 h-5 mt-0.5 flex-shrink-0"
-                                style={{ color: LUXURY.primary }}
-                              />
-                              <div>
-                                <span
-                                  className="block font-bold text-sm"
-                                  style={{ color: LUXURY.text }}
+                                <img
+                                  src={allImages[0]}
+                                  alt={day.title || '行程圖片'}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors" />
+                              </div>
+                              {/* 右側說明 */}
+                              <div
+                                className="flex flex-col justify-center p-5"
+                                style={{ backgroundColor: LUXURY.background }}
+                              >
+                                {/* 1. 標題 */}
+                                <h4
+                                  className="text-lg font-medium mb-3"
+                                  style={{
+                                    color: LUXURY.primary,
+                                    fontFamily: "'Noto Serif TC', serif"
+                                  }}
                                 >
-                                  {activity.title}
-                                </span>
-                                {activity.description && (
-                                  <span
-                                    className="block text-xs mt-1"
-                                    style={{ color: LUXURY.muted }}
+                                  Highlight
+                                </h4>
+                                {/* 2. 景點列表 */}
+                                <ul className="space-y-2 mb-4">
+                                  {day.activities?.map((activity, actIdx) => (
+                                    <li
+                                      key={actIdx}
+                                      className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80"
+                                      style={{ color: LUXURY.muted }}
+                                      onClick={() => setSelectedActivity({
+                                        title: activity.title || '',
+                                        description: activity.description,
+                                        image: activity.image
+                                      })}
+                                    >
+                                      <span
+                                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                        style={{ backgroundColor: LUXURY.secondary }}
+                                      />
+                                      {activity.title}
+                                    </li>
+                                  ))}
+                                </ul>
+                                {/* 3. 說明文字 */}
+                                {day.activities?.[0]?.description && (
+                                  <p
+                                    className="text-xs leading-relaxed border-t pt-3"
+                                    style={{
+                                      color: LUXURY.muted,
+                                      borderColor: '#e5e5e5'
+                                    }}
                                   >
-                                    {activity.description.substring(0, 60)}
-                                    {activity.description.length > 60 ? '...' : ''}
-                                  </span>
+                                    {day.activities[0].description}
+                                  </p>
                                 )}
                               </div>
                             </div>
-                          ))}
+                          )}
+
+                          {/* 多張圖片：橫向排列，最多顯示3張 */}
+                          {allImages.length >= 2 && (
+                            <div className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                              {allImages.slice(0, 3).map((img, imgIdx) => {
+                                const imgUrl = img
+                                const imgCaption = day.activities?.[imgIdx]?.title || ''
+
+                                return (
+                                  <div
+                                    key={imgIdx}
+                                    className="relative h-44 overflow-hidden rounded-sm cursor-pointer group/img"
+                                    onClick={() => openImageGallery(allImages, imgIdx, day.title)}
+                                  >
+                                    <img
+                                      src={imgUrl}
+                                      alt={imgCaption}
+                                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                    {/* 左下角標籤 */}
+                                    <div className="absolute bottom-3 left-3">
+                                      <span
+                                        className="text-white text-xs font-bold uppercase tracking-wider"
+                                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                                      >
+                                        {imgCaption}
+                                      </span>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+
+                          {/* 如果超過3張，顯示查看更多按鈕 */}
+                          {allImages.length > 3 && (
+                            <button
+                              className="mt-3 text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                              style={{ color: LUXURY.secondary }}
+                              onClick={() => openImageGallery(allImages, 3, day.title)}
+                            >
+                              <span>查看更多 +{allImages.length - 3}</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
+                      ) : (
+                        /* 無圖片時：顯示 Highlight 景點列表 */
+                        day.activities && day.activities.length > 0 && (
+                          <div
+                            className="p-5 rounded-sm mb-4"
+                            style={{ backgroundColor: LUXURY.background }}
+                          >
+                            <h4
+                              className="text-base font-medium mb-3"
+                              style={{
+                                color: LUXURY.primary,
+                                fontFamily: "'Noto Serif TC', serif"
+                              }}
+                            >
+                              Highlight
+                            </h4>
+                            <ul className="space-y-2">
+                              {day.activities.map((activity, actIdx) => (
+                                <li
+                                  key={actIdx}
+                                  className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80"
+                                  style={{ color: LUXURY.muted }}
+                                  onClick={() => setSelectedActivity({
+                                    title: activity.title || '',
+                                    description: activity.description,
+                                    image: activity.image
+                                  })}
+                                >
+                                  <span
+                                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: LUXURY.secondary }}
+                                  />
+                                  {activity.title}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )
                       )}
+
                     </div>
 
                     {/* 右側：餐食與住宿 */}
@@ -458,7 +582,112 @@ export function TourItinerarySectionLuxury({
         </div>
       </div>
 
-      {/* Activity Detail Modal */}
+      {/* Image Gallery Modal - 全螢幕圖片瀏覽器 */}
+      <AnimatePresence>
+        {imageGallery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            onClick={() => setImageGallery(null)}
+          >
+            {/* X 關閉按鈕 */}
+            <button
+              onClick={() => setImageGallery(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* 圖片計數 */}
+            <div className="absolute top-4 left-4 z-10 text-white/80 text-sm">
+              {imageGallery.currentIndex + 1} / {imageGallery.images.length}
+            </div>
+
+            {/* 左箭頭 */}
+            {imageGallery.images.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  prevImage()
+                }}
+                className="absolute left-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <ChevronLeft className="w-8 h-8 text-white" />
+              </button>
+            )}
+
+            {/* 圖片 */}
+            <motion.div
+              key={imageGallery.currentIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="max-w-4xl max-h-[80vh] mx-4"
+              onClick={e => e.stopPropagation()}
+            >
+              <img
+                src={imageGallery.images[imageGallery.currentIndex]}
+                alt={imageGallery.title || '行程圖片'}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+              {/* 標題 */}
+              {imageGallery.title && (
+                <div className="text-center mt-4">
+                  <p
+                    className="text-white text-lg"
+                    style={{ fontFamily: "'Noto Serif TC', serif" }}
+                  >
+                    {imageGallery.title}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+
+            {/* 右箭頭 */}
+            {imageGallery.images.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  nextImage()
+                }}
+                className="absolute right-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <ChevronRight className="w-8 h-8 text-white" />
+              </button>
+            )}
+
+            {/* 縮圖列表 */}
+            {imageGallery.images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {imageGallery.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setImageGallery({ ...imageGallery, currentIndex: idx })
+                    }}
+                    className={`w-16 h-12 rounded overflow-hidden border-2 transition-all ${
+                      idx === imageGallery.currentIndex
+                        ? 'border-white opacity-100'
+                        : 'border-transparent opacity-50 hover:opacity-75'
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Activity Detail Modal - 景點詳情彈窗（保留給無圖片的景點列表點擊） */}
       <AnimatePresence>
         {selectedActivity && (
           <motion.div
@@ -472,9 +701,17 @@ export function TourItinerarySectionLuxury({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl"
+              className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative"
               onClick={e => e.stopPropagation()}
             >
+              {/* X 關閉按鈕 */}
+              <button
+                onClick={() => setSelectedActivity(null)}
+                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+
               {selectedActivity.image && (
                 <div className="relative h-48">
                   <img
@@ -496,7 +733,7 @@ export function TourItinerarySectionLuxury({
               <div className="p-6">
                 {!selectedActivity.image && (
                   <h3
-                    className="text-xl font-bold mb-4"
+                    className="text-xl font-bold mb-4 pr-8"
                     style={{
                       color: LUXURY.text,
                       fontFamily: "'Noto Serif TC', serif"
@@ -513,13 +750,6 @@ export function TourItinerarySectionLuxury({
                     {selectedActivity.description}
                   </p>
                 )}
-                <button
-                  onClick={() => setSelectedActivity(null)}
-                  className="mt-6 w-full py-3 rounded-lg font-medium text-white transition-colors"
-                  style={{ backgroundColor: LUXURY.primary }}
-                >
-                  關閉
-                </button>
               </div>
             </motion.div>
           </motion.div>

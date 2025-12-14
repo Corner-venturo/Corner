@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
+import { HotelInfo } from '@/components/editor/tour-form/types'
 
 // Luxury 配色
 const LUXURY = {
@@ -12,16 +13,6 @@ const LUXURY = {
   surface: '#FFFFFF',
   text: '#2D3436',
   muted: '#636E72',
-}
-
-interface HotelInfo {
-  name?: string | null
-  location?: string | null
-  description?: string | null
-  image?: string | null
-  rating?: number | null
-  city?: string | null
-  nights?: number | null
 }
 
 interface TourHotelsSectionLuxuryProps {
@@ -98,7 +89,8 @@ function HotelCard({
   isMobile: boolean
   delay: number
 }) {
-  const rating = hotel.rating || 3
+  // 優先使用 images[0]，其次使用 image
+  const hotelImage = hotel.images?.[0] || hotel.image || null
 
   return (
     <motion.div
@@ -110,25 +102,22 @@ function HotelCard({
     >
       {/* 圖片區 */}
       <div className="relative h-64 rounded-sm overflow-hidden mb-6 shadow-lg">
-        <img
-          src={hotel.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&auto=format&fit=crop'}
-          alt={hotel.name || '飯店'}
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-        />
-        {/* 遮罩 */}
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
-
-        {/* 城市標籤 */}
-        {hotel.city && (
-          <div className="absolute bottom-4 left-4">
-            <span
-              className="bg-white/90 backdrop-blur-sm px-2 py-1 text-[10px] font-bold uppercase tracking-widest"
-              style={{ color: LUXURY.text }}
-            >
-              {hotel.city}
-            </span>
+        {hotelImage ? (
+          <img
+            src={hotelImage}
+            alt={hotel.name || '飯店'}
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ backgroundColor: LUXURY.text }}
+          >
+            <span className="text-white/50 text-sm">暫無圖片</span>
           </div>
         )}
+        {/* 遮罩 */}
+        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
       </div>
 
       {/* 文字區 */}
@@ -150,34 +139,13 @@ function HotelCard({
         />
 
         {/* 描述 */}
-        <p
-          className="text-xs leading-relaxed"
-          style={{ color: '#B2BEC3' }}
-        >
-          {hotel.description || hotel.location || '優質住宿體驗'}
-        </p>
-
-        {/* 星級 */}
-        {rating > 0 && (
-          <div className="flex justify-center gap-0.5 mt-3">
-            {[...Array(rating)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-3 h-3 fill-current"
-                style={{ color: LUXURY.secondary }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* 住宿晚數 */}
-        {hotel.nights && (
-          <div
-            className="mt-2 text-xs"
-            style={{ color: '#636E72' }}
+        {hotel.description && (
+          <p
+            className="text-xs leading-relaxed"
+            style={{ color: '#B2BEC3' }}
           >
-            {hotel.nights} 晚
-          </div>
+            {hotel.description}
+          </p>
         )}
       </div>
     </motion.div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Users, Utensils } from 'lucide-react'
+import { Calendar, Users, Utensils, MapPin } from 'lucide-react'
 
 interface TourHeroLuxuryProps {
   data: {
@@ -82,28 +82,37 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
             </div>
 
             {/* 主標題區塊 - 靠左對齊 */}
-            <h1
-              className={`font-medium leading-tight ${isMobile ? 'text-4xl' : 'text-5xl lg:text-7xl'}`}
-              style={{
-                color: LUXURY.text,
-                fontFamily: "'Noto Serif TC', serif"
-              }}
-            >
-              {titleParts.country && (
-                <>
-                  {titleParts.country}
-                  <span style={{ color: LUXURY.primary }}>{titleParts.highlight}</span>
-                  <br />
-                </>
+            <div className="space-y-2">
+              {/* 主標題 - 黑字 */}
+              <h1
+                className={`font-medium leading-tight ${isMobile ? 'text-4xl' : 'text-5xl lg:text-7xl'}`}
+                style={{
+                  color: LUXURY.text,
+                  fontFamily: "'Noto Serif TC', serif"
+                }}
+              >
+                <span className="relative inline-block">
+                  {data.title}
+                  <span
+                    className="absolute -bottom-2 left-0 w-full h-3 -rotate-1"
+                    style={{ backgroundColor: `${LUXURY.secondary}20` }}
+                  />
+                </span>
+              </h1>
+
+              {/* 副標題 - 綠字 */}
+              {data.subtitle && (
+                <h2
+                  className={`font-medium ${isMobile ? 'text-2xl' : 'text-3xl lg:text-4xl'}`}
+                  style={{
+                    color: LUXURY.primary,
+                    fontFamily: "'Noto Serif TC', serif"
+                  }}
+                >
+                  {data.subtitle}
+                </h2>
               )}
-              <span className="relative inline-block">
-                {titleParts.theme || data.title}
-                <span
-                  className="absolute -bottom-2 left-0 w-full h-3 -rotate-1"
-                  style={{ backgroundColor: `${LUXURY.secondary}20` }}
-                />
-              </span>
-            </h1>
+            </div>
 
             {/* 描述 - 靠左對齊 */}
             {data.description && (
@@ -164,9 +173,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                 style={{ borderLeft: `4px solid ${LUXURY.secondary}` }}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke={LUXURY.secondary}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  <MapPin className="w-5 h-5" style={{ color: LUXURY.secondary }} />
                   <span
                     className="text-xs font-bold tracking-widest uppercase"
                     style={{ color: LUXURY.muted }}
