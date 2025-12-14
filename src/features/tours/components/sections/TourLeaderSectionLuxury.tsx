@@ -55,13 +55,19 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
     if (!dateStr) return { date: '待定', weekday: '' }
     try {
       const date = new Date(dateStr)
+      if (isNaN(date.getTime())) return { date: '待定', weekday: '' }
+      const year = date.getFullYear()
+      const month = date.getMonth()
+      const day = date.getDate()
+      const dayOfWeek = date.getDay()
+      if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(dayOfWeek)) return { date: '待定', weekday: '' }
       const weekdays = ['日', '一', '二', '三', '四', '五', '六']
       return {
-        date: `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`,
-        weekday: `(${weekdays[date.getDay()]})`
+        date: `${year}.${(month + 1).toString().padStart(2, '0')}.${day.toString().padStart(2, '0')}`,
+        weekday: `(${weekdays[dayOfWeek]})`
       }
     } catch {
-      return { date: dateStr, weekday: '' }
+      return { date: '待定', weekday: '' }
     }
   }
 

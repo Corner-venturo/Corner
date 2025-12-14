@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { AlertCircle, FileX } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 
 interface TourNoticesSectionProps {
   data: {

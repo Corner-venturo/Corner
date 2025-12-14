@@ -385,7 +385,7 @@ export interface Itinerary {
   country: string
   city: string
   status: 'draft' | 'published'
-  cover_style?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' // 封面風格
+  cover_style?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' // 封面風格
   price?: string | null // 價格（如：39,800）
   price_note?: string | null // 價格備註（如：起、/人）
 

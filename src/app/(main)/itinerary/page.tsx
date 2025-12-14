@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useItineraries, useEmployees } from '@/hooks/cloud-hooks'
+import { useItineraries, useEmployees, useQuotes } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
@@ -25,6 +25,7 @@ const COMPANY_PASSWORD = '83212711'
 export default function ItineraryPage() {
   const router = useRouter()
   const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
+  const { items: quotes, create: createQuote, update: updateQuote } = useQuotes()
   const { items: employees } = useEmployees()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
@@ -123,7 +124,7 @@ export default function ItineraryPage() {
     try {
       // 複製所有欄位，但排除 id, created_at, updated_at 並覆蓋 tour_code, title, created_by
       const {
-        id: _id,
+        id: sourceItineraryId,
         created_at: _createdAt,
         updated_at: _updatedAt,
         created_by: _createdBy, // 作者改為當前登入者
@@ -142,8 +143,66 @@ export default function ItineraryPage() {
         created_by: user?.id, // 作者為當前登入者
       }
 
-      await createItinerary(newItinerary)
-      await alertSuccess('行程已複製成功！')
+      const createdItinerary = await createItinerary(newItinerary)
+
+      // 查找並複製關聯的報價單（清空客戶資料，保留價格數值）
+      const linkedQuotes = quotes.filter(q => q.itinerary_id === sourceItineraryId)
+      let quoteCopiedCount = 0
+
+      for (const quote of linkedQuotes) {
+        const {
+          id: _quoteId,
+          created_at: _quoteCreatedAt,
+          updated_at: _quoteUpdatedAt,
+          // 清空客戶個人資料
+          customer_name: _customerName,
+          contact_person: _contactPerson,
+          contact_phone: _contactPhone,
+          contact_email: _contactEmail,
+          contact_address: _contactAddress,
+          // 清空關聯資料
+          tour_id: _quoteTourId,
+          converted_to_tour: _convertedToTour,
+          // 重置狀態相關
+          status: _status,
+          received_amount: _receivedAmount,
+          balance_amount: _balanceAmount,
+          is_pinned: _isPinned,
+          // 保留其他所有資料（價格、項目等）
+          ...quoteRestData
+        } = quote
+
+        const newQuote = {
+          ...quoteRestData,
+          // 關聯到新行程
+          itinerary_id: createdItinerary?.id,
+          // 清空客戶資料
+          customer_name: '（待填寫）',
+          contact_person: undefined,
+          contact_phone: undefined,
+          contact_email: undefined,
+          contact_address: undefined,
+          // 重置狀態
+          status: 'draft' as const,
+          received_amount: undefined,
+          balance_amount: undefined,
+          converted_to_tour: false,
+          is_pinned: false,
+          // 更新行程編號
+          tour_code: duplicateTourCode.trim(),
+          // 作者為當前登入者
+          created_by: user?.id,
+          created_by_name: user?.name || undefined,
+        }
+
+        await createQuote(newQuote)
+        quoteCopiedCount++
+      }
+
+      const successMsg = quoteCopiedCount > 0
+        ? `行程已複製成功！同時複製了 ${quoteCopiedCount} 個報價單（客戶資料已清空）`
+        : '行程已複製成功！'
+      await alertSuccess(successMsg)
       setIsDuplicateDialogOpen(false)
       setDuplicateSource(null)
       setDuplicateTourCode('')
@@ -153,25 +212,76 @@ export default function ItineraryPage() {
     } finally {
       setIsDuplicating(false)
     }
-  }, [duplicateSource, duplicateTourCode, duplicateTitle, createItinerary, user?.id])
+  }, [duplicateSource, duplicateTourCode, duplicateTitle, createItinerary, createQuote, quotes, user?.id, user?.name])
 
   // 封存行程
   const handleArchive = useCallback(
     async (id: string) => {
-      const confirmed = await confirm('確定要封存這個行程嗎？封存後可在「封存」分頁中找到。', {
-        type: 'warning',
-        title: '封存行程',
-      })
-      if (confirmed) {
-        try {
-          await updateItinerary(id, { archived_at: new Date().toISOString() })
-          await alertSuccess('已封存！')
-        } catch (error) {
-          await alertError('封存失敗，請稍後再試')
+      // 檢查是否有關聯的報價單
+      const linkedQuotes = quotes.filter(q => q.itinerary_id === id)
+      const hasLinkedQuotes = linkedQuotes.length > 0
+
+      let syncAction: 'sync' | 'unlink' | 'cancel' = 'cancel'
+
+      if (hasLinkedQuotes) {
+        // 有關聯報價單，詢問處理方式
+        const result = await confirm(
+          `此行程有 ${linkedQuotes.length} 個關聯的報價單。\n\n請選擇封存方式：\n• 同步封存：報價單也一併封存\n• 僅封存行程：斷開關聯，報價單保留`,
+          {
+            type: 'warning',
+            title: '封存行程',
+            confirmText: '同步封存',
+            cancelText: '取消',
+            showThirdOption: true,
+            thirdOptionText: '僅封存行程',
+          }
+        )
+
+        if (result === true) {
+          syncAction = 'sync'
+        } else if (result === 'third') {
+          syncAction = 'unlink'
+        } else {
+          return // 取消操作
         }
+      } else {
+        // 沒有關聯報價單，直接確認
+        const confirmed = await confirm('確定要封存這個行程嗎？封存後可在「封存」分頁中找到。', {
+          type: 'warning',
+          title: '封存行程',
+        })
+        if (!confirmed) return
+        syncAction = 'sync' // 沒有報價單，直接封存
+      }
+
+      try {
+        const archivedAt = new Date().toISOString()
+
+        // 封存行程
+        await updateItinerary(id, { archived_at: archivedAt })
+
+        if (hasLinkedQuotes) {
+          if (syncAction === 'sync') {
+            // 同步封存報價單
+            for (const quote of linkedQuotes) {
+              await updateQuote(quote.id, { status: 'rejected' as const }) // 報價單沒有 archived_at，改用 rejected 狀態
+            }
+            await alertSuccess(`已封存行程及 ${linkedQuotes.length} 個報價單！`)
+          } else if (syncAction === 'unlink') {
+            // 斷開關聯
+            for (const quote of linkedQuotes) {
+              await updateQuote(quote.id, { itinerary_id: undefined })
+            }
+            await alertSuccess('已封存行程！報價單已斷開關聯並保留。')
+          }
+        } else {
+          await alertSuccess('已封存！')
+        }
+      } catch (error) {
+        await alertError('封存失敗，請稍後再試')
       }
     },
-    [updateItinerary]
+    [updateItinerary, updateQuote, quotes]
   )
 
   // 取消封存
@@ -852,7 +962,8 @@ export default function ItineraryPage() {
               />
             </div>
             <p className="text-xs text-morandi-muted">
-              其他資料（封面、行程內容、圖片等）將會完整複製。
+              封面、行程內容、圖片等將會完整複製。<br />
+              關聯的報價單也會一併複製（客戶資料會清空，價格保留）。
             </p>
           </div>
           <DialogFooter>

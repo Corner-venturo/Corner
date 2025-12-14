@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import { TourFormData, FlightStyleType } from '../types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CalendarPlus, Search, Loader2, Plane, Undo2 } from 'lucide-react'
+import { CalendarPlus, Search, Loader2, Plane, Undo2, Settings2, Check } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -64,9 +65,14 @@ const flightStyleOptions: { value: FlightStyleType; label: string; description: 
   { value: 'original', label: '經典金色', description: '莫蘭迪金色風格' },
   { value: 'chinese', label: '中國風', description: '書法水墨風格' },
   { value: 'japanese', label: '日式和風', description: '和紙風格＋圖片' },
+  { value: 'luxury', label: '奢華質感', description: '表格式深色調' },
+  { value: 'art', label: '藝術雜誌', description: 'Brutalist 高對比' },
 ]
 
 export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary }: FlightInfoSectionProps) {
+  // Modal 顯示狀態
+  const [showFlightSettings, setShowFlightSettings] = useState(false)
+
   // 航班查詢狀態
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
@@ -273,58 +279,87 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
     }
   }, [data.returnFlight?.flightNumber, data.returnFlight?.departureDate, data.departureDate, updateFlightField, updateFlightFields])
 
+  // 取得目前選擇的風格資訊
+  const currentStyle = flightStyleOptions.find(s => s.value === (data.flightStyle || 'original')) || flightStyleOptions[0]
+
+  // 產生航班摘要文字
+  const getFlightSummary = () => {
+    const outbound = data.outboundFlight
+    const returnFlight = data.returnFlight
+
+    if (!outbound?.flightNumber && !returnFlight?.flightNumber) {
+      return '尚未設定航班'
+    }
+
+    const parts: string[] = []
+    if (outbound?.flightNumber) {
+      parts.push(`去程: ${outbound.flightNumber}`)
+    }
+    if (returnFlight?.flightNumber) {
+      parts.push(`回程: ${returnFlight.flightNumber}`)
+    }
+    return parts.join(' / ')
+  }
+
   return (
     <div className="space-y-3">
       <h2 className="text-base font-bold text-morandi-primary border-b-2 border-[#C9A961] pb-1.5">
         航班資訊
       </h2>
 
-      {/* 航班卡片風格選擇 */}
-      {updateField && (
-        <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-3 rounded-lg border border-slate-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Plane className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-medium text-slate-600">航班卡片風格</span>
+      {/* 摘要按鈕卡片 - 點擊開啟設定 Modal */}
+      <button
+        type="button"
+        onClick={() => setShowFlightSettings(true)}
+        className="w-full group"
+      >
+        <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-[#C9A961]/40 bg-gradient-to-r from-[#F9F5ED] to-[#F5F0EB] hover:border-[#C9A961] hover:shadow-md transition-all">
+          {/* 航班圖示 */}
+          <div
+            className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: '#C9A96120' }}
+          >
+            <Plane className="w-7 h-7" style={{ color: '#C9A961' }} />
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {flightStyleOptions.map((option) => {
-              const isSelected = (data.flightStyle || 'original') === option.value
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => updateField('flightStyle', option.value)}
-                  className={cn(
-                    'flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
-                    isSelected
-                      ? 'border-morandi-gold bg-morandi-gold/10'
-                      : 'border-transparent bg-white hover:border-slate-300'
-                  )}
-                >
-                  <span className={cn(
-                    'text-xs font-bold',
-                    isSelected ? 'text-morandi-gold' : 'text-slate-700'
-                  )}>
-                    {option.label}
-                  </span>
-                  <span className="text-[10px] text-slate-500">{option.description}</span>
-                </button>
-              )
-            })}
+
+          {/* 航班資訊 */}
+          <div className="flex-1 text-left">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-bold text-morandi-primary">
+                {currentStyle.label}
+              </span>
+              <span className="text-xs text-morandi-secondary">
+                {currentStyle.description}
+              </span>
+            </div>
+            <div className="text-xs text-morandi-secondary">
+              {getFlightSummary()}
+            </div>
+            {tripDays > 0 && (
+              <div className="mt-1 text-xs font-medium" style={{ color: '#C9A961' }}>
+                行程 {tripDays} 天
+              </div>
+            )}
+          </div>
+
+          {/* 設定圖示 */}
+          <div className="flex items-center gap-2 text-morandi-secondary group-hover:text-morandi-primary transition-colors">
+            <Settings2 className="w-5 h-5" />
+            <span className="text-xs">設定</span>
           </div>
         </div>
-      )}
+      </button>
 
-      {/* 行程天數自動計算 */}
+      {/* 行程天數自動計算（保留在主面板以便快速存取） */}
       {tripDays > 0 && data.departureDate && (
         <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 p-3 rounded-lg border border-morandi-gold/30">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-morandi-primary">行程天數</span>
               <span className="text-lg font-bold text-morandi-gold">{tripDays}</span>
               <span className="text-sm text-morandi-secondary">天</span>
             </div>
-            <div className="h-6 w-px bg-morandi-container"></div>
+            <div className="h-6 w-px bg-morandi-container hidden sm:block"></div>
             <div className="text-xs text-morandi-secondary">
               {(() => {
                 const dep = parseDate(data.departureDate)
@@ -338,7 +373,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                 return `${formatDateFull(dep)} → ${formatDateFull(ret)}`
               })()}
             </div>
-            <div className="h-6 w-px bg-morandi-container"></div>
+            <div className="h-6 w-px bg-morandi-container hidden sm:block"></div>
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -367,289 +402,336 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         </div>
       )}
 
-      {/* 去程航班 */}
-      <div className="bg-[#F9F5ED] p-3 rounded-lg space-y-2 border border-[#E0D8CC]">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-sm text-[#3D2914]">去程航班</h3>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.outboundFlight?.hasMeal || false}
-                onChange={e => updateFlightField('outboundFlight', 'hasMeal', e.target.checked)}
-                className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
-              />
-              <span className="text-xs text-morandi-secondary">餐食</span>
-            </label>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleSearchOutbound}
-              disabled={loadingOutbound || !data.outboundFlight?.flightNumber}
-              className="h-7 text-xs gap-1"
-            >
-              {loadingOutbound ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Search size={12} />
-              )}
-              查詢航班
-            </Button>
-          </div>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {/* 第一行：航空公司、航班號碼、日期、查詢按鈕區 */}
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              航空公司
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.airline || ''}
-              onChange={e => updateFlightField('outboundFlight', 'airline', e.target.value)}
-              className="text-xs h-8"
-              placeholder="長榮航空"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              航班號碼
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.flightNumber || ''}
-              onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
-              className="text-xs h-8"
-              placeholder="BR158"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              日期 (月/日)
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.departureDate || ''}
-              onChange={e => {
-                let value = e.target.value
-                // 如果輸入完整格式 YYYY/MM/DD，自動截取 MM/DD
-                const parts = value.split('/')
-                if (parts.length === 3 && parts[0].length === 4) {
-                  value = `${parts[1]}/${parts[2]}`
-                }
-                updateFlightField('outboundFlight', 'departureDate', value)
-              }}
-              className="text-xs h-8"
-              placeholder="01/21"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              飛行時間
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.duration || ''}
-              onChange={e => updateFlightField('outboundFlight', 'duration', e.target.value)}
-              className="text-xs h-8"
-              placeholder="2h 30m"
-            />
-          </div>
-          {/* 第二行：機場和時間資訊 */}
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              出發機場
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.departureAirport || ''}
-              onChange={e =>
-                updateFlightField('outboundFlight', 'departureAirport', e.target.value)
-              }
-              className="text-xs h-8"
-              placeholder="TPE"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              出發時間
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.departureTime || ''}
-              onChange={e => updateFlightField('outboundFlight', 'departureTime', e.target.value)}
-              className="text-xs h-8"
-              placeholder="06:50"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              抵達機場
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.arrivalAirport || ''}
-              onChange={e => updateFlightField('outboundFlight', 'arrivalAirport', e.target.value)}
-              className="text-xs h-8"
-              placeholder="KMQ"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              抵達時間
-            </label>
-            <Input
-              type="text"
-              value={data.outboundFlight?.arrivalTime || ''}
-              onChange={e => updateFlightField('outboundFlight', 'arrivalTime', e.target.value)}
-              className="text-xs h-8"
-              placeholder="09:55"
-            />
-          </div>
-        </div>
-      </div>
+      {/* 航班設定 Modal */}
+      <Dialog open={showFlightSettings} onOpenChange={setShowFlightSettings}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plane className="w-5 h-5" style={{ color: '#C9A961' }} />
+              航班設定
+            </DialogTitle>
+          </DialogHeader>
 
-      {/* 回程航班 */}
-      <div className="bg-[#F5F0EB] p-3 rounded-lg space-y-2 border border-[#E0D8CC]">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-sm text-[#3D2914]">回程航班</h3>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.returnFlight?.hasMeal || false}
-                onChange={e => updateFlightField('returnFlight', 'hasMeal', e.target.checked)}
-                className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
-              />
-              <span className="text-xs text-morandi-secondary">餐食</span>
-            </label>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleSearchReturn}
-              disabled={loadingReturn || !data.returnFlight?.flightNumber}
-              className="h-7 text-xs gap-1"
-            >
-              {loadingReturn ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Search size={12} />
-              )}
-              查詢航班
-            </Button>
+          <div className="space-y-4 pt-2">
+            {/* 航班卡片風格選擇 */}
+            {updateField && (
+              <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-lg border border-slate-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <Plane className="w-4 h-4 text-slate-500" />
+                  <span className="text-sm font-medium text-slate-700">航班卡片風格</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {flightStyleOptions.map((option) => {
+                    const isSelected = (data.flightStyle || 'original') === option.value
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => updateField('flightStyle', option.value)}
+                        className={cn(
+                          'relative flex flex-col items-start p-2.5 rounded-lg border-2 transition-all text-left',
+                          isSelected
+                            ? 'border-morandi-gold bg-morandi-gold/10'
+                            : 'border-transparent bg-white hover:border-slate-300'
+                        )}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-1.5 right-1.5">
+                            <Check className="w-3.5 h-3.5 text-morandi-gold" />
+                          </div>
+                        )}
+                        <span className={cn(
+                          'text-xs font-bold',
+                          isSelected ? 'text-morandi-gold' : 'text-slate-700'
+                        )}>
+                          {option.label}
+                        </span>
+                        <span className="text-[10px] text-slate-500 mt-0.5">{option.description}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 去程航班 */}
+            <div className="bg-[#F9F5ED] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-[#3D2914]">去程航班</h3>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={data.outboundFlight?.hasMeal || false}
+                      onChange={e => updateFlightField('outboundFlight', 'hasMeal', e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                    />
+                    <span className="text-xs text-morandi-secondary">餐食</span>
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSearchOutbound}
+                    disabled={loadingOutbound || !data.outboundFlight?.flightNumber}
+                    className="h-7 text-xs gap-1"
+                  >
+                    {loadingOutbound ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Search size={12} />
+                    )}
+                    查詢航班
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    航空公司
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.airline || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'airline', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="長榮航空"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    航班號碼
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.flightNumber || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'flightNumber', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="BR158"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    日期 (月/日)
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.departureDate || ''}
+                    onChange={e => {
+                      let value = e.target.value
+                      const parts = value.split('/')
+                      if (parts.length === 3 && parts[0].length === 4) {
+                        value = `${parts[1]}/${parts[2]}`
+                      }
+                      updateFlightField('outboundFlight', 'departureDate', value)
+                    }}
+                    className="text-xs h-8"
+                    placeholder="01/21"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    飛行時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.duration || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'duration', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="2h 30m"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    出發機場
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.departureAirport || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'departureAirport', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="TPE"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    出發時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.departureTime || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'departureTime', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="06:50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    抵達機場
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.arrivalAirport || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'arrivalAirport', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="KMQ"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    抵達時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.outboundFlight?.arrivalTime || ''}
+                    onChange={e => updateFlightField('outboundFlight', 'arrivalTime', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="09:55"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 回程航班 */}
+            <div className="bg-[#F5F0EB] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-[#3D2914]">回程航班</h3>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={data.returnFlight?.hasMeal || false}
+                      onChange={e => updateFlightField('returnFlight', 'hasMeal', e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                    />
+                    <span className="text-xs text-morandi-secondary">餐食</span>
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSearchReturn}
+                    disabled={loadingReturn || !data.returnFlight?.flightNumber}
+                    className="h-7 text-xs gap-1"
+                  >
+                    {loadingReturn ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Search size={12} />
+                    )}
+                    查詢航班
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    航空公司
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.airline || ''}
+                    onChange={e => updateFlightField('returnFlight', 'airline', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="長榮航空"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    航班號碼
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.flightNumber || ''}
+                    onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="BR157"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    日期 (月/日)
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.departureDate || ''}
+                    onChange={e => {
+                      let value = e.target.value
+                      const parts = value.split('/')
+                      if (parts.length === 3 && parts[0].length === 4) {
+                        value = `${parts[1]}/${parts[2]}`
+                      }
+                      updateFlightField('returnFlight', 'departureDate', value)
+                    }}
+                    className="text-xs h-8"
+                    placeholder="01/25"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    飛行時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.duration || ''}
+                    onChange={e => updateFlightField('returnFlight', 'duration', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="2h 30m"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    出發機場
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.departureAirport || ''}
+                    onChange={e => updateFlightField('returnFlight', 'departureAirport', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="KMQ"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    出發時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.departureTime || ''}
+                    onChange={e => updateFlightField('returnFlight', 'departureTime', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="11:00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    抵達機場
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.arrivalAirport || ''}
+                    onChange={e => updateFlightField('returnFlight', 'arrivalAirport', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="TPE"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+                    抵達時間
+                  </label>
+                  <Input
+                    type="text"
+                    value={data.returnFlight?.arrivalTime || ''}
+                    onChange={e => updateFlightField('returnFlight', 'arrivalTime', e.target.value)}
+                    className="text-xs h-8"
+                    placeholder="12:30"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {/* 第一行：航空公司、航班號碼、日期、飛行時間 */}
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              航空公司
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.airline || ''}
-              onChange={e => updateFlightField('returnFlight', 'airline', e.target.value)}
-              className="text-xs h-8"
-              placeholder="長榮航空"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              航班號碼
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.flightNumber || ''}
-              onChange={e => updateFlightField('returnFlight', 'flightNumber', e.target.value)}
-              className="text-xs h-8"
-              placeholder="BR157"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              日期 (月/日)
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.departureDate || ''}
-              onChange={e => {
-                let value = e.target.value
-                // 如果輸入完整格式 YYYY/MM/DD，自動截取 MM/DD
-                const parts = value.split('/')
-                if (parts.length === 3 && parts[0].length === 4) {
-                  value = `${parts[1]}/${parts[2]}`
-                }
-                updateFlightField('returnFlight', 'departureDate', value)
-              }}
-              className="text-xs h-8"
-              placeholder="01/25"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              飛行時間
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.duration || ''}
-              onChange={e => updateFlightField('returnFlight', 'duration', e.target.value)}
-              className="text-xs h-8"
-              placeholder="2h 30m"
-            />
-          </div>
-          {/* 第二行：機場和時間資訊 */}
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              出發機場
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.departureAirport || ''}
-              onChange={e => updateFlightField('returnFlight', 'departureAirport', e.target.value)}
-              className="text-xs h-8"
-              placeholder="KMQ"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              出發時間
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.departureTime || ''}
-              onChange={e => updateFlightField('returnFlight', 'departureTime', e.target.value)}
-              className="text-xs h-8"
-              placeholder="11:00"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              抵達機場
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.arrivalAirport || ''}
-              onChange={e => updateFlightField('returnFlight', 'arrivalAirport', e.target.value)}
-              className="text-xs h-8"
-              placeholder="TPE"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
-              抵達時間
-            </label>
-            <Input
-              type="text"
-              value={data.returnFlight?.arrivalTime || ''}
-              onChange={e => updateFlightField('returnFlight', 'arrivalTime', e.target.value)}
-              className="text-xs h-8"
-              placeholder="12:30"
-            />
-          </div>
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

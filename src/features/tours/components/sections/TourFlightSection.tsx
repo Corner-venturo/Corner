@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { Plane, Calendar, Clock, Luggage, UtensilsCrossed } from 'lucide-react'
+import { TourFlightSectionLuxury } from './TourFlightSectionLuxury'
+import { TourFlightSectionArt } from './TourFlightSectionArt'
 
 interface FlightInfo {
   airline?: string | null
@@ -20,7 +22,7 @@ interface FlightInfo {
 }
 
 // 航班卡片風格類型
-type FlightStyleType = 'original' | 'chinese' | 'japanese'
+type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art'
 
 interface TourDisplayData {
   outboundFlight?: FlightInfo | null
@@ -29,7 +31,7 @@ interface TourDisplayData {
   flightStyle?: FlightStyleType // 航班卡片風格
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art'
 
 interface TourFlightSectionProps {
   data: TourDisplayData
@@ -577,6 +579,7 @@ function extractCityName(airport: string | null | undefined): string {
  * - original: 經典莫蘭迪金色風格
  * - chinese: 中國風書法風格
  * - japanese: 日式和紙風格（帶目的地圖片）
+ * - luxury: 奢華質感風格（表格式深色調）
  */
 export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: TourFlightSectionProps) {
   const isMobile = viewMode === 'mobile'
@@ -587,12 +590,24 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
     // 向後相容：如果沒有設定 flightStyle，根據 coverStyle 推斷
     if (coverStyle === 'nature' || coverStyle === 'serene') {
       effectiveFlightStyle = 'chinese'
+    } else if (coverStyle === 'luxury') {
+      effectiveFlightStyle = 'luxury'
     }
+  }
+
+  // Art 風格直接使用專屬組件（透過 flightStyle 或 coverStyle）
+  if (effectiveFlightStyle === 'art' || coverStyle === 'art') {
+    return <TourFlightSectionArt data={data} viewMode={viewMode} />
   }
 
   // 如果沒有航班資料，不顯示
   if (!data.outboundFlight && !data.returnFlight) {
     return null
+  }
+
+  // Luxury 奢華風格
+  if (effectiveFlightStyle === 'luxury') {
+    return <TourFlightSectionLuxury data={data} viewMode={viewMode} />
   }
 
   // 日式和紙風格

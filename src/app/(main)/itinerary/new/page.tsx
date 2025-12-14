@@ -47,7 +47,7 @@ interface LocalTourData {
   departureDate: string
   tourCode: string
   coverImage?: string
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' // 封面風格
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' // 封面風格
   price?: string | null // 價格
   priceNote?: string | null // 價格備註
   country: string

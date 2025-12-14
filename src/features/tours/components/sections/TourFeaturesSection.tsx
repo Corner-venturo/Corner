@@ -12,7 +12,7 @@ interface TourFeature {
   iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 
 interface TourData {
   features?: TourFeature[]

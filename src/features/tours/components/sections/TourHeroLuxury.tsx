@@ -1,6 +1,7 @@
 'use client'
 
-import { Calendar, Users, Utensils, MapPin } from 'lucide-react'
+import { Calendar, MapPin, Sparkles } from 'lucide-react'
+import { HeroStatCard } from '@/components/editor/tour-form/types'
 
 interface TourHeroLuxuryProps {
   data: {
@@ -16,6 +17,8 @@ interface TourHeroLuxuryProps {
     price?: string
     priceNote?: string
     days?: number
+    heroStatCard2?: HeroStatCard // 第二個統計卡片（可自訂）
+    heroStatCard3?: HeroStatCard // 第三個統計卡片（可自訂）
   }
   viewMode: 'desktop' | 'mobile'
 }
@@ -134,26 +137,42 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
             )}
 
             {/* 數據卡片 */}
-            <div className={`grid grid-cols-3 gap-4 pt-6 ${isMobile ? 'gap-3' : 'gap-6'}`}>
-              <DataCard
-                icon={<Calendar className="w-6 h-6" />}
-                value={dayNumber}
-                label="Days Journey"
-                isMobile={isMobile}
-              />
-              <DataCard
-                icon={<Users className="w-6 h-6" />}
-                value={4}
-                label="Onsen Stops"
-                isMobile={isMobile}
-              />
-              <DataCard
-                icon={<Utensils className="w-6 h-6" />}
-                value={3}
-                label="Fine Dining"
-                isMobile={isMobile}
-              />
-            </div>
+            {(() => {
+              // 計算有幾個卡片要顯示
+              const hasCard2 = data.heroStatCard2?.value && data.heroStatCard2?.label
+              const hasCard3 = data.heroStatCard3?.value && data.heroStatCard3?.label
+              const cardCount = 1 + (hasCard2 ? 1 : 0) + (hasCard3 ? 1 : 0)
+
+              return (
+                <div className={`grid gap-4 pt-6 ${isMobile ? 'gap-3' : 'gap-6'}`} style={{ gridTemplateColumns: `repeat(${cardCount}, 1fr)` }}>
+                  {/* 第一個卡片：天數（固定） */}
+                  <DataCard
+                    icon={<Calendar className="w-6 h-6" />}
+                    value={dayNumber}
+                    label="Days Journey"
+                    isMobile={isMobile}
+                  />
+                  {/* 第二個卡片：可自訂 */}
+                  {hasCard2 && (
+                    <DataCard
+                      icon={<Sparkles className="w-6 h-6" />}
+                      value={data.heroStatCard2!.value}
+                      label={data.heroStatCard2!.label}
+                      isMobile={isMobile}
+                    />
+                  )}
+                  {/* 第三個卡片：可自訂 */}
+                  {hasCard3 && (
+                    <DataCard
+                      icon={<Sparkles className="w-6 h-6" />}
+                      value={data.heroStatCard3!.value}
+                      label={data.heroStatCard3!.label}
+                      isMobile={isMobile}
+                    />
+                  )}
+                </div>
+              )
+            })()}
           </div>
 
           {/* 右側：主視覺圖片 */}
@@ -224,7 +243,7 @@ function DataCard({
   isMobile
 }: {
   icon: React.ReactNode
-  value: number
+  value: number | string
   label: string
   isMobile: boolean
 }) {

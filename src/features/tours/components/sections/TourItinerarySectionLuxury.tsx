@@ -60,8 +60,11 @@ function formatDateShort(dateStr: string | undefined): string {
   try {
     const date = new Date(dateStr)
     if (isNaN(date.getTime())) return ''
+    const month = date.getMonth()
+    const day = date.getDate()
+    if (isNaN(month) || isNaN(day)) return ''
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[date.getMonth()]} ${date.getDate()}`
+    return `${months[month]} ${day}`
   } catch {
     return ''
   }
@@ -70,14 +73,17 @@ function formatDateShort(dateStr: string | undefined): string {
 // 根據出發日期和實際天數（非 index）計算該天的日期
 // actualDayNumber 是從 1 開始的實際天數，建議行程不增加天數
 function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {
-  if (!departureDate || actualDayNumber < 1) return ''
+  if (!departureDate || isNaN(actualDayNumber) || actualDayNumber < 1) return ''
   try {
     const date = new Date(departureDate)
     if (isNaN(date.getTime())) return ''
     // actualDayNumber 從 1 開始，所以 Day 1 = 出發日，Day 2 = 出發日 +1
     date.setDate(date.getDate() + (actualDayNumber - 1))
+    const month = date.getMonth()
+    const day = date.getDate()
+    if (isNaN(month) || isNaN(day)) return ''
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[date.getMonth()]} ${date.getDate()}`
+    return `${months[month]} ${day}`
   } catch {
     return ''
   }
@@ -242,7 +248,7 @@ export function TourItinerarySectionLuxury({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-none md:rounded-3xl shadow-lg overflow-hidden group"
+                  className="bg-white rounded-2xl md:rounded-3xl shadow-lg overflow-hidden group"
                   style={{ borderColor: '#f0f0f0' }}
                 >
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'lg:grid-cols-12'} h-full`}>
@@ -523,7 +529,7 @@ export function TourItinerarySectionLuxury({
                           {day.meals?.breakfast && (
                             <div className="flex justify-between text-sm">
                               <span style={{ color: LUXURY.muted }}>Breakfast</span>
-                              <span className="font-medium" style={{ color: LUXURY.text }}>
+                              <span className="font-medium" style={{ color: dayColor }}>
                                 {day.meals.breakfast}
                               </span>
                             </div>
@@ -531,7 +537,7 @@ export function TourItinerarySectionLuxury({
                           {day.meals?.lunch && (
                             <div className="flex justify-between text-sm">
                               <span style={{ color: LUXURY.muted }}>Lunch</span>
-                              <span className="font-medium" style={{ color: LUXURY.text }}>
+                              <span className="font-medium" style={{ color: dayColor }}>
                                 {day.meals.lunch}
                               </span>
                             </div>
@@ -539,7 +545,7 @@ export function TourItinerarySectionLuxury({
                           {day.meals?.dinner && (
                             <div className="flex justify-between text-sm">
                               <span style={{ color: LUXURY.muted }}>Dinner</span>
-                              <span className="font-medium" style={{ color: LUXURY.primary }}>
+                              <span className="font-medium" style={{ color: dayColor }}>
                                 {day.meals.dinner}
                               </span>
                             </div>

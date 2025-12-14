@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react'
-import { TourFormData, DailyItinerary, Activity, ImagePositionSettings } from '../types'
+import { TourFormData, DailyItinerary, Activity, ImagePositionSettings, ItineraryStyleType, DayDisplayStyle } from '../types'
+import { DayStylePicker } from '../components/DayStylePicker'
 import { AttractionSelector } from '../../AttractionSelector'
 import { Attraction } from '@/features/attractions/types'
-import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid, Crop, ChevronUp, ChevronDown } from 'lucide-react'
+import { ArrowRight, Minus, Sparkles, Upload, Loader2, ImageIcon, X, FolderPlus, GripVertical, List, LayoutGrid, Crop, ChevronUp, ChevronDown, Palette } from 'lucide-react'
 import { DailyImagesUploader } from './DailyImagesUploader'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
@@ -634,12 +635,27 @@ export function DailyItinerarySection({
             )
           })()}
         </div>
-        <button
-          onClick={addDailyItinerary}
-          className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
-        >
-          + 新增天數
-        </button>
+        <div className="flex items-center gap-3">
+          {/* 行程風格選擇器 */}
+          <div className="flex items-center gap-1.5 bg-morandi-container/50 rounded-lg px-2 py-1">
+            <Palette size={14} className="text-morandi-secondary" />
+            <select
+              value={data.itineraryStyle || 'original'}
+              onChange={e => updateField('itineraryStyle', e.target.value as ItineraryStyleType)}
+              className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
+            >
+              <option value="original">經典時間軸</option>
+              <option value="luxury">奢華質感</option>
+              <option value="art">藝術雜誌</option>
+            </select>
+          </div>
+          <button
+            onClick={addDailyItinerary}
+            className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
+          >
+            + 新增天數
+          </button>
+        </div>
       </div>
 
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
@@ -697,6 +713,20 @@ export function DailyItinerarySection({
               </span>
             </div>
             <div className="flex items-center gap-4">
+              {/* 每日風格選擇器 + 預覽編輯 */}
+              <DayStylePicker
+                dayIndex={dayIndex}
+                dayData={day}
+                currentStyle={day.displayStyle || 'single-image'}
+                onStyleChange={(style) => updateDailyItinerary(dayIndex, 'displayStyle', style)}
+                onDayUpdate={(updatedDay) => {
+                  // 更新整個 day 物件
+                  const newItinerary = [...data.dailyItinerary]
+                  newItinerary[dayIndex] = updatedDay
+                  updateField('dailyItinerary', newItinerary)
+                }}
+                departureDate={data.departureDate}
+              />
               {/* 建議方案 checkbox - 不顯示在第一天 */}
               {dayIndex > 0 && (
                 <label className="flex items-center gap-2 cursor-pointer">

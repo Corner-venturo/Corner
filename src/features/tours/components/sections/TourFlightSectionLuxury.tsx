@@ -38,14 +38,18 @@ function formatFlightDate(dateStr: string | undefined | null): { date: string; d
   if (!dateStr) return { date: '--', day: '--' }
   try {
     const date = new Date(dateStr)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    if (isNaN(date.getTime())) return { date: '--', day: '--' }
+    const month = date.getMonth()
+    const dayOfMonth = date.getDate()
+    const dayOfWeek = date.getDay()
+    if (isNaN(month) || isNaN(dayOfMonth) || isNaN(dayOfWeek)) return { date: '--', day: '--' }
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     return {
-      date: `${date.getMonth() + 1}.${date.getDate().toString().padStart(2, '0')}`,
-      day: days[date.getDay()]
+      date: `${month + 1}.${dayOfMonth.toString().padStart(2, '0')}`,
+      day: days[dayOfWeek]
     }
   } catch {
-    return { date: dateStr, day: '--' }
+    return { date: '--', day: '--' }
   }
 }
 

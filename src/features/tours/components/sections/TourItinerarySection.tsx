@@ -24,7 +24,7 @@ interface TourItinerarySectionProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene'
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 }
 
 // 將標題中的文字符號轉換成 SVG 圖標

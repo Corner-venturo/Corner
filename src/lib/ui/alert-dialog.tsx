@@ -31,8 +31,11 @@ interface ConfirmState {
   htmlContent?: string // 支援 HTML 內容
   confirmText?: string
   cancelText?: string
+  showThirdOption?: boolean // 是否顯示第三個選項
+  thirdOptionText?: string // 第三個選項的文字
   onConfirm?: () => void
   onCancel?: () => void
+  onThirdOption?: () => void // 第三個選項的回調
 }
 
 interface PromptState {
@@ -62,8 +65,10 @@ interface DialogStore {
       htmlContent?: string
       confirmText?: string
       cancelText?: string
+      showThirdOption?: boolean
+      thirdOptionText?: string
     }
-  ) => Promise<boolean>
+  ) => Promise<boolean | 'third'>
   showPrompt: (
     message: string,
     options?: {
@@ -124,6 +129,8 @@ const useDialogStore = create<DialogStore>((set, get) => ({
           htmlContent: options.htmlContent,
           confirmText: options.confirmText || '確認',
           cancelText: options.cancelText || '取消',
+          showThirdOption: options.showThirdOption,
+          thirdOptionText: options.thirdOptionText,
           onConfirm: () => {
             get().closeConfirm(true)
             resolve(true)
@@ -131,6 +138,10 @@ const useDialogStore = create<DialogStore>((set, get) => ({
           onCancel: () => {
             get().closeConfirm(false)
             resolve(false)
+          },
+          onThirdOption: () => {
+            get().closeConfirm(false)
+            resolve('third')
           },
         },
       })
@@ -277,6 +288,15 @@ function ConfirmDialogComponent() {
           >
             {confirm.cancelText}
           </Button>
+          {confirm.showThirdOption && (
+            <Button
+              variant="outline"
+              onClick={() => confirm.onThirdOption?.()}
+              className="border-morandi-gold/30 hover:border-morandi-gold/50 text-morandi-secondary"
+            >
+              {confirm.thirdOptionText}
+            </Button>
+          )}
           <Button
             onClick={() => confirm.onConfirm?.()}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
@@ -365,6 +385,8 @@ export const confirm = (
     htmlContent?: string
     confirmText?: string
     cancelText?: string
+    showThirdOption?: boolean
+    thirdOptionText?: string
   },
   htmlContent?: string
 ) => {

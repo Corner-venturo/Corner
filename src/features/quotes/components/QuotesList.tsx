@@ -9,7 +9,7 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Quote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
-import { Calculator, Copy, Eye, Pin, Trash2, Users } from 'lucide-react'
+import { Archive, Calculator, Copy, Eye, Pin, Trash2, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
@@ -23,6 +23,7 @@ interface QuotesListProps {
   onDuplicate: (quoteId: string, e: React.MouseEvent) => void
   onTogglePin: (quoteId: string, isPinned: boolean, e: React.MouseEvent) => void
   onDelete: (quoteId: string, e: React.MouseEvent) => void
+  onReject?: (quoteId: string, e: React.MouseEvent) => void
 }
 
 export const QuotesList: React.FC<QuotesListProps> = ({
@@ -34,6 +35,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
   onDuplicate,
   onTogglePin,
   onDelete,
+  onReject,
 }) => {
   const tableColumns: TableColumn[] = useMemo(
     () => [
@@ -227,6 +229,18 @@ export const QuotesList: React.FC<QuotesListProps> = ({
             >
               <Copy size={16} />
             </Button>
+            {onReject && quote.status !== 'rejected' && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="iconSm"
+                onClick={e => onReject(quote.id, e)}
+                className="text-morandi-secondary hover:bg-morandi-secondary/10"
+                title="作廢報價單"
+              >
+                <Archive size={16} />
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"

@@ -1,6 +1,6 @@
 'use client'
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 
 interface SectionTitleProps {
   title: string

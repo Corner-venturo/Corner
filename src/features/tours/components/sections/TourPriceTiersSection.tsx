@@ -12,7 +12,7 @@ interface PriceTier {
   addon?: string
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 
 interface TourPriceTiersSectionProps {
   data: {

@@ -52,6 +52,7 @@ export const QuotesPage: React.FC = () => {
     handleTogglePin,
     handleDeleteQuote,
     handleQuoteClick,
+    handleRejectQuote,
   } = useQuotesData()
 
   // 打開類型選擇對話框
@@ -266,6 +267,7 @@ export const QuotesPage: React.FC = () => {
             onDuplicate={handleDuplicateQuote}
             onTogglePin={handleTogglePin}
             onDelete={handleDeleteQuote}
+            onReject={handleRejectQuote}
           />
         </div>
       </div>

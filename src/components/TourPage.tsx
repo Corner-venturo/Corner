@@ -10,11 +10,12 @@ import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGem
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
 import { TourHeroSerene } from '@/features/tours/components/sections/TourHeroSerene'
 import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
+import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
-import { TourFlightSectionLuxury } from '@/features/tours/components/sections/TourFlightSectionLuxury'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
 import { TourItinerarySectionLuxury } from '@/features/tours/components/sections/TourItinerarySectionLuxury'
+import { TourItinerarySectionArt } from '@/features/tours/components/sections/TourItinerarySectionArt'
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
 import { TourHotelsSectionLuxury } from '@/features/tours/components/sections/TourHotelsSectionLuxury'
@@ -86,10 +87,12 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section - 根據 coverStyle 切換五種風格 */}
+      {/* Hero Section - 根據 coverStyle 切換六種風格 */}
       <div id="top">
         {data.coverStyle === 'luxury' ? (
           <TourHeroLuxury data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'art' ? (
+          <TourHeroArt data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'gemini' ? (
           <TourHeroGemini data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'nature' ? (
@@ -106,13 +109,9 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         <div className="border-t border-border"></div>
       </div>
 
-      {/* Flight Section */}
+      {/* Flight Section - TourFlightSection 內部會根據 flightStyle/coverStyle 決定顯示風格 */}
       <div id="flight">
-        {data.coverStyle === 'luxury' ? (
-          <TourFlightSectionLuxury data={data} viewMode={viewMode} />
-        ) : (
-          <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
-        )}
+        <TourFlightSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
       </div>
 
       {/* Features Section - 只有當 features 有資料時才顯示 */}
@@ -142,24 +141,43 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Itinerary Section */}
       <div id="itinerary">
-        {data.coverStyle === 'luxury' ? (
-          <TourItinerarySectionLuxury
-            data={data}
-            viewMode={viewMode}
-            activeDayIndex={activeDayIndex}
-            dayRefs={dayRefs}
-            handleDayNavigate={handleDayNavigate}
-          />
-        ) : (
-          <TourItinerarySection
-            data={data}
-            viewMode={viewMode}
-            activeDayIndex={activeDayIndex}
-            dayRefs={dayRefs}
-            handleDayNavigate={handleDayNavigate}
-            coverStyle={data.coverStyle}
-          />
-        )}
+        {(() => {
+          // 優先使用 itineraryStyle，否則 fallback 到 coverStyle
+          const effectiveStyle = data.itineraryStyle || (data.coverStyle === 'luxury' ? 'luxury' : data.coverStyle === 'art' ? 'art' : 'original')
+
+          if (effectiveStyle === 'luxury') {
+            return (
+              <TourItinerarySectionLuxury
+                data={data}
+                viewMode={viewMode}
+                activeDayIndex={activeDayIndex}
+                dayRefs={dayRefs}
+                handleDayNavigate={handleDayNavigate}
+              />
+            )
+          } else if (effectiveStyle === 'art') {
+            return (
+              <TourItinerarySectionArt
+                data={data}
+                viewMode={viewMode}
+                activeDayIndex={activeDayIndex}
+                dayRefs={dayRefs}
+                handleDayNavigate={handleDayNavigate}
+              />
+            )
+          } else {
+            return (
+              <TourItinerarySection
+                data={data}
+                viewMode={viewMode}
+                activeDayIndex={activeDayIndex}
+                dayRefs={dayRefs}
+                handleDayNavigate={handleDayNavigate}
+                coverStyle={data.coverStyle}
+              />
+            )
+          }
+        })()}
       </div>
 
       {/* Divider */}

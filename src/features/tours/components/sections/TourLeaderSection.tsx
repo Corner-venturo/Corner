@@ -13,7 +13,7 @@ interface TourDisplayData {
   } | null
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
 
 interface TourLeaderSectionProps {
   data: TourDisplayData
