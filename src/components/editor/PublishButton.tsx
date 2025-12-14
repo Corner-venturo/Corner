@@ -209,9 +209,9 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       if (newItinerary?.id) {
         setShowSaveAsNewDialog(false)
         setNewFileName('')
-        // 導航到新的行程表
-        router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
-        await alert('已成功另存為新檔案！新的分享連結已更新。', 'success')
+        // 使用 window.location.href 強制刷新頁面，確保載入新資料
+        // 不用 router.push 是因為頁面有 ref 快取機制會阻止重新載入
+        window.location.href = `/itinerary/new?itinerary_id=${newItinerary.id}`
       }
     } catch (error) {
       console.error('另存新檔失敗:', error)
