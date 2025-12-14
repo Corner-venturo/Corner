@@ -18,7 +18,10 @@ import { TourItinerarySectionLuxury } from '@/features/tours/components/sections
 import { TourLeaderSection } from '@/features/tours/components/sections/TourLeaderSection'
 import { TourHotelsSection } from '@/features/tours/components/sections/TourHotelsSection'
 import { TourHotelsSectionLuxury } from '@/features/tours/components/sections/TourHotelsSectionLuxury'
+import { TourFeaturesSectionLuxury } from '@/features/tours/components/sections/TourFeaturesSectionLuxury'
+import { TourLeaderSectionLuxury } from '@/features/tours/components/sections/TourLeaderSectionLuxury'
 import { TourPricingSection } from '@/features/tours/components/sections/TourPricingSection'
+import { TourPricingSectionLuxury } from '@/features/tours/components/sections/TourPricingSectionLuxury'
 import { TourPriceTiersSection } from '@/features/tours/components/sections/TourPriceTiersSection'
 import { TourFAQSection } from '@/features/tours/components/sections/TourFAQSection'
 import { TourNoticesSection } from '@/features/tours/components/sections/TourNoticesSection'
@@ -120,7 +123,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           </div>
 
           <div id="features">
-            <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+            {data.coverStyle === 'luxury' ? (
+              <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
+            ) : (
+              <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+            )}
           </div>
 
           {/* Divider */}
@@ -164,7 +171,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       {/* Leader and Meeting Section - 有資料才顯示 */}
       {(data.leader?.name || data.leader?.phone || data.meetingInfo?.time || data.meetingInfo?.location || (data.meetingPoints && data.meetingPoints.length > 0)) && (
         <div id="leader">
-          <TourLeaderSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          {data.coverStyle === 'luxury' ? (
+            <TourLeaderSectionLuxury data={data} viewMode={viewMode} />
+          ) : (
+            <TourLeaderSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+          )}
         </div>
       )}
 
@@ -207,7 +218,11 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
 
       {/* Pricing Details Section (費用包含/不含) */}
       <div id="pricing">
-        <TourPricingSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        {data.coverStyle === 'luxury' ? (
+          <TourPricingSectionLuxury data={data} viewMode={viewMode} />
+        ) : (
+          <TourPricingSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
+        )}
       </div>
 
       {/* Divider - FAQ */}
