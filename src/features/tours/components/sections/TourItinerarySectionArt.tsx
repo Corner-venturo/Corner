@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { MutableRefObject, useState, useRef } from 'react'
 import { MapPin, X, ChevronLeft, ChevronRight, Utensils, Building2 } from 'lucide-react'
-import { TourFormData } from '@/components/editor/tour-form/types'
+import { TourFormData, DailyItinerary, DayDisplayStyle } from '@/components/editor/tour-form/types'
 
 // Art/Magazine 配色 - 根據 HTML 模板
 const ART = {
@@ -13,6 +13,7 @@ const ART = {
   ink: '#1a1a1a',
   clay: '#c76d54',
   sage: '#8da399',
+  timeline: '#4a6fa5',
 }
 
 interface TourItinerarySectionArtProps {
@@ -284,7 +285,8 @@ export function TourItinerarySectionArt({
                 const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
                 const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
                 const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
-                const hasImage = allImages.length > 0
+                const isLastDay = isLastMainDay(dailyItinerary, index)
+                const displayStyle = day.displayStyle || 'single-image'
 
                 return (
                   <motion.div
@@ -295,178 +297,21 @@ export function TourItinerarySectionArt({
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex-shrink-0 w-[400px] snap-start group"
+                    className={`flex-shrink-0 snap-start group ${
+                      displayStyle === 'timeline' ? 'w-[500px]' : 'w-[400px]'
+                    }`}
                   >
-                    {/* Brutalist 卡片 */}
-                    <div
-                      className="relative border h-full"
-                      style={{
-                        borderColor: ART.ink,
-                        backgroundColor: ART.paper,
-                      }}
-                    >
-                      {/* 大型浮水印數字 */}
-                      <div
-                        className="absolute top-4 left-4 text-[150px] leading-none font-black pointer-events-none select-none -z-0"
-                        style={{
-                          fontFamily: "'Cinzel', serif",
-                          color: `${ART.ink}08`,
-                        }}
-                      >
-                        {String(numericDay).padStart(2, '0')}
-                      </div>
-
-                      {/* 圖片區 - Sepia 濾鏡 */}
-                      {hasImage && (
-                        <div
-                          className="relative aspect-[4/3] overflow-hidden cursor-pointer"
-                          onClick={() => openImageGallery(allImages, 0, day.title)}
-                        >
-                          <img
-                            src={allImages[0]}
-                            alt={day.title || '行程圖片'}
-                            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                            style={{
-                              filter: 'sepia(30%)',
-                            }}
-                          />
-                          {/* Brutalist 陰影遮罩 */}
-                          <div
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)',
-                            }}
-                          />
-                          {/* 圖片數量標籤 */}
-                          {allImages.length > 1 && (
-                            <div
-                              className="absolute bottom-4 right-4 px-2 py-1 text-xs font-bold"
-                              style={{
-                                backgroundColor: ART.black,
-                                color: '#fff',
-                              }}
-                            >
-                              +{allImages.length - 1}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* 內容區 */}
-                      <div className="p-6 relative z-10">
-                        {/* 日期標籤 */}
-                        <div className="flex items-center justify-between mb-4">
-                          <span
-                            className="text-[10px] tracking-[0.3em] uppercase"
-                            style={{
-                              fontFamily: "'Cinzel', serif",
-                              color: ART.clay,
-                            }}
-                          >
-                            Day {String(numericDay).padStart(2, '0')}
-                          </span>
-                          {dateDisplay && (
-                            <span
-                              className="text-xs"
-                              style={{
-                                fontFamily: 'monospace',
-                                color: '#9CA3AF',
-                              }}
-                            >
-                              {dateDisplay}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* 標題 */}
-                        <h3
-                          className="text-xl font-bold mb-3 leading-tight"
-                          style={{
-                            fontFamily: "'Noto Serif TC', serif",
-                            color: ART.ink,
-                          }}
-                        >
-                          {day.title || `第 ${index + 1} 天行程`}
-                        </h3>
-
-                        {/* 地點 */}
-                        {day.locationLabel && (
-                          <div className="flex items-center gap-2 mb-3">
-                            <MapPin className="w-3 h-3" style={{ color: ART.clay }} />
-                            <span
-                              className="text-xs"
-                              style={{ color: '#6B7280' }}
-                            >
-                              {day.locationLabel}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* 描述 */}
-                        {day.description && (
-                          <p
-                            className="text-sm leading-relaxed mb-4 line-clamp-3"
-                            style={{ color: '#6B7280' }}
-                          >
-                            {day.description}
-                          </p>
-                        )}
-
-                        {/* 景點標籤 */}
-                        {day.activities && day.activities.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {day.activities.slice(0, 3).map((activity, actIdx) => (
-                              <button
-                                key={actIdx}
-                                onClick={() => setSelectedActivity({
-                                  title: activity.title || '',
-                                  description: activity.description,
-                                  image: activity.image
-                                })}
-                                className="px-3 py-1 text-xs border transition-colors hover:bg-black hover:text-white"
-                                style={{
-                                  borderColor: ART.ink,
-                                  color: ART.ink,
-                                }}
-                              >
-                                {activity.title}
-                              </button>
-                            ))}
-                            {day.activities.length > 3 && (
-                              <span
-                                className="px-3 py-1 text-xs"
-                                style={{ color: '#9CA3AF' }}
-                              >
-                                +{day.activities.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        )}
-
-                        {/* 餐食與住宿 - 底部分隔線 */}
-                        <div
-                          className="pt-4 border-t flex flex-col gap-2 text-xs"
-                          style={{ borderColor: `${ART.ink}20` }}
-                        >
-                          {(day.meals?.breakfast || day.meals?.lunch || day.meals?.dinner) && (
-                            <div className="flex items-center gap-2">
-                              <Utensils className="w-3 h-3" style={{ color: ART.accent }} />
-                              <span style={{ color: '#6B7280' }}>
-                                {[day.meals?.breakfast, day.meals?.lunch, day.meals?.dinner]
-                                  .filter(Boolean)
-                                  .join(' · ')}
-                              </span>
-                            </div>
-                          )}
-                          {!isLastMainDay(dailyItinerary, index) && day.accommodation && (
-                            <div className="flex items-center gap-2">
-                              <Building2 className="w-3 h-3" style={{ color: ART.accent }} />
-                              <span style={{ color: '#6B7280' }}>{day.accommodation}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <DayCard
+                      day={day}
+                      index={index}
+                      numericDay={numericDay}
+                      dateDisplay={dateDisplay}
+                      allImages={allImages}
+                      isLastDay={isLastDay}
+                      displayStyle={displayStyle}
+                      onActivityClick={setSelectedActivity}
+                      onImageClick={openImageGallery}
+                    />
                   </motion.div>
                 )
               })}
@@ -513,7 +358,8 @@ export function TourItinerarySectionArt({
               const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
               const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
               const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
-              const hasImage = allImages.length > 0
+              const isLastDay = isLastMainDay(dailyItinerary, index)
+              const displayStyle = day.displayStyle || 'single-image'
 
               return (
                 <motion.div
@@ -525,135 +371,18 @@ export function TourItinerarySectionArt({
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <div
-                    className="border relative overflow-hidden"
-                    style={{
-                      borderColor: ART.ink,
-                      backgroundColor: ART.paper,
-                    }}
-                  >
-                    {/* 大型浮水印數字 */}
-                    <div
-                      className="absolute top-2 right-2 text-[80px] leading-none font-black pointer-events-none select-none"
-                      style={{
-                        fontFamily: "'Cinzel', serif",
-                        color: `${ART.ink}08`,
-                      }}
-                    >
-                      {String(numericDay).padStart(2, '0')}
-                    </div>
-
-                    {/* 圖片 */}
-                    {hasImage && (
-                      <div
-                        className="relative aspect-[16/9] overflow-hidden"
-                        onClick={() => openImageGallery(allImages, 0, day.title)}
-                      >
-                        <img
-                          src={allImages[0]}
-                          alt={day.title || '行程圖片'}
-                          className="w-full h-full object-cover"
-                          style={{ filter: 'sepia(20%)' }}
-                        />
-                      </div>
-                    )}
-
-                    {/* 內容 */}
-                    <div className="p-5 relative z-10">
-                      <div className="flex items-center justify-between mb-3">
-                        <span
-                          className="text-[10px] tracking-[0.2em] uppercase"
-                          style={{
-                            fontFamily: "'Cinzel', serif",
-                            color: ART.clay,
-                          }}
-                        >
-                          Day {String(numericDay).padStart(2, '0')}
-                        </span>
-                        {dateDisplay && (
-                          <span
-                            className="text-xs"
-                            style={{
-                              fontFamily: 'monospace',
-                              color: '#9CA3AF',
-                            }}
-                          >
-                            {dateDisplay}
-                          </span>
-                        )}
-                      </div>
-
-                      <h3
-                        className="text-lg font-bold mb-2"
-                        style={{
-                          fontFamily: "'Noto Serif TC', serif",
-                          color: ART.ink,
-                        }}
-                      >
-                        {day.title || `第 ${index + 1} 天`}
-                      </h3>
-
-                      {day.description && (
-                        <p
-                          className="text-sm leading-relaxed mb-3 line-clamp-2"
-                          style={{ color: '#6B7280' }}
-                        >
-                          {day.description}
-                        </p>
-                      )}
-
-                      {/* 景點 */}
-                      {day.activities && day.activities.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                          {day.activities.slice(0, 2).map((activity, actIdx) => (
-                            <button
-                              key={actIdx}
-                              onClick={() => setSelectedActivity({
-                                title: activity.title || '',
-                                description: activity.description,
-                                image: activity.image
-                              })}
-                              className="px-2 py-1 text-[11px] border transition-colors"
-                              style={{
-                                borderColor: ART.ink,
-                                color: ART.ink,
-                              }}
-                            >
-                              {activity.title}
-                            </button>
-                          ))}
-                          {day.activities.length > 2 && (
-                            <span className="px-2 py-1 text-[11px]" style={{ color: '#9CA3AF' }}>
-                              +{day.activities.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {/* 餐食住宿 */}
-                      <div
-                        className="pt-3 border-t text-[11px] space-y-1"
-                        style={{ borderColor: `${ART.ink}15` }}
-                      >
-                        {(day.meals?.breakfast || day.meals?.lunch || day.meals?.dinner) && (
-                          <div className="flex items-center gap-2">
-                            <Utensils className="w-3 h-3" style={{ color: ART.accent }} />
-                            <span style={{ color: '#6B7280' }}>
-                              {[day.meals?.breakfast, day.meals?.lunch, day.meals?.dinner]
-                                .filter(Boolean)
-                                .join(' · ')}
-                            </span>
-                          </div>
-                        )}
-                        {!isLastMainDay(dailyItinerary, index) && day.accommodation && (
-                          <div className="flex items-center gap-2">
-                            <Building2 className="w-3 h-3" style={{ color: ART.accent }} />
-                            <span style={{ color: '#6B7280' }}>{day.accommodation}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <DayCard
+                    day={day}
+                    index={index}
+                    numericDay={numericDay}
+                    dateDisplay={dateDisplay}
+                    allImages={allImages}
+                    isLastDay={isLastDay}
+                    displayStyle={displayStyle}
+                    onActivityClick={setSelectedActivity}
+                    onImageClick={openImageGallery}
+                    isMobile
+                  />
                 </motion.div>
               )
             })}

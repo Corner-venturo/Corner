@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { TourFormData, CityOption, CoverStyleType } from '../types'
+import { TourFormData, CityOption, CoverStyleType, FlightStyleType } from '../types'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
@@ -212,6 +212,21 @@ export function CoverInfoSection({
     }
   }
 
+  // 封面風格對應的預設航班風格映射
+  const getDefaultFlightStyle = (coverStyle: CoverStyleType): FlightStyleType => {
+    switch (coverStyle) {
+      case 'nature':
+      case 'serene':
+        return 'chinese'
+      case 'luxury':
+        return 'luxury'
+      case 'art':
+        return 'art'
+      default:
+        return 'original'
+    }
+  }
+
   // 封面風格選項（五種款式）
   const coverStyleOptions: { value: CoverStyleType; label: string; description: string; color: string }[] = [
     {
@@ -323,7 +338,11 @@ export function CoverInfoSection({
                     <button
                       key={option.value}
                       type="button"
-                      onClick={() => updateField('coverStyle', option.value)}
+                      onClick={() => {
+                        updateField('coverStyle', option.value)
+                        // 同步更新航班風格為對應的預設值
+                        updateField('flightStyle', getDefaultFlightStyle(option.value))
+                      }}
                       className={cn(
                         'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
                         isSelected
