@@ -524,54 +524,56 @@ export function TourItinerarySectionLuxury({
                         </div>
                       </div>
 
-                      {/* 住宿 */}
-                      <div
-                        className="relative pl-6 border-l"
-                        style={{ borderColor: '#E5E7EB' }}
-                      >
-                        <span
-                          className="absolute -left-1.5 top-0 w-3 h-3 rounded-full border-2 border-white"
-                          style={{ backgroundColor: LUXURY.primary }}
-                        />
-                        <h5
-                          className="text-xs font-bold uppercase tracking-widest mb-3"
-                          style={{ color: LUXURY.muted }}
+                      {/* 住宿 - 最後一天不顯示 */}
+                      {index < dailyItinerary.length - 1 && (
+                        <div
+                          className="relative pl-6 border-l"
+                          style={{ borderColor: '#E5E7EB' }}
                         >
-                          Stay
-                        </h5>
-                        {day.accommodation ? (
-                          <div
-                            className="bg-white p-4 shadow-sm rounded-sm border"
-                            style={{ borderColor: '#f0f0f0' }}
+                          <span
+                            className="absolute -left-1.5 top-0 w-3 h-3 rounded-full border-2 border-white"
+                            style={{ backgroundColor: LUXURY.primary }}
+                          />
+                          <h5
+                            className="text-xs font-bold uppercase tracking-widest mb-3"
+                            style={{ color: LUXURY.muted }}
                           >
+                            Stay
+                          </h5>
+                          {day.accommodation ? (
                             <div
-                              className="font-bold text-lg mb-1"
-                              style={{
-                                fontFamily: "'Noto Serif TC', serif",
-                                color: LUXURY.text
-                              }}
+                              className="bg-white p-4 shadow-sm rounded-sm border"
+                              style={{ borderColor: '#f0f0f0' }}
                             >
-                              {day.accommodation}
-                            </div>
-                            {/* 星級 */}
-                            {day.accommodationRating && day.accommodationRating > 0 && (
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3, 4, 5].slice(0, day.accommodationRating).map(i => (
-                                  <Star
-                                    key={i}
-                                    className="w-3 h-3 fill-current"
-                                    style={{ color: LUXURY.secondary }}
-                                  />
-                                ))}
+                              <div
+                                className="font-bold text-lg mb-1"
+                                style={{
+                                  fontFamily: "'Noto Serif TC', serif",
+                                  color: LUXURY.text
+                                }}
+                              >
+                                {day.accommodation}
                               </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="text-sm" style={{ color: LUXURY.muted }}>
-                            待確認
-                          </div>
-                        )}
-                      </div>
+                              {/* 星級 */}
+                              {day.accommodationRating && day.accommodationRating > 0 && (
+                                <div className="flex gap-0.5">
+                                  {[1, 2, 3, 4, 5].slice(0, day.accommodationRating).map(i => (
+                                    <Star
+                                      key={i}
+                                      className="w-3 h-3 fill-current"
+                                      style={{ color: LUXURY.secondary }}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-sm" style={{ color: LUXURY.muted }}>
+                              待確認
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                   </div>

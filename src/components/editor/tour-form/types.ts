@@ -15,6 +15,8 @@ export interface Feature {
   title: string
   description: string
   images?: string[] // 圖片陣列（支援任意數量）
+  tag?: string // 自訂標籤文字（如 "Gastronomy"、"Discovery"）
+  tagColor?: string // 標籤顏色（如 "#2C5F4D"、"#C69C6D"）
 }
 
 export interface FocusCard {

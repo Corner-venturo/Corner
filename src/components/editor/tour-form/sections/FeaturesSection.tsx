@@ -1,9 +1,18 @@
 import React, { useState, useRef } from 'react'
 import { TourFormData, Feature } from '../types'
-import { iconOptions } from '../constants'
-import { ImageIcon, Loader2, X, Plus, GripVertical } from 'lucide-react'
+import { Loader2, X, Plus, GripVertical } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
+
+// 預設標籤顏色選項（Luxury 配色）
+const TAG_COLOR_OPTIONS = [
+  { value: '#2C5F4D', label: '深綠', preview: 'bg-[#2C5F4D]' },
+  { value: '#C69C6D', label: '金色', preview: 'bg-[#C69C6D]' },
+  { value: '#8F4F4F', label: '酒紅', preview: 'bg-[#8F4F4F]' },
+  { value: '#636E72', label: '灰色', preview: 'bg-[#636E72]' },
+  { value: '#2D3436', label: '深灰', preview: 'bg-[#2D3436]' },
+  { value: '#0984e3', label: '藍色', preview: 'bg-[#0984e3]' },
+]
 
 interface FeaturesSectionProps {
   data: TourFormData
@@ -298,19 +307,37 @@ export function FeaturesSection({
                 刪除
               </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-1">圖標</label>
-              <select
-                value={feature.icon}
-                onChange={e => updateFeature(index, 'icon', e.target.value)}
-                className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
-              >
-                {iconOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+            {/* 標籤文字 + 顏色選擇（同一行） */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-1">標籤文字</label>
+                <input
+                  type="text"
+                  value={feature.tag || ''}
+                  onChange={e => updateFeature(index, 'tag', e.target.value)}
+                  className="w-full px-3 py-2 border border-morandi-container rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold"
+                  placeholder="如：Gastronomy、Discovery"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-1">標籤顏色</label>
+                <div className="flex gap-1.5 items-center h-[42px]">
+                  {TAG_COLOR_OPTIONS.map(color => (
+                    <button
+                      key={color.value}
+                      type="button"
+                      onClick={() => updateFeature(index, 'tagColor', color.value)}
+                      className={`w-7 h-7 rounded-full border-2 transition-all ${
+                        feature.tagColor === color.value
+                          ? 'border-morandi-gold scale-110 ring-2 ring-morandi-gold/30'
+                          : 'border-transparent hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-1">標題</label>
