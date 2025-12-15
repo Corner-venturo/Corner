@@ -54,7 +54,7 @@ export function SupplierSearchSelect({
           onChange={e => onChange(e.target.value)}
           onClick={() => onShowDropdown(true)}
           onBlur={() => setTimeout(() => onShowDropdown(false), UI_DELAYS.SHORT_DELAY)}
-          className="mt-2 bg-background"
+          className={`bg-background ${label ? 'mt-2' : ''}`}
         />
         {showDropdown && (
           <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-[300px] overflow-y-auto">

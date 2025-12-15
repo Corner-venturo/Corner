@@ -112,6 +112,7 @@ export function EditableRequestItemList({
                 showDropdown={localSearch[item.id]?.show ?? false}
                 onShowDropdown={show => handleShowDropdownChange(item.id, show)}
                 placeholder="搜尋供應商..."
+                label=""
               />
             </div>
 
