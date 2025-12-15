@@ -499,7 +499,11 @@ export function AttractionsDialog({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              console.log('[景點] 上傳按鈕被點擊')
+              console.log('[景點] fileInputRef.current:', fileInputRef.current)
+              fileInputRef.current?.click()
+            }}
             disabled={isUploading}
           >
             {isUploading ? (

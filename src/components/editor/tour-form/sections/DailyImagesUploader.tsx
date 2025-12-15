@@ -436,11 +436,18 @@ export function DailyImagesUploader({
 
   // 上傳多張圖片
   const handleMultipleUpload = async (files: FileList | File[]) => {
+    console.log('[DailyImagesUploader] 開始上傳，檔案數量:', files.length)
+
     const imageFiles = Array.from(files).filter((file) =>
       file.type.startsWith('image/')
     )
 
-    if (imageFiles.length === 0) return
+    console.log('[DailyImagesUploader] 篩選後的圖片數量:', imageFiles.length)
+
+    if (imageFiles.length === 0) {
+      console.log('[DailyImagesUploader] 沒有有效的圖片檔案')
+      return
+    }
 
     setIsUploading(true)
     setUploadProgress(0)
@@ -450,44 +457,55 @@ export function DailyImagesUploader({
 
     try {
       for (const file of imageFiles) {
+        console.log('[DailyImagesUploader] 處理檔案:', file.name, file.type, file.size)
+
         const fileExt = file.name.split('.').pop()
         const fileName = `day-${dayIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
         const filePath = `tour-daily-images/${fileName}`
 
-        const { error: uploadError } = await supabase.storage
+        console.log('[DailyImagesUploader] 上傳到路徑:', filePath)
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('workspace-files')
           .upload(filePath, file)
 
         if (uploadError) {
-          console.error('上傳失敗:', uploadError)
+          console.error('[DailyImagesUploader] 上傳失敗:', uploadError)
           toast.error(`圖片上傳失敗: ${uploadError.message}`)
           continue
         }
+
+        console.log('[DailyImagesUploader] 上傳成功:', uploadData)
 
         const { data } = supabase.storage
           .from('workspace-files')
           .getPublicUrl(filePath)
 
+        console.log('[DailyImagesUploader] 公開 URL:', data.publicUrl)
         newImages.push(createDailyImage(data.publicUrl))
         completed++
         setUploadProgress(Math.round((completed / imageFiles.length) * 100))
       }
 
       if (newImages.length > 0) {
+        console.log('[DailyImagesUploader] 更新圖片列表，新增:', newImages.length, '張')
         onImagesChange([...images, ...newImages])
       }
     } catch (error) {
-      console.error('上傳錯誤:', error)
+      console.error('[DailyImagesUploader] 意外錯誤:', error)
       toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
     } finally {
       setIsUploading(false)
       setUploadProgress(0)
+      console.log('[DailyImagesUploader] 上傳流程結束')
     }
   }
 
   // 處理檔案選擇
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('[DailyImagesUploader] handleFileChange 被觸發')
     const files = e.target.files
+    console.log('[DailyImagesUploader] 選擇的檔案:', files?.length, '個')
     if (files && files.length > 0) {
       handleMultipleUpload(files)
     }
@@ -734,7 +752,11 @@ export function DailyImagesUploader({
           className={`flex flex-col items-center justify-center py-6 cursor-pointer hover:bg-morandi-container/20 rounded-lg transition-colors ${
             images.length > 0 ? 'border-t border-morandi-container/50 mt-2 pt-4' : ''
           }`}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            console.log('[DailyImagesUploader] 上傳按鈕被點擊')
+            console.log('[DailyImagesUploader] fileInputRef.current:', fileInputRef.current)
+            fileInputRef.current?.click()
+          }}
         >
           {isUploading ? (
             <>

@@ -688,8 +688,16 @@ function NewItineraryPageContent() {
     const initializeTourData = () => {
       const currentId = itineraryId || tourId
 
+      console.log('[initializeTourData] 被呼叫', {
+        currentId,
+        hasInitialized: hasInitializedRef.current,
+        lastId: lastIdRef.current,
+        itinerariesLength: itineraries.length
+      })
+
       // 如果 ID 沒變，且已經初始化過，就不要重新載入
       if (hasInitializedRef.current && lastIdRef.current === currentId) {
+        console.log('[initializeTourData] 已初始化，跳過')
         return
       }
 

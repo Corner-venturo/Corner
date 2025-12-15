@@ -245,7 +245,10 @@ export function DayCard({
             <input
               type="checkbox"
               checked={day.showDailyImages === true}
-              onChange={e => updateDailyItinerary(dayIndex, 'showDailyImages', e.target.checked)}
+              onChange={e => {
+                console.log('[DayCard] 每日圖片 checkbox 變更:', e.target.checked, 'dayIndex:', dayIndex)
+                updateDailyItinerary(dayIndex, 'showDailyImages', e.target.checked)
+              }}
               className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
             />
             <span className="text-sm font-medium text-morandi-primary">每日圖片</span>
