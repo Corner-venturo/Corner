@@ -24,8 +24,6 @@ export interface RequestItem {
   description: string
   unit_price: number
   quantity: number
-  payment_method?: 'transfer' | 'check' | 'cash'
-  custom_request_date?: string // 支票日期（只有選支票時才填）
 }
 
 export interface NewItemFormData {
@@ -34,57 +32,27 @@ export interface NewItemFormData {
   description: string
   unit_price: number
   quantity: number
-  payment_method?: 'transfer' | 'check' | 'cash'
-  custom_request_date?: string // 支票日期（只有選支票時才填）
 }
 
-// 請款單狀態流轉:
-// pending (請款中) -> approved (已核准) -> processing (出帳中) -> paid (已付款)
-//                  -> rejected (已駁回)
-export const statusLabels: Record<string, string> = {
+export const statusLabels: Record<PaymentRequest['status'], string> = {
   pending: '請款中',
-  approved: '已核准',
-  processing: '出帳中',
+  processing: '處理中',
   confirmed: '已確認',
   paid: '已付款',
-  rejected: '已駁回',
 }
 
-export const statusColors: Record<string, string> = {
+export const statusColors: Record<PaymentRequest['status'], string> = {
   pending: 'bg-morandi-gold',
-  approved: 'bg-blue-500',
-  processing: 'bg-orange-500',
+  processing: 'bg-morandi-gold',
   confirmed: 'bg-morandi-green',
   paid: 'bg-morandi-primary',
-  rejected: 'bg-red-500',
 }
 
-// 狀態流轉規則
-export const statusTransitions: Record<string, string[]> = {
-  pending: ['approved', 'rejected'],  // 請款中 -> 可核准或駁回
-  approved: ['processing', 'pending'], // 已核准 -> 可加入出帳或退回
-  processing: ['paid', 'approved'],    // 出帳中 -> 可標記已付款或退回
-  paid: [],                            // 已付款 -> 終態
-  rejected: ['pending'],               // 已駁回 -> 可重新提交
-  confirmed: ['paid'],                 // 已確認 -> 已付款（兼容舊狀態）
-}
-
-// 取得下一個可用狀態
-export function getNextStatuses(currentStatus: string): string[] {
-  return statusTransitions[currentStatus] || []
-}
-
-export const categoryOptions: Array<{ value: string; label: string }> = [
+export const categoryOptions = [
   { value: '住宿', label: '🏨 住宿' },
   { value: '交通', label: '🚌 交通' },
   { value: '餐食', label: '🍽️ 餐食' },
   { value: '門票', label: '🎫 門票' },
   { value: '導遊', label: '👥 導遊' },
-  { value: '保險', label: '🛡️ 保險' },
-  { value: '出團款', label: '💰 出團款' },
-  { value: '回團款', label: '💵 回團款' },
-  { value: '員工代墊', label: '👤 員工代墊' },
-  { value: 'ESIM', label: '📱 ESIM' },
-  { value: '同業', label: '🤝 同業' },
   { value: '其他', label: '📦 其他' },
-]
+] as const

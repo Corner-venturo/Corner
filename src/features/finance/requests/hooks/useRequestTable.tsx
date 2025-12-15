@@ -5,75 +5,74 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { statusLabels, statusColors } from '../types'
 
-// 狀態排序權重
-const STATUS_ORDER: Record<string, number> = {
-  pending: 1,
-  approved: 2,
-  processing: 3,
-  confirmed: 4,
-  paid: 5,
-  rejected: 6,
-}
-
 export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Table columns configuration
-  const tableColumns: TableColumn<PaymentRequest>[] = useMemo(
+  const tableColumns: TableColumn[] = useMemo(
     () => [
       {
-        key: 'code',
+        key: 'request_number',
         label: '請款單號',
         sortable: true,
-        render: (value) => <div className="font-medium text-morandi-primary">{String(value || '自動產生')}</div>,
+        filterable: true,
+        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
       },
       {
-        key: 'tour_code',
-        label: '關聯團號',
+        key: 'tour_name',
+        label: '團號',
         sortable: true,
-        render: (value) => <div className="text-sm text-morandi-secondary">{String(value || '無')}</div>,
+        filterable: true,
+        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
       },
       {
         key: 'order_number',
         label: '訂單編號',
         sortable: true,
-        render: (value) => <div className="text-sm text-morandi-primary">{String(value || '無')}</div>,
+        filterable: true,
+        render: value => <div className="text-sm text-morandi-primary">{value || '無'}</div>,
       },
       {
-        key: 'created_by_name',
-        label: '請款人',
-        sortable: true,
-        render: (value) => <div className="text-sm text-morandi-primary">{String(value || '-')}</div>,
-      },
-      {
-        key: 'created_at',
+        key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: (value, row: PaymentRequest) => (
+        filterable: true,
+        filterType: 'date',
+        render: (value, row) => (
           <div className="text-sm">
             <div
               className={
                 row.is_special_billing ? 'text-morandi-gold font-medium' : 'text-morandi-secondary'
               }
             >
-              {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '未設定'}
+              {value ? new Date(value).toLocaleDateString('zh-TW') : '未設定'}
             </div>
             {row.is_special_billing && <div className="text-xs text-morandi-gold">⚠️ 特殊出帳</div>}
           </div>
         ),
       },
       {
-        key: 'amount',
+        key: 'total_amount',
         label: '金額',
         sortable: true,
-        render: (_value, row: PaymentRequest) => (
-          <div className="font-semibold text-morandi-gold">NT$ {row.amount.toLocaleString()}</div>
+        filterable: true,
+        filterType: 'number',
+        render: value => (
+          <div className="font-semibold text-morandi-gold">NT$ {value.toLocaleString()}</div>
         ),
       },
       {
         key: 'status',
         label: '狀態',
         sortable: true,
-        render: (_value, row: PaymentRequest) => {
-          const statusBadge = getStatusBadge(row.status)
+        filterable: true,
+        filterType: 'select',
+        filterOptions: [
+          { value: 'pending', label: '請款中' },
+          { value: 'processing', label: '處理中' },
+          { value: 'confirmed', label: '已確認' },
+          { value: 'paid', label: '已付款' },
+        ],
+        render: value => {
+          const statusBadge = getStatusBadge(value)
           return (
             <Badge className={cn('text-xs text-white', statusBadge.color)}>
               {statusBadge.label}
@@ -92,33 +91,29 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         let aValue: string | number | Date, bValue: string | number | Date
 
         switch (column) {
-          case 'code':
-            aValue = a.code || ''
-            bValue = b.code || ''
+          case 'request_number':
+            aValue = a.request_number
+            bValue = b.request_number
             break
-          case 'tour_code':
-            aValue = a.tour_code || ''
-            bValue = b.tour_code || ''
+          case 'tour_name':
+            aValue = a.tour_name || ''
+            bValue = b.tour_name || ''
             break
           case 'order_number':
             aValue = a.order_number || ''
             bValue = b.order_number || ''
             break
-          case 'created_by_name':
-            aValue = a.created_by_name || ''
-            bValue = b.created_by_name || ''
+          case 'request_date':
+            aValue = new Date(a.request_date || 0)
+            bValue = new Date(b.request_date || 0)
             break
-          case 'created_at':
-            aValue = new Date(a.created_at || 0)
-            bValue = new Date(b.created_at || 0)
-            break
-          case 'amount':
-            aValue = a.amount
-            bValue = b.amount
+          case 'total_amount':
+            aValue = a.total_amount
+            bValue = b.total_amount
             break
           case 'status':
-            aValue = a.status ? STATUS_ORDER[a.status] || 99 : 99
-            bValue = b.status ? STATUS_ORDER[b.status] || 99 : 99
+            aValue = statusLabels[a.status]
+            bValue = statusLabels[b.status]
             break
           default:
             return 0
@@ -136,14 +131,16 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   const filterFunction = useCallback((data: PaymentRequest[], filters: Record<string, string>) => {
     return data.filter(request => {
       return (
-        (!filters.code ||
-          (request.code || '').toLowerCase().includes(filters.code.toLowerCase())) &&
-        (!filters.tour_code ||
-          (request.tour_code || '').toLowerCase().includes(filters.tour_code.toLowerCase())) &&
+        (!filters.request_number ||
+          request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
+        (!filters.tour_name ||
+          (request.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
         (!filters.order_number ||
-          (request.order_number || '').toLowerCase().includes(filters.order_number.toLowerCase())) &&
-        (!filters.created_at || (request.created_at || '').includes(filters.created_at)) &&
-        (!filters.amount || request.amount.toString().includes(filters.amount)) &&
+          (request.order_number || '')
+            .toLowerCase()
+            .includes(filters.order_number.toLowerCase())) &&
+        (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
+        (!filters.total_amount || request.total_amount.toString().includes(filters.total_amount)) &&
         (!filters.status || request.status === filters.status)
       )
     })
@@ -153,7 +150,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
     data: filteredAndSortedRequests,
     handleSort,
     handleFilter,
-  } = useEnhancedTable(payment_requests as PaymentRequest[], sortFunction, filterFunction)
+  } = useEnhancedTable(payment_requests as unknown, sortFunction, filterFunction)
 
   return {
     tableColumns,
@@ -165,7 +162,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
 
 function getStatusBadge(status: PaymentRequest['status']) {
   return {
-    label: status ? statusLabels[status] : '',
-    color: status ? statusColors[status] : '',
+    label: statusLabels[status],
+    color: statusColors[status],
   }
 }

@@ -64,7 +64,7 @@ export function RequestItemForm({
           <label className="text-sm font-medium text-morandi-secondary">類別</label>
           <Select
             value={newItem.category}
-            onValueChange={value => setNewItem(prev => ({ ...prev, category: value as NewItemFormData['category'] }))}
+            onValueChange={value => setNewItem(prev => ({ ...prev, category: value as unknown }))}
           >
             <SelectTrigger className="mt-2 bg-background">
               <SelectValue />
@@ -100,15 +100,6 @@ export function RequestItemForm({
           <Input
             value={newItem.description}
             onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                // 只有在不是輸入法組合中時才新增
-                if (!e.nativeEvent.isComposing) {
-                  onAddItem()
-                }
-              }
-            }}
             placeholder="輸入項目描述"
             className="mt-2"
           />
@@ -117,21 +108,11 @@ export function RequestItemForm({
         <div className="col-span-2">
           <label className="text-sm font-medium text-morandi-secondary">單價</label>
           <Input
-            type="text"
-            inputMode="numeric"
-            value={newItem.unit_price || ''}
-            onChange={e => {
-              // 全形轉半形並只保留數字
-              let value = e.target.value
-                .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                .replace(/[^\d]/g, '')
-              setNewItem(prev => ({ ...prev, unit_price: value ? Number(value) : 0 }))
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                e.preventDefault()
-              }
-            }}
+            type="number"
+            value={newItem.unit_price}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, unit_price: parseFloat(e.target.value) || 0 }))
+            }
             placeholder="0"
             className="mt-2"
           />
@@ -140,21 +121,11 @@ export function RequestItemForm({
         <div className="col-span-1">
           <label className="text-sm font-medium text-morandi-secondary">數量</label>
           <Input
-            type="text"
-            inputMode="numeric"
-            value={newItem.quantity || ''}
-            onChange={e => {
-              // 全形轉半形並只保留數字
-              let value = e.target.value
-                .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                .replace(/[^\d]/g, '')
-              setNewItem(prev => ({ ...prev, quantity: value ? Number(value) : 1 }))
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                e.preventDefault()
-              }
-            }}
+            type="number"
+            value={newItem.quantity}
+            onChange={e =>
+              setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+            }
             placeholder="1"
             className="mt-2"
           />

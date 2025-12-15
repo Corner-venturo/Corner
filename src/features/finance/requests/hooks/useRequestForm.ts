@@ -19,20 +19,8 @@ export function useRequestForm() {
     created_by: '1',
   })
 
-  // 初始化就有一行空白項目
-  const createEmptyItem = (): RequestItem => ({
-    id: Math.random().toString(36).substr(2, 9),
-    category: '住宿',
-    supplier_id: '',
-    supplierName: '',
-    description: '',
-    unit_price: 0,
-    quantity: 1,
-  })
+  const [requestItems, setRequestItems] = useState<RequestItem[]>([])
 
-  const [requestItems, setRequestItems] = useState<RequestItem[]>([createEmptyItem()])
-
-  // 保留 newItem 為了向後相容，但不再使用
   const [newItem, setNewItem] = useState<NewItemFormData>({
     category: '住宿',
     supplier_id: '',
@@ -105,7 +93,7 @@ export function useRequestForm() {
 
     const employeeList = employees.map(e => ({
       id: e.id,
-      name: e.display_name || e.english_name || e.chinese_name || e.employee_number || '未命名員工',
+      name: e.name,
       type: 'employee' as const,
       group: '員工',
     }))
@@ -124,30 +112,37 @@ export function useRequestForm() {
     [combinedSuppliers, supplierSearchValue]
   )
 
-  // Add new empty row
+  // Add item to list
   const addItemToList = useCallback(() => {
-    setRequestItems(prev => [...prev, createEmptyItem()])
-  }, [])
+    if (!newItem.supplier_id || !newItem.description) return
+
+    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id)
+    if (!selected) return
+
+    const itemId = Math.random().toString(36).substr(2, 9)
+    setRequestItems(prev => [
+      ...prev,
+      {
+        id: itemId,
+        ...newItem,
+        supplierName: selected.name,
+      },
+    ])
+
+    setNewItem({
+      category: '住宿',
+      supplier_id: '',
+      description: '',
+      unit_price: 0,
+      quantity: 1,
+    })
+    setSupplierSearchValue('')
+  }, [newItem, combinedSuppliers])
 
   // Remove item from list
   const removeItem = useCallback((itemId: string) => {
     setRequestItems(prev => prev.filter(item => item.id !== itemId))
   }, [])
-
-  // Update item in list
-  const updateItem = useCallback((itemId: string, updates: Partial<RequestItem>) => {
-    setRequestItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item
-
-      // 如果更新了 supplier_id，也要更新 supplierName
-      if (updates.supplier_id !== undefined) {
-        const selected = combinedSuppliers.find(s => s.id === updates.supplier_id)
-        return { ...item, ...updates, supplierName: selected?.name || '' }
-      }
-
-      return { ...item, ...updates }
-    }))
-  }, [combinedSuppliers])
 
   // Reset form
   const resetForm = useCallback(() => {
@@ -159,8 +154,7 @@ export function useRequestForm() {
       is_special_billing: false,
       created_by: '1',
     })
-    // 重置為一行空白項目
-    setRequestItems([createEmptyItem()])
+    setRequestItems([])
     setNewItem({
       category: '住宿',
       supplier_id: '',
@@ -201,7 +195,6 @@ export function useRequestForm() {
     total_amount,
     addItemToList,
     removeItem,
-    updateItem,
     resetForm,
     suppliers: combinedSuppliers,
     tours,
