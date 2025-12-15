@@ -339,9 +339,12 @@ export function CoverInfoSection({
                       key={option.value}
                       type="button"
                       onClick={() => {
-                        updateField('coverStyle', option.value)
-                        // 同步更新航班風格為對應的預設值
-                        updateField('flightStyle', getDefaultFlightStyle(option.value))
+                        // 使用 onChange 一次更新多個欄位，避免狀態覆蓋問題
+                        onChange({
+                          ...data,
+                          coverStyle: option.value,
+                          flightStyle: getDefaultFlightStyle(option.value),
+                        })
                       }}
                       className={cn(
                         'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',

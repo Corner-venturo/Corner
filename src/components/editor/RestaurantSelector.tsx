@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ export interface Restaurant {
   name: string
   name_en: string | null
   country_id: string
+  region_id: string | null
   city_id: string
   cuisine_type: string[] | null
   category: string | null
@@ -38,6 +39,7 @@ export interface Restaurant {
   is_active: boolean
   is_featured: boolean
   // Join fields
+  region_name?: string
   city_name?: string
 }
 
@@ -65,11 +67,13 @@ export interface MichelinRestaurant {
   images: string[] | null
   is_active: boolean | null
   // Join fields
+  region_name?: string
   city_name?: string
 }
 
 type CombinedRestaurant = (Restaurant | MichelinRestaurant) & {
   source: 'restaurant' | 'michelin'
+  region_name?: string
   city_name?: string
 }
 
@@ -83,6 +87,7 @@ interface RestaurantSelectorProps {
 
 // 保存篩選狀態
 let savedCountryId = ''
+let savedRegionId = ''
 let savedCityId = ''
 let savedCategory = ''
 
@@ -103,14 +108,16 @@ export function RestaurantSelector({
   includeMichelin = true,
 }: RestaurantSelectorProps) {
   const [selectedCountryId, setSelectedCountryId] = useState<string>(savedCountryId)
+  const [selectedRegionId, setSelectedRegionId] = useState<string>(savedRegionId)
   const [selectedCityId, setSelectedCityId] = useState<string>(savedCityId)
   const [selectedCategory, setSelectedCategory] = useState<string>(savedCategory)
   const [searchQuery, setSearchQuery] = useState('')
   const [restaurants, setRestaurants] = useState<CombinedRestaurant[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
-  const [cities, setCities] = useState<{ id: string; name: string }[]>([])
   const [countries, setCountries] = useState<{ id: string; name: string }[]>([])
+  const [regions, setRegions] = useState<{ id: string; name: string }[]>([])
+  const [cities, setCities] = useState<{ id: string; name: string }[]>([])
   const [showMichelinOnly, setShowMichelinOnly] = useState(false)
 
   // 載入所有國家
@@ -138,6 +145,8 @@ export function RestaurantSelector({
         if (matchedCountry && matchedCountry.id !== savedCountryId) {
           setSelectedCountryId(matchedCountry.id)
           savedCountryId = matchedCountry.id
+          setSelectedRegionId('')
+          savedRegionId = ''
           setSelectedCityId('')
           savedCityId = ''
           return
@@ -146,30 +155,63 @@ export function RestaurantSelector({
 
       if (savedCountryId) {
         setSelectedCountryId(savedCountryId)
+        setSelectedRegionId(savedRegionId)
         setSelectedCityId(savedCityId)
         setSelectedCategory(savedCategory)
       }
     }
   }, [isOpen, tourCountryName, countries])
 
+  // 國家變更
   const handleCountryChange = (countryId: string) => {
     setSelectedCountryId(countryId)
+    setSelectedRegionId('')
     setSelectedCityId('')
     savedCountryId = countryId
+    savedRegionId = ''
     savedCityId = ''
   }
 
+  // 區域變更
+  const handleRegionChange = (regionId: string) => {
+    setSelectedRegionId(regionId)
+    setSelectedCityId('')
+    savedRegionId = regionId
+    savedCityId = ''
+  }
+
+  // 城市變更
   const handleCityChange = (cityId: string) => {
     setSelectedCityId(cityId)
     savedCityId = cityId
   }
 
+  // 分類變更
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)
     savedCategory = category
   }
 
-  // 載入城市列表
+  // 載入區域列表
+  React.useEffect(() => {
+    if (!isOpen || !selectedCountryId) {
+      setRegions([])
+      return
+    }
+
+    const loadRegions = async () => {
+      const { data } = await supabase
+        .from('regions')
+        .select('id, name')
+        .eq('country_id', selectedCountryId)
+        .eq('is_active', true)
+        .order('name')
+      setRegions(data || [])
+    }
+    loadRegions()
+  }, [isOpen, selectedCountryId])
+
+  // 載入城市列表（根據區域或國家）
   React.useEffect(() => {
     if (!isOpen || !selectedCountryId) {
       setCities([])
@@ -177,16 +219,23 @@ export function RestaurantSelector({
     }
 
     const loadCities = async () => {
-      const { data } = await supabase
+      let query = supabase
         .from('cities')
         .select('id, name')
         .eq('country_id', selectedCountryId)
         .eq('is_active', true)
         .order('name')
+
+      // 如果有選區域，只顯示該區域的城市
+      if (selectedRegionId) {
+        query = query.eq('region_id', selectedRegionId)
+      }
+
+      const { data } = await query
       setCities(data || [])
     }
     loadCities()
-  }, [isOpen, selectedCountryId])
+  }, [isOpen, selectedCountryId, selectedRegionId])
 
   // 載入餐廳資料（包含一般餐廳和米其林餐廳）
   React.useEffect(() => {
@@ -207,11 +256,12 @@ export function RestaurantSelector({
           let restaurantQuery = supabase
             .from('restaurants')
             .select(`
-              id, name, name_en, country_id, city_id,
+              id, name, name_en, country_id, region_id, city_id,
               cuisine_type, category, meal_type, description,
               specialties, price_range, avg_price_lunch, avg_price_dinner,
               group_friendly, max_group_size, group_menu_available,
               private_room, thumbnail, images, rating, is_active, is_featured,
+              regions(name),
               cities!inner(name)
             `)
             .eq('is_active', true)
@@ -219,10 +269,17 @@ export function RestaurantSelector({
             .order('is_featured', { ascending: false })
             .order('display_order')
 
+          // 區域篩選
+          if (selectedRegionId) {
+            restaurantQuery = restaurantQuery.eq('region_id', selectedRegionId)
+          }
+
+          // 城市篩選
           if (selectedCityId) {
             restaurantQuery = restaurantQuery.eq('city_id', selectedCityId)
           }
 
+          // 分類篩選
           if (selectedCategory) {
             restaurantQuery = restaurantQuery.eq('category', selectedCategory)
           }
@@ -230,13 +287,14 @@ export function RestaurantSelector({
           const { data: restaurantData } = await restaurantQuery
 
           if (restaurantData) {
-             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             restaurantData.forEach((item: any) => {
               results.push({
                 id: item.id,
                 name: item.name,
                 name_en: item.name_en,
                 country_id: item.country_id,
+                region_id: item.region_id || null,
                 city_id: item.city_id,
                 cuisine_type: item.cuisine_type,
                 category: item.category,
@@ -256,6 +314,7 @@ export function RestaurantSelector({
                 is_active: item.is_active ?? true,
                 is_featured: item.is_featured ?? false,
                 source: 'restaurant' as const,
+                region_name: item.regions?.name || '',
                 city_name: item.cities?.name || '',
               })
             })
@@ -279,6 +338,7 @@ export function RestaurantSelector({
             .eq('country_id', selectedCountryId)
             .order('michelin_stars', { ascending: false })
 
+          // 城市篩選
           if (selectedCityId) {
             michelinQuery = michelinQuery.eq('city_id', selectedCityId)
           }
@@ -286,7 +346,7 @@ export function RestaurantSelector({
           const { data: michelinData } = await michelinQuery
 
           if (michelinData) {
-             
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             michelinData.forEach((item: any) => {
               results.push({
                 id: item.id,
@@ -303,7 +363,7 @@ export function RestaurantSelector({
                 price_range: item.price_range,
                 avg_price_lunch: item.avg_price_lunch,
                 avg_price_dinner: item.avg_price_dinner,
-                group_friendly: true, // 米其林餐廳通常不是團餐首選，但保留可選
+                group_friendly: true,
                 max_group_size: item.max_group_size,
                 group_menu_available: item.group_menu_available ?? false,
                 private_room: false,
@@ -333,7 +393,7 @@ export function RestaurantSelector({
     }
 
     loadRestaurants()
-  }, [isOpen, selectedCountryId, selectedCityId, selectedCategory, includeMichelin, showMichelinOnly])
+  }, [isOpen, selectedCountryId, selectedRegionId, selectedCityId, selectedCategory, includeMichelin, showMichelinOnly])
 
   // 搜尋過濾
   const filteredRestaurants = useMemo(() => {
@@ -350,6 +410,7 @@ export function RestaurantSelector({
       r =>
         r.name.toLowerCase().includes(query) ||
         r.name_en?.toLowerCase().includes(query) ||
+        r.region_name?.toLowerCase().includes(query) ||
         r.city_name?.toLowerCase().includes(query) ||
         r.cuisine_type?.some(c => c.toLowerCase().includes(query))
     )
@@ -408,7 +469,7 @@ export function RestaurantSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="w-[750px] h-[650px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-rose-50 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <UtensilsCrossed className="text-rose-500" size={22} />
@@ -417,7 +478,7 @@ export function RestaurantSelector({
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden flex flex-col p-4 gap-4">
-          {/* 篩選區 */}
+          {/* 篩選區 - 國家、區域、城市 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
             <select
@@ -432,6 +493,22 @@ export function RestaurantSelector({
                 </option>
               ))}
             </select>
+
+            {/* 區域選擇 */}
+            {selectedCountryId && regions.length > 0 && (
+              <select
+                value={selectedRegionId}
+                onChange={e => handleRegionChange(e.target.value)}
+                className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all"
+              >
+                <option value="">全部區域</option>
+                {regions.map(region => (
+                  <option key={region.id} value={region.id}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
@@ -561,6 +638,12 @@ export function RestaurantSelector({
                           </div>
                         )}
                         <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5 flex-wrap">
+                          {/* 顯示區域與城市 */}
+                          {restaurant.region_name && (
+                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+                              {restaurant.region_name}
+                            </span>
+                          )}
                           <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
                             {restaurant.city_name}
                           </span>

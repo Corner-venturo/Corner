@@ -1,0 +1,198 @@
+'use client'
+
+import React, { useRef, useState } from 'react'
+import { List, LayoutGrid } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable'
+import { Activity, DailyItinerary } from '../../types'
+import { SortableActivityItem } from './SortableActivityItem'
+import { SortableActivityGridItem } from './SortableActivityGridItem'
+
+interface ActivitiesSectionProps {
+  day: DailyItinerary
+  dayIndex: number
+  addActivity: (dayIndex: number) => void
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  reorderActivities?: (dayIndex: number, activities: Activity[]) => void
+  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  onOpenAttractionSelector: (dayIndex: number) => void
+  handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
+  uploadingActivityImage: { dayIndex: number; actIndex: number } | null
+  activityDragOver: { dayIndex: number; actIndex: number } | null
+  setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
+  onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
+}
+
+export function ActivitiesSection({
+  day,
+  dayIndex,
+  addActivity,
+  updateActivity,
+  removeActivity,
+  reorderActivities,
+  updateDailyItinerary,
+  onOpenAttractionSelector,
+  handleActivityImageUpload,
+  uploadingActivityImage,
+  activityDragOver,
+  setActivityDragOver,
+  onOpenPositionEditor,
+}: ActivitiesSectionProps) {
+  // 視圖模式
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const activityFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
+
+  // DnD Kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // 處理拖曳結束
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) return
+
+    const activities = day.activities
+    const oldIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === active.id)
+    const newIndex = activities.findIndex((_, i) => `activity-${dayIndex}-${i}` === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newActivities = arrayMove(activities, oldIndex, newIndex)
+      if (reorderActivities) {
+        reorderActivities(dayIndex, newActivities)
+      } else {
+        updateDailyItinerary(dayIndex, 'activities', newActivities)
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-morandi-primary">景點活動</label>
+          {/* 視圖切換按鈕 */}
+          <div className="flex items-center bg-morandi-container/50 rounded-lg p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-white shadow-sm text-morandi-primary'
+                  : 'text-morandi-secondary hover:text-morandi-primary'
+              }`}
+              title="列表模式"
+            >
+              <List size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white shadow-sm text-morandi-primary'
+                  : 'text-morandi-secondary hover:text-morandi-primary'
+              }`}
+              title="網格預覽（快速排序）"
+            >
+              <LayoutGrid size={14} />
+            </button>
+          </div>
+          <span className="text-xs text-morandi-secondary">
+            {viewMode === 'grid' ? '（拖曳調整順序）' : '（拖曳 ⋮⋮ 可調整順序）'}
+          </span>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => onOpenAttractionSelector(dayIndex)}
+            size="xs"
+            variant="default"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            從景點庫選擇
+          </Button>
+          <Button
+            onClick={() => addActivity(dayIndex)}
+            size="xs"
+            variant="secondary"
+          >
+            + 手動新增
+          </Button>
+        </div>
+      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={day.activities?.map((_, i) => `activity-${dayIndex}-${i}`) || []}
+          strategy={viewMode === 'grid' ? rectSortingStrategy : verticalListSortingStrategy}
+        >
+          {viewMode === 'grid' ? (
+            /* 網格預覽模式 */
+            <div className="grid grid-cols-5 gap-3 p-3 bg-morandi-container/20 rounded-xl">
+              {day.activities?.map((activity: Activity, actIndex: number) => (
+                <SortableActivityGridItem
+                  key={`activity-${dayIndex}-${actIndex}`}
+                  activity={activity}
+                  actIndex={actIndex}
+                  dayIndex={dayIndex}
+                />
+              ))}
+            </div>
+          ) : (
+            /* 列表編輯模式 */
+            <div className="space-y-2">
+              {day.activities?.map((activity: Activity, actIndex: number) => {
+                const isActivityUploading = uploadingActivityImage?.dayIndex === dayIndex && uploadingActivityImage?.actIndex === actIndex
+                const isActivityDragOver = activityDragOver?.dayIndex === dayIndex && activityDragOver?.actIndex === actIndex
+
+                return (
+                  <SortableActivityItem
+                    key={`activity-${dayIndex}-${actIndex}`}
+                    activity={activity}
+                    actIndex={actIndex}
+                    dayIndex={dayIndex}
+                    updateActivity={updateActivity}
+                    removeActivity={removeActivity}
+                    handleActivityImageUpload={handleActivityImageUpload}
+                    isActivityUploading={isActivityUploading}
+                    isActivityDragOver={isActivityDragOver}
+                    setActivityDragOver={setActivityDragOver}
+                    activityFileInputRefs={activityFileInputRefs}
+                    onOpenPositionEditor={onOpenPositionEditor}
+                  />
+                )
+              })}
+            </div>
+          )}
+        </SortableContext>
+      </DndContext>
+    </div>
+  )
+}

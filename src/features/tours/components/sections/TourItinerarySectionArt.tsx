@@ -1,8 +1,8 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { MutableRefObject, useState, useRef } from 'react'
-import { MapPin, X, ChevronLeft, ChevronRight, Utensils, Building2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { MutableRefObject, useState } from 'react'
+import { MapPin, X, ChevronLeft, ChevronRight, Utensils, Building2, Plane } from 'lucide-react'
 import { TourFormData, DailyItinerary, DayDisplayStyle } from '@/components/editor/tour-form/types'
 
 // Art/Magazine 配色 - 根據 HTML 模板
@@ -45,36 +45,22 @@ function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[]
   return labels
 }
 
-// 格式化日期為雜誌風格
-function formatDateDisplay(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return ''
-    const day = date.getDate()
-    const month = date.getMonth()
-    if (isNaN(day) || isNaN(month)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${day} ${months[month]}`
-  } catch {
-    return ''
-  }
-}
-
 // 根據出發日期計算該天日期
-function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {
-  if (!departureDate || isNaN(actualDayNumber) || actualDayNumber < 1) return ''
+function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): { day: number; month: string; monthShort: string; year: number } | null {
+  if (!departureDate || isNaN(actualDayNumber) || actualDayNumber < 1) return null
   try {
     const date = new Date(departureDate)
-    if (isNaN(date.getTime())) return ''
+    if (isNaN(date.getTime())) return null
     date.setDate(date.getDate() + (actualDayNumber - 1))
     const day = date.getDate()
     const month = date.getMonth()
-    if (isNaN(day) || isNaN(month)) return ''
+    const year = date.getFullYear()
+    if (isNaN(day) || isNaN(month)) return null
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${day} ${months[month]}`
+    const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    return { day, month: monthsFull[month], monthShort: months[month], year }
   } catch {
-    return ''
+    return null
   }
 }
 
@@ -108,13 +94,6 @@ export function TourItinerarySectionArt({
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
   const dayLabels = calculateDayLabels(dailyItinerary)
   const isMobile = viewMode === 'mobile'
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-
-  const [selectedActivity, setSelectedActivity] = useState<{
-    title: string
-    description?: string
-    image?: string
-  } | null>(null)
 
   const [imageGallery, setImageGallery] = useState<{
     images: string[]
@@ -123,426 +102,970 @@ export function TourItinerarySectionArt({
   } | null>(null)
 
   const openImageGallery = (images: string[], startIndex: number, title?: string) => {
-    setImageGallery({ images, currentIndex: startIndex, title })
-  }
-
-  const prevImage = () => {
-    if (!imageGallery) return
-    setImageGallery({
-      ...imageGallery,
-      currentIndex: imageGallery.currentIndex > 0
-        ? imageGallery.currentIndex - 1
-        : imageGallery.images.length - 1
-    })
-  }
-
-  const nextImage = () => {
-    if (!imageGallery) return
-    setImageGallery({
-      ...imageGallery,
-      currentIndex: imageGallery.currentIndex < imageGallery.images.length - 1
-        ? imageGallery.currentIndex + 1
-        : 0
-    })
-  }
-
-  // 水平捲動控制
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -400, behavior: 'smooth' })
-    }
-  }
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' })
+    if (images.length > 0) {
+      setImageGallery({ images, currentIndex: startIndex, title })
     }
   }
 
   return (
     <section
       id="itinerary"
-      className={isMobile ? 'py-12' : 'py-24'}
-      style={{ backgroundColor: ART.paper }}
+      className="relative overflow-hidden"
+      style={{ backgroundColor: ART.ink }}
     >
-      {/* 12 欄網格佈局 - 桌面版 */}
-      {!isMobile ? (
-        <div className="grid grid-cols-12 gap-0 min-h-[80vh]">
-          {/* 左側垂直導航 - 2 欄 */}
-          <div
-            className="col-span-2 border-r flex flex-col justify-center items-center py-12"
-            style={{ borderColor: `${ART.ink}20` }}
+      {/* 背景裝飾線 */}
+      <div className="absolute top-0 left-1/4 w-px h-full bg-white/10 hidden lg:block" />
+      <div className="absolute top-0 left-2/4 w-px h-full bg-white/10 hidden lg:block" />
+      <div className="absolute top-0 left-3/4 w-px h-full bg-white/10 hidden lg:block" />
+
+      {/* Section 標題 */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className={`text-center relative z-10 ${isMobile ? 'py-16 px-4' : 'py-24'}`}
+      >
+        <h2
+          className={`font-black leading-none tracking-tight text-white ${isMobile ? 'text-5xl' : 'text-7xl'}`}
+          style={{ fontFamily: "'Cinzel', serif" }}
+        >
+          CHRONICLES
+        </h2>
+        <div className="w-24 h-1 mx-auto mt-6" style={{ backgroundColor: ART.clay }} />
+      </motion.div>
+
+      {/* 每日行程 - 根據 displayStyle 切換不同佈局 */}
+      <div className="relative z-10">
+        {dailyItinerary.map((day, index) => {
+          const dayNumber = dayLabels[index].replace('Day ', '')
+          const numericDay = parseInt(dayNumber.split('-')[0], 10)
+          const dateInfo = calculateDayDate(data.departureDate, numericDay)
+          const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
+          const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
+          const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
+          const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
+          const isLastDay = isLastMainDay(dailyItinerary, index)
+          const displayStyle = day.displayStyle || 'single-image'
+
+          return (
+            <div
+              key={`day-${index}`}
+              id={`day-${index + 1}`}
+              ref={el => { dayRefs.current[index] = el as HTMLDivElement | null }}
+            >
+              {isMobile ? (
+                <MobileDaySection
+                  day={day}
+                  index={index}
+                  numericDay={numericDay}
+                  dateInfo={dateInfo}
+                  allImages={allImages}
+                  isLastDay={isLastDay}
+                  onImageClick={openImageGallery}
+                />
+              ) : (
+                <DaySection
+                  day={day}
+                  index={index}
+                  numericDay={numericDay}
+                  dateInfo={dateInfo}
+                  allImages={allImages}
+                  isLastDay={isLastDay}
+                  displayStyle={displayStyle}
+                  onImageClick={openImageGallery}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Image Gallery Modal */}
+      {imageGallery && (
+        <ImageGalleryModal
+          imageGallery={imageGallery}
+          onClose={() => setImageGallery(null)}
+          onPrev={() => setImageGallery({
+            ...imageGallery,
+            currentIndex: imageGallery.currentIndex > 0
+              ? imageGallery.currentIndex - 1
+              : imageGallery.images.length - 1
+          })}
+          onNext={() => setImageGallery({
+            ...imageGallery,
+            currentIndex: imageGallery.currentIndex < imageGallery.images.length - 1
+              ? imageGallery.currentIndex + 1
+              : 0
+          })}
+          onSelectIndex={(idx) => setImageGallery({ ...imageGallery, currentIndex: idx })}
+        />
+      )}
+    </section>
+  )
+}
+
+// ========== 桌面版 - 根據 displayStyle 切換佈局 ==========
+interface DaySectionProps {
+  day: DailyItinerary
+  index: number
+  numericDay: number
+  dateInfo: { day: number; month: string; monthShort: string; year: number } | null
+  allImages: string[]
+  isLastDay: boolean
+  displayStyle: DayDisplayStyle
+  onImageClick: (images: string[], startIndex: number, title?: string) => void
+}
+
+function DaySection({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  displayStyle,
+  onImageClick,
+}: DaySectionProps) {
+  switch (displayStyle) {
+    case 'single-image':
+      return (
+        <SingleImageLayout
+          day={day}
+          index={index}
+          numericDay={numericDay}
+          dateInfo={dateInfo}
+          allImages={allImages}
+          isLastDay={isLastDay}
+          onImageClick={onImageClick}
+        />
+      )
+    case 'multi-image':
+      return (
+        <MultiImageLayout
+          day={day}
+          index={index}
+          numericDay={numericDay}
+          dateInfo={dateInfo}
+          allImages={allImages}
+          isLastDay={isLastDay}
+          onImageClick={onImageClick}
+        />
+      )
+    case 'card-grid':
+      return (
+        <CardGridLayout
+          day={day}
+          index={index}
+          numericDay={numericDay}
+          dateInfo={dateInfo}
+          allImages={allImages}
+          isLastDay={isLastDay}
+          onImageClick={onImageClick}
+        />
+      )
+    case 'timeline':
+      return (
+        <TimelineLayout
+          day={day}
+          index={index}
+          numericDay={numericDay}
+          dateInfo={dateInfo}
+          allImages={allImages}
+          isLastDay={isLastDay}
+          onImageClick={onImageClick}
+        />
+      )
+    default:
+      return (
+        <SingleImageLayout
+          day={day}
+          index={index}
+          numericDay={numericDay}
+          dateInfo={dateInfo}
+          allImages={allImages}
+          isLastDay={isLastDay}
+          onImageClick={onImageClick}
+        />
+      )
+  }
+}
+
+// ========== 佈局 1: single-image - 左側日期 + 中央大圖 + 右側內容 ==========
+interface LayoutProps {
+  day: DailyItinerary
+  index: number
+  numericDay: number
+  dateInfo: { day: number; month: string; monthShort: string; year: number } | null
+  allImages: string[]
+  isLastDay: boolean
+  onImageClick: (images: string[], startIndex: number, title?: string) => void
+}
+
+function SingleImageLayout({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  onImageClick,
+}: LayoutProps) {
+  const hasImage = allImages.length > 0
+  const mainImage = allImages[0]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      className="grid grid-cols-12 gap-8 mb-32 items-center group max-w-7xl mx-auto px-4 lg:px-12"
+    >
+      {/* 左側日期面板 - 2欄 */}
+      <div className="col-span-2 text-right flex flex-col justify-start gap-4 h-full py-4 border-r border-white/20 pr-8">
+        <div>
+          <span
+            className="block text-6xl font-black text-white/20 group-hover:text-white transition-colors duration-500"
+            style={{ fontFamily: "'Cinzel', serif" }}
           >
-            {/* 垂直標題 */}
+            {String(numericDay).padStart(2, '0')}
+          </span>
+          {dateInfo && (
+            <span className="block text-xs tracking-[0.3em] mt-2 text-white/60">
+              {dateInfo.monthShort} {dateInfo.day}
+            </span>
+          )}
+        </div>
+        <div
+          className="text-xs uppercase tracking-widest pt-12 hidden lg:block"
+          style={{
+            writingMode: 'vertical-rl',
+            color: ART.clay,
+          }}
+        >
+          {day.isAlternative ? 'Alternative' : 'Arrival'}
+        </div>
+      </div>
+
+      {/* 中央大圖 - 5欄 */}
+      <div className="col-span-5 relative">
+        <div
+          className="relative overflow-hidden aspect-[4/5] cursor-pointer group/img"
+          style={{ filter: 'grayscale(100%)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+          onClick={() => onImageClick(allImages, 0, day.title)}
+        >
+          {hasImage ? (
+            <>
+              <img
+                src={mainImage}
+                alt={day.title || ''}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6">
+                <span
+                  className="text-xs border border-white/30 px-2 py-1 uppercase tracking-widest bg-black/30 backdrop-blur-md text-white"
+                >
+                  {day.locationLabel || day.title?.split('→')[0]?.trim() || 'Destination'}
+                </span>
+              </div>
+            </>
+          ) : (
             <div
-              className="tracking-[0.5em] uppercase text-xs mb-8"
-              style={{
-                writingMode: 'vertical-rl',
-                fontFamily: "'Cinzel', serif",
-                color: ART.clay,
-              }}
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: `${ART.clay}20` }}
             >
-              Chronicles
+              <Plane className="w-16 h-16 text-white/20" />
             </div>
+          )}
+        </div>
+        {/* 裝飾角落 */}
+        <div
+          className="absolute -top-4 -right-4 w-24 h-24 border-t-2 border-r-2 hidden lg:block"
+          style={{ borderColor: ART.clay }}
+        />
+      </div>
 
-            {/* 日期導航 */}
-            <div className="flex flex-col gap-6">
-              {dailyItinerary.map((day, index) => {
-                const dayNumber = dayLabels[index].replace('Day ', '')
-                const numericDay = parseInt(dayNumber.split('-')[0], 10)
-                const isActive = activeDayIndex === index
+      {/* 右側內容 - 5欄 */}
+      <div className="col-span-5 pl-0 lg:pl-12">
+        <h3
+          className="text-4xl mb-6 leading-tight text-white"
+          style={{ fontFamily: "'Noto Serif TC', serif" }}
+        >
+          {day.title?.split('→').map((part, i, arr) => (
+            <span key={i}>
+              {i > 0 && <span className="text-white/40"> → </span>}
+              {i === arr.length - 1 ? (
+                <span style={{ color: ART.clay }} className="italic">{part.trim()}</span>
+              ) : (
+                part.trim()
+              )}
+            </span>
+          )) || `第 ${index + 1} 天`}
+        </h3>
 
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleDayNavigate(index)}
-                    className={`group relative transition-all duration-300 ${
-                      isActive ? 'scale-110' : 'opacity-50 hover:opacity-100'
-                    }`}
-                  >
-                    <span
-                      className="block text-3xl font-black tracking-tighter"
-                      style={{
-                        fontFamily: "'Cinzel', serif",
-                        color: isActive ? ART.clay : ART.ink,
-                      }}
-                    >
-                      {String(numericDay).padStart(2, '0')}
-                    </span>
-                    {isActive && (
-                      <div
-                        className="absolute -right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
-                        style={{ backgroundColor: ART.clay }}
-                      />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+        {day.description && (
+          <p
+            className="text-lg leading-loose mb-8"
+            style={{ color: 'rgba(255,255,255,0.6)', fontFamily: "'Noto Serif TC', serif" }}
+          >
+            {day.description}
+          </p>
+        )}
 
-          {/* 主要內容區 - 10 欄 */}
-          <div className="col-span-10 relative">
-            {/* 標題區 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="px-12 pt-12 pb-8"
-            >
+        {/* 景點標籤 */}
+        {day.activities && day.activities.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {day.activities.slice(0, 4).map((activity, actIdx) => (
               <span
-                className="block text-xs tracking-[0.3em] uppercase mb-4"
-                style={{
-                  fontFamily: "'Cinzel', serif",
-                  color: ART.clay,
-                }}
+                key={actIdx}
+                className="px-3 py-1 text-sm border border-white/20 text-white/70 hover:bg-white hover:text-black transition-colors cursor-pointer"
               >
-                Daily Itinerary
+                {activity.title}
               </span>
-              <h2
-                className="text-6xl font-black leading-none tracking-tighter"
-                style={{
-                  fontFamily: "'Cinzel', 'Noto Serif TC', serif",
-                  color: ART.ink,
-                }}
-              >
-                每日行程
-              </h2>
-            </motion.div>
+            ))}
+          </div>
+        )}
 
-            {/* 水平捲動控制按鈕 */}
-            <div className="absolute top-12 right-12 flex gap-2 z-10">
-              <button
-                onClick={scrollLeft}
-                className="w-10 h-10 border flex items-center justify-center transition-colors hover:bg-black hover:text-white"
-                style={{ borderColor: ART.ink }}
+        {/* 餐食住宿 */}
+        <div className="grid grid-cols-2 gap-8 border-t border-white/10 pt-8">
+          {(day.meals?.lunch || day.meals?.dinner) && (
+            <div>
+              <h4
+                className="text-xs tracking-widest mb-2"
+                style={{ fontFamily: "'Cinzel', serif", color: ART.clay }}
               >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={scrollRight}
-                className="w-10 h-10 border flex items-center justify-center transition-colors hover:bg-black hover:text-white"
-                style={{ borderColor: ART.ink }}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+                DINING
+              </h4>
+              <p className="text-white/80" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+                {[day.meals?.lunch, day.meals?.dinner].filter(Boolean).join(' · ')}
+              </p>
             </div>
-
-            {/* 水平捲動卡片容器 */}
-            <div
-              ref={scrollContainerRef}
-              className="flex gap-6 overflow-x-auto pb-12 px-12 snap-x snap-mandatory"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-            >
-              {dailyItinerary.map((day, index) => {
-                const dayNumber = dayLabels[index].replace('Day ', '')
-                const numericDay = parseInt(dayNumber.split('-')[0], 10)
-                const dateDisplay = formatDateDisplay(day.date) || calculateDayDate(data.departureDate, numericDay)
-                const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
-                const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
-                const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
-                const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
-                const isLastDay = isLastMainDay(dailyItinerary, index)
-                const displayStyle = day.displayStyle || 'single-image'
-
-                return (
-                  <motion.div
-                    key={`day-${index}`}
-                    id={`day-${index + 1}`}
-                    ref={el => { dayRefs.current[index] = el as HTMLDivElement | null }}
-                    initial={{ opacity: 0, x: 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex-shrink-0 snap-start group ${
-                      displayStyle === 'timeline' ? 'w-[500px]' : 'w-[400px]'
-                    }`}
-                  >
-                    <DayCard
-                      day={day}
-                      index={index}
-                      numericDay={numericDay}
-                      dateDisplay={dateDisplay}
-                      allImages={allImages}
-                      isLastDay={isLastDay}
-                      displayStyle={displayStyle}
-                      onActivityClick={setSelectedActivity}
-                      onImageClick={openImageGallery}
-                    />
-                  </motion.div>
-                )
-              })}
+          )}
+          {!isLastDay && day.accommodation && (
+            <div>
+              <h4
+                className="text-xs tracking-widest mb-2"
+                style={{ fontFamily: "'Cinzel', serif", color: ART.clay }}
+              >
+                STAY
+              </h4>
+              <p className="text-white/80" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+                {day.accommodation}
+              </p>
             </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ========== 佈局 2: multi-image - 反向佈局 + 雙圖網格 ==========
+function MultiImageLayout({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  onImageClick,
+}: LayoutProps) {
+  const hasImage = allImages.length > 0
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      className="grid grid-cols-12 gap-8 mb-32 items-center group max-w-7xl mx-auto px-4 lg:px-12"
+    >
+      {/* 左側內容 - 5欄 (反向) */}
+      <div className="col-span-5 pr-0 lg:pr-12 text-right">
+        <h3
+          className="text-4xl mb-6 leading-tight text-white"
+          style={{ fontFamily: "'Noto Serif TC', serif" }}
+        >
+          {day.title?.split('→').map((part, i, arr) => (
+            <span key={i}>
+              {i > 0 && <br />}
+              {i === arr.length - 1 ? (
+                <span style={{ color: ART.sage }} className="italic">{part.trim()}</span>
+              ) : (
+                part.trim()
+              )}
+            </span>
+          )) || `第 ${index + 1} 天`}
+        </h3>
+
+        {day.description && (
+          <p
+            className="text-lg leading-loose mb-8"
+            style={{ color: 'rgba(255,255,255,0.6)', fontFamily: "'Noto Serif TC', serif" }}
+          >
+            {day.description}
+          </p>
+        )}
+
+        {/* 景點 highlight */}
+        <div className="flex justify-end gap-8 border-t border-white/10 pt-8">
+          {day.activities?.slice(0, 2).map((activity, actIdx) => (
+            <div key={actIdx} className="text-right">
+              <h4
+                className="text-xs tracking-widest mb-2"
+                style={{ fontFamily: "'Cinzel', serif", color: ART.sage }}
+              >
+                HIGHLIGHT
+              </h4>
+              <p className="text-white/80" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+                {activity.title}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 中央雙圖 - 5欄 */}
+      <div className="col-span-5">
+        <div className="grid grid-cols-2 gap-2">
+          {hasImage && (
+            <>
+              <div
+                className="overflow-hidden aspect-square cursor-pointer"
+                onClick={() => onImageClick(allImages, 0, day.title)}
+              >
+                <img
+                  src={allImages[0]}
+                  alt=""
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                  style={{ filter: 'grayscale(100%)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+                />
+              </div>
+              <div
+                className="overflow-hidden aspect-square translate-y-8 cursor-pointer"
+                onClick={() => onImageClick(allImages, allImages.length > 1 ? 1 : 0, day.title)}
+              >
+                <img
+                  src={allImages[1] || allImages[0]}
+                  alt=""
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                  style={{ filter: 'grayscale(100%)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+                />
+              </div>
+            </>
+          )}
+          {!hasImage && (
+            <div className="col-span-2 aspect-video bg-white/5 flex items-center justify-center">
+              <MapPin className="w-12 h-12 text-white/20" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 右側日期面板 - 2欄 */}
+      <div className="col-span-2 text-left pl-8 border-l border-white/20 h-full flex flex-col justify-between py-4">
+        <div>
+          <span
+            className="block text-6xl font-black text-white/20 group-hover:text-white transition-colors duration-500"
+            style={{ fontFamily: "'Cinzel', serif" }}
+          >
+            {String(numericDay).padStart(2, '0')}
+          </span>
+          {dateInfo && (
+            <span className="block text-xs tracking-[0.3em] mt-2 text-white/60">
+              {dateInfo.monthShort} {dateInfo.day}
+            </span>
+          )}
+        </div>
+        <div
+          className="text-xs uppercase tracking-widest pt-12"
+          style={{
+            writingMode: 'vertical-rl',
+            color: ART.sage,
+          }}
+        >
+          Adventure
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ========== 佈局 3: card-grid - 斜切背景 + 大圖 + 疊加內容 ==========
+function CardGridLayout({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  onImageClick,
+}: LayoutProps) {
+  const hasImage = allImages.length > 0
+  const mainImage = allImages[0]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      className="relative mb-32 group"
+    >
+      {/* 斜切背景 */}
+      <div
+        className="absolute inset-0 transform -skew-y-2 scale-105 z-0"
+        style={{ backgroundColor: 'rgba(244,241,234,0.05)' }}
+      />
+
+      <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center p-8 lg:p-16 max-w-7xl mx-auto">
+        {/* 左側大圖 */}
+        <div className="relative h-[400px] w-full">
+          {hasImage ? (
+            <img
+              src={mainImage}
+              alt={day.title || ''}
+              className="absolute inset-0 w-full h-full object-cover shadow-2xl cursor-pointer"
+              style={{ filter: 'contrast(125%) sepia(30%)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(0%)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(30%)' }}
+              onClick={() => onImageClick(allImages, 0, day.title)}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+              <MapPin className="w-16 h-16 text-white/20" />
+            </div>
+          )}
+          {/* 日期標籤 */}
+          <div
+            className="absolute -bottom-6 -right-6 p-4 font-black text-4xl shadow-lg"
+            style={{
+              backgroundColor: ART.clay,
+              color: ART.ink,
+              fontFamily: "'Cinzel', serif",
+              boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)',
+            }}
+          >
+            {String(numericDay).padStart(2, '0')}
           </div>
         </div>
-      ) : (
-        /* 手機版 - 垂直堆疊 */
-        <div className="px-4">
-          {/* 標題 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-8"
-          >
-            <span
-              className="block text-xs tracking-[0.3em] uppercase mb-3"
-              style={{
-                fontFamily: "'Cinzel', serif",
-                color: ART.clay,
-              }}
-            >
-              Chronicles
+
+        {/* 右側內容 */}
+        <div>
+          <div className="flex items-center gap-4 mb-4">
+            <span className="w-12 h-px" style={{ backgroundColor: ART.clay }} />
+            <span className="text-xs uppercase tracking-[0.3em] text-white/60">
+              {dateInfo ? `${dateInfo.monthShort} ${dateInfo.day}` : ''} · {day.locationLabel || 'Destination'}
             </span>
-            <h2
-              className="text-4xl font-black leading-none tracking-tighter"
-              style={{
-                fontFamily: "'Cinzel', 'Noto Serif TC', serif",
-                color: ART.ink,
-              }}
-            >
-              每日行程
-            </h2>
-          </motion.div>
-
-          {/* 手機版卡片 */}
-          <div className="space-y-6">
-            {dailyItinerary.map((day, index) => {
-              const dayNumber = dayLabels[index].replace('Day ', '')
-              const numericDay = parseInt(dayNumber.split('-')[0], 10)
-              const dateDisplay = formatDateDisplay(day.date) || calculateDayDate(data.departureDate, numericDay)
-              const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
-              const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
-              const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
-              const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
-              const isLastDay = isLastMainDay(dailyItinerary, index)
-              const displayStyle = day.displayStyle || 'single-image'
-
-              return (
-                <motion.div
-                  key={`day-${index}`}
-                  id={`day-${index + 1}`}
-                  ref={el => { dayRefs.current[index] = el as HTMLDivElement | null }}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <DayCard
-                    day={day}
-                    index={index}
-                    numericDay={numericDay}
-                    dateDisplay={dateDisplay}
-                    allImages={allImages}
-                    isLastDay={isLastDay}
-                    displayStyle={displayStyle}
-                    onActivityClick={setSelectedActivity}
-                    onImageClick={openImageGallery}
-                    isMobile
-                  />
-                </motion.div>
-              )
-            })}
           </div>
+
+          <h3
+            className="text-5xl mb-6 text-white"
+            style={{ fontFamily: "'Noto Serif TC', serif" }}
+          >
+            {day.title?.split('→').slice(-1)[0]?.trim() || `第 ${index + 1} 天`}
+          </h3>
+
+          {day.description && (
+            <p
+              className="text-lg leading-relaxed mb-8"
+              style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'Noto Serif TC', serif" }}
+            >
+              {day.description}
+            </p>
+          )}
+
+          {/* 景點列表 with icons */}
+          <ul className="space-y-4 font-mono text-sm text-white/50">
+            {day.activities?.slice(0, 3).map((activity, actIdx) => (
+              <li key={actIdx} className="flex items-center gap-3">
+                <span className="material-symbols-outlined" style={{ color: ART.clay }}>
+                  {activity.icon || 'place'}
+                </span>
+                {activity.title}
+              </li>
+            ))}
+            {!isLastDay && day.accommodation && (
+              <li className="flex items-center gap-3">
+                <Building2 className="w-5 h-5" style={{ color: ART.clay }} />
+                {day.accommodation}
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ========== 佈局 4: timeline - 時間軸卡片風格 ==========
+function TimelineLayout({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  onImageClick,
+}: LayoutProps) {
+  const hasImage = allImages.length > 0
+
+  // 判斷是否為最後一天（顯示特殊樣式）
+  const isReturnDay = isLastDay
+
+  if (isReturnDay) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="max-w-7xl mx-auto px-4 lg:px-12 pb-16"
+      >
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* 普通卡片 */}
+          <div
+            className="flex-1 p-6 flex flex-col justify-center border border-white/10 hover:bg-white/10 transition-colors"
+            style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+          >
+            <div className="flex items-center gap-4 mb-2">
+              <span
+                className="text-2xl font-black"
+                style={{ fontFamily: "'Cinzel', serif", color: ART.clay }}
+              >
+                {String(numericDay).padStart(2, '0')}
+              </span>
+              <h4
+                className="text-xl text-white"
+                style={{ fontFamily: "'Noto Serif TC', serif" }}
+              >
+                {day.title || `第 ${index + 1} 天`}
+              </h4>
+            </div>
+            {day.description && (
+              <p className="text-sm text-white/50 pl-10">{day.description}</p>
+            )}
+          </div>
+
+          {/* 特殊回程卡片 */}
+          <div
+            className="flex-1 p-6 flex flex-col justify-center relative overflow-hidden"
+            style={{ backgroundColor: ART.clay, color: ART.ink }}
+          >
+            <div
+              className="absolute -right-4 -bottom-4 text-8xl opacity-20 rotate-[-20deg]"
+            >
+              <Plane className="w-24 h-24" />
+            </div>
+            <div className="flex items-center gap-4 mb-2 relative z-10">
+              <span
+                className="text-2xl font-black"
+                style={{ fontFamily: "'Cinzel', serif" }}
+              >
+                {String(numericDay).padStart(2, '0')}
+              </span>
+              <h4
+                className="text-xl font-bold"
+                style={{ fontFamily: "'Noto Serif TC', serif" }}
+              >
+                Homecoming
+              </h4>
+            </div>
+            <p className="text-sm font-bold opacity-70 pl-10 relative z-10">
+              {day.description || 'Memories packed.'}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="max-w-7xl mx-auto px-4 lg:px-12 mb-8"
+    >
+      <div
+        className="min-w-[300px] lg:min-w-[400px] border border-white/10 p-8 hover:bg-white/10 transition-colors cursor-pointer group"
+        style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+      >
+        {/* 頂部日期 */}
+        <div className="flex justify-between items-start mb-12">
+          <span
+            className="text-4xl font-black"
+            style={{ fontFamily: "'Cinzel', serif", color: ART.clay }}
+          >
+            {String(numericDay).padStart(2, '0')}
+          </span>
+          {dateInfo && (
+            <span className="text-xs font-mono text-white/40">
+              {dateInfo.monthShort} {dateInfo.day}
+            </span>
+          )}
+        </div>
+
+        {/* 標題 */}
+        <h4
+          className="text-2xl mb-4 group-hover:text-white transition-colors"
+          style={{ fontFamily: "'Noto Serif TC', serif", color: ART.clay }}
+        >
+          {day.title || `第 ${index + 1} 天`}
+        </h4>
+
+        {/* 描述 */}
+        {day.description && (
+          <p className="text-sm text-white/60 mb-6 leading-relaxed">
+            {day.description}
+          </p>
+        )}
+
+        {/* 圖片 */}
+        {hasImage && (
+          <div
+            className="h-40 overflow-hidden mb-6 cursor-pointer"
+            style={{ filter: 'grayscale(100%)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.filter = 'grayscale(0%)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.filter = 'grayscale(100%)' }}
+            onClick={() => onImageClick(allImages, 0, day.title)}
+          >
+            <img
+              src={allImages[0]}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        {!hasImage && (
+          <div className="h-40 overflow-hidden mb-6 bg-white/5 flex items-center justify-center">
+            <MapPin className="w-8 h-8 text-white/20" />
+          </div>
+        )}
+
+        {/* 底部住宿 */}
+        {!isLastDay && day.accommodation && (
+          <div className="border-t border-white/10 pt-4 mt-auto">
+            <span className="text-xs uppercase tracking-widest text-white/40">
+              Stay: {day.accommodation}
+            </span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ========== 手機版 Section ==========
+interface MobileDaySectionProps {
+  day: DailyItinerary
+  index: number
+  numericDay: number
+  dateInfo: { day: number; month: string; monthShort: string; year: number } | null
+  allImages: string[]
+  isLastDay: boolean
+  onImageClick: (images: string[], startIndex: number, title?: string) => void
+}
+
+function MobileDaySection({
+  day,
+  index,
+  numericDay,
+  dateInfo,
+  allImages,
+  isLastDay,
+  onImageClick,
+}: MobileDaySectionProps) {
+  const hasImage = allImages.length > 0
+  const mainImage = allImages[0]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="border-t border-white/10 mx-4 py-8"
+    >
+      {/* 日期標題行 */}
+      <div className="flex items-center gap-4 mb-4">
+        <div
+          className="w-14 h-14 flex flex-col items-center justify-center"
+          style={{ backgroundColor: ART.clay }}
+        >
+          <span
+            className="text-xl font-black text-white"
+            style={{ fontFamily: "'Cinzel', serif" }}
+          >
+            {String(numericDay).padStart(2, '0')}
+          </span>
+        </div>
+        <div>
+          <h3
+            className="text-lg font-bold text-white"
+            style={{ fontFamily: "'Noto Serif TC', serif" }}
+          >
+            {day.title || `第 ${index + 1} 天`}
+          </h3>
+          {dateInfo && (
+            <div className="text-xs text-white/50">
+              {dateInfo.monthShort} {dateInfo.day}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 圖片 */}
+      {hasImage && (
+        <div
+          className="relative aspect-[16/9] mb-4 cursor-pointer"
+          onClick={() => onImageClick(allImages, 0, day.title)}
+        >
+          <img
+            src={mainImage}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          {allImages.length > 1 && (
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs">
+              +{allImages.length - 1}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Image Gallery Modal */}
-      <AnimatePresence>
-        {imageGallery && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ backgroundColor: ART.black }}
-            onClick={() => setImageGallery(null)}
+      {/* 描述 */}
+      {day.description && (
+        <p className="text-sm text-white/60 mb-4 leading-relaxed">
+          {day.description}
+        </p>
+      )}
+
+      {/* 景點 */}
+      {day.activities && day.activities.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {day.activities.slice(0, 3).map((activity, actIdx) => (
+            <span
+              key={actIdx}
+              className="px-2 py-1 text-xs border border-white/20 text-white/60"
+            >
+              {activity.title}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 餐食住宿 */}
+      <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-white/50">
+        {(day.meals?.lunch || day.meals?.dinner) && (
+          <div className="flex items-center gap-2">
+            <Utensils className="w-3 h-3" style={{ color: ART.clay }} />
+            <span>{[day.meals?.lunch, day.meals?.dinner].filter(Boolean).join(' · ')}</span>
+          </div>
+        )}
+        {!isLastDay && day.accommodation && (
+          <div className="flex items-center gap-2">
+            <Building2 className="w-3 h-3" style={{ color: ART.clay }} />
+            <span>{day.accommodation}</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ========== 圖片 Gallery Modal ==========
+interface ImageGalleryModalProps {
+  imageGallery: {
+    images: string[]
+    currentIndex: number
+    title?: string
+  }
+  onClose: () => void
+  onPrev: () => void
+  onNext: () => void
+  onSelectIndex: (idx: number) => void
+}
+
+function ImageGalleryModal({
+  imageGallery,
+  onClose,
+  onPrev,
+  onNext,
+  onSelectIndex,
+}: ImageGalleryModalProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: ART.black }}
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-white hover:text-black"
+      >
+        <X className="w-6 h-6 text-white" />
+      </button>
+
+      <div className="absolute top-6 left-6 z-10">
+        <span className="text-sm tracking-wider font-mono text-white/60">
+          {imageGallery.currentIndex + 1} / {imageGallery.images.length}
+        </span>
+      </div>
+
+      {imageGallery.images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); onPrev() }}
+            className="absolute left-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-white hover:text-black"
           >
+            <ChevronLeft className="w-6 h-6 text-white" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onNext() }}
+            className="absolute right-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-white hover:text-black"
+          >
+            <ChevronRight className="w-6 h-6 text-white" />
+          </button>
+        </>
+      )}
+
+      <motion.div
+        key={imageGallery.currentIndex}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="max-w-5xl max-h-[85vh] mx-6"
+        onClick={e => e.stopPropagation()}
+      >
+        <img
+          src={imageGallery.images[imageGallery.currentIndex]}
+          alt={imageGallery.title || '行程圖片'}
+          className="max-w-full max-h-[85vh] object-contain"
+        />
+      </motion.div>
+
+      {imageGallery.images.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+          {imageGallery.images.map((_, idx) => (
             <button
-              onClick={() => setImageGallery(null)}
-              className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center border transition-colors hover:bg-white hover:text-black"
-              style={{ borderColor: '#fff' }}
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
-
-            <div className="absolute top-6 left-6 z-10">
-              <span
-                className="text-sm tracking-wider"
-                style={{
-                  fontFamily: 'monospace',
-                  color: 'rgba(255,255,255,0.6)',
-                }}
-              >
-                {imageGallery.currentIndex + 1} / {imageGallery.images.length}
-              </span>
-            </div>
-
-            {imageGallery.images.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); prevImage() }}
-                  className="absolute left-6 z-10 w-12 h-12 flex items-center justify-center border transition-colors hover:bg-white hover:text-black"
-                  style={{ borderColor: '#fff' }}
-                >
-                  <ChevronLeft className="w-6 h-6 text-white" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); nextImage() }}
-                  className="absolute right-6 z-10 w-12 h-12 flex items-center justify-center border transition-colors hover:bg-white hover:text-black"
-                  style={{ borderColor: '#fff' }}
-                >
-                  <ChevronRight className="w-6 h-6 text-white" />
-                </button>
-              </>
-            )}
-
-            <motion.div
-              key={imageGallery.currentIndex}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className="max-w-5xl max-h-[85vh] mx-6"
-              onClick={e => e.stopPropagation()}
-            >
-              <img
-                src={imageGallery.images[imageGallery.currentIndex]}
-                alt={imageGallery.title || '行程圖片'}
-                className="max-w-full max-h-[85vh] object-contain"
-              />
-            </motion.div>
-
-            {imageGallery.images.length > 1 && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-                {imageGallery.images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setImageGallery({ ...imageGallery, currentIndex: idx })
-                    }}
-                    className={`w-2 h-2 transition-all ${
-                      idx === imageGallery.currentIndex
-                        ? 'bg-white w-8'
-                        : 'bg-white/30 hover:bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Activity Detail Modal - Brutalist 風格 */}
-      <AnimatePresence>
-        {selectedActivity && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}
-            onClick={() => setSelectedActivity(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="max-w-lg w-full overflow-hidden relative border"
-              style={{
-                backgroundColor: ART.paper,
-                borderColor: ART.ink,
-                boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)',
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setSelectedActivity(null)}
-                className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center border transition-colors hover:bg-black hover:text-white"
-                style={{ borderColor: ART.ink }}
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              {selectedActivity.image && (
-                <div className="relative aspect-[16/9]">
-                  <img
-                    src={selectedActivity.image}
-                    alt={selectedActivity.title}
-                    className="w-full h-full object-cover"
-                    style={{ filter: 'sepia(20%)' }}
-                  />
-                </div>
-              )}
-
-              <div className="p-8">
-                <h3
-                  className="text-2xl font-bold mb-4 pr-8"
-                  style={{
-                    fontFamily: "'Noto Serif TC', serif",
-                    color: ART.ink,
-                  }}
-                >
-                  {selectedActivity.title}
-                </h3>
-                {selectedActivity.description && (
-                  <p
-                    className="leading-relaxed"
-                    style={{ color: '#6B7280' }}
-                  >
-                    {selectedActivity.description}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
+              key={idx}
+              onClick={(e) => { e.stopPropagation(); onSelectIndex(idx) }}
+              className={`w-2 h-2 transition-all ${
+                idx === imageGallery.currentIndex
+                  ? 'bg-white w-8'
+                  : 'bg-white/30 hover:bg-white/50'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </motion.div>
   )
 }

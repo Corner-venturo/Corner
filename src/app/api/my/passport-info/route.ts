@@ -122,22 +122,137 @@ export async function GET(request: NextRequest) {
       .eq('email', user.email)
       .single()
 
-    if (customerError || !customer) {
-      // 使用者不在 customers 表中，回傳初始狀態
-      return NextResponse.json({
-        success: true,
-        data: {
-          total_points: 0,
-          level_name: '新手旅人',
-          next_level_name: '探索者',
-          points_to_next_level: 100,
-          earned_badges: []
-        },
-        message: '找不到對應的客戶資料'
-      })
-    }
+    // 如果找不到 customer，嘗試從 profiles 查詢（員工用戶）
+    let totalPoints = 0
+    let earnedBadges: EarnedBadge[] = []
+    let isEmployee = false
 
-    const totalPoints = customer.total_points || 0
+    if (customerError || !customer) {
+      // 嘗試從 profiles 表查詢（員工）
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, is_beta_tester')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profile) {
+        // 使用者不在任何表中，回傳初始狀態
+        return NextResponse.json({
+          success: true,
+          data: {
+            total_points: 0,
+            level_name: '新手旅人',
+            next_level_name: '探索者',
+            points_to_next_level: 100,
+            earned_badges: []
+          },
+          message: '找不到對應的用戶資料'
+        })
+      }
+
+      isEmployee = true
+
+      // 查詢員工的徽章（從 user_badges JOIN badges 表）
+      const { data: employeeBadges, error: empBadgesError } = await supabase
+        .from('user_badges')
+        .select(`
+          id,
+          awarded_at,
+          badges (
+            id,
+            code,
+            name,
+            description,
+            icon,
+            color,
+            category
+          )
+        `)
+        .eq('user_id', profile.id)
+        .order('awarded_at', { ascending: false })
+
+      if (!empBadgesError && employeeBadges) {
+        interface Badge {
+          id: string
+          code: string
+          name: string
+          description: string | null
+          icon: string | null
+          color: string | null
+          category: string | null
+        }
+
+        interface UserBadgeWithBadge {
+          id: string
+          awarded_at: string
+          badges: Badge | null
+        }
+
+        earnedBadges = ((employeeBadges || []) as unknown as UserBadgeWithBadge[])
+          .filter(ub => ub.badges !== null)
+          .map(ub => {
+            const badge = ub.badges!
+            return {
+              id: badge.id,
+              name: badge.name,
+              description: badge.description || '',
+              icon_url: badge.icon ? `/icons/badges/${badge.icon}.svg` : null,
+              category: badge.category,
+              earned_at: ub.awarded_at
+            }
+          })
+      }
+    } else {
+      // 客戶用戶
+      totalPoints = customer.total_points || 0
+
+      // 查詢客戶的徽章（從 customer_badges JOIN badge_definitions 表）
+      const { data: customerBadges, error: badgesError } = await supabase
+        .from('customer_badges')
+        .select(`
+          id,
+          earned_at,
+          badge_definitions (
+            id,
+            name,
+            description,
+            icon_url,
+            category
+          )
+        `)
+        .eq('customer_id', customer.id)
+        .order('earned_at', { ascending: false })
+
+      if (!badgesError && customerBadges) {
+        interface BadgeDefinition {
+          id: string
+          name: string
+          description: string
+          icon_url: string | null
+          category: string | null
+        }
+
+        interface CustomerBadgeWithDefinition {
+          id: string
+          earned_at: string
+          badge_definitions: BadgeDefinition | null
+        }
+
+        earnedBadges = ((customerBadges || []) as unknown as CustomerBadgeWithDefinition[])
+          .filter(cb => cb.badge_definitions !== null)
+          .map(cb => {
+            const badge = cb.badge_definitions!
+            return {
+              id: badge.id,
+              name: badge.name,
+              description: badge.description,
+              icon_url: badge.icon_url,
+              category: badge.category,
+              earned_at: cb.earned_at
+            }
+          })
+      }
+    }
 
     // 4. 計算等級資訊
     const levelName = calculateLevel(totalPoints)
@@ -150,58 +265,6 @@ export async function GET(request: NextRequest) {
     const nextLevelName = currentLevelIndex < LEVEL_DEFINITIONS.length - 1
       ? LEVEL_DEFINITIONS[currentLevelIndex + 1].name
       : null
-
-    // 5. 查詢已獲得的徽章（JOIN user_badges 和 badge_definitions）
-    const { data: userBadges, error: badgesError } = await supabase
-      .from('user_badges')
-      .select(`
-        id,
-        earned_at,
-        badge_definitions (
-          id,
-          name,
-          description,
-          icon_url,
-          category
-        )
-      `)
-      .eq('user_id', customer.id)
-      .order('earned_at', { ascending: false })
-
-    if (badgesError) {
-      console.error('查詢徽章失敗:', badgesError)
-      // 徽章查詢失敗不影響其他資料，繼續回傳
-    }
-
-    // 6. 整理徽章列表
-    // Supabase 對於單一關聯返回物件，非陣列
-    interface BadgeDefinition {
-      id: string
-      name: string
-      description: string
-      icon_url: string | null
-      category: string | null
-    }
-
-    interface UserBadgeWithDefinition {
-      id: string
-      earned_at: string
-      badge_definitions: BadgeDefinition | null
-    }
-
-    const earnedBadges: EarnedBadge[] = ((userBadges || []) as unknown as UserBadgeWithDefinition[])
-      .filter(ub => ub.badge_definitions !== null)
-      .map(ub => {
-        const badge = ub.badge_definitions!
-        return {
-          id: badge.id,
-          name: badge.name,
-          description: badge.description,
-          icon_url: badge.icon_url,
-          category: badge.category,
-          earned_at: ub.earned_at
-        }
-      })
 
     // 7. 回傳護照資訊
     return NextResponse.json({

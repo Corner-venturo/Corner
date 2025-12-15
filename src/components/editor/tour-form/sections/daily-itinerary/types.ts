@@ -1,0 +1,105 @@
+import { Activity, DailyItinerary, TourFormData } from '../../types'
+
+// 擴展型別（與 AttractionSelector 一致）
+export interface AttractionWithCity {
+  id: string
+  name: string
+  description?: string
+  thumbnail?: string
+  images?: string[]
+  city_name?: string
+}
+
+// 飯店資料型別
+export interface HotelData {
+  id: string
+  name: string
+  name_en?: string
+  brand?: string
+  star_rating?: number
+  hotel_class?: string
+  city_name?: string
+  thumbnail?: string
+}
+
+// 餐廳資料型別
+export interface RestaurantData {
+  id: string
+  name: string
+  name_en?: string
+  cuisine_type?: string[]
+  category?: string
+  price_range?: string
+  city_name?: string
+  is_michelin?: boolean
+  michelin_stars?: number
+  thumbnail?: string
+}
+
+// Props 型別
+export interface DailyItinerarySectionProps {
+  data: TourFormData
+  updateField: (field: string, value: unknown) => void
+  addDailyItinerary: () => void
+  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  removeDailyItinerary: (index: number) => void
+  swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
+  addActivity: (dayIndex: number) => void
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  reorderActivities?: (dayIndex: number, activities: Activity[]) => void
+  addDayImage: (dayIndex: number) => void
+  updateDayImage: (dayIndex: number, imageIndex: number, value: string) => void
+  removeDayImage: (dayIndex: number, imageIndex: number) => void
+  addRecommendation: (dayIndex: number) => void
+  updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void
+  removeRecommendation: (dayIndex: number, recIndex: number) => void
+}
+
+export interface SortableActivityItemProps {
+  activity: Activity
+  actIndex: number
+  dayIndex: number
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => void
+  isActivityUploading: boolean
+  isActivityDragOver: boolean
+  setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
+  activityFileInputRefs: React.MutableRefObject<{ [key: string]: HTMLInputElement | null }>
+  onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
+}
+
+export interface SortableActivityGridItemProps {
+  activity: Activity
+  actIndex: number
+  dayIndex: number
+}
+
+export interface DayCardProps {
+  day: DailyItinerary
+  dayIndex: number
+  dayLabel: string
+  data: TourFormData
+  // Actions
+  updateDailyItinerary: (index: number, field: string, value: unknown) => void
+  removeDailyItinerary: (index: number) => void
+  swapDailyItinerary?: (fromIndex: number, toIndex: number) => void
+  addActivity: (dayIndex: number) => void
+  updateActivity: (dayIndex: number, actIndex: number, field: string, value: string) => void
+  removeActivity: (dayIndex: number, actIndex: number) => void
+  reorderActivities?: (dayIndex: number, activities: Activity[]) => void
+  addRecommendation: (dayIndex: number) => void
+  updateRecommendation: (dayIndex: number, recIndex: number, value: string) => void
+  removeRecommendation: (dayIndex: number, recIndex: number) => void
+  updateField: (field: string, value: unknown) => void
+  // Selector handlers
+  onOpenAttractionSelector: (dayIndex: number) => void
+  onOpenHotelSelector: (dayIndex: number) => void
+  onOpenRestaurantSelector: (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => void
+}
+
+export interface MealSelectorState {
+  dayIndex: number
+  mealType: 'breakfast' | 'lunch' | 'dinner'
+}

@@ -8713,6 +8713,388 @@ export type Database = {
           },
         ]
       }
+      // === 手動添加的表格類型 (2025-12-15) ===
+      luxury_hotels: {
+        Row: {
+          id: string
+          name: string
+          name_en: string | null
+          name_local: string | null
+          brand: string | null
+          country_id: string
+          region_id: string | null
+          city_id: string
+          address: string | null
+          address_en: string | null
+          latitude: number | null
+          longitude: number | null
+          google_maps_url: string | null
+          star_rating: number | null
+          hotel_class: string | null
+          category: string | null
+          description: string | null
+          description_en: string | null
+          highlights: string[] | null
+          room_types: Json | null
+          price_range: string | null
+          avg_price_per_night: number | null
+          currency: string | null
+          facilities: Json | null
+          amenities: string[] | null
+          restaurants_count: number | null
+          has_michelin_restaurant: boolean | null
+          dining_options: string[] | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_phone: string | null
+          website: string | null
+          group_friendly: boolean | null
+          min_rooms_for_group: number | null
+          max_group_size: number | null
+          group_rate_available: boolean | null
+          commission_rate: number | null
+          airport_transfer: boolean | null
+          concierge_service: boolean | null
+          butler_service: boolean | null
+          best_seasons: string[] | null
+          awards: string[] | null
+          certifications: string[] | null
+          thumbnail: string | null
+          images: string[] | null
+          notes: string | null
+          internal_notes: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          display_order: number | null
+          created_at: string | null
+          updated_at: string | null
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          brand?: string | null
+          country_id: string
+          region_id?: string | null
+          city_id: string
+          address?: string | null
+          address_en?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          google_maps_url?: string | null
+          star_rating?: number | null
+          hotel_class?: string | null
+          category?: string | null
+          description?: string | null
+          description_en?: string | null
+          highlights?: string[] | null
+          room_types?: Json | null
+          price_range?: string | null
+          avg_price_per_night?: number | null
+          currency?: string | null
+          facilities?: Json | null
+          amenities?: string[] | null
+          restaurants_count?: number | null
+          has_michelin_restaurant?: boolean | null
+          dining_options?: string[] | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          website?: string | null
+          group_friendly?: boolean | null
+          min_rooms_for_group?: number | null
+          max_group_size?: number | null
+          group_rate_available?: boolean | null
+          commission_rate?: number | null
+          airport_transfer?: boolean | null
+          concierge_service?: boolean | null
+          butler_service?: boolean | null
+          best_seasons?: string[] | null
+          awards?: string[] | null
+          certifications?: string[] | null
+          thumbnail?: string | null
+          images?: string[] | null
+          notes?: string | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          brand?: string | null
+          country_id?: string
+          region_id?: string | null
+          city_id?: string
+          address?: string | null
+          address_en?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          google_maps_url?: string | null
+          star_rating?: number | null
+          hotel_class?: string | null
+          category?: string | null
+          description?: string | null
+          description_en?: string | null
+          highlights?: string[] | null
+          room_types?: Json | null
+          price_range?: string | null
+          avg_price_per_night?: number | null
+          currency?: string | null
+          facilities?: Json | null
+          amenities?: string[] | null
+          restaurants_count?: number | null
+          has_michelin_restaurant?: boolean | null
+          dining_options?: string[] | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          website?: string | null
+          group_friendly?: boolean | null
+          min_rooms_for_group?: number | null
+          max_group_size?: number | null
+          group_rate_available?: boolean | null
+          commission_rate?: number | null
+          airport_transfer?: boolean | null
+          concierge_service?: boolean | null
+          butler_service?: boolean | null
+          best_seasons?: string[] | null
+          awards?: string[] | null
+          certifications?: string[] | null
+          thumbnail?: string | null
+          images?: string[] | null
+          notes?: string | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "luxury_hotels_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_hotels_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurants: {
+        Row: {
+          id: string
+          name: string
+          name_en: string | null
+          name_local: string | null
+          country_id: string
+          region_id: string | null
+          city_id: string
+          address: string | null
+          address_en: string | null
+          latitude: number | null
+          longitude: number | null
+          google_maps_url: string | null
+          cuisine_type: string[] | null
+          category: string | null
+          meal_type: string[] | null
+          description: string | null
+          description_en: string | null
+          specialties: string[] | null
+          highlights: string[] | null
+          price_range: string | null
+          avg_price_lunch: number | null
+          avg_price_dinner: number | null
+          currency: string | null
+          opening_hours: Json | null
+          phone: string | null
+          website: string | null
+          reservation_required: boolean | null
+          reservation_url: string | null
+          group_friendly: boolean | null
+          min_group_size: number | null
+          max_group_size: number | null
+          group_menu_available: boolean | null
+          group_menu_price: number | null
+          group_menu_options: Json | null
+          private_room: boolean | null
+          private_room_capacity: number | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_phone: string | null
+          booking_notes: string | null
+          commission_rate: number | null
+          facilities: Json | null
+          dietary_options: string[] | null
+          thumbnail: string | null
+          images: string[] | null
+          menu_images: string[] | null
+          rating: number | null
+          review_count: number | null
+          notes: string | null
+          internal_notes: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          display_order: number | null
+          created_at: string | null
+          updated_at: string | null
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          country_id: string
+          region_id?: string | null
+          city_id: string
+          address?: string | null
+          address_en?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          google_maps_url?: string | null
+          cuisine_type?: string[] | null
+          category?: string | null
+          meal_type?: string[] | null
+          description?: string | null
+          description_en?: string | null
+          specialties?: string[] | null
+          highlights?: string[] | null
+          price_range?: string | null
+          avg_price_lunch?: number | null
+          avg_price_dinner?: number | null
+          currency?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          website?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          group_friendly?: boolean | null
+          min_group_size?: number | null
+          max_group_size?: number | null
+          group_menu_available?: boolean | null
+          group_menu_price?: number | null
+          group_menu_options?: Json | null
+          private_room?: boolean | null
+          private_room_capacity?: number | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          booking_notes?: string | null
+          commission_rate?: number | null
+          facilities?: Json | null
+          dietary_options?: string[] | null
+          thumbnail?: string | null
+          images?: string[] | null
+          menu_images?: string[] | null
+          rating?: number | null
+          review_count?: number | null
+          notes?: string | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          country_id?: string
+          region_id?: string | null
+          city_id?: string
+          address?: string | null
+          address_en?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          google_maps_url?: string | null
+          cuisine_type?: string[] | null
+          category?: string | null
+          meal_type?: string[] | null
+          description?: string | null
+          description_en?: string | null
+          specialties?: string[] | null
+          highlights?: string[] | null
+          price_range?: string | null
+          avg_price_lunch?: number | null
+          avg_price_dinner?: number | null
+          currency?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          website?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          group_friendly?: boolean | null
+          min_group_size?: number | null
+          max_group_size?: number | null
+          group_menu_available?: boolean | null
+          group_menu_price?: number | null
+          group_menu_options?: Json | null
+          private_room?: boolean | null
+          private_room_capacity?: number | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          booking_notes?: string | null
+          commission_rate?: number | null
+          facilities?: Json | null
+          dietary_options?: string[] | null
+          thumbnail?: string | null
+          images?: string[] | null
+          menu_images?: string[] | null
+          rating?: number | null
+          review_count?: number | null
+          notes?: string | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurants_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       tour_rooms_status: {

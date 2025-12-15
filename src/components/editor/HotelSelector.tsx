@@ -84,9 +84,9 @@ export function HotelSelector({
   const [hotels, setHotels] = useState<LuxuryHotel[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  const [countries, setCountries] = useState<{ id: string; name: string }[]>([])
   const [regions, setRegions] = useState<{ id: string; name: string }[]>([])
   const [cities, setCities] = useState<{ id: string; name: string }[]>([])
-  const [countries, setCountries] = useState<{ id: string; name: string }[]>([])
   const initialLoadDone = useRef(false)
 
   // 載入所有國家
@@ -114,6 +114,8 @@ export function HotelSelector({
         if (matchedCountry && matchedCountry.id !== savedCountryId) {
           setSelectedCountryId(matchedCountry.id)
           savedCountryId = matchedCountry.id
+          setSelectedRegionId('')
+          savedRegionId = ''
           setSelectedCityId('')
           savedCityId = ''
           return
@@ -122,30 +124,63 @@ export function HotelSelector({
 
       if (savedCountryId) {
         setSelectedCountryId(savedCountryId)
+        setSelectedRegionId(savedRegionId)
         setSelectedCityId(savedCityId)
         setSelectedBrand(savedBrand)
       }
     }
   }, [isOpen, tourCountryName, countries])
 
+  // 國家變更
   const handleCountryChange = (countryId: string) => {
     setSelectedCountryId(countryId)
+    setSelectedRegionId('')
     setSelectedCityId('')
     savedCountryId = countryId
+    savedRegionId = ''
     savedCityId = ''
   }
 
+  // 區域變更
+  const handleRegionChange = (regionId: string) => {
+    setSelectedRegionId(regionId)
+    setSelectedCityId('')
+    savedRegionId = regionId
+    savedCityId = ''
+  }
+
+  // 城市變更
   const handleCityChange = (cityId: string) => {
     setSelectedCityId(cityId)
     savedCityId = cityId
   }
 
+  // 品牌變更
   const handleBrandChange = (brand: string) => {
     setSelectedBrand(brand)
     savedBrand = brand
   }
 
-  // 載入城市列表
+  // 載入區域列表
+  React.useEffect(() => {
+    if (!isOpen || !selectedCountryId) {
+      setRegions([])
+      return
+    }
+
+    const loadRegions = async () => {
+      const { data } = await supabase
+        .from('regions')
+        .select('id, name')
+        .eq('country_id', selectedCountryId)
+        .eq('is_active', true)
+        .order('name')
+      setRegions(data || [])
+    }
+    loadRegions()
+  }, [isOpen, selectedCountryId])
+
+  // 載入城市列表（根據區域或國家）
   React.useEffect(() => {
     if (!isOpen || !selectedCountryId) {
       setCities([])
@@ -153,16 +188,23 @@ export function HotelSelector({
     }
 
     const loadCities = async () => {
-      const { data } = await supabase
+      let query = supabase
         .from('cities')
         .select('id, name')
         .eq('country_id', selectedCountryId)
         .eq('is_active', true)
         .order('name')
+
+      // 如果有選區域，只顯示該區域的城市
+      if (selectedRegionId) {
+        query = query.eq('region_id', selectedRegionId)
+      }
+
+      const { data } = await query
       setCities(data || [])
     }
     loadCities()
-  }, [isOpen, selectedCountryId])
+  }, [isOpen, selectedCountryId, selectedRegionId])
 
   // 載入飯店資料
   React.useEffect(() => {
@@ -179,10 +221,11 @@ export function HotelSelector({
         let query = supabase
           .from('luxury_hotels')
           .select(`
-            id, name, name_en, brand, country_id, city_id,
+            id, name, name_en, brand, country_id, region_id, city_id,
             star_rating, hotel_class, category, description,
             highlights, price_range, avg_price_per_night,
             thumbnail, images, is_active, is_featured,
+            regions(name),
             cities!inner(name)
           `)
           .eq('is_active', true)
@@ -190,10 +233,17 @@ export function HotelSelector({
           .order('is_featured', { ascending: false })
           .order('display_order')
 
+        // 區域篩選
+        if (selectedRegionId) {
+          query = query.eq('region_id', selectedRegionId)
+        }
+
+        // 城市篩選
         if (selectedCityId) {
           query = query.eq('city_id', selectedCityId)
         }
 
+        // 品牌篩選
         if (selectedBrand) {
           query = query.eq('brand', selectedBrand)
         }
@@ -202,7 +252,7 @@ export function HotelSelector({
 
         if (error) throw error
 
-         
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formatted = (data || []).map((item: any): LuxuryHotel => ({
           id: item.id,
           name: item.name,
@@ -222,6 +272,7 @@ export function HotelSelector({
           images: item.images,
           is_active: item.is_active ?? true,
           is_featured: item.is_featured ?? false,
+          region_name: item.regions?.name || '',
           city_name: item.cities?.name || '',
         }))
 
@@ -234,7 +285,7 @@ export function HotelSelector({
     }
 
     loadHotels()
-  }, [isOpen, selectedCountryId, selectedCityId, selectedBrand])
+  }, [isOpen, selectedCountryId, selectedRegionId, selectedCityId, selectedBrand])
 
   // 搜尋過濾
   const filteredHotels = useMemo(() => {
@@ -246,6 +297,7 @@ export function HotelSelector({
         h.name.toLowerCase().includes(query) ||
         h.name_en?.toLowerCase().includes(query) ||
         h.brand?.toLowerCase().includes(query) ||
+        h.region_name?.toLowerCase().includes(query) ||
         h.city_name?.toLowerCase().includes(query)
     )
   }, [hotels, searchQuery])
@@ -298,7 +350,7 @@ export function HotelSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="w-[750px] h-[650px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-amber-50 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Building2 className="text-amber-600" size={22} />
@@ -307,7 +359,7 @@ export function HotelSelector({
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden flex flex-col p-4 gap-4">
-          {/* 篩選區 */}
+          {/* 篩選區 - 第一排：國家、區域、城市 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
             <select
@@ -322,6 +374,22 @@ export function HotelSelector({
                 </option>
               ))}
             </select>
+
+            {/* 區域選擇 */}
+            {selectedCountryId && regions.length > 0 && (
+              <select
+                value={selectedRegionId}
+                onChange={e => handleRegionChange(e.target.value)}
+                className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
+              >
+                <option value="">全部區域</option>
+                {regions.map(region => (
+                  <option key={region.id} value={region.id}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
@@ -435,6 +503,12 @@ export function HotelSelector({
                           </div>
                         )}
                         <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5 flex-wrap">
+                          {/* 顯示區域與城市 */}
+                          {hotel.region_name && (
+                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+                              {hotel.region_name}
+                            </span>
+                          )}
                           <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
                             {hotel.city_name}
                           </span>
