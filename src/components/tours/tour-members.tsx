@@ -11,7 +11,7 @@ import { Trash2, GripVertical, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supabase = supabaseClient as any
 
 interface TourMembersProps {

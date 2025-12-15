@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

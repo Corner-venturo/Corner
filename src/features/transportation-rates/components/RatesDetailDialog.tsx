@@ -62,7 +62,7 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     })
     if (!confirmed) return
 
-    const result = await (supabase.from('transportation_rates') as ReturnType<typeof supabase.from>).delete().eq('id', id)
+    const result = await supabase.from('transportation_rates').delete().eq('id', id)
     const error = result.error
 
     if (error) {
@@ -83,10 +83,14 @@ export const RatesDetailDialog: React.FC<RatesDetailDialogProps> = ({
     }
     const dataWithCategory = data as CreateRateData
 
-    const result = await (supabase.from('transportation_rates') as ReturnType<typeof supabase.from>).insert({
-      ...data,
-      workspace_id: user?.workspace_id || null,
-      country_id: data.country_id || '',
+    if (!user?.workspace_id) {
+      toast.error('無法取得工作區資訊')
+      return
+    }
+
+    const result = await supabase.from('transportation_rates').insert({
+      workspace_id: user.workspace_id,
+      country_id: data.country_id || null,
       country_name: countryName,
       vehicle_type: data.vehicle_type || dataWithCategory?.category || '',
       price: dataWithCategory?.price_twd || 0,

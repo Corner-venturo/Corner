@@ -31,7 +31,7 @@ export interface Customer extends BaseEntity {
   gender?: string | null // 性別
   company?: string | null // 公司名稱
   tax_id?: string | null // 統編
-  member_type: MemberType // 會員類型：potential（潛在）/ member（普通）/ vip
+  member_type: MemberType | string // 會員類型：potential（潛在）/ member（普通）/ vip
   is_vip: boolean | null // 是否為 VIP（保留向下相容）
   vip_level?: VipLevel | string | null // VIP 等級
   source?: CustomerSource | string | null // 客戶來源

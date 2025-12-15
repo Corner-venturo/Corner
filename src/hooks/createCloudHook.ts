@@ -200,9 +200,8 @@ export function createCloudHook<T extends BaseEntity>(
       mutate(SWR_KEY, [...items, newItem], false)
 
       try {
-        const { error } = await supabase.from(tableName).insert(
-          newItem as Record<string, unknown>
-        )
+        // @ts-expect-error - Generic table operations cannot be fully typed
+        const { error } = await supabase.from(tableName).insert(newItem)
         if (error) throw error
 
         mutate(SWR_KEY)

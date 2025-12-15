@@ -201,7 +201,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
 
       // 處理 quote_items
       // 欄位對應: description (名稱), category (分類), item_type (類型)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       quoteItems?.forEach((item: any, index: number) => {
         const baseDate = tour.departure_date || new Date().toISOString().split('T')[0]
         const itemName = item.description || ''
@@ -367,7 +367,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
       setLoading(true)
 
       // 載入主表資料
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: mainData, error: mainError } = await (supabase as any)
         .from('tour_departure_data')
         .select('*')
@@ -381,7 +381,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
       if (mainData) {
         setData(mainData as unknown as TourDepartureData)
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: mealsData } = await (supabase as any)
           .from('tour_departure_meals')
           .select('*')
@@ -390,7 +390,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
           .order('display_order', { ascending: true })
         setMeals((mealsData || []) as TourDepartureMeal[])
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: accomData } = await (supabase as any)
           .from('tour_departure_accommodations')
           .select('*')
@@ -399,7 +399,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
           .order('display_order', { ascending: true })
         setAccommodations((accomData || []) as TourDepartureAccommodation[])
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: activData } = await (supabase as any)
           .from('tour_departure_activities')
           .select('*')
@@ -408,7 +408,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
           .order('display_order', { ascending: true })
         setActivities((activData || []) as TourDepartureActivity[])
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: othersData } = await (supabase as any)
           .from('tour_departure_others')
           .select('*')
@@ -441,7 +441,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
       let departureDataId = data.id
 
       if (!departureDataId) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: newData, error } = await (supabase as any)
           .from('tour_departure_data')
           .insert({
@@ -455,7 +455,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
         departureDataId = newData.id
         setData(prev => ({ ...prev!, id: departureDataId }))
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { error } = await (supabase as any)
           .from('tour_departure_data')
           .update(data)
