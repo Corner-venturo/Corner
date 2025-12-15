@@ -127,7 +127,8 @@ export function OrderMembersExpandable({
     loadTourDepartureDate()
     // 載入顧客資料（用於編輯模式搜尋）
     fetchCustomers()
-  }, [orderId, tourId, fetchCustomers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, tourId])
 
   const loadTourDepartureDate = async () => {
     try {
