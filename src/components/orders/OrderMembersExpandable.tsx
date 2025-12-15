@@ -82,6 +82,14 @@ export function OrderMembersExpandable({
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
   const [isAllEditMode, setIsAllEditMode] = useState(false) // 全部編輯模式
 
+  // 顧客搜尋相關狀態
+  const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
+  const [showCustomerMatchDialog, setShowCustomerMatchDialog] = useState(false)
+  const [matchedCustomers, setMatchedCustomers] = useState<typeof customers>([])
+  const [matchType, setMatchType] = useState<'name' | 'id_number'>('name')
+  const [pendingMemberIndex, setPendingMemberIndex] = useState<number | null>(null)
+  const [pendingMemberData, setPendingMemberData] = useState<Partial<OrderMember> | null>(null)
+
   // 護照上傳相關狀態
   const [processedFiles, setProcessedFiles] = useState<ProcessedFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
@@ -576,6 +584,151 @@ export function OrderMembersExpandable({
       .replace(/[^\d.]/g, '')
 
     updateField(memberId, field, processedValue ? parseFloat(processedValue) : 0)
+  }
+
+  // ========== 顧客搜尋相關函數（編輯模式） ==========
+
+  // 根據姓名搜尋顧客（2字以上觸發）
+  const checkCustomerMatchByName = (name: string, memberIndex: number, memberData: Partial<OrderMember>) => {
+    if (!name || name.length < 2) return
+
+    // 模糊搜尋：顧客姓名包含輸入的字串
+    const nameMatches = customers.filter(c =>
+      c.name?.includes(name) || name.includes(c.name || '')
+    )
+
+    if (nameMatches.length > 0) {
+      setMatchedCustomers(nameMatches)
+      setMatchType('name')
+      setPendingMemberIndex(memberIndex)
+      setPendingMemberData(memberData)
+      setShowCustomerMatchDialog(true)
+    }
+  }
+
+  // 根據身分證字號搜尋顧客（5字以上觸發）
+  const checkCustomerMatchByIdNumber = (idNumber: string, memberIndex: number, memberData: Partial<OrderMember>) => {
+    if (!idNumber || idNumber.length < 5) return
+
+    // 完全匹配身分證字號
+    const idMatches = customers.filter(c =>
+      c.national_id === idNumber
+    )
+
+    if (idMatches.length > 0) {
+      setMatchedCustomers(idMatches)
+      setMatchType('id_number')
+      setPendingMemberIndex(memberIndex)
+      setPendingMemberData(memberData)
+      setShowCustomerMatchDialog(true)
+    }
+  }
+
+  // 選擇顧客後帶入資料
+  const handleSelectCustomer = async (customer: typeof customers[0]) => {
+    if (pendingMemberIndex === null) return
+
+    const member = members[pendingMemberIndex]
+    if (!member) return
+
+    // 更新本地狀態
+    const updatedMember = {
+      ...member,
+      chinese_name: customer.name || member.chinese_name,
+      passport_name: customer.passport_romanization || member.passport_name,
+      birth_date: customer.date_of_birth || member.birth_date,
+      gender: customer.gender || member.gender,
+      id_number: customer.national_id || member.id_number,
+      passport_number: customer.passport_number || member.passport_number,
+      passport_expiry: customer.passport_expiry_date || member.passport_expiry,
+      customer_id: customer.id,
+      customer_verification_status: customer.verification_status,
+    }
+
+    setMembers(members.map((m, i) => i === pendingMemberIndex ? updatedMember : m))
+
+    // 儲存到資料庫
+    try {
+      await supabase
+        .from('order_members')
+        .update({
+          chinese_name: updatedMember.chinese_name,
+          passport_name: updatedMember.passport_name,
+          birth_date: updatedMember.birth_date,
+          gender: updatedMember.gender,
+          id_number: updatedMember.id_number,
+          passport_number: updatedMember.passport_number,
+          passport_expiry: updatedMember.passport_expiry,
+          customer_id: updatedMember.customer_id,
+        })
+        .eq('id', member.id)
+    } catch (error) {
+      logger.error('更新成員資料失敗:', error)
+    }
+
+    // 關閉對話框
+    setShowCustomerMatchDialog(false)
+    setPendingMemberIndex(null)
+    setPendingMemberData(null)
+  }
+
+  // 編輯模式下的姓名輸入處理
+  const handleEditModeNameChange = (memberId: string, value: string, memberIndex: number) => {
+    // 先更新本地狀態
+    const member = members.find(m => m.id === memberId)
+    if (!member) return
+
+    setMembers(members.map(m => m.id === memberId ? { ...m, chinese_name: value } : m))
+
+    // 2字以上觸發顧客搜尋
+    if (value.trim().length >= 2) {
+      checkCustomerMatchByName(value.trim(), memberIndex, { ...member, chinese_name: value })
+    }
+  }
+
+  // 編輯模式下的身分證輸入處理
+  const handleEditModeIdNumberChange = (memberId: string, value: string, memberIndex: number) => {
+    // 先轉大寫和半形
+    const processedValue = toHalfWidth(value).toUpperCase()
+    const member = members.find(m => m.id === memberId)
+    if (!member) return
+
+    // 自動判斷性別
+    let gender = member.gender
+    const idPattern = /^[A-Z][12]/
+    if (idPattern.test(processedValue)) {
+      const genderCode = processedValue.charAt(1)
+      gender = genderCode === '1' ? 'M' : 'F'
+    }
+
+    setMembers(members.map(m => m.id === memberId ? { ...m, id_number: processedValue, gender } : m))
+
+    // 5字以上觸發顧客搜尋
+    if (processedValue.length >= 5) {
+      checkCustomerMatchByIdNumber(processedValue, memberIndex, { ...member, id_number: processedValue })
+    }
+  }
+
+  // 編輯模式失去焦點時儲存
+  const handleEditModeBlur = async (memberId: string, field: keyof OrderMember, value: string | number) => {
+    if (isComposing) return
+
+    let processedValue: string | number | null = value
+    if (typeof value === 'string') {
+      processedValue = toHalfWidth(value)
+    }
+    if (processedValue === '' && (field.includes('date') || field.includes('expiry'))) {
+      processedValue = null
+    }
+
+    try {
+      await supabase
+        .from('order_members')
+        .update({ [field]: processedValue })
+        .eq('id', memberId)
+    } catch (error) {
+      logger.error('儲存失敗:', error)
+    }
   }
 
   // ========== PDF 轉 JPG 函數 ==========
@@ -1182,19 +1335,21 @@ export function OrderMembersExpandable({
                       <input
                         type="text"
                         value={member.chinese_name || ''}
-                        onChange={e => updateField(member.id, 'chinese_name', e.target.value)}
+                        onChange={e => handleEditModeNameChange(member.id, e.target.value, memberIndex)}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
                           setIsComposing(false)
                           setTimeout(() => {
-                            updateField(member.id, 'chinese_name', e.currentTarget.value)
+                            handleEditModeNameChange(member.id, e.currentTarget.value, memberIndex)
                           }, 0)
                         }}
+                        onBlur={e => handleEditModeBlur(member.id, 'chinese_name', e.target.value)}
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
                         data-member={member.id}
                         data-field="chinese_name"
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="輸入姓名搜尋..."
                       />
                     ) : (
                       <div className="flex items-center gap-1">
@@ -1296,12 +1451,14 @@ export function OrderMembersExpandable({
                       <input
                         type="text"
                         value={member.id_number || ''}
-                        onChange={e => updateField(member.id, 'id_number', e.target.value)}
+                        onChange={e => handleEditModeIdNumberChange(member.id, e.target.value, memberIndex)}
+                        onBlur={e => handleEditModeBlur(member.id, 'id_number', e.target.value)}
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'id_number')}
                         data-member={member.id}
                         data-field="id_number"
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="輸入身分證搜尋..."
                       />
                     ) : (
                       <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
@@ -1960,6 +2117,91 @@ export function OrderMembersExpandable({
               }
             >
               {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 顧客選擇對話框 */}
+      <Dialog open={showCustomerMatchDialog} onOpenChange={setShowCustomerMatchDialog}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {matchType === 'name' ? '找到相符的顧客 (姓名)' : '找到相符的顧客 (身分證)'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <p className="text-sm text-morandi-secondary mb-4">
+              請選擇要帶入的顧客資料，或點擊「取消」繼續手動輸入
+            </p>
+
+            {/* 橫向表格顯示 */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-morandi-container/30">
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">姓名</th>
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">英文拼音</th>
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">身分證</th>
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">護照號碼</th>
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">生日</th>
+                    <th className="px-3 py-2 text-left font-medium text-morandi-secondary border">性別</th>
+                    <th className="px-3 py-2 text-center font-medium text-morandi-secondary border w-20">選擇</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matchedCustomers.map((customer) => (
+                    <tr
+                      key={customer.id}
+                      className="hover:bg-morandi-container/20 cursor-pointer"
+                      onClick={() => handleSelectCustomer(customer)}
+                    >
+                      <td className="px-3 py-2 border text-morandi-primary font-medium">
+                        {customer.name || '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-morandi-primary">
+                        {customer.passport_romanization || '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-morandi-primary font-mono">
+                        {customer.national_id || '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-morandi-primary">
+                        {customer.passport_number || '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-morandi-primary">
+                        {customer.date_of_birth || '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-morandi-primary text-center">
+                        {customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : '-'}
+                      </td>
+                      <td className="px-3 py-2 border text-center">
+                        <Button
+                          size="sm"
+                          className="bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleSelectCustomer(customer)
+                          }}
+                        >
+                          選擇
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCustomerMatchDialog(false)
+                setPendingMemberIndex(null)
+                setPendingMemberData(null)
+              }}
+            >
+              取消
             </Button>
           </div>
         </DialogContent>
