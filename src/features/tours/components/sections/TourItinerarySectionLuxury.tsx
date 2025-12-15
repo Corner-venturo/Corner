@@ -146,16 +146,15 @@ export function TourItinerarySectionLuxury({
     image?: string
   } | null>(null)
 
-  // 圖片瀏覽器狀態
+  // 圖片瀏覽器狀態 - 每張圖片可以有自己的標題和描述
   const [imageGallery, setImageGallery] = useState<{
-    images: string[]
+    images: { url: string; title?: string; description?: string }[]
     currentIndex: number
-    title?: string
   } | null>(null)
 
   // 開啟圖片瀏覽器
-  const openImageGallery = (images: string[], startIndex: number, title?: string) => {
-    setImageGallery({ images, currentIndex: startIndex, title })
+  const openImageGallery = (images: { url: string; title?: string; description?: string }[], startIndex: number) => {
+    setImageGallery({ images, currentIndex: startIndex })
   }
 
   // 切換上一張
@@ -231,10 +230,19 @@ export function TourItinerarySectionLuxury({
             const dayNumber = dayLabels[index].replace('Day ', '')
             // 檢查圖片來源：1. day.images（需 showDailyImages=true） 2. activities 裡的 image
             const dayImages = day.showDailyImages === true && day.images && day.images.length > 0 ? day.images : []
-            const activityImages = day.activities?.filter(a => a.image).map(a => a.image!) || []
-            // 合併所有圖片來源，統一轉換為 string 格式
-            const normalizedDayImages = dayImages.map(img => typeof img === 'string' ? img : img.url)
-            const allImages: string[] = normalizedDayImages.length > 0 ? normalizedDayImages : activityImages
+            // 建構帶有標題和描述的圖片陣列
+            const normalizedDayImages = dayImages.map((img, idx) => ({
+              url: typeof img === 'string' ? img : img.url,
+              title: day.activities?.[idx]?.title || '',
+              description: day.activities?.[idx]?.description || ''
+            }))
+            const activityImagesWithInfo = day.activities?.filter(a => a.image).map(a => ({
+              url: a.image!,
+              title: a.title || '',
+              description: a.description || ''
+            })) || []
+            // 合併所有圖片來源
+            const allImages = normalizedDayImages.length > 0 ? normalizedDayImages : activityImagesWithInfo
             const hasImages = allImages.length > 0
 
             return (
@@ -356,11 +364,11 @@ export function TourItinerarySectionLuxury({
                               {/* 左側圖片 */}
                               <div
                                 className="relative h-56 overflow-hidden rounded-sm cursor-pointer group/img"
-                                onClick={() => openImageGallery(allImages, 0, day.title)}
+                                onClick={() => openImageGallery(allImages, 0)}
                               >
                                 <img
-                                  src={allImages[0]}
-                                  alt={day.title || '行程圖片'}
+                                  src={allImages[0].url}
+                                  alt={allImages[0].title || '行程圖片'}
                                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors" />
@@ -420,34 +428,29 @@ export function TourItinerarySectionLuxury({
                           {/* 多張圖片：橫向排列，最多顯示3張 */}
                           {allImages.length >= 2 && (
                             <div className={`grid gap-4 ${allImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                              {allImages.slice(0, 3).map((img, imgIdx) => {
-                                const imgUrl = img
-                                const imgCaption = day.activities?.[imgIdx]?.title || ''
-
-                                return (
-                                  <div
-                                    key={imgIdx}
-                                    className="relative h-44 overflow-hidden rounded-sm cursor-pointer group/img"
-                                    onClick={() => openImageGallery(allImages, imgIdx, day.title)}
-                                  >
-                                    <img
-                                      src={imgUrl}
-                                      alt={imgCaption}
-                                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                    {/* 左下角標籤 */}
-                                    <div className="absolute bottom-3 left-3">
-                                      <span
-                                        className="text-white text-xs font-bold uppercase tracking-wider"
-                                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                                      >
-                                        {imgCaption}
-                                      </span>
-                                    </div>
+                              {allImages.slice(0, 3).map((img, imgIdx) => (
+                                <div
+                                  key={imgIdx}
+                                  className="relative h-44 overflow-hidden rounded-sm cursor-pointer group/img"
+                                  onClick={() => openImageGallery(allImages, imgIdx)}
+                                >
+                                  <img
+                                    src={img.url}
+                                    alt={img.title || ''}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                  {/* 左下角標籤 */}
+                                  <div className="absolute bottom-3 left-3">
+                                    <span
+                                      className="text-white text-xs font-bold uppercase tracking-wider"
+                                      style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                                    >
+                                      {img.title}
+                                    </span>
                                   </div>
-                                )
-                              })}
+                                </div>
+                              ))}
                             </div>
                           )}
 
@@ -456,7 +459,7 @@ export function TourItinerarySectionLuxury({
                             <button
                               className="mt-3 text-sm font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
                               style={{ color: LUXURY.secondary }}
-                              onClick={() => openImageGallery(allImages, 3, day.title)}
+                              onClick={() => openImageGallery(allImages, 3)}
                             >
                               <span>查看更多 +{allImages.length - 3}</span>
                               <ArrowRight className="w-4 h-4" />
@@ -678,21 +681,26 @@ export function TourItinerarySectionLuxury({
               onClick={e => e.stopPropagation()}
             >
               <img
-                src={imageGallery.images[imageGallery.currentIndex]}
-                alt={imageGallery.title || '行程圖片'}
-                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                src={imageGallery.images[imageGallery.currentIndex].url}
+                alt={imageGallery.images[imageGallery.currentIndex].title || '行程圖片'}
+                className="max-w-full max-h-[60vh] object-contain rounded-lg"
               />
-              {/* 標題 */}
-              {imageGallery.title && (
-                <div className="text-center mt-4">
-                  <p
-                    className="text-white text-lg"
+              {/* 景點標題和描述 */}
+              <div className="text-center mt-4 max-w-2xl mx-auto">
+                {imageGallery.images[imageGallery.currentIndex].title && (
+                  <h3
+                    className="text-white text-xl font-bold mb-2"
                     style={{ fontFamily: "'Noto Serif TC', serif" }}
                   >
-                    {imageGallery.title}
+                    {imageGallery.images[imageGallery.currentIndex].title}
+                  </h3>
+                )}
+                {imageGallery.images[imageGallery.currentIndex].description && (
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {imageGallery.images[imageGallery.currentIndex].description}
                   </p>
-                </div>
-              )}
+                )}
+              </div>
             </motion.div>
 
             {/* 右箭頭 */}
@@ -725,7 +733,7 @@ export function TourItinerarySectionLuxury({
                     }`}
                   >
                     <img
-                      src={img}
+                      src={img.url}
                       alt=""
                       className="w-full h-full object-cover"
                     />

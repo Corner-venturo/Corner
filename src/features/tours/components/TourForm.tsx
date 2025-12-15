@@ -66,17 +66,17 @@ export function TourForm({
     }
   }, [isOpen, mode, fetchItineraries, fetchQuotes])
 
-  // 過濾可用的行程表（已發布且未關聯旅遊團的）
+  // 過濾可用的行程表（未關聯旅遊團的）
   const availableItineraries = useMemo(() => {
     return itineraries
-      .filter(i => i.status === 'published' && !i.tour_id && !(i as { _deleted?: boolean })._deleted)
+      .filter(i => !i.tour_id && !(i as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [itineraries])
 
-  // 過濾可用的報價單（標準報價單，未關聯旅遊團的）
+  // 過濾可用的報價單（未關聯旅遊團的）
   const availableQuotes = useMemo(() => {
     return quotes
-      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as { _deleted?: boolean })._deleted)
+      .filter(q => !q.tour_id && !(q as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [quotes])
 
@@ -355,6 +355,7 @@ export function TourForm({
                         setNewTour(prev => ({ ...prev, return_date }))
                       }}
                       min={newTour.departure_date || new Date().toISOString().split('T')[0]}
+                      defaultMonth={newTour.departure_date}
                       className="mt-1"
                       required
                     />

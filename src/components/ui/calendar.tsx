@@ -39,30 +39,25 @@ export function Calendar({
     defaultMonth || (selected instanceof Date ? selected : new Date())
   )
 
-  // 生成當月的所有日期（包含前後月份補齊）
+  // 生成當月的所有日期（包含前後月份補齊，固定 6 行 42 天）
   const generateCalendarDays = (): DayInfo[] => {
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
 
     // 本月第一天
     const firstDay = new Date(year, month, 1)
-    // 本月最後一天
-    const lastDay = new Date(year, month + 1, 0)
 
     // 計算第一週需要顯示的上個月日期（從週日開始）
     const startDate = new Date(firstDay)
     startDate.setDate(firstDay.getDate() - firstDay.getDay())
-
-    // 計算最後一週需要顯示的下個月日期
-    const endDate = new Date(lastDay)
-    endDate.setDate(lastDay.getDate() + (6 - lastDay.getDay()))
 
     const days: DayInfo[] = []
     const currentDate = new Date(startDate)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    while (currentDate <= endDate) {
+    // 固定生成 42 天（6 行 x 7 列），確保高度一致
+    for (let i = 0; i < 42; i++) {
       const dateToCheck = new Date(currentDate)
       dateToCheck.setHours(0, 0, 0, 0)
 
@@ -261,7 +256,7 @@ export function Calendar({
           const isFirstInRow = index % 7 === 0
           const isLastInRow = index % 7 === 6
           const isFirstRow = index < 7
-          const isLastRow = index >= days.length - 7
+          const isLastRow = index >= 35 // 固定 42 天，最後一行是 35-41
 
           return (
             <button

@@ -14,6 +14,7 @@ interface SimpleDateInputProps {
   className?: string
   placeholder?: string
   required?: boolean
+  defaultMonth?: string // YYYY-MM-DD 格式，用於指定日曆預設顯示的月份
 }
 
 export function SimpleDateInput({
@@ -23,6 +24,7 @@ export function SimpleDateInput({
   className,
   placeholder = '選擇日期',
   required = false,
+  defaultMonth,
 }: SimpleDateInputProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const yearRef = useRef<HTMLInputElement>(null)
@@ -42,6 +44,18 @@ export function SimpleDateInput({
   const minDate = min && min.match(/^\d{4}-\d{2}-\d{2}$/)
     ? parse(min, 'yyyy-MM-dd', new Date())
     : undefined
+  const defaultMonthDate = defaultMonth && defaultMonth.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(defaultMonth, 'yyyy-MM-dd', new Date())
+    : undefined
+
+  // 計算日曆預設顯示的月份（優先級：當前值 > defaultMonth > min > 今天）
+  const calendarDefaultMonth = dateValue && isValid(dateValue)
+    ? dateValue
+    : defaultMonthDate && isValid(defaultMonthDate)
+      ? defaultMonthDate
+      : minDate && isValid(minDate)
+        ? minDate
+        : undefined
 
   // 判斷是否為完整有效日期
   const isCompleteDate = year.length === 4 && month.length === 2 && day.length === 2 && dateValue && isValid(dateValue)
@@ -192,13 +206,19 @@ export function SimpleDateInput({
               <CalendarIcon className="h-4 w-4" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent
+            className="w-auto p-0"
+            align="start"
+            side="bottom"
+            sideOffset={4}
+            avoidCollisions={false}
+          >
             <Calendar
               mode="single"
               selected={dateValue && isValid(dateValue) ? dateValue : undefined}
               onSelect={handleCalendarSelect}
               disabled={minDate ? { before: minDate } : undefined}
-              defaultMonth={dateValue && isValid(dateValue) ? dateValue : undefined}
+              defaultMonth={calendarDefaultMonth}
             />
           </PopoverContent>
         </Popover>
