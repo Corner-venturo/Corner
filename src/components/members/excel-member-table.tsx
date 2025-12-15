@@ -16,7 +16,8 @@ import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ImageIcon, X, AlertTriangle } from 'lucide-react'
+import { ImageIcon, X, AlertTriangle, Edit3, Save } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { CustomerVerifyDialog } from '@/app/(main)/customers/components/CustomerVerifyDialog'
 
 interface MemberTableProps {
@@ -55,6 +56,9 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     // 護照驗證對話框
     const [showVerifyDialog, setShowVerifyDialog] = useState(false)
     const [verifyCustomer, setVerifyCustomer] = useState<Customer | null>(null)
+
+    // 全部編輯模式
+    const [isEditMode, setIsEditMode] = useState(false)
 
     const orderMembers = useMemo(
       () => members.filter(member => member.order_id === order_id),
@@ -355,39 +359,203 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       setTableMembers([...tableMembers, newMember])
     }
 
+    // 編輯模式下的欄位變更處理
+    const handleEditModeChange = useCallback(
+      (index: number, field: keyof EditingMember, value: string) => {
+        const updatedMembers = [...tableMembers]
+        const member = { ...updatedMembers[index], [field]: value }
+
+        // 從身分證自動計算性別
+        if (field === 'id_number' && value) {
+          member.gender = getGenderFromIdNumber(value)
+        }
+
+        updatedMembers[index] = member
+        setTableMembers(updatedMembers)
+
+        // 姓名輸入 2 字以上，觸發顧客搜尋
+        if (field === 'name' && value.trim().length >= 2) {
+          checkCustomerMatchByName(member, index)
+        }
+
+        // 身分證輸入 5 字以上，觸發顧客搜尋
+        if (field === 'id_number' && value.trim().length >= 5) {
+          checkCustomerMatchByIdNumber(member, index)
+        }
+
+        // 自動儲存（debounce）
+        autoSaveMember(member, index)
+      },
+      [tableMembers, checkCustomerMatchByName, checkCustomerMatchByIdNumber, autoSaveMember]
+    )
+
+    // 儲存編輯模式的所有變更
+    const handleSaveEditMode = useCallback(() => {
+      setIsEditMode(false)
+    }, [])
+
     // 暴露addRow函數給父組件
     useImperativeHandle(ref, () => ({
       addRow,
     }))
 
+    // 檢查是否有已填寫的資料
+    const hasExistingData = tableMembers.some(m => m.name?.trim() || m.id_number?.trim())
+
     return (
       <div className="w-full">
-        {/* 使用 ReactDataSheet 替代原來的表格 */}
-        <ReactDataSheetWrapper
-          columns={dataSheetColumns}
-          data={tableMembers.map((member, index: number) => {
-            const age = 'age' in member ? (member as EditingMember & { age: number }).age : 0
-            return {
-              ...member,
-              index: index + 1,
-              age: age > 0 ? `${age}歲` : '',
-              gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
-              passport_image_url: member.passport_image_url || '',
-              customer_id: member.customer_id || '',
-            }
-          })}
-          onDataUpdate={handleDataUpdate as (data: unknown[]) => void}
-          className="min-h-[400px]"
-        />
+        {/* 編輯模式切換按鈕 */}
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
+          <div className="text-sm text-muted-foreground">
+            共 {tableMembers.length} 位成員
+            {hasExistingData && !isEditMode && (
+              <span className="ml-2 text-amber-600">（已有 {tableMembers.filter(m => m.name?.trim()).length} 位有資料）</span>
+            )}
+          </div>
+          <Button
+            variant={isEditMode ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              if (!isEditMode && hasExistingData) {
+                // 有資料時提醒
+                if (confirm('目前已有成員資料，進入編輯模式後可直接修改所有欄位。確定要進入編輯模式嗎？')) {
+                  setIsEditMode(true)
+                }
+              } else {
+                setIsEditMode(!isEditMode)
+              }
+            }}
+            className="gap-2"
+          >
+            {isEditMode ? (
+              <>
+                <Save size={16} />
+                完成編輯
+              </>
+            ) : (
+              <>
+                <Edit3 size={16} />
+                全部編輯模式
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* 編輯模式：所有欄位都是 Input */}
+        {isEditMode ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead className="bg-muted/50 sticky top-0">
+                <tr>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-10">#</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[100px]">姓名</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[120px]">英文姓名</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">生日</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-[50px]">性別</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[120px]">身分證字號</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">護照號碼</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">護照效期</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableMembers.map((member, index) => (
+                  <tr key={member.id || `new-${index}`} className="border-b hover:bg-muted/20">
+                    <td className="px-2 py-1 text-muted-foreground">{index + 1}</td>
+                    <td className="px-1 py-1">
+                      <Input
+                        value={member.name || ''}
+                        onChange={(e) => handleEditModeChange(index, 'name', e.target.value)}
+                        placeholder="姓名"
+                        className="h-8 text-sm"
+                      />
+                    </td>
+                    <td className="px-1 py-1">
+                      <Input
+                        value={member.name_en || ''}
+                        onChange={(e) => handleEditModeChange(index, 'name_en', e.target.value)}
+                        placeholder="英文姓名"
+                        className="h-8 text-sm"
+                      />
+                    </td>
+                    <td className="px-1 py-1">
+                      <Input
+                        type="date"
+                        value={member.birthday || ''}
+                        onChange={(e) => handleEditModeChange(index, 'birthday', e.target.value)}
+                        className="h-8 text-sm"
+                      />
+                    </td>
+                    <td className="px-2 py-1 text-center text-muted-foreground">
+                      {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
+                    </td>
+                    <td className="px-1 py-1">
+                      <Input
+                        value={member.id_number || ''}
+                        onChange={(e) => handleEditModeChange(index, 'id_number', e.target.value)}
+                        placeholder="身分證字號"
+                        className="h-8 text-sm font-mono"
+                      />
+                    </td>
+                    <td className="px-1 py-1">
+                      <Input
+                        value={member.passport_number || ''}
+                        onChange={(e) => handleEditModeChange(index, 'passport_number', e.target.value)}
+                        placeholder="護照號碼"
+                        className="h-8 text-sm font-mono"
+                      />
+                    </td>
+                    <td className="px-1 py-1">
+                      <Input
+                        type="date"
+                        value={member.passport_expiry || ''}
+                        onChange={(e) => handleEditModeChange(index, 'passport_expiry', e.target.value)}
+                        className="h-8 text-sm"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          /* 一般模式：使用 ReactDataSheet */
+          <ReactDataSheetWrapper
+            columns={dataSheetColumns}
+            data={tableMembers.map((member, index: number) => {
+              const age = 'age' in member ? (member as EditingMember & { age: number }).age : 0
+              return {
+                ...member,
+                index: index + 1,
+                age: age > 0 ? `${age}歲` : '',
+                gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
+                passport_image_url: member.passport_image_url || '',
+                customer_id: member.customer_id || '',
+              }
+            })}
+            onDataUpdate={handleDataUpdate as (data: unknown[]) => void}
+            className="min-h-[400px]"
+          />
+        )}
 
         <div className="text-xs text-morandi-secondary px-6 py-2 space-y-1">
-          <p>• 點擊任意單元格即可編輯，自動儲存</p>
-          <p>• 年齡和性別為自動計算欄位</p>
-          <p>• 支援 Excel 式鍵盤導航和複製貼上</p>
-          <p>• 身分證號碼會自動計算年齡和性別</p>
-          <p>• 輸入姓名時會自動搜尋顧客資料庫，同名時可選擇</p>
-          <p>• <ImageIcon size={12} className="inline text-primary" /> 有護照照片的成員，點擊可預覽或驗證</p>
-          <p>• <AlertTriangle size={12} className="inline text-amber-500" /> 金色驚嘆號表示護照資料待驗證，點擊可進行驗證</p>
+          {isEditMode ? (
+            <>
+              <p>• 編輯模式：所有欄位都可以直接輸入</p>
+              <p>• 輸入姓名 2 字以上會自動搜尋相似顧客</p>
+              <p>• 輸入身分證 5 字以上會自動搜尋相同顧客</p>
+              <p>• 性別會根據身分證字號自動計算</p>
+            </>
+          ) : (
+            <>
+              <p>• 雙擊單元格即可編輯，自動儲存</p>
+              <p>• 年齡和性別為自動計算欄位</p>
+              <p>• 支援 Excel 式鍵盤導航和複製貼上</p>
+              <p>• 身分證號碼會自動計算年齡和性別</p>
+              <p>• 輸入姓名時會自動搜尋顧客資料庫，同名時可選擇</p>
+              <p>• <ImageIcon size={12} className="inline text-primary" /> 有護照照片的成員，點擊可預覽或驗證</p>
+              <p>• <AlertTriangle size={12} className="inline text-amber-500" /> 金色驚嘆號表示護照資料待驗證，點擊可進行驗證</p>
+            </>
+          )}
         </div>
 
         {/* 護照圖片預覽對話框 */}
