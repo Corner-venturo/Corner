@@ -77,6 +77,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     tour_code: data.tourCode,
     cover_image: data.coverImage,
     cover_style: data.coverStyle || 'original',
+    flight_style: data.flightStyle || 'original',
+    itinerary_style: data.itineraryStyle || 'original',
     price: data.price || null,
     price_note: data.priceNote || null,
     country: data.country,
