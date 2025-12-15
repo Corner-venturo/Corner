@@ -46,7 +46,25 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   const { generateRequestNumber, createRequest } = useRequestOperations()
 
-  // ... (rest of the component logic)
+  const handleCancel = () => {
+    resetForm()
+    onOpenChange(false)
+  }
+
+  const handleSubmit = async () => {
+    try {
+      await createRequest({
+        ...formData,
+        request_number: generateRequestNumber(),
+        items: requestItems,
+        total_amount,
+      })
+      resetForm()
+      onOpenChange(false)
+    } catch (error) {
+      console.error('新增請款單失敗:', error)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
