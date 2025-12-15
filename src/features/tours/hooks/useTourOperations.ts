@@ -142,6 +142,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
             ? availableCities.find(c => c.code === newTour.cityCode)
             : undefined
 
+        // 解析航班文字為 JSON（簡單格式：航空公司 班次 時間）
+        const parseFlightText = (text?: string) => {
+          if (!text?.trim()) return null
+          // 簡單存儲為 JSON，包含原始文字
+          return { text: text.trim() }
+        }
+
         const tourData = {
           name: newTour.name,
           location: cityName,
@@ -160,6 +167,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
           current_participants: 0,
           quote_id: fromQuoteId || undefined,
           enable_checkin: newTour.enable_checkin || false,
+          outbound_flight: parseFlightText(newTour.outbound_flight_text),
+          return_flight: parseFlightText(newTour.return_flight_text),
         }
 
         const createdTour = await actions.create(tourData)

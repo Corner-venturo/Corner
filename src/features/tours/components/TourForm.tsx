@@ -274,8 +274,11 @@ export function TourForm({
                         value={newTour.cityCode}
                         onChange={cityCode => setNewTour(prev => ({ ...prev, cityCode }))}
                         options={availableCities.map(city => ({
-                          value: city.code,
-                          label: `${city.name} (${city.code})`,
+                          value: city.code || `__no_code_${city.id}`,
+                          label: city.code
+                            ? `${city.name} (${city.code})`
+                            : `${city.name} ⚠️ 未設定機場代碼`,
+                          disabled: !city.code,
                         }))}
                         placeholder="輸入或選擇城市..."
                         emptyMessage="找不到符合的城市"
@@ -369,6 +372,31 @@ export function TourForm({
                     onChange={e => setNewTour(prev => ({ ...prev, description: e.target.value }))}
                     className="mt-1"
                   />
+                </div>
+
+                {/* 航班資訊（選填） */}
+                <div className="border-t pt-4 mt-4">
+                  <label className="text-sm font-medium text-morandi-primary mb-3 block">航班資訊（選填）</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-morandi-secondary">去程航班</label>
+                      <Input
+                        value={newTour.outbound_flight_text || ''}
+                        onChange={e => setNewTour(prev => ({ ...prev, outbound_flight_text: e.target.value }))}
+                        placeholder="例：BR 190 07:25-11:45"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-morandi-secondary">回程航班</label>
+                      <Input
+                        value={newTour.return_flight_text || ''}
+                        onChange={e => setNewTour(prev => ({ ...prev, return_flight_text: e.target.value }))}
+                        placeholder="例：BR 191 13:00-16:30"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-4">

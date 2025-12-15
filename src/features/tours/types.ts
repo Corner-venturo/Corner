@@ -15,6 +15,8 @@ export interface NewTourData {
   max_participants: number
   description?: string
   enable_checkin?: boolean // 是否開啟報到功能
+  outbound_flight_text?: string // 去程航班文字 (如: BR 190 07:25-11:45)
+  return_flight_text?: string // 回程航班文字 (如: BR 191 13:00-16:30)
 }
 
 export interface TourExtraFields {

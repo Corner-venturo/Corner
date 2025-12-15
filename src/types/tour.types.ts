@@ -3,6 +3,7 @@
  */
 
 import { BaseEntity } from './base.types'
+import { FlightInfo } from '@/stores/types'
 
 // ============================================
 // 旅遊團介面
@@ -52,6 +53,10 @@ export interface Tour extends BaseEntity {
   // 報到功能欄位
   enable_checkin?: boolean | null // 是否開啟報到功能
   checkin_qrcode?: string | null // 團體報到 QR Code 內容
+
+  // 航班資訊
+  outbound_flight?: FlightInfo | null // 去程航班
+  return_flight?: FlightInfo | null // 回程航班
 
   // 同步欄位
   _deleted?: boolean | null // 軟刪除標記
