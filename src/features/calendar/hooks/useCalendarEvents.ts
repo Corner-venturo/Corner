@@ -72,8 +72,10 @@ export function useCalendarEvents() {
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
   // 初始化時從 localStorage 讀取篩選狀態
+  const workspaceInitRef = useRef(false)
   useEffect(() => {
-    if (isSuperAdmin) {
+    if (isSuperAdmin && !workspaceInitRef.current) {
+      workspaceInitRef.current = true
       const saved = localStorage.getItem('calendar_workspace_filter')
       setSelectedWorkspaceId(saved)
       loadWorkspaces()

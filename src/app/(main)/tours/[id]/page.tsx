@@ -13,13 +13,12 @@ import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { TourMembersAdvanced } from '@/components/tours/tour-members-advanced'
-import { TourOperations } from '@/components/tours/tour-operations'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { TourDocuments } from '@/components/tours/tour-documents'
-import { TourAddOns } from '@/components/tours/tour-add-ons'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
+import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
 import { MessageSquare, FileText } from 'lucide-react'
 import { toast } from 'sonner'
@@ -29,8 +28,6 @@ const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
-  { value: 'operations', label: '團務' },
-  { value: 'addons', label: '加購' },
   { value: 'payments', label: '收款紀錄' },
   { value: 'costs', label: '成本支出' },
   { value: 'documents', label: '文件確認' },
@@ -44,12 +41,12 @@ export default function TourDetailPage() {
   const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState('overview')
-  const [triggerAddOnAdd, setTriggerAddOnAdd] = useState(false)
-  const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
+    const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
   const [triggerMemberAdd, setTriggerMemberAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showDepartureDialog, setShowDepartureDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
 
   // 建立頻道對話框狀態
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
@@ -169,10 +166,6 @@ export default function TourDetailPage() {
       switch (activeTab) {
         case 'overview':
           return '編輯'
-        case 'operations':
-          return '新增欄位'
-        case 'addons':
-          return '新增加購'
         case 'payments':
           return '新增收款'
         case 'costs':
@@ -192,13 +185,7 @@ export default function TourDetailPage() {
         // 根據不同分頁執行不同的邏輯
         switch (activeTab) {
           case 'overview':
-            // 功能: 編輯旅遊團基本資料
-            break
-          case 'operations':
-            // 功能: 新增團務欄位
-            break
-          case 'addons':
-            setTriggerAddOnAdd(true)
+            setShowEditDialog(true)
             break
           case 'payments':
             setTriggerPaymentAdd(true)
@@ -218,21 +205,11 @@ export default function TourDetailPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <TourOverview tour={tour} />
+        return <TourOverview tour={tour} onEdit={() => setShowEditDialog(true)} />
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
         return <TourMembersAdvanced tour={tour} />
-      case 'operations':
-        return <TourOperations tour={tour} />
-      case 'addons':
-        return (
-          <TourAddOns
-            tour={tour}
-            triggerAdd={triggerAddOnAdd}
-            onTriggerAddComplete={() => setTriggerAddOnAdd(false)}
-          />
-        )
       case 'payments':
         return (
           <TourPayments
@@ -350,6 +327,17 @@ export default function TourDetailPage() {
         onMembersChange={setSelectedMembers}
         onClose={handleCloseChannelDialog}
         onCreate={handleConfirmCreateChannel}
+      />
+
+      {/* 編輯旅遊團對話框 */}
+      <TourEditDialog
+        isOpen={showEditDialog}
+        onClose={() => setShowEditDialog(false)}
+        tour={tour}
+        onSuccess={() => {
+          // 重新載入旅遊團資料
+          window.location.reload()
+        }}
       />
     </div>
   )

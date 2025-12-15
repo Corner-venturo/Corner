@@ -20,11 +20,13 @@ import { cn } from '@/lib/utils'
 interface TourOverviewProps {
   tour: Tour
   orderFilter?: string // 選填：顯示特定訂單的總覽信息
+  onEdit?: () => void // 選填：編輯基本資料的回調
 }
 
 export const TourOverview = React.memo(function TourOverview({
   tour,
   orderFilter,
+  onEdit,
 }: TourOverviewProps) {
   const { items: orders } = useOrderStore()
 
@@ -164,7 +166,10 @@ export const TourOverview = React.memo(function TourOverview({
         <div>
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">快速操作</h3>
           <div className="space-y-2">
-            <Button className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white justify-start">
+            <Button
+              onClick={onEdit}
+              className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white justify-start"
+            >
               <FileText size={16} className="mr-2" />
               編輯基本資料
             </Button>

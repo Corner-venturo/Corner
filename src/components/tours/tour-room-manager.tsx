@@ -8,7 +8,7 @@ const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Trash2, Users, Hotel, X, Check, BedDouble, Copy, Plus, UserMinus } from 'lucide-react'
+import { Trash2, Users, Hotel, X, Check, BedDouble, Copy, Plus, UserMinus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
@@ -51,6 +51,67 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
   const [assignments, setAssignments] = useState<TourRoomAssignment[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedNight, setSelectedNight] = useState(1)
+  const [isSorting, setIsSorting] = useState(false)
+
+  const handleSortAndClose = async () => {
+    setIsSorting(true)
+    try {
+      const nightNumbers = [...new Set(rooms.map(r => r.night_number))]
+      const allUpdates = []
+
+      for (const night of nightNumbers) {
+        const nightRooms = rooms.filter(r => r.night_number === night)
+        const roomSortKeys = new Map<string, number>()
+
+        for (const room of nightRooms) {
+          const roomAssignments = assignments.filter(a => a.room_id === room.id)
+          const memberIdsInRoom = roomAssignments.map(a => a.order_member_id)
+
+          if (memberIdsInRoom.length === 0) {
+            roomSortKeys.set(room.id, Infinity)
+            continue
+          }
+
+          const minIndex = Math.min(
+            ...memberIdsInRoom.map(memberId => {
+              const index = members.findIndex(m => m.id === memberId)
+              return index === -1 ? Infinity : index
+            })
+          )
+          roomSortKeys.set(room.id, minIndex)
+        }
+
+        const sortedNightRooms = [...nightRooms].sort((a, b) => {
+          const keyA = roomSortKeys.get(a.id) ?? Infinity
+          const keyB = roomSortKeys.get(b.id) ?? Infinity
+          return keyA - keyB
+        })
+
+        const nightUpdates = sortedNightRooms.map((room, index) => ({
+          id: room.id,
+          display_order: index,
+        }))
+
+        allUpdates.push(...nightUpdates)
+      }
+
+      if (allUpdates.length > 0) {
+        const { error } = await supabase.from('tour_rooms').upsert(allUpdates)
+        if (error) {
+          console.error('Supabase upsert error:', error)
+          throw error
+        };
+      }
+
+      toast.success("房間順序已儲存")
+      onOpenChange(false)
+    } catch (error) {
+      console.error("排序失敗:", error)
+      toast.error("儲存排序失敗")
+    } finally {
+      setIsSorting(false)
+    }
+  }
 
   // 每晚的房型設定
   const [nightConfigs, setNightConfigs] = useState<Record<number, NightRoomConfig>>({})
@@ -613,7 +674,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open && !addRoomOpen} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-6xl w-[95vw] h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-border">
           <DialogTitle className="flex items-center gap-2 text-morandi-primary">
@@ -648,14 +709,23 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
               })}
             </div>
 
-            {/* 新增房間按鈕 */}
-            <button
-              onClick={() => setAddRoomOpen(true)}
-              className="flex items-center gap-1.5 text-sm font-normal px-4 py-1.5 rounded-md border border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-all ml-auto"
-            >
-              <Plus className="h-4 w-4" />
-              新增房間
-            </button>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={() => setAddRoomOpen(true)}
+                className="flex items-center gap-1.5 text-sm font-normal px-4 py-1.5 rounded-md border border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                新增房間
+              </button>
+              <Button
+                onClick={handleSortAndClose}
+                disabled={isSorting}
+                className="gap-1.5"
+              >
+                {isSorting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                完成並排序
+              </Button>
+            </div>
 
           </DialogTitle>
         </DialogHeader>
@@ -959,187 +1029,173 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
             )}
           </div>
         </div>
-        {/* 新增房間 Dialog - 遮罩層（全畫面） */}
-        {addRoomOpen && (
-          <div className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm" onClick={() => setAddRoomOpen(false)} />
-        )}
+      </DialogContent>
+    </Dialog>
 
-        {/* 新增房間 Dialog */}
-        {addRoomOpen && (
-          <div className="fixed inset-0 z-[10001] flex items-start justify-center pt-[10vh]">
-            <div className="bg-background rounded-xl border border-border shadow-lg max-w-4xl w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <BedDouble className="h-5 w-5 text-morandi-gold" />
-                  <h2 className="text-lg font-medium text-morandi-primary">
-                    批次新增房間 - 第 {selectedNight} 晚
-                  </h2>
-                  {tour?.departure_date && (
-                    <span className="text-sm text-morandi-muted ml-2">
-                      {getNightDate(selectedNight)}
-                    </span>
-                  )}
-                  <label className="flex items-center gap-1.5 ml-4 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={continueFromPrevious.has(selectedNight)}
-                      onChange={() => toggleContinueFromPrevious(selectedNight)}
-                      disabled={selectedNight <= 1}
-                      className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                    />
-                    <span className={`text-sm ${selectedNight <= 1 ? 'text-morandi-muted' : 'text-morandi-secondary'}`}>
-                      續住
-                    </span>
-                  </label>
-                </div>
+    {/* 新增房間 Dialog */}
+    <Dialog open={addRoomOpen} onOpenChange={(open) => { setAddRoomOpen(open); if (!open) resetRoomRows(); }}>
+      <DialogContent className="max-w-4xl w-full">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <BedDouble className="h-5 w-5 text-morandi-gold" />
+            批次新增房間 - 第 {selectedNight} 晚
+            {tour?.departure_date && (
+              <span className="text-sm font-normal text-morandi-muted ml-2">
+                {getNightDate(selectedNight)}
+              </span>
+            )}
+            <label className="flex items-center gap-1.5 ml-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={continueFromPrevious.has(selectedNight)}
+                onChange={() => toggleContinueFromPrevious(selectedNight)}
+                disabled={selectedNight <= 1}
+                className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold"
+              />
+              <span className={`text-sm ${selectedNight <= 1 ? 'text-morandi-muted' : 'text-morandi-secondary'}`}>
+                續住
+              </span>
+            </label>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 pt-4">
+          {/* 標題列 */}
+          <div className="grid gap-3 px-2 text-sm font-medium text-morandi-secondary items-center" style={{ gridTemplateColumns: `180px 100px 100px 120px 140px ${customFieldNames.map(() => '120px').join(' ')} auto 40px` }}>
+            <span>名稱</span>
+            <span>入住人數</span>
+            <span>間數</span>
+            <span>金額</span>
+            <span>訂房代號</span>
+            {customFieldNames.map((fieldName, fieldIndex) => (
+              <div key={fieldIndex} className="flex items-center gap-1">
+                <Input
+                  value={fieldName}
+                  onChange={e => updateCustomFieldName(fieldIndex, e.target.value)}
+                  className="h-7 text-xs"
+                />
                 <button
-                  onClick={() => { setAddRoomOpen(false); resetRoomRows() }}
-                  className="text-morandi-secondary hover:text-morandi-primary"
+                  onClick={() => removeCustomField(fieldIndex)}
+                  className="text-morandi-muted hover:text-morandi-red flex-shrink-0"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
+            ))}
+            <button
+              onClick={addCustomField}
+              className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-dashed border-morandi-muted text-morandi-muted hover:border-morandi-gold hover:text-morandi-gold transition-colors whitespace-nowrap"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              新增欄位
+            </button>
+            <span></span>
+          </div>
 
-              <div className="space-y-4">
-                {/* 標題列 */}
-                <div className="grid gap-3 px-2 text-sm font-medium text-morandi-secondary items-center" style={{ gridTemplateColumns: `180px 100px 100px 120px 140px ${customFieldNames.map(() => '120px').join(' ')} auto 40px` }}>
-                  <span>名稱</span>
-                  <span>入住人數</span>
-                  <span>間數</span>
-                  <span>金額</span>
-                  <span>訂房代號</span>
-                  {customFieldNames.map((fieldName, fieldIndex) => (
-                    <div key={fieldIndex} className="flex items-center gap-1">
-                      <Input
-                        value={fieldName}
-                        onChange={e => updateCustomFieldName(fieldIndex, e.target.value)}
-                        className="h-7 text-xs"
-                      />
-                      <button
-                        onClick={() => removeCustomField(fieldIndex)}
-                        className="text-morandi-muted hover:text-morandi-red flex-shrink-0"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
+          {/* 房間列表 */}
+          <div className="space-y-2 max-h-[300px] overflow-auto">
+            {newRoomRows.map((row, index) => (
+              <div key={row.id} className="grid gap-3 items-center" style={{ gridTemplateColumns: `180px 100px 100px 120px 140px ${customFieldNames.map(() => '120px').join(' ')} auto 40px` }}>
+                <Input
+                  value={row.roomName}
+                  onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, roomName: e.target.value } : r))}
+                  placeholder="豪華、海景..."
+                  className="h-10"
+                />
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={row.capacity || ''}
+                  onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, capacity: parseInt(e.target.value) || 0 } : r))}
+                  placeholder="2"
+                  className="h-10 text-center"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  value={row.count || ''}
+                  onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, count: parseInt(e.target.value) || 0 } : r))}
+                  className="h-10 text-center"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  value={row.amount}
+                  onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, amount: e.target.value } : r))}
+                  placeholder="0"
+                  className="h-10 text-center"
+                />
+                <Input
+                  value={row.bookingCode}
+                  onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, bookingCode: e.target.value } : r))}
+                  placeholder="訂房代號"
+                  className="h-10"
+                />
+                {customFieldNames.map((fieldName, fieldIndex) => (
+                  <Input
+                    key={fieldIndex}
+                    value={row.customFields[fieldName] || ''}
+                    onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? {
+                      ...r,
+                      customFields: { ...r.customFields, [fieldName]: e.target.value }
+                    } : r))}
+                    placeholder={fieldName}
+                    className="h-10"
+                  />
+                ))}
+                <div></div>
+                {index === 0 ? (
                   <button
-                    onClick={addCustomField}
-                    className="flex items-center gap-1 text-xs px-2 py-1 rounded border border-dashed border-morandi-muted text-morandi-muted hover:border-morandi-gold hover:text-morandi-gold transition-colors whitespace-nowrap"
+                    onClick={() => setNewRoomRows(prev => [{
+                      id: crypto.randomUUID(),
+                      roomName: '',
+                      capacity: 2,
+                      count: 1,
+                      amount: '',
+                      bookingCode: '',
+                      customFields: {}
+                    }, ...prev])}
+                    className="w-8 h-8 rounded flex items-center justify-center text-morandi-gold hover:bg-morandi-gold/10"
                   >
-                    <Plus className="h-3.5 w-3.5" />
-                    新增欄位
+                    <Plus className="h-4 w-4" />
                   </button>
-                  <span></span>
-                </div>
-
-                {/* 房間列表 */}
-                <div className="space-y-2 max-h-[300px] overflow-auto">
-                  {newRoomRows.map((row, index) => (
-                    <div key={row.id} className="grid gap-3 items-center" style={{ gridTemplateColumns: `180px 100px 100px 120px 140px ${customFieldNames.map(() => '120px').join(' ')} auto 40px` }}>
-                      <Input
-                        value={row.roomName}
-                        onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, roomName: e.target.value } : r))}
-                        placeholder="豪華、海景..."
-                        className="h-10"
-                      />
-                      <Input
-                        type="number"
-                        min="1"
-                        max="10"
-                        value={row.capacity || ''}
-                        onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, capacity: parseInt(e.target.value) || 0 } : r))}
-                        placeholder="2"
-                        className="h-10 text-center"
-                      />
-                      <Input
-                        type="number"
-                        min="0"
-                        value={row.count || ''}
-                        onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, count: parseInt(e.target.value) || 0 } : r))}
-                        className="h-10 text-center"
-                      />
-                      <Input
-                        type="number"
-                        min="0"
-                        value={row.amount}
-                        onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, amount: e.target.value } : r))}
-                        placeholder="0"
-                        className="h-10 text-center"
-                      />
-                      <Input
-                        value={row.bookingCode}
-                        onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? { ...r, bookingCode: e.target.value } : r))}
-                        placeholder="訂房代號"
-                        className="h-10"
-                      />
-                      {customFieldNames.map((fieldName, fieldIndex) => (
-                        <Input
-                          key={fieldIndex}
-                          value={row.customFields[fieldName] || ''}
-                          onChange={e => setNewRoomRows(prev => prev.map(r => r.id === row.id ? {
-                            ...r,
-                            customFields: { ...r.customFields, [fieldName]: e.target.value }
-                          } : r))}
-                          placeholder={fieldName}
-                          className="h-10"
-                        />
-                      ))}
-                      <div></div>
-                      {index === 0 ? (
-                        <button
-                          onClick={() => setNewRoomRows(prev => [{
-                            id: crypto.randomUUID(),
-                            roomName: '',
-                            capacity: 2,
-                            count: 1,
-                            amount: '',
-                            bookingCode: '',
-                            customFields: {}
-                          }, ...prev])}
-                          className="w-8 h-8 rounded flex items-center justify-center text-morandi-gold hover:bg-morandi-gold/10"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => removeRoomRow(row.id)}
-                          className="w-8 h-8 rounded flex items-center justify-center text-morandi-secondary hover:text-morandi-red"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* 統計 + 按鈕 */}
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-morandi-secondary">
-                      共 <span className="font-medium text-morandi-primary">{newRoomRows.reduce((sum, r) => sum + r.count, 0)}</span> 間房間
-                    </span>
-                    <span className="text-sm text-morandi-secondary">
-                      共 <span className="font-medium text-morandi-primary">{newRoomRows.reduce((sum, r) => sum + r.count * r.capacity, 0)}</span> 床位
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={() => { setAddRoomOpen(false); resetRoomRows() }}>
-                      取消
-                    </Button>
-                    <Button
-                      onClick={handleAddRooms}
-                      disabled={newRoomRows.reduce((sum, r) => sum + r.count, 0) === 0}
-                      className="btn-morandi-primary"
-                    >
-                      確認新增 ({newRoomRows.reduce((sum, r) => sum + r.count, 0)} 間)
-                    </Button>
-                  </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => removeRoomRow(row.id)}
+                    className="w-8 h-8 rounded flex items-center justify-center text-morandi-secondary hover:text-morandi-red"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
               </div>
+            ))}
+          </div>
+
+          {/* 統計 + 按鈕 */}
+          <div className="flex items-center justify-between pt-4 border-t border-border">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-morandi-secondary">
+                共 <span className="font-medium text-morandi-primary">{newRoomRows.reduce((sum, r) => sum + r.count, 0)}</span> 間房間
+              </span>
+              <span className="text-sm text-morandi-secondary">
+                共 <span className="font-medium text-morandi-primary">{newRoomRows.reduce((sum, r) => sum + r.count * r.capacity, 0)}</span> 床位
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => { setAddRoomOpen(false); resetRoomRows() }}>
+                取消
+              </Button>
+              <Button
+                onClick={handleAddRooms}
+                disabled={newRoomRows.reduce((sum, r) => sum + r.count, 0) === 0}
+                className="btn-morandi-primary"
+              >
+                確認新增 ({newRoomRows.reduce((sum, r) => sum + r.count, 0)} 間)
+              </Button>
             </div>
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
     </>

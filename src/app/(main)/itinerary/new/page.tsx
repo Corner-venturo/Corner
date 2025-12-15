@@ -999,6 +999,12 @@ function NewItineraryPageContent() {
       const days =
         Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
+      // 從旅遊團的航班資訊取得資料（如果有的話）
+      // tour 的類型來自 Supabase，需要轉型才能取得 flight 欄位
+      const tourData = tour as typeof tour & { outbound_flight?: FlightInfo; return_flight?: FlightInfo }
+      const tourOutboundFlight = tourData.outbound_flight ?? null
+      const tourReturnFlight = tourData.return_flight ?? null
+
       // 建立從旅遊團帶入的行程資料
       setTourData({
         tagline: 'Corner Travel 2025',
@@ -1014,30 +1020,30 @@ function NewItineraryPageContent() {
         city: city?.name || tour.location || '',
         status: '草稿',
         outboundFlight: {
-          airline: '',
-          flightNumber: '',
-          departureAirport: 'TPE',
-          departureTime: '',
-          departureDate: departureDate.toLocaleDateString('zh-TW', {
+          airline: tourOutboundFlight?.airline || '',
+          flightNumber: tourOutboundFlight?.flightNumber || '',
+          departureAirport: tourOutboundFlight?.departureAirport || 'TPE',
+          departureTime: tourOutboundFlight?.departureTime || '',
+          departureDate: tourOutboundFlight?.departureDate || departureDate.toLocaleDateString('zh-TW', {
             month: '2-digit',
             day: '2-digit',
           }),
-          arrivalAirport: city?.airport_code || '',
-          arrivalTime: '',
-          duration: '',
+          arrivalAirport: tourOutboundFlight?.arrivalAirport || city?.airport_code || '',
+          arrivalTime: tourOutboundFlight?.arrivalTime || '',
+          duration: tourOutboundFlight?.duration || '',
         },
         returnFlight: {
-          airline: '',
-          flightNumber: '',
-          departureAirport: city?.airport_code || '',
-          departureTime: '',
-          departureDate: returnDate.toLocaleDateString('zh-TW', {
+          airline: tourReturnFlight?.airline || '',
+          flightNumber: tourReturnFlight?.flightNumber || '',
+          departureAirport: tourReturnFlight?.departureAirport || city?.airport_code || '',
+          departureTime: tourReturnFlight?.departureTime || '',
+          departureDate: tourReturnFlight?.departureDate || returnDate.toLocaleDateString('zh-TW', {
             month: '2-digit',
             day: '2-digit',
           }),
-          arrivalAirport: 'TPE',
-          arrivalTime: '',
-          duration: '',
+          arrivalAirport: tourReturnFlight?.arrivalAirport || 'TPE',
+          arrivalTime: tourReturnFlight?.arrivalTime || '',
+          duration: tourReturnFlight?.duration || '',
         },
         features: [],
         focusCards: [],
