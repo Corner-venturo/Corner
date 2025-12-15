@@ -91,14 +91,14 @@ export function TableBody({
               className={cn(
                 'relative group border-b border-border/40 last:border-b-0',
                 isSelected && 'bg-morandi-gold/10',
-                (onRowClick || onRowDoubleClick) && !selection && !expandable && 'cursor-pointer',
+                (onRowClick || onRowDoubleClick) && !selection && 'cursor-pointer',
                 hoverable && 'hover:bg-morandi-container/20 transition-all duration-150',
                 striped && index % 2 === 0 && 'bg-morandi-container/20',
                 rowClassName?.(row)
               )}
               onClick={() => {
-                // Don't trigger row click if clicking on selection checkbox or expand button
-                if (selection || expandable) return
+                // Don't trigger row click if selection mode is active
+                if (selection) return
                 onRowClick?.(row, actualRowIndex)
               }}
               onDoubleClick={() => onRowDoubleClick?.(row, actualRowIndex)}

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { QuickReceipt } from '@/components/todos/quick-actions/quick-receipt'
 import { useOrders, useTours, useMembers } from '@/hooks/cloud-hooks'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
-import { ShoppingCart, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
 import { cn } from '@/lib/utils'
@@ -38,7 +38,22 @@ export default function OrdersPage() {
   }, [])
 
   const filteredOrders = orders.filter(order => {
-    const matchesStatus = statusFilter === 'all' || order.payment_status === statusFilter
+    let matchesFilter: boolean
+    switch (statusFilter) {
+      case 'all':
+        matchesFilter = !(order.tour_name?.includes('簽證專用團') || order.tour_name?.includes('網卡專用團'))
+        break
+      case 'visa-only':
+        matchesFilter = order.tour_name?.includes('簽證專用團') ?? false
+        break
+      case 'sim-only':
+        matchesFilter = order.tour_name?.includes('網卡專用團') ?? false
+        break
+      default:
+        matchesFilter = order.payment_status === statusFilter
+        break
+    }
+
     const matchesTour = !tourFilter || order.tour_id === tourFilter
 
     const searchLower = searchQuery.toLowerCase()
@@ -51,7 +66,7 @@ export default function OrdersPage() {
       order.sales_person?.toLowerCase().includes(searchLower) ||
       order.assistant?.toLowerCase().includes(searchLower)
 
-    return matchesStatus && matchesTour && matchesSearch
+    return matchesFilter && matchesTour && matchesSearch
   })
 
   // 計算待辦事項
@@ -187,6 +202,8 @@ export default function OrdersPage() {
           { value: 'unpaid', label: '未收款', icon: AlertCircle },
           { value: 'partial', label: '部分收款', icon: Clock },
           { value: 'paid', label: '已收款', icon: CheckCircle },
+          { value: 'visa-only', label: '簽證專用', icon: Shield },
+          { value: 'sim-only', label: '網卡專用', icon: Wifi },
         ]}
         activeTab={statusFilter}
         onTabChange={setStatusFilter}

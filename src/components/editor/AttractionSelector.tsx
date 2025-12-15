@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, MapPin, ImageIcon, Loader2, Sparkles } from 'lucide-react'
+import { Search, MapPin, ImageIcon, Loader2, Sparkles, Plus, PenLine } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { TourCountry } from './tour-form/types'
 import { Attraction } from '@/features/attractions/types'
@@ -88,6 +88,10 @@ export function AttractionSelector({
   const [cities, setCities] = useState<{ id: string; name: string }[]>([])
   const [countries, setCountries] = useState<{ id: string; name: string }[]>([])
   const initialLoadDone = useRef(false)
+
+  // 手動新增景點
+  const [showManualInput, setShowManualInput] = useState(false)
+  const [manualAttractionName, setManualAttractionName] = useState('')
 
   // 載入所有國家
   React.useEffect(() => {
@@ -348,6 +352,39 @@ export function AttractionSelector({
   const handleCancel = () => {
     setSelectedIds(new Set())
     setSearchQuery('')
+    setShowManualInput(false)
+    setManualAttractionName('')
+    onClose()
+  }
+
+  // 手動新增景點
+  const handleManualAdd = () => {
+    if (!manualAttractionName.trim()) return
+
+    // 創建一個臨時的景點物件
+    const manualAttraction: AttractionWithCity = {
+      id: `manual_${Date.now()}`,
+      name: manualAttractionName.trim(),
+      name_en: undefined,
+      category: undefined,
+      description: undefined,
+      thumbnail: undefined,
+      images: undefined,
+      country_id: selectedCountryId || '',
+      region_id: undefined,
+      city_id: selectedCityId || '',
+      city_name: cities.find(c => c.id === selectedCityId)?.name || '',
+      is_active: true,
+      display_order: 0,
+      created_at: '',
+      updated_at: '',
+    }
+
+    onSelect([manualAttraction])
+    setManualAttractionName('')
+    setShowManualInput(false)
+    setSelectedIds(new Set())
+    setSearchQuery('')
     onClose()
   }
 
@@ -412,7 +449,46 @@ export function AttractionSelector({
                 className="pl-10 h-11 rounded-xl border-morandi-container focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
               />
             </div>
+
+            {/* 手動新增按鈕 */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowManualInput(!showManualInput)}
+              className={`rounded-xl h-11 gap-1.5 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold/30' : ''}`}
+            >
+              <PenLine size={16} />
+              手動輸入
+            </Button>
           </div>
+
+          {/* 手動輸入區 */}
+          {showManualInput && (
+            <div className="flex gap-2 p-3 bg-morandi-gold/5 border border-morandi-gold/20 rounded-xl">
+              <Input
+                value={manualAttractionName}
+                onChange={e => setManualAttractionName(e.target.value)}
+                placeholder="輸入景點名稱..."
+                className="flex-1 h-10 rounded-lg border-morandi-gold/20 focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleManualAdd()
+                  }
+                }}
+                autoFocus
+              />
+              <Button
+                type="button"
+                onClick={handleManualAdd}
+                disabled={!manualAttractionName.trim()}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg h-10 px-4 gap-1.5"
+              >
+                <Plus size={16} />
+                新增
+              </Button>
+            </div>
+          )}
 
           {/* 景點列表 */}
           <div className="flex-1 overflow-y-auto border border-morandi-container/50 rounded-xl bg-white">

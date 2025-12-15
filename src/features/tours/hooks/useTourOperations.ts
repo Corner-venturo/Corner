@@ -142,11 +142,18 @@ export function useTourOperations(params: UseTourOperationsParams) {
             ? availableCities.find(c => c.code === newTour.cityCode)
             : undefined
 
-        // 解析航班文字為 JSON（簡單格式：航空公司 班次 時間）
-        const parseFlightText = (text?: string) => {
+        // 解析航班文字為 FlightInfo（簡單格式：航空公司 班次 時間）
+        const parseFlightText = (text?: string): import('@/stores/types').FlightInfo | null => {
           if (!text?.trim()) return null
-          // 簡單存儲為 JSON，包含原始文字
-          return { text: text.trim() }
+          // 存儲原始文字到 flightNumber，其他欄位留空讓用戶在行程表中填寫
+          return {
+            airline: '',
+            flightNumber: text.trim(),
+            departureAirport: '',
+            departureTime: '',
+            arrivalAirport: '',
+            arrivalTime: '',
+          }
         }
 
         const tourData = {

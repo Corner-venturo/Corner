@@ -139,6 +139,7 @@ export const CompanyAssetsPage: React.FC = () => {
     setIsDialogOpen(false)
     setIsEditMode(false)
     setEditingAsset(null)
+    setIsLoading(false)
     setFormData({ name: '', asset_type: 'image', file: null, restricted: false })
   }, [])
 
@@ -235,13 +236,14 @@ export const CompanyAssetsPage: React.FC = () => {
          
         const { error: dbError } = await (supabase as any).from('company_assets').insert({
           name: formData.name,
-          category: formData.asset_type, // 使用 category 欄位而非 asset_type
+          asset_type: formData.asset_type,
           file_path: filePath,
           file_size: file.size,
           mime_type: file.type,
           uploaded_by: user?.id || null,
           uploaded_by_name: userName,
           description: formData.restricted ? '受限資源' : null,
+          restricted: formData.restricted,
         })
 
         if (dbError) throw dbError

@@ -61,16 +61,37 @@ export function AccommodationSection({
           <Building2 size={14} />
           住宿
         </label>
-        <Button
-          type="button"
-          onClick={() => onOpenHotelSelector(dayIndex)}
-          disabled={day.isSameAccommodation}
-          size="xs"
-          variant="default"
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
-        >
-          從飯店庫選擇
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            onClick={() => onOpenHotelSelector(dayIndex)}
+            disabled={day.isSameAccommodation}
+            size="xs"
+            variant="default"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50"
+          >
+            從飯店庫選擇
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              // 清空欄位讓用戶手動輸入
+              updateDailyItinerary(dayIndex, 'accommodation', '')
+              updateDailyItinerary(dayIndex, 'accommodationUrl', '')
+              updateDailyItinerary(dayIndex, 'accommodationRating', 5)
+              // Focus 到輸入框
+              setTimeout(() => {
+                const input = document.querySelector(`#accommodation-input-${dayIndex}`) as HTMLInputElement
+                input?.focus()
+              }, 0)
+            }}
+            disabled={day.isSameAccommodation}
+            size="xs"
+            variant="secondary"
+          >
+            + 手動新增
+          </Button>
+        </div>
       </div>
 
       {/* 住宿輸入欄位 */}
@@ -78,6 +99,7 @@ export function AccommodationSection({
         <div className="flex-1 min-w-[200px]">
           <label className="block text-xs font-medium text-morandi-secondary mb-1">住宿名稱</label>
           <input
+            id={`accommodation-input-${dayIndex}`}
             type="text"
             value={day.accommodation || ''}
             onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}

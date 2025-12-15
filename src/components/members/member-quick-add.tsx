@@ -102,11 +102,14 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
   const memberStore = useMemberStore()
   const { items: customers, create: createCustomer } = useCustomerStore()
 
-  // 過濾掉已經在這個訂單裡的顧客
-  const existingCustomerIds = memberStore.items
-    .filter(m => m.order_id === orderId && m.customer_id)
-    .map(m => m.customer_id)
-  const availableCustomers = customers.filter(c => !existingCustomerIds.includes(c.id))
+  // 過濾掉已經在這個訂單裡的顧客（用身分證或護照號碼比對）
+  const existingIds = memberStore.items
+    .filter(m => m.order_id === orderId)
+    .flatMap(m => [m.national_id, m.passport_number, m.id_number].filter(Boolean))
+  const availableCustomers = customers.filter(c =>
+    !existingIds.includes(c.national_id ?? '') &&
+    !existingIds.includes(c.passport_number ?? '')
+  )
 
   // 上傳護照照片到 Supabase Storage
   const uploadPassportImage = async (file: File, memberId: string): Promise<string | null> => {

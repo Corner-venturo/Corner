@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -48,6 +49,33 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
   } = useRequestForm()
 
   const { generateRequestNumber, createRequest } = useRequestOperations()
+
+  // 載入資料（開啟對話框時）
+  useEffect(() => {
+    if (open) {
+      const loadData = async () => {
+        const { useTourStore, useOrderStore, useSupplierStore, useEmployeeStore } = await import('@/stores')
+        const tourStore = useTourStore.getState()
+        const orderStore = useOrderStore.getState()
+        const supplierStore = useSupplierStore.getState()
+        const employeeStore = useEmployeeStore.getState()
+
+        if (tourStore.items.length === 0) {
+          await tourStore.fetchAll()
+        }
+        if (orderStore.items.length === 0) {
+          await orderStore.fetchAll()
+        }
+        if (supplierStore.items.length === 0) {
+          await supplierStore.fetchAll()
+        }
+        if (employeeStore.items.length === 0) {
+          await employeeStore.fetchAll()
+        }
+      }
+      loadData()
+    }
+  }, [open])
 
   const handleSubmit = async () => {
     const selectedTour = tours.find(t => t.id === formData.tour_id)

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, Building2, ImageIcon, Loader2, Star, Crown } from 'lucide-react'
+import { Search, Building2, ImageIcon, Loader2, Star, Crown, Plus, PenLine } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 
 // 飯店型別
@@ -88,6 +88,10 @@ export function HotelSelector({
   const [regions, setRegions] = useState<{ id: string; name: string }[]>([])
   const [cities, setCities] = useState<{ id: string; name: string }[]>([])
   const initialLoadDone = useRef(false)
+
+  // 手動新增飯店
+  const [showManualInput, setShowManualInput] = useState(false)
+  const [manualHotelName, setManualHotelName] = useState('')
 
   // 載入所有國家
   React.useEffect(() => {
@@ -323,6 +327,43 @@ export function HotelSelector({
   const handleCancel = () => {
     setSelectedIds(new Set())
     setSearchQuery('')
+    setShowManualInput(false)
+    setManualHotelName('')
+    onClose()
+  }
+
+  // 手動新增飯店
+  const handleManualAdd = () => {
+    if (!manualHotelName.trim()) return
+
+    // 創建一個臨時的飯店物件
+    const manualHotel: LuxuryHotel = {
+      id: `manual_${Date.now()}`,
+      name: manualHotelName.trim(),
+      name_en: null,
+      brand: null,
+      country_id: selectedCountryId || '',
+      region_id: null,
+      city_id: selectedCityId || '',
+      star_rating: null,
+      hotel_class: null,
+      category: null,
+      description: null,
+      highlights: null,
+      price_range: null,
+      avg_price_per_night: null,
+      thumbnail: null,
+      images: null,
+      is_active: true,
+      is_featured: false,
+      city_name: cities.find(c => c.id === selectedCityId)?.name || '',
+    }
+
+    onSelect([manualHotel])
+    setManualHotelName('')
+    setShowManualInput(false)
+    setSelectedIds(new Set())
+    setSearchQuery('')
     onClose()
   }
 
@@ -434,7 +475,46 @@ export function HotelSelector({
                 className="pl-10 h-11 rounded-xl border-morandi-container focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
               />
             </div>
+
+            {/* 手動新增按鈕 */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowManualInput(!showManualInput)}
+              className={`rounded-xl h-11 gap-1.5 ${showManualInput ? 'bg-amber-50 border-amber-300' : ''}`}
+            >
+              <PenLine size={16} />
+              手動輸入
+            </Button>
           </div>
+
+          {/* 手動輸入區 */}
+          {showManualInput && (
+            <div className="flex gap-2 p-3 bg-amber-50/50 border border-amber-200 rounded-xl">
+              <Input
+                value={manualHotelName}
+                onChange={e => setManualHotelName(e.target.value)}
+                placeholder="輸入飯店名稱..."
+                className="flex-1 h-10 rounded-lg border-amber-200 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleManualAdd()
+                  }
+                }}
+                autoFocus
+              />
+              <Button
+                type="button"
+                onClick={handleManualAdd}
+                disabled={!manualHotelName.trim()}
+                className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg h-10 px-4 gap-1.5"
+              >
+                <Plus size={16} />
+                新增
+              </Button>
+            </div>
+          )}
 
           {/* 飯店列表 */}
           <div className="flex-1 overflow-y-auto border border-morandi-container/50 rounded-xl bg-white">

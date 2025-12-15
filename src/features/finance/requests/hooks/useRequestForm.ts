@@ -107,7 +107,7 @@ export function useRequestForm() {
       combinedSuppliers.filter(supplier => {
         const searchTerm = supplierSearchValue.toLowerCase()
         if (!searchTerm) return true
-        return supplier.name.toLowerCase().includes(searchTerm)
+        return (supplier.name || '').toLowerCase().includes(searchTerm)
       }),
     [combinedSuppliers, supplierSearchValue]
   )

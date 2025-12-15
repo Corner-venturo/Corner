@@ -133,7 +133,6 @@ export function FormDialog({
                       type="button"
                       variant="outline"
                       onClick={handleCancel}
-                      disabled={loading}
                     >
                       {cancelLabel}
                     </Button>
