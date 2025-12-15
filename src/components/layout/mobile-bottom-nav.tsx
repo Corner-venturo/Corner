@@ -1,10 +1,11 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 import {
   Home,
   Calendar,
@@ -122,19 +123,46 @@ function saveNavItems(itemIds: string[]) {
 
 export function MobileBottomNav() {
   const pathname = usePathname()
+  const { user, _hasHydrated } = useAuthStore()
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>(DEFAULT_SELECTED_IDS)
   const [showAllItems, setShowAllItems] = useState(false)
 
+  // 根據權限過濾可用的導航項目
+  const availableNavItems = useMemo(() => {
+    const permissions = user?.permissions || []
+    const isAdmin = permissions.includes('admin') || permissions.includes('*')
+
+    return DEFAULT_NAV_ITEMS.filter(item => {
+      if (!item.requiredPermission) return true
+      return isAdmin || permissions.includes(item.requiredPermission)
+    })
+  }, [user?.permissions])
+
   // 載入儲存的配置
   useEffect(() => {
-    setSelectedItemIds(getStoredNavItems())
-  }, [])
+    if (!_hasHydrated) return
+
+    const storedIds = getStoredNavItems()
+    const validStoredIds = storedIds.filter(id =>
+      availableNavItems.some(item => item.id === id)
+    )
+
+    if (validStoredIds.length > 0) {
+      setSelectedItemIds(validStoredIds)
+      return
+    }
+
+    // 如果沒有有效的配置，使用權限允許的前 4 個項目
+    setSelectedItemIds(availableNavItems.slice(0, 4).map(item => item.id))
+  }, [_hasHydrated, availableNavItems])
 
   // 過濾出選中的項目
   const selectedItems = selectedItemIds
-    .map(id => DEFAULT_NAV_ITEMS.find(item => item.id === id))
+    .map(id => availableNavItems.find(item => item.id === id))
     .filter((item): item is NavItem => item !== undefined)
     .slice(0, 4) // 最多 4 個
+
+  if (availableNavItems.length === 0) return null
 
   // 檢查路徑是否匹配
   const isActive = (href: string) => {
@@ -208,6 +236,7 @@ export function MobileBottomNav() {
       {/* 全功能選單 - 點擊「更多」時彈出 */}
       {showAllItems && (
         <MobileNavSettings
+          availableItems={availableNavItems}
           selectedItemIds={selectedItemIds}
           onSave={newIds => {
             setSelectedItemIds(newIds)
@@ -223,13 +252,23 @@ export function MobileBottomNav() {
 
 // 設定介面組件
 interface MobileNavSettingsProps {
+  availableItems: NavItem[]
   selectedItemIds: string[]
   onSave: (itemIds: string[]) => void
   onClose: () => void
 }
 
-function MobileNavSettings({ selectedItemIds, onSave, onClose }: MobileNavSettingsProps) {
+function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }: MobileNavSettingsProps) {
   const [tempSelected, setTempSelected] = useState<string[]>(selectedItemIds)
+
+  useEffect(() => {
+    const validSelections = selectedItemIds.filter(id =>
+      availableItems.some(item => item.id === id)
+    )
+    const fallbackSelections = availableItems.slice(0, 4).map(item => item.id)
+    const nextSelections = validSelections.length > 0 ? validSelections : fallbackSelections
+    setTempSelected(nextSelections)
+  }, [availableItems, selectedItemIds])
 
   const toggleItem = (id: string) => {
     if (tempSelected.includes(id)) {
@@ -275,7 +314,7 @@ function MobileNavSettings({ selectedItemIds, onSave, onClose }: MobileNavSettin
         {/* 功能列表 */}
         <div className="p-4 max-h-[50vh] overflow-y-auto">
           <div className="space-y-2">
-            {DEFAULT_NAV_ITEMS.map(item => {
+            {availableItems.map(item => {
               const Icon = ICON_MAP[item.icon]
               const isSelected = tempSelected.includes(item.id)
               const canSelect = isSelected || tempSelected.length < 4
