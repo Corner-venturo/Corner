@@ -45,7 +45,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 fontWeight: 600,
               }}
             >
-              人數
+              數量
             </th>
             <th
               className="px-3 py-2 text-center"

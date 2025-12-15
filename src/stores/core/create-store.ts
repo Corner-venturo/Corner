@@ -225,27 +225,51 @@ export function createStore<T extends BaseEntity>(
         }
 
         if (codePrefix && !(data as Record<string, unknown>).code) {
-          // 從資料庫查詢最大 code，確保唯一性
-          // 注意：不使用 .single()，因為空結果會導致錯誤
-          const { data: maxCodeResults } = await supabase
-            .from(tableName as any)
-            .select('code')
-            .like('code', `${codePrefix}%`)
-            .order('code', { ascending: false })
-            .limit(1)
+          // 生成唯一編號（帶重試機制避免競爭條件）
+          const generateUniqueCode = async (): Promise<string> => {
+            const maxRetries = 5
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+              // 從資料庫查詢最大 code
+              const { data: maxCodeResults } = await supabase
+                .from(tableName as any)
+                .select('code')
+                .like('code', `${codePrefix}%`)
+                .order('code', { ascending: false })
+                .limit(1)
 
-          let nextNumber = 1
-          const codeResults = maxCodeResults as Array<{ code?: string }> | null
-          if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
-            // 提取數字部分，例如 'C000032' -> 32
-            const numericPart = codeResults[0].code.replace(codePrefix, '')
-            const currentMax = parseInt(numericPart, 10)
-            if (!isNaN(currentMax)) {
-              nextNumber = currentMax + 1
+              let nextNumber = 1
+              const codeResults = maxCodeResults as Array<{ code?: string }> | null
+              if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
+                const numericPart = codeResults[0].code.replace(codePrefix, '')
+                const currentMax = parseInt(numericPart, 10)
+                if (!isNaN(currentMax)) {
+                  nextNumber = currentMax + 1 + attempt // 加上 attempt 避免重複
+                }
+              }
+
+              const candidateCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
+
+              // 檢查這個 code 是否已存在
+              const { data: existing } = await supabase
+                .from(tableName as any)
+                .select('id')
+                .eq('code', candidateCode)
+                .limit(1)
+
+              if (!existing || existing.length === 0) {
+                return candidateCode
+              }
+
+              // 如果存在，繼續下一次嘗試
+              logger.warn(`[${tableName}] Code ${candidateCode} 已存在，重試第 ${attempt + 1} 次`)
             }
+
+            // 最後手段：使用時間戳確保唯一
+            const timestamp = Date.now().toString(36).toUpperCase()
+            return `${codePrefix}${timestamp}`
           }
 
-          ;(insertData as Record<string, unknown>).code = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
+          ;(insertData as Record<string, unknown>).code = await generateUniqueCode()
         }
 
          

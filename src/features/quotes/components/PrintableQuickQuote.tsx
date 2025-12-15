@@ -484,7 +484,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             <thead>
               <tr style={{ backgroundColor: '#FAF7F2' }}>
                 <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', width: '35%' }}>摘要</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>人數</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '10%' }}>數量</th>
                 <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>單價</th>
                 <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '15%' }}>金額</th>
                 <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#6B5B4F', borderBottom: '1px solid #E5E7EB', borderLeft: '1px solid #E5E7EB', width: '25%' }}>備註</th>

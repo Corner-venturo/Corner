@@ -607,7 +607,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
             <thead className="bg-morandi-container/20">
               <tr>
                 <th className="px-3 py-2 text-left">摘要</th>
-                <th className="px-3 py-2 text-center w-20">人數</th>
+                <th className="px-3 py-2 text-center w-20">數量</th>
                 {isEditing && <th className="px-3 py-2 text-center w-24">成本</th>}
                 <th className="px-3 py-2 text-center w-28">單價</th>
                 <th className="px-3 py-2 text-center w-28">金額</th>

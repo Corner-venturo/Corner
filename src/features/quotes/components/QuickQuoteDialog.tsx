@@ -181,7 +181,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                 <thead className="bg-morandi-container/20">
                   <tr>
                     <th className="px-3 py-2 text-left">摘要</th>
-                    <th className="px-3 py-2 text-center w-20">人數</th>
+                    <th className="px-3 py-2 text-center w-20">數量</th>
                     <th className="px-3 py-2 text-center w-28">單價</th>
                     <th className="px-3 py-2 text-center w-28">金額</th>
                     <th className="px-3 py-2 text-left w-32">備註</th>

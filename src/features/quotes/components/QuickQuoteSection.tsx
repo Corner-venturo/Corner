@@ -209,7 +209,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                 <thead className="bg-morandi-container/20">
                   <tr>
                     <th className="px-2 py-1.5 text-left text-xs font-medium">摘要</th>
-                    <th className="px-2 py-1.5 text-center text-xs font-medium w-16">人數</th>
+                    <th className="px-2 py-1.5 text-center text-xs font-medium w-16">數量</th>
                     {!isReadOnly && <th className="px-2 py-1.5 text-center text-xs font-medium w-20">成本</th>}
                     <th className="px-2 py-1.5 text-center text-xs font-medium w-24">單價</th>
                     <th className="px-2 py-1.5 text-center text-xs font-medium w-24">金額</th>
