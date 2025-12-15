@@ -16,7 +16,8 @@ import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ImageIcon, X } from 'lucide-react'
+import { ImageIcon, X, AlertTriangle } from 'lucide-react'
+import { CustomerVerifyDialog } from '@/app/(main)/customers/components/CustomerVerifyDialog'
 
 interface MemberTableProps {
   order_id: string
@@ -43,12 +44,17 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     const { items: customers } = useCustomerStore()
     const [showMatchDialog, setShowMatchDialog] = useState(false)
     const [matchedCustomers, setMatchedCustomers] = useState<Customer[]>([])
+    const [matchType, setMatchType] = useState<'name' | 'id_number'>('name')
     const [pendingMemberIndex, setPendingMemberIndex] = useState<number | null>(null)
     const [pendingMemberData, setPendingMemberData] = useState<EditingMember | null>(null)
 
     // 護照圖片預覽
     const [showPassportPreview, setShowPassportPreview] = useState(false)
     const [previewMember, setPreviewMember] = useState<EditingMember | null>(null)
+
+    // 護照驗證對話框
+    const [showVerifyDialog, setShowVerifyDialog] = useState(false)
+    const [verifyCustomer, setVerifyCustomer] = useState<Customer | null>(null)
 
     const orderMembers = useMemo(
       () => members.filter(member => member.order_id === order_id),
@@ -59,17 +65,31 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     const saveTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map())
     const DEBOUNCE_DELAY = 800 // 800ms debounce
 
-    // 點擊姓名查看護照照片
+    // 點擊姓名查看護照照片或開啟驗證對話框
     const handleNameClick = useCallback(
       (rowData: Record<string, unknown>) => {
         const index = (rowData.index as number) - 1
         const member = tableMembers[index]
-        if (member && member.passport_image_url) {
+        if (!member) return
+
+        // 如果有關聯的顧客且有護照圖片，開啟驗證對話框
+        const customerId = member.customer_id
+        if (customerId) {
+          const customer = customers.find(c => c.id === customerId)
+          if (customer && customer.passport_image_url) {
+            setVerifyCustomer(customer)
+            setShowVerifyDialog(true)
+            return
+          }
+        }
+
+        // 否則只顯示護照圖片預覽
+        if (member.passport_image_url) {
           setPreviewMember(member)
           setShowPassportPreview(true)
         }
       },
-      [tableMembers]
+      [tableMembers, customers]
     )
 
     // 配置 DataSheet 欄位
@@ -78,17 +98,26 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       {
         key: 'name',
         label: '姓名',
-        width: 80,
+        width: 100,
         onCellClick: handleNameClick,
         valueRenderer: (cell) => {
           const rowData = cell.rowData as Record<string, unknown> | undefined
           const hasPassport = rowData?.passport_image_url
+          const customerId = rowData?.customer_id as string | undefined
           const name = cell.value as string
-          if (hasPassport && name) {
+
+          // 找到關聯的顧客，檢查驗證狀態
+          const customer = customerId ? customers.find(c => c.id === customerId) : null
+          const needsVerification = customer?.passport_image_url && customer?.verification_status !== 'verified'
+
+          if (hasPassport || customer?.passport_image_url) {
             return (
               <span className="flex items-center gap-1 cursor-pointer text-primary hover:underline">
-                <ImageIcon size={12} className="text-primary" />
-                {name}
+                {needsVerification && (
+                  <AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
+                )}
+                <ImageIcon size={12} className="text-primary flex-shrink-0" />
+                <span className="truncate">{name}</span>
               </span>
             )
           }
@@ -171,27 +200,56 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     }, [])
 
     // 處理資料更新 (用於 ReactDataSheet)
-    // 檢查顧客匹配
-    const checkCustomerMatch = useCallback(
+    // 檢查顧客匹配 - 姓名 2 字以上觸發模糊搜尋
+    const checkCustomerMatchByName = useCallback(
       (memberData: EditingMember, index: number) => {
         const name = memberData.name?.trim()
-        if (!name) return false
+        if (!name || name.length < 2) return false
 
-        // 搜尋同名顧客
-        const nameMatches = customers.filter(c => c.name === name)
+        // 模糊搜尋：姓名包含輸入的字串
+        const nameMatches = customers.filter(c =>
+          c.name?.includes(name) || name.includes(c.name || '')
+        )
 
         if (nameMatches.length === 0) {
           return false // 沒有匹配，繼續正常流程
         }
 
-        // 有同名顧客，顯示選擇對話框讓使用者確認
+        // 有匹配顧客，顯示選擇對話框讓使用者確認
         setMatchedCustomers(nameMatches)
+        setMatchType('name')
         setPendingMemberIndex(index)
         setPendingMemberData(memberData)
         setShowMatchDialog(true)
         return true
       },
-      [customers, tableMembers]
+      [customers]
+    )
+
+    // 檢查顧客匹配 - 身分證字號
+    const checkCustomerMatchByIdNumber = useCallback(
+      (memberData: EditingMember, index: number) => {
+        const idNumber = memberData.id_number?.trim()
+        if (!idNumber || idNumber.length < 5) return false
+
+        // 搜尋身分證字號相符的顧客
+        const idMatches = customers.filter(c =>
+          c.national_id === idNumber
+        )
+
+        if (idMatches.length === 0) {
+          return false
+        }
+
+        // 有匹配顧客，顯示選擇對話框
+        setMatchedCustomers(idMatches)
+        setMatchType('id_number')
+        setPendingMemberIndex(index)
+        setPendingMemberData(memberData)
+        setShowMatchDialog(true)
+        return true
+      },
+      [customers]
     )
 
     // 選擇顧客後帶入資料
@@ -249,23 +307,33 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 
         setTableMembers(processedData)
 
-        // 檢查是否有姓名變更，觸發顧客匹配
+        // 檢查是否有姓名或身分證字號變更，觸發顧客匹配
         processedData.forEach((member, index) => {
           const oldMember = tableMembers[index]
-          if (member.name !== oldMember?.name && member.name?.trim()) {
-            // 姓名有變更，檢查顧客匹配
-            const matched = checkCustomerMatch(member, index)
+
+          // 姓名有變更（2 字以上），檢查顧客匹配
+          if (member.name !== oldMember?.name && member.name?.trim() && member.name.trim().length >= 2) {
+            const matched = checkCustomerMatchByName(member, index)
             if (!matched) {
-              // 沒有匹配，正常儲存
               autoSaveMember(member, index)
             }
-          } else {
-            // 其他欄位變更，正常儲存
-            autoSaveMember(member, index)
+            return
           }
+
+          // 身分證字號有變更（5 字以上），檢查顧客匹配
+          if (member.id_number !== oldMember?.id_number && member.id_number?.trim() && member.id_number.trim().length >= 5) {
+            const matched = checkCustomerMatchByIdNumber(member, index)
+            if (!matched) {
+              autoSaveMember(member, index)
+            }
+            return
+          }
+
+          // 其他欄位變更，正常儲存
+          autoSaveMember(member, index)
         })
       },
-      [departure_date, autoSaveMember, checkCustomerMatch, tableMembers]
+      [departure_date, autoSaveMember, checkCustomerMatchByName, checkCustomerMatchByIdNumber, tableMembers]
     )
 
     // 新增行
@@ -305,6 +373,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
               age: age > 0 ? `${age}歲` : '',
               gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
               passport_image_url: member.passport_image_url || '',
+              customer_id: member.customer_id || '',
             }
           })}
           onDataUpdate={handleDataUpdate as (data: unknown[]) => void}
@@ -317,7 +386,8 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           <p>• 支援 Excel 式鍵盤導航和複製貼上</p>
           <p>• 身分證號碼會自動計算年齡和性別</p>
           <p>• 輸入姓名時會自動搜尋顧客資料庫，同名時可選擇</p>
-          <p>• 有護照照片的成員，姓名會顯示圖片圖示，點擊可預覽</p>
+          <p>• <ImageIcon size={12} className="inline text-primary" /> 有護照照片的成員，點擊可預覽或驗證</p>
+          <p>• <AlertTriangle size={12} className="inline text-amber-500" /> 金色驚嘆號表示護照資料待驗證，點擊可進行驗證</p>
         </div>
 
         {/* 護照圖片預覽對話框 */}
@@ -391,71 +461,57 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           </Dialog>
         )}
 
-        {/* 顧客選擇對話框 */}
+        {/* 顧客選擇對話框 - 橫向表格式 */}
         {showMatchDialog && matchedCustomers.length > 0 && (
           <Dialog open={true} onOpenChange={() => setShowMatchDialog(false)}>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>找到 {matchedCustomers.length} 位同名顧客</DialogTitle>
+            <DialogContent className="max-w-4xl p-0">
+              <DialogHeader className="p-4 pb-2">
+                <DialogTitle className="text-base">
+                  {matchType === 'name'
+                    ? `找到 ${matchedCustomers.length} 位相似顧客「${pendingMemberData?.name}」`
+                    : `找到 ${matchedCustomers.length} 位相同身分證「${pendingMemberData?.id_number}」`}
+                </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <p className="text-sm text-morandi-secondary">
-                  請選擇要使用的顧客資料（依身分證號碼區分）：
-                </p>
+              {/* 橫向表格 */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50 border-y">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">姓名</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">英文拼音</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">身分證</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">護照號碼</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">生日</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">性別</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matchedCustomers.map((customer) => (
+                      <tr
+                        key={customer.id}
+                        onClick={() => handleSelectCustomer(customer)}
+                        className="border-b hover:bg-primary/5 cursor-pointer transition-colors"
+                      >
+                        <td className="px-3 py-3 font-medium text-primary">{customer.name}</td>
+                        <td className="px-3 py-3 text-muted-foreground">{customer.passport_romanization || '-'}</td>
+                        <td className="px-3 py-3 font-mono text-xs">{customer.national_id || '-'}</td>
+                        <td className="px-3 py-3 font-mono text-xs">{customer.passport_number || '-'}</td>
+                        <td className="px-3 py-3">{customer.date_of_birth || '-'}</td>
+                        <td className="px-3 py-3">{customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {matchedCustomers.map((customer) => (
-                    <button
-                      key={customer.id}
-                      onClick={() => handleSelectCustomer(customer)}
-                      className="w-full p-4 text-left border-2 border-morandi-border rounded-lg hover:border-primary hover:bg-morandi-background transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-lg mb-2">{customer.name}</p>
-                          <div className="grid grid-cols-2 gap-2 text-sm text-morandi-secondary">
-                            <div>
-                              <span className="font-medium">身分證：</span>
-                              <span className="ml-1">{customer.national_id || '無'}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium">護照：</span>
-                              <span className="ml-1">{customer.passport_number || '無'}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium">生日：</span>
-                              <span className="ml-1">{customer.date_of_birth || '無'}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium">性別：</span>
-                              <span className="ml-1">
-                                {customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : '無'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="font-medium">電話：</span>
-                              <span className="ml-1">{customer.phone || '無'}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium">Email：</span>
-                              <span className="ml-1">{customer.email || '無'}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="ml-4 text-primary">
-                          <span className="text-sm">→ 選擇</span>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-center pt-4 border-t">
-                  <p className="text-sm text-morandi-secondary">或是手動輸入新的顧客資料</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
+              {/* 底部操作 */}
+              <div className="flex justify-between items-center p-3 border-t bg-muted/30">
+                <p className="text-xs text-muted-foreground">點擊列即可選擇該顧客資料</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
                       // 關閉對話框前，先儲存已輸入的資料（不帶入顧客資料）
                       if (pendingMemberIndex !== null && pendingMemberData) {
                         autoSaveMember(pendingMemberData, pendingMemberIndex)
@@ -467,11 +523,24 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
                   >
                     取消，手動輸入
                   </Button>
-                </div>
               </div>
             </DialogContent>
           </Dialog>
         )}
+
+        {/* 護照驗證對話框 - 複用顧客管理的驗證組件 */}
+        <CustomerVerifyDialog
+          open={showVerifyDialog}
+          onOpenChange={setShowVerifyDialog}
+          customer={verifyCustomer}
+          onUpdate={async (id, data) => {
+            // 使用 customerStore 更新顧客資料
+            const customerStore = useCustomerStore.getState()
+            await customerStore.update(id, data)
+            // 重新載入成員資料以更新狀態
+            memberStore.fetchAll()
+          }}
+        />
       </div>
     )
   }
