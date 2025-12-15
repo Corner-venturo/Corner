@@ -169,16 +169,24 @@ export function AttractionsDialog({
 
   // 上傳圖片
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('[景點圖片上傳] 開始處理')
     const files = e.target.files
-    if (!files || files.length === 0) return
+    if (!files || files.length === 0) {
+      console.log('[景點圖片上傳] 沒有選擇檔案')
+      return
+    }
 
+    console.log('[景點圖片上傳] 選擇了', files.length, '個檔案')
     setIsUploading(true)
     try {
       const newUrls: string[] = []
 
       for (const file of Array.from(files)) {
+        console.log('[景點圖片上傳] 處理檔案:', file.name, file.type, file.size)
+
         // 檢查檔案類型
         if (!file.type.startsWith('image/')) {
+          console.log('[景點圖片上傳] 非圖片檔案:', file.name)
           void alert(`${file.name} 不是圖片檔案`, 'warning')
           continue
         }
@@ -187,32 +195,39 @@ export function AttractionsDialog({
         const fileExt = file.name.split('.').pop()
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
         const filePath = `attractions/${fileName}`
+        console.log('[景點圖片上傳] 準備上傳到:', filePath)
 
         // 上傳到 Supabase Storage
-        const { error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('workspace-files')
           .upload(filePath, file)
 
         if (uploadError) {
-          console.error('上傳失敗:', uploadError)
-          void alert(`${file.name} 上傳失敗`, 'error')
+          console.error('[景點圖片上傳] 上傳失敗:', uploadError)
+          void alert(`${file.name} 上傳失敗: ${uploadError.message}`, 'error')
           continue
         }
+
+        console.log('[景點圖片上傳] 上傳成功:', uploadData)
 
         // 取得公開 URL
         const { data } = supabase.storage
           .from('workspace-files')
           .getPublicUrl(filePath)
 
+        console.log('[景點圖片上傳] 公開 URL:', data.publicUrl)
         newUrls.push(data.publicUrl)
       }
 
       // 更新圖片列表
-      const allImages = [...uploadedImages, ...newUrls]
-      setUploadedImages(allImages)
-      setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+      if (newUrls.length > 0) {
+        const allImages = [...uploadedImages, ...newUrls]
+        console.log('[景點圖片上傳] 更新圖片列表:', allImages.length, '張')
+        setUploadedImages(allImages)
+        setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+      }
     } catch (error) {
-      console.error('上傳錯誤:', error)
+      console.error('[景點圖片上傳] 意外錯誤:', error)
       void alert('上傳過程發生錯誤', 'error')
     } finally {
       setIsUploading(false)
@@ -220,6 +235,7 @@ export function AttractionsDialog({
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+      console.log('[景點圖片上傳] 處理完成')
     }
   }
 
