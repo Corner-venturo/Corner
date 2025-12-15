@@ -624,12 +624,26 @@ export function OrderMembersExpandable({
 
   // 根據身分證字號搜尋顧客（5字以上觸發）
   const checkCustomerMatchByIdNumber = (idNumber: string, memberIndex: number, memberData: Partial<OrderMember>) => {
-    if (!idNumber || idNumber.length < 5) return
+    // 使用 console.log 確保能看到輸出（不受 logger 設定影響）
+    console.log('[ID搜尋] 觸發:', { idNumber, memberIndex, customersCount: customers.length })
 
-    // 完全匹配身分證字號
-    const idMatches = customers.filter(c =>
-      c.national_id === idNumber
-    )
+    if (!idNumber || idNumber.length < 5) {
+      console.log('[ID搜尋] 長度不足5字，跳過')
+      return
+    }
+
+    // 雙向匹配身分證字號（輸入包含顧客ID 或 顧客ID包含輸入）
+    const normalizedInput = idNumber.toUpperCase().trim()
+    const idMatches = customers.filter(c => {
+      if (!c.national_id) return false
+      const normalizedCustomerId = c.national_id.toUpperCase().trim()
+      // 前綴匹配或完全匹配
+      return normalizedCustomerId.startsWith(normalizedInput) ||
+             normalizedInput.startsWith(normalizedCustomerId) ||
+             normalizedCustomerId === normalizedInput
+    })
+
+    console.log('[ID搜尋] 比對結果:', idMatches.length, '筆', '搜尋:', normalizedInput)
 
     if (idMatches.length > 0) {
       setMatchedCustomers(idMatches)
@@ -637,6 +651,10 @@ export function OrderMembersExpandable({
       setPendingMemberIndex(memberIndex)
       setPendingMemberData(memberData)
       setShowCustomerMatchDialog(true)
+    } else {
+      // 輸出前5筆顧客的身分證以供比對
+      const sampleIds = customers.slice(0, 10).map(c => c.national_id).filter(Boolean)
+      console.log('[ID搜尋] 無匹配結果。前10筆顧客身分證:', sampleIds)
     }
   }
 

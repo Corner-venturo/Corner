@@ -48,6 +48,8 @@ interface LocalTourData {
   tourCode: string
   coverImage?: string
   coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' // 封面風格
+  flightStyle?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' // 航班風格
+  itineraryStyle?: 'original' | 'luxury' | 'art' // 每日行程風格
   price?: string | null // 價格
   priceNote?: string | null // 價格備註
   country: string
@@ -444,6 +446,8 @@ function NewItineraryPageContent() {
       tour_code: data.tourCode,
       cover_image: data.coverImage,
       cover_style: data.coverStyle || 'original',
+      flight_style: data.flightStyle || 'original',
+      itinerary_style: data.itineraryStyle || 'original',
       price: data.price || null,
       price_note: data.priceNote || null,
       country: data.country,
@@ -703,6 +707,8 @@ function NewItineraryPageContent() {
             tourCode: itinerary.tour_code || '',
             coverImage: itinerary.cover_image || '',
             coverStyle: itinerary.cover_style || 'original',
+            flightStyle: ((itinerary as { flight_style?: string }).flight_style || 'original') as LocalTourData['flightStyle'],
+            itineraryStyle: ((itinerary as { itinerary_style?: string }).itinerary_style || 'original') as LocalTourData['itineraryStyle'],
             price: itinerary.price || '',
             priceNote: itinerary.price_note || '',
             country: itinerary.country || '',

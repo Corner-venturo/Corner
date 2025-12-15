@@ -2939,6 +2939,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           daily_itinerary: Json | null
+          flight_style: string | null
+          itinerary_style: string | null
           departure_date: string | null
           description: string | null
           duration_days: number | null
@@ -2998,6 +3000,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
+          flight_style?: string | null
+          itinerary_style?: string | null
           departure_date?: string | null
           description?: string | null
           duration_days?: number | null
@@ -3057,6 +3061,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
+          flight_style?: string | null
+          itinerary_style?: string | null
           departure_date?: string | null
           description?: string | null
           duration_days?: number | null
