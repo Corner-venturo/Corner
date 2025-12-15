@@ -102,6 +102,12 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
   const memberStore = useMemberStore()
   const { items: customers, create: createCustomer } = useCustomerStore()
 
+  // 過濾掉已經在這個訂單裡的顧客
+  const existingCustomerIds = memberStore.items
+    .filter(m => m.order_id === orderId && m.customer_id)
+    .map(m => m.customer_id)
+  const availableCustomers = customers.filter(c => !existingCustomerIds.includes(c.id))
+
   // 上傳護照照片到 Supabase Storage
   const uploadPassportImage = async (file: File, memberId: string): Promise<string | null> => {
     try {
@@ -435,7 +441,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
 
             <div className="space-y-4">
               <CustomerCombobox
-                customers={customers}
+                customers={availableCustomers}
                 value={selectedCustomer?.id}
                 onSelect={setSelectedCustomer}
               />

@@ -97,6 +97,9 @@ export interface DayCardProps {
   onOpenAttractionSelector: (dayIndex: number) => void
   onOpenHotelSelector: (dayIndex: number) => void
   onOpenRestaurantSelector: (dayIndex: number, mealType: 'breakfast' | 'lunch' | 'dinner') => void
+  // Image upload handlers
+  handleActivityImageUpload: (dayIndex: number, actIndex: number, file: File) => Promise<void>
+  onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
 }
 
 export interface MealSelectorState {

@@ -96,7 +96,7 @@ export function CustomerCombobox({
               {filteredCustomers.map(customer => (
                 <CommandItem
                   key={customer.id}
-                  value={customer.id}
+                  value={`${customer.name} ${customer.national_id || ''} ${customer.passport_number || ''}`}
                   onSelect={() => {
                     onSelect(customer.id === value ? null : customer)
                     setOpen(false)

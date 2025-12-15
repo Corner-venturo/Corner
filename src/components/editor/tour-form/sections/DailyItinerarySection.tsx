@@ -366,6 +366,10 @@ export function DailyItinerarySection({
           onOpenAttractionSelector={handleOpenAttractionSelector}
           onOpenHotelSelector={handleOpenHotelSelector}
           onOpenRestaurantSelector={handleOpenRestaurantSelector}
+          handleActivityImageUpload={handleActivityImageUpload}
+          onOpenPositionEditor={(dIdx, aIdx) => {
+            setActivityPositionEditor({ isOpen: true, dayIndex: dIdx, actIndex: aIdx })
+          }}
         />
       ))}
 

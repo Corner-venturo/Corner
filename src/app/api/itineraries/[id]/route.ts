@@ -87,6 +87,8 @@ export async function GET(
       tourCode: itinerary.tour_code,
       coverImage: itinerary.cover_image,
       coverStyle: itinerary.cover_style,
+      flightStyle: itinerary.flight_style,
+      itineraryStyle: itinerary.itinerary_style,
       price: itinerary.price,
       priceNote: itinerary.price_note,
       country: itinerary.country,

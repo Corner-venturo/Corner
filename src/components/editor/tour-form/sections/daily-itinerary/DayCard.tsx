@@ -30,25 +30,21 @@ export function DayCard({
   onOpenAttractionSelector,
   onOpenHotelSelector,
   onOpenRestaurantSelector,
+  handleActivityImageUpload,
+  onOpenPositionEditor,
 }: DayCardProps) {
   // 圖片上傳狀態
   const [uploadingActivityImage, setUploadingActivityImage] = useState<{ dayIndex: number; actIndex: number } | null>(null)
   const [activityDragOver, setActivityDragOver] = useState<{ dayIndex: number; actIndex: number } | null>(null)
 
-  // 景點圖片位置調整狀態（暫時在此處理）
-  const handleOpenPositionEditor = (dIdx: number, aIdx: number) => {
-    // 這將由父組件處理
-    console.log('Open position editor:', dIdx, aIdx)
-  }
-
-  // 圖片上傳處理（暫時簡化）
-  const handleActivityImageUpload = async (dIdx: number, aIdx: number, file: File) => {
-    if (!file.type.startsWith('image/')) {
-      return
-    }
+  // 包裝上傳函數，加入 loading 狀態管理
+  const handleImageUploadWithLoading = async (dIdx: number, aIdx: number, file: File) => {
     setUploadingActivityImage({ dayIndex: dIdx, actIndex: aIdx })
-    // 實際上傳邏輯將在父組件處理
-    setTimeout(() => setUploadingActivityImage(null), 100)
+    try {
+      await handleActivityImageUpload(dIdx, aIdx, file)
+    } finally {
+      setUploadingActivityImage(null)
+    }
   }
 
   return (
@@ -205,11 +201,11 @@ export function DayCard({
         reorderActivities={reorderActivities}
         updateDailyItinerary={updateDailyItinerary}
         onOpenAttractionSelector={onOpenAttractionSelector}
-        handleActivityImageUpload={handleActivityImageUpload}
+        handleActivityImageUpload={handleImageUploadWithLoading}
         uploadingActivityImage={uploadingActivityImage}
         activityDragOver={activityDragOver}
         setActivityDragOver={setActivityDragOver}
-        onOpenPositionEditor={handleOpenPositionEditor}
+        onOpenPositionEditor={onOpenPositionEditor}
       />
 
       {/* 推薦行程 */}
