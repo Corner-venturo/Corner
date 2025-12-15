@@ -200,7 +200,10 @@ export function DailyItinerarySection({
     actIndex: number,
     file: File
   ) => {
+    console.log('[每日行程圖片上傳] 開始處理:', { dayIndex, actIndex, fileName: file.name, fileSize: file.size, fileType: file.type })
+
     if (!file.type.startsWith('image/')) {
+      console.log('[每日行程圖片上傳] 非圖片檔案')
       void alert('請選擇圖片檔案', 'warning')
       return
     }
@@ -211,21 +214,25 @@ export function DailyItinerarySection({
       const fileExt = file.name.split('.').pop()
       const fileName = `activity-${dayIndex + 1}-${actIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
       const filePath = `tour-activity-images/${fileName}`
+      console.log('[每日行程圖片上傳] 準備上傳到:', filePath)
 
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('workspace-files')
         .upload(filePath, file)
 
       if (uploadError) {
-        console.error('上傳失敗:', uploadError)
-        void alert('圖片上傳失敗', 'error')
+        console.error('[每日行程圖片上傳] 上傳失敗:', uploadError)
+        void alert(`圖片上傳失敗: ${uploadError.message}`, 'error')
         return
       }
+
+      console.log('[每日行程圖片上傳] 上傳成功:', uploadData)
 
       const { data: urlData } = supabase.storage
         .from('workspace-files')
         .getPublicUrl(filePath)
 
+      console.log('[每日行程圖片上傳] 取得公開 URL:', urlData.publicUrl)
       updateActivity(dayIndex, actIndex, 'image', urlData.publicUrl)
 
       // 上傳成功後詢問是否存到圖庫
@@ -239,10 +246,11 @@ export function DailyItinerarySection({
       })
       setLibraryImageName(activityTitle)
     } catch (error) {
-      console.error('上傳錯誤:', error)
+      console.error('[每日行程圖片上傳] 意外錯誤:', error)
       void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingActivityImage(null)
+      console.log('[每日行程圖片上傳] 處理完成')
     }
   }
 
