@@ -102,6 +102,12 @@ export function LinkItineraryToTourDialog({
     try {
       setIsCreating(true)
 
+      // 從旅遊團帶入航班資訊
+      const tourWithFlight = tour as typeof tour & {
+        outbound_flight?: { text?: string } | null
+        return_flight?: { text?: string } | null
+      }
+
       // Create itinerary with minimal required fields
       const newItinerary = await create({
         title: tour.name,
@@ -119,6 +125,23 @@ export function LinkItineraryToTourDialog({
         country: '',
         features: [],
         focus_cards: [],
+        // 從旅遊團帶入航班資訊
+        outbound_flight: tourWithFlight.outbound_flight?.text ? {
+          airline: '',
+          flightNumber: tourWithFlight.outbound_flight.text,
+          departureAirport: '',
+          departureTime: '',
+          arrivalAirport: '',
+          arrivalTime: '',
+        } : undefined,
+        return_flight: tourWithFlight.return_flight?.text ? {
+          airline: '',
+          flightNumber: tourWithFlight.return_flight.text,
+          departureAirport: '',
+          departureTime: '',
+          arrivalAirport: '',
+          arrivalTime: '',
+        } : undefined,
       } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
       if (newItinerary?.id) {
