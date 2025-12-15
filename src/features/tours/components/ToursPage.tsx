@@ -163,7 +163,7 @@ export const ToursPage: React.FC = () => {
         .filter(c => c.is_active)
         .map(c => ({
           id: c.id,
-          code: c.airport_code || c.name,
+          code: c.airport_code || '',
           name: c.name,
           country_id: c.country_id,
         }))
@@ -221,7 +221,7 @@ export const ToursPage: React.FC = () => {
             .filter(c => c.is_active)
             .map(c => ({
               id: c.id,
-              code: c.airport_code || c.name,
+              code: c.airport_code || '',
               name: c.name,
               country_id: c.country_id,
             }))
@@ -241,7 +241,7 @@ export const ToursPage: React.FC = () => {
             .filter(c => c.is_active)
             .map(c => ({
               id: c.id,
-              code: c.airport_code || c.name,
+              code: c.airport_code || '',
               name: c.name,
               country_id: c.country_id,
             }))

@@ -98,6 +98,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
             ? newTour.customLocation!
             : availableCities.find(c => c.code === newTour.cityCode)?.name || newTour.cityCode
 
+        // 驗證城市代碼（團號需要 3 碼英文城市代碼）
+        if (!cityCode || cityCode.length < 2) {
+          setFormError('請選擇城市，或在「系統設定 > 地區管理」中為該城市設定機場代碼')
+          setSubmitting(false)
+          return
+        }
+
         // Edit mode: update existing tour
         if (dialogType === 'edit' && dialogData) {
           // Get city ID from availableCities (if not custom)
