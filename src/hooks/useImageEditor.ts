@@ -1,6 +1,10 @@
 /**
  * Image Editor Hook
  * 管理圖片編輯功能：縮放、平移、旋轉、翻轉、裁剪
+ *
+ * 共用於：
+ * - CustomerVerifyDialog (顧客護照驗證)
+ * - OrderMembersExpandable (訂單成員編輯)
  */
 
 import { useState, useCallback, useRef } from 'react'

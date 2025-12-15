@@ -17,3 +17,7 @@ export { useCrudOperations } from './useCrudOperations'
 export { useDataFiltering } from './useDataFiltering'
 export { useDialogState } from './useDialogState'
 export { useListPageState } from './useListPageState'
+
+// 圖片編輯 & OCR 辨識 Hooks
+export { useImageEditor } from './useImageEditor'
+export { useOcrRecognition, type OcrParsedData } from './useOcrRecognition'

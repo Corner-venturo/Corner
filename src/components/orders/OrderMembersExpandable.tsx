@@ -2,7 +2,8 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save } from 'lucide-react'
+import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -107,13 +108,9 @@ export function OrderMembersExpandable({
   const [editFormData, setEditFormData] = useState<Partial<OrderMember>>({})
   const [isSaving, setIsSaving] = useState(false)
 
-  // 護照圖片縮放相關狀態
-  const [imageZoom, setImageZoom] = useState(1)
-  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
-  const [imageRotation, setImageRotation] = useState(0) // 旋轉角度 (0, 90, 180, 270)
-  const [isImageDragging, setIsImageDragging] = useState(false)
-  const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 })
-  const imageContainerRef = useRef<HTMLDivElement>(null)
+  // 圖片編輯 & OCR 辨識 Hooks (共用於顧客管理和成員管理)
+  const imageEditor = useImageEditor()
+  const { isRecognizing, recognizePassport } = useOcrRecognition()
 
 
   // 定義可編輯欄位的順序（用於方向鍵導航）
@@ -255,68 +252,19 @@ export function OrderMembersExpandable({
       special_meal: member.special_meal || '',
       remarks: member.remarks || '',
     })
-    // 重置圖片縮放和旋轉狀態
-    setImageZoom(1)
-    setImagePosition({ x: 0, y: 0 })
-    setImageRotation(0)
+    // 重置圖片編輯狀態
+    imageEditor.reset()
     setIsEditDialogOpen(true)
   }
 
-  // 旋轉圖片並轉成 base64
-  const rotateImage = (imageUrl: string, rotation: number): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          reject(new Error('Cannot get canvas context'))
-          return
-        }
-
-        // 90 或 270 度旋轉時，寬高需要交換
-        if (rotation === 90 || rotation === 270) {
-          canvas.width = img.height
-          canvas.height = img.width
-        } else {
-          canvas.width = img.width
-          canvas.height = img.height
-        }
-
-        // 移動到中心點
-        ctx.translate(canvas.width / 2, canvas.height / 2)
-        // 旋轉
-        ctx.rotate((rotation * Math.PI) / 180)
-        // 畫圖片（從中心點偏移回去）
-        ctx.drawImage(img, -img.width / 2, -img.height / 2)
-
-        // 轉成 base64
-        resolve(canvas.toDataURL('image/jpeg', 0.9))
-      }
-      img.onerror = () => reject(new Error('Failed to load image'))
-      img.src = imageUrl
-    })
-  }
-
   // 儲存編輯/驗證（同步更新 order_members + customers）
+  // 注意：圖片旋轉/翻轉/裁剪現在由工具列即時儲存，此處只處理表單資料
   const handleSaveEdit = async () => {
     if (!editingMember) return
     setIsSaving(true)
 
     try {
       const customerStore = useCustomerStore.getState()
-
-      // 0. 如果有旋轉，先處理圖片
-      let newPassportImageUrl = editingMember.passport_image_url
-      if (imageRotation !== 0 && editingMember.passport_image_url) {
-        try {
-          newPassportImageUrl = await rotateImage(editingMember.passport_image_url, imageRotation)
-        } catch (err) {
-          logger.error('旋轉圖片失敗:', err)
-          // 繼續儲存其他資料，不因為圖片旋轉失敗而中斷
-        }
-      }
 
       // 1. 更新 order_members
       const memberUpdateData: Record<string, unknown> = {
@@ -329,11 +277,6 @@ export function OrderMembersExpandable({
         passport_expiry: editFormData.passport_expiry,
         special_meal: editFormData.special_meal,
         remarks: editFormData.remarks,
-      }
-
-      // 如果有旋轉，更新護照圖片
-      if (imageRotation !== 0 && newPassportImageUrl) {
-        memberUpdateData.passport_image_url = newPassportImageUrl
       }
 
       const { error: memberError } = await supabase
@@ -353,11 +296,6 @@ export function OrderMembersExpandable({
           national_id: editFormData.id_number,
           passport_number: editFormData.passport_number,
           passport_expiry_date: editFormData.passport_expiry,
-        }
-
-        // 如果有旋轉，同步更新顧客護照圖片
-        if (imageRotation !== 0 && newPassportImageUrl) {
-          customerUpdateData.passport_image_url = newPassportImageUrl
         }
 
         // 儲存時自動更新驗證狀態為 verified（無論是編輯或驗證模式）
@@ -1905,6 +1843,7 @@ export function OrderMembersExpandable({
         if (!open) {
           setEditingMember(null)
           setEditFormData({})
+          imageEditor.reset()
         }
       }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
@@ -1929,92 +1868,241 @@ export function OrderMembersExpandable({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
-                {editingMember?.passport_image_url && (
+                {editingMember?.passport_image_url && !imageEditor.isCropMode && (
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => setImageZoom(z => Math.max(0.5, z - 0.25))}
-                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => imageEditor.zoomOut()}
+                      className="p-1.5 hover:bg-gray-100 rounded-md"
                       title="縮小"
                     >
                       <ZoomOut size={16} className="text-gray-600" />
                     </button>
                     <span className="text-xs text-gray-500 min-w-[3rem] text-center">
-                      {Math.round(imageZoom * 100)}%
+                      {Math.round(imageEditor.zoom * 100)}%
                     </span>
                     <button
                       type="button"
-                      onClick={() => setImageZoom(z => Math.min(3, z + 0.25))}
-                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                      onClick={() => imageEditor.zoomIn()}
+                      className="p-1.5 hover:bg-gray-100 rounded-md"
                       title="放大"
                     >
                       <ZoomIn size={16} className="text-gray-600" />
                     </button>
-                    <div className="w-px h-4 bg-gray-300 mx-1" />
                     <button
                       type="button"
-                      onClick={() => setImageRotation(r => (r - 90 + 360) % 360)}
-                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
-                      title="逆時針旋轉"
+                      onClick={() => imageEditor.reset()}
+                      className="p-1.5 hover:bg-gray-100 rounded-md ml-1"
+                      title="重置檢視"
                     >
-                      <RotateCcw size={16} className="text-gray-600" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setImageRotation(r => (r + 90) % 360)}
-                      className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
-                      title="順時針旋轉"
-                    >
-                      <RotateCw size={16} className="text-gray-600" />
+                      <X size={16} className="text-gray-600" />
                     </button>
                   </div>
                 )}
               </div>
+
+              {/* 工具列 */}
+              {editingMember?.passport_image_url && !imageEditor.isCropMode && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => imageEditor.rotateLeft()}
+                      className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    >
+                      <RotateCcw size={16} className="text-blue-600" />
+                      <span className="text-gray-600 hidden sm:inline">左轉</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => imageEditor.rotateRight()}
+                      className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    >
+                      <RotateCw size={16} className="text-blue-600" />
+                      <span className="text-gray-600 hidden sm:inline">右轉</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => imageEditor.toggleFlipH()}
+                      className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-blue-100' : ''}`}
+                    >
+                      <FlipHorizontal size={16} className="text-blue-600" />
+                      <span className="text-gray-600 hidden sm:inline">翻轉</span>
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => imageEditor.startCrop()}
+                      className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    >
+                      <Crop size={16} className="text-purple-600" />
+                      <span className="text-gray-600 hidden sm:inline">裁剪</span>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {(imageEditor.rotation !== 0 || imageEditor.flipH) && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!editingMember?.passport_image_url) return
+                          imageEditor.setIsSaving(true)
+                          try {
+                            const transformedImage = await imageEditor.transformImage(
+                              editingMember.passport_image_url,
+                              imageEditor.rotation,
+                              imageEditor.flipH
+                            )
+                            const response = await fetch(transformedImage)
+                            const blob = await response.blob()
+                            const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+                            const { error: uploadError } = await supabase.storage
+                              .from('passport-images')
+                              .upload(fileName, blob, { upsert: true })
+                            if (uploadError) throw uploadError
+                            const { data: urlData } = supabase.storage
+                              .from('passport-images')
+                              .getPublicUrl(fileName)
+                            await supabase
+                              .from('order_members')
+                              .update({ passport_image_url: urlData.publicUrl })
+                              .eq('id', editingMember.id)
+                            setEditingMember({ ...editingMember, passport_image_url: urlData.publicUrl })
+                            imageEditor.reset()
+                            const { toast } = await import('sonner')
+                            toast.success('圖片已儲存')
+                          } catch (error) {
+                            const { toast } = await import('sonner')
+                            toast.error('儲存圖片失敗')
+                          } finally {
+                            imageEditor.setIsSaving(false)
+                          }
+                        }}
+                        disabled={imageEditor.isSaving}
+                        className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
+                      >
+                        <Save size={16} />
+                        <span>{imageEditor.isSaving ? '儲存中...' : '儲存圖片'}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!editingMember?.passport_image_url) return
+                        await recognizePassport(editingMember.passport_image_url, (result) => {
+                          setEditFormData(prev => ({
+                            ...prev,
+                            chinese_name: result.name || prev.chinese_name,
+                            passport_name: result.passport_romanization || prev.passport_name,
+                            birth_date: result.date_of_birth || prev.birth_date,
+                            gender: result.gender === '男' ? 'M' : result.gender === '女' ? 'F' : prev.gender,
+                            id_number: result.national_id || prev.id_number,
+                            passport_number: result.passport_number || prev.passport_number,
+                            passport_expiry: result.passport_expiry_date || prev.passport_expiry,
+                          }))
+                        })
+                      }}
+                      disabled={isRecognizing}
+                      className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
+                    >
+                      <RefreshCw size={16} className={isRecognizing ? 'animate-spin' : ''} />
+                      <span>{isRecognizing ? '辨識中...' : '再次辨識'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 裁剪模式工具列 */}
+              {editingMember?.passport_image_url && imageEditor.isCropMode && (
+                <div className="flex items-center justify-between bg-purple-50 rounded-lg p-2">
+                  <span className="text-xs text-purple-700">拖曳框選要保留的區域</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => imageEditor.cancelCrop()}
+                      className="px-3 py-1 text-xs text-gray-600 hover:bg-white rounded-md"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!editingMember?.passport_image_url) return
+                        try {
+                          const croppedImage = await imageEditor.confirmCrop(editingMember.passport_image_url)
+                          if (croppedImage) {
+                            imageEditor.setIsSaving(true)
+                            const response = await fetch(croppedImage)
+                            const blob = await response.blob()
+                            const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+                            const { error: uploadError } = await supabase.storage
+                              .from('passport-images')
+                              .upload(fileName, blob, { upsert: true })
+                            if (uploadError) throw uploadError
+                            const { data: urlData } = supabase.storage
+                              .from('passport-images')
+                              .getPublicUrl(fileName)
+                            await supabase
+                              .from('order_members')
+                              .update({ passport_image_url: urlData.publicUrl })
+                              .eq('id', editingMember.id)
+                            setEditingMember({ ...editingMember, passport_image_url: urlData.publicUrl })
+                            imageEditor.reset()
+                            const { toast } = await import('sonner')
+                            toast.success('裁剪完成')
+                          }
+                        } catch (error) {
+                          const { toast } = await import('sonner')
+                          toast.error(error instanceof Error ? error.message : '裁剪失敗')
+                        } finally {
+                          imageEditor.setIsSaving(false)
+                        }
+                      }}
+                      disabled={imageEditor.cropRect.width < 20 || imageEditor.isSaving}
+                      className="px-3 py-1 text-xs bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+                    >
+                      {imageEditor.isSaving ? '處理中...' : '確認裁剪'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 圖片容器 */}
               {editingMember?.passport_image_url ? (
                 <div
-                  ref={imageContainerRef}
-                  className="relative overflow-hidden rounded-lg border border-morandi-gold/20 bg-gray-50 cursor-grab active:cursor-grabbing"
+                  ref={imageEditor.containerRef}
+                  className={`relative overflow-hidden rounded-lg border bg-gray-50 ${
+                    imageEditor.isCropMode
+                      ? 'border-purple-400 cursor-crosshair'
+                      : 'cursor-grab active:cursor-grabbing'
+                  }`}
                   style={{ height: '320px' }}
-                  onWheel={(e) => {
-                    // 注意：不使用 preventDefault() 因為現代瀏覽器的 wheel 事件是 passive
-                    const delta = e.deltaY > 0 ? -0.1 : 0.1
-                    setImageZoom(z => Math.min(3, Math.max(0.5, z + delta)))
-                  }}
-                  onMouseDown={(e) => {
-                    if (imageZoom > 1) {
-                      setIsImageDragging(true)
-                      setImageDragStart({ x: e.clientX - imagePosition.x, y: e.clientY - imagePosition.y })
-                    }
-                  }}
-                  onMouseMove={(e) => {
-                    if (isImageDragging && imageZoom > 1) {
-                      setImagePosition({
-                        x: e.clientX - imageDragStart.x,
-                        y: e.clientY - imageDragStart.y,
-                      })
-                    }
-                  }}
-                  onMouseUp={() => setIsImageDragging(false)}
-                  onMouseLeave={() => setIsImageDragging(false)}
-                  onClick={() => {
-                    if (imageZoom === 1) {
-                      setImageZoom(2)
-                    }
-                  }}
+                  onWheel={imageEditor.handleWheel}
+                  onMouseDown={(e) => imageEditor.handleMouseDown(e, imageEditor.containerRef.current)}
+                  onMouseMove={(e) => imageEditor.handleMouseMove(e, imageEditor.containerRef.current)}
+                  onMouseUp={imageEditor.handleMouseUp}
+                  onMouseLeave={(e) => imageEditor.handleMouseLeave(e, imageEditor.containerRef.current)}
                 >
                   <img
                     src={editingMember.passport_image_url}
                     alt="護照照片"
-                    className="w-full h-full object-contain transition-transform duration-100"
+                    className="absolute w-full h-full object-contain transition-transform"
                     style={{
-                      transform: `scale(${imageZoom}) rotate(${imageRotation}deg) translate(${imagePosition.x / imageZoom}px, ${imagePosition.y / imageZoom}px)`,
+                      transform: `translate(${imageEditor.position.x}px, ${imageEditor.position.y}px) scale(${imageEditor.zoom}) rotate(${imageEditor.rotation}deg) ${imageEditor.flipH ? 'scaleX(-1)' : ''}`,
+                      transformOrigin: 'center center',
                     }}
                     draggable={false}
                   />
-                  {imageZoom === 1 && (
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded pointer-events-none">
-                      點擊放大 / 滾輪縮放
-                    </div>
+                  {/* 裁剪框 */}
+                  {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
+                    <div
+                      className="absolute border-2 border-purple-500 bg-purple-500/10"
+                      style={{
+                        left: imageEditor.cropRect.x,
+                        top: imageEditor.cropRect.y,
+                        width: imageEditor.cropRect.width,
+                        height: imageEditor.cropRect.height,
+                      }}
+                    />
                   )}
                 </div>
               ) : (

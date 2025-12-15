@@ -24,8 +24,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
-import { useImageEditor } from '../hooks/useImageEditor'
-import { useOcrRecognition } from '../hooks/useOcrRecognition'
+import { useImageEditor, useOcrRecognition } from '@/hooks'
 
 interface CustomerVerifyDialogProps {
   open: boolean

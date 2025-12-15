@@ -1,11 +1,28 @@
 /**
  * OCR Recognition Hook
  * 管理護照 OCR 辨識功能
+ *
+ * 共用於：
+ * - CustomerVerifyDialog (顧客護照驗證)
+ * - OrderMembersExpandable (訂單成員編輯)
  */
 
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
-import type { UpdateCustomerData } from '@/types/customer.types'
+
+/**
+ * OCR 辨識結果的通用資料結構
+ * 適用於顧客和訂單成員
+ */
+export interface OcrParsedData {
+  name?: string
+  passport_romanization?: string
+  date_of_birth?: string
+  gender?: string
+  passport_number?: string
+  passport_expiry_date?: string
+  national_id?: string
+}
 
 interface OcrResult {
   name?: string
@@ -31,11 +48,11 @@ export function useOcrRecognition() {
   /**
    * 辨識護照圖片
    * @param imageSource - 可以是 URL 或 File 物件
-   * @param onSuccess - 辨識成功時的回調函數
+   * @param onSuccess - 辨識成功時的回調函數，回傳解析後的資料
    */
   const recognizePassport = useCallback(async (
     imageSource: string | File,
-    onSuccess: (data: Partial<UpdateCustomerData>) => void
+    onSuccess: (data: OcrParsedData) => void
   ) => {
     setIsRecognizing(true)
     try {
@@ -77,7 +94,7 @@ export function useOcrRecognition() {
         }
 
         // 組合辨識結果
-        const recognizedData: Partial<UpdateCustomerData> = {
+        const recognizedData: OcrParsedData = {
           name: ocrData.name,
           passport_romanization: ocrData.passport_romanization,
           date_of_birth: ocrData.date_of_birth,
