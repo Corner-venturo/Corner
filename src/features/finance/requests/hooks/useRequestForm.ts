@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useTours } from '@/features/tours/hooks/useTours'
 import { useOrders } from '@/features/orders/hooks/useOrders'
 import { useSupplierStore, useEmployeeStore } from '@/stores'
@@ -34,7 +34,7 @@ export function useRequestForm() {
   ])
 
   // Update first item's supplier when request-level supplier changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData.supplier_id && requestItems.length > 0 &&
         (requestItems[0].supplier_id !== formData.supplier_id || requestItems[0].supplierName !== formData.supplier_name)) {
       setRequestItems(prev => prev.map((item, index) => {
