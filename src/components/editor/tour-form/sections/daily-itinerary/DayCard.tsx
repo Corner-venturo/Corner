@@ -101,19 +101,21 @@ export function DayCard({
           </span>
         </div>
         <div className="flex items-center gap-4">
-          {/* 每日風格選擇器 + 預覽編輯 */}
-          <DayStylePicker
-            dayIndex={dayIndex}
-            dayData={day}
-            currentStyle={day.displayStyle || 'single-image'}
-            onStyleChange={(style) => updateDailyItinerary(dayIndex, 'displayStyle', style)}
-            onDayUpdate={(updatedDay) => {
-              const newItinerary = [...data.dailyItinerary]
-              newItinerary[dayIndex] = updatedDay
-              updateField('dailyItinerary', newItinerary)
-            }}
-            departureDate={data.departureDate}
-          />
+          {/* 每日風格選擇器 + 預覽編輯 - 只在藝術風格時顯示 */}
+          {data.itineraryStyle === 'art' && (
+            <DayStylePicker
+              dayIndex={dayIndex}
+              dayData={day}
+              currentStyle={day.displayStyle || 'single-image'}
+              onStyleChange={(style) => updateDailyItinerary(dayIndex, 'displayStyle', style)}
+              onDayUpdate={(updatedDay) => {
+                const newItinerary = [...data.dailyItinerary]
+                newItinerary[dayIndex] = updatedDay
+                updateField('dailyItinerary', newItinerary)
+              }}
+              departureDate={data.departureDate}
+            />
+          )}
           {/* 建議方案 checkbox - 不顯示在第一天 */}
           {dayIndex > 0 && (
             <label className="flex items-center gap-2 cursor-pointer">
