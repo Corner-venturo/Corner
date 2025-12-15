@@ -104,8 +104,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
           orders.map(order => (
             <React.Fragment key={order.id}>
               <div
-                onClick={() => router.push(`/orders/${order.id}`)}
-                className="grid transition-colors cursor-pointer hover:bg-morandi-container/30 border-b border-border/50"
+                className="grid transition-colors border-b border-border/50"
                 style={{ gridTemplateColumns: gridCols }}
               >
                 <div className="py-2 px-4">

@@ -80,6 +80,7 @@ export function OrderMembersExpandable({
   const [memberCountToAdd, setMemberCountToAdd] = useState<number | ''>(1)
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
+  const [isAllEditMode, setIsAllEditMode] = useState(false) // 全部編輯模式
 
   // 護照上傳相關狀態
   const [processedFiles, setProcessedFiles] = useState<ProcessedFile[]>([])
@@ -1050,6 +1051,19 @@ export function OrderMembersExpandable({
           <Button
             size="sm"
             variant="ghost"
+            onClick={() => setIsAllEditMode(!isAllEditMode)}
+            className={cn(
+              "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30",
+              isAllEditMode && "bg-morandi-blue/10 text-morandi-blue"
+            )}
+            title={isAllEditMode ? "關閉全部編輯模式" : "開啟全部編輯模式"}
+          >
+            <Pencil size={14} />
+            {isAllEditMode ? "關閉編輯" : "全部編輯"}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={() => setShowIdentityColumn(!showIdentityColumn)}
             className={cn(
               "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30",
@@ -1132,86 +1146,215 @@ export function OrderMembersExpandable({
                   key={member.id}
                   className="group relative hover:bg-morandi-container/20 transition-colors"
                 >
-                  {/* 身份 - 唯讀顯示 */}
+                  {/* 身份 */}
                   {showIdentityColumn && (
-                    <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                      <span className="text-xs text-morandi-primary">{member.identity || '-'}</span>
+                    <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                      {isAllEditMode ? (
+                        <input
+                          type="text"
+                          value={member.identity || ''}
+                          onChange={e => updateField(member.id, 'identity', e.target.value)}
+                          onCompositionStart={() => setIsComposing(true)}
+                          onCompositionEnd={(e) => {
+                            setIsComposing(false)
+                            setTimeout(() => {
+                              updateField(member.id, 'identity', e.currentTarget.value)
+                            }, 0)
+                          }}
+                          onKeyDown={e => handleKeyDown(e, memberIndex, 'identity')}
+                          data-member={member.id}
+                          data-field="identity"
+                          className="w-full bg-transparent text-xs"
+                          style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        />
+                      ) : (
+                        <span className="text-xs text-morandi-primary">{member.identity || '-'}</span>
+                      )}
                     </td>
                   )}
 
-                  {/* 中文姓名 - 唯讀顯示，待驗證顯示紅色 */}
+                  {/* 中文姓名 */}
                   <td className={cn(
                     "border border-morandi-gold/20 px-2 py-1",
-                    member.customer_verification_status === 'unverified' ? 'bg-red-50' : 'bg-gray-50'
+                    isAllEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-red-50' : 'bg-gray-50')
                   )}>
-                    <div className="flex items-center gap-1">
-                      <span
-                        className={cn(
-                          "flex-1 text-xs",
-                          member.customer_verification_status === 'unverified' ? 'text-red-600 font-medium' : 'text-morandi-primary'
-                        )}
-                        title={member.customer_verification_status === 'unverified' ? '⚠️ 待驗證 - 請點擊編輯按鈕' : ''}
-                      >
-                        {member.chinese_name || '-'}
-                      </span>
-                      {member.passport_image_url && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPreviewMember(member)
-                            setIsPreviewOpen(true)
-                          }}
-                          className="p-0.5 text-morandi-gold hover:text-morandi-gold/80 transition-colors"
-                          title="查看護照照片"
-                        >
-                          <Eye size={12} />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* 護照拼音 - 唯讀 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
-                  </td>
-
-                  {/* 出生年月日 - 唯讀 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    <span className="text-xs text-morandi-primary">{member.birth_date || '-'}</span>
-                  </td>
-
-                  {/* 性別 - 唯讀 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50 text-xs text-center">
-                    <span className="text-morandi-primary">
-                      {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
-                    </span>
-                  </td>
-
-                  {/* 身分證號 - 唯讀 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
-                  </td>
-
-                  {/* 護照號碼 - 唯讀 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
-                  </td>
-
-                  {/* 護照效期 - 唯讀，含效期狀態提示 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50">
-                    {(() => {
-                      const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
-                      return (
-                        <span className={cn("text-xs", expiryInfo.className)}>
-                          {expiryInfo.text}
-                          {expiryInfo.statusLabel && (
-                            <span className="ml-1 text-[10px] font-medium">
-                              ({expiryInfo.statusLabel})
-                            </span>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.chinese_name || ''}
+                        onChange={e => updateField(member.id, 'chinese_name', e.target.value)}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={(e) => {
+                          setIsComposing(false)
+                          setTimeout(() => {
+                            updateField(member.id, 'chinese_name', e.currentTarget.value)
+                          }, 0)
+                        }}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
+                        data-member={member.id}
+                        data-field="chinese_name"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={cn(
+                            "flex-1 text-xs",
+                            member.customer_verification_status === 'unverified' ? 'text-red-600 font-medium' : 'text-morandi-primary'
                           )}
+                          title={member.customer_verification_status === 'unverified' ? '⚠️ 待驗證 - 請點擊編輯按鈕' : ''}
+                        >
+                          {member.chinese_name || '-'}
                         </span>
-                      )
-                    })()}
+                        {member.passport_image_url && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPreviewMember(member)
+                              setIsPreviewOpen(true)
+                            }}
+                            className="p-0.5 text-morandi-gold hover:text-morandi-gold/80 transition-colors"
+                            title="查看護照照片"
+                          >
+                            <Eye size={12} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+
+                  {/* 護照拼音 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.passport_name || ''}
+                        onChange={e => updateField(member.id, 'passport_name', e.target.value)}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={(e) => {
+                          setIsComposing(false)
+                          setTimeout(() => {
+                            updateField(member.id, 'passport_name', e.currentTarget.value)
+                          }, 0)
+                        }}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_name')}
+                        data-member={member.id}
+                        data-field="passport_name"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      />
+                    ) : (
+                      <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
+                    )}
+                  </td>
+
+                  {/* 出生年月日 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.birth_date || ''}
+                        onChange={e => handleDateInput(member.id, 'birth_date', e.target.value)}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'birth_date')}
+                        data-member={member.id}
+                        data-field="birth_date"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="YYYYMMDD"
+                      />
+                    ) : (
+                      <span className="text-xs text-morandi-primary">{member.birth_date || '-'}</span>
+                    )}
+                  </td>
+
+                  {/* 性別 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <select
+                        value={member.gender || ''}
+                        onChange={e => updateField(member.id, 'gender', e.target.value)}
+                        data-member={member.id}
+                        data-field="gender"
+                        className="w-full bg-transparent text-xs text-center"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      >
+                        <option value="">-</option>
+                        <option value="M">男</option>
+                        <option value="F">女</option>
+                      </select>
+                    ) : (
+                      <span className="text-morandi-primary">
+                        {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* 身分證號 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.id_number || ''}
+                        onChange={e => updateField(member.id, 'id_number', e.target.value)}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'id_number')}
+                        data-member={member.id}
+                        data-field="id_number"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      />
+                    ) : (
+                      <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
+                    )}
+                  </td>
+
+                  {/* 護照號碼 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.passport_number || ''}
+                        onChange={e => updateField(member.id, 'passport_number', e.target.value)}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_number')}
+                        data-member={member.id}
+                        data-field="passport_number"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      />
+                    ) : (
+                      <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
+                    )}
+                  </td>
+
+                  {/* 護照效期 */}
+                  <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    {isAllEditMode ? (
+                      <input
+                        type="text"
+                        value={member.passport_expiry || ''}
+                        onChange={e => handleDateInput(member.id, 'passport_expiry', e.target.value)}
+                        onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_expiry')}
+                        data-member={member.id}
+                        data-field="passport_expiry"
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="YYYYMMDD"
+                      />
+                    ) : (
+                      (() => {
+                        const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
+                        return (
+                          <span className={cn("text-xs", expiryInfo.className)}>
+                            {expiryInfo.text}
+                            {expiryInfo.statusLabel && (
+                              <span className="ml-1 text-[10px] font-medium">
+                                ({expiryInfo.statusLabel})
+                              </span>
+                            )}
+                          </span>
+                        )
+                      })()
+                    )}
                   </td>
 
                   {/* 飲食禁忌 */}
