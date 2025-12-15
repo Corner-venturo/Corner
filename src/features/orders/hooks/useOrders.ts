@@ -1,3 +1,5 @@
+'use client'
+
 import { useOrderStore } from '@/stores'
 import { orderService } from '../services/order.service'
 import { Order } from '@/stores/types'
