@@ -4,12 +4,12 @@ import { logger } from '@/lib/utils/logger'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { useOrderStore } from '@/stores'
+import { useOrderStore, useTourStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order } from '@/stores/types'
-import { OrderMembersExpandable } from './OrderMembersExpandable'
+import { OrderMemberView } from '@/components/members/OrderMemberView'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface SimpleOrderTableProps {
@@ -26,6 +26,12 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   const router = useRouter()
   const orderStore = useOrderStore()
   const deleteOrder = orderStore.delete
+  const { items: tours, fetchAll: fetchAllTours } = useTourStore();
+  
+  useEffect(() => {
+    fetchAllTours();
+  }, [fetchAllTours]);
+
   const { currentWorkspace } = useWorkspaceChannels()
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
@@ -225,12 +231,21 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
               {/* 展開成員列表 */}
               {expandedOrderId === order.id && currentWorkspace && (
                 <div className="bg-morandi-container/10">
-                  <OrderMembersExpandable
-                    orderId={order.id}
-                    tourId={order.tour_id}
-                    workspaceId={currentWorkspace.id}
-                    onClose={() => setExpandedOrderId(null)}
-                  />
+                  {(() => {
+                    const expandedOrder = orders.find(o => o.id === expandedOrderId);
+                    const expandedTour = expandedOrder ? tours.find(t => t.id === expandedOrder.tour_id) : undefined;
+                    const departureDate = expandedTour?.departure_date || '';
+
+                    return (
+                      <OrderMemberView
+                        order_id={order.id}
+                        departure_date={departureDate}
+                        member_count={order.member_count || 0}
+                        // workspaceId is implicitly handled by useMembers hook inside OrderMemberView
+                        // onClose={() => setExpandedOrderId(null)} - OrderMemberView doesn't need this prop
+                      />
+                    );
+                  })()}
                 </div>
               )}
             </React.Fragment>

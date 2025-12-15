@@ -31,12 +31,11 @@ export function useRequestOperations() {
         order_id: formData.order_id || undefined,
         order_number: orderNumber,
         request_date: formData.request_date,
-        items: [],
-        total_amount: 0,
+        amount: 0,
         status: 'pending',
         note: formData.note,
-        budget_warning: false,
-      } as unknown)
+        request_type: '供應商支出', // Default value for now
+      })
 
       // Add all items sequentially
       for (let i = 0; i < items.length; i++) {
@@ -80,12 +79,11 @@ export function useRequestOperations() {
           code: selectedTour.code,
           tour_name: selectedTour.name,
           request_date: formData.request_date,
-          items: [],
-          total_amount: 0,
+          amount: 0,
           status: 'pending',
           note: formData.note,
-          budget_warning: false,
-        } as unknown)
+          request_type: '供應商支出', // Default value for now
+        })
 
         // Add all items
         for (let i = 0; i < items.length; i++) {

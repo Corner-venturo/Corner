@@ -4,13 +4,14 @@ import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, Check, Crop, Settings2 } from 'lucide-react'
+import { Upload, Check, Crop, Settings2, Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { alert } from '@/lib/ui/alert-dialog'
+import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -44,6 +45,7 @@ export function CoverInfoSection({
   onChange,
 }: CoverInfoSectionProps) {
   const { cities, updateCity: updateCityInStore } = useRegionsStore()
+  const { coverTemplates, loading: templatesLoading } = useTemplates()
   const [uploading, setUploading] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState('')
@@ -227,49 +229,20 @@ export function CoverInfoSection({
     }
   }
 
-  // 封面風格選項（五種款式）
-  const coverStyleOptions: { value: CoverStyleType; label: string; description: string; color: string }[] = [
-    {
-      value: 'original',
-      label: '經典全屏',
-      description: '全螢幕背景圖片，文字置中，金色漸層動畫',
-      color: '#f59e0b', // amber
-    },
-    {
-      value: 'gemini',
-      label: 'Gemini 風格',
-      description: '精緻小巧，底部文字佈局，莫蘭迪金色',
-      color: '#c9aa7c', // morandi gold
-    },
-    {
-      value: 'nature',
-      label: '日式和風',
-      description: '日式極簡風，垂直文字，和紙紋理背景',
-      color: '#30abe8', // japan blue
-    },
-    {
-      value: 'serene',
-      label: '浮水印風',
-      description: '藍色寧靜風，大型日期浮水印，優雅字體',
-      color: '#4a6fa5', // serene blue
-    },
-    {
-      value: 'luxury',
-      label: '奢華質感',
-      description: '左右分欄佈局，襯線字體，深綠金色系',
-      color: '#2C5F4D', // luxury green
-    },
-    {
-      value: 'art',
-      label: '藝術雜誌',
-      description: '全螢幕大圖，高對比排版，雜誌感設計',
-      color: '#E63946', // art red
-    },
-  ]
+  // 從資料庫載入的封面風格選項
+  const coverStyleOptions = useMemo(() => {
+    return coverTemplates.map(template => ({
+      value: template.id as CoverStyleType,
+      label: template.name,
+      description: template.description || '',
+      color: getTemplateColor(template.id),
+      previewImage: template.preview_image_url,
+    }))
+  }, [coverTemplates])
 
   // 取得當前風格的顏色
   const currentStyleOption = coverStyleOptions.find(o => o.value === (data.coverStyle || 'original'))
-  const currentStyleColor = currentStyleOption?.color || '#f59e0b'
+  const currentStyleColor = currentStyleOption?.color || getTemplateColor(data.coverStyle)
 
   return (
     <div className="space-y-2">
@@ -331,59 +304,76 @@ export function CoverInfoSection({
             {/* 封面風格選擇器 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">封面風格</label>
-              <div className="grid grid-cols-2 gap-2">
-                {coverStyleOptions.map((option) => {
-                  const isSelected = (data.coverStyle || 'original') === option.value
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => {
-                        // 使用 onChange 一次更新多個欄位，避免狀態覆蓋問題
-                        onChange({
-                          ...data,
-                          coverStyle: option.value,
-                          flightStyle: getDefaultFlightStyle(option.value),
-                        })
-                      }}
-                      className={cn(
-                        'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
-                        isSelected
-                          ? 'ring-2 ring-offset-1 bg-white'
-                          : 'border-morandi-container hover:border-opacity-70 bg-white'
-                      )}
-                      style={{
-                        borderColor: isSelected ? option.color : undefined,
-                        ...(isSelected ? { ['--tw-ring-color' as string]: `${option.color}40` } : {})
-                      }}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-1.5">
-                          <div
-                            className="w-2.5 h-2.5 rounded-full"
-                            style={{ backgroundColor: option.color }}
-                          />
-                          <span
-                            className="font-medium text-sm"
-                            style={{ color: isSelected ? option.color : undefined }}
-                          >
-                            {option.label}
-                          </span>
-                        </div>
-                        {isSelected && (
-                          <div
-                            className="w-4 h-4 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: option.color }}
-                          >
-                            <Check size={10} className="text-white" />
+              {templatesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
+                  <span className="ml-2 text-sm text-morandi-secondary">載入模板中...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {coverStyleOptions.map((option) => {
+                    const isSelected = (data.coverStyle || 'original') === option.value
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          // 使用 onChange 一次更新多個欄位，避免狀態覆蓋問題
+                          onChange({
+                            ...data,
+                            coverStyle: option.value,
+                            flightStyle: getDefaultFlightStyle(option.value),
+                          })
+                        }}
+                        className={cn(
+                          'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
+                          isSelected
+                            ? 'ring-2 ring-offset-1 bg-white'
+                            : 'border-morandi-container hover:border-opacity-70 bg-white'
+                        )}
+                        style={{
+                          borderColor: isSelected ? option.color : undefined,
+                          ...(isSelected ? { ['--tw-ring-color' as string]: `${option.color}40` } : {})
+                        }}
+                      >
+                        {/* 預覽圖（如果有） */}
+                        {option.previewImage && (
+                          <div className="w-full h-16 mb-2 rounded overflow-hidden bg-morandi-container/30">
+                            <img
+                              src={option.previewImage}
+                              alt={option.label}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                         )}
-                      </div>
-                      <span className="text-[10px] text-morandi-secondary leading-tight mt-0.5">{option.description}</span>
-                    </button>
-                  )
-                })}
-              </div>
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-1.5">
+                            <div
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ backgroundColor: option.color }}
+                            />
+                            <span
+                              className="font-medium text-sm"
+                              style={{ color: isSelected ? option.color : undefined }}
+                            >
+                              {option.label}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <div
+                              className="w-4 h-4 rounded-full flex items-center justify-center"
+                              style={{ backgroundColor: option.color }}
+                            >
+                              <Check size={10} className="text-white" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-morandi-secondary leading-tight mt-0.5">{option.description}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Luxury 風格專屬設定 */}

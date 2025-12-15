@@ -20,6 +20,7 @@ import { useBatchRequestForm } from '@/features/finance/requests/hooks/useBatchR
 import { useRequestOperations } from '@/features/finance/requests/hooks/useRequestOperations'
 import { categoryOptions } from '@/features/finance/requests/types'
 import { BatchTourSelect } from '@/features/finance/requests/components/BatchTourSelect'
+import { EditableRequestItemList } from '@/features/finance/requests/components/RequestItemList'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -36,25 +37,21 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     formData,
     setFormData,
     requestItems,
-    newItem,
-    setNewItem,
     tourSearchValue,
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
-    supplierSearchValue,
-    setSupplierSearchValue,
+
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
-    showSupplierDropdown,
-    setShowSupplierDropdown,
+
     filteredTours,
     filteredOrders,
-    filteredSuppliers,
     total_amount,
-    addItemToList,
+    addNewEmptyItem,
+    updateItem,
     removeItem,
     resetForm,
     suppliers,
@@ -355,194 +352,18 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
         )}
       </div>
 
-      {/* Add Item Form */}
-      <div className="pt-3 border-t border-morandi-container/20">
-        <label className="text-sm font-medium text-morandi-primary mb-3 block">新增請款項目</label>
 
-        <div className="space-y-3 p-4 bg-morandi-container/5 rounded-lg border border-morandi-container/30">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-1 block">類別</label>
-              <Select
-                value={newItem.category}
-                onValueChange={value =>
-                  setNewItem(prev => ({ ...prev, category: value as typeof newItem.category }))
-                }
-              >
-                <SelectTrigger className="border-morandi-container/30">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-1 block">
-                供應商
-              </label>
-              <Select
-                value={newItem.supplier_id}
-                onValueChange={value => setNewItem(prev => ({ ...prev, supplier_id: value }))}
-              >
-                <SelectTrigger className="border-morandi-container/30">
-                  <SelectValue placeholder="選擇供應商" />
-                </SelectTrigger>
-                <SelectContent>
-                  {suppliers.map(supplier => (
-                    <SelectItem key={supplier.id} value={supplier.id}>
-                      {supplier.name} ({supplier.group})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-1 block">
-              項目描述
-            </label>
-            <Input
-              value={newItem.description}
-              onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  // 只有在不是輸入法組合中時才新增
-                  if (!e.nativeEvent.isComposing) {
-                    addItemToList()
-                  }
-                }
-              }}
-              placeholder="輸入項目描述"
-              className="border-morandi-container/30"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-1 block">單價</label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={newItem.unit_price || ''}
-                onChange={e => {
-                  // 全形轉半形並只保留數字
-                  let value = e.target.value
-                    .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                    .replace(/[^\d]/g, '')
-                  setNewItem(prev => ({ ...prev, unit_price: value ? Number(value) : 0 }))
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                    e.preventDefault()
-                  }
-                }}
-                placeholder="0"
-                className="border-morandi-container/30"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-1 block">數量</label>
-              <Input
-                type="text"
-                inputMode="numeric"
-                value={newItem.quantity || ''}
-                onChange={e => {
-                  // 全形轉半形並只保留數字
-                  let value = e.target.value
-                    .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-                    .replace(/[^\d]/g, '')
-                  setNewItem(prev => ({ ...prev, quantity: value ? Number(value) : 1 }))
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                    e.preventDefault()
-                  }
-                }}
-                placeholder="1"
-                className="border-morandi-container/30"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-1 block">小計</label>
-              <Input
-                value={`NT$ ${(newItem.unit_price * newItem.quantity).toLocaleString()}`}
-                disabled
-                className="bg-morandi-container/30"
-              />
-            </div>
-          </div>
-
-          <Button
-            onClick={addItemToList}
-            disabled={!newItem.supplier_id || !newItem.description}
-            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm"
-            size="sm"
-          >
-            <Plus size={16} className="mr-2" />
-            新增項目
-          </Button>
-        </div>
-      </div>
 
       {/* Item List */}
-      {requestItems.length > 0 && (
-        <div className="pt-3 border-t border-morandi-container/20">
-          <label className="text-sm font-medium text-morandi-primary mb-3 block">
-            請款項目列表 ({requestItems.length})
-          </label>
-          <div className="space-y-2 p-4 bg-morandi-container/5 rounded-lg border border-morandi-container/30">
-            <div className="space-y-2">
-              {requestItems.map(item => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-morandi-container/20"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-2 py-0.5 rounded">
-                        {categoryOptions.find(c => c.value === item.category)?.label}
-                      </span>
-                      <span className="text-sm font-medium text-morandi-primary">
-                        {item.supplierName}
-                      </span>
-                    </div>
-                    <div className="text-xs text-morandi-secondary">{item.description}</div>
-                    <div className="text-xs text-morandi-secondary mt-1">
-                      NT$ {item.unit_price.toLocaleString()} × {item.quantity} =
-                      <span className="font-semibold text-morandi-gold ml-1">
-                        NT$ {(item.unit_price * item.quantity).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="ml-4 text-morandi-red hover:bg-morandi-red/10 p-2 rounded transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-morandi-container/30 flex justify-between items-center">
-              <span className="text-sm font-semibold text-morandi-primary">總金額:</span>
-              <span className="text-lg font-bold text-morandi-gold">
-                NT$ {total_amount.toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="pt-3 border-t border-morandi-container/20">
+        <EditableRequestItemList
+          items={requestItems}
+          suppliers={suppliers}
+          updateItem={updateItem}
+          removeItem={removeItem}
+          addNewEmptyItem={addNewEmptyItem}
+        />
+      </div>
 
       {/* Note */}
       <div className="pt-3 border-t border-morandi-container/20">

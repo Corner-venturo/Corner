@@ -224,6 +224,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       tour_id: tourId,
       code,
       request_number: code,
+      request_date: requestDate,
       request_type: '從報價單自動生成',
       amount: 0,
       status: 'pending' as const,

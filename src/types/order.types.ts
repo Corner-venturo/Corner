@@ -13,15 +13,15 @@ import { BaseEntity } from './base.types'
  * 注意：所有可選欄位使用 | null 以符合 Supabase PostgreSQL 規範
  */
 export interface Order extends BaseEntity {
-  order_number: string // 訂單編號（相容舊欄位：code）
+  order_number: string | null // 訂單編號（相容舊欄位：code）
   code: string // 團號代碼
-  tour_id: string // 旅遊團 ID
-  tour_name: string // 旅遊團名稱
+  tour_id: string | null // 旅遊團 ID
+  tour_name: string | null // 旅遊團名稱
   customer_id?: string | null // 客戶 ID（可選）
   contact_person: string // 聯絡人
   contact_phone?: string | null // 聯絡電話（可選）
-  sales_person: string // 業務人員
-  assistant: string // 助理
+  sales_person: string | null // 業務人員
+  assistant: string | null // 助理
   member_count: number // 團員人數
   payment_status: PaymentStatus // 付款狀態
   status?: OrderStatus | null // 訂單狀態

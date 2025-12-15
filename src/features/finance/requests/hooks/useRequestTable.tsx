@@ -3,32 +3,32 @@ import { TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table'
 import { PaymentRequest } from '@/stores/types'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { statusLabels, statusColors } from '../types'
+import { statusLabels, statusColors } from '../types' // Assuming statusLabels and statusColors are now correctly typed
 
 export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Table columns configuration
-  const tableColumns: TableColumn[] = useMemo(
+  const tableColumns: TableColumn<PaymentRequest>[] = useMemo(
     () => [
       {
         key: 'request_number',
         label: '請款單號',
         sortable: true,
         filterable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value: unknown, row: PaymentRequest) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'tour_name',
-        label: '團號',
+        label: '團名', // Changed from '團號' to '團名' as per PaymentRequest type has tour_name
         sortable: true,
         filterable: true,
-        render: value => <div className="font-medium text-morandi-primary">{value}</div>,
+        render: (value: unknown, row: PaymentRequest) => <div className="font-medium text-morandi-primary">{value as string}</div>,
       },
       {
         key: 'order_number',
         label: '訂單編號',
         sortable: true,
         filterable: true,
-        render: value => <div className="text-sm text-morandi-primary">{value || '無'}</div>,
+        render: (value: unknown, row: PaymentRequest) => <div className="text-sm text-morandi-primary">{value as string || '無'}</div>,
       },
       {
         key: 'request_date',
@@ -36,27 +36,27 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         sortable: true,
         filterable: true,
         filterType: 'date',
-        render: (value, row) => (
+        render: (value: unknown, row: PaymentRequest) => (
           <div className="text-sm">
             <div
               className={
                 row.is_special_billing ? 'text-morandi-gold font-medium' : 'text-morandi-secondary'
               }
             >
-              {value ? new Date(value).toLocaleDateString('zh-TW') : '未設定'}
+              {value ? new Date(value as string).toLocaleDateString('zh-TW') : '未設定'}
             </div>
             {row.is_special_billing && <div className="text-xs text-morandi-gold">⚠️ 特殊出帳</div>}
           </div>
         ),
       },
       {
-        key: 'total_amount',
+        key: 'amount', // Renamed from total_amount
         label: '金額',
         sortable: true,
         filterable: true,
         filterType: 'number',
-        render: value => (
-          <div className="font-semibold text-morandi-gold">NT$ {value.toLocaleString()}</div>
+        render: (value: unknown, row: PaymentRequest) => ( // Value is number for amount
+          <div className="font-semibold text-morandi-gold">NT$ {(value as number).toLocaleString()}</div>
         ),
       },
       {
@@ -67,12 +67,11 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         filterType: 'select',
         filterOptions: [
           { value: 'pending', label: '請款中' },
-          { value: 'processing', label: '處理中' },
-          { value: 'confirmed', label: '已確認' },
+          { value: 'approved', label: '已確認' }, // Statuses from PaymentRequest
           { value: 'paid', label: '已付款' },
         ],
-        render: value => {
-          const statusBadge = getStatusBadge(value)
+        render: (value: unknown, row: PaymentRequest) => { // Value is string | null
+          const statusBadge = getStatusBadge(value as PaymentRequest['status'])
           return (
             <Badge className={cn('text-xs text-white', statusBadge.color)}>
               {statusBadge.label}
@@ -104,16 +103,17 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
             bValue = b.order_number || ''
             break
           case 'request_date':
-            aValue = new Date(a.request_date || 0)
+            aValue = new Date(a.request_date || 0) // Now request_date exists
             bValue = new Date(b.request_date || 0)
             break
-          case 'total_amount':
-            aValue = a.total_amount
-            bValue = b.total_amount
+          case 'amount': // Renamed from total_amount
+            aValue = a.amount
+            bValue = b.amount
             break
           case 'status':
-            aValue = statusLabels[a.status]
-            bValue = statusLabels[b.status]
+            // Provide default 'pending' if status is null for indexing
+            aValue = statusLabels[(a.status || 'pending') as 'pending' | 'approved' | 'paid']
+            bValue = statusLabels[(b.status || 'pending') as 'pending' | 'approved' | 'paid']
             break
           default:
             return 0
@@ -130,6 +130,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   // Filter function
   const filterFunction = useCallback((data: PaymentRequest[], filters: Record<string, string>) => {
     return data.filter(request => {
+      const requestStatus = request.status || 'pending'; // Provide default for filtering
       return (
         (!filters.request_number ||
           request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
@@ -140,17 +141,18 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
             .toLowerCase()
             .includes(filters.order_number.toLowerCase())) &&
         (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
-        (!filters.total_amount || request.total_amount.toString().includes(filters.total_amount)) &&
-        (!filters.status || request.status === filters.status)
+        (!filters.amount || request.amount.toString().includes(filters.amount)) && // Renamed from total_amount
+        (!filters.status || requestStatus === filters.status)
       )
     })
   }, [])
 
+  // Use PaymentRequest[] as the generic type for useEnhancedTable
   const {
     data: filteredAndSortedRequests,
     handleSort,
     handleFilter,
-  } = useEnhancedTable(payment_requests as unknown, sortFunction, filterFunction)
+  } = useEnhancedTable<PaymentRequest>(payment_requests, sortFunction, filterFunction)
 
   return {
     tableColumns,
@@ -160,9 +162,12 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   }
 }
 
+// Helper function for status badge, explicitly typed
 function getStatusBadge(status: PaymentRequest['status']) {
+  const currentStatus = (status || 'pending') as 'pending' | 'approved' | 'paid'; // Default to 'pending' if null
   return {
-    label: statusLabels[status],
-    color: statusColors[status],
+    label: statusLabels[currentStatus],
+    color: statusColors[currentStatus],
   }
 }
+

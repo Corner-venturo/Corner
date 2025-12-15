@@ -7,6 +7,7 @@ import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -60,17 +61,21 @@ function formatDateFull(date: Date): string {
   return `${year}/${month}/${day}`
 }
 
-// 航班風格選項
-const flightStyleOptions: { value: FlightStyleType; label: string; description: string }[] = [
-  { value: 'original', label: '經典金色', description: '莫蘭迪金色風格' },
-  { value: 'chinese', label: '中國風', description: '書法水墨風格' },
-  { value: 'japanese', label: '日式和風', description: '和紙風格＋圖片' },
-  { value: 'luxury', label: '奢華質感', description: '表格式深色調' },
-  { value: 'art', label: '藝術雜誌', description: 'Brutalist 高對比' },
-  { value: 'none', label: '國內無航班', description: '台灣行程免填' },
-]
-
 export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary }: FlightInfoSectionProps) {
+  // 從資料庫載入模板
+  const { flightTemplates, loading: templatesLoading } = useTemplates()
+
+  // 從資料庫載入的航班風格選項
+  const flightStyleOptions = useMemo(() => {
+    return flightTemplates.map(template => ({
+      value: template.id as FlightStyleType,
+      label: template.name,
+      description: template.description || '',
+      color: getTemplateColor(template.id),
+      previewImage: template.preview_image_url,
+    }))
+  }, [flightTemplates])
+
   // Modal 顯示狀態
   const [showFlightSettings, setShowFlightSettings] = useState(false)
 
@@ -281,7 +286,13 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
   }, [data.returnFlight?.flightNumber, data.returnFlight?.departureDate, data.departureDate, updateFlightField, updateFlightFields])
 
   // 取得目前選擇的風格資訊
-  const currentStyle = flightStyleOptions.find(s => s.value === (data.flightStyle || 'original')) || flightStyleOptions[0]
+  const currentStyle = flightStyleOptions.find(s => s.value === (data.flightStyle || 'original')) || {
+    value: 'original' as FlightStyleType,
+    label: '經典金色',
+    description: '莫蘭迪金色風格',
+    color: getTemplateColor('original'),
+    previewImage: null,
+  }
 
   // 產生航班摘要文字
   const getFlightSummary = () => {
@@ -421,37 +432,54 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                   <Plane className="w-4 h-4 text-slate-500" />
                   <span className="text-sm font-medium text-slate-700">航班卡片風格</span>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {flightStyleOptions.map((option) => {
-                    const isSelected = (data.flightStyle || 'original') === option.value
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => updateField('flightStyle', option.value)}
-                        className={cn(
-                          'relative flex flex-col items-start p-2.5 rounded-lg border-2 transition-all text-left',
-                          isSelected
-                            ? 'border-morandi-gold bg-morandi-gold/10'
-                            : 'border-transparent bg-white hover:border-slate-300'
-                        )}
-                      >
-                        {isSelected && (
-                          <div className="absolute top-1.5 right-1.5">
-                            <Check className="w-3.5 h-3.5 text-morandi-gold" />
-                          </div>
-                        )}
-                        <span className={cn(
-                          'text-xs font-bold',
-                          isSelected ? 'text-morandi-gold' : 'text-slate-700'
-                        )}>
-                          {option.label}
-                        </span>
-                        <span className="text-[10px] text-slate-500 mt-0.5">{option.description}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+                {templatesLoading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
+                    <span className="ml-2 text-sm text-slate-500">載入中...</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {flightStyleOptions.map((option) => {
+                      const isSelected = (data.flightStyle || 'original') === option.value
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => updateField('flightStyle', option.value)}
+                          className={cn(
+                            'relative flex flex-col items-start p-2.5 rounded-lg border-2 transition-all text-left',
+                            isSelected
+                              ? 'border-morandi-gold bg-morandi-gold/10'
+                              : 'border-transparent bg-white hover:border-slate-300'
+                          )}
+                        >
+                          {/* 預覽圖（如果有） */}
+                          {option.previewImage && (
+                            <div className="w-full h-12 mb-2 rounded overflow-hidden bg-slate-100">
+                              <img
+                                src={option.previewImage}
+                                alt={option.label}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          {isSelected && (
+                            <div className="absolute top-1.5 right-1.5">
+                              <Check className="w-3.5 h-3.5 text-morandi-gold" />
+                            </div>
+                          )}
+                          <span className={cn(
+                            'text-xs font-bold',
+                            isSelected ? 'text-morandi-gold' : 'text-slate-700'
+                          )}>
+                            {option.label}
+                          </span>
+                          <span className="text-[10px] text-slate-500 mt-0.5">{option.description}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
 

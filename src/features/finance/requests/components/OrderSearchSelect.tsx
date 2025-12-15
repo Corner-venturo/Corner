@@ -2,12 +2,7 @@
 
 import { Input } from '@/components/ui/input'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
-
-interface Order {
-  id: string
-  order_number: string
-  contact_person: string
-}
+import { Order } from '@/types/order.types'
 
 interface OrderSearchSelectProps {
   value: string

@@ -11,7 +11,7 @@ import type { Order } from '@/stores/types'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
-import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
+import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
 import { MemberQuickAdd } from '@/components/members/member-quick-add'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
@@ -82,7 +82,7 @@ export default function OrderDetailPage() {
 
             {/* 成員管理表格 */}
             <div className="border border-border rounded-lg overflow-hidden bg-card">
-              <ExcelMemberTable
+              <OrderMemberView
                 key={memberKey}
                 ref={memberTableRef}
                 order_id={orderId}

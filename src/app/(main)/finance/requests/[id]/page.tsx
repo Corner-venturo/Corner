@@ -134,8 +134,8 @@ export default function RequestDetailPage({ params }: PageProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge className={statusColors[request.status || 'pending']}>
-              {statusLabels[request.status || 'pending']}
+            <Badge className={statusColors[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}>
+              {statusLabels[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}
             </Badge>
             {request.status === 'pending' && (
               <Button

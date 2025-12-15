@@ -1,14 +1,9 @@
-'use client'
-
-import { useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TourSearchSelect } from './TourSearchSelect'
 import { OrderSearchSelect } from './OrderSearchSelect'
 import { RequestDateInput } from './RequestDateInput'
-import { RequestItemForm } from './RequestItemForm'
-import { RequestItemList } from './RequestItemList'
+import { SupplierSearchSelect } from './SupplierSearchSelect' // New Import
+import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 
@@ -22,83 +17,34 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     formData,
     setFormData,
     requestItems,
-    newItem,
-    setNewItem,
     tourSearchValue,
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
-    supplierSearchValue,
-    setSupplierSearchValue,
+    supplierSearchValue, // New
+    setSupplierSearchValue, // New
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
-    showSupplierDropdown,
-    setShowSupplierDropdown,
+    showSupplierDropdown, // New
+    setShowSupplierDropdown, // New
     filteredTours,
     filteredOrders,
-    filteredSuppliers,
+    filteredSuppliers, // New
     total_amount,
-    addItemToList,
+    addNewEmptyItem,
+    updateItem,
     removeItem,
     resetForm,
-    suppliers,
+    suppliers, // This 'suppliers' is all combined suppliers for item list
     tours,
     orders,
   } = useRequestForm()
 
   const { generateRequestNumber, createRequest } = useRequestOperations()
 
-  // 載入資料（開啟對話框時）
-  useEffect(() => {
-    if (open) {
-      const loadData = async () => {
-        const { useTourStore, useOrderStore, useSupplierStore, useEmployeeStore } = await import('@/stores')
-        const tourStore = useTourStore.getState()
-        const orderStore = useOrderStore.getState()
-        const supplierStore = useSupplierStore.getState()
-        const employeeStore = useEmployeeStore.getState()
-
-        if (tourStore.items.length === 0) {
-          await tourStore.fetchAll()
-        }
-        if (orderStore.items.length === 0) {
-          await orderStore.fetchAll()
-        }
-        if (supplierStore.items.length === 0) {
-          await supplierStore.fetchAll()
-        }
-        if (employeeStore.items.length === 0) {
-          await employeeStore.fetchAll()
-        }
-      }
-      loadData()
-    }
-  }, [open])
-
-  const handleSubmit = async () => {
-    const selectedTour = tours.find(t => t.id === formData.tour_id)
-    const selectedOrder = orders.find(o => o.id === formData.order_id)
-
-    if (!selectedTour) return
-
-    await createRequest(
-      formData,
-      requestItems,
-      selectedTour.name,
-      selectedTour.code,
-      selectedOrder?.order_number
-    )
-
-    resetForm()
-    onOpenChange(false)
-  }
-
-  const handleCancel = () => {
-    resetForm()
-    onOpenChange(false)
-  }
+  // ... (rest of the component logic)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -160,6 +106,23 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                 }}
               />
 
+              <SupplierSearchSelect
+                value={supplierSearchValue}
+                onChange={setSupplierSearchValue}
+                onSelect={supplier => {
+                  setFormData(prev => ({
+                    ...prev,
+                    supplier_id: supplier.id,
+                    supplier_name: supplier.name || '',
+                  }))
+                  setSupplierSearchValue(supplier.name || '')
+                }}
+                suppliers={filteredSuppliers}
+                showDropdown={showSupplierDropdown}
+                onShowDropdown={setShowSupplierDropdown}
+                label="請款供應商 (主要)"
+              />
+
               <div>
                 <label className="text-sm font-medium text-morandi-primary">備註</label>
                 <Input
@@ -172,20 +135,14 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
             </div>
           </div>
 
-          {/* Item Form */}
-          <RequestItemForm
-            newItem={newItem}
-            setNewItem={setNewItem}
-            onAddItem={addItemToList}
-            suppliers={filteredSuppliers}
-            supplierSearchValue={supplierSearchValue}
-            setSupplierSearchValue={setSupplierSearchValue}
-            showSupplierDropdown={showSupplierDropdown}
-            setShowSupplierDropdown={setShowSupplierDropdown}
-          />
-
           {/* Item List */}
-          <RequestItemList items={requestItems} onRemoveItem={removeItem} />
+          <EditableRequestItemList
+            items={requestItems}
+            suppliers={suppliers}
+            updateItem={updateItem}
+            removeItem={removeItem}
+            addNewEmptyItem={addNewEmptyItem}
+          />
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">

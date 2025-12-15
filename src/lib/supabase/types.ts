@@ -572,6 +572,39 @@ export type Database = {
         }
         Relationships: []
       }
+      assigned_itineraries: {
+        Row: {
+          assigned_date: string
+          created_at: string
+          created_by: string | null
+          end_date: string
+          id: string
+          itinerary_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_date: string
+          created_at?: string
+          created_by?: string | null
+          end_date: string
+          id?: string
+          itinerary_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_date?: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string
+          id?: string
+          itinerary_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       attractions: {
         Row: {
           address: string | null
@@ -727,6 +760,39 @@ export type Database = {
           requirements?: Json | null
           sort_order?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      badges: {
+        Row: {
+          category: string | null
+          code: string
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -1007,6 +1073,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      casual_trips: {
+        Row: {
+          cover_image: string | null
+          created_at: string | null
+          description: string | null
+          destination: string | null
+          end_date: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          visibility: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string | null
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          visibility?: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string | null
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          visibility?: string
+        }
+        Relationships: []
       }
       categories: {
         Row: {
@@ -1946,6 +2063,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_templates: {
+        Row: {
+          component_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          component_name: string
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          component_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customer_assigned_itineraries: {
         Row: {
           assigned_date: string
@@ -2022,6 +2175,42 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_badges: {
+        Row: {
+          badge_id: string
+          customer_id: string
+          earned_at: string | null
+          id: string
+        }
+        Insert: {
+          badge_id: string
+          customer_id: string
+          earned_at?: string | null
+          id?: string
+        }
+        Update: {
+          badge_id?: string
+          customer_id?: string
+          earned_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_badges_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
@@ -2245,6 +2434,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      daily_templates: {
+        Row: {
+          component_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          component_name: string
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          component_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       disbursement_orders: {
         Row: {
@@ -2636,6 +2861,42 @@ export type Database = {
           },
         ]
       }
+      flight_templates: {
+        Row: {
+          component_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          component_name: string
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          component_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       friends: {
         Row: {
           created_at: string | null
@@ -2936,22 +3197,25 @@ export type Database = {
           country: string | null
           cover_image: string | null
           cover_style: string | null
+          cover_template_id: string | null
           created_at: string
           created_by: string | null
           daily_itinerary: Json | null
-          flight_style: string | null
-          itinerary_style: string | null
+          daily_template_id: string | null
           departure_date: string | null
           description: string | null
           duration_days: number | null
           erp_itinerary_id: string | null
           faqs: Json | null
           features: Json | null
+          flight_style: string | null
+          flight_template_id: string | null
           focus_cards: Json | null
           hotels: Json | null
           id: string
           is_latest: boolean | null
           is_template: boolean | null
+          itinerary_style: string | null
           itinerary_subtitle: string | null
           leader: Json | null
           meeting_info: Json | null
@@ -2997,22 +3261,25 @@ export type Database = {
           country?: string | null
           cover_image?: string | null
           cover_style?: string | null
+          cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
-          flight_style?: string | null
-          itinerary_style?: string | null
+          daily_template_id?: string | null
           departure_date?: string | null
           description?: string | null
           duration_days?: number | null
           erp_itinerary_id?: string | null
           faqs?: Json | null
           features?: Json | null
+          flight_style?: string | null
+          flight_template_id?: string | null
           focus_cards?: Json | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
           is_template?: boolean | null
+          itinerary_style?: string | null
           itinerary_subtitle?: string | null
           leader?: Json | null
           meeting_info?: Json | null
@@ -3058,22 +3325,25 @@ export type Database = {
           country?: string | null
           cover_image?: string | null
           cover_style?: string | null
+          cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
           daily_itinerary?: Json | null
-          flight_style?: string | null
-          itinerary_style?: string | null
+          daily_template_id?: string | null
           departure_date?: string | null
           description?: string | null
           duration_days?: number | null
           erp_itinerary_id?: string | null
           faqs?: Json | null
           features?: Json | null
+          flight_style?: string | null
+          flight_template_id?: string | null
           focus_cards?: Json | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
           is_template?: boolean | null
+          itinerary_style?: string | null
           itinerary_subtitle?: string | null
           leader?: Json | null
           meeting_info?: Json | null
@@ -3126,6 +3396,27 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itineraries_cover_template_id_fkey"
+            columns: ["cover_template_id"]
+            isOneToOne: false
+            referencedRelation: "cover_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itineraries_daily_template_id_fkey"
+            columns: ["daily_template_id"]
+            isOneToOne: false
+            referencedRelation: "daily_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itineraries_flight_template_id_fkey"
+            columns: ["flight_template_id"]
+            isOneToOne: false
+            referencedRelation: "flight_templates"
             referencedColumns: ["id"]
           },
           {
@@ -3333,6 +3624,213 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      luxury_hotels: {
+        Row: {
+          address: string | null
+          address_en: string | null
+          airport_transfer: boolean | null
+          amenities: string[] | null
+          avg_price_per_night: number | null
+          awards: string[] | null
+          best_seasons: string[] | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_phone: string | null
+          brand: string | null
+          butler_service: boolean | null
+          category: string | null
+          certifications: string[] | null
+          city_id: string
+          commission_rate: number | null
+          concierge_service: boolean | null
+          country_id: string
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          description: string | null
+          description_en: string | null
+          dining_options: string[] | null
+          display_order: number | null
+          facilities: Json | null
+          google_maps_url: string | null
+          group_friendly: boolean | null
+          group_rate_available: boolean | null
+          has_michelin_restaurant: boolean | null
+          highlights: string[] | null
+          hotel_class: string | null
+          id: string
+          images: string[] | null
+          internal_notes: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          longitude: number | null
+          max_group_size: number | null
+          min_rooms_for_group: number | null
+          name: string
+          name_en: string | null
+          name_local: string | null
+          notes: string | null
+          price_range: string | null
+          region_id: string | null
+          restaurants_count: number | null
+          room_types: Json | null
+          star_rating: number | null
+          thumbnail: string | null
+          updated_at: string | null
+          updated_by: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          address_en?: string | null
+          airport_transfer?: boolean | null
+          amenities?: string[] | null
+          avg_price_per_night?: number | null
+          awards?: string[] | null
+          best_seasons?: string[] | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          brand?: string | null
+          butler_service?: boolean | null
+          category?: string | null
+          certifications?: string[] | null
+          city_id: string
+          commission_rate?: number | null
+          concierge_service?: boolean | null
+          country_id: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dining_options?: string[] | null
+          display_order?: number | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          group_friendly?: boolean | null
+          group_rate_available?: boolean | null
+          has_michelin_restaurant?: boolean | null
+          highlights?: string[] | null
+          hotel_class?: string | null
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          min_rooms_for_group?: number | null
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          price_range?: string | null
+          region_id?: string | null
+          restaurants_count?: number | null
+          room_types?: Json | null
+          star_rating?: number | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          address_en?: string | null
+          airport_transfer?: boolean | null
+          amenities?: string[] | null
+          avg_price_per_night?: number | null
+          awards?: string[] | null
+          best_seasons?: string[] | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_phone?: string | null
+          brand?: string | null
+          butler_service?: boolean | null
+          category?: string | null
+          certifications?: string[] | null
+          city_id?: string
+          commission_rate?: number | null
+          concierge_service?: boolean | null
+          country_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dining_options?: string[] | null
+          display_order?: number | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          group_friendly?: boolean | null
+          group_rate_available?: boolean | null
+          has_michelin_restaurant?: boolean | null
+          highlights?: string[] | null
+          hotel_class?: string | null
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          min_rooms_for_group?: number | null
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          price_range?: string | null
+          region_id?: string | null
+          restaurants_count?: number | null
+          room_types?: Json | null
+          star_rating?: number | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "luxury_hotels_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_hotels_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_hotels_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_hotels_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "luxury_hotels_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
         ]
@@ -4887,6 +5385,66 @@ export type Database = {
         }
         Relationships: []
       }
+      private_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          read_at: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          read_at?: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          read_at?: string | null
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          customer_id: string | null
+          id: string
+          is_beta_tester: boolean | null
+          name: string | null
+          nickname: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          id: string
+          is_beta_tester?: boolean | null
+          name?: string | null
+          nickname?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          is_beta_tester?: boolean | null
+          name?: string | null
+          nickname?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       progress_photos: {
         Row: {
           created_at: string
@@ -5625,6 +6183,222 @@ export type Database = {
           },
         ]
       }
+      restaurants: {
+        Row: {
+          address: string | null
+          address_en: string | null
+          avg_price_dinner: number | null
+          avg_price_lunch: number | null
+          booking_contact: string | null
+          booking_email: string | null
+          booking_notes: string | null
+          booking_phone: string | null
+          category: string | null
+          city_id: string
+          commission_rate: number | null
+          country_id: string
+          created_at: string | null
+          created_by: string | null
+          cuisine_type: string[] | null
+          currency: string | null
+          description: string | null
+          description_en: string | null
+          dietary_options: string[] | null
+          display_order: number | null
+          facilities: Json | null
+          google_maps_url: string | null
+          group_friendly: boolean | null
+          group_menu_available: boolean | null
+          group_menu_options: Json | null
+          group_menu_price: number | null
+          highlights: string[] | null
+          id: string
+          images: string[] | null
+          internal_notes: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          longitude: number | null
+          max_group_size: number | null
+          meal_type: string[] | null
+          menu_images: string[] | null
+          min_group_size: number | null
+          name: string
+          name_en: string | null
+          name_local: string | null
+          notes: string | null
+          opening_hours: Json | null
+          phone: string | null
+          price_range: string | null
+          private_room: boolean | null
+          private_room_capacity: number | null
+          rating: number | null
+          region_id: string | null
+          reservation_required: boolean | null
+          reservation_url: string | null
+          review_count: number | null
+          specialties: string[] | null
+          thumbnail: string | null
+          updated_at: string | null
+          updated_by: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          address_en?: string | null
+          avg_price_dinner?: number | null
+          avg_price_lunch?: number | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_notes?: string | null
+          booking_phone?: string | null
+          category?: string | null
+          city_id: string
+          commission_rate?: number | null
+          country_id: string
+          created_at?: string | null
+          created_by?: string | null
+          cuisine_type?: string[] | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dietary_options?: string[] | null
+          display_order?: number | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          group_friendly?: boolean | null
+          group_menu_available?: boolean | null
+          group_menu_options?: Json | null
+          group_menu_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          meal_type?: string[] | null
+          menu_images?: string[] | null
+          min_group_size?: number | null
+          name: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          private_room?: boolean | null
+          private_room_capacity?: number | null
+          rating?: number | null
+          region_id?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          review_count?: number | null
+          specialties?: string[] | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          address_en?: string | null
+          avg_price_dinner?: number | null
+          avg_price_lunch?: number | null
+          booking_contact?: string | null
+          booking_email?: string | null
+          booking_notes?: string | null
+          booking_phone?: string | null
+          category?: string | null
+          city_id?: string
+          commission_rate?: number | null
+          country_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          cuisine_type?: string[] | null
+          currency?: string | null
+          description?: string | null
+          description_en?: string | null
+          dietary_options?: string[] | null
+          display_order?: number | null
+          facilities?: Json | null
+          google_maps_url?: string | null
+          group_friendly?: boolean | null
+          group_menu_available?: boolean | null
+          group_menu_options?: Json | null
+          group_menu_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_group_size?: number | null
+          meal_type?: string[] | null
+          menu_images?: string[] | null
+          min_group_size?: number | null
+          name?: string
+          name_en?: string | null
+          name_local?: string | null
+          notes?: string | null
+          opening_hours?: Json | null
+          phone?: string | null
+          price_range?: string | null
+          private_room?: boolean | null
+          private_room_capacity?: number | null
+          rating?: number | null
+          region_id?: string | null
+          reservation_required?: boolean | null
+          reservation_url?: string | null
+          review_count?: number | null
+          specialties?: string[] | null
+          thumbnail?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurants_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurants_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurants_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "restaurants_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rich_documents: {
         Row: {
           canvas_id: string
@@ -5724,6 +6498,7 @@ export type Database = {
           amount: number
           category: string
           created_at: string | null
+          currency: string | null
           expense_date: string | null
           id: string
           note: string | null
@@ -5735,6 +6510,7 @@ export type Database = {
           amount: number
           category?: string
           created_at?: string | null
+          currency?: string | null
           expense_date?: string | null
           id?: string
           note?: string | null
@@ -5746,6 +6522,7 @@ export type Database = {
           amount?: number
           category?: string
           created_at?: string | null
+          currency?: string | null
           expense_date?: string | null
           id?: string
           note?: string | null
@@ -5811,27 +6588,36 @@ export type Database = {
       split_bill_projects: {
         Row: {
           created_at: string | null
+          enabled_currencies: string[] | null
+          exchange_rates: Json | null
           id: string
           name: string
           owner_id: string
+          settlement_currency: string | null
           status: string
           total_amount: number | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          enabled_currencies?: string[] | null
+          exchange_rates?: Json | null
           id?: string
           name: string
           owner_id: string
+          settlement_currency?: string | null
           status?: string
           total_amount?: number | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          enabled_currencies?: string[] | null
+          exchange_rates?: Json | null
           id?: string
           name?: string
           owner_id?: string
+          settlement_currency?: string | null
           status?: string
           total_amount?: number | null
           updated_at?: string | null
@@ -6985,7 +7771,7 @@ export type Database = {
           capacity: number
           created_at: string | null
           display_order: number | null
-          hotel_name: string
+          hotel_name: string | null
           id: string
           night_number: number
           notes: string | null
@@ -6998,7 +7784,7 @@ export type Database = {
           capacity?: number
           created_at?: string | null
           display_order?: number | null
-          hotel_name: string
+          hotel_name?: string | null
           id?: string
           night_number?: number
           notes?: string | null
@@ -7011,7 +7797,7 @@ export type Database = {
           capacity?: number
           created_at?: string | null
           display_order?: number | null
-          hotel_name?: string
+          hotel_name?: string | null
           id?: string
           night_number?: number
           notes?: string | null
@@ -7165,11 +7951,13 @@ export type Database = {
           main_city_id: string | null
           max_participants: number | null
           name: string
+          outbound_flight: Json | null
           price: number | null
           profit: number
           quote_cost_structure: Json | null
           quote_id: string | null
           return_date: string
+          return_flight: Json | null
           status: string | null
           total_cost: number
           total_revenue: number
@@ -7209,11 +7997,13 @@ export type Database = {
           main_city_id?: string | null
           max_participants?: number | null
           name: string
+          outbound_flight?: Json | null
           price?: number | null
           profit?: number
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date: string
+          return_flight?: Json | null
           status?: string | null
           total_cost?: number
           total_revenue?: number
@@ -7253,11 +8043,13 @@ export type Database = {
           main_city_id?: string | null
           max_participants?: number | null
           name?: string
+          outbound_flight?: Json | null
           price?: number | null
           profit?: number
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date?: string
+          return_flight?: Json | null
           status?: string | null
           total_cost?: number
           total_revenue?: number
@@ -7680,6 +8472,98 @@ export type Database = {
           },
         ]
       }
+      trip_members_v2: {
+        Row: {
+          assigned_itinerary_id: string
+          customer_id: string
+          esim_activation_date: string | null
+          esim_data_plan: string | null
+          esim_expiry_date: string | null
+          esim_provider: string | null
+          esim_url: string | null
+          id: string
+          joined_at: string
+          payment_balance_due_date: string | null
+          payment_currency: string | null
+          payment_deposit_amount: number | null
+          payment_deposit_paid_at: string | null
+          payment_paid_amount: number | null
+          payment_records: Json | null
+          payment_status: string | null
+          payment_total_amount: number | null
+          role: string
+          room_assignments: Json | null
+          visa_application_date: string | null
+          visa_country: string | null
+          visa_expiry_date: string | null
+          visa_notes: string | null
+          visa_status: string | null
+          visa_type: string | null
+        }
+        Insert: {
+          assigned_itinerary_id: string
+          customer_id: string
+          esim_activation_date?: string | null
+          esim_data_plan?: string | null
+          esim_expiry_date?: string | null
+          esim_provider?: string | null
+          esim_url?: string | null
+          id?: string
+          joined_at?: string
+          payment_balance_due_date?: string | null
+          payment_currency?: string | null
+          payment_deposit_amount?: number | null
+          payment_deposit_paid_at?: string | null
+          payment_paid_amount?: number | null
+          payment_records?: Json | null
+          payment_status?: string | null
+          payment_total_amount?: number | null
+          role?: string
+          room_assignments?: Json | null
+          visa_application_date?: string | null
+          visa_country?: string | null
+          visa_expiry_date?: string | null
+          visa_notes?: string | null
+          visa_status?: string | null
+          visa_type?: string | null
+        }
+        Update: {
+          assigned_itinerary_id?: string
+          customer_id?: string
+          esim_activation_date?: string | null
+          esim_data_plan?: string | null
+          esim_expiry_date?: string | null
+          esim_provider?: string | null
+          esim_url?: string | null
+          id?: string
+          joined_at?: string
+          payment_balance_due_date?: string | null
+          payment_currency?: string | null
+          payment_deposit_amount?: number | null
+          payment_deposit_paid_at?: string | null
+          payment_paid_amount?: number | null
+          payment_records?: Json | null
+          payment_status?: string | null
+          payment_total_amount?: number | null
+          role?: string
+          room_assignments?: Json | null
+          visa_application_date?: string | null
+          visa_country?: string | null
+          visa_expiry_date?: string | null
+          visa_notes?: string | null
+          visa_status?: string | null
+          visa_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_members_v2_assigned_itinerary_id_fkey"
+            columns: ["assigned_itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "assigned_itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usa_esta: {
         Row: {
           applicant_name_zh: string
@@ -8041,36 +8925,36 @@ export type Database = {
       }
       user_badges: {
         Row: {
+          awarded_at: string | null
           badge_id: string
-          earned_at: string
           id: string
           user_id: string
         }
         Insert: {
+          awarded_at?: string | null
           badge_id: string
-          earned_at?: string
           id?: string
           user_id: string
         }
         Update: {
+          awarded_at?: string | null
           badge_id?: string
-          earned_at?: string
           id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_badges_badge_id_fkey"
+            foreignKeyName: "user_badges_badge_id_fkey_badges"
             columns: ["badge_id"]
             isOneToOne: false
-            referencedRelation: "badge_definitions"
+            referencedRelation: "badges"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "customers"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -8715,388 +9599,6 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      // === 手動添加的表格類型 (2025-12-15) ===
-      luxury_hotels: {
-        Row: {
-          id: string
-          name: string
-          name_en: string | null
-          name_local: string | null
-          brand: string | null
-          country_id: string
-          region_id: string | null
-          city_id: string
-          address: string | null
-          address_en: string | null
-          latitude: number | null
-          longitude: number | null
-          google_maps_url: string | null
-          star_rating: number | null
-          hotel_class: string | null
-          category: string | null
-          description: string | null
-          description_en: string | null
-          highlights: string[] | null
-          room_types: Json | null
-          price_range: string | null
-          avg_price_per_night: number | null
-          currency: string | null
-          facilities: Json | null
-          amenities: string[] | null
-          restaurants_count: number | null
-          has_michelin_restaurant: boolean | null
-          dining_options: string[] | null
-          booking_contact: string | null
-          booking_email: string | null
-          booking_phone: string | null
-          website: string | null
-          group_friendly: boolean | null
-          min_rooms_for_group: number | null
-          max_group_size: number | null
-          group_rate_available: boolean | null
-          commission_rate: number | null
-          airport_transfer: boolean | null
-          concierge_service: boolean | null
-          butler_service: boolean | null
-          best_seasons: string[] | null
-          awards: string[] | null
-          certifications: string[] | null
-          thumbnail: string | null
-          images: string[] | null
-          notes: string | null
-          internal_notes: string | null
-          is_active: boolean | null
-          is_featured: boolean | null
-          display_order: number | null
-          created_at: string | null
-          updated_at: string | null
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          name_en?: string | null
-          name_local?: string | null
-          brand?: string | null
-          country_id: string
-          region_id?: string | null
-          city_id: string
-          address?: string | null
-          address_en?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          google_maps_url?: string | null
-          star_rating?: number | null
-          hotel_class?: string | null
-          category?: string | null
-          description?: string | null
-          description_en?: string | null
-          highlights?: string[] | null
-          room_types?: Json | null
-          price_range?: string | null
-          avg_price_per_night?: number | null
-          currency?: string | null
-          facilities?: Json | null
-          amenities?: string[] | null
-          restaurants_count?: number | null
-          has_michelin_restaurant?: boolean | null
-          dining_options?: string[] | null
-          booking_contact?: string | null
-          booking_email?: string | null
-          booking_phone?: string | null
-          website?: string | null
-          group_friendly?: boolean | null
-          min_rooms_for_group?: number | null
-          max_group_size?: number | null
-          group_rate_available?: boolean | null
-          commission_rate?: number | null
-          airport_transfer?: boolean | null
-          concierge_service?: boolean | null
-          butler_service?: boolean | null
-          best_seasons?: string[] | null
-          awards?: string[] | null
-          certifications?: string[] | null
-          thumbnail?: string | null
-          images?: string[] | null
-          notes?: string | null
-          internal_notes?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          name_en?: string | null
-          name_local?: string | null
-          brand?: string | null
-          country_id?: string
-          region_id?: string | null
-          city_id?: string
-          address?: string | null
-          address_en?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          google_maps_url?: string | null
-          star_rating?: number | null
-          hotel_class?: string | null
-          category?: string | null
-          description?: string | null
-          description_en?: string | null
-          highlights?: string[] | null
-          room_types?: Json | null
-          price_range?: string | null
-          avg_price_per_night?: number | null
-          currency?: string | null
-          facilities?: Json | null
-          amenities?: string[] | null
-          restaurants_count?: number | null
-          has_michelin_restaurant?: boolean | null
-          dining_options?: string[] | null
-          booking_contact?: string | null
-          booking_email?: string | null
-          booking_phone?: string | null
-          website?: string | null
-          group_friendly?: boolean | null
-          min_rooms_for_group?: number | null
-          max_group_size?: number | null
-          group_rate_available?: boolean | null
-          commission_rate?: number | null
-          airport_transfer?: boolean | null
-          concierge_service?: boolean | null
-          butler_service?: boolean | null
-          best_seasons?: string[] | null
-          awards?: string[] | null
-          certifications?: string[] | null
-          thumbnail?: string | null
-          images?: string[] | null
-          notes?: string | null
-          internal_notes?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "luxury_hotels_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "luxury_hotels_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      restaurants: {
-        Row: {
-          id: string
-          name: string
-          name_en: string | null
-          name_local: string | null
-          country_id: string
-          region_id: string | null
-          city_id: string
-          address: string | null
-          address_en: string | null
-          latitude: number | null
-          longitude: number | null
-          google_maps_url: string | null
-          cuisine_type: string[] | null
-          category: string | null
-          meal_type: string[] | null
-          description: string | null
-          description_en: string | null
-          specialties: string[] | null
-          highlights: string[] | null
-          price_range: string | null
-          avg_price_lunch: number | null
-          avg_price_dinner: number | null
-          currency: string | null
-          opening_hours: Json | null
-          phone: string | null
-          website: string | null
-          reservation_required: boolean | null
-          reservation_url: string | null
-          group_friendly: boolean | null
-          min_group_size: number | null
-          max_group_size: number | null
-          group_menu_available: boolean | null
-          group_menu_price: number | null
-          group_menu_options: Json | null
-          private_room: boolean | null
-          private_room_capacity: number | null
-          booking_contact: string | null
-          booking_email: string | null
-          booking_phone: string | null
-          booking_notes: string | null
-          commission_rate: number | null
-          facilities: Json | null
-          dietary_options: string[] | null
-          thumbnail: string | null
-          images: string[] | null
-          menu_images: string[] | null
-          rating: number | null
-          review_count: number | null
-          notes: string | null
-          internal_notes: string | null
-          is_active: boolean | null
-          is_featured: boolean | null
-          display_order: number | null
-          created_at: string | null
-          updated_at: string | null
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          name_en?: string | null
-          name_local?: string | null
-          country_id: string
-          region_id?: string | null
-          city_id: string
-          address?: string | null
-          address_en?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          google_maps_url?: string | null
-          cuisine_type?: string[] | null
-          category?: string | null
-          meal_type?: string[] | null
-          description?: string | null
-          description_en?: string | null
-          specialties?: string[] | null
-          highlights?: string[] | null
-          price_range?: string | null
-          avg_price_lunch?: number | null
-          avg_price_dinner?: number | null
-          currency?: string | null
-          opening_hours?: Json | null
-          phone?: string | null
-          website?: string | null
-          reservation_required?: boolean | null
-          reservation_url?: string | null
-          group_friendly?: boolean | null
-          min_group_size?: number | null
-          max_group_size?: number | null
-          group_menu_available?: boolean | null
-          group_menu_price?: number | null
-          group_menu_options?: Json | null
-          private_room?: boolean | null
-          private_room_capacity?: number | null
-          booking_contact?: string | null
-          booking_email?: string | null
-          booking_phone?: string | null
-          booking_notes?: string | null
-          commission_rate?: number | null
-          facilities?: Json | null
-          dietary_options?: string[] | null
-          thumbnail?: string | null
-          images?: string[] | null
-          menu_images?: string[] | null
-          rating?: number | null
-          review_count?: number | null
-          notes?: string | null
-          internal_notes?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          name_en?: string | null
-          name_local?: string | null
-          country_id?: string
-          region_id?: string | null
-          city_id?: string
-          address?: string | null
-          address_en?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          google_maps_url?: string | null
-          cuisine_type?: string[] | null
-          category?: string | null
-          meal_type?: string[] | null
-          description?: string | null
-          description_en?: string | null
-          specialties?: string[] | null
-          highlights?: string[] | null
-          price_range?: string | null
-          avg_price_lunch?: number | null
-          avg_price_dinner?: number | null
-          currency?: string | null
-          opening_hours?: Json | null
-          phone?: string | null
-          website?: string | null
-          reservation_required?: boolean | null
-          reservation_url?: string | null
-          group_friendly?: boolean | null
-          min_group_size?: number | null
-          max_group_size?: number | null
-          group_menu_available?: boolean | null
-          group_menu_price?: number | null
-          group_menu_options?: Json | null
-          private_room?: boolean | null
-          private_room_capacity?: number | null
-          booking_contact?: string | null
-          booking_email?: string | null
-          booking_phone?: string | null
-          booking_notes?: string | null
-          commission_rate?: number | null
-          facilities?: Json | null
-          dietary_options?: string[] | null
-          thumbnail?: string | null
-          images?: string[] | null
-          menu_images?: string[] | null
-          rating?: number | null
-          review_count?: number | null
-          notes?: string | null
-          internal_notes?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "restaurants_country_id_fkey"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "restaurants_city_id_fkey"
-            columns: ["city_id"]
-            isOneToOne: false
-            referencedRelation: "cities"
             referencedColumns: ["id"]
           },
         ]

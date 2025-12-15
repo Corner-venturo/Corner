@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import { useTours } from '@/features/tours/hooks/useTours'
 import { useOrders } from '@/features/orders/hooks/useOrders'
 import { useSupplierStore, useEmployeeStore } from '@/stores'
-import { RequestFormData, RequestItem, NewItemFormData } from '../types'
+import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
   const { tours } = useTours()
@@ -17,17 +17,38 @@ export function useRequestForm() {
     note: '',
     is_special_billing: false,
     created_by: '1',
+    supplier_id: '', // New: Request-level supplier ID
+    supplier_name: '', // New: Request-level supplier name
   })
 
-  const [requestItems, setRequestItems] = useState<RequestItem[]>([])
+  const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
+    {
+      id: Math.random().toString(36).substr(2, 9),
+      category: '住宿', // Default category
+      supplier_id: '',
+      supplierName: '',
+      description: '',
+      unit_price: 0,
+      quantity: 1,
+    },
+  ])
 
-  const [newItem, setNewItem] = useState<NewItemFormData>({
-    category: '住宿',
-    supplier_id: '',
-    description: '',
-    unit_price: 0,
-    quantity: 1,
-  })
+  // Update first item's supplier when request-level supplier changes
+  React.useEffect(() => {
+    if (formData.supplier_id && requestItems.length > 0 &&
+        (requestItems[0].supplier_id !== formData.supplier_id || requestItems[0].supplierName !== formData.supplier_name)) {
+      setRequestItems(prev => prev.map((item, index) => {
+        if (index === 0) {
+          return {
+            ...item,
+            supplier_id: formData.supplier_id,
+            supplierName: formData.supplier_name || '',
+          };
+        }
+        return item;
+      }));
+    }
+  }, [formData.supplier_id, formData.supplier_name, requestItems]);
 
   // Search states
   const [tourSearchValue, setTourSearchValue] = useState('')
@@ -93,7 +114,7 @@ export function useRequestForm() {
 
     const employeeList = employees.map(e => ({
       id: e.id,
-      name: e.name,
+      name: e.display_name,
       type: 'employee' as const,
       group: '員工',
     }))
@@ -112,32 +133,26 @@ export function useRequestForm() {
     [combinedSuppliers, supplierSearchValue]
   )
 
-  // Add item to list
-  const addItemToList = useCallback(() => {
-    if (!newItem.supplier_id || !newItem.description) return
-
-    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id)
-    if (!selected) return
-
-    const itemId = Math.random().toString(36).substr(2, 9)
-    setRequestItems(prev => [
-      ...prev,
-      {
-        id: itemId,
-        ...newItem,
-        supplierName: selected.name,
-      },
-    ])
-
-    setNewItem({
+  // Add a new empty item to the list
+  const addNewEmptyItem = useCallback(() => {
+    const newItem: RequestItem = {
+      id: Math.random().toString(36).substr(2, 9),
       category: '住宿',
-      supplier_id: '',
+      supplier_id: formData.supplier_id || '', // Use request-level supplier if available
+      supplierName: formData.supplier_name || '', // Use request-level supplier name
       description: '',
       unit_price: 0,
       quantity: 1,
-    })
-    setSupplierSearchValue('')
-  }, [newItem, combinedSuppliers])
+    }
+    setRequestItems(prev => [...prev, newItem])
+  }, [formData.supplier_id, formData.supplier_name])
+
+  // Update an item in the list
+  const updateItem = useCallback((itemId: string, updatedFields: Partial<RequestItem>) => {
+    setRequestItems(prev =>
+      prev.map(item => (item.id === itemId ? { ...item, ...updatedFields } : item))
+    )
+  }, [])
 
   // Remove item from list
   const removeItem = useCallback((itemId: string) => {
@@ -153,15 +168,20 @@ export function useRequestForm() {
       note: '',
       is_special_billing: false,
       created_by: '1',
-    })
-    setRequestItems([])
-    setNewItem({
-      category: '住宿',
       supplier_id: '',
-      description: '',
-      unit_price: 0,
-      quantity: 1,
+      supplier_name: '',
     })
+    setRequestItems([
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        category: '住宿', // Default category
+        supplier_id: '',
+        supplierName: '',
+        description: '',
+        unit_price: 0,
+        quantity: 1,
+      },
+    ])
     setTourSearchValue('')
     setOrderSearchValue('')
     setSupplierSearchValue('')
@@ -175,8 +195,6 @@ export function useRequestForm() {
     setFormData,
     requestItems,
     setRequestItems,
-    newItem,
-    setNewItem,
     tourSearchValue,
     setTourSearchValue,
     orderSearchValue,
@@ -193,7 +211,8 @@ export function useRequestForm() {
     filteredOrders,
     filteredSuppliers,
     total_amount,
-    addItemToList,
+    addNewEmptyItem,
+    updateItem,
     removeItem,
     resetForm,
     suppliers: combinedSuppliers,

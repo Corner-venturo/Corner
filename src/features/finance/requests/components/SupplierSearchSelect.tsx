@@ -5,7 +5,7 @@ import { UI_DELAYS } from '@/lib/constants/timeouts'
 
 interface SupplierOption {
   id: string
-  name: string
+  name: string | null
   type: 'supplier' | 'employee'
   group: string
 }

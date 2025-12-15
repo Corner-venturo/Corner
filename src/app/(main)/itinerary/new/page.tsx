@@ -486,6 +486,12 @@ function NewItineraryPageContent() {
     setAutoSaveStatus('saving')
     try {
       const convertedData = convertDataForSave()
+      // Debug: 檢查風格欄位是否正確傳遞
+      console.log('[AutoSave] 準備存檔，風格欄位:', {
+        cover_style: convertedData.cover_style,
+        flight_style: convertedData.flight_style,
+        itinerary_style: convertedData.itinerary_style,
+      })
 
       if (currentItineraryId) {
         // 更新現有行程
@@ -705,6 +711,12 @@ function NewItineraryPageContent() {
       if (itineraryId && !tourId) {
         const itinerary = itineraries.find((i) => i.id === itineraryId)
         if (itinerary) {
+          // Debug: 檢查從資料庫載入的風格欄位
+          console.log('[initializeTourData] 從資料庫載入風格欄位:', {
+            cover_style: itinerary.cover_style,
+            flight_style: (itinerary as { flight_style?: string }).flight_style,
+            itinerary_style: (itinerary as { itinerary_style?: string }).itinerary_style,
+          })
           // 從 itinerary 載入完整資料
           setTourData({
             tagline: itinerary.tagline || 'Corner Travel 2025',

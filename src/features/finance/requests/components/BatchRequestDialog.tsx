@@ -5,13 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BatchTourSelect } from './BatchTourSelect'
 import { RequestDateInput } from './RequestDateInput'
-import { RequestItemForm } from './RequestItemForm'
-import { RequestItemList } from './RequestItemList'
+import { EditableRequestItemList } from './RequestItemList'
 import { useBatchRequestForm } from '../hooks/useBatchRequestForm'
+import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
-import { RequestItem, NewItemFormData } from '../types'
-import { useState, useCallback, useMemo } from 'react'
-import { useSupplierStore, useEmployeeStore } from '@/stores'
 
 interface BatchRequestDialogProps {
   open: boolean
@@ -27,126 +24,35 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
     setBatchTourSearch,
     showBatchTourDropdown,
     setShowBatchTourDropdown,
-    filteredTours,
+    filteredTours: batchFilteredTours,
     toggleTourSelection,
     removeTourFromSelection,
-    resetForm,
+    resetForm: resetBatchForm,
     tours,
   } = useBatchRequestForm()
 
-  const { items: suppliers } = useSupplierStore()
-  const { items: employees } = useEmployeeStore()
+  const {
+    requestItems,
+    total_amount,
+    addNewEmptyItem,
+    updateItem,
+    removeItem,
+    resetForm: resetItemForm,
+    suppliers,
+  } = useRequestForm()
+
   const { createBatchRequests } = useRequestOperations()
-
-  // Local state for items (shared between single and batch)
-  const [requestItems, setRequestItems] = useState<RequestItem[]>([])
-  const [newItem, setNewItem] = useState<NewItemFormData>({
-    category: '住宿',
-    supplier_id: '',
-    description: '',
-    unit_price: 0,
-    quantity: 1,
-  })
-
-  // Supplier search states
-  const [supplierSearchValue, setSupplierSearchValue] = useState('')
-  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false)
-
-  // Combine suppliers and employees
-  const combinedSuppliers = useMemo(() => {
-    const supplierList = suppliers.map(s => ({
-      id: s.id,
-      name: s.name,
-      type: 'supplier' as const,
-      group: '供應商',
-    }))
-
-    const employeeList = employees.map(e => ({
-      id: e.id,
-      name: e.name,
-      type: 'employee' as const,
-      group: '員工',
-    }))
-
-    return [...supplierList, ...employeeList]
-  }, [suppliers, employees])
-
-  // Filter suppliers by search
-  const filteredSuppliers = useMemo(
-    () =>
-      combinedSuppliers.filter(supplier => {
-        const searchTerm = supplierSearchValue.toLowerCase()
-        if (!searchTerm) return true
-        return supplier.name.toLowerCase().includes(searchTerm)
-      }),
-    [combinedSuppliers, supplierSearchValue]
-  )
-
-  // Calculate total amount
-  const total_amount = useMemo(
-    () => requestItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
-    [requestItems]
-  )
-
-  // Add item to list
-  const addItemToList = useCallback(() => {
-    if (!newItem.supplier_id || !newItem.description) return
-
-    const selected = combinedSuppliers.find(s => s.id === newItem.supplier_id)
-    if (!selected) return
-
-    const itemId = Math.random().toString(36).substr(2, 9)
-    setRequestItems(prev => [
-      ...prev,
-      {
-        id: itemId,
-        ...newItem,
-        supplierName: selected.name,
-      },
-    ])
-
-    setNewItem({
-      category: '住宿',
-      supplier_id: '',
-      description: '',
-      unit_price: 0,
-      quantity: 1,
-    })
-    setSupplierSearchValue('')
-  }, [newItem, combinedSuppliers])
-
-  // Remove item from list
-  const removeItem = useCallback((itemId: string) => {
-    setRequestItems(prev => prev.filter(item => item.id !== itemId))
-  }, [])
 
   const handleSubmit = async () => {
     await createBatchRequests(formData, requestItems, selectedTourIds, tours)
-
-    resetForm()
-    setRequestItems([])
-    setNewItem({
-      category: '住宿',
-      supplier_id: '',
-      description: '',
-      unit_price: 0,
-      quantity: 1,
-    })
+    resetBatchForm()
+    resetItemForm()
     onOpenChange(false)
   }
 
   const handleCancel = () => {
-    resetForm()
-    setRequestItems([])
-    setNewItem({
-      category: '住宿',
-      supplier_id: '',
-      description: '',
-      unit_price: 0,
-      quantity: 1,
-    })
-    setSupplierSearchValue('')
-    setShowSupplierDropdown(false)
+    resetBatchForm()
+    resetItemForm()
     onOpenChange(false)
   }
 
@@ -163,7 +69,7 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
           <BatchTourSelect
             searchValue={batchTourSearch}
             onSearchChange={setBatchTourSearch}
-            tours={filteredTours}
+            tours={batchFilteredTours}
             selectedTourIds={selectedTourIds}
             onToggleTour={toggleTourSelection}
             onRemoveTour={removeTourFromSelection}
@@ -199,24 +105,13 @@ export function BatchRequestDialog({ open, onOpenChange }: BatchRequestDialogPro
             </div>
           </div>
 
-          {/* Item Form */}
-          <RequestItemForm
-            newItem={newItem}
-            setNewItem={setNewItem}
-            onAddItem={addItemToList}
-            suppliers={filteredSuppliers}
-            supplierSearchValue={supplierSearchValue}
-            setSupplierSearchValue={setSupplierSearchValue}
-            showSupplierDropdown={showSupplierDropdown}
-            setShowSupplierDropdown={setShowSupplierDropdown}
-          />
-
           {/* Item List */}
-          <RequestItemList
+          <EditableRequestItemList
             items={requestItems}
-            onRemoveItem={removeItem}
-            showBatchTotal={true}
-            batchCount={selectedTourIds.length}
+            suppliers={suppliers}
+            updateItem={updateItem}
+            removeItem={removeItem}
+            addNewEmptyItem={addNewEmptyItem}
           />
 
           {/* Actions */}

@@ -15,7 +15,8 @@ import { Check, Trash2, Plus, Pencil, X, Save } from 'lucide-react'
 import { usePaymentRequestStore, usePaymentRequestItemStore, useTourStore, useSupplierStore } from '@/stores'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
-import { statusLabels, statusColors, categoryOptions, getNextStatuses } from '../types'
+import { statusLabels, statusColors, categoryOptions } from '../types'
+import { getNextStatuses } from '../utils'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -204,8 +205,8 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                 {request.order_number && ` | 訂單：${request.order_number}`}
               </p>
             </div>
-            <Badge className={statusColors[request.status || 'pending']}>
-              {statusLabels[request.status || 'pending']}
+            <Badge className={statusColors[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}>
+              {statusLabels[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}
             </Badge>
           </div>
         </DialogHeader>

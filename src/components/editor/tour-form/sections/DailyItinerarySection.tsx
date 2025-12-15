@@ -1,16 +1,17 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import { TourFormData, DailyItinerary, Activity, ItineraryStyleType } from '../types'
 import { AttractionSelector } from '../../AttractionSelector'
 import { HotelSelector, LuxuryHotel } from '../../HotelSelector'
 import { RestaurantSelector, Restaurant, MichelinRestaurant } from '../../RestaurantSelector'
+import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 
 type CombinedRestaurant = (Restaurant | MichelinRestaurant) & {
   source: 'restaurant' | 'michelin'
   city_name?: string
 }
-import { Palette, FolderPlus, Loader2 } from 'lucide-react'
+import { Palette, FolderPlus, Loader2, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
@@ -94,6 +95,20 @@ export function DailyItinerarySection({
   const [isSavingToLibrary, setIsSavingToLibrary] = useState(false)
 
   const workspaceId = useAuthStore(state => state.user?.workspace_id)
+
+  // 從資料庫載入模板
+  const { dailyTemplates, loading: templatesLoading } = useTemplates()
+
+  // 從資料庫載入的行程風格選項
+  const itineraryStyleOptions = useMemo(() => {
+    return dailyTemplates.map(template => ({
+      value: template.id as ItineraryStyleType,
+      label: template.name,
+      description: template.description || '',
+      color: getTemplateColor(template.id),
+      previewImage: template.preview_image_url,
+    }))
+  }, [dailyTemplates])
 
   // 開啟景點選擇器
   const handleOpenAttractionSelector = (dayIndex: number) => {
@@ -325,15 +340,21 @@ export function DailyItinerarySection({
           {/* 行程風格選擇器 */}
           <div className="flex items-center gap-1.5 bg-morandi-container/50 rounded-lg px-2 py-1">
             <Palette size={14} className="text-morandi-secondary" />
-            <select
-              value={data.itineraryStyle || 'original'}
-              onChange={e => updateField('itineraryStyle', e.target.value as ItineraryStyleType)}
-              className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
-            >
-              <option value="original">經典時間軸</option>
-              <option value="luxury">奢華質感</option>
-              <option value="art">藝術雜誌</option>
-            </select>
+            {templatesLoading ? (
+              <Loader2 size={14} className="animate-spin text-morandi-secondary" />
+            ) : (
+              <select
+                value={data.itineraryStyle || 'original'}
+                onChange={e => updateField('itineraryStyle', e.target.value as ItineraryStyleType)}
+                className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
+              >
+                {itineraryStyleOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <button
             onClick={addDailyItinerary}

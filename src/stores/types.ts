@@ -710,6 +710,7 @@ export interface PaymentRequest {
   tour_id?: string | null
   tour_code?: string | null // 團號（快照）
   tour_name?: string | null // 團名（快照）
+  request_date: string // 請款日期 (YYYY-MM-DD)
   request_type: string // 請款類型（例：員工代墊、供應商支出）
   amount: number // 總金額
   supplier_id?: string | null
@@ -753,7 +754,7 @@ export interface PaymentRequestItem {
   item_number: string // REQ-2024001-001
   category: PaymentItemCategory
   supplier_id: string
-  supplier_name: string // 供應商名稱快照
+  supplier_name: string | null // 供應商名稱快照
   description: string
   unit_price: number
   quantity: number

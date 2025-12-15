@@ -20,7 +20,7 @@ export interface RequestItem {
   id: string
   category: PaymentRequestItem['category']
   supplier_id: string
-  supplierName: string
+  supplierName: string | null
   description: string
   unit_price: number
   quantity: number
@@ -34,17 +34,15 @@ export interface NewItemFormData {
   quantity: number
 }
 
-export const statusLabels: Record<PaymentRequest['status'], string> = {
+export const statusLabels: Record<'pending' | 'approved' | 'paid', string> = {
   pending: '請款中',
-  processing: '處理中',
-  confirmed: '已確認',
+  approved: '已確認',
   paid: '已付款',
 }
 
-export const statusColors: Record<PaymentRequest['status'], string> = {
+export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
   pending: 'bg-morandi-gold',
-  processing: 'bg-morandi-gold',
-  confirmed: 'bg-morandi-green',
+  approved: 'bg-morandi-green',
   paid: 'bg-morandi-primary',
 }
 
@@ -56,3 +54,5 @@ export const categoryOptions = [
   { value: '導遊', label: '👥 導遊' },
   { value: '其他', label: '📦 其他' },
 ] as const
+
+

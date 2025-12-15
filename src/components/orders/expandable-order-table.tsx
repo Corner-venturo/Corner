@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useTourStore, useOrderStore } from '@/stores'
 import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
+import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
 import { Order } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -339,7 +339,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
 
                             {/* 分頁內容 */}
                             {activeTabs[order.id] === 'members' ? (
-                              <ExcelMemberTable
+                              <OrderMemberView
                                 ref={ref => {
                                   if (ref) memberTableRefs.current[order.id] = ref
                                 }}

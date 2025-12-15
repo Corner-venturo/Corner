@@ -6,7 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { useOrderStore, useTourStore, useMemberStore } from '@/stores'
 import { ArrowLeft } from 'lucide-react'
-import { ExcelMemberTable, MemberTableRef } from '@/components/members/excel-member-table'
+import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
 import { MemberQuickAdd } from '@/components/members/member-quick-add'
 
 export default function MemberDetailPage() {
@@ -84,7 +84,7 @@ export default function MemberDetailPage() {
       {/* 成員管理表格 */}
       <div className="px-6 pb-6">
         <div className="border border-border rounded-lg overflow-hidden bg-card">
-          <ExcelMemberTable
+          <OrderMemberView
             ref={memberTableRef}
             order_id={orderId}
             departure_date={tour?.departure_date || ''}
