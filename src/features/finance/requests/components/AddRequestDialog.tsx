@@ -1,10 +1,10 @@
+import { useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TourSearchSelect } from './TourSearchSelect'
 import { OrderSearchSelect } from './OrderSearchSelect'
 import { RequestDateInput } from './RequestDateInput'
-import { SupplierSearchSelect } from './SupplierSearchSelect' // New Import
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
@@ -23,28 +23,30 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
-    supplierSearchValue, // New
-    setSupplierSearchValue, // New
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
-    showSupplierDropdown, // New
-    setShowSupplierDropdown, // New
     filteredTours,
     filteredOrders,
-    filteredSuppliers, // New
     total_amount,
     addNewEmptyItem,
     updateItem,
     removeItem,
     resetForm,
-    suppliers, // This 'suppliers' is all combined suppliers for item list
-    tours,
-    orders,
+    suppliers,
   } = useRequestForm()
 
   const { generateRequestNumber, createRequest } = useRequestOperations()
+
+  // 如果只有一個訂單，自動帶入
+  useEffect(() => {
+    if (formData.tour_id && filteredOrders.length === 1 && !formData.order_id) {
+      const order = filteredOrders[0]
+      setFormData(prev => ({ ...prev, order_id: order.id }))
+      setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
+    }
+  }, [formData.tour_id, filteredOrders, formData.order_id, setFormData, setOrderSearchValue])
 
   const handleCancel = () => {
     resetForm()
@@ -53,12 +55,17 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   const handleSubmit = async () => {
     try {
-      await createRequest({
-        ...formData,
-        request_number: generateRequestNumber(),
-        items: requestItems,
-        total_amount,
-      })
+      // 找到選中的旅遊團和訂單資訊
+      const selectedTour = filteredTours.find(t => t.id === formData.tour_id)
+      const selectedOrder = filteredOrders.find(o => o.id === formData.order_id)
+
+      await createRequest(
+        formData,
+        requestItems,
+        selectedTour?.name || '',
+        selectedTour?.code || '',
+        selectedOrder?.order_number
+      )
       resetForm()
       onOpenChange(false)
     } catch (error) {
@@ -68,7 +75,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">
@@ -78,9 +85,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="border border-border rounded-md p-4">
-            <h3 className="text-sm font-medium text-morandi-primary mb-4">基本資訊</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TourSearchSelect
                 value={tourSearchValue}
                 onChange={setTourSearchValue}
@@ -126,23 +131,6 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                 }}
               />
 
-              <SupplierSearchSelect
-                value={supplierSearchValue}
-                onChange={setSupplierSearchValue}
-                onSelect={supplier => {
-                  setFormData(prev => ({
-                    ...prev,
-                    supplier_id: supplier.id,
-                    supplier_name: supplier.name || '',
-                  }))
-                  setSupplierSearchValue(supplier.name || '')
-                }}
-                suppliers={filteredSuppliers}
-                showDropdown={showSupplierDropdown}
-                onShowDropdown={setShowSupplierDropdown}
-                label="請款供應商 (主要)"
-              />
-
               <div>
                 <label className="text-sm font-medium text-morandi-primary">備註</label>
                 <Input
@@ -152,7 +140,6 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                   className="mt-1"
                 />
               </div>
-            </div>
           </div>
 
           {/* Item List */}

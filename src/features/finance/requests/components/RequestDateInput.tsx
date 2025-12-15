@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -9,7 +10,33 @@ interface RequestDateInputProps {
   label?: string
 }
 
+// 計算下一個週四（如果今天是週四，跳到下週四）
+function getNextThursday(): string {
+  const today = new Date()
+  const dayOfWeek = today.getDay() // 0=週日, 1=週一, ..., 4=週四
+
+  let daysUntilThursday = 4 - dayOfWeek
+  if (daysUntilThursday <= 0) {
+    // 今天是週四或之後，跳到下週四
+    daysUntilThursday += 7
+  }
+
+  const nextThursday = new Date(today)
+  nextThursday.setDate(today.getDate() + daysUntilThursday)
+
+  // 格式化為 YYYY-MM-DD
+  return nextThursday.toISOString().split('T')[0]
+}
+
 export function RequestDateInput({ value, onChange, label = '請款日期' }: RequestDateInputProps) {
+  // 打開時自動帶入下一個週四
+  useEffect(() => {
+    if (!value) {
+      const nextThursday = getNextThursday()
+      onChange(nextThursday, false)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleDateChange = (selectedDate: string) => {
     const isThursday = selectedDate ? new Date(selectedDate + 'T00:00:00').getDay() === 4 : false
     onChange(selectedDate, !isThursday)

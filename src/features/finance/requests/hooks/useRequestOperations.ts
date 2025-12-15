@@ -21,7 +21,7 @@ export function useRequestOperations() {
       tourCode: string,
       orderNumber?: string
     ) => {
-      if (!formData.tour_id || items.length === 0) return null
+      if (!formData.tour_id || !items || items.length === 0) return null
 
       // Create payment request
       const request = await createPaymentRequest({

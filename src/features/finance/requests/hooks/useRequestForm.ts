@@ -5,10 +5,20 @@ import { useSupplierStore, useEmployeeStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
-  const { tours } = useTours()
-  const { orders } = useOrders()
-  const { items: suppliers } = useSupplierStore()
-  const { items: employees } = useEmployeeStore()
+  const { tours, loadTours } = useTours()
+  const { orders, loadOrders } = useOrders()
+  const supplierStore = useSupplierStore()
+  const employeeStore = useEmployeeStore()
+  const suppliers = supplierStore.items
+  const employees = employeeStore.items
+
+  // 載入所需資料
+  useEffect(() => {
+    loadTours()
+    loadOrders()
+    supplierStore.fetchAll()
+    employeeStore.fetchAll()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [formData, setFormData] = useState<RequestFormData>({
     tour_id: '',
@@ -17,8 +27,6 @@ export function useRequestForm() {
     note: '',
     is_special_billing: false,
     created_by: '1',
-    supplier_id: '', // New: Request-level supplier ID
-    supplier_name: '', // New: Request-level supplier name
   })
 
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
@@ -33,30 +41,11 @@ export function useRequestForm() {
     },
   ])
 
-  // Update first item's supplier when request-level supplier changes
-  useEffect(() => {
-    if (formData.supplier_id && requestItems.length > 0 &&
-        (requestItems[0].supplier_id !== formData.supplier_id || requestItems[0].supplierName !== formData.supplier_name)) {
-      setRequestItems(prev => prev.map((item, index) => {
-        if (index === 0) {
-          return {
-            ...item,
-            supplier_id: formData.supplier_id,
-            supplierName: formData.supplier_name || '',
-          };
-        }
-        return item;
-      }));
-    }
-  }, [formData.supplier_id, formData.supplier_name, requestItems]);
-
   // Search states
   const [tourSearchValue, setTourSearchValue] = useState('')
   const [orderSearchValue, setOrderSearchValue] = useState('')
-  const [supplierSearchValue, setSupplierSearchValue] = useState('')
   const [showTourDropdown, setShowTourDropdown] = useState(false)
   const [showOrderDropdown, setShowOrderDropdown] = useState(false)
-  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false)
 
   // Filter tours by search
   const filteredTours = useMemo(
@@ -122,30 +111,19 @@ export function useRequestForm() {
     return [...supplierList, ...employeeList]
   }, [suppliers, employees])
 
-  // Filter suppliers by search
-  const filteredSuppliers = useMemo(
-    () =>
-      combinedSuppliers.filter(supplier => {
-        const searchTerm = supplierSearchValue.toLowerCase()
-        if (!searchTerm) return true
-        return (supplier.name || '').toLowerCase().includes(searchTerm)
-      }),
-    [combinedSuppliers, supplierSearchValue]
-  )
-
   // Add a new empty item to the list
   const addNewEmptyItem = useCallback(() => {
     const newItem: RequestItem = {
       id: Math.random().toString(36).substr(2, 9),
       category: '住宿',
-      supplier_id: formData.supplier_id || '', // Use request-level supplier if available
-      supplierName: formData.supplier_name || '', // Use request-level supplier name
+      supplier_id: '',
+      supplierName: '',
       description: '',
       unit_price: 0,
       quantity: 1,
     }
     setRequestItems(prev => [...prev, newItem])
-  }, [formData.supplier_id, formData.supplier_name])
+  }, [])
 
   // Update an item in the list
   const updateItem = useCallback((itemId: string, updatedFields: Partial<RequestItem>) => {
@@ -168,8 +146,6 @@ export function useRequestForm() {
       note: '',
       is_special_billing: false,
       created_by: '1',
-      supplier_id: '',
-      supplier_name: '',
     })
     setRequestItems([
       {
@@ -184,10 +160,8 @@ export function useRequestForm() {
     ])
     setTourSearchValue('')
     setOrderSearchValue('')
-    setSupplierSearchValue('')
     setShowTourDropdown(false)
     setShowOrderDropdown(false)
-    setShowSupplierDropdown(false)
   }, [])
 
   return {
@@ -199,24 +173,17 @@ export function useRequestForm() {
     setTourSearchValue,
     orderSearchValue,
     setOrderSearchValue,
-    supplierSearchValue,
-    setSupplierSearchValue,
     showTourDropdown,
     setShowTourDropdown,
     showOrderDropdown,
     setShowOrderDropdown,
-    showSupplierDropdown,
-    setShowSupplierDropdown,
     filteredTours,
     filteredOrders,
-    filteredSuppliers,
     total_amount,
     addNewEmptyItem,
     updateItem,
     removeItem,
     resetForm,
     suppliers: combinedSuppliers,
-    tours,
-    orders,
   }
 }

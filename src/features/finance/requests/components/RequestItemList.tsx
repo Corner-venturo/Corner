@@ -59,20 +59,21 @@ export function EditableRequestItemList({
   return (
     <div className="border border-border rounded-md p-4">
       <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目</h3>
-      <div className="space-y-3">
-        {/* Header */}
-        <div className="grid grid-cols-12 gap-4 px-3 text-xs font-medium text-morandi-secondary">
-          <div className="col-span-2">類別</div>
-          <div className="col-span-3">供應商</div>
-          <div className="col-span-3">項目描述</div>
-          <div className="col-span-1 text-right">單價</div>
-          <div className="col-span-1 text-center">數量</div>
-          <div className="col-span-1 text-right">小計</div>
-          <div className="col-span-1"></div>
-        </div>
 
-        {/* Items */}
-        {items.map(item => (
+      {/* Header - 固定不動 */}
+      <div className="grid grid-cols-12 gap-4 px-3 text-xs font-medium text-morandi-secondary mb-3">
+        <div className="col-span-2">類別</div>
+        <div className="col-span-3">供應商</div>
+        <div className="col-span-3">項目描述</div>
+        <div className="col-span-1 text-right">單價</div>
+        <div className="col-span-1 text-center">數量</div>
+        <div className="col-span-1 text-right">小計</div>
+        <div className="col-span-1"></div>
+      </div>
+
+      {/* Items - 固定高度可捲動 */}
+      <div className="space-y-3 h-[200px] overflow-y-auto">
+        {items.map((item, index) => (
           <div key={item.id} className="grid grid-cols-12 gap-2 items-start">
             {/* Category */}
             <div className="col-span-2">
@@ -160,30 +161,32 @@ export function EditableRequestItemList({
             </div>
             
             {/* Actions */}
-            <div className="col-span-1 flex items-center h-10 justify-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => removeItem(item.id)}
-                className="text-morandi-red hover:bg-morandi-red/10"
-              >
-                <Trash2 size={16} />
-              </Button>
+            <div className="col-span-1 flex items-center h-10 justify-center gap-1">
+              {/* 第一項不能刪除，顯示新增按鈕；其他項顯示刪除按鈕 */}
+              {index === 0 ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={addNewEmptyItem}
+                  className="text-morandi-gold hover:bg-morandi-gold/10"
+                  title="新增項目"
+                >
+                  <Plus size={16} />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeItem(item.id)}
+                  className="text-morandi-red hover:bg-morandi-red/10"
+                  title="刪除項目"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              )}
             </div>
           </div>
         ))}
-
-        <div className="pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addNewEmptyItem}
-            className="w-full border-dashed"
-          >
-            <Plus size={16} className="mr-2" />
-            新增項目
-          </Button>
-        </div>
       </div>
 
       {/* Total */}
