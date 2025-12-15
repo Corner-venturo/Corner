@@ -153,7 +153,8 @@ export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxu
 // - japanese: 日式和紙風格（帶目的地圖片）
 // - luxury: 奢華質感風格（表格式 + 深色調）
 // - art: 藝術雜誌風格（Brutalist + 高對比）
-export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art'
+// - none: 國內無航班（台灣行程不需要航班）
+export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none'
 
 // 每日行程風格類型：
 // - original: 經典時間軸風格

@@ -67,6 +67,7 @@ const flightStyleOptions: { value: FlightStyleType; label: string; description: 
   { value: 'japanese', label: '日式和風', description: '和紙風格＋圖片' },
   { value: 'luxury', label: '奢華質感', description: '表格式深色調' },
   { value: 'art', label: '藝術雜誌', description: 'Brutalist 高對比' },
+  { value: 'none', label: '國內無航班', description: '台灣行程免填' },
 ]
 
 export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary }: FlightInfoSectionProps) {

@@ -22,7 +22,7 @@ interface FlightInfo {
 }
 
 // 航班卡片風格類型
-type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art'
+type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none'
 
 interface TourDisplayData {
   outboundFlight?: FlightInfo | null
@@ -593,6 +593,11 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
     } else if (coverStyle === 'luxury') {
       effectiveFlightStyle = 'luxury'
     }
+  }
+
+  // 國內無航班 - 不顯示航班區塊
+  if (effectiveFlightStyle === 'none') {
+    return null
   }
 
   // Art 風格直接使用專屬組件（透過 flightStyle 或 coverStyle）
