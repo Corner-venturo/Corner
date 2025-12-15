@@ -125,7 +125,9 @@ export function OrderMembersExpandable({
   useEffect(() => {
     loadMembers()
     loadTourDepartureDate()
-  }, [orderId, tourId])
+    // 載入顧客資料（用於編輯模式搜尋）
+    fetchCustomers()
+  }, [orderId, tourId, fetchCustomers])
 
   const loadTourDepartureDate = async () => {
     try {
@@ -424,7 +426,15 @@ export function OrderMembersExpandable({
       return
     }
 
-    // Enter / 下鍵：移動到下一列同一欄位
+    // 全部編輯模式下，Enter 不跳行（讓搜尋對話框彈出）
+    if (isAllEditMode && e.key === 'Enter') {
+      e.preventDefault()
+      // 觸發 blur 來儲存
+      ;(e.target as HTMLInputElement).blur()
+      return
+    }
+
+    // Enter / 下鍵：移動到下一列同一欄位（非編輯模式）
     if (e.key === 'Enter' || e.key === 'ArrowDown') {
       e.preventDefault()
       const nextMemberIndex = memberIndex + 1
@@ -590,12 +600,17 @@ export function OrderMembersExpandable({
 
   // 根據姓名搜尋顧客（2字以上觸發）
   const checkCustomerMatchByName = (name: string, memberIndex: number, memberData: Partial<OrderMember>) => {
-    if (!name || name.length < 2) return
+    logger.log('checkCustomerMatchByName called:', { name, memberIndex, customersCount: customers.length })
+    if (!name || name.length < 2) {
+      logger.log('Name too short, skipping search')
+      return
+    }
 
     // 模糊搜尋：顧客姓名包含輸入的字串
     const nameMatches = customers.filter(c =>
       c.name?.includes(name) || name.includes(c.name || '')
     )
+    logger.log('Name matches found:', nameMatches.length)
 
     if (nameMatches.length > 0) {
       setMatchedCustomers(nameMatches)
@@ -674,14 +689,19 @@ export function OrderMembersExpandable({
 
   // 編輯模式下的姓名輸入處理
   const handleEditModeNameChange = (memberId: string, value: string, memberIndex: number) => {
+    logger.log('handleEditModeNameChange called:', { memberId, value, memberIndex })
     // 先更新本地狀態
     const member = members.find(m => m.id === memberId)
-    if (!member) return
+    if (!member) {
+      logger.log('Member not found')
+      return
+    }
 
     setMembers(members.map(m => m.id === memberId ? { ...m, chinese_name: value } : m))
 
     // 2字以上觸發顧客搜尋
     if (value.trim().length >= 2) {
+      logger.log('Triggering customer search for name:', value.trim())
       checkCustomerMatchByName(value.trim(), memberIndex, { ...member, chinese_name: value })
     }
   }
