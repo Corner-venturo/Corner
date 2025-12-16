@@ -35,8 +35,8 @@ describe('AuthStore', () => {
     // Reset store state before each test
     const store = useAuthStore.getState()
     await store.logout()
-    // Ensure currentProfile is cleared
-    useAuthStore.setState({ currentProfile: null, user: null, isAuthenticated: false })
+    // Ensure user is cleared
+    useAuthStore.setState({ user: null, isAuthenticated: false })
   })
 
   describe('Initial State', () => {
@@ -46,27 +46,32 @@ describe('AuthStore', () => {
       expect(state.user).toBeNull()
       expect(state.isAuthenticated).toBe(false)
       expect(state.sidebarCollapsed).toBe(true)
-      expect(state.currentProfile).toBeNull()
-      expect(state.isOfflineMode).toBe(false)
     })
   })
 
   describe('Login', () => {
-    it('should login user and set authenticated state', () => {
+    it('should set user and authenticated state', () => {
       const mockUser: User = {
         id: '1',
-        name: 'Test User',
-        username: 'testuser',
-        email: 'test@example.com',
-        role: 'admin',
+        employee_number: 'EMP001',
+        display_name: 'Test User',
+        chinese_name: 'Test User',
+        english_name: 'Test User',
+        personal_info: {},
+        job_info: {},
+        salary_info: {},
         permissions: ['view_orders', 'edit_orders'],
+        roles: ['employee'],
+        attendance: { leave_records: [], overtime_records: [] },
+        contracts: [],
+        status: 'active',
         workspace_id: 'workspace-1',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
 
       const store = useAuthStore.getState()
-      store.login(mockUser)
+      store.setUser(mockUser)
 
       const state = useAuthStore.getState()
       expect(state.user).toEqual(mockUser)
@@ -78,18 +83,25 @@ describe('AuthStore', () => {
     it('should clear user data and set unauthenticated', async () => {
       const mockUser: User = {
         id: '1',
-        name: 'Test User',
-        username: 'testuser',
-        email: 'test@example.com',
-        role: 'admin',
+        employee_number: 'EMP001',
+        display_name: 'Test User',
+        chinese_name: 'Test User',
+        english_name: 'Test User',
+        personal_info: {},
+        job_info: {},
+        salary_info: {},
         permissions: ['view_orders'],
+        roles: ['employee'],
+        attendance: { leave_records: [], overtime_records: [] },
+        contracts: [],
+        status: 'active',
         workspace_id: 'workspace-1',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
 
       const store = useAuthStore.getState()
-      store.login(mockUser)
+      store.setUser(mockUser)
       await store.logout()
 
       const state = useAuthStore.getState()
@@ -100,29 +112,27 @@ describe('AuthStore', () => {
 
   describe('Permissions', () => {
     it('should check user permissions correctly', () => {
-      const mockProfile = {
+      const mockUser: User = {
         id: '1',
         employee_number: 'EMP001',
         display_name: 'Test User',
+        chinese_name: 'Test User',
+        english_name: 'Test User',
+        personal_info: {},
+        job_info: {},
+        salary_info: {},
         permissions: ['view_orders', 'edit_orders', 'delete_orders'],
-      }
-
-      const store = useAuthStore.getState()
-      // Set currentProfile directly for testing
-      store.login({
-        id: '1',
-        name: 'Test User',
-        username: 'testuser',
-        email: 'test@example.com',
-        role: 'admin',
-        permissions: ['view_orders', 'edit_orders', 'delete_orders'],
+        roles: ['employee'],
+        attendance: { leave_records: [], overtime_records: [] },
+        contracts: [],
+        status: 'active',
         workspace_id: 'workspace-1',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      })
+      }
 
-      // Manually set currentProfile for this test
-      useAuthStore.setState({ currentProfile: mockProfile as any })
+      const store = useAuthStore.getState()
+      store.setUser(mockUser)
 
       expect(store.checkPermission('view_orders')).toBe(true)
       expect(store.checkPermission('edit_orders')).toBe(true)
