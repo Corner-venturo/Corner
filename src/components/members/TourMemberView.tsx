@@ -16,8 +16,9 @@ interface TourMemberViewProps {
   // Initially, members might be passed, but with useMembers hook, we'll fetch them internally
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TourMemberViewRef {
-  // Define any methods TourMemberView exposes to its parent if needed
+  // 預留給未來 forwardRef 暴露方法用
 }
 
 interface EditingMember extends Omit<Member, 'id' | 'created_at' | 'updated_at'> {

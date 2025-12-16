@@ -37,6 +37,14 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
 
+  // next-env.d.ts 特殊處理（Next.js 自動生成，不能改）
+  {
+    files: ['next-env.d.ts'],
+    rules: {
+      '@typescript-eslint/triple-slash-reference': 'off',
+    },
+  },
+
   // 客製化與覆蓋規則
   {
     plugins: {
