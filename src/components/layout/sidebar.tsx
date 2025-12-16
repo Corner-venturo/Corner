@@ -115,6 +115,12 @@ export function Sidebar() {
 
   // 切換子選單展開/收起
   const toggleSubmenu = (href: string) => {
+    // 如果側邊欄是收起的，先展開側邊欄再展開子選單
+    if (!isExpanded) {
+      setIsExpanded(true)
+      setExpandedMenus([href])
+      return
+    }
     setExpandedMenus(prev =>
       prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]
     )
