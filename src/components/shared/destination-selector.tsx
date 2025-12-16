@@ -53,10 +53,10 @@ export function DestinationSelector({
     .filter(r => r.is_active)
     .map(r => ({ id: r.id, code: r.code || r.id, name: r.name }))
 
-  // 根據國家 ID 取得城市列表
+  // 根據國家 ID 取得主要城市列表（只顯示有機場的主要城市）
   const getCitiesByCountryId = (countryId: string) => {
     return regionStore.getCitiesByCountry(countryId)
-      .filter(c => c.is_active)
+      .filter(c => c.is_active && c.is_major) // 只顯示主要城市
       .map(c => ({ id: c.id, code: c.airport_code || c.id, name: c.name }))
   }
 

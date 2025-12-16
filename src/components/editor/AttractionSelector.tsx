@@ -240,8 +240,8 @@ export function AttractionSelector({
           images: string[] | null
           country_id: string
           region_id: string | null
-          city_id: string
-          cities: { name: string }
+          city_id: string | null
+          cities: { name: string } | null
         }): AttractionWithCity => ({
           id: item.id,
           name: item.name,
@@ -252,7 +252,7 @@ export function AttractionSelector({
           images: item.images ?? undefined,
           country_id: item.country_id,
           region_id: item.region_id ?? undefined,
-          city_id: item.city_id,
+          city_id: item.city_id ?? undefined,
           city_name: item.cities?.name || '',
           is_active: true,
           display_order: 0,

@@ -121,9 +121,9 @@ export function useRegionData(data: { country?: string }) {
       return []
     }
 
-    // 返回該國家的所有啟用城市
+    // 返回該國家的主要城市（用於封面選擇）
     const result = cities
-      .filter(c => c.country_id === country.id && c.is_active)
+      .filter(c => c.country_id === country.id && c.is_active && c.is_major)
       .map(c => ({
         id: c.id,
         code: c.airport_code || c.name,

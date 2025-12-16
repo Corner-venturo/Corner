@@ -609,7 +609,7 @@ export type Database = {
         Row: {
           address: string | null
           category: string | null
-          city_id: string
+          city_id: string | null
           country_id: string
           created_at: string | null
           description: string | null
@@ -637,7 +637,7 @@ export type Database = {
         Insert: {
           address?: string | null
           category?: string | null
-          city_id: string
+          city_id?: string | null
           country_id: string
           created_at?: string | null
           description?: string | null
