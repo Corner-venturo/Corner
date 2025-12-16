@@ -4,7 +4,8 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { FileSignature, Edit2, Trash2, Eye, Mail, Plus } from 'lucide-react'
-import { useTours, useOrders, useMembers } from '@/hooks/cloud-hooks'
+import { useTours } from '@/hooks/cloud-hooks'
+import { useOrdersListSlim, useMembersCountSlim } from '@/hooks/useListSlim'
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { Tour } from '@/stores/types'
@@ -20,8 +21,8 @@ export default function ContractsPage() {
   const searchParams = useSearchParams()
   const tourIdParam = searchParams?.get('tour_id')
   const { items: tours, update: updateTour } = useTours()
-  const { items: orders } = useOrders()
-  const { items: members } = useMembers()
+  const { items: orders } = useOrdersListSlim()
+  const { items: members } = useMembersCountSlim()
   const { toast } = useToast()
   const [contractDialog, setContractDialog] = useState<{
     isOpen: boolean
