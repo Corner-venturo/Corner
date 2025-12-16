@@ -19,10 +19,9 @@ import {
   Archive,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useEmployees } from '@/hooks/cloud-hooks'
-import { useOrdersListSlim } from '@/hooks/useListSlim'
-import { useRegionsStore, useItineraryStore } from '@/stores'
+import { useOrdersListSlim, useQuotesListSlim, useItinerariesListSlim } from '@/hooks/useListSlim'
+import { useRegionsStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { useDialog } from '@/hooks/useDialog'
@@ -60,8 +59,8 @@ export const ToursPage: React.FC = () => {
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
-  const { quotes, updateQuote } = useQuotes()
-  const { items: itineraries, update: updateItinerary } = useItineraryStore()
+  const { items: quotes, update: updateQuote } = useQuotesListSlim()
+  const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
   const { dialog, openDialog, closeDialog } = useDialog()
 
   // Use custom hooks

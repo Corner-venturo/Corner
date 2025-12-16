@@ -2,7 +2,7 @@
 // 瘦身版列表 hooks：只 select 列表頁需要的欄位，減少 payload
 
 import { createCloudHook } from './createCloudHook'
-import type { Tour, Order } from '@/stores/types'
+import type { Tour, Order, Quote, Itinerary } from '@/stores/types'
 
 // ============================================
 // Orders 列表瘦身版
@@ -52,4 +52,41 @@ const TOURS_LIST_FIELDS = [
 export const useToursListSlim = createCloudHook<Tour>('tours', {
   select: TOURS_LIST_FIELDS,
   orderBy: { column: 'departure_date', ascending: false },
+})
+
+// ============================================
+// Quotes 列表瘦身版（用於 /tours 連結報價）
+// ============================================
+
+const QUOTES_LIST_FIELDS = [
+  'id',
+  'tour_id',
+  'name',
+  'total_cost',
+  'group_size',
+].join(',')
+
+/**
+ * 瘦身版 Quotes hook - 只抓連結功能需要的欄位
+ */
+export const useQuotesListSlim = createCloudHook<Quote>('quotes', {
+  select: QUOTES_LIST_FIELDS,
+  orderBy: { column: 'created_at', ascending: false },
+})
+
+// ============================================
+// Itineraries 列表瘦身版（用於 /tours 連結行程）
+// ============================================
+
+const ITINERARIES_LIST_FIELDS = [
+  'id',
+  'tour_id',
+].join(',')
+
+/**
+ * 瘦身版 Itineraries hook - 只抓連結功能需要的欄位
+ */
+export const useItinerariesListSlim = createCloudHook<Itinerary>('itineraries', {
+  select: ITINERARIES_LIST_FIELDS,
+  orderBy: { column: 'created_at', ascending: false },
 })
