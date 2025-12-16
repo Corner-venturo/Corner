@@ -114,6 +114,12 @@ export function Sidebar() {
     }
   }
 
+  // 關閉側邊欄（跳轉時使用）
+  const closeSidebar = () => {
+    setIsExpanded(false)
+    setExpandedMenus([])
+  }
+
   // 切換子選單展開/收起
   const toggleSubmenu = (href: string) => {
     // 如果側邊欄是收起的，先展開側邊欄再展開子選單
@@ -238,6 +244,7 @@ export function Sidebar() {
         <Link
           href={item.href}
           prefetch={false}
+          onClick={closeSidebar}
           className={cn(
             'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
             'hover:bg-morandi-gold/5 hover:text-morandi-gold',
@@ -364,6 +371,7 @@ export function Sidebar() {
             <Link
               href="/settings"
               prefetch={false}
+              onClick={closeSidebar}
               className={cn(
                 'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
                 'hover:bg-morandi-gold/5 hover:text-morandi-gold',

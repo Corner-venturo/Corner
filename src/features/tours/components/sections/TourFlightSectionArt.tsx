@@ -34,17 +34,50 @@ interface TourFlightSectionArtProps {
 }
 
 // 格式化日期為藝術雜誌風格
+// 支援多種格式：
+// - "10/21" (月/日) → "21 OCT"
+// - "2024-10-21" (ISO) → "21 OCT 2024"
+// - "10/21/2024" (月/日/年) → "21 OCT 2024"
 function formatFlightDate(dateStr: string | undefined | null): string {
   if (!dateStr) return ''
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+
   try {
+    // 嘗試解析 "MM/DD" 格式（不含年份）
+    const mmddMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})$/)
+    if (mmddMatch) {
+      const month = parseInt(mmddMatch[1], 10) - 1 // 0-indexed
+      const day = parseInt(mmddMatch[2], 10)
+      if (month >= 0 && month < 12 && day >= 1 && day <= 31) {
+        return `${day} ${months[month]}`
+      }
+    }
+
+    // 嘗試解析 "MM/DD/YYYY" 格式
+    const mmddyyyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+    if (mmddyyyyMatch) {
+      const month = parseInt(mmddyyyyMatch[1], 10) - 1
+      const day = parseInt(mmddyyyyMatch[2], 10)
+      const year = parseInt(mmddyyyyMatch[3], 10)
+      if (month >= 0 && month < 12 && day >= 1 && day <= 31) {
+        return `${day} ${months[month]} ${year}`
+      }
+    }
+
+    // 嘗試解析 ISO 格式 "YYYY-MM-DD"
     const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return ''
-    const day = date.getDate()
-    const month = date.getMonth()
-    const year = date.getFullYear()
-    if (isNaN(day) || isNaN(month) || isNaN(year)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${day} ${months[month]} ${year}`
+    if (!isNaN(date.getTime())) {
+      const day = date.getDate()
+      const month = date.getMonth()
+      const year = date.getFullYear()
+      // 過濾掉異常年份（2001 代表解析錯誤）
+      if (year < 2020 || year > 2100) {
+        return ''
+      }
+      return `${day} ${months[month]} ${year}`
+    }
+
+    return ''
   } catch {
     return ''
   }

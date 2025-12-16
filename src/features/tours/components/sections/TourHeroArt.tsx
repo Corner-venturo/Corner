@@ -29,14 +29,41 @@ interface TourHeroArtProps {
     price?: string
     priceNote?: string
     days?: number
+    dailyItinerary?: Array<{ dayLabel?: string }>
   }
   viewMode: 'desktop' | 'mobile'
 }
 
-// 從標題中提取天數
-function extractDayNumber(title: string): number {
+// 從標題或行程陣列中提取天數
+function extractDayNumber(title: string, dailyItinerary?: Array<{ dayLabel?: string }>): number {
+  // 優先從 dailyItinerary 計算天數
+  if (dailyItinerary && dailyItinerary.length > 0) {
+    // 檢查最後一個 dayLabel，可能是 "Day 5" 或 "Day 3-4" 這種格式
+    const lastDay = dailyItinerary[dailyItinerary.length - 1]
+    if (lastDay?.dayLabel) {
+      // 嘗試匹配 "Day 3-4" 格式（取較大的數字）
+      const rangeMatch = lastDay.dayLabel.match(/(\d+)\s*-\s*(\d+)/)
+      if (rangeMatch) {
+        return parseInt(rangeMatch[2], 10)
+      }
+      // 嘗試匹配 "Day 5" 格式
+      const singleMatch = lastDay.dayLabel.match(/(\d+)/)
+      if (singleMatch) {
+        return parseInt(singleMatch[1], 10)
+      }
+    }
+    // 如果無法從 dayLabel 解析，就用陣列長度
+    return dailyItinerary.length
+  }
+
+  // fallback: 從標題中提取天數
   const match = title.match(/(\d+)\s*[天日]/)
-  return match ? parseInt(match[1], 10) : 7
+  if (match) {
+    return parseInt(match[1], 10)
+  }
+
+  // 最後 fallback: 返回 0（不顯示或顯示 --）
+  return 0
 }
 
 // 格式化日期為 DEC 24 格式
@@ -74,7 +101,7 @@ function formatCountryDisplay(country: string | undefined): { main: string; sub:
 
 export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
   const isMobile = viewMode === 'mobile'
-  const dayNumber = data.days || extractDayNumber(data.title)
+  const dayNumber = data.days || extractDayNumber(data.title, data.dailyItinerary)
   const dateDisplay = formatDateShort(data.departureDate)
   const countryDisplay = formatCountryDisplay(data.country)
   const coverImage = (data.coverImage && data.coverImage.trim() !== '') ? data.coverImage : DEFAULT_COVER

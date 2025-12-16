@@ -80,7 +80,7 @@ interface UseMembersReturn {
  * const { members: tourMembers } = useMembers({ tourId: 'tour-456' })
  * ```
  */
-export function useMembers({ orderId, tourId }: UseMembersOptions): UseMembersReturn {
+export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMembersReturn {
   // 使用 SWR-based cloud hook 取得所有成員
   // 將 `useMembers` 從 `./cloud-hooks` 重新命名為 `useMembersCloud` 以避免名稱衝突
   const {
