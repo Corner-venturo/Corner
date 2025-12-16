@@ -1,37 +1,33 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Order } from '@/stores/types'
+import { Order, Tour } from '@/stores/types'
 import { OrderMemberView } from '@/components/members/OrderMemberView'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
 interface SimpleOrderTableProps {
   orders: Order[]
+  tours?: Pick<Tour, 'id' | 'departure_date'>[] // 可選，由父層傳入避免重複 fetch
   showTourInfo?: boolean
   className?: string
 }
 
 export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   orders,
+  tours = [], // 由父層傳入，避免重複 fetch
   showTourInfo = false,
   className,
 }: SimpleOrderTableProps) {
   const router = useRouter()
   const orderStore = useOrderStore()
   const deleteOrder = orderStore.delete
-  const { items: tours, fetchAll: fetchAllTours } = useTourStore();
-  
-  useEffect(() => {
-    fetchAllTours();
-  }, [fetchAllTours]);
-
   const { currentWorkspace } = useWorkspaceChannels()
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 

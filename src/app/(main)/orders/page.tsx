@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { QuickReceipt } from '@/components/todos/quick-actions/quick-receipt'
-import { useOrders, useTours, useMembers } from '@/hooks/cloud-hooks'
+import { useOrdersListSlim, useToursListSlim } from '@/hooks/useListSlim'
+import { useMemberActions } from '@/hooks/useMemberActions'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
@@ -15,9 +16,9 @@ import type { Order, Member } from '@/stores/types'
 
 export default function OrdersPage() {
   const router = useRouter()
-  const { items: orders, create: addOrder } = useOrders()
-  const { items: tours } = useTours()
-  const { create: addMember } = useMembers()
+  const { items: orders, create: addOrder } = useOrdersListSlim()
+  const { items: tours } = useToursListSlim()
+  const { create: addMember } = useMemberActions()
   const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
   const [tourFilter, _setTourFilter] = useState('')
@@ -266,7 +267,7 @@ export default function OrdersPage() {
         )}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="flex-1" orders={filteredOrders as Order[]} showTourInfo={true} />
+        <SimpleOrderTable className="flex-1" orders={filteredOrders as Order[]} tours={tours} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

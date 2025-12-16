@@ -20,7 +20,8 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
-import { useOrders, useEmployees, useMembers } from '@/hooks/cloud-hooks'
+import { useEmployees } from '@/hooks/cloud-hooks'
+import { useOrdersListSlim } from '@/hooks/useListSlim'
 import { useRegionsStore, useItineraryStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -56,8 +57,7 @@ export const ToursPage: React.FC = () => {
     mode: 'create' | 'edit'
   }>({ isOpen: false, tour: null, mode: 'edit' })
 
-  const { items: orders, create: addOrder } = useOrders()
-  const { items: members } = useMembers()
+  const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
   const { quotes, updateQuote } = useQuotes()
