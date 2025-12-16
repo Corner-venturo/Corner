@@ -62,7 +62,7 @@ export function DisbursementPage() {
      
   }, [])
 
-  // 取得待出帳的請款單（狀態為 approved，且尚未加入任何出納單）
+  // 取得待出帳的請款單（狀態為 pending，且尚未加入任何出納單）
   const pendingRequests = useMemo(() => {
     // 收集所有已在出納單中的請款單 ID
     const usedRequestIds = new Set<string>()
@@ -70,9 +70,9 @@ export function DisbursementPage() {
       order.payment_request_ids?.forEach(id => usedRequestIds.add(id))
     })
 
-    // 只顯示「已核准」且「尚未加入出納單」的請款單
+    // 只顯示「請款中」且「尚未加入出納單」的請款單
     return payment_requests.filter(r =>
-      r.status === 'approved' && !usedRequestIds.has(r.id)
+      r.status === 'pending' && !usedRequestIds.has(r.id)
     )
   }, [payment_requests, disbursement_orders])
 

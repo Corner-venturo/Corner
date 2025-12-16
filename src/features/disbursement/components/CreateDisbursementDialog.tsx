@@ -199,9 +199,9 @@ export function CreateDisbursementDialog({
 
       console.log('✅ 出納單已建立:', data)
 
-      // 更新請款單狀態為 processing
+      // 更新請款單狀態為 approved（已確認，已加入出納單）
       for (const id of selectedRequestIds) {
-        await updatePaymentRequest(id, { status: 'processing' })
+        await updatePaymentRequest(id, { status: 'approved' })
       }
 
       // 重新載入出納單列表
