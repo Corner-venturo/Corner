@@ -64,14 +64,20 @@ export function MainLayout({ children }: MainLayoutProps) {
     return () => clearTimeout(checkTimeout)
   }, [isClient, pathname, router])
 
-      // 初始化離線資料庫和基礎資料
+      // 初始化離線資料庫和基礎資料（延遲執行，避免阻塞首次渲染）
       useEffect(() => {
         if (!isClient) return
 
-        // 載入基礎資料（只載入全域需要的資料）
+        // 需要 workspace 資料的路由前綴
+        const ROUTES_NEED_WORKSPACE = ['/tours', '/orders', '/quotes', '/contracts', '/finance']
+        const needsWorkspace = ROUTES_NEED_WORKSPACE.some(route => pathname.startsWith(route))
+
+        if (!needsWorkspace) return
+
+        // 載入基礎資料（使用 requestIdleCallback 延遲非關鍵載入）
         const loadInitialData = async () => {
           try {
-            // 載入工作空間（全域需要，用於生成團號等）
+            // 載入工作空間（用於生成團號等）
             const { useWorkspaceStoreData } = await import('@/stores/workspace/workspace-store')
             const workspaceStore = useWorkspaceStoreData.getState()
             if (workspaceStore.items.length === 0 && workspaceStore.fetchAll) {
@@ -82,8 +88,15 @@ export function MainLayout({ children }: MainLayoutProps) {
           }
         }
 
-        loadInitialData()
-      }, [isClient])
+        // 延遲執行，讓首次渲染優先完成
+        if ('requestIdleCallback' in window) {
+          const idleId = requestIdleCallback(() => loadInitialData(), { timeout: 2000 })
+          return () => cancelIdleCallback(idleId)
+        } else {
+          const timeoutId = setTimeout(loadInitialData, 100)
+          return () => clearTimeout(timeoutId)
+        }
+      }, [isClient, pathname])
   // 不需要側邊欄的頁面（支援完全匹配和前綴匹配）
   const shouldShowSidebar = !NO_SIDEBAR_PAGES.some(
     page => pathname === page || pathname.startsWith(page + '/')
