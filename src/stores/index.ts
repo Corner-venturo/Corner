@@ -197,6 +197,12 @@ export const useVendorCostStore = createStore<import('./types').VendorCost>('ven
 // 供應商 Store
 export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
 
+// 領隊資料 Store（基礎資料，不需要 workspace 隔離）
+export const useTourLeaderStore = createStore<import('@/types/tour-leader.types').TourLeader>(
+  'tour_leaders',
+  'TL'
+)
+
 // 供應商類別 Store
 export { useSupplierCategoryStore } from './supplier-category-store'
 
