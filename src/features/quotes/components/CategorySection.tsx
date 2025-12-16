@@ -197,8 +197,8 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   return (
     <React.Fragment>
       {/* 分類標題行 */}
-      <tr className="bg-morandi-container/20 border-b border-border/40">
-        <td colSpan={2} className="py-3 px-4 text-sm font-medium text-morandi-primary">
+      <tr className="bg-morandi-container/40 border-b border-border/60">
+        <td colSpan={2} className="py-3 px-4 text-sm font-semibold text-morandi-charcoal border-l-4 border-l-morandi-gold">
           <div className="flex items-center space-x-2">
             <Icon size={16} className="text-morandi-gold" />
             <span>{category.name}</span>

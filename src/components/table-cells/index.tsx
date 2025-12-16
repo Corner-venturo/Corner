@@ -193,7 +193,7 @@ export function StatusCell({
   if (variant === 'badge') {
     const bgColor = getStatusBgColor(type, status)
     return (
-      <Badge className={cn('text-white', bgColor, className)}>
+      <Badge className={cn(bgColor, color, className)}>
         {showIcon && IconComponent && <IconComponent className="w-3 h-3 mr-1" />}
         {label}
       </Badge>

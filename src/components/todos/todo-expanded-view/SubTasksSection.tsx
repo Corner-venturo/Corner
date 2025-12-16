@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
-import { Check, X, CheckCircle, Edit2, Calendar, CalendarCheck } from 'lucide-react'
+import { Plus, Trash2, Calendar, CalendarCheck } from 'lucide-react'
 import { generateUUID } from '@/lib/utils/uuid'
 import { SubTasksSectionProps } from './types'
 import { useCalendarEventStore } from '@/stores'
@@ -44,7 +43,6 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
         ? `${calendarDate}T${calendarTime}:00${tzOffset}`
         : `${calendarDate}T09:00:00${tzOffset}`
 
-      // 結束時間預設 1 小時後
       const endHour = calendarTime ? parseInt(calendarTime.split(':')[0]) + 1 : 10
       const endTime = `${String(endHour).padStart(2, '0')}:${calendarTime?.split(':')[1] || '00'}`
       const endDateTime = `${calendarDate}T${endTime}:00${tzOffset}`
@@ -61,7 +59,6 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
         created_by: user.id,
       })
 
-      // 更新子任務的 calendar_event_id
       if (newEvent?.id) {
         const updatedSubTasks = (todo.sub_tasks || []).map(task =>
           task.id === calendarDialog.subTaskId
@@ -89,7 +86,6 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
       done: false,
     }
 
-    // 如果目前狀態是「待辦」，自動切換到「進行中」
     const updates: Partial<typeof todo> = {
       sub_tasks: [...(todo.sub_tasks || []), newTask],
     }
@@ -120,158 +116,136 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
   }
 
   const completedSubTasks = (todo.sub_tasks || []).filter(task => task.done).length
+  const totalSubTasks = (todo.sub_tasks || []).length
 
   return (
-    <div className="mb-4 bg-card border border-border rounded-xl p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-morandi-primary flex items-center gap-1.5">
-          <CheckCircle size={14} className="text-morandi-gold" />
-          子任務清單
-        </h4>
-        <span className="text-xs text-morandi-primary bg-morandi-gold/10 border border-morandi-gold/20 px-2 py-1 rounded-lg font-medium">
-          {completedSubTasks}/{(todo.sub_tasks || []).length}
-        </span>
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-serif font-bold text-[#333333]">子任務</h3>
+        <span className="text-xs text-[#8C8C8C]">{completedSubTasks} / {totalSubTasks} 已完成</span>
       </div>
 
-      <div className="space-y-1.5 mb-3">
+      <div className="space-y-3">
         {(todo.sub_tasks || []).map(task => (
-          <div
-            key={task.id}
-            className="flex items-center gap-2 p-2 rounded-lg bg-morandi-container/10 hover:bg-morandi-container/20 transition-colors border border-transparent hover:border-morandi-gold/20 group relative"
-          >
-            {editingSubTaskId === task.id ? (
-              // 編輯模式
-              <>
-                <button
-                  onClick={() => toggleSubTask(task.id)}
-                  className={cn(
-                    'w-4 h-4 rounded border-2 transition-all flex items-center justify-center shadow-sm flex-shrink-0',
-                    task.done
-                      ? 'bg-morandi-gold border-morandi-gold scale-110'
-                      : 'border-morandi-muted hover:border-morandi-gold bg-white'
-                  )}
-                >
-                  {task.done && <Check size={12} className="text-white" />}
-                </button>
-                <Input
+          <div key={task.id} className="flex items-start gap-3 group">
+            {/* Checkbox */}
+            <input
+              type="checkbox"
+              checked={task.done}
+              onChange={() => toggleSubTask(task.id)}
+              disabled={readOnly}
+              className="mt-1 w-5 h-5 rounded border-gray-300 text-[#C9D4C5] focus:ring-[#C9D4C5] cursor-pointer"
+            />
+
+            {/* Content */}
+            <div className="flex-1">
+              {editingSubTaskId === task.id ? (
+                <input
+                  type="text"
                   value={editingSubTaskContent}
                   onChange={e => setEditingSubTaskContent(e.target.value)}
-                  className="text-xs h-7 flex-1"
-                  autoFocus
-                />
-                <Button
-                  size="sm"
-                  onClick={() => {
+                  onBlur={() => {
                     const updatedSubTasks = (todo.sub_tasks || []).map(t =>
                       t.id === task.id ? { ...t, title: editingSubTaskContent } : t
                     )
                     onUpdate({ sub_tasks: updatedSubTasks })
                     setEditingSubTaskId(null)
                   }}
-                  className="bg-morandi-gold hover:bg-morandi-gold/90 h-7 text-xs px-2"
-                >
-                  儲存
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setEditingSubTaskId(null)}
-                  className="h-7 text-xs px-2"
-                >
-                  取消
-                </Button>
-              </>
-            ) : (
-              // 顯示模式
-              <>
-                <button
-                  onClick={() => toggleSubTask(task.id)}
-                  className={cn(
-                    'w-4 h-4 rounded border-2 transition-all flex items-center justify-center shadow-sm flex-shrink-0',
-                    task.done
-                      ? 'bg-morandi-gold border-morandi-gold scale-110'
-                      : 'border-morandi-muted hover:border-morandi-gold bg-white'
-                  )}
-                >
-                  {task.done && <Check size={12} className="text-white" />}
-                </button>
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      const updatedSubTasks = (todo.sub_tasks || []).map(t =>
+                        t.id === task.id ? { ...t, title: editingSubTaskContent } : t
+                      )
+                      onUpdate({ sub_tasks: updatedSubTasks })
+                      setEditingSubTaskId(null)
+                    }
+                  }}
+                  className="w-full bg-transparent border-0 border-b border-[#B8A99A] focus:ring-0 p-0 text-sm text-[#333333]"
+                  autoFocus
+                />
+              ) : (
                 <span
                   className={cn(
-                    'text-xs flex-1 font-medium',
-                    task.done ? 'line-through text-morandi-muted' : 'text-morandi-primary'
+                    'text-sm transition-colors cursor-pointer',
+                    task.done ? 'text-[#8C8C8C] line-through' : 'text-[#333333]'
                   )}
+                  onClick={() => {
+                    if (!readOnly) {
+                      setEditingSubTaskId(task.id)
+                      setEditingSubTaskContent(task.title)
+                    }
+                  }}
                 >
                   {task.title}
                 </span>
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  {/* 行事曆按鈕 */}
-                  {task.calendar_event_id ? (
-                    <span
-                      className="p-1 text-emerald-600"
-                      title="已加入行事曆"
-                    >
-                      <CalendarCheck size={12} />
-                    </span>
-                  ) : !readOnly && (
-                    <button
-                      onClick={() => setCalendarDialog({
-                        open: true,
-                        subTaskId: task.id,
-                        subTaskTitle: task.title,
-                      })}
-                      className="p-1 hover:bg-blue-100 rounded text-morandi-secondary hover:text-blue-600"
-                      title="加入行事曆"
-                    >
-                      <Calendar size={12} />
-                    </button>
-                  )}
-                  {!readOnly && (
-                    <>
-                      <button
-                        onClick={() => {
-                          setEditingSubTaskId(task.id)
-                          setEditingSubTaskContent(task.title)
-                        }}
-                        className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
-                        title="編輯子任務"
-                      >
-                        <Edit2 size={12} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id)
-                          onUpdate({ sub_tasks: updatedSubTasks })
-                        }}
-                        className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
-                        title="刪除子任務"
-                      >
-                        <X size={12} />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* 行事曆按鈕 */}
+              {task.calendar_event_id ? (
+                <span className="p-1 text-emerald-600" title="已加入行事曆">
+                  <CalendarCheck size={14} />
+                </span>
+              ) : !readOnly && (
+                <button
+                  onClick={() => setCalendarDialog({
+                    open: true,
+                    subTaskId: task.id,
+                    subTaskTitle: task.title,
+                  })}
+                  className="p-1 text-[#8C8C8C] hover:text-[#8FA9C2] transition-colors"
+                  title="加入行事曆"
+                >
+                  <Calendar size={14} />
+                </button>
+              )}
+              {!readOnly && (
+                <button
+                  onClick={() => {
+                    const updatedSubTasks = (todo.sub_tasks || []).filter(t => t.id !== task.id)
+                    onUpdate({ sub_tasks: updatedSubTasks })
+                  }}
+                  className="p-1 text-[#8C8C8C] hover:text-[#C77D7D] transition-colors"
+                  title="刪除"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
           </div>
         ))}
-      </div>
 
-      {/* 新增子任務區域 - 唯讀模式隱藏 */}
-      {!readOnly && (
-        <div className="flex gap-1.5">
-          <Input
-            placeholder="新增子任務..."
-            value={newSubTask}
-            onChange={e => setNewSubTask(e.target.value)}
-            onKeyDown={handleSubTaskKeyDown}
-            {...subTaskCompositionProps}
-            className="text-xs h-8 border-morandi-container/30 focus-visible:ring-morandi-gold"
-          />
-          <Button size="sm" onClick={addSubTask} className="bg-morandi-gold hover:bg-morandi-gold/90 h-8 px-2.5 text-xs">
-            新增
-          </Button>
-        </div>
-      )}
+        {/* 新增子任務 */}
+        {!readOnly && (
+          <button
+            onClick={() => {
+              const inputElement = document.getElementById('new-subtask-input')
+              if (inputElement) inputElement.focus()
+            }}
+            className="flex items-center gap-2 text-sm text-[#B8A99A] font-semibold hover:text-[#9E8C7A] mt-2 group"
+          >
+            <Plus size={18} className="group-hover:rotate-90 transition-transform" />
+            新增子任務
+          </button>
+        )}
+
+        {!readOnly && (
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              id="new-subtask-input"
+              type="text"
+              placeholder="輸入子任務內容..."
+              value={newSubTask}
+              onChange={e => setNewSubTask(e.target.value)}
+              onKeyDown={handleSubTaskKeyDown}
+              {...subTaskCompositionProps}
+              className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-[#B8A99A] focus:ring-0 p-0 text-sm text-[#333333] placeholder-gray-400"
+            />
+          </div>
+        )}
+      </div>
 
       {/* 行事曆 Dialog */}
       <Dialog open={calendarDialog.open} onOpenChange={(open) => {
@@ -284,19 +258,19 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
         <DialogContent className="max-w-xs">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-sm">
-              <Calendar size={16} className="text-blue-600" />
+              <Calendar size={16} className="text-[#B8A99A]" />
               加入行事曆
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-morandi-secondary mb-1 block">任務名稱</label>
-              <div className="text-sm font-medium text-morandi-primary bg-morandi-container/10 px-3 py-2 rounded-lg">
+              <label className="text-xs text-[#8C8C8C] mb-1 block">任務名稱</label>
+              <div className="text-sm font-medium text-[#333333] bg-[#F9F8F6] px-3 py-2 rounded-lg">
                 {calendarDialog.subTaskTitle}
               </div>
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary mb-1 block">日期 *</label>
+              <label className="text-xs text-[#8C8C8C] mb-1 block">日期 *</label>
               <Input
                 type="date"
                 value={calendarDate}
@@ -305,7 +279,7 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary mb-1 block">時間（可選）</label>
+              <label className="text-xs text-[#8C8C8C] mb-1 block">時間（可選）</label>
               <Input
                 type="time"
                 value={calendarTime}
@@ -315,10 +289,8 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
               />
             </div>
             <div className="flex gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 h-8"
+              <button
+                className="flex-1 h-9 px-4 rounded-lg border border-[#E8E4E0] text-[#333333] bg-white hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
                 onClick={() => {
                   setCalendarDialog({ open: false, subTaskId: '', subTaskTitle: '' })
                   setCalendarDate('')
@@ -326,15 +298,14 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
                 }}
               >
                 取消
-              </Button>
-              <Button
-                size="sm"
-                className="flex-1 h-8 bg-blue-600 hover:bg-blue-700"
+              </button>
+              <button
+                className="flex-1 h-9 px-4 rounded-lg bg-[#B8A99A] hover:bg-[#9E8C7A] text-white text-sm font-medium disabled:opacity-50"
                 onClick={handleAddToCalendar}
                 disabled={!calendarDate}
               >
                 建立
-              </Button>
+              </button>
             </div>
           </div>
         </DialogContent>

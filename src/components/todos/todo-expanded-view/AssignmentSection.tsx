@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Calendar, FileText, X, UserCheck } from 'lucide-react'
+import { FileText, X, UserCheck } from 'lucide-react'
 import { AssignmentSectionProps } from './types'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -74,10 +74,9 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
         )}
 
         {/* 期限 + 狀態合併一排 */}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
           {/* 期限 */}
           <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-morandi-secondary" />
             {readOnly ? (
               <span className={cn('text-sm font-medium', getDeadlineColor())}>
                 {todo.deadline || '未設定'}
@@ -88,7 +87,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                   type="date"
                   value={todo.deadline || ''}
                   onChange={e => onUpdate({ deadline: e.target.value })}
-                  className={cn('text-sm font-medium h-8 w-auto', getDeadlineColor())}
+                  className={cn('text-sm font-medium h-9 w-[160px]', getDeadlineColor())}
                 />
                 {todo.deadline && (
                   <button
@@ -104,15 +103,15 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
           </div>
 
           {/* 分隔線 */}
-          <div className="h-6 w-px bg-border" />
+          <div className="h-8 w-px bg-border" />
 
           {/* 狀態按鈕 */}
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex-1 grid grid-cols-4 gap-2">
             <button
               onClick={() => !readOnly && onUpdate({ status: 'pending' })}
               disabled={readOnly}
               className={cn(
-                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'py-2 text-xs rounded-lg transition-all font-medium text-center',
                 todo.status === 'pending'
                   ? 'bg-morandi-muted text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-muted/20 text-morandi-secondary',
@@ -126,7 +125,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'in_progress' })}
               disabled={readOnly}
               className={cn(
-                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'py-2 text-xs rounded-lg transition-all font-medium text-center',
                 todo.status === 'in_progress'
                   ? 'bg-morandi-gold text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-gold/20 text-morandi-secondary',
@@ -140,7 +139,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'completed' })}
               disabled={readOnly}
               className={cn(
-                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'py-2 text-xs rounded-lg transition-all font-medium text-center',
                 todo.status === 'completed'
                   ? 'bg-morandi-green text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-green/20 text-morandi-secondary',
@@ -154,7 +153,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               onClick={() => !readOnly && onUpdate({ status: 'cancelled' })}
               disabled={readOnly}
               className={cn(
-                'px-2.5 py-1.5 text-xs rounded-lg transition-all font-medium',
+                'py-2 text-xs rounded-lg transition-all font-medium text-center',
                 todo.status === 'cancelled'
                   ? 'bg-morandi-red text-white shadow-md'
                   : 'bg-morandi-container/30 border border-morandi-red/20 text-morandi-secondary',

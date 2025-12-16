@@ -80,19 +80,22 @@ export function DestinationSelector({
           <label className="text-sm font-medium text-morandi-secondary mb-2 block">
             國家/地區 <span className="text-morandi-red">*</span>
           </label>
-          <select
+          <Combobox
             value={countryCode}
-            onChange={e => handleCountryChange(e.target.value)}
-            className="w-full p-2 border border-morandi-container/30 rounded-md bg-background text-sm"
-          >
-            <option value="">請選擇國家...</option>
-            {activeCountries.map(country => (
-              <option key={country.id} value={country.code}>
-                {country.name}
-              </option>
-            ))}
-            <option value="__custom__">+ 新增其他目的地</option>
-          </select>
+            onChange={handleCountryChange}
+            options={[
+              ...activeCountries.map(country => ({
+                value: country.code,
+                label: country.name,
+              })),
+              { value: '__custom__', label: '+ 新增其他目的地' },
+            ]}
+            placeholder="輸入或選擇國家..."
+            emptyMessage="找不到符合的國家"
+            showSearchIcon={true}
+            showClearButton={true}
+            className="border-morandi-container/30"
+          />
         </div>
 
         <div>

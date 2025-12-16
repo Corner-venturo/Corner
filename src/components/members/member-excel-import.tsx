@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useMemberStore, useCustomerStore } from '@/stores'
 import { toast } from 'sonner'
-import * as XLSX from 'xlsx'
 
 interface MemberExcelImportProps {
   orderId: string
@@ -55,8 +54,11 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
     if (!file) return
 
     const reader = new FileReader()
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
+        // 動態載入 xlsx（避免污染首屏 bundle）
+        const XLSX = await import('xlsx')
+
         const data = evt.target?.result
         const workbook = XLSX.read(data, { type: 'binary' })
         const sheetName = workbook.SheetNames[0]

@@ -169,7 +169,7 @@ export const MUSCLE_GROUPS = [
   { id: 'chest', name: '胸', icon: 'dumbbell', color: '#E8D5D5' },
   { id: 'back', name: '背', icon: 'activity', color: '#B4C5D1' },
   { id: 'legs', name: '腿', icon: 'footprints', color: '#C8D5C8' },
-  { id: 'shoulders', name: '肩', icon: 'dumbbell', color: '#C9A961' },
+  { id: 'shoulders', name: '肩', icon: 'dumbbell', color: '#B8A99A' },
   { id: 'arms', name: '手臂', icon: 'zap', color: '#C3B5A7' },
   { id: 'core', name: '核心', icon: 'flame', color: '#D9CFC3' },
   { id: 'cardio', name: '有氧', icon: 'activity', color: '#B8C4C2' },

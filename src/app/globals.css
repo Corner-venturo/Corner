@@ -1,28 +1,43 @@
 @import 'tailwindcss';
 
-/* 莫蘭迪主題（預設） */
+/* Venturo CIS 主題 v2.1（原 morandi 主題）*/
 :root,
 [data-theme='morandi'] {
-  /* 主色系 */
-  --morandi-primary: #3a3633;
-  --morandi-secondary: #8b8680;
-  --morandi-gold: #c9aa7c;
-  --morandi-gold-rgb: 201, 170, 124;
-  --morandi-gold-hover: #b8996b;
-  --morandi-green: #9fa68f;
-  --morandi-green-rgb: 159, 166, 143;
-  --morandi-red: #c08374;
-  --morandi-container: #e8e5e0;
-  --morandi-muted: #b8b2aa;
+  /* 主色系 - Venturo CIS v2.1 */
+  --morandi-primary: #333333;      /* Charcoal - 主要文字 */
+  --morandi-secondary: #8C8C8C;    /* Text Sub - 次要文字 */
+  --morandi-gold: #B8A99A;         /* Taupe - 主色 */
+  --morandi-gold-rgb: 184, 169, 154;
+  --morandi-gold-hover: #9E8C7A;   /* Taupe Dark */
+  --morandi-green: #8FA38F;        /* Fern - 成功色 */
+  --morandi-green-rgb: 143, 163, 143;
+  --morandi-red: #C77D7D;          /* Muted Red - 錯誤色 */
+  --morandi-container: #E8E4E0;    /* Beige - 容器/中性 */
+  --morandi-muted: #8C8C8C;        /* Text Sub */
+
+  /* 新增 CIS 語意色 */
+  --venturo-taupe: #B8A99A;
+  --venturo-taupe-light: #C6B9AC;
+  --venturo-taupe-dark: #9E8C7A;
+  --venturo-sage: #C9D4C5;
+  --venturo-sage-light: #D8E0D5;
+  --venturo-sage-dark: #AEBEA8;
+  --venturo-charcoal: #333333;
+  --venturo-charcoal-light: #5C5C5C;
+  --venturo-charcoal-dark: #1A1A1A;
+  --venturo-success: #8FA38F;
+  --venturo-warning: #D4B483;
+  --venturo-error: #C77D7D;
+  --venturo-info: #8FA9C2;
 
   /* 背景色 */
-  --background: #f6f4f1;
-  --card: #ffffff;
-  --border: #d4c4b0;
-  --popover: #ffffff;
-  --popover-foreground: #3a3633;
-  --accent: #e8e5e0;
-  --accent-foreground: #3a3633;
+  --background: #F9F8F6;           /* Off-White */
+  --card: #FFFFFF;                 /* Surface */
+  --border: #E8E4E0;               /* Beige */
+  --popover: #FFFFFF;
+  --popover-foreground: #333333;
+  --accent: #E8E4E0;               /* Beige */
+  --accent-foreground: #333333;
 
   /* 設定對應變數 */
   --foreground: var(--morandi-primary);
@@ -30,12 +45,12 @@
   --border-muted: var(--morandi-container);
 
   /* 表單元素專用變數 */
-  --input-border: #d4c4b0;
-  --input-border-hover: #c4a572;
-  --input-border-focus: #c4a572;
-  --input-bg: #ffffff;
-  --input-text: #3a3633;
-  --input-placeholder: #b8b2aa;
+  --input-border: #E8E4E0;         /* Beige */
+  --input-border-hover: #B8A99A;   /* Taupe */
+  --input-border-focus: #B8A99A;   /* Taupe */
+  --input-bg: #FFFFFF;
+  --input-text: #333333;           /* Charcoal */
+  --input-placeholder: #8C8C8C;    /* Text Sub */
 }
 
 /* Discord 風格深色主題 */
@@ -252,14 +267,14 @@ body {
     color 0.3s ease;
 }
 
-/* 金色質感提升 - 左邊框加入細微漸層陰影 */
+/* Taupe 質感提升 - 左邊框加入細微漸層陰影 */
 .hover\:border-l-3:hover {
-  box-shadow: -2px 0 4px rgba(201, 170, 124, 0.15);
+  box-shadow: -2px 0 4px rgba(184, 169, 154, 0.15);
 }
 
 /* Active 狀態的左邊框也加陰影 */
 .border-l-3 {
-  box-shadow: -2px 0 4px rgba(201, 170, 124, 0.15);
+  box-shadow: -2px 0 4px rgba(184, 169, 154, 0.15);
 }
 
 /* 全站滾動條規範 - 完全隱藏，只在需要滾動且正在滾動時顯示 */
@@ -335,10 +350,10 @@ body {
 
 /* 功能色 - 背景 */
 .bg-morandi-gold {
-  background: linear-gradient(to bottom right, #d4c5a9, #c9b896, #bfad87);
+  background: linear-gradient(to bottom right, #C6B9AC, #B8A99A, #9E8C7A);
 }
 .bg-morandi-gold-hover:hover {
-  background: linear-gradient(to bottom right, #c9b896, #bfad87, #b5a378);
+  background: linear-gradient(to bottom right, #B8A99A, #9E8C7A, #8A7B6A);
 }
 .bg-morandi-red {
   background-color: var(--morandi-red);
@@ -464,44 +479,44 @@ body {
 
 /* 佈局與裝飾分離的組合式樣式 */
 .btn-gradient-primary {
-  background: linear-gradient(to right, #b5986a, #d4c4a8);
+  background: linear-gradient(to right, #9E8C7A, #B8A99A);
   color: white;
   border: none;
-  box-shadow: 0 2px 8px rgba(181, 152, 106, 0.15);
+  box-shadow: 0 2px 8px rgba(184, 169, 154, 0.15);
   transition: all 0.2s ease;
 }
 .btn-gradient-primary:hover {
-  background: linear-gradient(to right, #a08968, #c4b89a);
-  box-shadow: 0 4px 12px rgba(181, 152, 106, 0.25);
+  background: linear-gradient(to right, #8A7B6A, #9E8C7A);
+  box-shadow: 0 4px 12px rgba(184, 169, 154, 0.25);
   transform: scale(1.02);
 }
 .btn-gradient-primary:active {
   transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(181, 152, 106, 0.2);
+  box-shadow: 0 1px 4px rgba(184, 169, 154, 0.2);
 }
 
-/* 主要按鈕 - 柔和漸層（參考記帳頁面） */
+/* 主要按鈕 - Taupe 漸層 */
 .btn-morandi-primary {
-  background: linear-gradient(to right, #b5986a, #d4c4a8);
+  background: linear-gradient(to right, #9E8C7A, #B8A99A);
   color: white;
   font-weight: 500;
   padding: 0.5rem 1.25rem;
   border-radius: 0.75rem;
   border: none;
-  box-shadow: 0 2px 8px rgba(181, 152, 106, 0.15);
+  box-shadow: 0 2px 8px rgba(184, 169, 154, 0.15);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .btn-morandi-primary:hover {
-  background: linear-gradient(to right, #a08968, #c4b89a);
-  box-shadow: 0 4px 12px rgba(181, 152, 106, 0.25);
+  background: linear-gradient(to right, #8A7B6A, #9E8C7A);
+  box-shadow: 0 4px 12px rgba(184, 169, 154, 0.25);
   transform: scale(1.02);
 }
 
 .btn-morandi-primary:active {
   transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(181, 152, 106, 0.2);
+  box-shadow: 0 1px 4px rgba(184, 169, 154, 0.2);
 }
 
 /* 次要按鈕 - 淡雅半透明（參考記帳頁面） */

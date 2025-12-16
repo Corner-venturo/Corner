@@ -66,7 +66,7 @@ export function QuickActionsSection({ activeTab, onTabChange }: QuickActionsSect
   )
 }
 
-export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionContentProps) {
+export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: QuickActionContentProps) {
   const { items: employees, fetchAll } = useUserStore()
   const { user: currentUser } = useAuthStore()
   const [shareData, setShareData] = React.useState({
@@ -104,6 +104,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
       // 重置表單
       setShareData({ targetUserId: '', permission: 'view', message: '' })
       await alert('待辦事項已成功共享！', 'success')
+      onClose?.()
     } catch (error) {
       void alert('共享失敗，請稍後再試', 'error')
     } finally {
@@ -175,28 +176,28 @@ export function QuickActionContent({ activeTab, todo, onUpdate }: QuickActionCon
       }
       return (
         <Suspense fallback={LoadingFallback}>
-          <QuickReceipt />
+          <QuickReceipt onSubmit={onClose} />
         </Suspense>
       )
 
     case 'invoice':
       return (
         <Suspense fallback={LoadingFallback}>
-          <QuickDisbursement />
+          <QuickDisbursement onSubmit={onClose} />
         </Suspense>
       )
 
     case 'group':
       return (
         <Suspense fallback={LoadingFallback}>
-          <QuickGroup />
+          <QuickGroup onSubmit={onClose} />
         </Suspense>
       )
 
     case 'pnr':
       return (
         <Suspense fallback={LoadingFallback}>
-          <QuickPNR todo={todo} onUpdate={onUpdate} />
+          <QuickPNR todo={todo} onUpdate={onUpdate} onClose={onClose} />
         </Suspense>
       )
 

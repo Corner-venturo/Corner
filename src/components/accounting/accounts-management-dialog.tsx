@@ -62,23 +62,23 @@ export function AccountsManagementDialog({
       maxWidth="lg"
     >
       {/* 總資產卡片 */}
-      <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#F9F5ED] to-[#F5EDDC]">
-        <div className="text-sm text-[#9E8F81] mb-1">總資產</div>
-        <div className="text-3xl font-bold text-[#3D2914]">NT$ {totalBalance.toLocaleString()}</div>
-        <div className="text-xs text-[#AFA598] mt-2">{accounts.length} 個帳戶</div>
+      <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6]">
+        <div className="text-sm text-[#8C8C8C] mb-1">總資產</div>
+        <div className="text-3xl font-bold text-[#333333]">NT$ {totalBalance.toLocaleString()}</div>
+        <div className="text-xs text-[#8C8C8C] mt-2">{accounts.length} 個帳戶</div>
       </div>
 
       {/* 帳戶列表 */}
       {accounts.length === 0 ? (
         <div className="text-center py-12">
-          <Wallet size={48} className="mx-auto mb-3 text-[#AFA598]" />
-          <div className="text-[#9E8F81] mb-4">還沒有帳戶</div>
+          <Wallet size={48} className="mx-auto mb-3 text-[#8C8C8C]" />
+          <div className="text-[#8C8C8C] mb-4">還沒有帳戶</div>
           <Button
             onClick={() => {
               onClose()
               onAddAccount()
             }}
-            className="bg-[#C9A961] hover:bg-[#B8985A] text-white"
+            className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             新增第一個帳戶
@@ -93,13 +93,13 @@ export function AccountsManagementDialog({
             return (
               <div
                 key={account.id}
-                className="p-4 rounded-xl bg-white/60 border border-[#E0D8CC] hover:border-[#C9A961] transition-all"
+                className="p-4 rounded-xl bg-white/60 border border-[#E8E4E0] hover:border-[#B8A99A] transition-all"
               >
                 <div className="flex items-start gap-3">
                   {/* 圖標 */}
                   <div
                     className="w-12 h-12 rounded-lg flex items-center justify-center text-white flex-shrink-0"
-                    style={{ backgroundColor: account.color || '#C9A961' }}
+                    style={{ backgroundColor: account.color || '#B8A99A' }}
                   >
                     <Icon size={24} />
                   </div>
@@ -108,8 +108,8 @@ export function AccountsManagementDialog({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-[#3D2914] truncate">{account.name}</div>
-                        <div className="text-xs text-[#9E8F81] mt-0.5">
+                        <div className="font-semibold text-[#333333] truncate">{account.name}</div>
+                        <div className="text-xs text-[#8C8C8C] mt-0.5">
                           {account.type === 'cash' && '現金'}
                           {account.type === 'bank' && '銀行帳戶'}
                           {account.type === 'credit' && '信用卡'}
@@ -117,7 +117,7 @@ export function AccountsManagementDialog({
                           {account.type === 'other' && '其他帳戶'}
                         </div>
                         {account.description && (
-                          <div className="text-xs text-[#AFA598] mt-1">{account.description}</div>
+                          <div className="text-xs text-[#8C8C8C] mt-1">{account.description}</div>
                         )}
                       </div>
 
@@ -126,13 +126,13 @@ export function AccountsManagementDialog({
                         <div
                           className={cn(
                             'font-bold text-lg',
-                            isNegative ? 'text-[#C89B9B]' : 'text-[#3D2914]'
+                            isNegative ? 'text-[#C89B9B]' : 'text-[#333333]'
                           )}
                         >
                           {isNegative ? '-' : ''}NT$ {Math.abs(account.balance).toLocaleString()}
                         </div>
                         {account.type === 'credit' && account.credit_limit && (
-                          <div className="text-xs text-[#9E8F81] mt-1">
+                          <div className="text-xs text-[#8C8C8C] mt-1">
                             額度 NT$ {account.credit_limit.toLocaleString()}
                           </div>
                         )}
@@ -142,13 +142,13 @@ export function AccountsManagementDialog({
                     {/* 信用卡可用額度 */}
                     {account.type === 'credit' && account.available_credit !== undefined && (
                       <div className="mt-3">
-                        <div className="flex items-center justify-between text-xs text-[#9E8F81] mb-1">
+                        <div className="flex items-center justify-between text-xs text-[#8C8C8C] mb-1">
                           <span>可用額度</span>
                           <span>NT$ {account.available_credit.toLocaleString()}</span>
                         </div>
-                        <div className="h-1.5 bg-[#F5F0EB] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[#F9F8F6] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#C9A961] rounded-full transition-all"
+                            className="h-full bg-[#B8A99A] rounded-full transition-all"
                             style={{
                               width: `${account.credit_limit ? (account.available_credit / account.credit_limit) * 100 : 0}%`,
                             }}
@@ -178,14 +178,14 @@ export function AccountsManagementDialog({
 
       {/* 新增帳戶按鈕 */}
       {accounts.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-[#E0D8CC]">
+        <div className="mt-4 pt-4 border-t border-[#E8E4E0]">
           <Button
             onClick={() => {
               onClose()
               onAddAccount()
             }}
             variant="outline"
-            className="w-full border-[#E0D8CC] hover:border-[#C9A961] hover:bg-[#FAF8F5]"
+            className="w-full border-[#E8E4E0] hover:border-[#B8A99A] hover:bg-[#F9F8F6]"
           >
             <Plus className="h-4 w-4 mr-2" />
             新增帳戶

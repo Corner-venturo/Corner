@@ -15,7 +15,6 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Upload, FileSpreadsheet } from 'lucide-react'
-import * as XLSX from 'xlsx'
 import type { CreateReceiptData } from '@/types/receipt.types'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -45,10 +44,13 @@ export function BatchCreateReceiptDialog({
     setIsProcessing(true)
 
     try {
+      // 動態載入 xlsx（避免污染首屏 bundle）
+      const XLSX = await import('xlsx')
+
       const data = await selectedFile.arrayBuffer()
       const workbook = XLSX.read(data)
       const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-       
+
       const jsonData: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet)
 
       const parsedReceipts: CreateReceiptData[] = jsonData.map(row => ({
@@ -105,7 +107,10 @@ export function BatchCreateReceiptDialog({
     }
   }
 
-  const downloadTemplate = () => {
+  const downloadTemplate = async () => {
+    // 動態載入 xlsx（避免污染首屏 bundle）
+    const XLSX = await import('xlsx')
+
     const template = [
       {
         '訂單ID': '範例ID',

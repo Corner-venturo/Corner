@@ -15,7 +15,7 @@ export type { DayDisplayStyle } from '../types'
 const styleOptions: { value: DayDisplayStyle; icon: React.ReactNode; label: string; color: string }[] = [
   { value: 'single-image', icon: <Image size={16} />, label: '單張大圖', color: '#c76d54' },
   { value: 'multi-image', icon: <Images size={16} />, label: '多圖輪播', color: '#8da399' },
-  { value: 'card-grid', icon: <LayoutGrid size={16} />, label: '卡片網格', color: '#D4AF37' },
+  { value: 'card-grid', icon: <LayoutGrid size={16} />, label: '卡片網格', color: '#B8A99A' },
   { value: 'timeline', icon: <GitBranch size={16} />, label: '時間軸', color: '#4a6fa5' },
 ]
 
@@ -555,7 +555,7 @@ function CardGridTemplate({
       {/* 標題 */}
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl bg-[#D4AF37] flex flex-col items-center justify-center text-white">
+          <div className="w-16 h-16 rounded-xl bg-[#B8A99A] flex flex-col items-center justify-center text-white">
             <span className="text-2xl font-bold">{dayIndex + 1}</span>
             <span className="text-[10px] opacity-80">{dateDisplay}</span>
           </div>
@@ -622,7 +622,7 @@ function CardGridTemplate({
           <button
             type="button"
             onClick={addActivity}
-            className="h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors"
+            className="h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
           >
             <Plus size={28} />
             <span className="text-sm mt-1">新增景點</span>
@@ -631,9 +631,9 @@ function CardGridTemplate({
       </div>
 
       {/* 底部：餐食 + 住宿 */}
-      <div className="px-6 py-4 bg-[#D4AF37]/5 border-t border-[#D4AF37]/20 flex gap-6">
+      <div className="px-6 py-4 bg-[#B8A99A]/5 border-t border-[#B8A99A]/20 flex gap-6">
         <div className="flex-1">
-          <div className="text-xs text-[#D4AF37] font-medium mb-1">餐食安排</div>
+          <div className="text-xs text-[#B8A99A] font-medium mb-1">餐食安排</div>
           <div className="flex gap-4 text-sm">
             <span>
               早：<EditableText
@@ -671,7 +671,7 @@ function CardGridTemplate({
           </div>
         </div>
         <div>
-          <div className="text-xs text-[#D4AF37] font-medium mb-1">住宿</div>
+          <div className="text-xs text-[#B8A99A] font-medium mb-1">住宿</div>
           <EditableText
             value={editingDay.accommodation || ''}
             fieldKey="accommodation"

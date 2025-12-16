@@ -29,9 +29,10 @@ import type { Todo } from '@/stores/types'
 interface QuickPNRProps {
   todo?: Todo
   onUpdate?: (updates: Partial<Todo>) => void
+  onClose?: () => void
 }
 
-export function QuickPNR({ todo, onUpdate }: QuickPNRProps) {
+export function QuickPNR({ todo, onUpdate, onClose }: QuickPNRProps) {
   const [rawPNR, setRawPNR] = useState('')
   const [isParsing, setIsParsing] = useState(false)
   const [parsedData, setParsedData] = useState<ReturnType<typeof parseAmadeusPNR> | null>(null)

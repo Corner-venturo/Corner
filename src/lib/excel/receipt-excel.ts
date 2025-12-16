@@ -2,12 +2,14 @@
  * 收款單 Excel 匯出
  */
 
-import * as XLSX from 'xlsx'
 import type { Receipt } from '@/types/receipt.types'
 import { formatDate } from '@/lib/utils'
 import { RECEIPT_TYPE_LABELS, RECEIPT_STATUS_LABELS, ReceiptType, ReceiptStatus } from '@/types/receipt.types'
 
-export function exportReceiptsToExcel(receipts: Receipt[], filename?: string): void {
+export async function exportReceiptsToExcel(receipts: Receipt[], filename?: string): Promise<void> {
+  // 動態載入 xlsx（避免污染首屏 bundle）
+  const XLSX = await import('xlsx')
+
   const data = receipts.map(r => ({
     '收款單號': r.receipt_number,
     '訂單編號': r.order_number || '-',

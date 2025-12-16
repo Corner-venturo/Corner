@@ -1,18 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { useEnterSubmitWithShift } from '@/hooks/useEnterSubmit'
-import { MessageSquare, Edit2, X } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { NotesSectionProps } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { generateUUID } from '@/lib/utils/uuid'
 
 export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const [newNote, setNewNote] = useState('')
-  const [editingNoteIndex, setEditingNoteIndex] = useState<number | null>(null)
-  const [editingNoteContent, setEditingNoteContent] = useState('')
   const { user } = useAuthStore()
 
   // 進入備註區時，自動標記所有未讀留言為已讀
@@ -24,7 +20,6 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
     )
 
     if (unreadNotes.length > 0) {
-      // 更新所有未讀留言的 read_by
       const updatedNotes = todo.notes.map(note => {
         if (note.author_id !== user.id && !note.read_by?.includes(user.id)) {
           return {
@@ -36,7 +31,7 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
       })
       onUpdate({ notes: updatedNotes })
     }
-  }, [todo.id]) // 只在打開待辦時執行一次
+  }, [todo.id])
 
   const addNote = () => {
     if (!newNote.trim() || !user) return
@@ -52,10 +47,9 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         user.english_name ||
         user.personal_info?.email ||
         '未知使用者',
-      read_by: [user.id], // 發送者自己已讀
+      read_by: [user.id],
     }
 
-    // 如果目前狀態是「待辦」，自動切換到「進行中」
     const updates: Partial<typeof todo> = {
       notes: [...(todo.notes || []), note],
     }
@@ -71,113 +65,101 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
   const { handleKeyDown: handleNoteKeyDown, compositionProps: noteCompositionProps } =
     useEnterSubmitWithShift(addNote)
 
-  return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-0">
-      <h4 className="text-sm font-semibold text-morandi-primary mb-3 flex items-center gap-1.5">
-        <MessageSquare size={14} className="text-morandi-gold" />
-        備註
-      </h4>
-      <div className="space-y-2 mb-3 flex-1 overflow-y-auto">
-        {todo.notes.map((note, index) => (
-          <div
-            key={index}
-            className="bg-gradient-to-br from-morandi-container/20 to-morandi-container/10 border border-morandi-container/30 rounded-lg p-3 hover:shadow-sm transition-shadow group relative"
-          >
-            {editingNoteIndex === index ? (
-              // 編輯模式
-              <div>
-                <span className="text-xs text-morandi-muted font-medium">
-                  {new Date(note.timestamp).toLocaleString()}
-                </span>
-                <Textarea
-                  value={editingNoteContent}
-                  onChange={e => setEditingNoteContent(e.target.value)}
-                  className="text-xs mt-2 resize-none border-morandi-gold/20 focus-visible:ring-morandi-gold"
-                  rows={3}
-                  autoFocus
-                />
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      const newNotes = [...todo.notes]
-                      newNotes[index] = { ...note, content: editingNoteContent }
-                      onUpdate({ notes: newNotes })
-                      setEditingNoteIndex(null)
-                    }}
-                    className="bg-morandi-gold hover:bg-morandi-gold/90 h-7 text-xs"
-                  >
-                    儲存
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setEditingNoteIndex(null)}
-                    className="h-7 text-xs"
-                  >
-                    取消
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              // 顯示模式
-              <>
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  <button
-                    onClick={() => {
-                      setEditingNoteIndex(index)
-                      setEditingNoteContent(note.content)
-                    }}
-                    className="p-1 hover:bg-morandi-gold/10 rounded text-morandi-secondary hover:text-morandi-gold"
-                    title="編輯備註"
-                  >
-                    <Edit2 size={12} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      const newNotes = todo.notes.filter((_, i) => i !== index)
-                      onUpdate({ notes: newNotes })
-                    }}
-                    className="p-1 hover:bg-morandi-red/10 rounded text-morandi-red"
-                    title="刪除備註"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-medium text-morandi-primary">
-                    {note.author_name || '未知使用者'}
-                  </span>
-                  <span className="text-xs text-morandi-muted">
-                    {new Date(note.timestamp).toLocaleString()}
-                  </span>
-                </div>
-                <div className="text-xs text-morandi-primary leading-relaxed whitespace-pre-wrap mt-1">
-                  {note.content}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+  // 格式化時間
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp)
+    const now = new Date()
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
 
-      <div className="flex gap-2 items-center">
-        <Textarea
-          placeholder="新增備註... (Enter 送出)"
-          value={newNote}
-          onChange={e => setNewNote(e.target.value)}
-          onKeyDown={handleNoteKeyDown}
-          {...noteCompositionProps}
-          className="text-sm resize-none border-morandi-container/40 focus-visible:ring-morandi-gold focus-visible:border-morandi-gold shadow-sm !min-h-0 h-9 py-2"
-          rows={1}
-        />
-        <Button
-          size="sm"
-          onClick={addNote}
-          className="bg-morandi-gold hover:bg-morandi-gold/90 shadow-sm h-9"
-        >
-          新增
-        </Button>
+    if (diffDays === 0) {
+      return `今天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+    } else if (diffDays === 1) {
+      return `昨天 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`
+    } else {
+      return date.toLocaleString('zh-TW', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+  }
+
+  // 獲取作者縮寫
+  const getInitials = (name: string) => {
+    if (!name) return '?'
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.substring(0, 2).toUpperCase()
+  }
+
+  const isCurrentUser = (authorId: string) => authorId === user?.id
+
+  return (
+    <div>
+      <h3 className="text-lg font-serif font-bold text-[#333333] mb-6">討論</h3>
+
+      <div className="space-y-6">
+        {(todo.notes || []).map((note, index) => {
+          const isMine = isCurrentUser(note.author_id)
+
+          return (
+            <div key={index} className="flex gap-4">
+              {/* Avatar */}
+              {isMine ? (
+                <div className="w-8 h-8 rounded-full bg-[#B8A99A] text-white flex items-center justify-center text-xs font-bold mt-1 shadow-sm">
+                  ME
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-[#C9D4C5] text-[#333333] flex items-center justify-center text-xs font-bold mt-1 shadow-sm">
+                  {getInitials(note.author_name || '')}
+                </div>
+              )}
+
+              {/* Message bubble */}
+              <div className={`flex-1 rounded-r-xl rounded-bl-xl p-4 ${isMine ? 'bg-[#B8A99A]/10' : 'bg-[#F9F8F6]'}`}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-bold text-[#333333]">
+                    {isMine ? '你' : note.author_name}
+                  </span>
+                  <span className="text-[10px] text-[#8C8C8C] uppercase tracking-wide">
+                    {formatTime(note.timestamp)}
+                  </span>
+                </div>
+                <p className="text-sm text-[#333333] leading-relaxed whitespace-pre-wrap">
+                  {note.content}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* 新增留言輸入框 */}
+        <div className="flex gap-4 mt-4">
+          <div className="w-8 h-8 rounded-full bg-[#B8A99A] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+            ME
+          </div>
+          <div className="flex-1 relative">
+            <textarea
+              placeholder="撰寫留言..."
+              value={newNote}
+              onChange={e => setNewNote(e.target.value)}
+              onKeyDown={handleNoteKeyDown}
+              {...noteCompositionProps}
+              rows={2}
+              className="w-full bg-white border border-[#E8E4E0] rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] outline-none resize-none shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] pr-12"
+            />
+            <button
+              onClick={addNote}
+              disabled={!newNote.trim()}
+              className="absolute bottom-3 right-3 text-[#B8A99A] hover:text-[#9E8C7A] transition-colors p-1 disabled:opacity-50"
+            >
+              <Send size={20} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

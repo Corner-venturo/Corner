@@ -10,8 +10,8 @@ import React from 'react'
 // Corner 品牌色系
 const CORNER_COLORS = {
   orange: '#F89A1E', // Corner 橘色
-  gold: '#D4AF37',   // 金色（次要）
-  brown: '#6B5B4F',  // 深棕色
+  gold: '#B8A99A',   // 金色（次要）
+  brown: '#333333',  // 深棕色
   lightBrown: '#FAF7F2', // 淺棕背景
   gray: '#4B5563',
   lightGray: '#9CA3AF',

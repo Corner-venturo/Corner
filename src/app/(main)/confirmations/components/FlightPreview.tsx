@@ -40,7 +40,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       {data.segments && data.segments.length > 0 && (
         <div>
           <div className="border-t border-b py-2" style={{ borderColor: '#d4af37', borderStyle: 'dashed' }}>
-            <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: '#6B5B4F' }}>
+            <div className="grid grid-cols-12 gap-2 font-medium" style={{ color: '#333333' }}>
               <div className="col-span-2 text-center">日 期</div>
               <div className="col-span-6">時 間  航 班</div>
               <div className="col-span-4">其 他 訊 息</div>

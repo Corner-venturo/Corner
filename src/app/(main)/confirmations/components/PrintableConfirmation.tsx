@@ -120,7 +120,9 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             }
 
             /* 使用 table 的 thead/tfoot 來實作固定頁首頁尾 */
+            /* 顯示列印版本的 table（覆蓋 hidden class） */
             table.print-wrapper {
+              display: table !important;
               width: 100%;
               border-collapse: collapse;
             }
@@ -182,7 +184,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                 <td>
                   <div
                     className="relative pb-4 mb-6"
-                    style={{ borderBottom: '1px solid #D4AF37' }}
+                    style={{ borderBottom: '1px solid #B8A99A' }}
                   >
                     {/* Logo - 左上角 */}
                     {logoUrl ? (
@@ -211,11 +213,11 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                     <div className="relative z-10 text-center py-2">
                       <div
                         className="text-sm tracking-widest mb-1"
-                        style={{ color: '#D4AF37', fontWeight: 500 }}
+                        style={{ color: '#B8A99A', fontWeight: 500 }}
                       >
                         CONFIRMATION
                       </div>
-                      <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                      <h1 className="text-xl font-bold" style={{ color: '#333333' }}>
                         {title}
                       </h1>
                     </div>
@@ -279,7 +281,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
 
           {/* 非列印模式的內容 */}
           <div className="print:hidden">
-            <div className="relative pb-4 mb-6" style={{ borderBottom: '1px solid #D4AF37' }}>
+            <div className="relative pb-4 mb-6" style={{ borderBottom: '1px solid #B8A99A' }}>
               {/* Logo - 左上角 */}
               {logoUrl ? (
                 <div
@@ -307,11 +309,11 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
               <div className="relative z-10 text-center py-2">
                 <div
                   className="text-sm tracking-widest mb-1"
-                  style={{ color: '#D4AF37', fontWeight: 500 }}
+                  style={{ color: '#B8A99A', fontWeight: 500 }}
                 >
                   CONFIRMATION
                 </div>
-                <h1 className="text-xl font-bold" style={{ color: '#6B5B4F' }}>
+                <h1 className="text-xl font-bold" style={{ color: '#333333' }}>
                   {title}
                 </h1>
               </div>
@@ -388,17 +390,17 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
         }}>
           <thead>
             <tr style={{
-              borderTop: '2px dashed #D4AF37',
-              borderBottom: '2px dashed #D4AF37',
+              borderTop: '2px dashed #B8A99A',
+              borderBottom: '2px dashed #B8A99A',
               backgroundColor: '#FFFBF0'
             }}>
-              <th className="py-3 text-center font-semibold" style={{ width: '120px', color: '#6B5B4F' }}>
+              <th className="py-3 text-center font-semibold" style={{ width: '120px', color: '#333333' }}>
                 日 期
               </th>
-              <th className="py-3 text-left font-semibold" style={{ color: '#6B5B4F' }}>
+              <th className="py-3 text-left font-semibold" style={{ color: '#333333' }}>
                 時 間  航 班
               </th>
-              <th className="py-3 text-left font-semibold" colSpan={2} style={{ color: '#6B5B4F' }}>
+              <th className="py-3 text-left font-semibold" colSpan={2} style={{ color: '#333333' }}>
                 其 他 訊 息
               </th>
             </tr>
@@ -437,7 +439,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
                 </tr>
                 {/* 抵達行 */}
                 <tr style={{
-                  borderBottom: idx === (data.segments?.length || 0) - 1 ? 'none' : '1px dashed #D4AF37'
+                  borderBottom: idx === (data.segments?.length || 0) - 1 ? 'none' : '1px dashed #B8A99A'
                 }}>
                   <td className="py-1.5 pb-3"></td>
                   <td className="py-1.5 pb-3" style={{ color: '#374151' }}>

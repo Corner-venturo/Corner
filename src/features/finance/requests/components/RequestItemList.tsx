@@ -9,10 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus } from 'lucide-react'
 import { RequestItem, categoryOptions } from '../types'
-import { SupplierSearchSelect } from './SupplierSearchSelect'
-import { useState } from 'react'
 
 interface SupplierOption {
   id: string
@@ -38,23 +37,11 @@ export function EditableRequestItemList({
 }: EditableRequestItemListProps) {
   const total_amount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
 
-  // Manage local state for search inputs within each row
-  const [localSearch, setLocalSearch] = useState<Record<string, { search: string; show: boolean }>>(
-    {}
-  )
-
-  const handleLocalSearchChange = (id: string, search: string) => {
-    setLocalSearch(prev => ({ ...prev, [id]: { ...prev[id], search } }))
-  }
-
-  const handleShowDropdownChange = (id: string, show: boolean) => {
-    setLocalSearch(prev => ({ ...prev, [id]: { ...prev[id], show } }))
-  }
-
-  const getFilteredSuppliers = (searchValue: string) => {
-    if (!searchValue) return suppliers
-    return suppliers.filter(s => (s.name || '').toLowerCase().includes(searchValue.toLowerCase()))
-  }
+  // 將供應商轉換成 Combobox 的選項格式
+  const supplierOptions = suppliers.map(s => ({
+    value: s.id,
+    label: s.name || '未命名',
+  }))
 
   return (
     <div className="border border-border rounded-md p-4">
@@ -98,22 +85,17 @@ export function EditableRequestItemList({
 
             {/* Supplier */}
             <div className="col-span-3">
-              <SupplierSearchSelect
-                value={localSearch[item.id]?.search ?? item.supplierName}
-                onChange={value => handleLocalSearchChange(item.id, value)}
-                onSelect={supplier => {
+              <Combobox
+                options={supplierOptions}
+                value={item.supplier_id}
+                onChange={value => {
+                  const supplier = suppliers.find(s => s.id === value)
                   updateItem(item.id, {
-                    supplier_id: supplier.id,
-                    supplierName: supplier.name,
+                    supplier_id: value,
+                    supplierName: supplier?.name || '',
                   })
-                  handleLocalSearchChange(item.id, supplier.name || '')
-                  handleShowDropdownChange(item.id, false)
                 }}
-                suppliers={getFilteredSuppliers(localSearch[item.id]?.search ?? '')}
-                showDropdown={localSearch[item.id]?.show ?? false}
-                onShowDropdown={show => handleShowDropdownChange(item.id, show)}
-                placeholder="搜尋供應商..."
-                label=""
+                placeholder="選擇供應商..."
               />
             </div>
 

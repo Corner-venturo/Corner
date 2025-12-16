@@ -195,7 +195,7 @@ export default function ModulesManagementPage() {
       <div className="pt-[72px] p-6">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* 工作空間資訊 */}
-          <Card className="bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB] border-[#E0D8CC]">
+          <Card className="bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6] border-[#E8E4E0]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
@@ -203,10 +203,10 @@ export default function ModulesManagementPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-semibold text-[#3D2914]">
+              <div className="text-lg font-semibold text-[#333333]">
                 {currentWorkspace?.name || '未知工作空間'}
               </div>
-              <div className="text-sm text-[#9E8F81] mt-1">
+              <div className="text-sm text-[#8C8C8C] mt-1">
                 工作空間 ID: {user?.workspace_id}
               </div>
             </CardContent>
@@ -250,7 +250,7 @@ export default function ModulesManagementPage() {
                   <CardContent className="pt-4 space-y-4">
                     {/* 狀態 */}
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-[#6B5D52]">狀態</span>
+                      <span className="text-sm font-medium text-[#8C8C8C]">狀態</span>
                       {status.enabled && !status.expired ? (
                         <Badge className="bg-green-100 text-green-700 border-green-300">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -272,13 +272,13 @@ export default function ModulesManagementPage() {
                     {/* 到期日 */}
                     {status.enabled && status.expiresAt && (
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-[#9E8F81]">到期日</span>
+                        <span className="text-[#8C8C8C]">到期日</span>
                         <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-[#9E8F81]" />
+                          <Calendar className="h-3 w-3 text-[#8C8C8C]" />
                           <span
                             className={cn(
                               'font-medium',
-                              status.expired ? 'text-red-600' : 'text-[#3D2914]'
+                              status.expired ? 'text-red-600' : 'text-[#333333]'
                             )}
                           >
                             {new Date(status.expiresAt).toLocaleDateString('zh-TW')}
@@ -289,10 +289,10 @@ export default function ModulesManagementPage() {
 
                     {/* 功能列表 */}
                     <div className="space-y-2">
-                      <div className="text-sm font-medium text-[#6B5D52]">功能特性</div>
+                      <div className="text-sm font-medium text-[#8C8C8C]">功能特性</div>
                       <ul className="space-y-1.5">
                         {info.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-[#9E8F81]">
+                          <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">
                             <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                             <span>{feature}</span>
                           </li>
@@ -314,7 +314,7 @@ export default function ModulesManagementPage() {
                       ) : (
                         <Button
                           onClick={() => handleEnableModule(moduleName)}
-                          className="w-full bg-[#C9A961] hover:bg-[#B8985A] text-white"
+                          className="w-full bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
                           disabled={loading}
                         >
                           {status.enabled && status.expired ? '重新啟用' : '啟用模組'}
@@ -369,15 +369,15 @@ export default function ModulesManagementPage() {
                 onChange={e => setExpiresDate(e.target.value)}
                 min={new Date().toISOString().split('T')[0]}
               />
-              <p className="text-sm text-[#9E8F81]">留空表示永久授權</p>
+              <p className="text-sm text-[#8C8C8C]">留空表示永久授權</p>
             </div>
 
             {selectedModule && (
-              <div className="bg-[#FAF8F5] border border-[#E0D8CC] rounded-lg p-4">
-                <div className="text-sm font-medium text-[#6B5D52] mb-2">包含功能</div>
+              <div className="bg-[#F9F8F6] border border-[#E8E4E0] rounded-lg p-4">
+                <div className="text-sm font-medium text-[#8C8C8C] mb-2">包含功能</div>
                 <ul className="space-y-1.5">
                   {MODULE_INFO[selectedModule].features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm text-[#9E8F81]">
+                    <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">
                       <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
@@ -393,7 +393,7 @@ export default function ModulesManagementPage() {
             </Button>
             <Button
               onClick={handleConfirmEnable}
-              className="bg-[#C9A961] hover:bg-[#B8985A] text-white"
+              className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
               disabled={loading}
             >
               {loading ? '處理中...' : '確認啟用'}

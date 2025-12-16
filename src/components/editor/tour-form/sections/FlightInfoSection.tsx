@@ -315,7 +315,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
 
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-bold text-morandi-primary border-b-2 border-[#C9A961] pb-1.5">
+      <h2 className="text-base font-bold text-morandi-primary border-b-2 border-[#B8A99A] pb-1.5">
         航班資訊
       </h2>
 
@@ -325,13 +325,13 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         onClick={() => setShowFlightSettings(true)}
         className="w-full group"
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-[#C9A961]/40 bg-gradient-to-r from-[#F9F5ED] to-[#F5F0EB] hover:border-[#C9A961] hover:shadow-md transition-all">
+        <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-[#B8A99A]/40 bg-gradient-to-r from-[#F9F8F6] to-[#F9F8F6] hover:border-[#B8A99A] hover:shadow-md transition-all">
           {/* 航班圖示 */}
           <div
             className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: '#C9A96120' }}
+            style={{ backgroundColor: '#B8A99A20' }}
           >
-            <Plane className="w-7 h-7" style={{ color: '#C9A961' }} />
+            <Plane className="w-7 h-7" style={{ color: '#B8A99A' }} />
           </div>
 
           {/* 航班資訊 */}
@@ -348,7 +348,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
               {getFlightSummary()}
             </div>
             {tripDays > 0 && (
-              <div className="mt-1 text-xs font-medium" style={{ color: '#C9A961' }}>
+              <div className="mt-1 text-xs font-medium" style={{ color: '#B8A99A' }}>
                 行程 {tripDays} 天
               </div>
             )}
@@ -419,7 +419,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plane className="w-5 h-5" style={{ color: '#C9A961' }} />
+              <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
               航班設定
             </DialogTitle>
           </DialogHeader>
@@ -484,9 +484,9 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             )}
 
             {/* 去程航班 */}
-            <div className="bg-[#F9F5ED] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+            <div className="bg-[#F9F8F6] p-4 rounded-lg space-y-3 border border-[#E8E4E0]">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-sm text-[#3D2914]">去程航班</h3>
+                <h3 className="font-bold text-sm text-[#333333]">去程航班</h3>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
@@ -622,9 +622,9 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
             </div>
 
             {/* 回程航班 */}
-            <div className="bg-[#F5F0EB] p-4 rounded-lg space-y-3 border border-[#E0D8CC]">
+            <div className="bg-[#F9F8F6] p-4 rounded-lg space-y-3 border border-[#E8E4E0]">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-sm text-[#3D2914]">回程航班</h3>
+                <h3 className="font-bold text-sm text-[#333333]">回程航班</h3>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input

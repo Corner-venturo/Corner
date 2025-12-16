@@ -34,6 +34,7 @@ export function CalendarGrid({
         dateClick={onDateClick}
         eventClick={onEventClick}
         locale="zh-tw"
+        dayCellContent={(arg) => arg.dayNumberText.replace('日', '')}
         height="100%"
         dayMaxEvents={3}
         moreLinkClick={onMoreLinkClick}

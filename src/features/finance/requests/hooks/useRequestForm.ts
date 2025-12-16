@@ -185,5 +185,7 @@ export function useRequestForm() {
     removeItem,
     resetForm,
     suppliers: combinedSuppliers,
+    tours,
+    orders,
   }
 }

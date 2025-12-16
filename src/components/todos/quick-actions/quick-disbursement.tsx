@@ -21,6 +21,7 @@ import { useRequestOperations } from '@/features/finance/requests/hooks/useReque
 import { categoryOptions } from '@/features/finance/requests/types'
 import { BatchTourSelect } from '@/features/finance/requests/components/BatchTourSelect'
 import { EditableRequestItemList } from '@/features/finance/requests/components/RequestItemList'
+import { RequestDateInput } from '@/features/finance/requests/components/RequestDateInput'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -59,22 +60,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
     orders,
   } = useRequestForm()
 
-  // ✅ 載入團體和訂單資料（進入請款頁面時）
-  React.useEffect(() => {
-    const loadData = async () => {
-      const { useTourStore, useOrderStore } = await import('@/stores')
-      const tourStore = useTourStore.getState()
-      const orderStore = useOrderStore.getState()
-
-      if (tourStore.items.length === 0) {
-        await tourStore.fetchAll()
-      }
-      if (orderStore.items.length === 0) {
-        await orderStore.fetchAll()
-      }
-    }
-    loadData()
-  }, [])
+  // 資料載入由 useRequestForm 內部處理
 
   // Batch request hook
   const {
@@ -94,30 +80,8 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
   const { createRequest, createBatchRequests } = useRequestOperations()
 
-  // Generate upcoming Thursdays for request date (20 weeks = ~5 months)
-  const upcomingThursdays = useMemo(() => {
-    const thursdays = []
-    const today = new Date()
-    const currentDay = today.getDay()
-
-    // 如果今天是週四，從今天開始；否則從下一個週四開始
-    let daysUntilThursday = (4 - currentDay + 7) % 7
-
-    for (let i = 0; i < 20; i++) {
-      const thursdayDate = new Date(today)
-      thursdayDate.setDate(today.getDate() + daysUntilThursday + i * 7)
-
-      thursdays.push({
-        value: thursdayDate.toISOString().split('T')[0],
-        label: `${thursdayDate.toLocaleDateString('zh-TW')} (${thursdayDate.toLocaleDateString('zh-TW', { weekday: 'short' })})`,
-      })
-    }
-
-    return thursdays
-  }, [])
-
-  const selectedTour = tours.find(t => t.id === formData.tour_id)
-  const selectedOrder = orders.find(o => o.id === formData.order_id)
+  const selectedTour = (tours || []).find(t => t.id === formData.tour_id)
+  const selectedOrder = (orders || []).find(o => o.id === formData.order_id)
 
   const handleSubmit = async () => {
     if (mode === 'single') {
@@ -209,16 +173,20 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
             <div>
               <Label className="text-sm font-medium text-morandi-secondary">團體 *</Label>
               <Combobox
-                options={tours.map(tour => ({
+                options={(tours || []).map(tour => ({
                   value: tour.id,
                   label: `${tour.code || ''} - ${tour.name || ''}`,
                 }))}
                 value={formData.tour_id}
                 onChange={value => {
+                  // 找出該團體的訂單
+                  const tourOrders = (orders || []).filter(o => o.tour_id === value)
+                  // 如果只有一個訂單，自動帶入
+                  const autoOrderId = tourOrders.length === 1 ? tourOrders[0].id : ''
                   setFormData(prev => ({
                     ...prev,
                     tour_id: value,
-                    order_id: '',
+                    order_id: autoOrderId,
                   }))
                 }}
                 placeholder="請選擇團體..."
@@ -275,81 +243,16 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {/* Request Date */}
       <div className="pt-3 border-t border-morandi-container/20">
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-          請款日期 <span className="text-morandi-red">*</span>
-        </label>
-
-        <div className="mb-3 flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="isSpecialBilling"
-            checked={
-              mode === 'single' ? formData.is_special_billing : batchFormData.is_special_billing
+        <RequestDateInput
+          value={mode === 'single' ? formData.request_date : batchFormData.request_date}
+          onChange={(date, isSpecialBilling) => {
+            if (mode === 'single') {
+              setFormData(prev => ({ ...prev, request_date: date, is_special_billing: isSpecialBilling }))
+            } else {
+              setBatchFormData(prev => ({ ...prev, request_date: date, is_special_billing: isSpecialBilling }))
             }
-            onChange={e => {
-              if (mode === 'single') {
-                setFormData(prev => ({
-                  ...prev,
-                  is_special_billing: e.target.checked,
-                  request_date: '',
-                }))
-              } else {
-                setBatchFormData(prev => ({
-                  ...prev,
-                  is_special_billing: e.target.checked,
-                  request_date: '',
-                }))
-              }
-            }}
-            className="rounded border-border"
-          />
-          <label htmlFor="isSpecialBilling" className="text-sm text-morandi-primary cursor-pointer">
-            特殊出帳 (可選擇任何日期)
-          </label>
-        </div>
-
-        {(mode === 'single' ? formData.is_special_billing : batchFormData.is_special_billing) ? (
-          <div>
-            <Input
-              type="date"
-              value={mode === 'single' ? formData.request_date : batchFormData.request_date}
-              onChange={e => {
-                if (mode === 'single') {
-                  setFormData(prev => ({ ...prev, request_date: e.target.value }))
-                } else {
-                  setBatchFormData(prev => ({ ...prev, request_date: e.target.value }))
-                }
-              }}
-              className="bg-morandi-gold/10 border-morandi-container/30"
-            />
-            <p className="text-xs text-morandi-gold mt-1.5">⚠️ 特殊出帳：可選擇任何日期</p>
-          </div>
-        ) : (
-          <div>
-            <Select
-              value={mode === 'single' ? formData.request_date : batchFormData.request_date}
-              onValueChange={value => {
-                if (mode === 'single') {
-                  setFormData(prev => ({ ...prev, request_date: value }))
-                } else {
-                  setBatchFormData(prev => ({ ...prev, request_date: value }))
-                }
-              }}
-            >
-              <SelectTrigger className="border-morandi-container/30">
-                <SelectValue placeholder="選擇請款日期 (週四)" />
-              </SelectTrigger>
-              <SelectContent>
-                {upcomingThursdays.map(thursday => (
-                  <SelectItem key={thursday.value} value={thursday.value}>
-                    {thursday.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-morandi-secondary mt-1.5">💼 一般請款固定每週四</p>
-          </div>
-        )}
+          }}
+        />
       </div>
 
 

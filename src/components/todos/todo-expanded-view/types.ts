@@ -40,4 +40,5 @@ export interface QuickActionContentProps {
   activeTab: QuickActionTab
   todo: Todo
   onUpdate?: (updates: Partial<Todo>) => void
+  onClose?: () => void
 }

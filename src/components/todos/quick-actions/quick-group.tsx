@@ -42,6 +42,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
   const [newOrder, setNewOrder] = useState({
     contact_person: '',
+    contact_phone: '',
     sales_person: currentUserName,
     assistant: '',
     member_count: undefined as number | undefined,
@@ -101,6 +102,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           code: createdTour.code,
           tour_name: createdTour.name,
           contact_person: newOrder.contact_person,
+          contact_phone: newOrder.contact_phone,
           sales_person: newOrder.sales_person || '未指派',
           assistant: newOrder.assistant || '未指派',
           member_count: newOrder.member_count || 1,
@@ -128,6 +130,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       })
       setNewOrder({
         contact_person: '',
+        contact_phone: '',
         sales_person: '',
         assistant: '',
         member_count: 1,
@@ -163,11 +166,11 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           countryCode={newTour.countryCode}
           cityCode={newTour.cityCode}
           customLocation={newTour.customLocation}
-          onCountryChange={(countryCode, cities) => {
+          onCountryChange={(countryCode) => {
             setNewTour(prev => ({
               ...prev,
               countryCode,
-              cityCode: countryCode === '__custom__' ? '__custom__' : cities[0]?.code || '',
+              cityCode: countryCode === '__custom__' ? '__custom__' : '',
               customLocation: '',
             }))
           }}
@@ -233,14 +236,25 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       <div className="border-t border-morandi-container/30 pt-4 space-y-4">
         <h4 className="text-sm font-semibold text-morandi-primary">同時新增訂單（選填）</h4>
 
-        <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">聯絡人</label>
-          <Input
-            value={newOrder.contact_person}
-            onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
-            placeholder="留空則不建立訂單"
-            className="border-morandi-container/30"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-morandi-secondary mb-2 block">聯絡人</label>
+            <Input
+              value={newOrder.contact_person}
+              onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
+              placeholder="留空則不建立訂單"
+              className="border-morandi-container/30"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-morandi-secondary mb-2 block">電話</label>
+            <Input
+              value={newOrder.contact_phone}
+              onChange={e => setNewOrder(prev => ({ ...prev, contact_phone: e.target.value }))}
+              placeholder="聯絡電話"
+              className="border-morandi-container/30"
+            />
+          </div>
         </div>
 
         {newOrder.contact_person && (

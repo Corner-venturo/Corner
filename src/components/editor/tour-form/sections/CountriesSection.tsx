@@ -150,7 +150,7 @@ export function CountriesSection({
 
   return (
     <div className="space-y-4">
-      <div className="border-b-2 border-[#C9A961] pb-2">
+      <div className="border-b-2 border-[#B8A99A] pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
         <p className="text-xs text-morandi-secondary mt-1">
           設定此行程會前往的國家，方便後續選擇景點
@@ -159,10 +159,10 @@ export function CountriesSection({
 
       {/* 主要國家 */}
       {primaryCountry && (
-        <div className="p-4 bg-[#F9F5ED] border-2 border-[#E5D4A6] rounded-lg">
+        <div className="p-4 bg-[#F9F8F6] border-2 border-[#C6B9AC] rounded-lg">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-[#3D2914]">主要國家</label>
-            <span className="text-xs bg-[#C9A961] text-white px-2 py-0.5 rounded">主要</span>
+            <label className="text-sm font-semibold text-[#333333]">主要國家</label>
+            <span className="text-xs bg-[#B8A99A] text-white px-2 py-0.5 rounded">主要</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -221,7 +221,7 @@ export function CountriesSection({
                 </label>
                 <button
                   onClick={() => removeCountry(actualIndex)}
-                  className="text-[#9E8F81] hover:text-[#6B5D52] text-sm flex items-center gap-1"
+                  className="text-[#8C8C8C] hover:text-[#8C8C8C] text-sm flex items-center gap-1"
                 >
                   <X size={14} />
                   刪除
@@ -265,7 +265,7 @@ export function CountriesSection({
       {/* 新增按鈕 */}
       <button
         onClick={addCountry}
-        className="w-full px-4 py-2.5 border-2 border-dashed border-[#E0D8CC] rounded-lg text-sm text-morandi-secondary hover:border-[#C9A961] hover:text-[#3D2914] hover:bg-[#FAF8F5] transition-colors"
+        className="w-full px-4 py-2.5 border-2 border-dashed border-[#E8E4E0] rounded-lg text-sm text-morandi-secondary hover:border-[#B8A99A] hover:text-[#333333] hover:bg-[#F9F8F6] transition-colors"
       >
         + 新增其他國家
       </button>

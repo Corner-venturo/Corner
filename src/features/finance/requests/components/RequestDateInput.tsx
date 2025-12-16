@@ -63,7 +63,7 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
             isSpecialBilling ? 'text-morandi-gold' : 'text-morandi-secondary'
           )}
         >
-          {isSpecialBilling ? '⚠️ 特殊出帳：非週四請款' : '💼 一般請款：週四出帳'}
+          {isSpecialBilling ? '特殊出帳：非週四請款' : '一般請款：週四出帳'}
         </p>
       )}
     </div>

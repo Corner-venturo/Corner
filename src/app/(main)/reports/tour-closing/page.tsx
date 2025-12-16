@@ -9,7 +9,6 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
-import * as XLSX from 'xlsx'
 
 interface TourClosingReport {
   id: string
@@ -191,7 +190,7 @@ export default function TourClosingReportPage() {
   }, [reports, selectedMonth])
 
   // 產出 Excel 報表
-  const exportToExcel = (month?: string) => {
+  const exportToExcel = async (month?: string) => {
     const dataToExport = month
       ? reports.filter(r => r.closing_date?.substring(0, 7) === month)
       : filteredReports
@@ -200,6 +199,9 @@ export default function TourClosingReportPage() {
       toast.error('沒有資料可匯出')
       return
     }
+
+    // 動態載入 xlsx（避免污染首屏 bundle）
+    const XLSX = await import('xlsx')
 
     // 準備 Excel 資料
     const excelData = dataToExport.map(report => ({

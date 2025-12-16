@@ -272,7 +272,7 @@ export function Sidebar() {
   return (
     <div
       className={cn(
-        'fixed left-0 top-0 h-screen bg-morandi-container border-r border-border z-30 transition-[width] duration-300 flex flex-col',
+        'fixed left-0 top-0 h-screen bg-morandi-container border-r-2 border-morandi-gold/20 z-30 transition-[width] duration-300 flex flex-col',
         'hidden lg:flex',
         isExpanded ? 'w-[180px]' : 'w-16'
       )}

@@ -10,8 +10,8 @@ import React from 'react'
 // Corner 品牌色系
 const CORNER_COLORS = {
   orange: '#F89A1E', // Corner 橘色
-  gold: '#D4AF37',   // 金色（次要）
-  brown: '#6B5B4F',  // 深棕色
+  gold: '#B8A99A',   // 金色（次要）
+  brown: '#333333',  // 深棕色
   lightBrown: '#FAF7F2', // 淺棕背景
   gray: '#4B5563',
   lightGray: '#9CA3AF',
@@ -110,7 +110,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
 
         {/* 標題 - 右側 */}
         <div className="text-right">
-          <div className="text-[18pt] font-bold text-[#6B5B4F] mb-1">{t.title}</div>
+          <div className="text-[18pt] font-bold text-[#333333] mb-1">{t.title}</div>
           <div className="text-[9pt] text-[#9CA3AF] tracking-[2px]">{t.subtitle}</div>
         </div>
       </div>
@@ -118,18 +118,18 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       {/* 確認資訊 */}
       <div className="bg-[#FAF7F2] p-3 px-4 rounded-lg mb-5 border-l-4 border-[#F89A1E]">
         <div className="mb-1.5">
-          <span className="text-[#6B5B4F] font-semibold">{t.confirmation}</span>
+          <span className="text-[#333333] font-semibold">{t.confirmation}</span>
           <span className="text-[#F89A1E] font-bold text-[12pt]">
             {data.confirmation_number}
           </span>
         </div>
         <div className="mb-1.5">
-          <span className="text-[#6B5B4F] font-semibold">{t.pin}</span>
+          <span className="text-[#333333] font-semibold">{t.pin}</span>
           <span className="font-bold">{data.pin_code}</span>
           <span className="text-[#9CA3AF] text-[9pt] ml-2">{t.pinNote}</span>
         </div>
         <div>
-          <span className="text-[#6B5B4F] font-semibold">{t.order}</span>
+          <span className="text-[#333333] font-semibold">{t.order}</span>
           <span>{data.order_number}</span>
         </div>
       </div>
@@ -146,7 +146,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
           </div>
         )}
         <div className="flex-1">
-          <h2 className="m-0 mb-2 text-[14pt] font-bold text-[#6B5B4F]">{data.hotel_name}</h2>
+          <h2 className="m-0 mb-2 text-[14pt] font-bold text-[#333333]">{data.hotel_name}</h2>
           <div className="text-[10pt] text-[#4B5563] mb-1">📍 {data.hotel_address}</div>
           <div className="text-[10pt] text-[#4B5563]">📞 {data.hotel_phone}</div>
         </div>
@@ -157,7 +157,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
         {/* 入住時間 */}
         <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
           <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkIn}</div>
-          <div className="text-[15pt] font-bold text-[#6B5B4F] mb-1">{data.check_in_date}</div>
+          <div className="text-[15pt] font-bold text-[#333333] mb-1">{data.check_in_date}</div>
           <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_in_day}</div>
           <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_in_time}</div>
           <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>
@@ -166,7 +166,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
         {/* 退房時間 */}
         <div className="p-4 bg-[#FAF7F2] rounded-lg text-center">
           <div className="text-[9pt] text-[#9CA3AF] mb-2 font-semibold">{t.checkOut}</div>
-          <div className="text-[15pt] font-bold text-[#6B5B4F] mb-1">{data.check_out_date}</div>
+          <div className="text-[15pt] font-bold text-[#333333] mb-1">{data.check_out_date}</div>
           <div className="text-[9pt] text-[#4B5563] mb-1">{data.check_out_day}</div>
           <div className="text-[10pt] text-[#F89A1E] font-semibold">{data.check_out_time}</div>
           <div className="text-[8pt] text-[#9CA3AF] mt-0.5">{t.hotelTime}</div>
@@ -185,14 +185,14 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
       <div className="grid grid-cols-1 gap-4 mb-6">
         {/* 房型 */}
         <div className="p-4 border border-[#E5E7EB] rounded-lg">
-          <h3 className="m-0 mb-3 text-[12pt] font-bold text-[#6B5B4F] border-b border-[#F89A1E] pb-2">
+          <h3 className="m-0 mb-3 text-[12pt] font-bold text-[#333333] border-b border-[#F89A1E] pb-2">
             {data.room_type}
           </h3>
 
           {/* 旅客姓名 */}
           <div className="mb-3">
             <div className="text-[9pt] text-[#9CA3AF] mb-1 font-semibold">{t.guestName}</div>
-            <div className="text-[11pt] font-semibold text-[#6B5B4F]">
+            <div className="text-[11pt] font-semibold text-[#333333]">
               {data.guest_names.join(', ')}
             </div>
           </div>

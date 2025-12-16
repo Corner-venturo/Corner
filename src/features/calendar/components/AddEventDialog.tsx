@@ -1,8 +1,7 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { X } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { AddEventDialogState, NewEventForm } from '../types'
 
 interface AddEventDialogProps {
@@ -53,7 +52,6 @@ const formatSingleTime = (value: string): string => {
 // 解析時間範圍（0800-1400 → { start: '08:00', end: '14:00' }）
 const parseTimeRange = (value: string): { start: string; end: string | null } => {
   const normalized = toHalfWidth(value)
-  // 檢查是否包含分隔符號（- 或 ~）
   const separatorMatch = normalized.match(/[-~]/)
   if (separatorMatch) {
     const parts = normalized.split(/[-~]/)
@@ -63,10 +61,11 @@ const parseTimeRange = (value: string): { start: string; end: string | null } =>
       return { start, end: end || null }
     }
   }
-
-  // 沒有分隔符號，只處理開始時間
   return { start: formatSingleTime(normalized), end: null }
 }
+
+// 輸入框樣式
+const inputClassName = "w-full px-4 py-2.5 rounded-lg border border-[#E8E4E0] bg-white text-[#333333] placeholder:text-[#333333]/30 focus:outline-none focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] transition-shadow text-sm shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
 
 export function AddEventDialog({
   dialog,
@@ -79,11 +78,19 @@ export function AddEventDialog({
 
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>新增行事曆事項</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-[600px] p-0 rounded-2xl border-[#E8E4E0] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 pb-2">
+          <h2 className="text-2xl font-bold tracking-tight text-[#333333]">新增行事曆事項</h2>
+          <button
+            onClick={onClose}
+            className="text-[#333333]/40 hover:text-[#333333] transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
+        {/* Form */}
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -91,62 +98,72 @@ export function AddEventDialog({
               onSubmit()
             }
           }}
-          className="space-y-4"
+          className="p-6 pt-4 space-y-6"
         >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">開始日期</label>
-              <Input
+          {/* 日期欄位 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#333333]/80">開始日期</label>
+              <input
                 type="date"
                 value={dialog.selectedDate}
                 onChange={e => onDialogChange({ ...dialog, selectedDate: e.target.value })}
-                className="mt-1"
+                className={inputClassName}
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">結束日期（選填）</label>
-              <Input
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#333333]/80">結束日期 (選填)</label>
+              <input
                 type="date"
                 value={newEvent.end_date}
                 onChange={e => onNewEventChange({ ...newEvent, end_date: e.target.value })}
                 min={dialog.selectedDate}
-                className="mt-1"
-                placeholder="跨天活動請選擇"
+                placeholder="年 / 月 / 日"
+                className={inputClassName}
               />
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">標題</label>
-            <Input
+          {/* 標題 */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-[#333333]/80">標題</label>
+            <input
+              type="text"
               value={newEvent.title}
               onChange={e => onNewEventChange({ ...newEvent, title: e.target.value })}
               placeholder="輸入事項標題"
-              className="mt-1"
+              className={inputClassName}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">事件類型</label>
-              <select
-                value={newEvent.visibility}
-                onChange={e =>
-                  onNewEventChange({
-                    ...newEvent,
-                    visibility: e.target.value as 'personal' | 'company',
-                  })
-                }
-                className="mt-1"
-              >
-                <option value="personal">個人行事曆</option>
-                <option value="company">公司行事曆</option>
-              </select>
+          {/* 類型與時間 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#333333]/80">事件類型</label>
+              <div className="relative">
+                <select
+                  value={newEvent.visibility}
+                  onChange={e =>
+                    onNewEventChange({
+                      ...newEvent,
+                      visibility: e.target.value as 'personal' | 'company',
+                    })
+                  }
+                  className={`${inputClassName} appearance-none pr-10`}
+                >
+                  <option value="personal">個人行事曆</option>
+                  <option value="company">公司行事曆</option>
+                </select>
+                <svg className="absolute right-3 top-1/2 -translate-y-1/2 text-[#333333]/60 pointer-events-none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">開始時間（選填）</label>
-              <Input
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#333333]/80">開始時間 (選填)</label>
+              <input
+                type="text"
                 value={newEvent.start_time}
                 onChange={e => onNewEventChange({ ...newEvent, start_time: e.target.value })}
                 onBlur={e => {
@@ -158,48 +175,42 @@ export function AddEventDialog({
                   })
                 }}
                 placeholder="如 0800-1400 或 14:30"
-                className="mt-1"
+                className={inputClassName}
               />
             </div>
           </div>
 
-          {/* 結束時間 - 有開始時間才顯示 */}
-          {newEvent.start_time && (
-            <div>
-              <label className="text-sm font-medium text-morandi-primary">結束時間（選填）</label>
-              <Input
-                value={newEvent.end_time}
-                onChange={e => onNewEventChange({ ...newEvent, end_time: e.target.value })}
-                onBlur={e => onNewEventChange({ ...newEvent, end_time: formatSingleTime(e.target.value) })}
-                placeholder="如 1200 或 18:00"
-                className="mt-1"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">說明（選填）</label>
-            <Input
+          {/* 說明 */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-[#333333]/80">說明 (選填)</label>
+            <textarea
               value={newEvent.description}
               onChange={e => onNewEventChange({ ...newEvent, description: e.target.value })}
               placeholder="輸入說明"
-              className="mt-1"
+              rows={3}
+              className={`${inputClassName} resize-none`}
             />
           </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button
-              type="submit"
-              disabled={!newEvent.title.trim()}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              新增 <span className="ml-1 text-xs opacity-70">(Enter)</span>
-            </Button>
-          </div>
         </form>
+
+        {/* Footer */}
+        <div className="p-6 pt-2 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-lg border border-[#E8E4E0] text-[#333333] bg-white hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
+          >
+            取消
+          </button>
+          <button
+            type="submit"
+            disabled={!newEvent.title.trim()}
+            onClick={() => newEvent.title.trim() && onSubmit()}
+            className="px-6 py-2.5 rounded-lg bg-[#B8A99A] hover:bg-[#9E8C7A] text-white shadow-md hover:shadow-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            新增 (Enter)
+          </button>
+        </div>
       </DialogContent>
     </Dialog>
   )

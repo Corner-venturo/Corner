@@ -20,7 +20,7 @@ export function PreviewContainer({ formData }: PreviewContainerProps) {
       </div>
 
       {/* 預覽容器 */}
-      <div className="flex-1 overflow-y-auto p-8 bg-[#f6f4f1]">
+      <div className="flex-1 overflow-y-auto p-8 bg-[#F9F8F6]">
         <div className="max-w-[21cm] mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
           {formData.type === 'accommodation' ? (
             <AccommodationPreview formData={formData} />

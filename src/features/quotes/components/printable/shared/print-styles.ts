@@ -57,8 +57,8 @@ export const PRINT_STYLES = `
 `
 
 export const MORANDI_COLORS = {
-  gold: '#D4AF37',
-  brown: '#6B5B4F',
+  gold: '#B8A99A',
+  brown: '#333333',
   lightBrown: '#FAF7F2',
   gray: '#4B5563',
   lightGray: '#9CA3AF',

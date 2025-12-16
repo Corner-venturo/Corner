@@ -193,7 +193,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         {/* 返回按鈕 */}
         <button
           onClick={() => setStep('selectType')}
-          className="flex items-center text-[#9E8F81] hover:text-[#6B5D52] mb-4 -mt-2"
+          className="flex items-center text-[#8C8C8C] hover:text-[#8C8C8C] mb-4 -mt-2"
         >
           <ChevronLeft size={20} />
           <span className="text-sm">返回</span>
@@ -202,10 +202,10 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         {/* 分類列表或空狀態 */}
         {filteredCategories.length === 0 && !isAddingCategory ? (
           <div className="text-center py-12">
-            <div className="text-[#9E8F81] mb-4">還沒有分類</div>
+            <div className="text-[#8C8C8C] mb-4">還沒有分類</div>
             <Button
               onClick={() => setIsAddingCategory(true)}
-              className="bg-[#C9A961] hover:bg-[#B8985A] text-white"
+              className="bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               新增第一個分類
@@ -214,7 +214,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
         ) : isAddingCategory ? (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">分類名稱</label>
+              <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">分類名稱</label>
               <Input
                 value={newCategoryName}
                 onChange={e => setNewCategoryName(e.target.value)}
@@ -225,7 +225,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                   }
                 }}
                 placeholder="例如：餐費、交通、娛樂"
-                className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+                className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
                 autoFocus
               />
             </div>
@@ -236,14 +236,14 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                   setNewCategoryName('')
                 }}
                 variant="outline"
-                className="flex-1 border-[#E0D8CC]"
+                className="flex-1 border-[#E8E4E0]"
               >
                 取消
               </Button>
               <Button
                 onClick={handleAddCategory}
                 disabled={!newCategoryName.trim()}
-                className="flex-1 bg-[#C9A961] hover:bg-[#B8985A] text-white"
+                className="flex-1 bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
               >
                 新增
               </Button>
@@ -257,9 +257,9 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelect(category.id)}
-                  className="p-4 rounded-xl bg-white/60 hover:bg-white border-2 border-[#E0D8CC] hover:border-[#C9A961] transition-all text-left"
+                  className="p-4 rounded-xl bg-white/60 hover:bg-white border-2 border-[#E8E4E0] hover:border-[#B8A99A] transition-all text-left"
                 >
-                  <div className="font-medium text-[#3D2914]">{category.name}</div>
+                  <div className="font-medium text-[#333333]">{category.name}</div>
                 </button>
               ))}
             </div>
@@ -267,7 +267,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             {/* 新增分類按鈕 */}
             <button
               onClick={() => setIsAddingCategory(true)}
-              className="w-full p-3 rounded-xl border-2 border-dashed border-[#E0D8CC] hover:border-[#C9A961] text-[#9E8F81] hover:text-[#6B5D52] transition-all flex items-center justify-center space-x-2"
+              className="w-full p-3 rounded-xl border-2 border-dashed border-[#E8E4E0] hover:border-[#B8A99A] text-[#8C8C8C] hover:text-[#8C8C8C] transition-all flex items-center justify-center space-x-2"
             >
               <Plus size={18} />
               <span className="text-sm font-medium">新增分類</span>
@@ -293,29 +293,29 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       {/* 返回按鈕 */}
       <button
         onClick={() => setStep('selectCategory')}
-        className="flex items-center text-[#9E8F81] hover:text-[#6B5D52] mb-4 -mt-2"
+        className="flex items-center text-[#8C8C8C] hover:text-[#8C8C8C] mb-4 -mt-2"
       >
         <ChevronLeft size={20} />
         <span className="text-sm">更改分類</span>
       </button>
 
       {/* 已選分類顯示 */}
-      <div className="mb-4 p-3 rounded-lg bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB]">
-        <div className="text-xs text-[#9E8F81] mb-1">
+      <div className="mb-4 p-3 rounded-lg bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6]">
+        <div className="text-xs text-[#8C8C8C] mb-1">
           {transactionType === 'expense' ? '支出' : '收入'}分類
         </div>
-        <div className="font-medium text-[#3D2914]">
+        <div className="font-medium text-[#333333]">
           {categories.find(c => c.id === selectedCategory)?.name}
         </div>
       </div>
 
       {/* 帳戶選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">選擇帳戶</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">選擇帳戶</label>
         <select
           value={formData.account_id}
           onChange={e => setFormData(prev => ({ ...prev, account_id: e.target.value }))}
-          className="w-full p-3 border border-[#E0D8CC] rounded-lg bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20 transition-colors"
+          className="w-full p-3 border border-[#E8E4E0] rounded-lg bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20 transition-colors"
         >
           <option value="">請選擇帳戶</option>
           {accounts.map(account => (
@@ -328,9 +328,9 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
       {/* 金額 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">金額</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">金額</label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9E8F81] text-sm">
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8C8C8C] text-sm">
             NT$
           </span>
           <Input
@@ -340,7 +340,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             onKeyDown={handleKeyDown}
             {...compositionProps}
             placeholder="0"
-            className="pl-12 text-lg font-semibold border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+            className="pl-12 text-lg font-semibold border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
             min="0"
             step="1"
             autoFocus
@@ -350,25 +350,25 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
 
       {/* 日期 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">日期</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">日期</label>
         <Input
           type="date"
           value={formData.date}
           onChange={e => setFormData(prev => ({ ...prev, date: e.target.value }))}
-          className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
       {/* 備註 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">備註</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">備註</label>
         <Input
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder="輸入備註（選填）"
-          className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
     </FormDialog>

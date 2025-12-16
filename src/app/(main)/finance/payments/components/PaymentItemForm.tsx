@@ -4,6 +4,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/date-input'
 import {
   Select,
   SelectContent,
@@ -99,10 +100,9 @@ export function PaymentItemForm({
 
         <div className="col-span-2">
           <label className="text-sm font-medium text-morandi-primary mb-2 block">交易日期 *</label>
-          <Input
-            type="date"
+          <DateInput
             value={item.transaction_date}
-            onChange={e => onUpdate(item.id, { transaction_date: e.target.value })}
+            onChange={value => onUpdate(item.id, { transaction_date: value })}
           />
         </div>
 
@@ -142,10 +142,9 @@ export function PaymentItemForm({
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
               付款截止日 *
             </label>
-            <Input
-              type="date"
+            <DateInput
               value={item.pay_dateline || ''}
-              onChange={e => onUpdate(item.id, { pay_dateline: e.target.value })}
+              onChange={value => onUpdate(item.id, { pay_dateline: value })}
             />
           </div>
 

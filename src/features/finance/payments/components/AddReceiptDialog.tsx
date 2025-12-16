@@ -146,9 +146,30 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
       onSuccess?.()
     } catch (error) {
       logger.error('❌ Create Receipt Error:', error)
+
+      // 解析錯誤訊息
+      let errorMessage = '發生未知錯誤，請檢查必填欄位是否完整'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (typeof error === 'object' && error !== null) {
+        // Supabase 錯誤格式
+        const err = error as { message?: string; error?: string; details?: string; code?: string }
+        if (err.message) {
+          errorMessage = err.message
+        } else if (err.error) {
+          errorMessage = err.error
+        } else if (err.details) {
+          errorMessage = err.details
+        } else if (err.code) {
+          errorMessage = `錯誤代碼: ${err.code}`
+        } else if (Object.keys(error).length > 0) {
+          errorMessage = JSON.stringify(error)
+        }
+      }
+
       toast({
         title: '❌ 建立失敗',
-        description: error instanceof Error ? error.message : '請稍後再試',
+        description: errorMessage,
         variant: 'destructive',
       })
     }

@@ -16,7 +16,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#C9A961',
+  themeColor: '#B8A99A',
 }
 
 export default function FitnessLayout({

@@ -290,9 +290,30 @@ export function createStore<T extends BaseEntity>(
 
         return createdItem
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '建立失敗'
+        // 解析錯誤訊息
+        let errorMessage = '建立失敗'
+        if (error instanceof Error) {
+          errorMessage = error.message
+        } else if (error && typeof error === 'object') {
+          const err = error as { message?: string; error?: string; details?: string; code?: string; hint?: string }
+          if (err.message) {
+            errorMessage = err.message
+          } else if (err.details) {
+            errorMessage = err.details
+          } else if (err.error) {
+            errorMessage = err.error
+          } else if (err.code) {
+            errorMessage = `資料庫錯誤 (${err.code})`
+          } else if (Object.keys(error).length === 0) {
+            errorMessage = '資料庫操作失敗，請檢查必填欄位或權限設定'
+          }
+        }
+
+        logger.error(`[${tableName}] create 失敗:`, error)
         set({ error: errorMessage, loading: false })
-        throw error
+
+        // 拋出帶有訊息的 Error，方便上層處理
+        throw new Error(errorMessage)
       }
     },
 

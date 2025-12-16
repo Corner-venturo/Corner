@@ -73,12 +73,12 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
   // 可用訂單（根據選中的團體過濾）
   const availableOrders = useMemo(() => {
     if (!selectedTourId) return []
-    return orders.filter(order => order.tour_id === selectedTourId)
+    return (orders || []).filter(order => order.tour_id === selectedTourId)
   }, [orders, selectedTourId])
 
   // 選中的訂單
   const selectedOrder = useMemo(() => {
-    return orders.find(order => order.id === selectedOrderId)
+    return (orders || []).find(order => order.id === selectedOrderId)
   }, [orders, selectedOrderId])
 
   // 更新收款項目
@@ -133,17 +133,20 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         <div>
           <Label className="text-sm font-medium text-morandi-secondary">團體</Label>
           <Combobox
-            options={tours.map(tour => {
-              logger.log('🎯 Tour:', tour.id, tour.code, tour.name)
-              return {
-                value: tour.id,
-                label: `${tour.code || ''} - ${tour.name || ''}`,
-              }
-            })}
+            options={(tours || []).map(tour => ({
+              value: tour.id,
+              label: `${tour.code || ''} - ${tour.name || ''}`,
+            }))}
             value={selectedTourId}
             onChange={value => {
-              logger.log('✅ Selected Tour ID:', value)
               setSelectedTourId(value)
+              // 找出該團體的訂單，如果只有一個就自動帶入
+              const tourOrders = (orders || []).filter(o => o.tour_id === value)
+              if (tourOrders.length === 1) {
+                setSelectedOrderId(tourOrders[0].id)
+              } else {
+                setSelectedOrderId('')
+              }
             }}
             placeholder="請選擇團體..."
             className="mt-1"

@@ -473,12 +473,12 @@ export default function CustomersPage() {
                       <div><span style="color: #6b7280;">生日</span> <span style="color: #374151; margin-left: 8px;">${existingCustomer.date_of_birth || '-'}</span></div>
                     </div>
                   </div>
-                  <div style="display: flex; align-items: center; color: #b59d7b; font-size: 20px;">→</div>
+                  <div style="display: flex; align-items: center; color: #B8A99A; font-size: 20px;">→</div>
                   <div style="flex: 1;">
-                    <div style="font-weight: 500; margin-bottom: 8px; color: #b59d7b; font-size: 13px; text-align: center;">新護照資料</div>
+                    <div style="font-weight: 500; margin-bottom: 8px; color: #B8A99A; font-size: 13px; text-align: center;">新護照資料</div>
                     ${item.imageBase64 ?
-                      `<img src="${item.imageBase64}" style="width: 100%; height: 120px; object-fit: contain; border-radius: 6px; border: 1px solid #b59d7b; margin-bottom: 8px; background: #fefcf8;" />` :
-                      `<div style="height: 120px; background: #fefcf8; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #9ca3af; margin-bottom: 8px; border: 1px solid #b59d7b;">無照片</div>`
+                      `<img src="${item.imageBase64}" style="width: 100%; height: 120px; object-fit: contain; border-radius: 6px; border: 1px solid #B8A99A; margin-bottom: 8px; background: #fefcf8;" />` :
+                      `<div style="height: 120px; background: #fefcf8; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #9ca3af; margin-bottom: 8px; border: 1px solid #B8A99A;">無照片</div>`
                     }
                     <div style="font-size: 12px; line-height: 1.6; background: #fefcf8; padding: 10px; border-radius: 6px; border: 1px solid #e8dcc8;">
                       <div style="margin-bottom: 4px;"><span style="color: #6b7280;">姓名</span> <span style="color: #374151; margin-left: 8px;">${ocrData.name || '-'}</span></div>

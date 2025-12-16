@@ -48,7 +48,7 @@ const accountTypes: Array<{
     id: 'other',
     label: '其他帳戶',
     icon: PiggyBank,
-    color: '#C9A961',
+    color: '#B8A99A',
     description: '數位錢包、其他資產',
   },
 ] as const
@@ -59,9 +59,9 @@ const predefinedColors = [
   '#8BA8C4', // 莫蘭迪藍
   '#C89B9B', // 莫蘭迪粉
   '#B4A5C8', // 莫蘭迪紫
-  '#C9A961', // 莫蘭迪金
+  '#B8A99A', // 莫蘭迪金
   '#D9A5A5', // 莫蘭迪玫瑰
-  '#9E8F81', // 莫蘭迪咖啡
+  '#8C8C8C', // 莫蘭迪咖啡
   '#A8B4A5', // 莫蘭迪灰綠
 ]
 
@@ -150,7 +150,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
     >
       {/* 帳戶類型選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-3 block">帳戶類型</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-3 block">帳戶類型</label>
         <div className="grid grid-cols-1 gap-2">
           {accountTypes.map(type => {
             const Icon = type.icon
@@ -169,7 +169,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 className={cn(
                   'p-3 rounded-xl transition-all flex items-center space-x-3 text-left',
                   isSelected
-                    ? 'bg-gradient-to-r from-[#F9F5ED] to-[#F5EDDC] shadow-sm'
+                    ? 'bg-gradient-to-r from-[#F9F8F6] to-[#F9F8F6] shadow-sm'
                     : 'bg-white/40 hover:bg-white/60'
                 )}
               >
@@ -180,11 +180,11 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                   <Icon size={18} />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-[#3D2914] text-sm">{type.label}</div>
-                  <div className="text-xs text-[#9E8F81]">{type.description}</div>
+                  <div className="font-medium text-[#333333] text-sm">{type.label}</div>
+                  <div className="text-xs text-[#8C8C8C]">{type.description}</div>
                 </div>
                 {isSelected && (
-                  <div className="w-5 h-5 rounded-full bg-[#C9A961] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-[#B8A99A] flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
@@ -202,24 +202,24 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
 
       {/* 帳戶名稱 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">帳戶名稱</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">帳戶名稱</label>
         <Input
           value={formData.name}
           onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder={`輸入${selectedAccountType?.label}名稱`}
-          className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
       {/* 初始餘額 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">
           {formData.type === 'credit' ? '目前欠款金額' : '初始餘額'}
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9E8F81] text-sm">
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8C8C8C] text-sm">
             NT$
           </span>
           <Input
@@ -229,12 +229,12 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
             onKeyDown={handleKeyDown}
             {...compositionProps}
             placeholder="0"
-            className="pl-12 border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+            className="pl-12 border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
             step="1"
           />
         </div>
         {formData.type === 'credit' && (
-          <div className="text-xs text-[#9E8F81] mt-1.5 bg-[#F9F5ED] px-3 py-2 rounded-lg">
+          <div className="text-xs text-[#8C8C8C] mt-1.5 bg-[#F9F8F6] px-3 py-2 rounded-lg">
             信用卡請輸入負數（如：-5000 表示欠款5000元）
           </div>
         )}
@@ -243,9 +243,9 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       {/* 信用卡額度 */}
       {formData.type === 'credit' && (
         <div>
-          <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">信用額度</label>
+          <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">信用額度</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9E8F81] text-sm">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8C8C8C] text-sm">
               NT$
             </span>
             <Input
@@ -255,18 +255,18 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               onKeyDown={handleKeyDown}
               {...compositionProps}
               placeholder="50000"
-              className="pl-12 border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+              className="pl-12 border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
               min="0"
               step="1000"
             />
           </div>
-          <div className="text-xs text-[#9E8F81] mt-1.5">設定這張信用卡的總額度限制</div>
+          <div className="text-xs text-[#8C8C8C] mt-1.5">設定這張信用卡的總額度限制</div>
         </div>
       )}
 
       {/* 顏色選擇 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-2 block">顏色標識</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-2 block">顏色標識</label>
         <div className="flex flex-wrap gap-2.5">
           {predefinedColors.map(color => (
             <button
@@ -276,7 +276,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               className={cn(
                 'w-10 h-10 rounded-xl transition-all shadow-sm',
                 formData.color === color
-                  ? 'ring-2 ring-[#C9A961] ring-offset-2 scale-110'
+                  ? 'ring-2 ring-[#B8A99A] ring-offset-2 scale-110'
                   : 'hover:scale-105'
               )}
               style={{ backgroundColor: color }}
@@ -287,30 +287,30 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
 
       {/* 描述 */}
       <div>
-        <label className="text-sm font-medium text-[#6B5D52] mb-1.5 block">備註說明</label>
+        <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">備註說明</label>
         <Input
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder="輸入帳戶備註（選填）"
-          className="border-[#E0D8CC] bg-white/60 focus:border-[#C9A961] focus:ring-[#C9A961]/20"
+          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
       {/* 預覽卡片 */}
       {formData.name && (
-        <div className="p-4 bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EB] rounded-xl">
-          <div className="text-xs font-medium text-[#9E8F81] mb-3">預覽效果</div>
+        <div className="p-4 bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6] rounded-xl">
+          <div className="text-xs font-medium text-[#8C8C8C] mb-3">預覽效果</div>
           <div className="flex items-center space-x-3">
             <div
               className="w-3 h-3 rounded-full shadow-sm"
               style={{ backgroundColor: formData.color }}
             />
             <div className="flex-1">
-              <div className="font-medium text-[#3D2914] text-sm">{formData.name}</div>
+              <div className="font-medium text-[#333333] text-sm">{formData.name}</div>
               {formData.description && (
-                <div className="text-xs text-[#9E8F81] mt-0.5">{formData.description}</div>
+                <div className="text-xs text-[#8C8C8C] mt-0.5">{formData.description}</div>
               )}
             </div>
             <div

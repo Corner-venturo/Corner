@@ -2,17 +2,28 @@
 
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InputIME } from '@/components/ui/input-ime'
 import { StarRating } from '@/components/ui/star-rating'
-import { Check, Calendar, CalendarCheck, X, Eye } from 'lucide-react'
+import {
+  X,
+  Eye,
+  Calendar,
+  CalendarCheck,
+  Check,
+  Clock,
+  Receipt,
+  FileText,
+  Users,
+  Plane,
+  Share2,
+} from 'lucide-react'
 import { TodoExpandedViewProps } from './types'
 import { useTodoExpandedView } from './useTodoExpandedView'
 import { SubTasksSection } from './SubTasksSection'
 import { NotesSection } from './NotesSection'
 import { AssignmentSection } from './AssignmentSection'
-import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
+import { QuickActionContent } from './QuickActionsSection'
 import { useAuthStore } from '@/stores/auth-store'
 import { useCalendarEventStore } from '@/stores'
 import {
@@ -22,16 +33,41 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { logger } from '@/lib/utils/logger'
+import type { QuickActionTab } from './types'
+
+// 快速操作按鈕配置
+const quickActionButtons = [
+  { key: 'receipt' as const, label: '收款管理', desc: '收款追蹤', icon: Receipt, color: 'bg-[#C9D4C5]/20 text-[#AEBEA8]', hoverColor: 'group-hover:bg-[#C9D4C5] group-hover:text-[#333333]' },
+  { key: 'invoice' as const, label: '請款管理', desc: '請款', icon: FileText, color: 'bg-[#B8A99A]/20 text-[#B8A99A]', hoverColor: 'group-hover:bg-[#B8A99A] group-hover:text-white' },
+  { key: 'group' as const, label: '開團', desc: '旅遊', icon: Users, color: 'bg-[#8FA9C2]/20 text-[#8FA9C2]', hoverColor: 'group-hover:bg-[#8FA9C2] group-hover:text-white' },
+  { key: 'pnr' as const, label: '連結 PNR', desc: '機票', icon: Plane, color: 'bg-[#D4B483]/20 text-[#D4B483]', hoverColor: 'group-hover:bg-[#D4B483] group-hover:text-white' },
+  { key: 'share' as const, label: '共享任務', desc: '協作', icon: Share2, color: 'bg-[#333333]/10 text-[#333333]', hoverColor: 'group-hover:bg-[#333333] group-hover:text-white' },
+]
 
 export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewProps) {
   const { activeTab, setActiveTab } = useTodoExpandedView()
   const { user } = useAuthStore()
   const { create: createCalendarEvent } = useCalendarEventStore()
-
   // 行事曆 Dialog 狀態
   const [calendarDialog, setCalendarDialog] = useState(false)
   const [calendarDate, setCalendarDate] = useState('')
   const [calendarTime, setCalendarTime] = useState('')
+
+  // 快速操作 Dialog 狀態
+  const [quickActionDialog, setQuickActionDialog] = useState(false)
+  const [selectedQuickAction, setSelectedQuickAction] = useState<QuickActionTab | null>(null)
+
+  // 點擊快速操作按鈕
+  const handleQuickActionClick = (key: QuickActionTab) => {
+    setSelectedQuickAction(key)
+    setQuickActionDialog(true)
+  }
+
+  // 取得快速操作標題
+  const getQuickActionTitle = (key: QuickActionTab | null) => {
+    const btn = quickActionButtons.find(b => b.key === key)
+    return btn?.label || '快速操作'
+  }
 
   // 新增行事曆事件
   const handleAddToCalendar = async () => {
@@ -43,7 +79,6 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
         ? `${calendarDate}T${calendarTime}:00${tzOffset}`
         : `${calendarDate}T09:00:00${tzOffset}`
 
-      // 結束時間預設 1 小時後
       const endHour = calendarTime ? parseInt(calendarTime.split(':')[0]) + 1 : 10
       const endTime = `${String(endHour).padStart(2, '0')}:${calendarTime?.split(':')[1] || '00'}`
       const endDateTime = `${calendarDate}T${endTime}:00${tzOffset}`
@@ -60,7 +95,6 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
         created_by: user.id,
       })
 
-      // 更新待辦事項的 calendar_event_id
       if (newEvent?.id) {
         onUpdate({ calendar_event_id: newEvent.id })
       }
@@ -78,143 +112,190 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
     return null
   }
 
-  // 判斷是否可編輯：建立者或在 visibility 列表中
+  // 判斷是否可編輯
   const currentUserId = user?.id
   const isCreator = todo.creator === currentUserId
   const isInVisibility = todo.visibility?.includes(currentUserId || '')
   const canEdit = isCreator || isInVisibility
-
-  // 唯讀模式的 onUpdate（什麼都不做）
   const readOnlyUpdate = () => {}
+
+  // 格式化日期
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '未設定'
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
+
+  // 優先級顏色
+  const getPriorityColor = (priority: number) => {
+    if (priority >= 4) return 'text-[#C77D7D] bg-[#C77D7D]/10'
+    if (priority >= 3) return 'text-[#D4B483] bg-[#D4B483]/10'
+    return 'text-[#8C8C8C] bg-[#E8E4E0]'
+  }
+
+  const getPriorityLabel = (priority: number) => {
+    if (priority >= 4) return '高優先'
+    if (priority >= 3) return '中優先'
+    return '一般'
+  }
+
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case 'completed': return '已完成'
+      case 'in_progress': return '進行中'
+      default: return '待處理'
+    }
+  }
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[500] flex items-center justify-center p-2 sm:p-4"
+      className="fixed inset-0 z-[500] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(51, 51, 51, 0.4)', backdropFilter: 'blur(2px)' }}
       onClick={onClose}
     >
       <div
-        className="bg-background rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-[900px] lg:max-w-[1200px] max-h-[95vh] sm:max-h-[85vh] flex flex-col relative border border-border"
+        className="bg-white w-full max-w-[1200px] max-h-[90vh] rounded-2xl shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] border border-[#E8E4E0] overflow-hidden flex flex-col md:flex-row relative"
         onClick={e => e.stopPropagation()}
       >
-        {/* 右上角關閉按鈕 */}
+        {/* 關閉按鈕 */}
         <button
           onClick={onClose}
-          className="absolute top-1 right-1 z-10 p-1 hover:bg-morandi-red/10 hover:text-morandi-red transition-colors rounded-lg text-morandi-secondary"
+          className="absolute top-4 right-4 z-50 p-2 rounded-full hover:bg-[#E8E4E0]/50 text-[#333333] transition-colors"
           title="關閉"
         >
-          <X size={16} />
+          <X size={24} />
         </button>
 
-        {/* 唯讀提示 */}
-        {!canEdit && (
-          <div className="absolute top-1 left-1 z-10 flex items-center gap-1 bg-amber-100 text-amber-700 px-2 py-1 rounded-lg text-xs">
-            <Eye size={12} />
-            <span>唯讀模式</span>
-          </div>
-        )}
-
-        {/* 主要內容區 */}
-        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden pt-2">
-          {/* 左半部：詳情資料 */}
-          <div className="w-full lg:w-1/2 px-4 sm:px-6 py-3 sm:py-4 border-b lg:border-b-0 lg:border-r border-border flex flex-col overflow-y-auto">
-            {/* 標題與星級 */}
-            <div className="mb-4 bg-card border border-border rounded-xl p-4 shadow-sm">
-              <div className="flex items-center justify-between gap-4">
-                {/* 左邊：標題 + 行事曆按鈕 */}
-                <div className="flex-1 flex items-center gap-2">
-                  {canEdit ? (
-                    <InputIME
-                      value={todo.title}
-                      onChange={value => onUpdate({ title: value })}
-                      className="text-lg font-bold border-none shadow-none p-0 h-auto focus-visible:ring-0 bg-transparent flex-1"
-                      placeholder="輸入任務標題..."
-                    />
-                  ) : (
-                    <div className="text-lg font-bold text-morandi-primary flex-1">{todo.title}</div>
-                  )}
-                  {/* 行事曆按鈕 */}
-                  {todo.calendar_event_id ? (
-                    <span className="p-1.5 text-emerald-600" title="已加入行事曆">
-                      <CalendarCheck size={18} />
-                    </span>
-                  ) : canEdit && (
-                    <button
-                      onClick={() => setCalendarDialog(true)}
-                      className="p-1.5 hover:bg-blue-100 rounded-lg text-morandi-secondary hover:text-blue-600 transition-colors"
-                      title="加入行事曆"
-                    >
-                      <Calendar size={18} />
-                    </button>
-                  )}
+        {/* 左側主要內容區 (3/4) */}
+        <div className="w-full md:w-2/3 lg:w-3/4 flex flex-col h-full border-r border-[#E8E4E0] bg-white">
+          {/* Header */}
+          <div className="p-6 lg:p-8 border-b border-[#E8E4E0] shrink-0">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                {/* 標籤列 */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#8C8C8C] border border-[#E8E4E0] rounded-sm bg-[#F9F8F6]">
+                    {todo.todo_number || 'TASK'}
+                  </span>
+                  <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-sm ${getPriorityColor(todo.priority)}`}>
+                    {getPriorityLabel(todo.priority)}
+                  </span>
                 </div>
-
-                {/* 右邊：優先級 */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs text-morandi-secondary">優先級:</span>
-                  <StarRating
-                    value={todo.priority}
-                    onChange={canEdit ? (value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })) : undefined}
-                    size="sm"
-                    disabled={!canEdit}
+                {/* 標題 */}
+                {canEdit ? (
+                  <InputIME
+                    value={todo.title}
+                    onChange={value => onUpdate({ title: value })}
+                    className="text-2xl md:text-3xl font-serif text-[#333333] font-medium bg-transparent border-none p-0 focus-visible:ring-0 w-full placeholder-gray-300 leading-tight"
+                    placeholder="輸入任務標題..."
                   />
-                </div>
+                ) : (
+                  <h1 className="text-2xl md:text-3xl font-serif text-[#333333] font-medium leading-tight">
+                    {todo.title}
+                  </h1>
+                )}
+              </div>
+              {/* 右側星級和行事曆 */}
+              <div className="flex flex-col items-end gap-2 pr-8 md:pr-0">
+                <StarRating
+                  value={todo.priority}
+                  onChange={canEdit ? (value => onUpdate({ priority: value as 1 | 2 | 3 | 4 | 5 })) : undefined}
+                  size="sm"
+                  disabled={!canEdit}
+                />
+                {todo.calendar_event_id ? (
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 mt-1">
+                    <CalendarCheck size={18} />
+                    已加入行事曆
+                  </span>
+                ) : canEdit && (
+                  <button
+                    onClick={() => setCalendarDialog(true)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[#B8A99A] hover:text-[#9E8C7A] transition-colors mt-1"
+                  >
+                    <Calendar size={18} />
+                    加入行事曆
+                  </button>
+                )}
               </div>
             </div>
-
-            {/* 基本資訊 */}
-            <AssignmentSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
-
-            {/* 子任務清單 */}
-            <SubTasksSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
-
-            {/* 備註區 - 即使唯讀也可以留言 */}
-            <NotesSection todo={todo} onUpdate={onUpdate} />
           </div>
 
-          {/* 右半部：快速功能 */}
-          <div className="w-full lg:w-1/2 px-4 sm:px-6 py-3 sm:py-4 flex flex-col overflow-y-auto">
-            {/* 快速功能分頁 - 唯讀模式隱藏 */}
-            {canEdit && (
-              <>
-                <QuickActionsSection activeTab={activeTab} onTabChange={setActiveTab} />
+          {/* 可滾動內容區 */}
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
+            {/* 指派、期限、狀態區塊 */}
+            <AssignmentSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
 
-                {/* 分頁內容 */}
-                <div className="flex-1 bg-card border border-border rounded-xl p-4 overflow-y-auto shadow-sm">
-                  <QuickActionContent activeTab={activeTab} todo={todo} onUpdate={onUpdate} />
+            {/* 子任務區 */}
+            <SubTasksSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
+
+            {/* 討論區 */}
+            <div className="pt-6 border-t border-[#E8E4E0]">
+              <NotesSection todo={todo} onUpdate={onUpdate} />
+            </div>
+          </div>
+        </div>
+
+        {/* 右側邊欄 (1/4) */}
+        <div className="w-full md:w-1/3 lg:w-1/4 bg-[#F9F8F6] flex flex-col h-full border-l border-[#E8E4E0] relative">
+          {/* 唯讀模式標籤 */}
+          {!canEdit && (
+            <div className="absolute top-0 right-0 p-2 z-10 pointer-events-none">
+              <span className="bg-[#E8E4E0] text-[10px] uppercase font-bold text-[#8C8C8C] px-2 py-1 rounded-bl-lg rounded-tr-lg opacity-50">
+                唯讀模式
+              </span>
+            </div>
+          )}
+
+          <div className="p-6 overflow-y-auto flex-1">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#8C8C8C] mb-6 border-l-2 border-[#B8A99A] pl-3">
+              快速操作
+            </h3>
+
+            {canEdit ? (
+              <>
+                {/* 快速操作按鈕 */}
+                <div className="space-y-3 mb-6">
+                  {quickActionButtons.map(btn => {
+                    const Icon = btn.icon
+                    return (
+                      <button
+                        key={btn.key}
+                        onClick={() => handleQuickActionClick(btn.key)}
+                        className="w-full flex items-center gap-3 p-3 bg-white rounded-lg shadow-[0_2px_12px_-2px_rgba(51,51,51,0.05)] hover:shadow-md transition-all group text-left border border-transparent hover:border-[#B8A99A]/30"
+                      >
+                        <span className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${btn.color} ${btn.hoverColor}`}>
+                          <Icon size={18} />
+                        </span>
+                        <div>
+                          <span className="block text-sm font-medium text-[#333333]">{btn.label}</span>
+                          <span className="block text-[10px] text-[#8C8C8C]">{btn.desc}</span>
+                        </div>
+                      </button>
+                    )
+                  })}
                 </div>
 
-                {/* 快速操作按鈕 */}
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    onClick={() => {
-                      onUpdate({ status: 'completed', completed: true })
-                      onClose()
-                    }}
-                    className="flex-1 bg-gradient-to-r from-morandi-gold to-yellow-400 hover:from-morandi-gold/90 hover:to-yellow-400/90 text-white shadow-md hover:shadow-lg transition-all"
-                  >
-                    <Check size={16} className="mr-1" />
-                    標記完成
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const newDeadline = new Date()
-                      newDeadline.setDate(newDeadline.getDate() + 7)
-                      onUpdate({ deadline: newDeadline.toISOString().split('T')[0] })
-                    }}
-                    className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all"
-                  >
-                    <Calendar size={16} className="mr-1" />
-                    延期一週
-                  </Button>
+                {/* 系統日誌 */}
+                <div className="mt-6 pt-6 border-t border-[#E8E4E0]">
+                  <h4 className="text-[10px] font-bold uppercase text-[#8C8C8C] mb-3">系統紀錄</h4>
+                  <ul className="space-y-3 relative before:absolute before:left-[5px] before:top-1 before:bottom-0 before:w-px before:bg-[#E8E4E0]">
+                    <li className="pl-4 relative">
+                      <div className="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-white border-2 border-[#C9D4C5] z-10"></div>
+                      <p className="text-xs text-[#333333]">狀態更新為 <span className="font-bold text-[#D4B483]">{getStatusLabel(todo.status)}</span></p>
+                      <p className="text-[10px] text-[#8C8C8C] mt-0.5">剛剛</p>
+                    </li>
+                    <li className="pl-4 relative">
+                      <div className="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-white border-2 border-[#B8A99A] z-10"></div>
+                      <p className="text-xs text-[#333333]">建立任務</p>
+                      <p className="text-[10px] text-[#8C8C8C] mt-0.5">{formatDate(todo.created_at)}</p>
+                    </li>
+                  </ul>
                 </div>
               </>
-            )}
-
-            {/* 唯讀模式顯示提示 */}
-            {!canEdit && (
+            ) : (
               <div className="flex-1 flex items-center justify-center">
-                <div className="text-center text-morandi-secondary">
+                <div className="text-center text-[#8C8C8C]">
                   <Eye size={32} className="mx-auto mb-2 opacity-50" />
                   <p className="text-sm">這是公開的待辦事項</p>
                   <p className="text-xs mt-1">只有建立者和共享者可以編輯</p>
@@ -222,6 +303,33 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
               </div>
             )}
           </div>
+
+          {/* 底部操作按鈕 */}
+          {canEdit && (
+            <div className="mt-auto p-6 border-t border-[#E8E4E0] bg-white">
+              <button
+                onClick={() => {
+                  onUpdate({ status: 'completed', completed: true })
+                  onClose()
+                }}
+                className="w-full bg-[#C9D4C5] hover:bg-[#AEBEA8] text-[#333333] active:scale-95 transition-all duration-300 py-3 rounded-lg text-sm font-semibold tracking-wide shadow-sm hover:shadow-md mb-3 flex items-center justify-center gap-2"
+              >
+                <Check size={20} />
+                標記完成
+              </button>
+              <button
+                onClick={() => {
+                  const newDeadline = new Date()
+                  newDeadline.setDate(newDeadline.getDate() + 7)
+                  onUpdate({ deadline: newDeadline.toISOString().split('T')[0] })
+                }}
+                className="w-full bg-transparent border border-[#B8A99A] text-[#B8A99A] hover:bg-[#B8A99A] hover:text-white transition-all duration-300 py-2.5 rounded-lg text-sm font-semibold tracking-wide flex items-center justify-center gap-2"
+              >
+                <Clock size={20} />
+                延期一週
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 行事曆 Dialog */}
@@ -235,19 +343,19 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
           <DialogContent className="max-w-xs">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-sm">
-                <Calendar size={16} className="text-blue-600" />
+                <Calendar size={16} className="text-[#B8A99A]" />
                 加入行事曆
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-morandi-secondary mb-1 block">任務名稱</label>
-                <div className="text-sm font-medium text-morandi-primary bg-morandi-container/10 px-3 py-2 rounded-lg">
+                <label className="text-xs text-[#8C8C8C] mb-1 block">任務名稱</label>
+                <div className="text-sm font-medium text-[#333333] bg-[#F9F8F6] px-3 py-2 rounded-lg">
                   {todo.title}
                 </div>
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary mb-1 block">日期 *</label>
+                <label className="text-xs text-[#8C8C8C] mb-1 block">日期 *</label>
                 <Input
                   type="date"
                   value={calendarDate}
@@ -256,7 +364,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary mb-1 block">時間（可選）</label>
+                <label className="text-xs text-[#8C8C8C] mb-1 block">時間（可選）</label>
                 <Input
                   type="time"
                   value={calendarTime}
@@ -266,10 +374,8 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                 />
               </div>
               <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 h-8"
+                <button
+                  className="flex-1 h-9 px-4 rounded-lg border border-[#E8E4E0] text-[#333333] bg-white hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
                   onClick={() => {
                     setCalendarDialog(false)
                     setCalendarDate('')
@@ -277,16 +383,48 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                   }}
                 >
                   取消
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 h-8 bg-blue-600 hover:bg-blue-700"
+                </button>
+                <button
+                  className="flex-1 h-9 px-4 rounded-lg bg-[#B8A99A] hover:bg-[#9E8C7A] text-white text-sm font-medium disabled:opacity-50"
                   onClick={handleAddToCalendar}
                   disabled={!calendarDate}
                 >
                   建立
-                </Button>
+                </button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* 快速操作 Dialog */}
+        <Dialog open={quickActionDialog} onOpenChange={setQuickActionDialog}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-lg font-serif">
+                {selectedQuickAction && (() => {
+                  const btn = quickActionButtons.find(b => b.key === selectedQuickAction)
+                  if (!btn) return null
+                  const Icon = btn.icon
+                  return (
+                    <>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center ${btn.color}`}>
+                        <Icon size={18} />
+                      </span>
+                      {btn.label}
+                    </>
+                  )
+                })()}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {selectedQuickAction && (
+                <QuickActionContent
+                  activeTab={selectedQuickAction}
+                  todo={todo}
+                  onUpdate={onUpdate}
+                  onClose={() => setQuickActionDialog(false)}
+                />
+              )}
             </div>
           </DialogContent>
         </Dialog>

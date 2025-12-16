@@ -812,24 +812,24 @@ export default function QuoteDetailPage() {
             <div className="border border-border bg-card rounded-xl shadow-sm">
               <div ref={scrollRef} className="overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse">
-                  <thead className="bg-morandi-container/40 border-b border-border/60">
+                  <thead className="bg-morandi-container/50 border-b border-border">
                     <tr>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary w-12 table-divider">
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-morandi-charcoal w-12 table-divider">
                         分類
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-70 table-divider">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-70 table-divider">
                         項目
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-8 table-divider">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-8 table-divider">
                         數量
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider">
                         單價
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-28 table-divider whitespace-nowrap">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider whitespace-nowrap">
                         小計
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary w-24">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-24">
                         操作
                       </th>
                     </tr>

@@ -40,6 +40,20 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
     setIsMounted(true)
   }, [])
 
+  // ESC 鍵關閉
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
   const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
 
   if (!isOpen || !isMounted) return null
@@ -71,6 +85,19 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
 
             #printable-quick-quote-overlay .print\\:hidden {
               display: none !important;
+            }
+
+            /* 顯示列印版本的 table（覆蓋 hidden class） */
+            table.print-wrapper {
+              display: table !important;
+            }
+
+            table.print-wrapper tbody > tr {
+              height: 100%;
+            }
+
+            table.print-wrapper tbody > tr > td {
+              vertical-align: top;
             }
           }
         `}
