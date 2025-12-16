@@ -133,20 +133,23 @@ export const useAuthStore = create<AuthState>()(
 
           logger.log('✅ Supabase authentication successful')
 
-          try {
-            const email = `${username}@venturo.com`
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-              email,
-              password,
-            })
-            if (authError) {
-              logger.warn('⚠️ Supabase Auth session sign-in failed (but login proceeds):', authError.message)
-            } else {
-              logger.log('✅ Supabase Auth session created:', authData.user?.id)
+          // Supabase Auth 登入（必須成功才能繼續）
+          const email = `${username}@venturo.com`
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+
+          if (authError) {
+            logger.error('❌ Supabase Auth session sign-in failed:', authError.message)
+            // 密碼不同步，需要重設
+            return {
+              success: false,
+              message: '密碼需要重設，請聯繫管理員或使用「忘記密碼」功能'
             }
-          } catch (authError) {
-            logger.warn('⚠️ Supabase Auth session creation failed:', authError)
           }
+
+          logger.log('✅ Supabase Auth session created:', authData.user?.id)
 
           // 查詢 workspace code（如果有 workspace_id）
           let workspaceCode: string | undefined = undefined

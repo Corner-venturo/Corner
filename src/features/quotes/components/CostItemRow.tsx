@@ -58,53 +58,63 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
-          onChange={e =>
-            handleUpdateItem(categoryId, item.id, 'quantity', Number(e.target.value) || 0)
-          }
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          onChange={e => {
+            const val = e.target.value.trim()
+            handleUpdateItem(categoryId, item.id, 'quantity', val === '' ? null : Number(val) || 0)
+          }}
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
         />
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         {item.name === '成人' ? (
           <input
-            type="number"
-            value={item.adult_price || ''}
-            onChange={e =>
-              handleUpdateItem(categoryId, item.id, 'adult_price', Number(e.target.value) || 0)
-            }
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            type="text"
+            inputMode="numeric"
+            value={item.adult_price ?? ''}
+            onChange={e => {
+              const val = e.target.value.trim()
+              handleUpdateItem(categoryId, item.id, 'adult_price', val === '' ? null : Number(val) || 0)
+            }}
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
             placeholder="成人票價"
           />
         ) : item.name === '兒童' ? (
           <input
-            type="number"
-            value={item.child_price || ''}
-            onChange={e =>
-              handleUpdateItem(categoryId, item.id, 'child_price', Number(e.target.value) || 0)
-            }
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            type="text"
+            inputMode="numeric"
+            value={item.child_price ?? ''}
+            onChange={e => {
+              const val = e.target.value.trim()
+              handleUpdateItem(categoryId, item.id, 'child_price', val === '' ? null : Number(val) || 0)
+            }}
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
             placeholder="兒童票價"
           />
         ) : item.name === '嬰兒' ? (
           <input
-            type="number"
-            value={item.infant_price || ''}
-            onChange={e =>
-              handleUpdateItem(categoryId, item.id, 'infant_price', Number(e.target.value) || 0)
-            }
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            type="text"
+            inputMode="numeric"
+            value={item.infant_price ?? ''}
+            onChange={e => {
+              const val = e.target.value.trim()
+              handleUpdateItem(categoryId, item.id, 'infant_price', val === '' ? null : Number(val) || 0)
+            }}
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
             placeholder="嬰兒票價"
           />
         ) : (
           <input
-            type="number"
-            value={item.unit_price || ''}
-            onChange={e =>
-              handleUpdateItem(categoryId, item.id, 'unit_price', Number(e.target.value) || 0)
-            }
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            type="text"
+            inputMode="numeric"
+            value={item.unit_price ?? ''}
+            onChange={e => {
+              const val = e.target.value.trim()
+              handleUpdateItem(categoryId, item.id, 'unit_price', val === '' ? null : Number(val) || 0)
+            }}
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
           />
         )}
       </td>

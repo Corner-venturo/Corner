@@ -52,7 +52,7 @@ export function useEmployeeForm(onSubmit: () => void) {
     }
 
     try {
-      const employee_number = userStoreHelpers.generateUserNumber(formData.english_name)
+      const employee_number = userStoreHelpers.generateUserNumber()
       const hashedPassword = await hashPassword(formData.defaultPassword)
 
       // 決定 workspace_id
@@ -105,6 +105,27 @@ export function useEmployeeForm(onSubmit: () => void) {
       }
 
       const newEmployee = await addUser(dbEmployeeData as any)
+
+      // 建立 Supabase Auth 帳號（用於 RLS）
+      try {
+        const authResponse = await fetch('/api/auth/create-employee-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employee_number,
+            password: formData.defaultPassword,
+          }),
+        })
+
+        if (!authResponse.ok) {
+          const error = await authResponse.json()
+          logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', error)
+        } else {
+          logger.log('✅ Auth 帳號已建立:', employee_number)
+        }
+      } catch (authError) {
+        logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', authError)
+      }
 
       // 自動加入該 workspace 的所有頻道
       if (newEmployee?.id) {

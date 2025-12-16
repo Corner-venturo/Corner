@@ -27,32 +27,79 @@ export const userStoreHelpers = {
 
   /**
    * 員工編號生成
+   * 格式: E001-E999, EA01-EA99, EB01-EB99, EC01-EC99...
+   * E000 為超級管理員保留
    */
-  generateUserNumber: (english_name: string): string => {
+  generateUserNumber: (_english_name?: string): string => {
     const state = useUserStore.getState()
     const users = state.items
-    const baseName = english_name.toLowerCase()
 
-    // 所有現有的員工編號（包括同名和不同名的）
+    // 所有現有的員工編號
     const allEmployeeNumbers = users.map(user => user.employee_number)
 
-    // 取得所有數字編號（不限名字）
-    const allNumericNumbers = allEmployeeNumbers
-      .map(num => {
-        const match = num.match(/\d+$/)
-        return match ? parseInt(match[0], 10) : 0
-      })
-      .filter(num => num > 0)
+    /**
+     * 解析員工編號為序列號
+     * E001-E999 → 1-999
+     * EA01-EA99 → 1000-1098
+     * EB01-EB99 → 1099-1197
+     * ...
+     */
+    const parseEmployeeNumber = (num: string): number => {
+      // E000-E999 格式
+      const basicMatch = num.match(/^E(\d{3})$/)
+      if (basicMatch) {
+        return parseInt(basicMatch[1], 10)
+      }
 
-    // 找到全局最大編號
-    const maxNumber = allNumericNumbers.length > 0 ? Math.max(...allNumericNumbers) : 0
-    let nextNumber = maxNumber + 1
+      // EA01-EZ99 格式
+      const extendedMatch = num.match(/^E([A-Z])(\d{2})$/)
+      if (extendedMatch) {
+        const letterIndex = extendedMatch[1].charCodeAt(0) - 'A'.charCodeAt(0)
+        const number = parseInt(extendedMatch[2], 10)
+        // EA01 = 1000, EA99 = 1098, EB01 = 1099, ...
+        return 1000 + letterIndex * 99 + (number - 1)
+      }
 
-    // 確保這個編號不會與現有的任何員工編號衝突
-    let candidate = `${baseName}${nextNumber.toString().padStart(2, '0')}`
+      return -1 // 非有效 E 格式
+    }
+
+    /**
+     * 將序列號轉換為員工編號
+     * 1-999 → E001-E999
+     * 1000-1098 → EA01-EA99
+     * 1099-1197 → EB01-EB99
+     * ...
+     */
+    const toEmployeeNumber = (seq: number): string => {
+      if (seq < 1000) {
+        return `E${seq.toString().padStart(3, '0')}`
+      }
+
+      const extended = seq - 1000
+      const letterIndex = Math.floor(extended / 99)
+      const number = (extended % 99) + 1
+      const letter = String.fromCharCode('A'.charCodeAt(0) + letterIndex)
+      return `E${letter}${number.toString().padStart(2, '0')}`
+    }
+
+    // 找出現有最大序號
+    const existingSequences = allEmployeeNumbers
+      .map(parseEmployeeNumber)
+      .filter(n => n >= 0)
+
+    const maxSequence = existingSequences.length > 0 ? Math.max(...existingSequences) : 0
+    let nextSequence = maxSequence + 1
+
+    // 跳過 E000（超級管理員保留）
+    if (nextSequence === 0) {
+      nextSequence = 1
+    }
+
+    // 產生編號並確保不重複
+    let candidate = toEmployeeNumber(nextSequence)
     while (allEmployeeNumbers.includes(candidate)) {
-      nextNumber++
-      candidate = `${baseName}${nextNumber.toString().padStart(2, '0')}`
+      nextSequence++
+      candidate = toEmployeeNumber(nextSequence)
     }
 
     return candidate

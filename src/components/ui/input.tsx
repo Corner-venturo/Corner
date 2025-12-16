@@ -1,12 +1,34 @@
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
-import { toHalfWidth } from '@/lib/utils/text'
+import { toHalfWidth, tryCalculateMath } from '@/lib/utils/text'
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, onChange, onKeyDown, onCompositionStart, onCompositionEnd, style, ...props }, ref) => {
+export interface InputProps extends React.ComponentProps<'input'> {
+  /**
+   * 是否啟用數學計算（失焦時自動計算數學表達式）
+   * @default true（數字類型輸入框）
+   */
+  enableMathCalculation?: boolean
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({
+    className,
+    type,
+    onChange,
+    onKeyDown,
+    onBlur,
+    onCompositionStart,
+    onCompositionEnd,
+    enableMathCalculation,
+    style,
+    ...props
+  }, ref) => {
     const isComposingRef = React.useRef(false)
     const justFinishedComposingRef = React.useRef(false)
+
+    // 數字類型預設啟用數學計算
+    const shouldCalculateMath = enableMathCalculation ?? (type === 'number' || type === 'text')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!onChange) return
@@ -57,13 +79,38 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // 🔥 核心：輸入法組合中按 Enter 時，阻止事件冒泡
+      // 這樣可以防止表單提交或觸發其他 Enter 行為
+      if (e.key === 'Enter' && isComposingRef.current) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
       // 先調用外部的 onKeyDown
       if (onKeyDown) {
         onKeyDown(e)
       }
+    }
 
-      // 注意：不要在這裡 preventDefault()，否則會阻止 form submit
-      // 如果需要特定行為，應該由外部的 onKeyDown 處理
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      // 失焦時進行數學計算（如果啟用）
+      if (shouldCalculateMath && onChange && e.target.value) {
+        const calculatedValue = tryCalculateMath(e.target.value)
+        if (calculatedValue !== e.target.value) {
+          const syntheticEvent = {
+            ...e,
+            target: { ...e.target, value: calculatedValue },
+            currentTarget: { ...e.currentTarget, value: calculatedValue },
+          } as React.ChangeEvent<HTMLInputElement>
+          onChange(syntheticEvent)
+        }
+      }
+
+      // 調用外部的 onBlur
+      if (onBlur) {
+        onBlur(e)
+      }
     }
 
     return (
@@ -77,6 +124,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         ref={ref}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         onCompositionStart={(e) => {
           isComposingRef.current = true
           // 調用外部的 onCompositionStart

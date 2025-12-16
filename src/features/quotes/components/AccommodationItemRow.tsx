@@ -44,12 +44,14 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
       {/* 人數欄 */}
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
-          onChange={e =>
-            handleUpdateItem(categoryId, item.id, 'quantity', Number(e.target.value) || 0)
-          }
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          onChange={e => {
+            const val = e.target.value.trim()
+            handleUpdateItem(categoryId, item.id, 'quantity', val === '' ? null : Number(val) || 0)
+          }}
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
           placeholder="人數"
         />
       </td>
@@ -57,12 +59,14 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
       {/* 單價欄 */}
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
         <input
-          type="number"
-          value={item.unit_price || ''}
-          onChange={e =>
-            handleUpdateItem(categoryId, item.id, 'unit_price', Number(e.target.value) || 0)
-          }
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          type="text"
+          inputMode="numeric"
+          value={item.unit_price ?? ''}
+          onChange={e => {
+            const val = e.target.value.trim()
+            handleUpdateItem(categoryId, item.id, 'unit_price', val === '' ? null : Number(val) || 0)
+          }}
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
           placeholder="單價"
         />
       </td>

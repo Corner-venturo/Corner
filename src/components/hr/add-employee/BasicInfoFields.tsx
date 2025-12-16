@@ -37,7 +37,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
-            英文姓名 * (用於生成員工編號)
+            英文姓名 *
           </label>
           <Input
             value={formData.english_name}
@@ -45,25 +45,19 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
             placeholder="例：John"
             required
           />
-          {formData.english_name && (
-            <p className="text-xs text-morandi-muted mt-1">
-              員工編號將為：{userStoreHelpers.generateUserNumber(formData.english_name)}
-            </p>
-          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">
             員工編號（自動生成）
           </label>
           <Input
-            value={
-              formData.english_name
-                ? userStoreHelpers.generateUserNumber(formData.english_name)
-                : ''
-            }
+            value={userStoreHelpers.generateUserNumber()}
             disabled
             className="bg-morandi-container/20"
           />
+          <p className="text-xs text-morandi-muted mt-1">
+            格式：E001-E999, EA01-EA99...
+          </p>
         </div>
       </div>
 

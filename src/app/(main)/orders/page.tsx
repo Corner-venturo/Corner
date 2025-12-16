@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -32,9 +32,8 @@ export default function OrdersPage() {
   } | null>(null)
 
   // 🔥 載入 workspace（只執行一次）
-  React.useEffect(() => {
+  useEffect(() => {
     loadWorkspaces()
-   
   }, [])
 
   const filteredOrders = orders.filter(order => {

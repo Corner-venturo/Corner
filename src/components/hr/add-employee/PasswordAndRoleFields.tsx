@@ -3,23 +3,25 @@
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { EmployeeFormData } from './types'
+import { type UserRole, ROLES } from '@/lib/rbac-config'
 
 interface PasswordAndRoleFieldsProps {
   formData: EmployeeFormData
   setFormData: (data: EmployeeFormData) => void
 }
 
-type EmployeeRole =
-  | 'user'
-  | 'employee'
-  | 'admin'
-  | 'tour_leader'
-  | 'sales'
-  | 'accountant'
-  | 'assistant'
+// 可選擇的角色（排除 super_admin，只有超級管理員才能賦予）
+const SELECTABLE_ROLES: { value: UserRole; label: string }[] = [
+  { value: 'staff', label: ROLES.staff.label },
+  { value: 'sales', label: ROLES.sales.label },
+  { value: 'tour_leader', label: ROLES.tour_leader.label },
+  { value: 'accountant', label: ROLES.accountant.label },
+  { value: 'assistant', label: ROLES.assistant.label },
+  { value: 'admin', label: ROLES.admin.label },
+]
 
 export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRoleFieldsProps) {
-  const toggleRole = (role: EmployeeRole) => {
+  const toggleRole = (role: UserRole) => {
     if (formData.roles.includes(role)) {
       setFormData({ ...formData, roles: formData.roles.filter(r => r !== role) })
     } else {
@@ -45,20 +47,10 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
 
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-2">
-          附加身份標籤（可複選）
+          員工角色（可複選）
         </label>
         <div className="flex flex-wrap gap-4">
-          {(
-            [
-              { value: 'user', label: '普通使用者' },
-              { value: 'employee', label: '員工' },
-              { value: 'admin', label: '管理員' },
-              { value: 'tour_leader', label: '領隊' },
-              { value: 'sales', label: '業務' },
-              { value: 'accountant', label: '會計' },
-              { value: 'assistant', label: '助理' },
-            ] as const
-          ).map(({ value, label }) => (
+          {SELECTABLE_ROLES.map(({ value, label }) => (
             <label key={value} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -72,7 +64,7 @@ export function PasswordAndRoleFields({ formData, setFormData }: PasswordAndRole
           ))}
         </div>
         <p className="text-xs text-morandi-muted mt-2">
-          此標籤僅用於篩選，不影響實際權限功能。可勾選多個身份
+          角色會影響員工可使用的功能。一般員工請選擇「一般員工」
         </p>
       </div>
     </>

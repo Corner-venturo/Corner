@@ -232,9 +232,13 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                       </td>
                       <td className="px-2 py-1">
                         <Input
-                          type="number"
-                          value={item.quantity || ''}
-                          onChange={e => updateItem(item.id, 'quantity', Number(e.target.value) || 0)}
+                          type="text"
+                          inputMode="numeric"
+                          value={item.quantity && item.quantity !== 0 ? item.quantity : ''}
+                          onChange={e => {
+                            const val = e.target.value.trim()
+                            updateItem(item.id, 'quantity', val === '' ? 0 : Number(val) || 0)
+                          }}
                           disabled={isReadOnly}
                           className="h-7 text-sm text-center"
                         />
@@ -242,18 +246,26 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                       {!isReadOnly && (
                         <td className="px-2 py-1">
                           <Input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             value={(item as any).cost || ''}
-                            onChange={e => updateItem(item.id, 'cost' as any, Number(e.target.value) || 0)}
+                            onChange={e => {
+                              const val = e.target.value.trim()
+                              updateItem(item.id, 'cost' as any, val === '' ? 0 : Number(val) || 0)
+                            }}
                             className="h-7 text-sm text-right"
                           />
                         </td>
                       )}
                       <td className="px-2 py-1">
                         <Input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           value={item.unit_price || ''}
-                          onChange={e => updateItem(item.id, 'unit_price', Number(e.target.value) || 0)}
+                          onChange={e => {
+                            const val = e.target.value.trim()
+                            updateItem(item.id, 'unit_price', val === '' ? 0 : Number(val) || 0)
+                          }}
                           disabled={isReadOnly}
                           className="h-7 text-sm text-right"
                         />
@@ -345,9 +357,13 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               <label className="text-xs font-medium text-morandi-secondary">已收金額</label>
               {!isReadOnly ? (
                 <Input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={customerInfo.received_amount || ''}
-                  onChange={e => setField('received_amount', Number(e.target.value) || 0)}
+                  onChange={e => {
+                    const val = e.target.value.trim()
+                    setField('received_amount', val === '' ? 0 : Number(val) || 0)
+                  }}
                   className="mt-1 h-8 text-lg font-bold"
                 />
               ) : (

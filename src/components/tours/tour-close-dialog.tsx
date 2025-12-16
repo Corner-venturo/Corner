@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Tour } from '@/types/tour.types'
 import { PaymentRequest } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import { Plus, X } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -31,6 +32,7 @@ interface TourCloseDialogProps {
 }
 
 export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourCloseDialogProps) {
+  const user = useAuthStore(state => state.user)
   const [loading, setLoading] = useState(false)
   const [calculating, setCalculating] = useState(true)
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -218,7 +220,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             supplier_name: '業務業績',
             amount,
             note: `業務業績 ${recipient.percentage}%`,
-            status: 'pending'
+            status: 'pending',
+            workspace_id: user?.workspace_id
           })
         }
       }
@@ -233,7 +236,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             supplier_name: 'OP 獎金',
             amount,
             note: `OP 獎金 ${recipient.percentage}%`,
-            status: 'pending'
+            status: 'pending',
+            workspace_id: user?.workspace_id
           })
         }
       }

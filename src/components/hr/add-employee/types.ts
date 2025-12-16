@@ -1,10 +1,12 @@
+import { type UserRole } from '@/lib/rbac-config'
+
 export interface EmployeeFormData {
   english_name: string
   display_name: string
   chinese_name: string
   defaultPassword: string
   workspace_id?: string // super_admin 可以選擇 workspace
-  roles: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant')[]
+  roles: UserRole[]
   personal_info: {
     national_id: string
     birthday: string

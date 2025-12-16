@@ -122,12 +122,14 @@ export default function ItineraryPage() {
 
     setIsDuplicating(true)
     try {
-      // 複製所有欄位，但排除 id, created_at, updated_at 並覆蓋 tour_code, title, created_by
+      // 複製所有欄位，但排除系統欄位，讓 store 自動注入
       const {
         id: sourceItineraryId,
         created_at: _createdAt,
         updated_at: _updatedAt,
         created_by: _createdBy, // 作者改為當前登入者
+        updated_by: _updatedBy, // 更新者改為當前登入者
+        workspace_id: _workspaceId, // workspace 由 store 自動注入當前用戶的
         tour_id: _tourId, // 複製的行程不關聯原有的團
         is_template: _isTemplate, // 複製的行程不是公司範例
         closed_at: _closedAt, // 複製的行程不是結案狀態
@@ -174,6 +176,9 @@ export default function ItineraryPage() {
 
         const newQuote = {
           ...quoteRestData,
+          // 排除系統欄位，讓 store 自動生成/注入
+          code: undefined, // 讓 store 自動生成新的報價單編號
+          workspace_id: undefined, // 讓 store 自動注入當前用戶的 workspace
           // 關聯到新行程
           itinerary_id: createdItinerary?.id,
           // 清空客戶資料
