@@ -61,7 +61,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/payments', label: '收款管理', icon: CreditCard, requiredPermission: 'payments' },
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
-      { href: '/finance/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
+      { href: '/erp-accounting/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
       { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ],

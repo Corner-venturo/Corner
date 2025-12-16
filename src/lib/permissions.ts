@@ -139,8 +139,8 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     id: 'vouchers',
     label: '會計傳票',
     category: '全部',
-    routes: ['/finance/vouchers'],
-    description: '會計傳票管理（需啟用會計模組）',
+    routes: ['/erp-accounting'],
+    description: '會計傳票管理',
   },
   {
     id: 'hr',
