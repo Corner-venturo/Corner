@@ -12,11 +12,10 @@ import {
   Archive,
   ArchiveRestore,
   FileSignature,
-  Flag,
   MessageSquare,
   LockOpen,
   Eye,
-  Calculator,
+  Link,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -100,7 +99,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <MessageSquare size={14} />
           </button>
 
-          {/* 報價單 */}
+          {/* 連結文件（報價單/行程表） */}
           <button
             onClick={e => {
               e.stopPropagation()
@@ -114,26 +113,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-            title="管理報價單"
+            title="連結文件"
           >
-            <Calculator size={14} />
-          </button>
-
-          {/* 行程表 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              setSelectedTour(tour)
-              if (onOpenItineraryDialog) {
-                onOpenItineraryDialog(tour)
-              } else {
-                router.push(`/itinerary/${tour.id}`)
-              }
-            }}
-            className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
-            title="管理行程表"
-          >
-            <Flag size={14} />
+            <Link size={14} />
           </button>
 
           {/* 合約管理 */}

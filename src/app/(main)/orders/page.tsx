@@ -136,8 +136,6 @@ export default function OrdersPage() {
     contact_person: string
     sales_person: string
     assistant: string
-    member_count: number
-    total_amount: number
   }) => {
     const selectedTour = tours.find(t => t.id === orderData.tour_id)
     if (!selectedTour || !currentWorkspace) return
@@ -147,7 +145,7 @@ export default function OrdersPage() {
     const nextOrderNumber = tourOrders.length + 1
     const orderNumber = `${selectedTour.code}-${nextOrderNumber.toString().padStart(2, '0')}`
 
-    const newOrder = await addOrder({
+    await addOrder({
       order_number: orderNumber,
       tour_id: orderData.tour_id,
       code: selectedTour.code,
@@ -156,26 +154,15 @@ export default function OrdersPage() {
       contact_phone: null,
       sales_person: orderData.sales_person,
       assistant: orderData.assistant,
-      member_count: orderData.member_count,
-      total_amount: orderData.total_amount,
+      member_count: 0,
+      total_amount: 0,
       paid_amount: 0,
       payment_status: 'unpaid',
-      remaining_amount: orderData.total_amount,
+      remaining_amount: 0,
       status: null,
       notes: null,
       customer_id: null,
     } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
-
-    // 自動建立空白成員記錄
-    if (newOrder && orderData.member_count > 0) {
-      const memberPromises = Array.from({ length: orderData.member_count }, () =>
-        addMember({
-          name: '',
-          order_id: newOrder.id,
-        } as Omit<Member, 'id' | 'created_at' | 'updated_at'>)
-      )
-      await Promise.all(memberPromises)
-    }
 
     setIsAddDialogOpen(false)
   }

@@ -11,7 +11,6 @@ import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
-import { useAuthStore } from '@/stores/auth-store'
 import { alert } from '@/lib/ui/alert-dialog'
 
 interface QuickGroupProps {
@@ -22,7 +21,6 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const tourStore = useTourStore()
   const orderStore = useOrderStore()
   const { items: employees } = useUserStore()
-  const { user } = useAuthStore()
   const [submitting, setSubmitting] = useState(false)
 
   const [newTour, setNewTour] = useState({
@@ -38,15 +36,11 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
     isSpecial: false,
   })
 
-  const currentUserName = user?.display_name || user?.english_name || ''
-
   const [newOrder, setNewOrder] = useState({
     contact_person: '',
     contact_phone: '',
-    sales_person: currentUserName,
+    sales_person: '',
     assistant: '',
-    member_count: undefined as number | undefined,
-    total_amount: 0,
   })
 
   // 篩選業務人員和助理
@@ -105,10 +99,10 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           contact_phone: newOrder.contact_phone,
           sales_person: newOrder.sales_person || '未指派',
           assistant: newOrder.assistant || '未指派',
-          member_count: newOrder.member_count || 1,
-          total_amount: newOrder.total_amount,
+          member_count: 1,
+          total_amount: 0,
           paid_amount: 0,
-          remaining_amount: newOrder.total_amount,
+          remaining_amount: 0,
           payment_status: 'unpaid' as const,
         }
 
@@ -133,8 +127,6 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         contact_phone: '',
         sales_person: '',
         assistant: '',
-        member_count: 1,
-        total_amount: 0,
       })
 
       await alert(newOrder.contact_person ? '成功建立旅遊團和訂單！' : '成功建立旅遊團！', 'success')
@@ -295,40 +287,6 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  團員人數
-                </label>
-                <Input
-                  type="number"
-                  value={newOrder.member_count || ''}
-                  onChange={e => {
-                    const value = e.target.value
-                    setNewOrder(prev => ({
-                      ...prev,
-                      member_count: value === '' ? undefined : Number(value),
-                    }))
-                  }}
-                  placeholder="1"
-                  min="0"
-                  className="border-morandi-container/30"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  訂單金額
-                </label>
-                <Input
-                  type="number"
-                  value={newOrder.total_amount}
-                  onChange={e =>
-                    setNewOrder(prev => ({ ...prev, total_amount: Number(e.target.value) }))
-                  }
-                  className="border-morandi-container/30"
-                />
-              </div>
-            </div>
           </>
         )}
 

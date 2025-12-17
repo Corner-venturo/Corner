@@ -2121,9 +2121,98 @@ export function OrderMembersExpandable({
                   )}
                 </div>
               ) : (
-                <div className="w-full h-48 bg-morandi-container/30 rounded-lg flex items-center justify-center text-morandi-secondary">
-                  <FileImage size={48} className="opacity-30" />
-                </div>
+                <label
+                  htmlFor="edit-passport-upload"
+                  className="w-full h-48 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-secondary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
+                >
+                  <Upload size={32} className="mb-2 opacity-50" />
+                  <span className="text-sm">點擊上傳護照照片</span>
+                  <span className="text-xs mt-1 opacity-70">支援 JPG、PNG</span>
+                  <input
+                    id="edit-passport-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file || !editingMember) return
+
+                      try {
+                        // 壓縮圖片
+                        const compressedFile = await new Promise<File>((resolve, reject) => {
+                          const reader = new FileReader()
+                          reader.readAsDataURL(file)
+                          reader.onload = (ev) => {
+                            const img = new Image()
+                            img.src = ev.target?.result as string
+                            img.onload = () => {
+                              const canvas = document.createElement('canvas')
+                              let { width, height } = img
+                              const maxDimension = 1200
+                              if (width > maxDimension || height > maxDimension) {
+                                if (width > height) {
+                                  height = (height / width) * maxDimension
+                                  width = maxDimension
+                                } else {
+                                  width = (width / height) * maxDimension
+                                  height = maxDimension
+                                }
+                              }
+                              canvas.width = width
+                              canvas.height = height
+                              const ctx = canvas.getContext('2d')!
+                              ctx.drawImage(img, 0, 0, width, height)
+                              canvas.toBlob(
+                                (blob) => {
+                                  if (blob) {
+                                    resolve(new File([blob], file.name, { type: 'image/jpeg' }))
+                                  } else {
+                                    reject(new Error('壓縮失敗'))
+                                  }
+                                },
+                                'image/jpeg',
+                                0.8
+                              )
+                            }
+                            img.onerror = reject
+                          }
+                          reader.onerror = reject
+                        })
+
+                        // 上傳到 Supabase Storage
+                        const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+                        const { error: uploadError } = await supabase.storage
+                          .from('passport-images')
+                          .upload(fileName, compressedFile, { upsert: true })
+
+                        if (uploadError) throw uploadError
+
+                        const { data: urlData } = supabase.storage
+                          .from('passport-images')
+                          .getPublicUrl(fileName)
+
+                        // 更新資料庫
+                        await supabase
+                          .from('order_members')
+                          .update({ passport_image_url: urlData.publicUrl })
+                          .eq('id', editingMember.id)
+
+                        // 更新本地狀態
+                        setEditingMember({ ...editingMember, passport_image_url: urlData.publicUrl })
+
+                        const { toast } = await import('sonner')
+                        toast.success('護照照片上傳成功')
+                      } catch (error) {
+                        logger.error('護照上傳失敗:', error)
+                        const { toast } = await import('sonner')
+                        toast.error('上傳失敗，請重試')
+                      }
+
+                      // 清空 input
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
               )}
               {editMode === 'verify' && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">

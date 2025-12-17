@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { useToursListSlim } from '@/hooks/useListSlim'
 import { useUserStore } from '@/stores/user-store'
-import { useAuthStore } from '@/stores/auth-store'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 
@@ -18,8 +17,6 @@ export interface OrderFormData {
   contact_person: string
   sales_person: string
   assistant: string
-  member_count: number
-  total_amount: number
 }
 
 interface AddOrderFormProps {
@@ -37,25 +34,16 @@ interface AddOrderFormProps {
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
   const { items: tours } = useToursListSlim()
   const { items: employees, fetchAll: fetchEmployees } = useUserStore()
-  const { user } = useAuthStore()
 
   // 判斷是否為嵌入模式
   const isEmbedded = !!onChange
-
-  // Debug: 檢查員工資料
-  React.useEffect(() => {}, [employees])
-
-  // 取得當前登入使用者的顯示名稱
-  const currentUserName = user?.display_name || user?.english_name || ''
 
   // 內部 state（獨立模式使用）
   const [internalFormData, setInternalFormData] = useState<Partial<OrderFormData>>({
     tour_id: tourId || '',
     contact_person: '',
-    sales_person: currentUserName, // 自動帶入當前使用者
+    sales_person: '',
     assistant: '',
-    member_count: 1,
-    total_amount: 0,
   })
 
   // 使用外部 state 或內部 state
@@ -69,17 +57,6 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
     }
   }, [employees.length, fetchEmployees])
 
-  // 只在初始化時自動填入業務欄位（之後允許用戶清空）
-  const hasInitialized = React.useRef(false)
-  React.useEffect(() => {
-    if (!isEmbedded && currentUserName && !hasInitialized.current) {
-      setInternalFormData(prev => ({
-        ...prev,
-        sales_person: currentUserName,
-      }))
-      hasInitialized.current = true
-    }
-  }, [currentUserName, isEmbedded])
 
   // 篩選業務人員（roles 包含 'sales'）
   const salesPersons = useMemo(() => {
