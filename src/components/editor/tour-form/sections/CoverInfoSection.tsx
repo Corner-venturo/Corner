@@ -220,7 +220,6 @@ export function CoverInfoSection({
   const getDefaultFlightStyle = (coverStyle: CoverStyleType): FlightStyleType => {
     switch (coverStyle) {
       case 'nature':
-      case 'serene':
         return 'chinese'
       case 'luxury':
         return 'luxury'
@@ -231,15 +230,17 @@ export function CoverInfoSection({
     }
   }
 
-  // 從資料庫載入的封面風格選項
+  // 從資料庫載入的封面風格選項（排除 serene）
   const coverStyleOptions = useMemo(() => {
-    return coverTemplates.map(template => ({
-      value: template.id as CoverStyleType,
-      label: template.name,
-      description: template.description || '',
-      color: getTemplateColor(template.id),
-      previewImage: template.preview_image_url,
-    }))
+    return coverTemplates
+      .filter(template => template.id !== 'serene')
+      .map(template => ({
+        value: template.id as CoverStyleType,
+        label: template.name,
+        description: template.description || '',
+        color: getTemplateColor(template.id),
+        previewImage: template.preview_image_url,
+      }))
   }, [coverTemplates])
 
   // 取得當前風格的顏色
@@ -802,30 +803,6 @@ export function CoverInfoSection({
                           </div>
                         </div>
                       )}
-                    </div>
-                  ) : data.coverStyle === 'serene' ? (
-                    /* Serene 風格：淺色漸層 + 左側垂直文字 + 右側內容 */
-                    <div className="absolute inset-0">
-                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover opacity-90" />
-                      <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-[#f6f8f8]" />
-                      <div className="absolute inset-0 flex">
-                        {/* 左側垂直文字 */}
-                        <div className={cn('flex justify-center items-start gap-1 opacity-80', previewMode === 'mobile' ? 'w-1/3 px-2 pt-4' : 'w-1/2 px-4 pt-6')}>
-                          <h1 className={cn('font-black text-[#111e21] tracking-widest leading-none', previewMode === 'mobile' ? 'text-base' : 'text-2xl')} style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>{data.title || '行程標題'}</h1>
-                          <p className={cn('font-light text-[#111e21] tracking-wider', previewMode === 'mobile' ? 'text-[10px] pt-2' : 'text-xs pt-6')} style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>{data.subtitle || '副標題'}</p>
-                        </div>
-                        {/* 右側內容 */}
-                        <div className={cn('flex flex-col justify-center', previewMode === 'mobile' ? 'w-2/3 p-2' : 'w-1/2 p-4')}>
-                          <h2 className={cn('font-bold text-[#111e21] leading-tight mb-1', previewMode === 'mobile' ? 'text-sm' : 'text-lg')}>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30c9e8] to-teal-400">{data.title || '行程標題'}</span>
-                          </h2>
-                          <p className={cn('text-[#111e21]/80 mb-2 line-clamp-2', previewMode === 'mobile' ? 'text-[9px]' : 'text-[10px]')}>{data.description || '描述文字'}</p>
-                          <div className={cn('flex gap-2', previewMode === 'mobile' ? 'text-[9px]' : 'text-[10px]')}>
-                            <span className="text-gray-500">{data.departureDate || '日期'}</span>
-                            <span className="font-bold text-[#111e21]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   ) : data.coverStyle === 'nature' ? (
                     /* Nature 風格：和紙背景 + 左側垂直文字 + 右側大圖 */
