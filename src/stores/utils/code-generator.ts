@@ -1,14 +1,21 @@
 /**
  * 編號生成工具
  *
- * 報價單格式：{辦公室代碼}-{letter}{3位數} (如: TP-A001, TC-A001)
- * 字母循環：A001-A999 → B001-B999 → C001-C999...
+ * 團號格式：{城市代號}{年後2碼}{月}{日}{A-Z}
+ * 例如：CNX250128A (清邁 2025/01/28 第1團)
  *
- * 團號格式：{辦公室代碼}-{城市代號}{年後2碼}{月}{日}{流水號2位}
- * 例如：TP-CNX25012801 (台北清邁 2025/01/28 第1團)
+ * 員工編號格式：{辦公室}-E{3位數} → {辦公室}-E{字母}{2位數}
+ * 例如：TP-E001, TC-E001, TP-EA01...
+ * （由 user-store.ts 的 generateUserNumber 處理）
  *
- * 員工編號格式：{辦公室代碼}-E{3位數}
- * 例如：TP-E001 (台北第1位員工)
+ * 其他編號格式（由 createCloudHook.ts 處理）：
+ * - 客戶：C{6位數} (如: C000001)
+ * - 訂單：O{6位數} (如: O000001)
+ * - 報價單：Q{6位數} (如: Q000001)
+ * - 行程表：I{6位數} (如: I000001)
+ * - 請款單：PR{6位數} (如: PR000001)
+ * - 出納單：DO{6位數} (如: DO000001)
+ * - 收款單：RO{6位數} (如: RO000001)
  */
 
 import { logger } from '@/lib/utils/logger'
@@ -18,15 +25,15 @@ import type { CodeConfig } from '../core/types'
 /**
  * 生成團號
  *
- * @param workspaceCode - 辦公室代碼（如 TP, TC）
+ * @param workspaceCode - 辦公室代碼（已忽略，保留參數以維持 API 相容性）
  * @param cityCode - 城市機場代號（如 CNX, BKK）
  * @param departureDate - 出發日期 (ISO 8601 格式)
- * @param existingTours - 現有旅遊團列表（同 workspace）
- * @returns 團號（如 TP-CNX25012801）
+ * @param existingTours - 現有旅遊團列表
+ * @returns 團號（如 CNX250128A）
  *
  * @example
  * generateTourCode('TP', 'CNX', '2025-01-28', existingTours)
- * // => 'TP-CNX25012801' (台北清邁 2025年1月28日 第1團)
+ * // => 'CNX250128A' (清邁 2025年1月28日 第1團)
  */
 export function generateTourCode(
   workspaceCode: string,
@@ -39,25 +46,31 @@ export function generateTourCode(
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const day = date.getDate().toString().padStart(2, '0')
 
-  // 格式：TP-CNX25012801 (辦公室-城市代碼+年月日+流水號)
-  const datePrefix = `${workspaceCode}-${cityCode}${year}${month}${day}`
+  // 格式：CNX250128A (城市代碼+年月日+字母)
+  const datePrefix = `${cityCode}${year}${month}${day}`
 
-  // 找出同日期同城市同辦公室的最大流水號
-  let maxSequence = 0
+  // 找出同日期同城市的最大字母
+  let maxLetter = ''
   existingTours.forEach(tour => {
     const code = tour.code
     if (code?.startsWith(datePrefix)) {
-      // 提取最後兩碼流水號（例如 TP-CNX25012801 → 01）
-      const sequencePart = code.slice(-2)
-      const sequence = parseInt(sequencePart, 10)
-      if (!isNaN(sequence) && sequence > maxSequence) {
-        maxSequence = sequence
+      // 提取最後一碼字母（例如 CNX250128A → A）
+      const lastChar = code.slice(-1)
+      if (/^[A-Z]$/.test(lastChar) && lastChar > maxLetter) {
+        maxLetter = lastChar
       }
+    }
+    // 向後相容：也檢查舊格式 TP-CNX25012801
+    if (code?.includes(`-${datePrefix}`)) {
+      const oldLastChar = code.slice(-2, -1) // 取倒數第二碼看是否為數字
+      // 如果是舊格式數字，視為已使用過
+      if (!maxLetter) maxLetter = '@' // @ 的下一個是 A
     }
   })
 
-  const nextSequence = (maxSequence + 1).toString().padStart(2, '0')
-  return `${datePrefix}${nextSequence}`
+  // 計算下一個字母
+  const nextLetter = maxLetter ? String.fromCharCode(maxLetter.charCodeAt(0) + 1) : 'A'
+  return `${datePrefix}${nextLetter}`
 }
 
 /**

@@ -9,7 +9,7 @@ export type ReceiptStatus = 'received' | 'confirmed' | 'rejected'
 export type PaymentMethod = 'cash' | 'transfer' | 'card' | 'check'
 
 // 簽證狀態
-export type VisaStatus = 'pending' | 'submitted' | 'issued' | 'collected' | 'rejected'
+export type VisaStatus = 'pending' | 'submitted' | 'collected' | 'rejected' | 'returned'
 
 // 正確的 User 型別（與 Employee 一致）
 export interface User {
@@ -751,7 +751,8 @@ export type PaymentItemCategory =
 export interface PaymentRequestItem {
   id: string
   request_id: string // 所屬請款單ID
-  item_number: string // REQ-2024001-001
+  item_number: string // PR000001-A, PR000001-B...
+  tour_id?: string | null // 品項關聯的團號（可獨立移動到不同團）
   category: PaymentItemCategory
   supplier_id: string
   supplier_name: string | null // 供應商名稱快照

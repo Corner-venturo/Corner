@@ -93,28 +93,10 @@ function formatDateShort(dateStr: string): string {
   }
 }
 
-// 從國家名稱提取顯示文字
-function formatCountryDisplay(country: string | undefined): { main: string; sub: string } {
-  if (!country) return { main: 'JP', sub: '' }
-
-  if (/[\u4e00-\u9fa5]/.test(country)) {
-    return {
-      main: country.slice(0, 2),
-      sub: country.slice(2) || ''
-    }
-  }
-
-  return {
-    main: country.slice(0, 3).toUpperCase(),
-    sub: country.slice(3).toUpperCase()
-  }
-}
-
 export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
   const isMobile = viewMode === 'mobile'
   const dayNumber = data.days || extractDayNumber(data.title, data.dailyItinerary)
   const dateDisplay = formatDateShort(data.departureDate)
-  const countryDisplay = formatCountryDisplay(data.country)
   const coverImage = (data.coverImage && data.coverImage.trim() !== '') ? data.coverImage : DEFAULT_COVER
 
   return (
@@ -138,10 +120,10 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
         {!isMobile ? (
           <div className="flex items-center gap-12 min-h-[600px]">
             {/* 左側文字區 - 固定寬度 */}
-            <div className="w-1/2 flex-shrink-0 relative">
+            <div className="w-[40%] flex-shrink-0 relative pl-[130px]">
               {/* 裝飾圓環 */}
               <div
-                className="absolute -left-8 top-1/2 -translate-y-1/2 w-48 h-48 rounded-full border opacity-10 pointer-events-none"
+                className="absolute left-[60px] top-1/2 -translate-y-1/2 w-48 h-48 rounded-full border opacity-10 pointer-events-none"
                 style={{ borderColor: ART.ink }}
               />
 
@@ -168,28 +150,14 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 className="mb-8"
               >
                 <h1
-                  className="text-8xl xl:text-9xl leading-[0.85] tracking-tight"
+                  className="text-6xl xl:text-7xl leading-[0.9] tracking-tight"
                   style={{
                     fontFamily: "'Cinzel', 'Noto Serif TC', serif",
                     fontWeight: 700,
                     color: ART.ink,
                   }}
                 >
-                  {countryDisplay.main}
-                  {countryDisplay.sub && (
-                    <>
-                      <br />
-                      <span
-                        className="text-7xl xl:text-8xl"
-                        style={{
-                          WebkitTextStroke: `1px ${ART.ink}`,
-                          color: 'transparent',
-                        }}
-                      >
-                        {countryDisplay.sub}
-                      </span>
-                    </>
-                  )}
+                  <RichText html={data.title} />
                 </h1>
 
                 <div
@@ -241,7 +209,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
             </div>
 
             {/* 右側圖片區 - 固定寬度 */}
-            <div className="w-1/2 flex-shrink-0 relative h-[550px]">
+            <div className="w-[55%] flex-shrink-0 relative h-[550px]">
               {/* 大數字背景 */}
               <div
                 className="absolute -top-4 -right-4 text-[200px] leading-none font-black pointer-events-none select-none"
@@ -273,7 +241,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   <img
                     src={coverImage}
                     alt={data.title}
-                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out cursor-pointer"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
@@ -303,20 +271,39 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
           </div>
         ) : (
           /* 手機版：上下佈局 */
-          <div className="space-y-8">
-            {/* 標籤 */}
+          <div className="relative space-y-6">
+            {/* 右上：資訊（絕對定位） */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-block border px-3 py-1 rounded-full"
-              style={{ borderColor: ART.ink }}
+              className="absolute top-[30px] right-0 flex flex-col gap-2 text-right"
             >
-              <span
-                className="text-[10px] tracking-[0.2em] uppercase"
-                style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
-              >
-                <RichText html={data.tagline || data.tourCode || 'COLLECTION'} />
-              </span>
+              <div>
+                <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                  Departure
+                </span>
+                <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                  {dateDisplay || '--'}
+                </span>
+              </div>
+              <div>
+                <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                  Duration
+                </span>
+                <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                  {dayNumber} DAYS
+                </span>
+              </div>
+              {data.price && (
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.15em] mr-2" style={{ color: '#9CA3AF' }}>
+                    Price
+                  </span>
+                  <span className="text-sm" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
+                    {data.price}
+                  </span>
+                </div>
+              )}
             </motion.div>
 
             {/* 標題 */}
@@ -324,25 +311,40 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              className="pl-[20px]"
             >
               <h1
-                className="text-5xl leading-[0.9] tracking-tight"
+                className="text-4xl leading-[0.9] tracking-tight"
                 style={{
                   fontFamily: "'Cinzel', 'Noto Serif TC', serif",
                   fontWeight: 700,
                   color: ART.ink,
                 }}
               >
-                {countryDisplay.main}
+                <RichText html={data.title} />
               </h1>
-              <div
-                className="italic text-3xl mt-2 ml-4"
-                style={{
-                  fontFamily: "'Noto Serif TC', serif",
-                  color: ART.clay,
-                }}
-              >
-                <RichText html={data.subtitle || 'Odyssey'} />
+              {/* 副標題 + 標籤 */}
+              <div className="flex items-center gap-3 mt-2 ml-4">
+                <div
+                  className="italic text-3xl"
+                  style={{
+                    fontFamily: "'Noto Serif TC', serif",
+                    color: ART.clay,
+                  }}
+                >
+                  <RichText html={data.subtitle || 'Odyssey'} />
+                </div>
+                <div
+                  className="inline-block border px-3 py-1 rounded-full"
+                  style={{ borderColor: ART.ink }}
+                >
+                  <span
+                    className="text-[10px] tracking-[0.2em] uppercase"
+                    style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
+                  >
+                    <RichText html={data.tagline || data.tourCode || 'COLLECTION'} />
+                  </span>
+                </div>
               </div>
             </motion.div>
 
@@ -364,34 +366,8 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 <img
                   src={coverImage}
                   alt={data.title}
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-cover"
                 />
-              </div>
-            </motion.div>
-
-            {/* 資訊列 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex gap-6 pt-6 border-t"
-              style={{ borderColor: `${ART.ink}15` }}
-            >
-              <div>
-                <span className="block text-[9px] uppercase tracking-[0.15em] mb-0.5" style={{ color: '#9CA3AF' }}>
-                  Departure
-                </span>
-                <span className="text-base" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
-                  {dateDisplay || '--'}
-                </span>
-              </div>
-              <div>
-                <span className="block text-[9px] uppercase tracking-[0.15em] mb-0.5" style={{ color: '#9CA3AF' }}>
-                  Duration
-                </span>
-                <span className="text-base" style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}>
-                  {dayNumber} DAYS
-                </span>
               </div>
             </motion.div>
           </div>

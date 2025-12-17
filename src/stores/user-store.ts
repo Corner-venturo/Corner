@@ -7,6 +7,7 @@ import { User } from './types'
 import { createStore } from './core/create-store'
 import { TABLES } from '@/lib/db/schemas'
 import { generateUUID } from '@/lib/utils/uuid'
+import { useAuthStore } from './auth-store'
 
 // 建立員工 Store
 export const useUserStore = createStore<User>(
@@ -27,32 +28,41 @@ export const userStoreHelpers = {
 
   /**
    * 員工編號生成
-   * 格式: E001-E999, EA01-EA99, EB01-EB99, EC01-EC99...
+   * 格式: {辦公室}-E001-E999, {辦公室}-EA01-EA99...
+   * 例如: TP-E001, TC-E001, TP-EA01
    * E000 為超級管理員保留
    */
   generateUserNumber: (_english_name?: string): string => {
     const state = useUserStore.getState()
     const users = state.items
 
-    // 所有現有的員工編號
-    const allEmployeeNumbers = users.map(user => user.employee_number)
+    // 取得當前 workspace code（TP 或 TC）
+    const currentUser = useAuthStore.getState().user
+    const workspaceCode = currentUser?.workspace_code || 'TP'
+
+    // 所有現有的員工編號（同 workspace）
+    const allEmployeeNumbers = users
+      .filter(user => user.employee_number?.startsWith(`${workspaceCode}-`))
+      .map(user => user.employee_number)
 
     /**
      * 解析員工編號為序列號
-     * E001-E999 → 1-999
-     * EA01-EA99 → 1000-1098
-     * EB01-EB99 → 1099-1197
+     * TP-E001-TP-E999 → 1-999
+     * TP-EA01-TP-EA99 → 1000-1098
      * ...
      */
     const parseEmployeeNumber = (num: string): number => {
+      // 移除前綴 "TP-" 或 "TC-"
+      const withoutPrefix = num.replace(/^[A-Z]{2}-/, '')
+
       // E000-E999 格式
-      const basicMatch = num.match(/^E(\d{3})$/)
+      const basicMatch = withoutPrefix.match(/^E(\d{3})$/)
       if (basicMatch) {
         return parseInt(basicMatch[1], 10)
       }
 
       // EA01-EZ99 格式
-      const extendedMatch = num.match(/^E([A-Z])(\d{2})$/)
+      const extendedMatch = withoutPrefix.match(/^E([A-Z])(\d{2})$/)
       if (extendedMatch) {
         const letterIndex = extendedMatch[1].charCodeAt(0) - 'A'.charCodeAt(0)
         const number = parseInt(extendedMatch[2], 10)
@@ -64,22 +74,23 @@ export const userStoreHelpers = {
     }
 
     /**
-     * 將序列號轉換為員工編號
-     * 1-999 → E001-E999
-     * 1000-1098 → EA01-EA99
-     * 1099-1197 → EB01-EB99
+     * 將序列號轉換為員工編號（含前綴）
+     * 1-999 → TP-E001-TP-E999
+     * 1000-1098 → TP-EA01-TP-EA99
      * ...
      */
     const toEmployeeNumber = (seq: number): string => {
+      let base: string
       if (seq < 1000) {
-        return `E${seq.toString().padStart(3, '0')}`
+        base = `E${seq.toString().padStart(3, '0')}`
+      } else {
+        const extended = seq - 1000
+        const letterIndex = Math.floor(extended / 99)
+        const number = (extended % 99) + 1
+        const letter = String.fromCharCode('A'.charCodeAt(0) + letterIndex)
+        base = `E${letter}${number.toString().padStart(2, '0')}`
       }
-
-      const extended = seq - 1000
-      const letterIndex = Math.floor(extended / 99)
-      const number = (extended % 99) + 1
-      const letter = String.fromCharCode('A'.charCodeAt(0) + letterIndex)
-      return `E${letter}${number.toString().padStart(2, '0')}`
+      return `${workspaceCode}-${base}`
     }
 
     // 找出現有最大序號
