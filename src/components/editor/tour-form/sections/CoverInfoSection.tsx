@@ -789,57 +789,69 @@ export function CoverInfoSection({
                       </div>
                     </div>
                   ) : data.coverStyle === 'serene' ? (
-                    /* Serene 風格：淡藍色調 */
+                    /* Serene 風格：全屏背景 + 左側垂直標題 + 底部玻璃卡片 */
                     <div className="absolute inset-0">
-                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.8) saturate(0.9)' }} />
-                      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(74,111,165,0.4) 0%, rgba(74,111,165,0.1) 100%)' }} />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                        <span className={cn('px-3 py-1 rounded-full bg-white/20 backdrop-blur text-white/90 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>
-                          {data.tagline || 'Venturo Travel'}
-                        </span>
-                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
+                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70" />
+                      {/* 左側垂直標題 */}
+                      <div className={cn('absolute left-3 flex items-center', previewMode === 'mobile' ? 'top-8 bottom-24' : 'top-12 bottom-28')} style={{ writingMode: 'vertical-rl' }}>
+                        <h1 className={cn('font-black text-white tracking-widest', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')} style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                           {data.title || '行程標題'}
                         </h1>
-                        <p className={cn('text-white/80 mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#87CEEB' }}>
-                          {data.subtitle || '副標題'}
-                        </p>
-                        <div className="flex gap-2 flex-wrap justify-center">
-                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                      </div>
+                      {/* 底部玻璃卡片 */}
+                      <div className={cn('absolute bottom-0 left-0 right-0', previewMode === 'mobile' ? 'p-3' : 'p-4')}>
+                        <div className="backdrop-blur-md bg-white/90 rounded-xl p-3 shadow-xl">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="px-2 py-0.5 rounded-full bg-[#30c9e8]/10 text-[10px] font-bold text-[#30c9e8]">7 Days</span>
+                            <span className="text-[10px] text-gray-500">{data.subtitle || '副標題'}</span>
                           </div>
-                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
-                          </div>
-                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                          <h2 className={cn('font-bold text-[#111e21] mb-1', previewMode === 'mobile' ? 'text-sm' : 'text-base')}>
+                            {data.title || '行程標題'}
+                          </h2>
+                          <p className="text-[10px] text-gray-600 mb-2 line-clamp-2">{data.description || '描述文字'}</p>
+                          <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-[10px]">
+                            <span className="text-gray-500">{data.departureDate || '日期'}</span>
+                            <span className="font-bold text-[#111e21]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
                           </div>
                         </div>
+                        <p className="text-center text-[10px] text-white/70 mt-2">{data.tagline || 'Corner Travel'}</p>
                       </div>
                     </div>
                   ) : data.coverStyle === 'nature' ? (
-                    /* Nature 風格：日本藍色調 */
-                    <div className="absolute inset-0">
-                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.75)' }} />
-                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(48,171,232,0.2) 0%, rgba(0,0,0,0.6) 100%)' }} />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                        <span className={cn('px-3 py-1 rounded-full border text-white/90 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)' }}>
-                          {data.tagline || 'Venturo Travel'}
-                        </span>
-                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
+                    /* Nature 風格：和紙背景 + 左側垂直文字 + 右側大圖 */
+                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#f9f9f7' }}>
+                      {/* 左側垂直文字 */}
+                      <div className={cn('flex gap-1 justify-center items-center', previewMode === 'mobile' ? 'px-2' : 'px-4')}>
+                        <h1
+                          className={cn('text-[#2c3e50] font-black tracking-wider', previewMode === 'mobile' ? 'text-base' : 'text-xl')}
+                          style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
+                        >
                           {data.title || '行程標題'}
                         </h1>
-                        <p className={cn('mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#30abe8' }}>
+                        <h2
+                          className={cn('text-[#30abe8] font-bold tracking-wider', previewMode === 'mobile' ? 'text-xs' : 'text-sm')}
+                          style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
+                        >
                           {data.subtitle || '副標題'}
-                        </p>
-                        <div className="flex gap-2 flex-wrap justify-center">
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
-                          </div>
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
-                          </div>
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                        </h2>
+                      </div>
+                      {/* 右側圖片 */}
+                      <div className="flex-1 relative">
+                        <div className={cn('w-full h-full overflow-hidden', previewMode === 'mobile' ? 'rounded-t-[20px] rounded-b-lg' : 'rounded-t-[40px] rounded-b-lg')}>
+                          <div className="absolute inset-0 bg-[#30abe8]/10 mix-blend-overlay z-10" />
+                          <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
+                          {/* 底部標籤 */}
+                          <div className={cn('absolute z-20 flex flex-wrap gap-1', previewMode === 'mobile' ? 'bottom-2 left-2' : 'bottom-3 left-3')}>
+                            <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                              <span className="text-[10px] font-bold text-[#2c3e50]">{data.tagline || 'Travel'}</span>
+                            </div>
+                            <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                              <span className="text-[10px] text-[#2c3e50]">{data.departureDate || '日期'}</span>
+                            </div>
+                            <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                              <span className="text-[10px] text-[#2c3e50]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
