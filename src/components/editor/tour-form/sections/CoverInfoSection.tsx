@@ -731,6 +731,8 @@ export function CoverInfoSection({
                 >
                   <div className="w-full h-full overflow-hidden" style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
                     {(() => {
+                      // 從 dailyItinerary 計算天數
+                      const days = data.dailyItinerary?.length || 0
                       const heroData = {
                         coverImage: data.coverImage,
                         tagline: data.tagline || 'Corner Travel',
@@ -742,6 +744,10 @@ export function CoverInfoSection({
                         price: data.price || '',
                         priceNote: data.priceUnit || '/人',
                         country: selectedCountry || '',
+                        days: days > 0 ? days : undefined,
+                        heroStatCard2: data.heroStatCard2,
+                        heroStatCard3: data.heroStatCard3,
+                        dailyItinerary: data.dailyItinerary,
                       }
                       const viewMode = previewMode
 
