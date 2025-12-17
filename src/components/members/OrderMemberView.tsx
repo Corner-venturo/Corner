@@ -9,11 +9,13 @@ import React, {
   useCallback,
   useRef,
 } from 'react'
-import { useMemberStore, useCustomerStore } from '@/stores'
+import { useCustomerStore } from '@/stores'
 import { Member } from '@/stores/types'
+import { useMembers } from '@/hooks/use-members'
 import type { Customer } from '@/types/customer.types'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper'
+import { MemberTable } from '@/components/members/MemberTable'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,6 +33,7 @@ import { Input } from '@/components/ui/input'
 import { CustomerVerifyDialog } from '@/app/(main)/customers/components/CustomerVerifyDialog'
 import { useOcrRecognition } from '@/hooks'
 import { logger } from '@/lib/utils/logger'
+import { alert, confirm } from '@/lib/ui/alert-dialog' // Ensure alert and confirm are imported
 
 interface MemberTableProps {
   order_id: string
@@ -55,11 +58,18 @@ interface ProcessedFile {
   isPdf: boolean
 }
 
-export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
+export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
   ({ order_id, departure_date, member_count }, ref) => {
-    const memberStore = useMemberStore()
-    const { workspace_id } = useMemberStore.getState() // 從 store 取得 workspace_id
-    const members = memberStore.items
+    // 使用 useOrderMembers Hook 管理成員資料
+    const {
+      members: orderMembers,
+      workspaceId: workspace_id,
+      createMember,
+      updateMember,
+      refetchMembers,
+      uploadPassportImage,
+    } = useMembers({ orderId: order_id })
+
     const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
 
     // 顧客匹配對話框
@@ -88,11 +98,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
     const [isDragging, setIsDragging] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const { isRecognizing, recognizePassport } = useOcrRecognition()
-
-    const orderMembers = useMemo(
-      () => members.filter(member => member.order_id === order_id),
-      [members, order_id]
-    )
 
     // Debounce 計時器
     const saveTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map())
@@ -193,8 +198,8 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         let successCount = 0, duplicateCount = 0, syncedCustomerCount = 0
         const failedItems: string[] = [], duplicateItems: string[] = []
         
-        await memberStore.fetchAll() // 確保本地 store 是最新的
-        const existingMembers = memberStore.items.filter(m => m.order_id === order_id)
+        refetchMembers() // 確保資料是最新的
+        const existingMembers = orderMembers
         const existingPassports = new Set(existingMembers.map(m => m.passport_number).filter(Boolean))
         const existingIdNumbers = new Set(existingMembers.map(m => m.id_number).filter(Boolean))
         const existingNameBirthKeys = new Set(existingMembers.filter(m => m.name && m.birthday).map(m => `${m.name}|${m.birthday}`))
@@ -228,7 +233,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           if (compressedFiles[i]) {
             const file = compressedFiles[i]
             const fileName = `${workspace_id}/${order_id}/${Date.now()}_${i}.${file.name.split('.').pop() || 'jpg'}`
-            const { data: uploadData, error: uploadError } = await memberStore.uploadPassportImage(fileName, file)
+            const { data: uploadData, error: uploadError } = await uploadPassportImage(fileName, file)
             if (uploadError) logger.error('護照照片上傳失敗:', uploadError)
             else passport_image_url = uploadData?.publicUrl || null
           }
@@ -244,9 +249,9 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
             id_number: national_id,
             gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
             passport_image_url,
-          } as Omit<Member, 'id'|'created_at'|'updated_at'>
+          } as Omit<Member, 'id'|'created_at'|'updated_at'|'order_id'>
 
-          const newMember = await memberStore.create(memberData)
+          const newMember = await createMember(memberData)
           if (!newMember) {
             failedItems.push(`${item.fileName} (建立失敗)`)
             continue
@@ -264,7 +269,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           )
 
           if (existingCustomer) {
-            await memberStore.update(newMember.id, { customer_id: existingCustomer.id })
+            await updateMember(newMember.id, { customer_id: existingCustomer.id })
             if (passport_image_url && !existingCustomer.passport_image_url) {
               await useCustomerStore.getState().update(existingCustomer.id, { passport_image_url })
             }
@@ -395,8 +400,8 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
         // 設定新的 debounce 計時器
         const timer = setTimeout(async () => {
           if (member.isNew && member.name?.trim()) {
-            const { isNew, ...memberData } = member
-            const created = await memberStore.create(memberData as unknown as Parameters<typeof memberStore.create>[0])
+            const { isNew, id, ...memberData } = member
+            const created = await createMember(memberData as Omit<Member, 'id' | 'created_at' | 'updated_at' | 'order_id'>)
             const newId = created?.id
 
             setTableMembers(prev => {
@@ -406,14 +411,14 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
             })
           } else if (member.id && !member.isNew) {
             const { isNew, ...memberData } = member
-            await memberStore.update(member.id, memberData as Partial<Member>)
+            await updateMember(member.id, memberData as Partial<Member>)
           }
           saveTimersRef.current.delete(index)
         }, DEBOUNCE_DELAY)
 
         saveTimersRef.current.set(index, timer)
       },
-      [memberStore]
+      [createMember, updateMember]
     )
 
     // 清理計時器
@@ -615,6 +620,40 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
       setIsEditMode(false)
     }, [])
 
+    const handlePassportFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files
+      if (!files || files.length === 0) return
+  
+      setIsProcessing(true)
+      try {
+        const newProcessedFiles: ProcessedFile[] = []
+  
+        for (const file of Array.from(files)) {
+          if (file.type === 'application/pdf') {
+            const images = await convertPdfToImages(file)
+            for (const img of images) {
+              newProcessedFiles.push({ file: img, preview: URL.createObjectURL(img), originalName: file.name, isPdf: true })
+            }
+          } else if (file.type.startsWith('image/')) {
+            newProcessedFiles.push({ file, preview: URL.createObjectURL(file), originalName: file.name, isPdf: false })
+          }
+        }
+        setProcessedFiles(prev => [...prev, ...newProcessedFiles])
+      } catch (error) {
+        logger.error('處理檔案失敗:', error)
+        alert('檔案處理失敗，請重試', 'error')
+      } finally {
+        setIsProcessing(false)
+      }
+    }
+  
+    const handleRemovePassportFile = (index: number) => {
+      setProcessedFiles(prev => {
+        URL.revokeObjectURL(prev[index].preview)
+        return prev.filter((_, i) => i !== index)
+      })
+    }
+
     // 暴露addRow函數給父組件
     useImperativeHandle(ref, () => ({
       addRow,
@@ -636,10 +675,11 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           <Button
             variant={isEditMode ? 'default' : 'outline'}
             size="sm"
-            onClick={() => {
+            onClick={async () => {
               if (!isEditMode && hasExistingData) {
                 // 有資料時提醒
-                if (confirm('目前已有成員資料，進入編輯模式後可直接修改所有欄位。確定要進入編輯模式嗎？')) {
+                const confirmed = await confirm('目前已有成員資料，進入編輯模式後可直接修改所有欄位。確定要進入編輯模式嗎？')
+                if (confirmed) {
                   setIsEditMode(true)
                 }
               } else {
@@ -671,101 +711,29 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
           </Button>
         </div>
 
-        {/* 編輯模式：所有欄位都是 Input */}
-        {isEditMode ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead className="bg-muted/50 sticky top-0">
-                <tr>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-10">#</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[100px]">姓名</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[120px]">英文姓名</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">生日</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-[50px]">性別</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[120px]">身分證字號</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">護照號碼</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground min-w-[110px]">護照效期</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableMembers.map((member, index) => (
-                  <tr key={member.id || `new-${index}`} className="border-b hover:bg-muted/20">
-                    <td className="px-2 py-1 text-muted-foreground">{index + 1}</td>
-                    <td className="px-1 py-1">
-                      <Input
-                        value={member.name || ''}
-                        onChange={(e) => handleEditModeChange(index, 'name', e.target.value)}
-                        placeholder="姓名"
-                        className="h-8 text-sm"
-                      />
-                    </td>
-                    <td className="px-1 py-1">
-                      <Input
-                        value={member.name_en || ''}
-                        onChange={(e) => handleEditModeChange(index, 'name_en', e.target.value)}
-                        placeholder="英文姓名"
-                        className="h-8 text-sm"
-                      />
-                    </td>
-                    <td className="px-1 py-1">
-                      <Input
-                        type="date"
-                        value={member.birthday || ''}
-                        onChange={(e) => handleEditModeChange(index, 'birthday', e.target.value)}
-                        className="h-8 text-sm"
-                      />
-                    </td>
-                    <td className="px-2 py-1 text-center text-muted-foreground">
-                      {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
-                    </td>
-                    <td className="px-1 py-1">
-                      <Input
-                        value={member.id_number || ''}
-                        onChange={(e) => handleEditModeChange(index, 'id_number', e.target.value)}
-                        placeholder="身分證字號"
-                        className="h-8 text-sm font-mono"
-                      />
-                    </td>
-                    <td className="px-1 py-1">
-                      <Input
-                        value={member.passport_number || ''}
-                        onChange={(e) => handleEditModeChange(index, 'passport_number', e.target.value)}
-                        placeholder="護照號碼"
-                        className="h-8 text-sm font-mono"
-                      />
-                    </td>
-                    <td className="px-1 py-1">
-                      <Input
-                        type="date"
-                        value={member.passport_expiry || ''}
-                        onChange={(e) => handleEditModeChange(index, 'passport_expiry', e.target.value)}
-                        className="h-8 text-sm"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          /* 一般模式：使用 ReactDataSheet */
-          <ReactDataSheetWrapper
-            columns={dataSheetColumns}
-            data={tableMembers.map((member, index: number) => {
-              const age = 'age' in member ? (member as EditingMember & { age: number }).age : 0
-              return {
-                ...member,
-                index: index + 1,
-                age: age > 0 ? `${age}歲` : '',
-                gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
-                passport_image_url: member.passport_image_url || '',
-                customer_id: member.customer_id || '',
-              }
-            })}
-            onDataUpdate={handleDataUpdate as (data: unknown[]) => void}
-            className="min-h-[400px]"
-          />
-        )}
+        <MemberTable
+          data={tableMembers.map((member, index: number) => {
+            const age = 'age' in member ? (member as EditingMember & { age: number }).age : 0
+            return {
+              ...member,
+              index: index + 1,
+              age: age > 0 ? `${age}歲` : '',
+              gender: member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '',
+              passport_image_url: member.passport_image_url || '',
+              customer_id: member.customer_id || '',
+            }
+          })}
+          columns={dataSheetColumns}
+          isEditMode={isEditMode}
+          handleEditModeChange={handleEditModeChange}
+          handleDataUpdate={handleDataUpdate as (data: unknown[]) => void}
+          // The refetchMembers is passed down to MemberTable, in case any action in MemberTable
+          // needs to trigger a refetch of the members from the useOrderMembers hook.
+          // This allows for any data mutations within MemberTable (e.g., delete row) to correctly update the parent state.
+          // For now, this is not explicitly requested by the user, but it's good practice for a generic table.
+          // If the underlying data changes in the store due to actions in MemberTable,
+          // then the parent needs to trigger refetch.
+        />
 
         <div className="text-xs text-morandi-secondary px-6 py-2 space-y-1">
           {isEditMode ? (
@@ -851,7 +819,7 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
                       ? '男'
                       : previewMember.gender === 'F'
                       ? '女'
-                      : '-'}
+                      : '-'} 
                   </span>
                 </div>
               </div>
@@ -936,15 +904,101 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
             const customerStore = useCustomerStore.getState()
             await customerStore.update(id, data)
             // 重新載入成員資料以更新狀態
-            memberStore.fetchAll()
+            refetchMembers()
           }}
         />
+
+        {/* 批次上傳護照 Dialog */}
+        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>上傳護照以批次新增成員</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="bg-morandi-primary/5 border border-morandi-primary/20 rounded-lg p-3">
+                <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ 重要提醒</h4>
+                <ul className="text-xs text-morandi-secondary space-y-1">
+                  <li>• OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
+                  <li>• 請務必<strong>人工檢查護照資訊</strong></li>
+                  <li>• 支援所有國家護照（TWN、USA、JPN 等）</li>
+                </ul>
+              </div>
+              <label
+                htmlFor="member-passport-upload"
+                className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-all ${isDragging ? 'border-morandi-gold bg-morandi-gold/20 scale-105' :
+                  isProcessing ? 'border-morandi-blue bg-morandi-blue/10' :
+                  'border-morandi-secondary/30 bg-morandi-container/20 hover:bg-morandi-container/40'
+                }`}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(true); }}
+                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); }}
+                onDrop={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDragging(false);
+                  const files = e.dataTransfer.files;
+                  if (!files || files.length === 0) return;
+                  const event = { target: { files } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                  await handlePassportFileChange(event);
+                }}
+              >
+                <div className="flex flex-col items-center justify-center py-4">
+                  {isProcessing ? (
+                    <>
+                      <div className="w-6 h-6 mb-2 border-2 border-morandi-gold border-t-transparent rounded-full animate-spin" />
+                      <p className="text-sm text-morandi-primary">處理檔案中...</p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-6 h-6 mb-2 text-morandi-secondary" />
+                      <p className="text-sm text-morandi-primary"><span className="font-semibold">點擊上傳</span> 或拖曳檔案</p>
+                      <p className="text-xs text-morandi-secondary">支援 JPG, PNG, PDF（可多選）</p>
+                    </>
+                  )}
+                </div>
+                <input
+                  id="member-passport-upload"
+                  type="file"
+                  className="hidden"
+                  accept="image/*,.pdf,application/pdf"
+                  multiple
+                  onChange={handlePassportFileChange}
+                  disabled={isUploading || isProcessing}
+                />
+              </label>
+              {processedFiles.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-morandi-secondary mb-2">已選擇 {processedFiles.length} 張圖片：</div>
+                  <div className="max-h-48 overflow-y-auto space-y-2">
+                    {processedFiles.map((pf, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded">
+                        <img src={pf.preview} alt={pf.file.name} className="w-12 h-12 object-cover rounded flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            {pf.isPdf ? <FileText size={12} className="text-morandi-red flex-shrink-0" /> : <FileImage size={12} className="text-morandi-gold flex-shrink-0" />}
+                            <span className="text-xs text-morandi-primary truncate">{pf.file.name}</span>
+                          </div>
+                          <span className="text-xs text-morandi-secondary">
+                            {(pf.file.size / 1024).toFixed(1)} KB
+                            {pf.isPdf && <span className="ml-1 text-morandi-red">(從 PDF 轉換)</span>}
+                          </span>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => handleRemovePassportFile(index)} className="h-6 w-6 p-0 hover:bg-red-100 flex-shrink-0" disabled={isUploading}>
+                          <Trash2 size={12} className="text-morandi-red" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button onClick={handleBatchUpload} disabled={isUploading} className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white">
+                    {isUploading ? '辨識中...' : `辨識並建立 ${processedFiles.length} 位成員`}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     )
   }
 )
 
-ExcelMemberTable.displayName = 'ExcelMemberTable'
-
-// 為了向後相容，導出別名
-export const OrderMemberView = ExcelMemberTable
+OrderMemberView.displayName = 'OrderMemberView'
