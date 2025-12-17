@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MapPin, MapIcon, Bus, Building2, ImageIcon, FileText } from 'lucide-react'
+import { MapPin, Bus, Building2, ImageIcon } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -9,21 +9,12 @@ import { cn } from '@/lib/utils'
 
 const databaseModules = [
   {
-    id: 'regions',
-    title: '地區管理',
-    description: '管理旅遊目的地和相關設定',
+    id: 'travel',
+    title: '旅遊資料庫',
+    description: '國家、區域、城市、景點統一管理',
     icon: MapPin,
-    href: '/database/regions',
-    color: 'bg-blue-500',
-    count: 3,
-  },
-  {
-    id: 'attractions',
-    title: '景點管理',
-    description: '管理各地區的旅遊景點資訊',
-    icon: MapIcon,
     href: '/database/attractions',
-    color: 'bg-rose-500',
+    color: 'bg-blue-500',
     count: 0,
   },
   {
@@ -144,10 +135,10 @@ export default function DatabasePage() {
             <Button
               variant="outline"
               className="h-auto p-4 text-left flex flex-col items-start"
-              onClick={() => router.push('/database/regions')}
+              onClick={() => router.push('/database/attractions')}
             >
-              <div className="font-medium text-morandi-primary">新增地區</div>
-              <div className="text-sm text-morandi-secondary mt-1">快速添加新的旅遊目的地</div>
+              <div className="font-medium text-morandi-primary">管理地區</div>
+              <div className="text-sm text-morandi-secondary mt-1">國家、區域、主要城市設定</div>
             </Button>
             <Button
               variant="outline"

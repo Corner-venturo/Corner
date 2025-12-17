@@ -304,7 +304,7 @@ export function AttractionsDialog({
       title={attraction ? '編輯景點' : '新增景點'}
       onSubmit={handleSubmit}
       submitLabel={attraction ? '更新' : '新增'}
-      submitDisabled={!formData.name || !formData.country_id || !formData.city_id}
+      submitDisabled={!formData.name || !formData.country_id || !formData.region_id}
       maxWidth="2xl"
       contentClassName="max-h-[90vh] overflow-y-auto"
     >
@@ -370,7 +370,7 @@ export function AttractionsDialog({
 
         {availableRegions.length > 0 && (
           <div>
-            <label className="text-sm font-medium">地區</label>
+            <label className="text-sm font-medium">地區 *</label>
             <select
               value={formData.region_id}
               onChange={e =>
@@ -381,6 +381,7 @@ export function AttractionsDialog({
                 }))
               }
               className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+              required
             >
               <option value="">請選擇</option>
               {availableRegions.map((r) => (
@@ -393,14 +394,13 @@ export function AttractionsDialog({
         )}
 
         <div>
-          <label className="text-sm font-medium">城市 *</label>
+          <label className="text-sm font-medium">城市（選填）</label>
           <select
             value={formData.city_id}
             onChange={e => setFormData(prev => ({ ...prev, city_id: e.target.value }))}
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-            required
           >
-            <option value="">請選擇</option>
+            <option value="">不指定</option>
             {availableCities.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}

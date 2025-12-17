@@ -9,7 +9,7 @@ export interface Attraction {
   description?: string
   country_id: string
   region_id?: string
-  city_id: string
+  city_id?: string | null
   category?: string
   tags?: string[]
   duration_minutes?: number
@@ -38,7 +38,7 @@ export interface AttractionFormData {
   description: string
   country_id: string
   region_id: string
-  city_id: string
+  city_id?: string | null
   category: string
   tags: string
   duration_minutes: number

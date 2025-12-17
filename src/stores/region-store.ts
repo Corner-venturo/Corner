@@ -53,6 +53,7 @@ export interface City {
   primary_image?: number // 1 or 2, indicates which image is primary
   display_order: number
   is_active: boolean
+  is_major?: boolean // 主要城市（有機場，用於開團/封面選擇）
   created_at: string
   updated_at: string
 }

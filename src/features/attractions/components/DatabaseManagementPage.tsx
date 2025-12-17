@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { MapPin, Star, Sparkles } from 'lucide-react'
+import { MapPin, Star, Sparkles, Globe } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import type { Country } from '@/stores/region-store'
 
 // Lazy load tabs - 只有切換到該 tab 才載入組件
+const RegionsTab = lazy(() => import('./tabs/RegionsTab'))
 const AttractionsTab = lazy(() => import('./tabs/AttractionsTab'))
 const MichelinRestaurantsTab = lazy(() => import('./tabs/MichelinRestaurantsTab'))
 const PremiumExperiencesTab = lazy(() => import('./tabs/PremiumExperiencesTab'))
@@ -20,8 +21,8 @@ const PremiumExperiencesTab = lazy(() => import('./tabs/PremiumExperiencesTab'))
 // ============================================
 
 export default function DatabaseManagementPage() {
-  const [activeTab, setActiveTab] = useState('attractions')
-  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['attractions']))
+  const [activeTab, setActiveTab] = useState('regions')
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['regions']))
 
   // 景點分頁的狀態
   const [searchTerm, setSearchTerm] = useState('')
@@ -88,6 +89,7 @@ export default function DatabaseManagementPage() {
           { label: '旅遊資料庫', href: '/database/attractions' },
         ]}
         tabs={[
+          { value: 'regions', label: '國家/區域', icon: Globe },
           { value: 'attractions', label: '景點活動', icon: MapPin },
           { value: 'michelin', label: '米其林餐廳', icon: Star },
           { value: 'experiences', label: '頂級體驗', icon: Sparkles },
@@ -99,41 +101,43 @@ export default function DatabaseManagementPage() {
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋景點名稱..."
         filters={
-          <>
-            {/* 國家篩選 - 三個 tab 共用 */}
-            <Combobox
-              value={selectedCountry}
-              onChange={setSelectedCountry}
-              options={[
-                { value: '', label: '所有國家' },
-                ...countries.map(country => ({
-                  value: country.id,
-                  label: `${country.emoji} ${country.name}`,
-                })),
-              ]}
-              placeholder="選擇國家..."
-              emptyMessage="找不到符合的國家"
-              showSearchIcon={true}
-              showClearButton={true}
-            />
-            {/* 分類篩選 - 只在景點活動顯示 */}
-            {activeTab === 'attractions' && (
-              <select
-                value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-                className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background text-morandi-primary min-w-[120px]"
-              >
-                <option value="all">全部分類</option>
-                {categoryOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            )}
-          </>
+          activeTab !== 'regions' ? (
+            <>
+              {/* 國家篩選 - 景點相關 tab 共用 */}
+              <Combobox
+                value={selectedCountry}
+                onChange={setSelectedCountry}
+                options={[
+                  { value: '', label: '所有國家' },
+                  ...countries.map(country => ({
+                    value: country.id,
+                    label: `${country.emoji} ${country.name}`,
+                  })),
+                ]}
+                placeholder="選擇國家..."
+                emptyMessage="找不到符合的國家"
+                showSearchIcon={true}
+                showClearButton={true}
+              />
+              {/* 分類篩選 - 只在景點活動顯示 */}
+              {activeTab === 'attractions' && (
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background text-morandi-primary min-w-[120px]"
+                >
+                  <option value="all">全部分類</option>
+                  {categoryOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </>
+          ) : undefined
         }
-        showClearFilters={Boolean(hasActiveFilters)}
+        showClearFilters={activeTab !== 'regions' && Boolean(hasActiveFilters)}
         onClearFilters={clearFilters}
         onAdd={activeTab === 'attractions' ? openAdd : undefined}
         addLabel="新增景點"
@@ -143,6 +147,18 @@ export default function DatabaseManagementPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">
           {/* 分頁內容 - 只載入已訪問過的 tab */}
           <div className="flex-1 overflow-hidden">
+            <TabsContent value="regions" className="h-full mt-0 data-[state=inactive]:hidden">
+              {loadedTabs.has('regions') && (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">載入中...</div>
+                  }
+                >
+                  <RegionsTab />
+                </Suspense>
+              )}
+            </TabsContent>
+
             <TabsContent value="attractions" className="h-full mt-0 data-[state=inactive]:hidden">
               {loadedTabs.has('attractions') && (
                 <Suspense
