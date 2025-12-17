@@ -1,61 +1,52 @@
 /**
- * Venturo CIS Color Palette v2.1
- * 企業識別色系（原莫蘭迪色系）
+ * Morandi Color Palette
+ * 優雅的莫蘭迪色系，適合旅遊行程手冊
  */
 export const morandiColors = {
-  // 主色系 - Venturo CIS v2.1
-  primary: '#333333', // Charcoal - 主要文字
-  secondary: '#8C8C8C', // Text Sub - 次要文字
-  accent: '#B8A99A', // Taupe - 強調色/主色
-  gold: '#B8A99A', // Taupe - 主色（保持相容性）
-  goldLight: '#C6B9AC', // Taupe Light - 淺主色
-  goldDark: '#9E8C7A', // Taupe Dark - 深主色/hover
+  // 主色系
+  primary: '#E8D5C4', // 米色 - 主要背景色
+  secondary: '#A8B4A5', // 灰綠色 - 次要元素
+  accent: '#C3B5A7', // 奶茶色 - 強調色
+  gold: '#C9A961', // 柔和金色 - 重點裝飾（降低飽和度）
+  goldLight: '#E5D4A6', // 淺金色 - 金色背景
 
   // 文字色系
   text: {
-    primary: '#333333', // Charcoal - 主要文字
-    secondary: '#8C8C8C', // Text Sub - 次要文字
-    light: '#8C8C8C', // Text Sub - 輔助文字
-    muted: '#8C8C8C', // Text Sub - 輕度文字
+    primary: '#3D2914', // 深咖啡色 - 主要文字
+    secondary: '#6B5D52', // 中咖啡色 - 次要文字
+    light: '#9E8F81', // 淺咖啡色 - 輔助文字
+    muted: '#AFA598', // 極淺咖啡 - 輕度文字
   },
 
   // 背景色系
   background: {
-    main: '#F9F8F6', // Off-White - 主背景
-    cream: '#F9F8F6', // Off-White
-    white: '#FFFFFF', // Surface - 純白
-    lightGold: '#F9F8F6', // Off-White
+    main: '#FAF8F5', // 主背景
+    cream: '#F5F0EB', // 奶油色背景
+    white: '#FEFEFE', // 柔白背景
+    lightGold: '#F9F5ED', // 淺金背景
   },
 
   // 邊框色系
   border: {
-    light: '#E8E4E0', // Beige - 淺邊框
-    medium: '#E8E4E0', // Beige - 中等邊框
-    gold: '#B8A99A', // Taupe - 主色邊框
+    light: '#EDE8E0', // 淺邊框
+    medium: '#E0D8CC', // 中等邊框
+    gold: '#D4C5A8', // 金色邊框
   },
 
   // 卡片陰影
   shadow: {
-    soft: 'rgba(51, 51, 51, 0.08)', // 柔和陰影
-    medium: 'rgba(51, 51, 51, 0.12)', // 中等陰影
-    strong: 'rgba(51, 51, 51, 0.16)', // 強陰影
-  },
-
-  // 語意色系
-  semantic: {
-    success: '#8FA38F', // Fern - 成功
-    warning: '#D4B483', // Warm - 警告
-    error: '#C77D7D', // Muted Red - 錯誤
-    info: '#8FA9C2', // Cool Blue - 資訊
+    soft: 'rgba(61, 41, 20, 0.08)', // 柔和陰影
+    medium: 'rgba(61, 41, 20, 0.12)', // 中等陰影
+    strong: 'rgba(61, 41, 20, 0.16)', // 強陰影
   },
 
   // 輔助色系
   support: {
-    warmGray: '#E8E4E0', // Beige
-    coolGray: '#C9D4C5', // Sage
-    softPink: '#C77D7D', // Muted Red（淺化）
-    mutedBlue: '#8FA9C2', // Cool Blue
-    sage: '#C9D4C5', // Sage Green
+    warmGray: '#D9CFC3', // 暖灰色
+    coolGray: '#B8C4C2', // 冷灰色
+    softPink: '#E8D5D5', // 柔粉色
+    mutedBlue: '#B4C5D1', // 靜謐藍
+    sage: '#C8D5C8', // 鼠尾草綠
   },
 } as const
 
@@ -79,23 +70,23 @@ export function getMonandiColor(path: string): string {
 }
 
 /**
- * Tailwind CSS 類名映射 - Venturo CIS v2.1
+ * Tailwind CSS 類名映射
  */
 export const morandiColorClasses = {
   // 背景色
-  'bg-morandi-primary': 'bg-[#333333]',
-  'bg-morandi-secondary': 'bg-[#8C8C8C]',
-  'bg-morandi-accent': 'bg-[#B8A99A]',
-  'bg-morandi-gold': 'bg-[#B8A99A]',
-  'bg-morandi-light': 'bg-[#F9F8F6]',
+  'bg-morandi-primary': 'bg-[#E8D5C4]',
+  'bg-morandi-secondary': 'bg-[#A8B4A5]',
+  'bg-morandi-accent': 'bg-[#C3B5A7]',
+  'bg-morandi-gold': 'bg-[#D4AF37]',
+  'bg-morandi-light': 'bg-[#FAF8F5]',
 
   // 文字色
-  'text-morandi-primary': 'text-[#333333]',
-  'text-morandi-secondary': 'text-[#8C8C8C]',
-  'text-morandi-light': 'text-[#8C8C8C]',
-  'text-morandi-gold': 'text-[#B8A99A]',
+  'text-morandi-primary': 'text-[#3D2914]',
+  'text-morandi-secondary': 'text-[#6B5D52]',
+  'text-morandi-light': 'text-[#9E8F81]',
+  'text-morandi-gold': 'text-[#D4AF37]',
 
   // 邊框色
-  'border-morandi-primary': 'border-[#E8E4E0]',
-  'border-morandi-gold': 'border-[#B8A99A]',
+  'border-morandi-primary': 'border-[#E8D5C4]',
+  'border-morandi-gold': 'border-[#D4AF37]',
 } as const
