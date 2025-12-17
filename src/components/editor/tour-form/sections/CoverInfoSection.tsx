@@ -836,6 +836,33 @@ export function CoverInfoSection({
                         </p>
                       </div>
                     </div>
+                  ) : data.coverStyle === 'gemini' ? (
+                    /* Gemini 風格：金色主題、底部對齊 */
+                    <div className="absolute inset-0">
+                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#3a3633]/90 via-[#3a3633]/40 to-transparent" />
+                      <div className={cn('absolute bottom-0 left-0 right-0 text-white', previewMode === 'mobile' ? 'p-3' : 'p-5')}>
+                        <span className={cn('inline-block rounded-full font-bold tracking-wider mb-2', previewMode === 'mobile' ? 'px-2 py-0.5 text-[8px]' : 'px-3 py-1 text-[10px]')} style={{ backgroundColor: '#c9aa7c', color: '#3a3633' }}>
+                          CORNER TRAVEL
+                        </span>
+                        {data.tagline && (
+                          <p className={cn('mb-1', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')} style={{ color: '#c9aa7c' }}>
+                            {data.tagline}
+                          </p>
+                        )}
+                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
+                          {data.subtitle || '副標題'}
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '出發日期'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ) : (
                     /* Original/Default 風格：經典全屏 */
                     <>
