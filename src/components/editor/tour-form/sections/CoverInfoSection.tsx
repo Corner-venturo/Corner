@@ -738,14 +738,18 @@ export function CoverInfoSection({
                         <p className={cn('mb-2', previewMode === 'mobile' ? 'text-xs' : 'text-sm')} style={{ color: '#636E72' }}>
                           {data.subtitle || '副標題'}
                         </p>
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 mt-2 flex-wrap">
                           <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
-                            <div className="text-[8px] text-white/70">天數</div>
-                            <div className="text-xs font-bold text-white">7</div>
+                            <div className="text-[8px] text-white/70">出發</div>
+                            <div className="text-xs font-bold text-white">{data.departureDate || '日期'}</div>
                           </div>
                           <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#C69C6D' }}>
-                            <div className="text-[8px] text-white/70">餐廳</div>
-                            <div className="text-xs font-bold text-white">{data.heroStatCard2?.value || 5}</div>
+                            <div className="text-[8px] text-white/70">代碼</div>
+                            <div className="text-xs font-bold text-white">{data.tourCode || 'CODE'}</div>
+                          </div>
+                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
+                            <div className="text-[8px] text-white/70">價格</div>
+                            <div className="text-xs font-bold text-white">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</div>
                           </div>
                         </div>
                       </div>
@@ -768,9 +772,20 @@ export function CoverInfoSection({
                           {data.title || '行程標題'}
                         </h1>
                         <div className="w-12 h-0.5 my-2" style={{ backgroundColor: '#E63946' }} />
-                        <p className={cn('text-white/60', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
+                        <p className={cn('text-white/60 mb-2', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
                           {data.subtitle || 'Odyssey'}
                         </p>
+                        <div className="flex gap-2 flex-wrap justify-center">
+                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                          </div>
+                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
+                          </div>
+                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ) : data.coverStyle === 'serene' ? (
@@ -785,9 +800,20 @@ export function CoverInfoSection({
                         <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
                           {data.title || '行程標題'}
                         </h1>
-                        <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#87CEEB' }}>
+                        <p className={cn('text-white/80 mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#87CEEB' }}>
                           {data.subtitle || '副標題'}
                         </p>
+                        <div className="flex gap-2 flex-wrap justify-center">
+                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                          </div>
+                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
+                          </div>
+                          <div className={cn('bg-white/20 backdrop-blur rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ) : data.coverStyle === 'nature' ? (
@@ -802,9 +828,20 @@ export function CoverInfoSection({
                         <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
                           {data.title || '行程標題'}
                         </h1>
-                        <p className={cn('mb-3', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#30abe8' }}>
+                        <p className={cn('mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#30abe8' }}>
                           {data.subtitle || '副標題'}
                         </p>
+                        <div className="flex gap-2 flex-wrap justify-center">
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                          </div>
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
+                          </div>
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)', border: '1px solid #30abe8' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ) : data.coverStyle === 'gemini' ? (
@@ -827,9 +864,15 @@ export function CoverInfoSection({
                         <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
                           {data.subtitle || '副標題'}
                         </p>
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 mt-2 flex-wrap">
                           <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '出發日期'}</span>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                          </div>
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
+                          </div>
+                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
+                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
                           </div>
                         </div>
                       </div>
@@ -854,14 +897,18 @@ export function CoverInfoSection({
                         <p className={cn('text-white/80 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>
                           {data.description || '此處顯示行程描述'}
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap justify-center">
                           <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
                             <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>出發</div>
-                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '2025/01/01'}</div>
+                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</div>
                           </div>
                           <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
                             <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>代碼</div>
                             <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</div>
+                          </div>
+                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
+                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>價格</div>
+                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</div>
                           </div>
                         </div>
                       </div>
