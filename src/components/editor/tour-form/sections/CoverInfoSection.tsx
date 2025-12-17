@@ -332,7 +332,7 @@ export function CoverInfoSection({
                           })
                         }}
                         className={cn(
-                          'w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center font-medium',
+                          'w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center text-sm',
                           isSelected
                             ? 'ring-2 ring-offset-1'
                             : 'border-morandi-container hover:border-opacity-70 bg-white'
