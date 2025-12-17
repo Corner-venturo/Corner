@@ -838,7 +838,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
             <label className="text-sm font-medium text-morandi-secondary">已收金額</label>
             {isEditing ? (
               <Input
-                type="number"
+                type="text" inputMode="decimal"
                 value={formData.received_amount === 0 ? '' : formData.received_amount}
                 onChange={e => {
                   let val = e.target.value

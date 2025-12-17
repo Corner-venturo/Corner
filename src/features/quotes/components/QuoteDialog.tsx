@@ -135,7 +135,7 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
           <div>
             <label className="text-sm font-medium text-morandi-primary">人數</label>
             <Input
-              type="number"
+              type="text" inputMode="decimal"
               value={formData.group_size}
               onChange={e => {
                 const value = e.target.value

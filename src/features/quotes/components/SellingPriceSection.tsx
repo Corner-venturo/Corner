@@ -241,7 +241,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </td>
               <td className="py-2 px-2 text-center border-r border-border">
                 <input
-                  type="number"
+                  type="text" inputMode="decimal"
                   value={sellingPrices.single_room || ''}
                   onChange={e => handlePriceChange('single_room', e.target.value)}
                   disabled={isReadOnly}
@@ -271,7 +271,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </td>
               <td className="py-2 px-2 text-center border-r border-border">
                 <input
-                  type="number"
+                  type="text" inputMode="decimal"
                   value={sellingPrices.adult || ''}
                   onChange={e => handlePriceChange('adult', e.target.value)}
                   disabled={isReadOnly}
@@ -301,7 +301,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </td>
               <td className="py-2 px-2 text-center border-r border-border">
                 <input
-                  type="number"
+                  type="text" inputMode="decimal"
                   value={sellingPrices.child_with_bed || ''}
                   onChange={e => handlePriceChange('child_with_bed', e.target.value)}
                   disabled={isReadOnly}
@@ -331,7 +331,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </td>
               <td className="py-2 px-2 text-center border-r border-border">
                 <input
-                  type="number"
+                  type="text" inputMode="decimal"
                   value={sellingPrices.child_no_bed || ''}
                   onChange={e => handlePriceChange('child_no_bed', e.target.value)}
                   disabled={isReadOnly}
@@ -361,7 +361,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
               </td>
               <td className="py-2 px-2 text-center border-r border-border">
                 <input
-                  type="number"
+                  type="text" inputMode="decimal"
                   value={sellingPrices.infant || ''}
                   onChange={e => handlePriceChange('infant', e.target.value)}
                   disabled={isReadOnly}
@@ -401,7 +401,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     </td>
                     <td className="py-2 px-2 text-center border-r border-border">
                       <input
-                        type="number"
+                        type="text" inputMode="decimal"
                         value={getRoomTypePrice(room.name, 'adult') || ''}
                         onChange={e =>
                           handleRoomTypePriceChange(room.name, 'adult', e.target.value)
@@ -434,7 +434,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                     </td>
                     <td className="py-2 px-2 text-center border-r border-border">
                       <input
-                        type="number"
+                        type="text" inputMode="decimal"
                         value={getRoomTypePrice(room.name, 'child') || ''}
                         onChange={e =>
                           handleRoomTypePriceChange(room.name, 'child', e.target.value)
@@ -468,7 +468,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         <div className="mt-3 space-y-2">
           <div className="flex gap-2">
             <Input
-              type="number"
+              type="text" inputMode="decimal"
               value={newTierCount}
               onChange={e => setNewTierCount(e.target.value)}
               placeholder="輸入人數（如：20、30、40）"
@@ -555,7 +555,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 </td>
                 <td className="py-2 px-2 text-center border-r border-border">
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     value={tier.selling_prices.single_room || ''}
                     onChange={e => handleTierPriceChange(tier.id, 'single_room', e.target.value)}
                     disabled={isReadOnly}
@@ -587,7 +587,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 </td>
                 <td className="py-2 px-2 text-center border-r border-border">
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     value={tier.selling_prices.adult || ''}
                     onChange={e => handleTierPriceChange(tier.id, 'adult', e.target.value)}
                     disabled={isReadOnly}
@@ -617,7 +617,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 </td>
                 <td className="py-2 px-2 text-center border-r border-border">
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     value={tier.selling_prices.child_with_bed || ''}
                     onChange={e => handleTierPriceChange(tier.id, 'child_with_bed', e.target.value)}
                     disabled={isReadOnly}
@@ -649,7 +649,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 </td>
                 <td className="py-2 px-2 text-center border-r border-border">
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     value={tier.selling_prices.child_no_bed || ''}
                     onChange={e => handleTierPriceChange(tier.id, 'child_no_bed', e.target.value)}
                     disabled={isReadOnly}
@@ -681,7 +681,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
                 </td>
                 <td className="py-2 px-2 text-center border-r border-border">
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     value={tier.selling_prices.infant || ''}
                     onChange={e => handleTierPriceChange(tier.id, 'infant', e.target.value)}
                     disabled={isReadOnly}

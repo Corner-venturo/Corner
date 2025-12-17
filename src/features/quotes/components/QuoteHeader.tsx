@@ -232,7 +232,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <span className="text-sm text-morandi-secondary">總人數</span>
             <input
-              type="number"
+              type="text" inputMode="decimal"
               value={
                 participantCounts.adult +
                 participantCounts.child_with_bed +

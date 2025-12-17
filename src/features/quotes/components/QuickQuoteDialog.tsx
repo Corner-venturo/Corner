@@ -201,7 +201,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                       </td>
                       <td className="px-3 py-2">
                         <Input
-                          type="number"
+                          type="text" inputMode="decimal"
                           value={item.quantity === 0 ? '' : item.quantity}
                           onChange={e => {
                             const val = e.target.value
@@ -222,7 +222,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                       </td>
                       <td className="px-3 py-2">
                         <Input
-                          type="number"
+                          type="text" inputMode="decimal"
                           value={item.unit_price === 0 ? '' : item.unit_price}
                           onChange={e => {
                             const val = e.target.value
@@ -286,7 +286,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
             <div>
               <label className="text-sm font-medium text-morandi-primary">已收金額</label>
               <Input
-                type="number"
+                type="text" inputMode="decimal"
                 value={formData.received_amount}
                 onChange={e => {
                   const value = e.target.value
