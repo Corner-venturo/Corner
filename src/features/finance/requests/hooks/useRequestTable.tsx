@@ -10,25 +10,31 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   const tableColumns: TableColumn<PaymentRequest>[] = useMemo(
     () => [
       {
-        key: 'request_number',
+        key: 'code',
         label: '請款單號',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => <div className="font-medium text-morandi-primary">{value as string}</div>,
+        render: (value: unknown, row: PaymentRequest) => (
+          <div className="font-medium text-morandi-primary">{value as string || row.request_number || '—'}</div>
+        ),
       },
       {
         key: 'tour_name',
-        label: '團名', // Changed from '團號' to '團名' as per PaymentRequest type has tour_name
+        label: '團名',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => <div className="font-medium text-morandi-primary">{value as string}</div>,
+        render: (value: unknown, row: PaymentRequest) => (
+          <div className="font-medium text-morandi-primary">{value as string || row.tour_code || '—'}</div>
+        ),
       },
       {
         key: 'order_number',
         label: '訂單編號',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => <div className="text-sm text-morandi-primary">{value as string || '無'}</div>,
+        render: (value: unknown, row: PaymentRequest) => (
+          <div className="text-sm text-morandi-primary">{value as string || '—'}</div>
+        ),
       },
       {
         key: 'request_date',
@@ -90,9 +96,9 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         let aValue: string | number | Date, bValue: string | number | Date
 
         switch (column) {
-          case 'request_number':
-            aValue = a.request_number
-            bValue = b.request_number
+          case 'code':
+            aValue = a.code || a.request_number || ''
+            bValue = b.code || b.request_number || ''
             break
           case 'tour_name':
             aValue = a.tour_name || ''
@@ -131,9 +137,10 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
   const filterFunction = useCallback((data: PaymentRequest[], filters: Record<string, string>) => {
     return data.filter(request => {
       const requestStatus = request.status || 'pending'; // Provide default for filtering
+      const requestCode = request.code || request.request_number || ''
       return (
-        (!filters.request_number ||
-          request.request_number.toLowerCase().includes(filters.request_number.toLowerCase())) &&
+        (!filters.code ||
+          requestCode.toLowerCase().includes(filters.code.toLowerCase())) &&
         (!filters.tour_name ||
           (request.tour_name || '').toLowerCase().includes(filters.tour_name.toLowerCase())) &&
         (!filters.order_number ||
@@ -141,7 +148,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
             .toLowerCase()
             .includes(filters.order_number.toLowerCase())) &&
         (!filters.request_date || (request.request_date || '').includes(filters.request_date)) &&
-        (!filters.amount || request.amount.toString().includes(filters.amount)) && // Renamed from total_amount
+        (!filters.amount || request.amount.toString().includes(filters.amount)) &&
         (!filters.status || requestStatus === filters.status)
       )
     })
