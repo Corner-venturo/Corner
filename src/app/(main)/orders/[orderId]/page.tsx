@@ -1,18 +1,17 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { FileText } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useOrderStore, useTourStore, useAuthStore } from '@/stores'
 import type { Order } from '@/stores/types'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
-import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
-import { MemberQuickAdd } from '@/components/members/member-quick-add'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
@@ -29,9 +28,8 @@ export default function OrderDetailPage() {
   const router = useRouter()
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
+  const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
   const [activeTab, setActiveTab] = useState('overview')
-  const memberTableRef = useRef<MemberTableRef | null>(null)
-  const [memberKey, setMemberKey] = useState(0) // 用於強制刷新成員表格
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
 
   const orderId = params.orderId as string
@@ -69,25 +67,13 @@ export default function OrderDetailPage() {
         return <TourOverview tour={tour} orderFilter={order.id} />
       case 'members':
         return (
-          <div className="space-y-6 p-6">
-            {/* 快速新增成員（含 OCR 辨識） */}
-            <MemberQuickAdd
-              orderId={orderId}
-              departureDate={tour?.departure_date || ''}
-              onMembersAdded={() => {
-                // 刷新成員表格
-                setMemberKey(prev => prev + 1)
-              }}
-            />
-
-            {/* 成員管理表格 */}
+          <div className="p-6">
             <div className="border border-border rounded-lg overflow-hidden bg-card">
-              <OrderMemberView
-                key={memberKey}
-                ref={memberTableRef}
-                order_id={orderId}
-                departure_date={tour?.departure_date || ''}
-                member_count={order.member_count ?? 0}
+              <OrderMembersExpandable
+                orderId={orderId}
+                tourId={order.tour_id || ''}
+                workspaceId={workspaceId}
+                onClose={() => setActiveTab('overview')}
               />
             </div>
           </div>

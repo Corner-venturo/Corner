@@ -1,13 +1,12 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
+import React from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { useOrderStore, useTourStore, useMemberStore } from '@/stores'
+import { useOrderStore, useTourStore, useAuthStore } from '@/stores'
 import { ArrowLeft } from 'lucide-react'
-import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
-import { MemberQuickAdd } from '@/components/members/member-quick-add'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 
 export default function MemberDetailPage() {
   const router = useRouter()
@@ -15,16 +14,10 @@ export default function MemberDetailPage() {
   const orderId = params.orderId as string
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
-  const memberStore = useMemberStore()
-  const memberTableRef = useRef<MemberTableRef | null>(null)
+  const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
 
   const order = orders.find(o => o.id === orderId)
   const tour = tours.find(t => t.id === order?.tour_id)
-
-  // 重新載入成員資料（不刷新頁面）
-  const handleMembersAdded = useCallback(() => {
-    memberStore.fetchAll()
-  }, [memberStore])
 
   if (!order) {
     return (
@@ -41,11 +34,9 @@ export default function MemberDetailPage() {
   }
 
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <ResponsiveHeader
         title={`成員管理 - ${order.order_number}`}
-        onAdd={() => memberTableRef.current?.addRow()}
-        addLabel="新增成員"
       >
         {/* 訂單資訊 */}
         <div className="flex items-center space-x-6 text-sm text-morandi-secondary">
@@ -72,23 +63,14 @@ export default function MemberDetailPage() {
         </div>
       </ResponsiveHeader>
 
-      {/* 快速新增成員 */}
-      <div className="px-6">
-        <MemberQuickAdd
-          orderId={orderId}
-          departureDate={tour?.departure_date || ''}
-          onMembersAdded={handleMembersAdded}
-        />
-      </div>
-
-      {/* 成員管理表格 */}
+      {/* 成員管理 */}
       <div className="px-6 pb-6">
         <div className="border border-border rounded-lg overflow-hidden bg-card">
-          <OrderMemberView
-            ref={memberTableRef}
-            order_id={orderId}
-            departure_date={tour?.departure_date || ''}
-            member_count={order.member_count ?? 0}
+          <OrderMembersExpandable
+            orderId={orderId}
+            tourId={order.tour_id || ''}
+            workspaceId={workspaceId}
+            onClose={() => router.push('/orders')}
           />
         </div>
       </div>

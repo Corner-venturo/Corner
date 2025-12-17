@@ -9,8 +9,9 @@ import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
-import { OrderMemberView } from '@/components/members/OrderMemberView'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { useAuthStore } from '@/stores'
 
 interface SimpleOrderTableProps {
   orders: Order[]
@@ -227,21 +228,12 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
               {/* 展開成員列表 */}
               {expandedOrderId === order.id && currentWorkspace && (
                 <div className="bg-morandi-container/10">
-                  {(() => {
-                    const expandedOrder = orders.find(o => o.id === expandedOrderId);
-                    const expandedTour = expandedOrder ? tours.find(t => t.id === expandedOrder.tour_id) : undefined;
-                    const departureDate = expandedTour?.departure_date || '';
-
-                    return (
-                      <OrderMemberView
-                        order_id={order.id}
-                        departure_date={departureDate}
-                        member_count={order.member_count || 0}
-                        // workspaceId is implicitly handled by useMembers hook inside OrderMemberView
-                        // onClose={() => setExpandedOrderId(null)} - OrderMemberView doesn't need this prop
-                      />
-                    );
-                  })()}
+                  <OrderMembersExpandable
+                    orderId={order.id}
+                    tourId={order.tour_id || ''}
+                    workspaceId={currentWorkspace.id}
+                    onClose={() => setExpandedOrderId(null)}
+                  />
                 </div>
               )}
             </React.Fragment>
