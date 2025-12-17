@@ -178,17 +178,17 @@ export type PaymentMethodValue = (typeof PAYMENT_METHOD_MAP)[PaymentMethodKey]
 export const VISA_STATUS_MAP = {
   pending: '待送件',
   submitted: '已送件',
-  issued: '已下件',
   collected: '已取件',
   rejected: '退件',
+  returned: '已歸還',
 } as const
 
 export const VISA_STATUS_REVERSE_MAP = {
   待送件: 'pending',
   已送件: 'submitted',
-  已下件: 'issued',
   已取件: 'collected',
   退件: 'rejected',
+  已歸還: 'returned',
 } as const
 
 export type VisaStatusKey = keyof typeof VISA_STATUS_MAP

@@ -211,26 +211,27 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
           <div className="flex items-center mr-4">{props.customActions}</div>
         )}
 
-        {/* 操作按鈕 */}
-        {props.actions ? (
-          <div className="flex items-center gap-3">{props.actions}</div>
-        ) : props.onAdd ? (
-          <button
-            onClick={props.onAdd}
-            data-create-box
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            {props.addLabel || '新增'}
-          </button>
-        ) : null}
+        {/* 操作按鈕 - actions 和 onAdd 可以同時顯示 */}
+        <div className="flex items-center gap-3">
+          {props.actions}
+          {props.onAdd && (
+            <button
+              onClick={props.onAdd}
+              data-create-box
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              {props.addLabel || '新增'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

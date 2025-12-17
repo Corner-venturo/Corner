@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { FlightRouteSearchDialog } from '../components/FlightRouteSearchDialog'
+import { PreviewPanel } from '../components/PreviewPanel'
+import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -26,6 +28,8 @@ interface FlightInfoSectionProps {
   // 復原功能
   canUndoItinerary?: boolean
   onUndoItinerary?: () => void
+  // 精簡模式（只顯示卡片，不顯示額外內容）
+  compact?: boolean
 }
 
 // 日期格式轉換輔助函式
@@ -62,7 +66,7 @@ function formatDateFull(date: Date): string {
   return `${year}/${month}/${day}`
 }
 
-export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary }: FlightInfoSectionProps) {
+export function FlightInfoSection({ data, updateFlightField, updateFlightFields, onGenerateDailyItinerary, updateField, canUndoItinerary, onUndoItinerary, compact = false }: FlightInfoSectionProps) {
   // 從資料庫載入模板
   const { flightTemplates, loading: templatesLoading } = useTemplates()
 
@@ -320,55 +324,33 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
 
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-bold text-morandi-primary border-b-2 border-[#B8A99A] pb-1.5">
-        航班資訊
-      </h2>
-
       {/* 摘要按鈕卡片 - 點擊開啟設定 Modal */}
       <button
         type="button"
         onClick={() => setShowFlightSettings(true)}
         className="w-full group"
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-[#B8A99A]/40 bg-gradient-to-r from-[#F9F8F6] to-[#F9F8F6] hover:border-[#B8A99A] hover:shadow-md transition-all">
+        <div className="flex items-center gap-3 p-3 rounded-lg border-2 border-[#B8A99A]/30 bg-[#B8A99A]/5 hover:border-[#B8A99A] hover:shadow-md transition-all">
           {/* 航班圖示 */}
           <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: '#B8A99A20' }}
+            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: '#B8A99A' }}
           >
-            <Plane className="w-7 h-7" style={{ color: '#B8A99A' }} />
+            <Plane className="w-5 h-5 text-white" />
           </div>
 
           {/* 航班資訊 */}
           <div className="flex-1 text-left">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-sm font-bold text-morandi-primary">
-                {currentStyle.label}
-              </span>
-              <span className="text-xs text-morandi-secondary">
-                {currentStyle.description}
-              </span>
-            </div>
-            <div className="text-xs text-morandi-secondary">
-              {getFlightSummary()}
-            </div>
-            {tripDays > 0 && (
-              <div className="mt-1 text-xs font-medium" style={{ color: '#B8A99A' }}>
-                行程 {tripDays} 天
-              </div>
-            )}
-          </div>
-
-          {/* 設定圖示 */}
-          <div className="flex items-center gap-2 text-morandi-secondary group-hover:text-morandi-primary transition-colors">
-            <Settings2 className="w-5 h-5" />
-            <span className="text-xs">設定</span>
+            <h2 className="text-base font-bold text-morandi-primary">航班資訊</h2>
+            <p className="text-xs text-morandi-secondary">
+              {currentStyle.label}{tripDays > 0 ? ` · ${tripDays} 天` : ''}
+            </p>
           </div>
         </div>
       </button>
 
       {/* 行程天數自動計算（保留在主面板以便快速存取） */}
-      {tripDays > 0 && data.departureDate && (
+      {!compact && tripDays > 0 && data.departureDate && (
         <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 p-3 rounded-lg border border-morandi-gold/30">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
@@ -421,15 +403,18 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
 
       {/* 航班設定 Modal */}
       <Dialog open={showFlightSettings} onOpenChange={setShowFlightSettings}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
-              航班設定
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-hidden p-0">
+          <div className="flex h-full">
+            {/* 左側：設定表單 */}
+            <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-morandi-container">
+              <DialogHeader className="mb-4">
+                <DialogTitle className="flex items-center gap-2">
+                  <Plane className="w-5 h-5" style={{ color: '#B8A99A' }} />
+                  航班設定
+                </DialogTitle>
+              </DialogHeader>
 
-          <div className="space-y-4 pt-2">
+              <div className="space-y-4 pt-2">
             {/* 航班卡片風格選擇 */}
             {updateField && (
               <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-lg border border-slate-200">
@@ -783,6 +768,27 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                 </div>
               </div>
             </div>
+              </div>
+            </div>
+
+            {/* 右側：即時預覽 */}
+            <PreviewPanel
+              styleLabel={currentStyle?.label}
+              styleColor={currentStyle?.color}
+            >
+              {(viewMode) => (
+                <div className="w-full h-full overflow-auto p-6">
+                  <TourFlightSection
+                    data={{
+                      outboundFlight: data.outboundFlight,
+                      returnFlight: data.returnFlight,
+                      flightStyle: data.flightStyle || 'original',
+                    }}
+                    viewMode={viewMode}
+                  />
+                </div>
+              )}
+            </PreviewPanel>
           </div>
         </DialogContent>
       </Dialog>

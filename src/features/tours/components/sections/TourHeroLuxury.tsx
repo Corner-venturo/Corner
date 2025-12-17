@@ -1,8 +1,7 @@
 'use client'
 
-import { Calendar, MapPin, Sparkles } from 'lucide-react'
-import { HeroStatCard } from '@/components/editor/tour-form/types'
-import { isHtmlString, htmlToPlainText, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import { MapPin } from 'lucide-react'
+import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -28,9 +27,6 @@ interface TourHeroLuxuryProps {
     city?: string
     price?: string
     priceNote?: string
-    days?: number
-    heroStatCard2?: HeroStatCard // 第二個統計卡片（可自訂）
-    heroStatCard3?: HeroStatCard // 第三個統計卡片（可自訂）
   }
   viewMode: 'desktop' | 'mobile'
 }
@@ -52,10 +48,6 @@ const LUXURY = {
  */
 export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
   const isMobile = viewMode === 'mobile'
-  const dayNumber = data.days || extractDayNumber(data.title) || 7
-
-  // 從標題中解析國家和主題
-  const titleParts = parseTitle(data.title)
 
   return (
     <header
@@ -148,43 +140,6 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
               </div>
             )}
 
-            {/* 數據卡片 */}
-            {(() => {
-              // 計算有幾個卡片要顯示
-              const hasCard2 = data.heroStatCard2?.value && data.heroStatCard2?.label
-              const hasCard3 = data.heroStatCard3?.value && data.heroStatCard3?.label
-              const cardCount = 1 + (hasCard2 ? 1 : 0) + (hasCard3 ? 1 : 0)
-
-              return (
-                <div className={`grid gap-4 pt-6 ${isMobile ? 'gap-3' : 'gap-6'}`} style={{ gridTemplateColumns: `repeat(${cardCount}, 1fr)` }}>
-                  {/* 第一個卡片：天數（固定） */}
-                  <DataCard
-                    icon={<Calendar className="w-6 h-6" />}
-                    value={dayNumber}
-                    label="Days Journey"
-                    isMobile={isMobile}
-                  />
-                  {/* 第二個卡片：可自訂 */}
-                  {hasCard2 && (
-                    <DataCard
-                      icon={<Sparkles className="w-6 h-6" />}
-                      value={data.heroStatCard2!.value}
-                      label={data.heroStatCard2!.label}
-                      isMobile={isMobile}
-                    />
-                  )}
-                  {/* 第三個卡片：可自訂 */}
-                  {hasCard3 && (
-                    <DataCard
-                      icon={<Sparkles className="w-6 h-6" />}
-                      value={data.heroStatCard3!.value}
-                      label={data.heroStatCard3!.label}
-                      isMobile={isMobile}
-                    />
-                  )}
-                </div>
-              )
-            })()}
           </div>
 
           {/* 右側：主視覺圖片 */}
@@ -245,97 +200,4 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
       </div>
     </header>
   )
-}
-
-// 數據卡片組件
-function DataCard({
-  icon,
-  value,
-  label,
-  isMobile
-}: {
-  icon: React.ReactNode
-  value: number | string
-  label: string
-  isMobile: boolean
-}) {
-  return (
-    <div
-      className={`group bg-white rounded-xl border shadow-sm hover:shadow-md transition-all duration-300 ${
-        isMobile ? 'p-3' : 'p-4'
-      }`}
-      style={{ borderColor: '#f0f0f0' }}
-    >
-      <div
-        className="mb-2 group-hover:scale-110 transition-transform"
-        style={{ color: LUXURY.primary }}
-      >
-        {icon}
-      </div>
-      <div
-        className={`font-medium ${isMobile ? 'text-2xl' : 'text-3xl'}`}
-        style={{
-          color: LUXURY.text,
-          fontFamily: "'Noto Serif TC', serif"
-        }}
-      >
-        {value}
-      </div>
-      <div
-        className="text-[10px] tracking-widest uppercase mt-1"
-        style={{ color: LUXURY.muted }}
-      >
-        {label}
-      </div>
-    </div>
-  )
-}
-
-// 解析標題
-function parseTitle(title: string): { country?: string; highlight?: string; theme?: string } {
-  // 嘗試匹配 "九州冬日聖誕奇蹟" 這樣的格式
-  const patterns = [
-    /^(.+?)(冬日|春日|夏日|秋日|之旅|遊)(.+)$/,
-    /^(.+?)(\d+[天日])(.*)$/,
-  ]
-
-  for (const pattern of patterns) {
-    const match = title.match(pattern)
-    if (match) {
-      return {
-        country: match[1],
-        highlight: match[2],
-        theme: match[3] || undefined
-      }
-    }
-  }
-
-  return { theme: title }
-}
-
-// 從標題提取天數
-function extractDayNumber(title: string): number | null {
-  // 先轉換為純文字（移除 HTML 標籤）
-  const plainTitle = htmlToPlainText(title)
-
-  const chineseNumbers: Record<string, number> = {
-    '一': 1, '二': 2, '三': 3, '四': 4, '五': 5,
-    '六': 6, '七': 7, '八': 8, '九': 9, '十': 10,
-  }
-
-  const patterns = [
-    /(\d+)\s*[天日]/,
-    /(十[一二三四五]?|[一二三四五六七八九])\s*[天日]/
-  ]
-
-  for (const pattern of patterns) {
-    const match = plainTitle.match(pattern)
-    if (match) {
-      const num = match[1]
-      if (/^\d+$/.test(num)) return parseInt(num, 10)
-      if (chineseNumbers[num]) return chineseNumbers[num]
-    }
-  }
-
-  return null
 }

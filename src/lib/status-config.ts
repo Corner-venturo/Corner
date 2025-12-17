@@ -286,23 +286,23 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       icon: Package,
       bgColor: 'bg-morandi-primary/10',
     },
-    issued: {
+    collected: {
       color: 'text-morandi-green',
-      label: '已下件',
+      label: '已取件',
       icon: CheckCircle,
       bgColor: 'bg-morandi-green/10',
-    },
-    collected: {
-      color: 'text-morandi-primary',
-      label: '已取件',
-      icon: FileCheck,
-      bgColor: 'bg-morandi-primary/10',
     },
     rejected: {
       color: 'text-morandi-red',
       label: '退件',
       icon: XCircle,
       bgColor: 'bg-morandi-red/10',
+    },
+    returned: {
+      color: 'text-morandi-secondary',
+      label: '已歸還',
+      icon: FileCheck,
+      bgColor: 'bg-morandi-secondary/10',
     },
     default: {
       color: 'text-morandi-secondary',

@@ -33,6 +33,7 @@ function mergePermissionsWithRoles(
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
+  isAdmin: boolean // Added isAdmin flag
   sidebarCollapsed: boolean
   _hasHydrated: boolean
 
@@ -66,10 +67,15 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
+      isAdmin: false, // Initial state
       sidebarCollapsed: true,
       _hasHydrated: false,
       
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => {
+        const isAuthenticated = !!user;
+        const isAdmin = isAuthenticated && (user.permissions.includes('admin') || user.permissions.includes('*'));
+        set({ user, isAuthenticated, isAdmin });
+      },
 
       logout: async () => {
         try {
@@ -91,6 +97,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
+          isAdmin: false,
         })
       },
 
@@ -207,7 +214,7 @@ export const useAuthStore = create<AuthState>()(
           const token = generateToken(authPayload)
           setSecureCookie(token, false)
 
-          set({ user, isAuthenticated: true })
+          get().setUser(user);
           
           logger.log('✅ Login successful:', employeeData.display_name)
           return { success: true }
@@ -220,7 +227,8 @@ export const useAuthStore = create<AuthState>()(
       checkPermission: (permission: string) => {
         const user = get().user
         if (!user) return false
-        return user.permissions.includes(permission) || user.permissions.includes('admin')
+        // Updated to use the new isAdmin flag for simplicity
+        return get().isAdmin || user.permissions.includes(permission)
       },
 
       refreshUserData: async () => {
@@ -294,7 +302,7 @@ export const useAuthStore = create<AuthState>()(
             updated_at: employeeData.updated_at || new Date().toISOString(),
           }
 
-          set({ user: updatedUser })
+          get().setUser(updatedUser);
           logger.log('✅ User data refreshed:', updatedUser.display_name)
         } catch (error) {
           logger.error('💥 Error refreshing user data:', error)
@@ -311,6 +319,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: state => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        isAdmin: state.isAdmin, // Persist isAdmin
         sidebarCollapsed: state.sidebarCollapsed,
       }),
       onRehydrateStorage: () => state => {

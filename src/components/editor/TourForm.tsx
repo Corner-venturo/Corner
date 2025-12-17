@@ -210,38 +210,41 @@ export function TourForm({ data, onChange }: TourFormProps) {
       </div>
 
       <div className="p-6 space-y-8">
-        {/* 封面設定 */}
-        <div id="section-cover">
-          <CoverInfoSection
-            data={data}
-            user={user}
-            selectedCountry={selectedCountry}
-            setSelectedCountry={setSelectedCountry}
-            setSelectedCountryCode={setSelectedCountryCode}
-            allDestinations={allDestinations}
-            availableCities={availableCities}
-            countryNameToCode={countryNameToCode}
-            updateField={handlers.updateField}
-            updateCity={handlers.updateCity}
-            onChange={onChange}
-          />
-        </div>
+        {/* 三格快捷設定 */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* 封面設定 */}
+          <div id="section-cover">
+            <CoverInfoSection
+              data={data}
+              user={user}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+              setSelectedCountryCode={setSelectedCountryCode}
+              allDestinations={allDestinations}
+              availableCities={availableCities}
+              countryNameToCode={countryNameToCode}
+              updateField={handlers.updateField}
+              updateCity={handlers.updateCity}
+              onChange={onChange}
+            />
+          </div>
 
-        {/* 航班資訊 */}
-        <div id="section-flight">
-          <FlightInfoSection
-            data={data}
-            updateFlightField={handlers.updateFlightField}
-            updateFlightFields={handlers.updateFlightFields}
-            updateField={handlers.updateField}
-            canUndoItinerary={itineraryBackup !== null && itineraryBackup.length > 0}
-            onUndoItinerary={() => {
-              if (itineraryBackup) {
-                onChange({ ...data, dailyItinerary: itineraryBackup })
-                setItineraryBackup(null)
-              }
-            }}
-            onGenerateDailyItinerary={(days: number, departureDate: string) => {
+          {/* 航班資訊 */}
+          <div id="section-flight">
+            <FlightInfoSection
+              data={data}
+              updateFlightField={handlers.updateFlightField}
+              updateFlightFields={handlers.updateFlightFields}
+              updateField={handlers.updateField}
+              compact={true}
+              canUndoItinerary={itineraryBackup !== null && itineraryBackup.length > 0}
+              onUndoItinerary={() => {
+                if (itineraryBackup) {
+                  onChange({ ...data, dailyItinerary: itineraryBackup })
+                  setItineraryBackup(null)
+                }
+              }}
+              onGenerateDailyItinerary={(days: number, departureDate: string) => {
               // 備份當前行程（用於復原）
               if (data.dailyItinerary && data.dailyItinerary.length > 0) {
                 setItineraryBackup([...data.dailyItinerary])
@@ -297,33 +300,47 @@ export function TourForm({ data, onChange }: TourFormProps) {
               onChange({ ...data, dailyItinerary: newDailyItinerary })
             }}
           />
-        </div>
-
-        {/* 行程特色 */}
-        <div id="section-features" className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-morandi-container/10 rounded-lg border border-morandi-container/30">
-            <input
-              type="checkbox"
-              id="showFeatures"
-              checked={data.showFeatures !== false}
-              onChange={e => onChange({ ...data, showFeatures: e.target.checked })}
-              className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
-            />
-            <label htmlFor="showFeatures" className="text-sm font-medium text-morandi-primary cursor-pointer">
-              顯示行程特色區塊
-            </label>
           </div>
 
-          {data.showFeatures !== false && (
-            <FeaturesSection
-              data={data}
-              addFeature={handlers.addFeature}
-              updateFeature={handlers.updateFeature}
-              removeFeature={handlers.removeFeature}
-              reorderFeature={handlers.reorderFeature}
-            />
-          )}
+          {/* 行程特色 */}
+          <div id="section-features">
+            <button
+              type="button"
+              onClick={() => onChange({ ...data, showFeatures: data.showFeatures === false })}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-morandi-gold/30 bg-morandi-gold/5 hover:border-morandi-gold hover:shadow-md transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-morandi-gold">
+                <Star size={20} className="text-white" />
+              </div>
+              <div className="text-left flex-1">
+                <h2 className="text-base font-bold text-morandi-primary">特色行程</h2>
+                <p className="text-xs text-morandi-secondary">
+                  {data.showFeatures !== false ? '已啟用' : '未啟用'}
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={data.showFeatures !== false}
+                onChange={e => {
+                  e.stopPropagation()
+                  onChange({ ...data, showFeatures: e.target.checked })
+                }}
+                className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
+              />
+            </button>
+          </div>
         </div>
+
+        {/* 行程特色展開內容 */}
+        {data.showFeatures !== false && (
+          <FeaturesSection
+            data={data}
+            addFeature={handlers.addFeature}
+            updateFeature={handlers.updateFeature}
+            removeFeature={handlers.removeFeature}
+            reorderFeature={handlers.reorderFeature}
+          />
+        )}
 
         {/* 每日行程 */}
         <div id="section-itinerary">

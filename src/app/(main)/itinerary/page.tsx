@@ -22,6 +22,13 @@ const statusFilters = ['全部', '草稿', '已發布', '公司範例', '結案'
 // 公司密碼（統編）
 const COMPANY_PASSWORD = '83212711'
 
+// 移除 HTML 標籤，只保留純文字
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  // 移除所有 HTML 標籤
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 export default function ItineraryPage() {
   const router = useRouter()
   const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
@@ -468,9 +475,11 @@ export default function ItineraryPage() {
           const versionRecords = itinerary.version_records as Array<unknown> | undefined
           const versionCount = versionRecords?.length || 0
           const extraVersions = versionCount > 1 ? versionCount - 1 : 0
+          // 移除 HTML 標籤，只顯示純文字
+          const cleanTitle = stripHtml(itinerary.title)
           return (
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-morandi-primary">{itinerary.title}</span>
+              <span className="text-sm font-medium text-morandi-primary">{cleanTitle}</span>
               {extraVersions > 0 && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-morandi-gold/10 text-morandi-gold font-medium">
                   +{extraVersions}
@@ -783,17 +792,17 @@ export default function ItineraryPage() {
       }
     }
 
-    // 搜尋 - 搜尋所有文字欄位
+    // 搜尋 - 搜尋所有文字欄位（移除 HTML 標籤後再搜尋）
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase()
       filtered = filtered.filter(
         item =>
-          item.title.toLowerCase().includes(searchLower) ||
+          stripHtml(item.title).toLowerCase().includes(searchLower) ||
           item.country.toLowerCase().includes(searchLower) ||
           item.city.toLowerCase().includes(searchLower) ||
           item.tour_code?.toLowerCase().includes(searchLower) ||
           item.status.toLowerCase().includes(searchLower) ||
-          item.description?.toLowerCase().includes(searchLower)
+          stripHtml(item.description).toLowerCase().includes(searchLower)
       )
     }
 
@@ -953,7 +962,7 @@ export default function ItineraryPage() {
           </DialogHeader>
           <div className="py-4 space-y-4">
             <p className="text-sm text-morandi-secondary">
-              正在複製：<span className="font-medium text-morandi-primary">{duplicateSource?.title}</span>
+              正在複製：<span className="font-medium text-morandi-primary">{stripHtml(duplicateSource?.title)}</span>
             </p>
             <div className="space-y-2">
               <Label htmlFor="duplicateTourCode">行程編號 *</Label>

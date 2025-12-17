@@ -5,7 +5,7 @@ import { MessageList, MessageInput, MemberSidebar } from '../chat'
 import { validateFile } from '../chat/utils'
 import { Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Message, AdvanceList, SharedOrderList, AdvanceItem } from '@/stores/workspace'
+import type { Message, AdvanceList, SharedOrderList, Channel } from '@/stores/workspace'
 import { alert } from '@/lib/ui/alert-dialog'
 
 interface MessageListTheme {
@@ -27,6 +27,8 @@ const theme: MessageListTheme = {
 }
 
 interface ChannelChatMessagesProps {
+  channel: Channel; // Use the full channel object
+  isAdmin: boolean; // Pass down isAdmin
   messages: Message[]
   advanceLists: AdvanceList[]
   sharedOrderLists: SharedOrderList[]
@@ -58,6 +60,8 @@ interface ChannelChatMessagesProps {
 }
 
 export function ChatMessages({
+  channel,
+  isAdmin,
   messages,
   advanceLists,
   sharedOrderLists,
@@ -256,7 +260,7 @@ export function ChatMessages({
           onReply={onReply}
           getReplyCount={getReplyCount}
           onCreatePayment={onCreatePayment}
-          onDeleteAdvanceList={onDeleteAdvanceList}
+  onDeleteAdvanceList={onDeleteAdvanceList}
           onCreateReceipt={onCreateReceipt}
           messagesEndRef={messagesEndRef}
           theme={theme}
@@ -266,6 +270,8 @@ export function ChatMessages({
       </div>
 
       <MessageInput
+        channel={channel}
+        isAdmin={isAdmin}
         channelName={channelName}
         value={messageText}
         onChange={onMessageChange}

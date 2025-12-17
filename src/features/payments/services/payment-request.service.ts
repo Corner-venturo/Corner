@@ -76,7 +76,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const existingItems = this.getItemsByRequestId(requestId)
 
     const now = this.now()
-    const itemNumber = `${request.code}-${String(existingItems.length + 1).padStart(3, '0')}`
+    // 品項編號格式：PR000001-A, PR000001-B...
+    const letterIndex = existingItems.length
+    const itemLetter = String.fromCharCode('A'.charCodeAt(0) + letterIndex)
+    const itemNumber = `${request.code}-${itemLetter}`
 
     // 資料庫欄位是 unitprice（無底線），轉換欄位名稱
     const item = {

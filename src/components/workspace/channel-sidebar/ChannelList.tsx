@@ -17,22 +17,25 @@ import {
 } from '@dnd-kit/sortable'
 import type { Channel, ChannelGroup } from '@/stores/workspace-store'
 import { ChannelListSection, GroupedChannelList } from './ChannelListSection'
+import { getWorkspaceMembers } from '@/lib/actions/user-actions'
 
 interface ChannelListProps {
   announcementChannels: Channel[]
   announcementGroup: ChannelGroup | undefined
-  favoriteChannels: Channel[] // 🔥 新增：我的最愛
+  favoriteChannels: Channel[]
   userGroupedChannels: Array<{ group: ChannelGroup; channels: Channel[] }>
   ungroupedChannels: Channel[]
   unjoinedChannels: Channel[]
   archivedChannels: Channel[]
   archivedGroup: ChannelGroup | undefined
+  dmMembers: Awaited<ReturnType<typeof getWorkspaceMembers>>
   selectedChannelId: string | null
   isAdmin: boolean
   expandedSections: Record<string, boolean>
   searchQuery?: string
   // Callbacks
   onSelectChannel: (channel: Channel | null) => void
+  onSelectMember: (memberId: string) => void // New callback for DM
   toggleChannelFavorite: (id: string) => void
   onDelete: (id: string) => void
   onEdit: (id: string) => void
@@ -54,11 +57,13 @@ export function ChannelList({
   unjoinedChannels,
   archivedChannels,
   archivedGroup,
+  dmMembers,
   selectedChannelId,
   isAdmin,
   expandedSections,
   searchQuery = '',
   onSelectChannel,
+  onSelectMember,
   toggleChannelFavorite,
   onDelete,
   onEdit,
@@ -91,6 +96,25 @@ export function ChannelList({
     ...unjoinedChannels,
     ...archivedChannels,
   ]
+
+  // Map dmMembers to a structure compatible with ChannelListSection
+  const dmChannels = dmMembers.map(member => ({
+    id: member.id, // Using user id as a key, will be handled by onSelectMember
+    name: member.full_name,
+    avatar_url: member.avatar_url,
+    type: 'direct' as const, // Synthetic type for rendering
+    // Add other required Channel properties as dummy values if needed
+    group_id: null,
+    is_favorite: false,
+    order: 0,
+    created_by: '',
+    workspace_id: '',
+    description: '',
+    is_archived: false,
+    scope: 'workspace' as const,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -177,6 +201,30 @@ export function ChannelList({
               icon="hash"
               showAddButton
               onAddClick={() => {}}
+            />
+          )}
+          
+          {/* New Section for Direct Messages */}
+          {dmChannels.length > 0 && (
+            <ChannelListSection
+              channels={dmChannels}
+              selectedChannelId={selectedChannelId}
+              onSelectChannel={(channel) => {
+                if (channel?.id) {
+                  onSelectMember(channel.id)
+                }
+              }}
+              toggleChannelFavorite={() => {}} // No favorite for DMs
+              onDelete={() => {}} // No delete for DMs
+              onEdit={() => {}} // No edit for DMs
+              onJoinChannel={() => {}} // No join for DMs
+              onLeaveChannel={() => {}} // No leave for DMs
+              isAdmin={isAdmin}
+              checkIsMember={() => true} // Always a member of your own DMs
+              isExpanded={expandedSections.directMessages !== false}
+              onToggleExpanded={() => onToggleExpanded('directMessages', !expandedSections.directMessages)}
+              title="私訊"
+              icon="user"
             />
           )}
 

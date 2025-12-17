@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { useEmployeeStore } from '@/stores'
+import { useEmployeeStore, useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Plus, Building2, Users, Shield } from 'lucide-react'
 import { toast } from 'sonner'
 import { alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * Workspace 管理頁面
@@ -16,8 +17,9 @@ import { alert } from '@/lib/ui/alert-dialog'
  * 使用前端過濾實現資料隔離
  */
 export default function WorkspacesPage() {
-  const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace } = useWorkspaceChannels()
+  const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace, createChannel } = useWorkspaceChannels()
   const employeeStore = useEmployeeStore()
+  const { user } = useAuthStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({
     name: '',
@@ -41,19 +43,39 @@ export default function WorkspacesPage() {
   }
 
   const handleCreate = async () => {
-    if (!newWorkspace.name) {
+    if (!newWorkspace.name || !user) {
       toast.error('請填寫工作空間名稱')
       return
     }
 
-    await createWorkspace({
-      name: newWorkspace.name,
-      description: newWorkspace.description,
-      is_active: true,
-    })
+    try {
+      const createdWs = await createWorkspace({
+        name: newWorkspace.name,
+        description: newWorkspace.description,
+        is_active: true,
+      })
 
-    setNewWorkspace({ name: '', description: '' })
-    setShowAddDialog(false)
+      if (createdWs) {
+        logger.log(`Workspace created: ${createdWs.id}. Creating announcement channel...`)
+        // Automatically create an announcement channel
+        await createChannel({
+          workspace_id: createdWs.id,
+          name: '公告',
+          description: '此頻道用於發布全工作空間的重要公告。',
+          type: 'PUBLIC',
+          is_announcement: true,
+          created_by: user.id,
+        })
+        toast.success('工作空間和公告頻道已建立')
+      }
+
+      setNewWorkspace({ name: '', description: '' })
+      setShowAddDialog(false)
+
+    } catch (error) {
+      logger.error('Failed to create workspace or announcement channel:', error)
+      toast.error('建立失敗')
+    }
   }
 
   const toggleActive = async (id: string, currentStatus: boolean) => {

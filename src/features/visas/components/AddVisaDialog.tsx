@@ -343,21 +343,29 @@ export function AddVisaDialog({
                 ＋追加
               </Button>
 
-              {/* 新增/刪除按鈕 */}
+              {/* 新增按鈕：只在最後一列顯示 */}
+              {index === applicants.length - 1 && (
+                <Button
+                  type="button"
+                  onClick={addApplicant}
+                  size="sm"
+                  className="h-8 w-8 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  title="新增辦理人"
+                >
+                  +
+                </Button>
+              )}
+
+              {/* 刪除按鈕：所有列都顯示（刪除邏輯會確保至少保留一個空的主列） */}
               <Button
                 type="button"
-                onClick={
-                  index === applicants.length - 1 ? addApplicant : () => removeApplicant(applicant.id)
-                }
+                onClick={() => removeApplicant(applicant.id)}
                 size="sm"
-                className={
-                  index === applicants.length - 1
-                    ? 'h-8 w-8 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                    : 'h-8 w-8 p-0 text-morandi-red hover:bg-red-50'
-                }
-                variant={index === applicants.length - 1 ? 'default' : 'ghost'}
+                className="h-8 w-8 p-0 text-morandi-red hover:bg-red-50"
+                variant="ghost"
+                title="刪除"
               >
-                {index === applicants.length - 1 ? '+' : '✕'}
+                ✕
               </Button>
             </div>
           </div>

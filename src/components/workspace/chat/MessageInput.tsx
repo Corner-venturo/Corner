@@ -2,15 +2,18 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, Send, Smile, Paperclip } from 'lucide-react'
+import { Plus, Send, Smile } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FilePreview } from './FilePreview'
 import { UploadProgress } from './UploadProgress'
 import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickActionMenu'
 import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
+import type { Channel } from '@/stores/workspace'
 
 interface MessageInputProps {
+  channel: Channel
+  isAdmin: boolean
   channelName: string
   value: string
   onChange: (value: string) => void
@@ -28,6 +31,8 @@ interface MessageInputProps {
 }
 
 export function MessageInput({
+  channel,
+  isAdmin,
   channelName,
   value,
   onChange,
@@ -48,6 +53,9 @@ export function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
+
+  const isAnnouncementChannel = channel.is_announcement
+  const isDisabled = isAnnouncementChannel && !isAdmin
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -313,6 +321,7 @@ export function MessageInput({
             size="icon"
             className="w-9 h-9 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
             onClick={() => setShowQuickMenu(!showQuickMenu)}
+            disabled={isDisabled}
           >
             <Plus size={18} />
           </Button>
@@ -326,6 +335,7 @@ export function MessageInput({
             className="hidden"
             onChange={handleFileSelect}
             accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+            disabled={isDisabled}
           />
         </div>
 
@@ -342,8 +352,8 @@ export function MessageInput({
                 }
               }
             }}
-            placeholder={`在 #${channelName} 中輸入訊息...`}
-            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors"
+            placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `在 #${channelName} 中輸入訊息...`}
+            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
             rows={1}
             style={{
               height: 'auto',
@@ -355,10 +365,12 @@ export function MessageInput({
               target.style.height = 'auto'
               target.style.height = Math.min(target.scrollHeight, 120) + 'px'
             }}
+            disabled={isDisabled}
           />
           <button
             type="button"
             className="absolute right-2 top-3 p-1 text-morandi-secondary hover:text-morandi-gold transition-colors pointer-events-auto z-10"
+            disabled={isDisabled}
           >
             <Smile size={16} />
           </button>
@@ -366,7 +378,7 @@ export function MessageInput({
 
         <Button
           type="submit"
-          disabled={(!value.trim() && attachedFiles.length === 0) || uploadingFiles}
+          disabled={(!value.trim() && attachedFiles.length === 0) || uploadingFiles || isDisabled}
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploadingFiles ? (
@@ -376,15 +388,6 @@ export function MessageInput({
           )}
         </Button>
       </form>
-
-      {isDragging && (
-        <div className="absolute inset-0 flex items-center justify-center bg-morandi-gold/5 border-2 border-dashed border-morandi-gold rounded-lg pointer-events-none">
-          <div className="text-center">
-            <Paperclip size={32} className="mx-auto mb-2 text-morandi-gold" />
-            <p className="text-morandi-gold font-medium">放開以上傳檔案</p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

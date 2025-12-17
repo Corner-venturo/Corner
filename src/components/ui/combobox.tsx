@@ -102,7 +102,7 @@ export function Combobox<T = unknown>({
   const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([])
 
   // 當 value 或 options 改變時，更新搜尋值為對應的 label
-  // 如果找不到匹配的 option，保留原本的 value 作為顯示
+  // 如果找不到匹配的 option，顯示空字串避免顯示原始 ID 或亂碼
   React.useEffect(() => {
     // 如果 value 為空，強制清空 searchValue
     if (!value) {
@@ -111,8 +111,9 @@ export function Combobox<T = unknown>({
     }
 
     const selectedOption = options.find(opt => opt.value === value)
-    // 如果找到匹配的 option，用其 label；否則保留原本的 value（讓城市名稱顯示出來）
-    const newLabel = selectedOption?.label || value || ''
+    // 只顯示找到的 option 的 label，找不到時顯示空字串
+    // 這樣可以避免顯示原始 ID、UUID 或其他不應該顯示的資料
+    const newLabel = selectedOption?.label || ''
     // 只在 label 真的改變時才更新，避免不必要的 re-render
     setSearchValue(prev => (prev !== newLabel ? newLabel : prev))
   }, [value, options]) // 加回 options 依賴，確保 options 變化時能正確更新

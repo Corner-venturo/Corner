@@ -144,47 +144,104 @@ export function useVisasDialog(tours: Tour[]) {
   // 移除辦理人
   const removeApplicant = useCallback(
     (id: string) => {
-      if (applicants.length > 1) {
-        setApplicants(prev => prev.filter(a => a.id !== id))
-      }
+      setApplicants(prev => {
+        // 找到要刪除的項目
+        const target = prev.find(a => a.id === id)
+        if (!target) return prev
+
+        // 如果是追加列，直接刪除
+        if (target.isAdditional) {
+          return prev.filter(a => a.id !== id)
+        }
+
+        // 如果是主列，一起刪除它的追加列
+        const filteredList = prev.filter(a => a.id !== id && a.parentId !== id)
+
+        // 確保至少有一個主列（非追加列）
+        const hasMainApplicant = filteredList.some(a => !a.isAdditional)
+        if (!hasMainApplicant) {
+          // 如果刪除後沒有主列了，保留一個空的主列
+          return [{
+            id: '1',
+            name: '',
+            country: '護照 成人',
+            is_urgent: false,
+            received_date: '',
+            expected_issue_date: '',
+            cost: 0,
+          }]
+        }
+
+        return filteredList
+      })
     },
-    [applicants.length]
+    []
   )
 
   // 更新辦理人資料
   const updateApplicant = useCallback(
     (id: string, field: keyof VisaApplicant, value: unknown) => {
-      setApplicants(prev =>
-        prev.map(a => {
-          if (a.id !== id) return a
+      setApplicants(prev => {
+        // 先找到被更新的申請人
+        const targetIndex = prev.findIndex(a => a.id === id)
+        if (targetIndex === -1) return prev
 
-          const updated = { ...a, [field]: value }
+        const target = prev[targetIndex]
+        const updated = { ...target, [field]: value }
 
-          // 如果是收件時間或簽證類型改變，自動計算預計下件時間
-          if (field === 'received_date' || field === 'country' || field === 'is_urgent') {
-            if (updated.received_date) {
-              const visaTypeWithUrgent = updated.is_urgent
-                ? `${updated.country} 急件`
-                : updated.country
-              updated.expected_issue_date = calculateReceivedDate(
-                updated.received_date,
-                visaTypeWithUrgent
-              )
-            }
+        // 如果是收件時間或簽證類型改變，自動計算預計下件時間
+        if (field === 'received_date' || field === 'country' || field === 'is_urgent') {
+          if (updated.received_date) {
+            const visaTypeWithUrgent = updated.is_urgent
+              ? `${updated.country} 急件`
+              : updated.country
+            updated.expected_issue_date = calculateReceivedDate(
+              updated.received_date,
+              visaTypeWithUrgent
+            )
           }
+        }
 
-          // 如果勾選/取消急件，自動調整成本 ±1000
-          if (field === 'is_urgent') {
-            if (value === true) {
-              updated.cost = a.cost + 1000
-            } else {
-              updated.cost = Math.max(0, a.cost - 1000)
-            }
+        // 如果勾選/取消急件，自動調整成本 ±1000
+        if (field === 'is_urgent') {
+          if (value === true) {
+            updated.cost = target.cost + 1000
+          } else {
+            updated.cost = Math.max(0, target.cost - 1000)
           }
+        }
 
-          return updated
-        })
-      )
+        // 更新主列
+        const newList = prev.map(a => (a.id === id ? updated : a))
+
+        // 如果是主列（非追加列），且修改了日期或急件，同步更新追加列
+        if (!target.isAdditional && (field === 'received_date' || field === 'expected_issue_date' || field === 'is_urgent')) {
+          return newList.map(a => {
+            if (a.parentId !== id) return a
+            // 追加列的收件日期 = 主列的預計下件日期
+            const newReceivedDate = updated.expected_issue_date || ''
+            const visaTypeWithUrgent = a.is_urgent ? `${a.country} 急件` : a.country
+            const newExpectedDate = newReceivedDate
+              ? calculateReceivedDate(newReceivedDate, visaTypeWithUrgent)
+              : ''
+            return {
+              ...a,
+              received_date: newReceivedDate,
+              expected_issue_date: newExpectedDate,
+            }
+          })
+        }
+
+        // 如果是主列（非追加列），且修改了姓名，同步更新追加列的姓名
+        if (!target.isAdditional && field === 'name') {
+          return newList.map(a => {
+            if (a.parentId !== id) return a
+            return { ...a, name: value as string }
+          })
+        }
+
+        return newList
+      })
     },
     [calculateReceivedDate]
   )

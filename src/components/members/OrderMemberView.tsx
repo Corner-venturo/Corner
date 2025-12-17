@@ -195,14 +195,14 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
         if (!response.ok) throw new Error('OCR 辨識失敗')
         const result = await response.json()
 
-        let successCount = 0, duplicateCount = 0, syncedCustomerCount = 0
-        const failedItems: string[] = [], duplicateItems: string[] = []
-        
+        let successCount = 0, duplicateCount = 0, syncedCustomerCount = 0, replacedCount = 0
+        const failedItems: string[] = [], duplicateItems: { name: string; reason: string; existingMemberId: string; newData: Record<string, unknown>; fileIndex: number }[] = []
+
         refetchMembers() // 確保資料是最新的
         const existingMembers = orderMembers
-        const existingPassports = new Set(existingMembers.map(m => m.passport_number).filter(Boolean))
-        const existingIdNumbers = new Set(existingMembers.map(m => m.id_number).filter(Boolean))
-        const existingNameBirthKeys = new Set(existingMembers.filter(m => m.name && m.birthday).map(m => `${m.name}|${m.birthday}`))
+        const existingPassportMap = new Map(existingMembers.filter(m => m.passport_number).map(m => [m.passport_number, m.id]))
+        const existingIdNumberMap = new Map(existingMembers.filter(m => m.id_number).map(m => [m.id_number, m.id]))
+        const existingNameBirthMap = new Map(existingMembers.filter(m => m.name && m.birthday).map(m => [`${m.name}|${m.birthday}`, m.id]))
 
         await fetchCustomers()
         const freshCustomers = useCustomerStore.getState().items
@@ -218,14 +218,30 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
           const cleanChineseName = name.replace(/\([^)]+\)$/, '').trim()
           const nameBirthKey = cleanChineseName && date_of_birth ? `${cleanChineseName}|${date_of_birth}` : ''
 
-          let isDuplicate = false, duplicateReason = ''
-          if (passport_number && existingPassports.has(passport_number)) { isDuplicate = true; duplicateReason = '護照號碼重複' }
-          else if (national_id && existingIdNumbers.has(national_id)) { isDuplicate = true; duplicateReason = '身分證號重複' }
-          else if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) { isDuplicate = true; duplicateReason = '姓名+生日重複' }
-          
-          if (isDuplicate) {
+          let existingMemberId: string | undefined
+          let duplicateReason = ''
+          if (passport_number && existingPassportMap.has(passport_number)) { existingMemberId = existingPassportMap.get(passport_number); duplicateReason = '護照號碼重複' }
+          else if (national_id && existingIdNumberMap.has(national_id)) { existingMemberId = existingIdNumberMap.get(national_id); duplicateReason = '身分證號重複' }
+          else if (nameBirthKey && existingNameBirthMap.has(nameBirthKey)) { existingMemberId = existingNameBirthMap.get(nameBirthKey); duplicateReason = '姓名+生日重複' }
+
+          if (existingMemberId) {
+            // 收集重複項目，稍後詢問用戶是否替換
+            duplicateItems.push({
+              name: cleanChineseName || item.fileName,
+              reason: duplicateReason,
+              existingMemberId,
+              newData: {
+                name: cleanChineseName,
+                name_en: item.customer.passport_romanization || item.customer.english_name || '',
+                passport_number,
+                passport_expiry: item.customer.passport_expiry_date || null,
+                birthday: date_of_birth,
+                id_number: national_id,
+                gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
+              },
+              fileIndex: i,
+            })
             duplicateCount++
-            duplicateItems.push(`${cleanChineseName || item.fileName} (${duplicateReason})`)
             continue
           }
           
@@ -256,11 +272,12 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
             failedItems.push(`${item.fileName} (建立失敗)`)
             continue
           }
-          
+
           successCount++
-          if (passport_number) existingPassports.add(passport_number)
-          if (national_id) existingIdNumbers.add(national_id)
-          if (nameBirthKey) existingNameBirthKeys.add(nameBirthKey)
+          // 更新 Map 以追蹤本批次新增的成員
+          if (passport_number) existingPassportMap.set(passport_number, newMember.id)
+          if (national_id) existingIdNumberMap.set(national_id, newMember.id)
+          if (nameBirthKey) existingNameBirthMap.set(nameBirthKey, newMember.id)
 
           let existingCustomer = freshCustomers.find(c => 
             (passport_number && c.passport_number === passport_number) ||
@@ -278,9 +295,45 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
             // ... (create new customer logic, can be simplified for now)
           }
         }
-        
+
+        // 處理重複項目：詢問用戶是否要替換
+        if (duplicateItems.length > 0) {
+          const duplicateNames = duplicateItems.map(d => `• ${d.name} (${d.reason})`).join('\n')
+          const shouldReplace = await confirm(
+            `發現 ${duplicateItems.length} 位重複成員：\n\n${duplicateNames}\n\n是否要用新的護照資料替換？\n（新照片可能比較清楚）`,
+            { title: '發現重複成員', confirmText: '替換', cancelText: '跳過' }
+          )
+
+          if (shouldReplace) {
+            for (const dup of duplicateItems) {
+              try {
+                // 上傳新的護照照片
+                let passport_image_url: string | null = null
+                if (compressedFiles[dup.fileIndex]) {
+                  const file = compressedFiles[dup.fileIndex]
+                  const fileName = `${workspace_id}/${order_id}/${Date.now()}_replace_${dup.fileIndex}.${file.name.split('.').pop() || 'jpg'}`
+                  const { data: uploadData, error: uploadError } = await uploadPassportImage(fileName, file)
+                  if (uploadError) logger.error('護照照片上傳失敗:', uploadError)
+                  else passport_image_url = uploadData?.publicUrl || null
+                }
+
+                // 更新成員資料
+                await updateMember(dup.existingMemberId, {
+                  ...dup.newData,
+                  ...(passport_image_url ? { passport_image_url } : {}),
+                } as Partial<Member>)
+                replacedCount++
+              } catch (err) {
+                logger.error('替換成員資料失敗:', err)
+              }
+            }
+          }
+        }
+
         let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員`
-        // ... (rest of the success message construction)
+        if (replacedCount > 0) message += `\n🔄 已替換 ${replacedCount} 位重複成員`
+        else if (duplicateCount > 0) message += `\n⚠️ 跳過 ${duplicateCount} 位重複成員`
+        if (syncedCustomerCount > 0) message += `\n👤 已連結 ${syncedCustomerCount} 位既有顧客`
         alert(message, 'success')
         
         processedFiles.forEach(pf => URL.revokeObjectURL(pf.preview))

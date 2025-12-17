@@ -72,6 +72,7 @@ export function ChannelChat() {
     isMessagesLoading,
     advanceLists,
     sharedOrderLists,
+    isAdmin, // Get isAdmin from the hook
 
     // Store actions
     loadSharedOrderLists,
@@ -122,6 +123,8 @@ export function ChannelChat() {
             }
           >
             <ChatMessages
+              channel={selectedChannel} // Pass the whole channel object
+              isAdmin={isAdmin} // Pass isAdmin flag
               messages={currentMessages || []}
               advanceLists={advanceLists}
               sharedOrderLists={sharedOrderLists}

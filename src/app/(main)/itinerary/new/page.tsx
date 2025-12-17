@@ -339,8 +339,6 @@ function NewItineraryPageContent() {
   const { countries, cities } = useRegionsStore()
 
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
-  const [scale, setScale] = useState(1)
-  const containerRef = useRef<HTMLDivElement>(null)
   const mobileContentRef = useRef<HTMLDivElement>(null)
   // 版本控制：-1 表示主版本，0+ 表示 version_records 的索引
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
@@ -1081,50 +1079,8 @@ function NewItineraryPageContent() {
      
   }, [tourId, itineraryId, tours, itineraries, countries, cities, isFromQuote, daysFromQuote])
 
-  // 計算縮放比例（必須在 early return 之前）
-  useEffect(() => {
-    const calculateScale = () => {
-      if (!containerRef.current) return
-
-      const container = containerRef.current
-      const containerWidth = container.clientWidth
-      const containerHeight = container.clientHeight
-
-      // 容器尺寸還沒準備好時跳過
-      if (containerWidth === 0 || containerHeight === 0) return
-
-      // 調整目標尺寸（含手機框架）
-      const targetWidth = viewMode === 'mobile' ? 410 : 1200 // 390 + 邊框
-      const targetHeight = viewMode === 'mobile' ? 880 : 800 // 844 + 邊框
-
-      // 計算縮放，留一些邊距
-      const scaleX = (containerWidth - 40) / targetWidth
-      const scaleY = (containerHeight - 40) / targetHeight
-
-      const finalScale = Math.min(scaleX, scaleY, 0.9) // 最大 0.9 避免太大
-
-      setScale(finalScale)
-    }
-
-    // 使用 ResizeObserver 監聽容器尺寸變化
-    const resizeObserver = new ResizeObserver(() => {
-      calculateScale()
-    })
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current)
-    }
-
-    // 初次計算延遲執行，確保 DOM 已渲染
-    const timer = setTimeout(calculateScale, 100)
-
-    window.addEventListener('resize', calculateScale)
-    return () => {
-      clearTimeout(timer)
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', calculateScale)
-    }
-  }, [viewMode])
+  // 固定縮放比例（避免重新整理時的渲染問題）
+  const scale = viewMode === 'mobile' ? 0.7 : 0.5
 
   // 切換到手機模式時，滾動到標題區域
   useEffect(() => {
@@ -1463,9 +1419,9 @@ function NewItineraryPageContent() {
             </div>
 
             {/* 預覽容器 */}
-            <div className="flex-1 overflow-hidden p-8" ref={containerRef}>
+            <div className="flex-1 overflow-auto p-4">
               <div className="w-full h-full flex items-center justify-center">
-                {/* 縮放容器 */}
+                {/* 縮放容器 - 固定比例 */}
                 <div
                   style={{
                     transform: `scale(${scale})`,

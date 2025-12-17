@@ -49,6 +49,7 @@ export function ReturnDocumentsDialog({
           : existingNote
 
         await updateVisa(visa.id, {
+          status: 'returned',
           documents_returned_date: returnDate,
           note: newNote,
         })

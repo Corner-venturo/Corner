@@ -3,7 +3,8 @@ import {
   useWorkspaceChannels,
   useWorkspaceChat,
   useWorkspaceWidgets,
-  useChatStore, // Import the full chat store
+  useChatStore,
+  useAuthStore, // Import useAuthStore
 } from '@/stores/workspace'
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
 import {
@@ -45,6 +46,8 @@ export function useChannelChat() {
     updateChannel,
     deleteChannel,
   } = useWorkspaceChannels()
+  
+  const { isAdmin } = useAuthStore(); // Get isAdmin flag
 
   const { channelMessages, messagesLoading, loadMessages } = useWorkspaceChat()
   const { subscribeToMessages, unsubscribeFromMessages } = useChatStore()
@@ -189,6 +192,7 @@ export function useChannelChat() {
     isMessagesLoading,
     advanceLists,
     sharedOrderLists,
+    isAdmin, // Expose isAdmin flag
 
     // Store actions
     loadSharedOrderLists,

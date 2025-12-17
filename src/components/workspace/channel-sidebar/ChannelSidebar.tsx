@@ -1,7 +1,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useAuthStore } from '@/stores/auth-store'
@@ -24,10 +24,15 @@ import { CreateChannelDialog } from './CreateChannelDialog'
 import { EditChannelDialog } from './EditChannelDialog'
 import { ChannelList } from './ChannelList'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { getWorkspaceMembers } from '@/lib/actions/user-actions'
+import { getOrCreateDmChannel } from '@/lib/actions/channel-actions'
 
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
   // 🔥 直接訂閱 channel store 的 items，繞過 Facade 的響應式問題
   const channelStoreItems = useChannelStore(state => state.items)
+  const [dmMembers, setDmMembers] = useState<Awaited<ReturnType<typeof getWorkspaceMembers>>>([])
+  const [isCreatingDm, setIsCreatingDm] = useState(false)
+
 
   // Use selective hooks for better performance
   const {
@@ -119,6 +124,19 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     useChannelMemberStore.getState().fetchAll()
   }, [currentWorkspace?.id])
 
+  // Fetch workspace members for DMs
+  useEffect(() => {
+    async function fetchMembers() {
+      try {
+        const members = await getWorkspaceMembers();
+        setDmMembers(members);
+      } catch (error) {
+        logger.error('Failed to fetch workspace members for DMs:', error);
+      }
+    }
+    fetchMembers();
+  }, []);
+
   // 🔥 開啟建立頻道對話框時，自動選中建立者
   useEffect(() => {
     if (showCreateChannelDialog && user?.id && !selectedMembers.includes(user.id)) {
@@ -135,6 +153,23 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
     void loadChannelMembers(currentWorkspace.id, selectedChannelId)
      
   }, [selectedChannelId, currentWorkspace?.id])
+
+  const handleSelectMember = async (memberId: string) => {
+    setIsCreatingDm(true);
+    try {
+      const dmChannel = await getOrCreateDmChannel(memberId);
+      if (dmChannel) {
+        // Since the server action revalidates the path, the new channel
+        // should appear automatically. We just need to select it.
+        onSelectChannel(dmChannel as Channel);
+      }
+    } catch (error) {
+      logger.error('Failed to create or get DM channel:', error);
+      void alert('開啟私訊失敗', 'error');
+    } finally {
+      setIsCreatingDm(false);
+    }
+  };
 
   const handleRemoveMember = async () => {
     if (!memberToRemove || !selectedChannelId || !currentWorkspace) {
@@ -500,7 +535,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         onCreateChannel={() => setShowCreateChannelDialog(true)}
         onCreateGroup={() => setShowNewGroupDialog(true)}
         onRefresh={() => currentWorkspace?.id && loadChannels(currentWorkspace.id)}
-        isRefreshing={loading}
+        isRefreshing={loading || isCreatingDm}
       />
 
       {/* Search input */}
@@ -524,11 +559,13 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         unjoinedChannels={unjoinedChannels}
         archivedChannels={archivedChannels}
         archivedGroup={archivedGroup}
+        dmMembers={dmMembers}
         selectedChannelId={selectedChannelId}
         isAdmin={isAdmin}
         expandedSections={expandedSections}
         searchQuery={searchQuery}
         onSelectChannel={onSelectChannel}
+        onSelectMember={handleSelectMember}
         toggleChannelFavorite={toggleChannelPin}
         onDelete={handleDeleteClick}
         onEdit={handleEditClick}

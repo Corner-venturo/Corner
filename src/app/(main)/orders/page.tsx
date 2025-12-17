@@ -69,15 +69,10 @@ export default function OrdersPage() {
     return matchesFilter && matchesTour && matchesSearch
   })
 
-  // 計算待辦事項
-  interface TodoItem {
-    type: 'payment' | 'overdue' | 'partial'
-    priority: 'high' | 'medium'
-    message: string
-    order_id: string
-  }
-
-  const todos = React.useMemo(() => {
+  // 計算待辦事項 (用戶要求移除)
+  const todos: TodoItem[] = React.useMemo(() => {
+    return [];
+    /*
     const result: TodoItem[] = []
     const today = new Date()
     const _sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -133,7 +128,8 @@ export default function OrdersPage() {
     })
 
     return result
-  }, [orders, tours])
+    */
+  }, [orders, tours]);
 
   const handleAddOrder = async (orderData: {
     tour_id: string
@@ -220,7 +216,8 @@ export default function OrdersPage() {
       />
 
       <div className="flex-1 overflow-auto flex flex-col">
-        {/* 待辦事項提醒 */}
+        {/* 待辦事項提醒 (用戶要求移除) */}
+        {/*
         {todos.length > 0 && (
           <div className="mb-6">
             <div className="bg-morandi-red/5 border border-morandi-red/20 rounded-lg p-4">
@@ -265,6 +262,7 @@ export default function OrdersPage() {
             </div>
           </div>
         )}
+        */}
 
         {/* 訂單列表 */}
         <SimpleOrderTable className="flex-1" orders={filteredOrders as Order[]} tours={tours} showTourInfo={true} />

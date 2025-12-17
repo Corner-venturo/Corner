@@ -57,17 +57,15 @@ export function VisasList({
       label: '狀態',
       render: (value, rowData) => {
         const visa = rowData as Visa
+        const statusColors: Record<string, string> = {
+          pending: 'text-morandi-gold',
+          submitted: 'text-morandi-primary',
+          collected: 'text-morandi-green',
+          rejected: 'text-morandi-red',
+          returned: 'text-morandi-secondary',
+        }
         return (
-          <span
-            className={cn(
-              'text-sm font-medium',
-              visa.status === 'submitted'
-                ? 'text-morandi-gold'
-                : visa.status === 'issued'
-                  ? 'text-morandi-green'
-                  : 'text-morandi-secondary'
-            )}
-          >
+          <span className={cn('text-sm font-medium', statusColors[visa.status] || 'text-morandi-secondary')}>
             {getVisaStatusLabel(visa.status)}
           </span>
         )

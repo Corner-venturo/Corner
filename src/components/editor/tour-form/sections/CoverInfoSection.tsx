@@ -4,8 +4,10 @@ import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, Check, Crop, Settings2, Loader2, Monitor, Smartphone } from 'lucide-react'
+import { Upload, Crop, Settings2, Loader2, CalendarIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
@@ -13,6 +15,7 @@ import { RichTextInput } from '@/components/ui/rich-text-input'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
+import { PreviewPanel } from '../components/PreviewPanel'
 // Hero 組件
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
@@ -60,8 +63,6 @@ export function CoverInfoSection({
   const [showPositionEditor, setShowPositionEditor] = useState(false)
   // 封面設定 Modal
   const [showCoverSettings, setShowCoverSettings] = useState(false)
-  // 預覽模式
-  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop')
 
   // 取得當前選擇城市的圖片
   const cityImages = useMemo(() => {
@@ -260,38 +261,20 @@ export function CoverInfoSection({
       <button
         type="button"
         onClick={() => setShowCoverSettings(true)}
-        className="w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all hover:shadow-md"
-        style={{ borderColor: currentStyleColor, backgroundColor: `${currentStyleColor}08` }}
+        className="w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all hover:shadow-md"
+        style={{ borderColor: `${currentStyleColor}50`, backgroundColor: `${currentStyleColor}08` }}
       >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: currentStyleColor }}
-          >
-            <Settings2 size={20} className="text-white" />
-          </div>
-          <div className="text-left">
-            <h2 className="text-base font-bold text-morandi-primary">封面設定</h2>
-            <p className="text-xs text-morandi-secondary">
-              {currentStyleOption?.label || '經典全屏'} · {data.title || '未設定標題'}
-            </p>
-          </div>
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: currentStyleColor }}
+        >
+          <Settings2 size={20} className="text-white" />
         </div>
-        <div className="flex items-center gap-2">
-          {data.coverImage && (
-            <img
-              src={data.coverImage}
-              alt="封面預覽"
-              className="w-12 h-12 rounded object-cover border"
-              style={{ borderColor: `${currentStyleColor}40` }}
-            />
-          )}
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: `${currentStyleColor}20` }}
-          >
-            <Check size={14} style={{ color: currentStyleColor }} />
-          </div>
+        <div className="text-left flex-1">
+          <h2 className="text-base font-bold text-morandi-primary">封面設定</h2>
+          <p className="text-xs text-morandi-secondary">
+            風格：{currentStyleOption?.label || '經典全屏'}
+          </p>
         </div>
       </button>
 
@@ -359,73 +342,6 @@ export function CoverInfoSection({
                 </div>
               )}
             </div>
-
-            {/* Luxury 風格專屬設定 */}
-            {data.coverStyle === 'luxury' && (
-              <div className="p-3 rounded-lg border-2 border-dashed" style={{ borderColor: '#2C5F4D50', backgroundColor: '#2C5F4D08' }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#2C5F4D' }}>
-                    <Settings2 size={12} className="text-white" />
-                  </div>
-                  <span className="text-sm font-medium" style={{ color: '#2C5F4D' }}>Luxury 統計卡片</span>
-                  <span className="text-xs text-morandi-secondary">（第一個固定為天數）</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-14 text-xs text-morandi-secondary">卡片 2</span>
-                    <Input
-                      type="number"
-                      value={data.heroStatCard2?.value || ''}
-                      onChange={e => updateField('heroStatCard2', {
-                        ...data.heroStatCard2,
-                        value: e.target.value ? parseInt(e.target.value) : '',
-                        label: data.heroStatCard2?.label || ''
-                      })}
-                      placeholder="數字"
-                      className="h-8 w-16"
-                      min={0}
-                    />
-                    <Input
-                      type="text"
-                      value={data.heroStatCard2?.label || ''}
-                      onChange={e => updateField('heroStatCard2', {
-                        ...data.heroStatCard2,
-                        value: data.heroStatCard2?.value || '',
-                        label: e.target.value
-                      })}
-                      placeholder="如 Fine Dining"
-                      className="h-8 flex-1"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-14 text-xs text-morandi-secondary">卡片 3</span>
-                    <Input
-                      type="number"
-                      value={data.heroStatCard3?.value || ''}
-                      onChange={e => updateField('heroStatCard3', {
-                        ...data.heroStatCard3,
-                        value: e.target.value ? parseInt(e.target.value) : '',
-                        label: data.heroStatCard3?.label || ''
-                      })}
-                      placeholder="數字"
-                      className="h-8 w-16"
-                      min={0}
-                    />
-                    <Input
-                      type="text"
-                      value={data.heroStatCard3?.label || ''}
-                      onChange={e => updateField('heroStatCard3', {
-                        ...data.heroStatCard3,
-                        value: data.heroStatCard3?.value || '',
-                        label: e.target.value
-                      })}
-                      placeholder="如 Attractions"
-                      className="h-8 flex-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* 基本資訊 */}
             <div className="space-y-3">
@@ -513,45 +429,33 @@ export function CoverInfoSection({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">出發日期</label>
-                  <Input
-                    type="text"
-                    value={data.departureDate || ''}
-                    onChange={e => {
-                      let value = toHalfWidth(e.target.value)
-                      value = value.replace(/[^\d/]/g, '')
-                      if (/^\d{8}$/.test(value)) {
-                        value = `${value.slice(0, 4)}/${value.slice(4, 6)}/${value.slice(6, 8)}`
-                      } else if (/^\d{7}$/.test(value)) {
-                        const year = value.slice(0, 4)
-                        const rest = value.slice(4)
-                        const month1 = rest.slice(0, 2)
-                        const day1 = rest.slice(2)
-                        if (parseInt(month1) <= 12 && parseInt(day1) >= 1 && parseInt(day1) <= 31) {
-                          value = `${year}/${month1}/${day1}`
-                        } else {
-                          const month2 = rest.slice(0, 1)
-                          const day2 = rest.slice(1)
-                          value = `${year}/${month2}/${day2}`
-                        }
-                      } else if (/^\d{6}$/.test(value)) {
-                        value = `${value.slice(0, 4)}/${value.slice(4, 5)}/${value.slice(5, 6)}`
-                      }
-                      updateField('departureDate', value)
-                    }}
-                    onBlur={e => {
-                      const value = e.target.value
-                      const match = value.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/)
-                      if (match) {
-                        const [, year, month, day] = match
-                        const formatted = `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`
-                        if (formatted !== value) {
-                          updateField('departureDate', formatted)
-                        }
-                      }
-                    }}
-                    placeholder="2025/10/21"
-                    className="h-9"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          'w-full h-9 justify-start text-left font-normal',
+                          !data.departureDate && 'text-muted-foreground'
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {data.departureDate || '選擇日期'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : undefined}
+                        onSelect={(date) => {
+                          if (date && date instanceof Date) {
+                            const formatted = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
+                            updateField('departureDate', formatted)
+                          }
+                        }}
+                        defaultMonth={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">行程代碼</label>
@@ -685,93 +589,39 @@ export function CoverInfoSection({
             </div>
 
             {/* 右側：實時預覽 */}
-            <div className="w-1/2 bg-slate-800 flex flex-col overflow-hidden">
-              {/* 版本切換按鈕 */}
-              <div className="flex items-center justify-center gap-2 p-3 bg-slate-900 border-b border-slate-700">
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode('desktop')}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors',
-                    previewMode === 'desktop'
-                      ? 'bg-white text-slate-900'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  )}
-                >
-                  <Monitor size={16} />
-                  電腦版
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewMode('mobile')}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors',
-                    previewMode === 'mobile'
-                      ? 'bg-white text-slate-900'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  )}
-                >
-                  <Smartphone size={16} />
-                  手機版
-                </button>
-              </div>
+            <PreviewPanel
+              styleLabel={currentStyleOption?.label || '經典全屏'}
+              styleColor={currentStyleColor}
+            >
+              {(viewMode) => {
+                const heroData = {
+                  coverImage: data.coverImage,
+                  tagline: data.tagline || 'Corner Travel',
+                  title: data.title || '行程標題',
+                  subtitle: data.subtitle || '副標題',
+                  description: data.description || '此處顯示行程描述',
+                  departureDate: data.departureDate || '2025/01/01',
+                  tourCode: data.tourCode || 'CODE',
+                  price: data.price || '',
+                  priceNote: data.priceNote || '/人',
+                  country: selectedCountry || '',
+                  dailyItinerary: data.dailyItinerary,
+                }
 
-              {/* 預覽區域 - 直接使用真實 Hero 組件 */}
-              <div className="flex-1 flex items-center justify-center p-4 overflow-auto bg-slate-100">
-                <div
-                  className={cn(
-                    'relative overflow-hidden shadow-2xl transition-all duration-300',
-                    previewMode === 'mobile'
-                      ? 'w-[360px] h-[700px] rounded-[2.5rem] border-[8px] border-slate-600 bg-slate-600'
-                      : 'w-full h-[80vh] rounded-lg border border-slate-600'
-                  )}
-                >
-                  <div className="w-full h-full overflow-hidden" style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
-                    {(() => {
-                      // 從 dailyItinerary 計算天數
-                      const days = data.dailyItinerary?.length || 0
-                      const heroData = {
-                        coverImage: data.coverImage,
-                        tagline: data.tagline || 'Corner Travel',
-                        title: data.title || '行程標題',
-                        subtitle: data.subtitle || '副標題',
-                        description: data.description || '此處顯示行程描述',
-                        departureDate: data.departureDate || '2025/01/01',
-                        tourCode: data.tourCode || 'CODE',
-                        price: data.price || '',
-                        priceNote: data.priceUnit || '/人',
-                        country: selectedCountry || '',
-                        days: days > 0 ? days : undefined,
-                        heroStatCard2: data.heroStatCard2,
-                        heroStatCard3: data.heroStatCard3,
-                        dailyItinerary: data.dailyItinerary,
-                      }
-                      const viewMode = previewMode
-
-                      switch (data.coverStyle) {
-                        case 'luxury':
-                          return <TourHeroLuxury data={heroData} viewMode={viewMode} />
-                        case 'art':
-                          return <TourHeroArt data={heroData} viewMode={viewMode} />
-                        case 'nature':
-                          return <TourHeroNature data={heroData} viewMode={viewMode} />
-                        case 'gemini':
-                          return <TourHeroGemini data={heroData} viewMode={viewMode} />
-                        default:
-                          return <TourHeroSection data={heroData} viewMode={viewMode} />
-                      }
-                    })()}
-                  </div>
-
-                  {/* 風格標籤 */}
-                  <div className={cn('absolute z-20', previewMode === 'mobile' ? 'top-2 right-2' : 'top-3 right-3')}>
-                    <span className={cn('rounded-full text-white font-medium', previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-2 py-1 text-[10px]')} style={{ backgroundColor: currentStyleColor }}>
-                      {currentStyleOption?.label || '經典全屏'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                switch (data.coverStyle) {
+                  case 'luxury':
+                    return <TourHeroLuxury data={heroData} viewMode={viewMode} />
+                  case 'art':
+                    return <TourHeroArt data={heroData} viewMode={viewMode} />
+                  case 'nature':
+                    return <TourHeroNature data={heroData} viewMode={viewMode} />
+                  case 'gemini':
+                    return <TourHeroGemini data={heroData} viewMode={viewMode} />
+                  default:
+                    return <TourHeroSection data={heroData} viewMode={viewMode} />
+                }
+              }}
+            </PreviewPanel>
           </div>
         </DialogContent>
       </Dialog>
