@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import { TourFormData, FlightStyleType } from '../types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CalendarPlus, Search, Loader2, Plane, Undo2, Settings2, Check } from 'lucide-react'
+import { CalendarPlus, Search, Loader2, Plane, Undo2, Settings2, Check, List } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
+import { FlightRouteSearchDialog } from '../components/FlightRouteSearchDialog'
 
 interface FlightInfoSectionProps {
   data: TourFormData
@@ -82,6 +83,10 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
   // 航班查詢狀態
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
+
+  // 航線查詢 Dialog 狀態
+  const [showRouteSearchOutbound, setShowRouteSearchOutbound] = useState(false)
+  const [showRouteSearchReturn, setShowRouteSearchReturn] = useState(false)
 
   // Track previous values to detect changes
   const prevOutboundRef = useRef({
@@ -512,6 +517,16 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                     )}
                     查詢航班
                   </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowRouteSearchOutbound(true)}
+                    className="h-7 text-xs gap-1 border-morandi-gold/50 text-morandi-gold hover:bg-morandi-gold/10"
+                  >
+                    <List size={12} />
+                    查詢航線
+                  </Button>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
@@ -650,6 +665,16 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                     )}
                     查詢航班
                   </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowRouteSearchReturn(true)}
+                    className="h-7 text-xs gap-1 border-morandi-gold/50 text-morandi-gold hover:bg-morandi-gold/10"
+                  >
+                    <List size={12} />
+                    查詢航線
+                  </Button>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
@@ -761,6 +786,83 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 去程航線查詢 Dialog */}
+      <FlightRouteSearchDialog
+        open={showRouteSearchOutbound}
+        onOpenChange={setShowRouteSearchOutbound}
+        defaultOrigin={data.outboundFlight?.departureAirport || 'TPE'}
+        defaultDestination={data.outboundFlight?.arrivalAirport || ''}
+        defaultDate={(() => {
+          // 嘗試從出發日期計算
+          if (data.departureDate) {
+            const dep = parseDate(data.departureDate)
+            if (dep) return dep.toISOString().split('T')[0]
+          }
+          return new Date().toISOString().split('T')[0]
+        })()}
+        onSelectFlight={(flight) => {
+          const fields: Record<string, string> = {
+            flightNumber: flight.flightNumber,
+            airline: flight.airline,
+            departureAirport: flight.departureAirport,
+            arrivalAirport: flight.arrivalAirport,
+            departureTime: flight.departureTime,
+          }
+          if (flight.arrivalTime) {
+            fields.arrivalTime = flight.arrivalTime
+          }
+          if (updateFlightFields) {
+            updateFlightFields('outboundFlight', fields)
+          } else {
+            Object.entries(fields).forEach(([key, value]) => {
+              updateFlightField('outboundFlight', key, value)
+            })
+          }
+        }}
+      />
+
+      {/* 回程航線查詢 Dialog */}
+      <FlightRouteSearchDialog
+        open={showRouteSearchReturn}
+        onOpenChange={setShowRouteSearchReturn}
+        defaultOrigin={data.returnFlight?.departureAirport || data.outboundFlight?.arrivalAirport || ''}
+        defaultDestination={data.returnFlight?.arrivalAirport || 'TPE'}
+        defaultDate={(() => {
+          // 嘗試從回程日期計算
+          if (data.returnFlight?.departureDate && data.departureDate) {
+            const dep = parseDate(data.departureDate)
+            if (dep) {
+              const [month, day] = (data.returnFlight.departureDate || '').split('/').map(Number)
+              if (month && day) {
+                let year = dep.getFullYear()
+                if (month < dep.getMonth() + 1) year += 1
+                return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+              }
+            }
+          }
+          return new Date().toISOString().split('T')[0]
+        })()}
+        onSelectFlight={(flight) => {
+          const fields: Record<string, string> = {
+            flightNumber: flight.flightNumber,
+            airline: flight.airline,
+            departureAirport: flight.departureAirport,
+            arrivalAirport: flight.arrivalAirport,
+            departureTime: flight.departureTime,
+          }
+          if (flight.arrivalTime) {
+            fields.arrivalTime = flight.arrivalTime
+          }
+          if (updateFlightFields) {
+            updateFlightFields('returnFlight', fields)
+          } else {
+            Object.entries(fields).forEach(([key, value]) => {
+              updateFlightField('returnFlight', key, value)
+            })
+          }
+        }}
+      />
     </div>
   )
 }

@@ -65,8 +65,19 @@ export const QuotesList: React.FC<QuotesListProps> = ({
           const quote = row as Quote
           // 快速報價單顯示 customer_name，團體報價單顯示 name
           const displayName = quote.quote_type === 'quick' ? quote.customer_name : quote.name
+          // 版本數量
+          const versions = (quote as Quote & { versions?: Array<unknown> }).versions
+          const versionCount = versions?.length || 0
+          const extraVersions = versionCount > 1 ? versionCount - 1 : 0
           return (
-            <span className="text-sm font-medium text-morandi-primary">{displayName || '-'}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-morandi-primary">{displayName || '-'}</span>
+              {extraVersions > 0 && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-morandi-gold/10 text-morandi-gold font-medium">
+                  +{extraVersions}
+                </span>
+              )}
+            </div>
           )
         },
       },

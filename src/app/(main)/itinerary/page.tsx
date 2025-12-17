@@ -464,9 +464,21 @@ export default function ItineraryPage() {
         key: 'title',
         label: '行程名稱',
         sortable: true,
-        render: (_value, itinerary) => (
-          <span className="text-sm font-medium text-morandi-primary">{itinerary.title}</span>
-        ),
+        render: (_value, itinerary) => {
+          const versionRecords = itinerary.version_records as Array<unknown> | undefined
+          const versionCount = versionRecords?.length || 0
+          const extraVersions = versionCount > 1 ? versionCount - 1 : 0
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-morandi-primary">{itinerary.title}</span>
+              {extraVersions > 0 && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-morandi-gold/10 text-morandi-gold font-medium">
+                  +{extraVersions}
+                </span>
+              )}
+            </div>
+          )
+        },
       },
       {
         key: 'destination',

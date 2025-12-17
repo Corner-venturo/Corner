@@ -120,8 +120,22 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
 
       if (data.id) {
         if (currentVersionIndex === -1) {
-          // 更新主版本
-          await update(data.id, convertedData)
+          // 更新主版本（同時更新版本 1 的資料）
+          const updatedRecords = [...versionRecords]
+          if (updatedRecords.length > 0) {
+            // 同步更新版本 1 的內容
+            updatedRecords[0] = {
+              ...updatedRecords[0],
+              note: data.title || updatedRecords[0].note, // 更新版本名稱
+              daily_itinerary: data.dailyItinerary || [],
+              features: data.features,
+              focus_cards: data.focusCards,
+              leader: data.leader,
+              meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+              hotels: data.hotels,
+            }
+          }
+          await update(data.id, { ...convertedData, version_records: updatedRecords })
         } else {
           // 更新特定版本記錄
           const updatedRecords = [...versionRecords]
@@ -137,11 +151,24 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
           await update(data.id, { version_records: updatedRecords })
         }
       } else {
-        // 第一次建立，帶入登入者 ID
+        // 第一次建立，自動建立版本 1（名稱 = 行程名稱）
+        const firstVersion: ItineraryVersionRecord = {
+          id: generateUUID(),
+          version: 1,
+          note: data.title || '版本 1',
+          daily_itinerary: data.dailyItinerary || [],
+          features: data.features,
+          focus_cards: data.focusCards,
+          leader: data.leader,
+          meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+          hotels: data.hotels,
+          created_at: new Date().toISOString(),
+        }
+
         const newItinerary = await create({
           ...convertedData,
           created_by: user?.id || undefined,
-          version_records: [],
+          version_records: [firstVersion],
         } as Parameters<typeof create>[0])
 
         if (newItinerary?.id) {
@@ -276,7 +303,11 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
 
   // 取得目前版本名稱
   const getCurrentVersionName = () => {
-    if (currentVersionIndex === -1) return '主版本'
+    if (currentVersionIndex === -1) {
+      // 主版本 = 版本 1
+      const firstVersion = versionRecords[0]
+      return firstVersion?.note || data.title || '版本 1'
+    }
     const record = versionRecords[currentVersionIndex]
     return record?.note || `版本 ${record?.version || currentVersionIndex + 1}`
   }
@@ -352,55 +383,55 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64" align="end">
               <div className="px-2 py-1.5 text-sm font-medium text-morandi-primary border-b border-border">
-                版本歷史
+                版本歷史 {versionRecords.length > 0 && `(${versionRecords.length})`}
               </div>
-              {/* 主版本 */}
-              <DropdownMenuItem
-                className="flex items-center justify-between py-2 cursor-pointer"
-                onClick={() => handleVersionSelect('-1')}
-              >
-                <span className="font-medium">{data.tourCode || '原始版本'}</span>
-                {currentVersionIndex === -1 && (
-                  <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
-                )}
-              </DropdownMenuItem>
-              {/* 其他版本 */}
-              {versionRecords.map((record, index) => (
-                <DropdownMenuItem
-                  key={record.id}
-                  className="flex items-center justify-between py-2 cursor-pointer relative"
-                  onMouseEnter={() => setHoveredVersionIndex(index)}
-                  onMouseLeave={() => setHoveredVersionIndex(null)}
-                  onClick={() => handleVersionSelect(index.toString())}
-                >
-                  <div className="flex flex-col flex-1">
-                    <span className="font-medium">{record.note || `版本 ${record.version}`}</span>
-                    <span className="text-xs text-morandi-secondary">
-                      {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {currentVersionIndex === index && (
-                      <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
-                    )}
-                    {hoveredVersionIndex === index && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteVersion(index)
-                        }}
-                        className="p-1 hover:bg-red-100 rounded transition-colors"
-                        title="刪除版本"
-                      >
-                        <Trash2 size={14} className="text-red-500" />
-                      </button>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
+              {/* 所有版本 */}
+              {versionRecords.map((record, index) => {
+                const isMainVersion = index === 0
+                const isCurrentVersion = (isMainVersion && currentVersionIndex === -1) || currentVersionIndex === index
+                return (
+                  <DropdownMenuItem
+                    key={record.id}
+                    className="flex items-center justify-between py-2 cursor-pointer relative"
+                    onMouseEnter={() => setHoveredVersionIndex(index)}
+                    onMouseLeave={() => setHoveredVersionIndex(null)}
+                    onClick={() => handleVersionSelect(isMainVersion ? '-1' : index.toString())}
+                  >
+                    <div className="flex flex-col flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{record.note || `版本 ${record.version}`}</span>
+                        {isMainVersion && (
+                          <span className="text-[10px] text-morandi-secondary bg-slate-100 px-1.5 py-0.5 rounded">主版本</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-morandi-secondary">
+                        {record.created_at ? new Date(record.created_at).toLocaleString('zh-TW') : ''}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isCurrentVersion && (
+                        <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
+                      )}
+                      {/* 版本 1 (主版本) 不可刪除 */}
+                      {hoveredVersionIndex === index && !isMainVersion && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteVersion(index)
+                          }}
+                          className="p-1 hover:bg-red-100 rounded transition-colors"
+                          title="刪除版本"
+                        >
+                          <Trash2 size={14} className="text-red-500" />
+                        </button>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                )
+              })}
               {versionRecords.length === 0 && (
                 <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                  尚無其他版本，點擊「另存」創建新版本
+                  儲存後會自動建立版本 1
                 </div>
               )}
             </DropdownMenuContent>
