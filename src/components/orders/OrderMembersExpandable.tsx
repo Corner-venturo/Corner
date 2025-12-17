@@ -1082,10 +1082,19 @@ export function OrderMembersExpandable({
               })
 
               if (existingCustomer) {
-                // 找到現有顧客，關聯
+                // 找到現有顧客，關聯並補齊缺少的資料
+                const updateData: Record<string, unknown> = {
+                  customer_id: existingCustomer.id
+                }
+
+                // 如果 order_member 的拼音是空的，從現有顧客補上
+                if (!newMember.passport_name && existingCustomer.passport_romanization) {
+                  updateData.passport_name = existingCustomer.passport_romanization
+                }
+
                 await supabase
                   .from('order_members')
-                  .update({ customer_id: existingCustomer.id })
+                  .update(updateData)
                   .eq('id', newMember.id)
 
                 // 如果現有顧客沒有護照圖片，更新它
