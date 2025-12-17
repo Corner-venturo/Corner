@@ -735,9 +735,10 @@ export function CoverInfoSection({
                         <h1 className={cn('font-bold mb-1', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')} style={{ color: '#2C5F4D', fontFamily: "'Noto Serif TC', serif" }}>
                           {data.title || '行程標題'}
                         </h1>
-                        <p className={cn('mb-2', previewMode === 'mobile' ? 'text-xs' : 'text-sm')} style={{ color: '#636E72' }}>
+                        <p className={cn('', previewMode === 'mobile' ? 'text-xs' : 'text-sm')} style={{ color: '#636E72' }}>
                           {data.subtitle || '副標題'}
                         </p>
+                        <p className="text-[10px] text-gray-400 mb-2 line-clamp-2">{data.description || '描述文字'}</p>
                         <div className="flex gap-2 mt-2 flex-wrap">
                           <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
                             <div className="text-[8px] text-white/70">出發</div>
@@ -776,9 +777,11 @@ export function CoverInfoSection({
                           {data.title || '行程標題'}
                         </h1>
                         {/* 副標題 */}
-                        <p className={cn('italic mb-3', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#c76d54', fontFamily: 'serif' }}>
-                          {data.subtitle || 'Odyssey'}
+                        <p className={cn('italic', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#c76d54', fontFamily: 'serif' }}>
+                          {data.subtitle || '副標題'}
                         </p>
+                        {/* 描述 */}
+                        <p className="text-[10px] text-gray-500 mb-2 line-clamp-2">{data.description || '描述文字'}</p>
                         {/* 資訊列 */}
                         <div className="flex gap-4 pt-2 border-t" style={{ borderColor: 'rgba(26,26,26,0.1)' }}>
                           <div>
@@ -854,15 +857,18 @@ export function CoverInfoSection({
                           <div className="absolute inset-0 bg-[#30abe8]/10 mix-blend-overlay z-10" />
                           <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
                           {/* 底部標籤 */}
-                          <div className={cn('absolute z-20 flex flex-wrap gap-1', previewMode === 'mobile' ? 'bottom-2 left-2' : 'bottom-3 left-3')}>
-                            <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                              <span className="text-[10px] font-bold text-[#2c3e50]">{data.tagline || 'Travel'}</span>
-                            </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                              <span className="text-[10px] text-[#2c3e50]">{data.departureDate || '日期'}</span>
-                            </div>
-                            <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                              <span className="text-[10px] text-[#2c3e50]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
+                          <div className={cn('absolute z-20', previewMode === 'mobile' ? 'bottom-2 left-2 right-2' : 'bottom-3 left-3 right-3')}>
+                            <p className="text-[10px] text-white bg-black/40 backdrop-blur-sm rounded px-2 py-1 mb-1 line-clamp-2">{data.description || '描述文字'}</p>
+                            <div className="flex flex-wrap gap-1">
+                              <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                                <span className="text-[10px] font-bold text-[#2c3e50]">{data.tagline || 'Travel'}</span>
+                              </div>
+                              <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                                <span className="text-[10px] text-[#2c3e50]">{data.departureDate || '日期'}</span>
+                              </div>
+                              <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
+                                <span className="text-[10px] text-[#2c3e50]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -888,7 +894,8 @@ export function CoverInfoSection({
                         <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
                           {data.subtitle || '副標題'}
                         </p>
-                        <div className="flex gap-2 mt-2 flex-wrap">
+                        <p className="text-[10px] text-white/60 mb-1 line-clamp-2">{data.description || '描述文字'}</p>
+                        <div className="flex gap-2 mt-1 flex-wrap">
                           <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
                             <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
                           </div>
