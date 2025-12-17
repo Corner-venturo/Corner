@@ -1,13 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { isHtmlString, htmlToPlainText } from '@/lib/utils/rich-text'
+import { isHtmlString, htmlToPlainText, cleanTiptapHtml } from '@/lib/utils/rich-text'
 
-// 渲染可能包含 HTML 的文字
+// 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
   if (!html) return null
   if (isHtmlString(html)) {
-    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+    const cleanHtml = cleanTiptapHtml(html)
+    return <span className={className} dangerouslySetInnerHTML={{ __html: cleanHtml }} />
   }
   return <span className={className}>{html}</span>
 }

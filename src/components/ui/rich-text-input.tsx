@@ -51,16 +51,17 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
   const containerRef = useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
+    immediatelyRender: false, // 避免 SSR hydration 問題
     extensions: [
       StarterKit.configure({
-        paragraph: singleLine ? false : undefined,
-        hardBreak: singleLine ? false : undefined,
+        // 保留 paragraph（必須），但禁用其他區塊類型
         heading: false,
         bulletList: false,
         orderedList: false,
         blockquote: false,
         codeBlock: false,
         horizontalRule: false,
+        hardBreak: singleLine ? false : undefined,
       }),
       TextStyle,
       Color,

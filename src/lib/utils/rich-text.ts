@@ -19,6 +19,16 @@ export function htmlToPlainText(html: string | null | undefined): string {
 }
 
 /**
+ * 清理 Tiptap 輸出的 HTML
+ * 移除外層 <p> 標籤，保留內部樣式
+ */
+export function cleanTiptapHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  // 移除外層 <p> 標籤
+  return html.replace(/^<p>/, '').replace(/<\/p>$/, '')
+}
+
+/**
  * 安全地渲染可能包含 HTML 的文字
  * 如果是 HTML，使用 dangerouslySetInnerHTML
  * 如果是純文字，直接顯示

@@ -2,13 +2,15 @@
 
 import { Calendar, MapPin, Sparkles } from 'lucide-react'
 import { HeroStatCard } from '@/components/editor/tour-form/types'
-import { isHtmlString, htmlToPlainText } from '@/lib/utils/rich-text'
+import { isHtmlString, htmlToPlainText, cleanTiptapHtml } from '@/lib/utils/rich-text'
 
-// 渲染可能包含 HTML 的文字
+// 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
   if (!html) return null
   if (isHtmlString(html)) {
-    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+    // 清理 Tiptap 輸出的 <p> 標籤，保留樣式
+    const cleanHtml = cleanTiptapHtml(html)
+    return <span className={className} dangerouslySetInnerHTML={{ __html: cleanHtml }} />
   }
   return <span className={className}>{html}</span>
 }
