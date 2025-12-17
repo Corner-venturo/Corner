@@ -104,6 +104,12 @@ export function Combobox<T = unknown>({
   // 當 value 或 options 改變時，更新搜尋值為對應的 label
   // 如果找不到匹配的 option，保留原本的 value 作為顯示
   React.useEffect(() => {
+    // 如果 value 為空，強制清空 searchValue
+    if (!value) {
+      setSearchValue('')
+      return
+    }
+
     const selectedOption = options.find(opt => opt.value === value)
     // 如果找到匹配的 option，用其 label；否則保留原本的 value（讓城市名稱顯示出來）
     const newLabel = selectedOption?.label || value || ''
