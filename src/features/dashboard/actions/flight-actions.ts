@@ -377,9 +377,6 @@ export async function searchAirportDeparturesAction(
     return { error: '日期格式錯誤，請使用 YYYY-MM-DD 格式。' }
   }
 
-  // 設定查詢時間範圍（當天 00:00 到 23:59，使用當地時間格式）
-  const fromTime = `${date}T00:00`
-  const toTime = `${date}T23:59`
   const cleanAirportCode = airportCode.toUpperCase().trim()
 
   // 驗證機場代碼
@@ -388,42 +385,55 @@ export async function searchAirportDeparturesAction(
     return { error: '機場代碼應為 3 個字母（如 TPE）。' }
   }
 
-  const url = `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${cleanAirportCode}/${fromTime}/${toTime}?direction=Departure&withCancelled=true`
+  // API 限制：時間範圍不能超過 12 小時，所以需要分兩次查詢
+  const timeRanges = [
+    { from: `${date}T00:00`, to: `${date}T11:59` },
+    { from: `${date}T12:00`, to: `${date}T23:59` },
+  ]
 
   try {
     logger.log(`🔍 查詢機場出發航班: ${cleanAirportCode} on ${date}`)
-    logger.log(`🔗 API URL: ${url}`)
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-host': 'aerodatabox.p.rapidapi.com',
-        'x-rapidapi-key': apiKey,
-      },
-    })
+    let allDepartures: ApiFlightData[] = []
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Unknown error')
-      logger.error(`❌ AeroDataBox API Error: ${response.status} - ${errorText}`)
-      logger.error(`❌ Request: ${cleanAirportCode} on ${date}`)
+    for (const range of timeRanges) {
+      const url = `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${cleanAirportCode}/${range.from}/${range.to}?direction=Departure&withCancelled=true`
+      logger.log(`🔗 API URL: ${url}`)
 
-      if (response.status === 400) {
-        return { error: `查詢參數錯誤：機場 ${cleanAirportCode}，日期 ${date}。請確認機場代碼正確。` }
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-host': 'aerodatabox.p.rapidapi.com',
+          'x-rapidapi-key': apiKey,
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error')
+        logger.error(`❌ AeroDataBox API Error: ${response.status} - ${errorText}`)
+        logger.error(`❌ Request: ${cleanAirportCode} on ${date}`)
+
+        if (response.status === 400) {
+          return { error: `查詢參數錯誤：機場 ${cleanAirportCode}，日期 ${date}。請確認機場代碼正確。` }
+        }
+        if (response.status === 404) {
+          return { error: '找不到該機場的資訊。' }
+        }
+        if (response.status === 429) {
+          return { error: '本月查詢額度已用完，請下個月再試。' }
+        }
+        if (response.status === 401 || response.status === 403) {
+          return { error: 'API 金鑰無效或已過期，請聯絡管理員。' }
+        }
+        return { error: `查詢失敗 (${response.status})，請稍後再試。` }
       }
-      if (response.status === 404) {
-        return { error: '找不到該機場的資訊。' }
-      }
-      if (response.status === 429) {
-        return { error: '本月查詢額度已用完，請下個月再試。' }
-      }
-      if (response.status === 401 || response.status === 403) {
-        return { error: 'API 金鑰無效或已過期，請聯絡管理員。' }
-      }
-      return { error: `查詢失敗 (${response.status})，請稍後再試。` }
+
+      const apiData = await response.json()
+      const departures = apiData.departures || []
+      allDepartures = allDepartures.concat(departures)
     }
 
-    const apiData = await response.json()
-    const departures = apiData.departures || []
+    const departures = allDepartures
 
     // 轉換資料格式
     let flights: AirportFlightItem[] = departures.map((flight: ApiFlightData) => {

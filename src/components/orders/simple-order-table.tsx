@@ -1,13 +1,14 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { useOrderStore } from '@/stores'
+import { useOrderStore, useAuthStore } from '@/stores'
 import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 
 interface SimpleOrderTableProps {
   orders: Order[]
@@ -25,6 +26,8 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   const router = useRouter()
   const orderStore = useOrderStore()
   const deleteOrder = orderStore.delete
+  const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
   const handleDeleteOrder = async (order: Order, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -150,16 +153,19 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
 
                 <div className="py-1 px-4">
                   <div className="flex items-center space-x-1">
-                    {/* 成員按鈕 - 直接跳轉到訂單詳情頁的成員分頁 */}
+                    {/* 成員按鈕 - 展開成員列表 */}
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={e => {
                         e.stopPropagation()
                         e.preventDefault()
-                        router.push(`/orders/${order.id}?tab=members`)
+                        setExpandedOrderId(expandedOrderId === order.id ? null : order.id)
                       }}
-                      className="h-8 w-8 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10"
+                      className={cn(
+                        'h-8 w-8 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10',
+                        expandedOrderId === order.id && 'bg-morandi-blue/10'
+                      )}
                       title="查看成員"
                     >
                       <User size={16} />
@@ -209,6 +215,17 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                 </div>
               </div>
 
+              {/* 展開成員列表 */}
+              {expandedOrderId === order.id && (
+                <div className="bg-morandi-container/10 border-t border-border">
+                  <OrderMembersExpandable
+                    orderId={order.id}
+                    tourId={order.tour_id || ''}
+                    workspaceId={workspaceId}
+                    onClose={() => setExpandedOrderId(null)}
+                  />
+                </div>
+              )}
             </React.Fragment>
           ))
         )}

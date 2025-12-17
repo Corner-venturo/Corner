@@ -1,5 +1,15 @@
 'use client'
 
+/**
+ * 航線查詢 Dialog
+ *
+ * TODO: 下一個工程 - 需要新的「航班時刻表 API」
+ * 目前使用 AeroDataBox API 只能查詢 14 天內的即時航班動態
+ * 如果要查詢更遠的未來航班（如明年的固定班次），需要：
+ * 1. 使用 OAG 或其他航班時刻表 API
+ * 2. 或建立自己的航線資料庫
+ */
+
 import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -33,10 +43,27 @@ export function FlightRouteSearchDialog({
   defaultDate,
   onSelectFlight,
 }: FlightRouteSearchDialogProps) {
+  // 計算有效的搜尋日期（API 只支援 14 天內的查詢）
+  const getValidSearchDate = (inputDate?: string) => {
+    const today = new Date()
+    const maxDate = new Date(today)
+    maxDate.setDate(maxDate.getDate() + 14)
+
+    if (inputDate) {
+      const targetDate = new Date(inputDate)
+      // 如果日期在有效範圍內（今天到 14 天後），使用該日期
+      if (targetDate >= today && targetDate <= maxDate) {
+        return inputDate
+      }
+    }
+    // 否則使用今天
+    return today.toISOString().split('T')[0]
+  }
+
   // 搜尋條件
   const [origin, setOrigin] = useState(defaultOrigin)
   const [destination, setDestination] = useState(defaultDestination)
-  const [searchDate, setSearchDate] = useState(defaultDate || new Date().toISOString().split('T')[0])
+  const [searchDate, setSearchDate] = useState(getValidSearchDate(defaultDate))
 
   // 搜尋狀態
   const [loading, setLoading] = useState(false)
@@ -48,7 +75,7 @@ export function FlightRouteSearchDialog({
     if (open) {
       setOrigin(defaultOrigin)
       setDestination(defaultDestination)
-      setSearchDate(defaultDate || new Date().toISOString().split('T')[0])
+      setSearchDate(getValidSearchDate(defaultDate))
       setFlights([])
       setSearched(false)
     }
@@ -178,12 +205,17 @@ export function FlightRouteSearchDialog({
               </div>
             </div>
 
-            {destination && (
-              <div className="text-xs text-slate-500 flex items-center gap-1">
-                <MapPin size={12} />
-                查詢 {origin} → {destination} 的直飛航班
+            <div className="text-xs text-slate-500 space-y-1">
+              {destination && (
+                <div className="flex items-center gap-1">
+                  <MapPin size={12} />
+                  查詢 {origin} → {destination} 的直飛航班
+                </div>
+              )}
+              <div className="text-amber-600">
+                ⚠️ 航班 API 只能查詢 14 天內的航班
               </div>
-            )}
+            </div>
           </div>
 
           {/* 搜尋日期顯示 */}
