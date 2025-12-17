@@ -114,6 +114,21 @@ export const ToursPage: React.FC = () => {
       setSelectedItineraryId(null)
       setSelectedQuoteId(null)
 
+      // 重置表單（確保不會殘留上次的選擇）
+      setNewTour({
+        name: '',
+        countryCode: '',
+        cityCode: '',
+        departure_date: '',
+        return_date: '',
+        price: 0,
+        status: 'draft',
+        isSpecial: false,
+        max_participants: 20,
+        description: '',
+      })
+      setAvailableCities([])
+
       if (countries.length === 0) {
         await fetchRegions()
       }
@@ -122,7 +137,7 @@ export const ToursPage: React.FC = () => {
       }
       openDialog('create', tour, fromQuoteId)
     },
-    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog]
+    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog, setNewTour, setAvailableCities]
   )
 
   // Build PageRequest parameters
