@@ -747,8 +747,8 @@ export function CoverInfoSection({
                   className={cn(
                     'relative overflow-hidden shadow-2xl transition-all duration-300',
                     previewMode === 'mobile'
-                      ? 'w-[280px] h-[500px] rounded-[2.5rem] border-[8px] border-slate-600 bg-slate-600'
-                      : 'w-[500px] h-[350px] rounded-lg border border-slate-600'
+                      ? 'w-[320px] h-[580px] rounded-[2.5rem] border-[8px] border-slate-600 bg-slate-600'
+                      : 'w-[600px] h-[420px] rounded-lg border border-slate-600'
                   )}
                 >
                   {/* 根據風格顯示不同的封面預覽 */}
