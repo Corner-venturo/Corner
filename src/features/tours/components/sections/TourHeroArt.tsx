@@ -1,6 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { isHtmlString, htmlToPlainText } from '@/lib/utils/rich-text'
+
+// 渲染可能包含 HTML 的文字
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return null
+  if (isHtmlString(html)) {
+    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  }
+  return <span className={className}>{html}</span>
+}
 
 // Art/Magazine 配色 - 根據 HTML 模板
 const ART = {
@@ -145,7 +155,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   className="text-[11px] tracking-[0.25em] uppercase"
                   style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
                 >
-                  {data.tagline || data.tourCode || 'COLLECTION'}
+                  <RichText html={data.tagline || data.tourCode || 'COLLECTION'} />
                 </span>
               </motion.div>
 
@@ -188,7 +198,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                     color: ART.clay,
                   }}
                 >
-                  {data.subtitle || 'Odyssey'}
+                  <RichText html={data.subtitle || 'Odyssey'} />
                 </div>
               </motion.div>
 
@@ -283,7 +293,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                       className="italic text-sm leading-relaxed"
                       style={{ fontFamily: "'Noto Serif TC', serif", color: ART.ink }}
                     >
-                      "{data.description}"
+                      "<RichText html={data.description} />"
                     </p>
                   </motion.div>
                 )}
@@ -304,7 +314,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                 className="text-[10px] tracking-[0.2em] uppercase"
                 style={{ fontFamily: "'Cinzel', serif", color: ART.ink }}
               >
-                {data.tagline || data.tourCode || 'COLLECTION'}
+                <RichText html={data.tagline || data.tourCode || 'COLLECTION'} />
               </span>
             </motion.div>
 
@@ -331,7 +341,7 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                   color: ART.clay,
                 }}
               >
-                {data.subtitle || 'Odyssey'}
+                <RichText html={data.subtitle || 'Odyssey'} />
               </div>
             </motion.div>
 

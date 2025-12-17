@@ -2,6 +2,16 @@
 
 import { Calendar, MapPin, Sparkles } from 'lucide-react'
 import { HeroStatCard } from '@/components/editor/tour-form/types'
+import { isHtmlString, htmlToPlainText } from '@/lib/utils/rich-text'
+
+// 渲染可能包含 HTML 的文字
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return null
+  if (isHtmlString(html)) {
+    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  }
+  return <span className={className}>{html}</span>
+}
 
 interface TourHeroLuxuryProps {
   data: {
@@ -95,7 +105,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                 }}
               >
                 <span className="relative inline-block">
-                  {data.title}
+                  <RichText html={data.title} />
                   <span
                     className="absolute -bottom-2 left-0 w-full h-3 -rotate-1"
                     style={{ backgroundColor: `${LUXURY.secondary}20` }}
@@ -112,7 +122,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                     fontFamily: "'Noto Serif TC', serif"
                   }}
                 >
-                  {data.subtitle}
+                  <RichText html={data.subtitle} />
                 </h2>
               )}
             </div>
@@ -131,7 +141,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
                     fontFamily: "'Noto Sans TC', sans-serif"
                   }}
                 >
-                  {data.description}
+                  <RichText html={data.description} />
                 </p>
               </div>
             )}
@@ -303,6 +313,9 @@ function parseTitle(title: string): { country?: string; highlight?: string; them
 
 // 從標題提取天數
 function extractDayNumber(title: string): number | null {
+  // 先轉換為純文字（移除 HTML 標籤）
+  const plainTitle = htmlToPlainText(title)
+
   const chineseNumbers: Record<string, number> = {
     '一': 1, '二': 2, '三': 3, '四': 4, '五': 5,
     '六': 6, '七': 7, '八': 8, '九': 9, '十': 10,
@@ -314,7 +327,7 @@ function extractDayNumber(title: string): number | null {
   ]
 
   for (const pattern of patterns) {
-    const match = title.match(pattern)
+    const match = plainTitle.match(pattern)
     if (match) {
       const num = match[1]
       if (/^\d+$/.test(num)) return parseInt(num, 10)

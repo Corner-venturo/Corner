@@ -1,6 +1,16 @@
 'use client'
 
 import { MapPin, Calendar } from 'lucide-react'
+import { isHtmlString } from '@/lib/utils/rich-text'
+
+// 渲染可能包含 HTML 的文字
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return null
+  if (isHtmlString(html)) {
+    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  }
+  return <span className={className}>{html}</span>
+}
 
 interface TourHeroGeminiProps {
   data: {
@@ -70,7 +80,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
               viewMode === 'mobile' ? 'text-xs' : 'text-sm md:text-base'
             }`}
           >
-            {data.tagline}
+            <RichText html={data.tagline} />
           </p>
         )}
 
@@ -80,7 +90,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
             viewMode === 'mobile' ? 'text-2xl' : 'text-3xl md:text-5xl'
           }`}
         >
-          {data.title || '探索世界的美好'}
+          <RichText html={data.title || '探索世界的美好'} />
         </h1>
 
         {/* Subtitle / Description */}
@@ -89,7 +99,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
             viewMode === 'mobile' ? 'text-sm' : 'text-lg md:text-xl'
           }`}
         >
-          {data.subtitle || data.description || '每一次旅行，都是一場心靈的冒險'}
+          <RichText html={data.subtitle || data.description || '每一次旅行，都是一場心靈的冒險'} />
         </p>
 
         {/* Meta Info Bar */}

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
+import { RichTextInput } from '@/components/ui/rich-text-input'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
@@ -429,35 +430,32 @@ export function CoverInfoSection({
             {/* 基本資訊 */}
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">標籤文字</label>
-                <Input
-                  type="text"
+                <label className="block text-sm font-medium text-morandi-primary mb-1">
+                  標籤文字
+                  <span className="ml-2 text-xs text-morandi-secondary font-normal">選取文字可調整樣式</span>
+                </label>
+                <RichTextInput
                   value={data.tagline || ''}
-                  onChange={e => updateField('tagline', e.target.value)}
+                  onChange={value => updateField('tagline', value)}
                   placeholder="Venturo Travel 2025 秋季精選"
-                  className="h-9"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">主標題</label>
-                  <Input
-                    type="text"
+                  <RichTextInput
                     value={data.title || ''}
-                    onChange={e => updateField('title', e.target.value)}
+                    onChange={value => updateField('title', value)}
                     placeholder="漫遊福岡"
-                    className="h-9"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">副標題</label>
-                  <Input
-                    type="text"
+                  <RichTextInput
                     value={data.subtitle || ''}
-                    onChange={e => updateField('subtitle', e.target.value)}
+                    onChange={value => updateField('subtitle', value)}
                     placeholder={data.coverStyle === 'art' ? 'Odyssey' : '半自由行'}
-                    className="h-9"
                   />
                   {data.coverStyle === 'art' && !data.subtitle && (
                     <p className="text-xs text-morandi-secondary mt-1">
@@ -469,12 +467,11 @@ export function CoverInfoSection({
 
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
-                <Input
-                  type="text"
+                <RichTextInput
                   value={data.description || ''}
-                  onChange={e => updateField('description', e.target.value)}
+                  onChange={value => updateField('description', value)}
                   placeholder="2日市區自由活動 · 保證入住溫泉飯店 · 柳川遊船 · 阿蘇火山"
-                  className="h-9"
+                  singleLine={false}
                 />
               </div>
 

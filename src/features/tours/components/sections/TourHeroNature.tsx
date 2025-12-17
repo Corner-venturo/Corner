@@ -1,6 +1,16 @@
 'use client'
 
 import { MapPin } from 'lucide-react'
+import { isHtmlString } from '@/lib/utils/rich-text'
+
+// 渲染可能包含 HTML 的文字
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return null
+  if (isHtmlString(html)) {
+    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  }
+  return <span className={className}>{html}</span>
+}
 
 interface TourHeroNatureProps {
   data: {
@@ -72,7 +82,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                 fontFamily: "'Noto Sans TC', sans-serif"
               }}
             >
-              {data.title}
+              <RichText html={data.title} />
             </h1>
 
             {/* 副標題 - 獨立一行，字體小 40% */}
@@ -87,7 +97,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                   fontFamily: "'Noto Sans TC', sans-serif"
                 }}
               >
-                {data.subtitle}
+                <RichText html={data.subtitle} />
               </h2>
             )}
 
@@ -100,7 +110,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                   textOrientation: 'mixed'
                 }}
               >
-                {data.description}
+                <RichText html={data.description} />
               </p>
             )}
           </div>
@@ -141,7 +151,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                     isMobile ? 'px-3 py-1.5' : 'px-4 py-2'
                   }`}>
                     <span className={`font-medium tracking-wider text-[#2c3e50] ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
-                      {data.tagline}
+                      <RichText html={data.tagline} />
                     </span>
                   </div>
                 )}

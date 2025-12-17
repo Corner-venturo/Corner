@@ -1,4 +1,14 @@
 import { motion } from 'framer-motion'
+import { isHtmlString } from '@/lib/utils/rich-text'
+
+// 渲染可能包含 HTML 的文字
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return null
+  if (isHtmlString(html)) {
+    return <span className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  }
+  return <span className={className}>{html}</span>
+}
 
 interface TourDisplayData {
   coverImage?: string | null
@@ -58,7 +68,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                 : 'inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 text-xs sm:text-sm font-medium mb-4'
             }
           >
-            {data.tagline || 'Venturo Travel 2025 秋季精選'}
+            <RichText html={data.tagline || 'Venturo Travel 2025 秋季精選'} />
           </motion.span>
 
           <motion.h1
@@ -71,7 +81,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                 : 'text-4xl md:text-6xl lg:text-8xl font-bold text-white mb-4'
             }
           >
-            {data.title}
+            <RichText html={data.title} />
             <br />
             <span
               className={
@@ -80,7 +90,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                   : 'text-2xl md:text-4xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500'
               }
             >
-              {data.subtitle}
+              <RichText html={data.subtitle} />
             </span>
           </motion.h1>
 
@@ -94,7 +104,7 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
                 : 'text-base md:text-xl lg:text-2xl text-white/80 max-w-3xl mx-auto mb-8 px-4'
             }
           >
-            {data.description}
+            <RichText html={data.description} />
           </motion.p>
 
           <motion.div
