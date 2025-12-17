@@ -37,7 +37,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     suppliers,
   } = useRequestForm()
 
-  const { generateRequestNumber, createRequest } = useRequestOperations()
+  const { generateRequestCode, createRequest } = useRequestOperations()
 
   // 如果只有一個訂單，自動帶入
   useEffect(() => {
@@ -47,6 +47,10 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
     }
   }, [formData.tour_id, filteredOrders, formData.order_id, setFormData, setOrderSearchValue])
+
+  // 取得選中的旅遊團以預覽編號
+  const selectedTour = filteredTours.find(t => t.id === formData.tour_id)
+  const previewCode = selectedTour ? generateRequestCode(selectedTour.code) : '請先選擇旅遊團'
 
   const handleCancel = () => {
     resetForm()
@@ -79,7 +83,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">
-            請款單號: {generateRequestNumber()} (自動生成)
+            請款單號: <span className="font-medium text-morandi-primary">{previewCode}</span> (自動生成)
           </p>
         </DialogHeader>
 

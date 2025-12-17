@@ -5,7 +5,17 @@ import { RequestFormData, BatchRequestFormData, RequestItem } from '../types'
 export function useRequestOperations() {
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
 
-  // Generate request number preview
+  // 根據團號生成請款單編號：團號-R01, 團號-R02, ...
+  const generateRequestCode = useCallback((tourCode: string) => {
+    // 找到該團已有的請款單數量
+    const existingCount = payment_requests.filter(r =>
+      r.tour_code === tourCode || r.code?.startsWith(`${tourCode}-R`)
+    ).length
+    const nextNumber = existingCount + 1
+    return `${tourCode}-R${nextNumber.toString().padStart(2, '0')}`
+  }, [payment_requests])
+
+  // Generate request number preview (舊方法，保留向下相容)
   const generateRequestNumber = useCallback(() => {
     const year = new Date().getFullYear()
     const count = payment_requests.length + 1
@@ -23,10 +33,14 @@ export function useRequestOperations() {
     ) => {
       if (!formData.tour_id || !items || items.length === 0) return null
 
+      // 生成請款單編號：團號-R01
+      const requestCode = generateRequestCode(tourCode)
+
       // Create payment request
       const request = await createPaymentRequest({
         tour_id: formData.tour_id,
-        code: tourCode,
+        code: requestCode,
+        tour_code: tourCode, // 保存團號供查詢用
         tour_name: tourName,
         order_id: formData.order_id || undefined,
         order_number: orderNumber,
@@ -54,7 +68,7 @@ export function useRequestOperations() {
 
       return request
     },
-    [createPaymentRequest, addPaymentItem]
+    [createPaymentRequest, addPaymentItem, generateRequestCode]
   )
 
   // Create batch requests
@@ -73,10 +87,14 @@ export function useRequestOperations() {
         const selectedTour = tours.find(t => t.id === tourId)
         if (!selectedTour) continue
 
+        // 生成請款單編號：團號-R01
+        const requestCode = generateRequestCode(selectedTour.code)
+
         // Create payment request
         const request = await createPaymentRequest({
           tour_id: tourId,
-          code: selectedTour.code,
+          code: requestCode,
+          tour_code: selectedTour.code, // 保存團號供查詢用
           tour_name: selectedTour.name,
           request_date: formData.request_date,
           amount: 0,
@@ -105,11 +123,12 @@ export function useRequestOperations() {
 
       return createdRequests
     },
-    [createPaymentRequest, addPaymentItem]
+    [createPaymentRequest, addPaymentItem, generateRequestCode]
   )
 
   return {
     generateRequestNumber,
+    generateRequestCode,
     createRequest,
     createBatchRequests,
   }
