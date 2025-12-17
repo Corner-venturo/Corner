@@ -370,15 +370,29 @@ export async function searchAirportDeparturesAction(
     return { error: 'API 金鑰未設定，請聯絡管理員。' }
   }
 
-  // 設定查詢時間範圍（當天 00:00 到 23:59）
+  // 驗證日期格式 (YYYY-MM-DD)
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  if (!dateRegex.test(date)) {
+    logger.error(`❌ 日期格式錯誤: ${date}，應為 YYYY-MM-DD`)
+    return { error: '日期格式錯誤，請使用 YYYY-MM-DD 格式。' }
+  }
+
+  // 設定查詢時間範圍（當天 00:00 到 23:59，使用當地時間格式）
   const fromTime = `${date}T00:00`
   const toTime = `${date}T23:59`
-  const cleanAirportCode = airportCode.toUpperCase()
+  const cleanAirportCode = airportCode.toUpperCase().trim()
+
+  // 驗證機場代碼
+  if (!cleanAirportCode || cleanAirportCode.length !== 3) {
+    logger.error(`❌ 機場代碼格式錯誤: ${cleanAirportCode}`)
+    return { error: '機場代碼應為 3 個字母（如 TPE）。' }
+  }
 
   const url = `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${cleanAirportCode}/${fromTime}/${toTime}?direction=Departure&withCancelled=true`
 
   try {
-    logger.log(`🔍 查詢機場出發航班: ${url}`)
+    logger.log(`🔍 查詢機場出發航班: ${cleanAirportCode} on ${date}`)
+    logger.log(`🔗 API URL: ${url}`)
 
     const response = await fetch(url, {
       method: 'GET',
@@ -391,7 +405,11 @@ export async function searchAirportDeparturesAction(
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error')
       logger.error(`❌ AeroDataBox API Error: ${response.status} - ${errorText}`)
+      logger.error(`❌ Request: ${cleanAirportCode} on ${date}`)
 
+      if (response.status === 400) {
+        return { error: `查詢參數錯誤：機場 ${cleanAirportCode}，日期 ${date}。請確認機場代碼正確。` }
+      }
       if (response.status === 404) {
         return { error: '找不到該機場的資訊。' }
       }

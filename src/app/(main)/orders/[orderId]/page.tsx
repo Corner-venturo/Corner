@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { FileText } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
@@ -26,11 +26,20 @@ const tabs = [
 export default function OrderDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { items: orders } = useOrderStore()
   const { items: tours } = useTourStore()
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
   const [activeTab, setActiveTab] = useState('overview')
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
+
+  // 從 URL 讀取 tab 參數
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && ['overview', 'members', 'payments', 'costs'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   const orderId = params.orderId as string
   const order = orders.find(o => o.id === orderId)
