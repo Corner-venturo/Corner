@@ -15,6 +15,7 @@ import { TableName } from '@/lib/db/schemas'
 import { memoryCache } from '@/lib/cache/memory-cache'
 import { supabase } from '@/lib/supabase/client'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 // 型別定義
 import type { StoreState, StoreConfig, CreateInput, UpdateInput } from './types'
@@ -112,6 +113,7 @@ export function createStore<T extends BaseEntity>(
 
   // 建立 AbortController 管理器
   const abortManager = new AbortManager()
+  let subscription: RealtimeChannel | null = null
 
   // 建立 Zustand Store
   const store = create<StoreState<T>>()((set, get) => ({
@@ -432,6 +434,79 @@ export function createStore<T extends BaseEntity>(
       abortManager.abort()
       set({ loading: false })
       logger.log(`🛑 [${tableName}] 已取消進行中的請求`)
+    },
+
+    // ============================================
+    // Realtime Subscription
+    // ============================================
+    subscribe: () => {
+      if (subscription) {
+        logger.log(`[${tableName}] 已有訂閱，無需重複訂閱`)
+        return
+      }
+
+      logger.log(`[${tableName}] 建立 Realtime 訂閱...`)
+      subscription = supabase
+        .channel(`public:${tableName}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: tableName },
+          (payload) => {
+            logger.log(`[${tableName}] Realtime event:`, payload)
+            const { eventType, new: newRecord, old: oldRecord } = payload
+
+            const { workspaceId: currentWorkspaceId } = getCurrentUserContext()
+
+            switch (eventType) {
+              case 'INSERT': {
+                const inserted = newRecord as T
+                // 🔒 Workspace 隔離
+                if (config.workspaceScoped && inserted.workspace_id !== currentWorkspaceId) return
+                set(state => ({ items: [inserted, ...state.items] }))
+                break
+              }
+              case 'UPDATE': {
+                const updated = newRecord as T
+                // 🔒 Workspace 隔離
+                if (config.workspaceScoped && updated.workspace_id !== currentWorkspaceId) return
+                set(state => ({
+                  items: state.items.map(item => (item.id === updated.id ? updated : item)),
+                }))
+                break
+              }
+              case 'DELETE': {
+                const deleted = oldRecord as Partial<T>
+                // 刪除操作，我們只需要 id
+                if (!deleted.id) return
+                set(state => ({
+                  items: state.items.filter(item => item.id !== deleted.id),
+                }))
+                break
+              }
+            }
+          }
+        )
+        .subscribe((status, err) => {
+          if (status === 'SUBSCRIBED') {
+            logger.log(`✅ [${tableName}] Realtime 訂閱成功！`)
+          }
+          if (status === 'CHANNEL_ERROR') {
+            logger.error(`[${tableName}] Realtime 訂閱錯誤:`, err)
+            set({ error: `Realtime 訂閱錯誤: ${err?.message}` })
+          }
+          if (status === 'TIMED_OUT') {
+            logger.warn(`[${tableName}] Realtime 訂閱超時`)
+            set({ error: 'Realtime 訂閱超時' })
+          }
+        })
+    },
+
+    unsubscribe: () => {
+      if (subscription) {
+        logger.log(`[${tableName}] 取消 Realtime 訂閱...`)
+        supabase.removeChannel(subscription)
+        subscription = null
+      }
     },
   }))
 

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   useWorkspaceChannels,
   useWorkspaceChat,
   useWorkspaceWidgets,
+  useChatStore, // Import the full chat store
 } from '@/stores/workspace'
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
 import {
@@ -46,6 +47,7 @@ export function useChannelChat() {
   } = useWorkspaceChannels()
 
   const { channelMessages, messagesLoading, loadMessages } = useWorkspaceChat()
+  const { subscribeToMessages, unsubscribeFromMessages } = useChatStore()
 
   const {
     advanceLists,
@@ -138,6 +140,16 @@ export function useChannelChat() {
     loadAdvanceLists,
     loadSharedOrderLists
   )
+
+  // Realtime subscription effect
+  useEffect(() => {
+    subscribeToMessages()
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribeFromMessages()
+    }
+  }, [subscribeToMessages, unsubscribeFromMessages])
 
   return {
     // State

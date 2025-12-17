@@ -293,14 +293,16 @@ export const useChatStore = () => {
     clearMessages: uiStore.clearMessages,
 
     // ============================================
-    // Realtime 訂閱 (createStore 自動處理)
+    // Realtime Subscription
     // ============================================
-    subscribeToMessages: (channelId: string) => {
-      // createStore handles subscriptions automatically
+    subscribeToMessages: () => {
+      // The underlying createStore now handles the subscription logic
+      messageStore.subscribe()
     },
 
     unsubscribeFromMessages: () => {
-      // createStore handles unsubscriptions automatically
+      // The underlying createStore now handles the unsubscription logic
+      messageStore.unsubscribe()
     },
   }
 }
