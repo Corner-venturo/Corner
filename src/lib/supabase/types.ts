@@ -2897,6 +2897,139 @@ export type Database = {
         }
         Relationships: []
       }
+      // === 手動添加的模板表 (2025-12-17) ===
+      leader_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          preview_image_url: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      hotel_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          preview_image_url: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pricing_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          preview_image_url: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      features_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          preview_image_url: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          preview_image_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       friends: {
         Row: {
           created_at: string | null
@@ -3247,6 +3380,11 @@ export type Database = {
           version: number | null
           version_records: Json | null
           workspace_id: string
+          // 新增區塊風格欄位 (2025-12-17)
+          leader_style: string | null
+          hotel_style: string | null
+          pricing_style: string | null
+          features_style: string | null
         }
         Insert: {
           _deleted?: boolean | null
@@ -3311,6 +3449,11 @@ export type Database = {
           version?: number | null
           version_records?: Json | null
           workspace_id: string
+          // 新增區塊風格欄位 (2025-12-17)
+          leader_style?: string | null
+          hotel_style?: string | null
+          pricing_style?: string | null
+          features_style?: string | null
         }
         Update: {
           _deleted?: boolean | null
@@ -3375,6 +3518,11 @@ export type Database = {
           version?: number | null
           version_records?: Json | null
           workspace_id?: string
+          // 新增區塊風格欄位 (2025-12-17)
+          leader_style?: string | null
+          hotel_style?: string | null
+          pricing_style?: string | null
+          features_style?: string | null
         }
         Relationships: [
           {
