@@ -751,95 +751,128 @@ export function CoverInfoSection({
                       : 'w-[500px] h-[350px] rounded-lg border border-slate-600'
                   )}
                 >
-                  {/* 封面預覽 */}
-                  <div className="absolute inset-0">
-                    {/* 背景圖片 */}
-                    <img
-                      src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=75&auto=format&fit=crop'}
-                      alt="封面預覽"
-                      className="w-full h-full object-cover"
-                      style={{ filter: 'brightness(0.7)' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
-                  </div>
-
-                  {/* 封面內容 */}
-                  <div className={cn(
-                    'relative z-10 h-full flex flex-col items-center justify-center text-center',
-                    previewMode === 'mobile' ? 'p-4' : 'p-8'
-                  )}>
-                    {/* 標籤 */}
-                    <span className={cn(
-                      'inline-block bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 font-medium mb-3',
-                      previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'
-                    )}>
-                      {data.tagline || 'Venturo Travel 2025 秋季精選'}
-                    </span>
-
-                    {/* 主標題 */}
-                    <h1 className={cn(
-                      'font-bold text-white mb-1',
-                      previewMode === 'mobile' ? 'text-xl' : 'text-3xl'
-                    )}>
-                      {data.title || '行程標題'}
-                    </h1>
-
-                    {/* 副標題 */}
-                    <p className={cn(
-                      'text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-3',
-                      previewMode === 'mobile' ? 'text-sm' : 'text-xl'
-                    )}>
-                      {data.subtitle || '副標題'}
-                    </p>
-
-                    {/* 描述 */}
-                    <p className={cn(
-                      'text-white/80 max-w-md mx-auto mb-4',
-                      previewMode === 'mobile' ? 'text-[10px] leading-tight' : 'text-sm'
-                    )}>
-                      {data.description || '此處顯示行程描述'}
-                    </p>
-
-                    {/* 資訊卡片 */}
-                    <div className={cn(
-                      'flex justify-center',
-                      previewMode === 'mobile' ? 'gap-2 flex-wrap' : 'gap-4'
-                    )}>
-                      <div className={cn(
-                        'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
-                        previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
-                      )}>
-                        <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>出發日期</div>
-                        <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>{data.departureDate || '2025/01/01'}</div>
-                      </div>
-                      <div className={cn(
-                        'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
-                        previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
-                      )}>
-                        <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>行程代碼</div>
-                        <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>{data.tourCode || 'CODE'}</div>
-                      </div>
-                      {data.price && (
-                        <div className={cn(
-                          'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
-                          previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
-                        )}>
-                          <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>每人</div>
-                          <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>${data.price}{data.priceNote || ''}</div>
+                  {/* 根據風格顯示不同的封面預覽 */}
+                  {data.coverStyle === 'luxury' ? (
+                    /* Luxury 風格：左右分欄、米色背景 */
+                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#FDFBF7' }}>
+                      {/* 左側文字 */}
+                      <div className={cn('flex flex-col justify-center', previewMode === 'mobile' ? 'w-full p-3' : 'w-1/2 p-6')}>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border text-[10px] mb-2 w-fit" style={{ borderColor: '#C69C6D30', color: '#C69C6D' }}>
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#8F4F4F' }} />
+                          {data.tagline || 'LUXURY COLLECTION'}
+                        </span>
+                        <h1 className={cn('font-bold mb-1', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')} style={{ color: '#2C5F4D', fontFamily: "'Noto Serif TC', serif" }}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <p className={cn('mb-2', previewMode === 'mobile' ? 'text-xs' : 'text-sm')} style={{ color: '#636E72' }}>
+                          {data.subtitle || '副標題'}
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
+                            <div className="text-[8px] text-white/70">天數</div>
+                            <div className="text-xs font-bold text-white">7</div>
+                          </div>
+                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#C69C6D' }}>
+                            <div className="text-[8px] text-white/70">餐廳</div>
+                            <div className="text-xs font-bold text-white">{data.heroStatCard2?.value || 5}</div>
+                          </div>
                         </div>
-                      )}
+                      </div>
+                      {/* 右側圖片 */}
+                      {!previewMode || previewMode === 'desktop' ? (
+                        <div className="w-1/2 relative">
+                          <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
+                        </div>
+                      ) : null}
                     </div>
-                  </div>
+                  ) : data.coverStyle === 'art' ? (
+                    /* Art 風格：雜誌風格、紅色調 */
+                    <div className="absolute inset-0" style={{ backgroundColor: '#1a1a1a' }}>
+                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover opacity-60" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                        <span className={cn('uppercase tracking-[0.3em] mb-2', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')} style={{ color: '#E63946' }}>
+                          {data.tagline || 'ODYSSEY'}
+                        </span>
+                        <h1 className={cn('font-black text-white mb-1', previewMode === 'mobile' ? 'text-2xl' : 'text-4xl')} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <div className="w-12 h-0.5 my-2" style={{ backgroundColor: '#E63946' }} />
+                        <p className={cn('text-white/60', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
+                          {data.subtitle || 'Odyssey'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : data.coverStyle === 'serene' ? (
+                    /* Serene 風格：淡藍色調 */
+                    <div className="absolute inset-0">
+                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.8) saturate(0.9)' }} />
+                      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(74,111,165,0.4) 0%, rgba(74,111,165,0.1) 100%)' }} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                        <span className={cn('px-3 py-1 rounded-full bg-white/20 backdrop-blur text-white/90 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>
+                          {data.tagline || 'Venturo Travel'}
+                        </span>
+                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#87CEEB' }}>
+                          {data.subtitle || '副標題'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : data.coverStyle === 'nature' ? (
+                    /* Nature 風格：日本藍色調 */
+                    <div className="absolute inset-0">
+                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.75)' }} />
+                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(48,171,232,0.2) 0%, rgba(0,0,0,0.6) 100%)' }} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                        <span className={cn('px-3 py-1 rounded-full border text-white/90 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')} style={{ borderColor: '#30abe8', backgroundColor: 'rgba(48,171,232,0.2)' }}>
+                          {data.tagline || 'Venturo Travel'}
+                        </span>
+                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-3xl')}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <p className={cn('mb-3', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#30abe8' }}>
+                          {data.subtitle || '副標題'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Original/Default 風格：經典全屏 */
+                    <>
+                      <div className="absolute inset-0">
+                        <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
+                      </div>
+                      <div className={cn('relative z-10 h-full flex flex-col items-center justify-center text-center', previewMode === 'mobile' ? 'p-4' : 'p-6')}>
+                        <span className={cn('inline-block bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 font-medium mb-3', previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs')}>
+                          {data.tagline || 'Venturo Travel'}
+                        </span>
+                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-2xl')}>
+                          {data.title || '行程標題'}
+                        </h1>
+                        <p className={cn('text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-lg')}>
+                          {data.subtitle || '副標題'}
+                        </p>
+                        <p className={cn('text-white/80 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>
+                          {data.description || '此處顯示行程描述'}
+                        </p>
+                        <div className="flex gap-2">
+                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
+                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>出發</div>
+                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '2025/01/01'}</div>
+                          </div>
+                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
+                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>代碼</div>
+                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* 風格標籤 */}
-                  <div className={cn('absolute', previewMode === 'mobile' ? 'top-2 right-2' : 'top-4 right-4')}>
-                    <span
-                      className={cn(
-                        'rounded-full text-white font-medium',
-                        previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'
-                      )}
-                      style={{ backgroundColor: currentStyleColor }}
-                    >
+                  <div className={cn('absolute z-20', previewMode === 'mobile' ? 'top-2 right-2' : 'top-3 right-3')}>
+                    <span className={cn('rounded-full text-white font-medium', previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-2 py-1 text-[10px]')} style={{ backgroundColor: currentStyleColor }}>
                       {currentStyleOption?.label || '經典全屏'}
                     </span>
                   </div>
