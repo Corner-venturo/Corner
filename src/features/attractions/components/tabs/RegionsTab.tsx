@@ -1,16 +1,16 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect } from 'react'
-import { MapPin, Map, Star, Globe } from 'lucide-react'
+import { Globe, Map, Star } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 interface Country {
   id: string
@@ -40,19 +40,16 @@ interface City {
   name_en: string | null
   is_active: boolean | null
   is_major: boolean | null
-  background_image_url: string | null
 }
 
-type TabType = 'countries' | 'regions'
+type SubTabType = 'countries' | 'regions'
 
-export default function RegionsPage() {
+export default function RegionsTab() {
   const [countries, setCountries] = useState<Country[]>([])
   const [regions, setRegions] = useState<Region[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
-
-  // 分頁
-  const [activeTab, setActiveTab] = useState<TabType>('countries')
+  const [subTab, setSubTab] = useState<SubTabType>('countries')
 
   // 城市管理視窗
   const [isCitiesDialogOpen, setIsCitiesDialogOpen] = useState(false)
@@ -61,7 +58,6 @@ export default function RegionsPage() {
   // 載入資料
   const fetchData = async () => {
     setLoading(true)
-
     const [countriesRes, regionsRes, citiesRes] = await Promise.all([
       supabase.from('countries').select('*').order('display_order'),
       supabase.from('regions').select('*').order('country_id').order('display_order'),
@@ -101,10 +97,7 @@ export default function RegionsPage() {
       return
     }
 
-    // 更新本地狀態
-    setCities(prev => prev.map(c =>
-      c.id === cityId ? { ...c, is_major: !currentStatus } : c
-    ))
+    setCities(prev => prev.map(c => (c.id === cityId ? { ...c, is_major: !currentStatus } : c)))
   }
 
   // 切換地區狀態
@@ -153,15 +146,11 @@ export default function RegionsPage() {
   // 按地區分組城市
   const citiesByRegion = useMemo(() => {
     const grouped: Record<string, City[]> = { '': [] }
-
     countryCities.forEach(city => {
       const regionId = city.region_id || ''
-      if (!grouped[regionId]) {
-        grouped[regionId] = []
-      }
+      if (!grouped[regionId]) grouped[regionId] = []
       grouped[regionId].push(city)
     })
-
     return grouped
   }, [countryCities])
 
@@ -190,9 +179,7 @@ export default function RegionsPage() {
       {
         key: 'code',
         label: '代碼',
-        render: (_value, row) => (
-          <span className="text-sm font-mono">{row.code || '-'}</span>
-        ),
+        render: (_value, row) => <span className="text-sm font-mono">{row.code || '-'}</span>,
       },
       {
         key: 'has_regions',
@@ -226,9 +213,7 @@ export default function RegionsPage() {
               className="h-8 px-3 text-xs"
             >
               {cityCount} 城市
-              {majorCount > 0 && (
-                <span className="ml-1 text-amber-600">({majorCount} 主要)</span>
-              )}
+              {majorCount > 0 && <span className="ml-1 text-amber-600">({majorCount} 主要)</span>}
             </Button>
           )
         },
@@ -308,25 +293,25 @@ export default function RegionsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title="地區管理"
-        icon={MapPin}
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '資料庫管理', href: '/database' },
-          { label: '地區管理', href: '/database/regions' },
-        ]}
-        tabs={[
-          { value: 'countries', label: '國家', icon: Globe },
-          { value: 'regions', label: '地區', icon: Map },
-        ]}
-        activeTab={activeTab}
-        onTabChange={(tabId) => setActiveTab(tabId as TabType)}
-      />
+      {/* 子分頁 */}
+      <div className="px-4 pt-2 border-b">
+        <Tabs value={subTab} onValueChange={v => setSubTab(v as SubTabType)}>
+          <TabsList className="h-9">
+            <TabsTrigger value="countries" className="text-xs gap-1.5">
+              <Globe size={14} />
+              國家
+            </TabsTrigger>
+            <TabsTrigger value="regions" className="text-xs gap-1.5">
+              <Map size={14} />
+              地區
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* 表格內容 */}
       <div className="flex-1 overflow-auto">
-        {activeTab === 'countries' && (
+        {subTab === 'countries' && (
           <EnhancedTable<Country>
             columns={countryColumns}
             data={countries}
@@ -334,7 +319,7 @@ export default function RegionsPage() {
             emptyMessage="尚無國家資料"
           />
         )}
-        {activeTab === 'regions' && (
+        {subTab === 'regions' && (
           <EnhancedTable<Region>
             columns={regionColumns}
             data={regions}
@@ -348,25 +333,18 @@ export default function RegionsPage() {
       <Dialog open={isCitiesDialogOpen} onOpenChange={setIsCitiesDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {selectedCountry?.name} - 主要城市設定
-            </DialogTitle>
+            <DialogTitle>{selectedCountry?.name} - 主要城市設定</DialogTitle>
           </DialogHeader>
 
           {countryCities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              此國家尚無城市資料
-            </div>
+            <div className="text-center py-8 text-muted-foreground">此國家尚無城市資料</div>
           ) : (
             <div className="space-y-6">
               {Object.entries(citiesByRegion).map(([regionId, regionCities]) => (
                 <div key={regionId || 'no-region'}>
-                  {/* 地區標題 */}
                   <div className="text-sm font-medium text-muted-foreground mb-2 pb-1 border-b">
                     {getRegionName(regionId)} ({regionCities.length})
                   </div>
-
-                  {/* 城市列表 - 勾選式 */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {regionCities.map(city => (
                       <label
@@ -377,9 +355,7 @@ export default function RegionsPage() {
                           checked={city.is_major ?? false}
                           onCheckedChange={() => handleToggleMajor(city.id, city.is_major ?? false)}
                         />
-                        <span className="text-sm">
-                          {city.name}
-                        </span>
+                        <span className="text-sm">{city.name}</span>
                         {city.is_major && (
                           <Star size={12} className="text-amber-500 fill-amber-500 ml-auto" />
                         )}
@@ -395,9 +371,7 @@ export default function RegionsPage() {
             <div className="text-sm text-muted-foreground">
               已選 {countryCities.filter(c => c.is_major).length} 個主要城市
             </div>
-            <Button onClick={() => setIsCitiesDialogOpen(false)}>
-              完成
-            </Button>
+            <Button onClick={() => setIsCitiesDialogOpen(false)}>完成</Button>
           </div>
         </DialogContent>
       </Dialog>
