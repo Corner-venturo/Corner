@@ -11,6 +11,7 @@
 
 import { useMemo, useCallback } from 'react'
 import { useMembers as useMembersCloud } from './cloud-hooks' // Renamed to avoid conflict
+import { useMemberActions } from './useMemberActions' // 使用有同步邏輯的 actions
 import { supabase } from '@/lib/supabase/client'
 import type { Member } from '@/stores/types'
 
@@ -88,12 +89,13 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
     isLoading,
     isValidating,
     error,
-    create,
     update,
-    delete: remove,
     fetchAll,
     getById,
   } = useMembersCloud() // Use useMembersCloud here
+
+  // 使用 useMemberActions 來執行 create/delete，這樣會自動同步 order.member_count
+  const { create, delete: remove } = useMemberActions()
 
   // 取得當前 workspace ID
   const workspaceId = useMemo(() => getCurrentWorkspaceId(), [])
