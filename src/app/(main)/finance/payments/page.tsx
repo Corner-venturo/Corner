@@ -13,7 +13,6 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -21,7 +20,7 @@ import { Plus, Search, FileDown, Layers, Eye, CheckSquare } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 
 // Components
-import { ReceiptSearchDialog, BatchConfirmReceiptDialog } from './components'
+import { ReceiptSearchDialog, BatchConfirmReceiptDialog, ReceiptDetailDialog } from './components'
 import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
 import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
 
@@ -38,8 +37,6 @@ import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
 import type { ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
-  const router = useRouter()
-
   // 資料與業務邏輯
   const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
   const { user } = useAuthStore()
@@ -54,6 +51,8 @@ export default function PaymentsPage() {
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
   const [isBatchConfirmDialogOpen, setIsBatchConfirmDialogOpen] = useState(false)
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
   // 初始化載入資料
@@ -102,8 +101,9 @@ export default function PaymentsPage() {
 
   // 事件處理
   const handleViewDetail = useCallback((receipt: Receipt) => {
-    router.push(`/finance/payments/${receipt.id}`)
-  }, [router])
+    setSelectedReceipt(receipt)
+    setIsDetailDialogOpen(true)
+  }, [])
 
   const handleSubmit = async (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => {
     try {
@@ -242,6 +242,14 @@ export default function PaymentsPage() {
       <BatchConfirmReceiptDialog
         open={isBatchConfirmDialogOpen}
         onOpenChange={setIsBatchConfirmDialogOpen}
+        onSuccess={fetchReceipts}
+      />
+
+      {/* 收款單詳情對話框 */}
+      <ReceiptDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        receipt={selectedReceipt}
         onSuccess={fetchReceipts}
       />
     </div>

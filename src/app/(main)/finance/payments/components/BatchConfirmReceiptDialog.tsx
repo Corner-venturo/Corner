@@ -52,8 +52,17 @@ export function BatchConfirmReceiptDialog({
 
   // 篩選待確認的收款單 (status = 0)
   const pendingReceipts = useMemo(() => {
-    return receipts.filter(r => r.status === ReceiptStatus.PENDING)
-  }, [receipts])
+    // Debug: 顯示所有收款單的 status 值
+    if (open && receipts.length > 0) {
+      console.log('📋 所有收款單 status:', receipts.map(r => ({
+        receipt_number: r.receipt_number,
+        status: r.status,
+        status_type: typeof r.status
+      })))
+    }
+    // 使用數值比較，避免 enum vs number 類型問題
+    return receipts.filter(r => Number(r.status) === 0)
+  }, [receipts, open])
 
   // 初始化確認項目
   useMemo(() => {
@@ -131,7 +140,7 @@ export function BatchConfirmReceiptDialog({
         // 更新收款單狀態
         await updateReceipt(item.receipt.id, {
           actual_amount: item.actualAmount,
-          status: ReceiptStatus.CONFIRMED,
+          status: 1, // 已確認
           note: item.receipt.note
             ? `${item.receipt.note}\n[會計批量確認] ${new Date().toLocaleDateString()}`
             : `[會計批量確認] ${new Date().toLocaleDateString()}`,
@@ -150,7 +159,7 @@ export function BatchConfirmReceiptDialog({
         if (order) {
           // 計算該訂單所有已確認收款的總金額
           const allConfirmedReceipts = receipts.filter(
-            r => r.order_id === orderId && r.status === ReceiptStatus.CONFIRMED
+            r => r.order_id === orderId && Number(r.status) === 1
           )
           const previousConfirmed = allConfirmedReceipts.reduce(
             (sum, r) => sum + (r.actual_amount || 0),
