@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit } from 'lucide-react'
+import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit, Link2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useItineraries, useEmployees, useQuotes } from '@/hooks/cloud-hooks'
+import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
@@ -34,6 +34,7 @@ export default function ItineraryPage() {
   const { items: itineraries, delete: deleteItinerary, update: updateItinerary, create: createItinerary } = useItineraries()
   const { items: quotes, create: createQuote, update: updateQuote } = useQuotes()
   const { items: employees } = useEmployees()
+  const { items: tours } = useTours()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
   const regionsStore = useRegionsStore()
@@ -92,6 +93,13 @@ export default function ItineraryPage() {
     const employee = employees.find(e => e.id === employeeId)
     return employee?.display_name || employee?.chinese_name || '-'
   }, [employees])
+
+  // 根據 tour_id 查找綁定的團號
+  const getLinkedTourCode = useCallback((tourId?: string | null) => {
+    if (!tourId) return null
+    const tour = tours.find(t => t.id === tourId)
+    return tour?.code || null
+  }, [tours])
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = useCallback(() => {
@@ -461,11 +469,23 @@ export default function ItineraryPage() {
         key: 'tour_code',
         label: '行程編號',
         sortable: true,
-        render: (_value, itinerary) => (
-          <span className="text-sm text-morandi-secondary font-mono">
-            {itinerary.tour_code || '-'}
-          </span>
-        ),
+        render: (_value, itinerary) => {
+          const linkedTourCode = getLinkedTourCode(itinerary.tour_id)
+          const isLinked = !!linkedTourCode
+          return (
+            <div className="flex items-center gap-1.5">
+              {isLinked && (
+                <Link2 size={12} className="text-morandi-blue flex-shrink-0" />
+              )}
+              <span className={cn(
+                "text-sm font-mono",
+                isLinked ? "text-morandi-blue font-medium" : "text-morandi-secondary"
+              )}>
+                {isLinked ? linkedTourCode : (itinerary.tour_code || '-')}
+              </span>
+            </div>
+          )
+        },
       },
       {
         key: 'title',
@@ -744,7 +764,7 @@ export default function ItineraryPage() {
         },
       },
     ],
-    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName]
+    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName, getLinkedTourCode]
   )
 
   // 過濾資料
@@ -805,6 +825,15 @@ export default function ItineraryPage() {
           stripHtml(item.description).toLowerCase().includes(searchLower)
       )
     }
+
+    // 排序：已綁定團的行程表排在最後面
+    filtered = filtered.sort((a, b) => {
+      const aLinked = !!a.tour_id
+      const bLinked = !!b.tour_id
+      if (aLinked && !bLinked) return 1  // a 已綁定，排後面
+      if (!aLinked && bLinked) return -1 // b 已綁定，排後面
+      return 0 // 維持原順序
+    })
 
     return filtered
   }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id, isSuperAdmin])
@@ -1016,6 +1045,13 @@ export default function ItineraryPage() {
             columns={tableColumns as TableColumn[]}
             data={filteredItineraries}
             onRowClick={(itinerary) => handleRowClick(itinerary as Itinerary)}
+            rowClassName={(row) => {
+              const itinerary = row as Itinerary
+              if (itinerary.tour_id) {
+                return 'bg-morandi-blue/5 hover:bg-morandi-blue/10'
+              }
+              return ''
+            }}
           />
         </div>
       </div>
