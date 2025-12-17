@@ -945,3 +945,6 @@ export const ExcelMemberTable = forwardRef<MemberTableRef, MemberTableProps>(
 )
 
 ExcelMemberTable.displayName = 'ExcelMemberTable'
+
+// 為了向後相容，導出別名
+export const OrderMemberView = ExcelMemberTable

@@ -1,16 +1,18 @@
 'use client'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-form'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Search, Loader2 } from 'lucide-react'
 import { NewTourData } from '../types'
 import { useItineraryStore, useQuoteStore } from '@/stores'
 import type { Itinerary, Quote } from '@/stores/types'
+import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
+import { toast } from 'sonner'
 
 interface TourFormProps {
   isOpen: boolean
@@ -57,6 +59,80 @@ export function TourForm({
   // 載入行程表和報價單資料
   const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
   const { items: quotes, fetchAll: fetchQuotes } = useQuoteStore()
+
+  // 航班查詢狀態
+  const [loadingOutbound, setLoadingOutbound] = useState(false)
+  const [loadingReturn, setLoadingReturn] = useState(false)
+
+  // 查詢去程航班
+  const handleSearchOutbound = useCallback(async () => {
+    const flightNumber = newTour.outbound_flight_number
+    if (!flightNumber) {
+      toast.warning('請先輸入航班號碼')
+      return
+    }
+
+    // 使用出發日期或今天
+    const flightDate = newTour.departure_date || new Date().toISOString().split('T')[0]
+
+    setLoadingOutbound(true)
+    try {
+      const result = await searchFlightAction(flightNumber, flightDate)
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+      if (result.data) {
+        // 組合航班資訊文字
+        const flightText = `${result.data.airline} ${result.data.flightNumber} ${result.data.departure.time}-${result.data.arrival.time}`
+        setNewTour(prev => ({
+          ...prev,
+          outbound_flight_text: flightText,
+          outbound_flight_number: result.data!.flightNumber,
+        }))
+        toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+      }
+    } catch {
+      toast.error('查詢航班時發生錯誤')
+    } finally {
+      setLoadingOutbound(false)
+    }
+  }, [newTour.outbound_flight_number, newTour.departure_date, setNewTour])
+
+  // 查詢回程航班
+  const handleSearchReturn = useCallback(async () => {
+    const flightNumber = newTour.return_flight_number
+    if (!flightNumber) {
+      toast.warning('請先輸入航班號碼')
+      return
+    }
+
+    // 使用回程日期或今天
+    const flightDate = newTour.return_date || new Date().toISOString().split('T')[0]
+
+    setLoadingReturn(true)
+    try {
+      const result = await searchFlightAction(flightNumber, flightDate)
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+      if (result.data) {
+        // 組合航班資訊文字
+        const flightText = `${result.data.airline} ${result.data.flightNumber} ${result.data.departure.time}-${result.data.arrival.time}`
+        setNewTour(prev => ({
+          ...prev,
+          return_flight_text: flightText,
+          return_flight_number: result.data!.flightNumber,
+        }))
+        toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+      }
+    } catch {
+      toast.error('查詢航班時發生錯誤')
+    } finally {
+      setLoadingReturn(false)
+    }
+  }, [newTour.return_flight_number, newTour.return_date, setNewTour])
 
   // 打開對話框時載入資料
   useEffect(() => {
@@ -377,24 +453,81 @@ export function TourForm({
                 {/* 航班資訊（選填） */}
                 <div className="border-t pt-4 mt-4">
                   <label className="text-sm font-medium text-morandi-primary mb-3 block">航班資訊（選填）</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-morandi-secondary">去程航班</label>
-                      <Input
-                        value={newTour.outbound_flight_text || ''}
-                        onChange={e => setNewTour(prev => ({ ...prev, outbound_flight_text: e.target.value }))}
-                        placeholder="例：BR 190 07:25-11:45"
-                        className="mt-1"
-                      />
+                  <div className="space-y-3">
+                    {/* 去程航班 */}
+                    <div className="bg-morandi-container/20 p-3 rounded-lg">
+                      <label className="text-xs font-medium text-morandi-secondary mb-2 block">去程航班</label>
+                      <div className="flex gap-2">
+                        <div className="w-28">
+                          <Input
+                            value={newTour.outbound_flight_number || ''}
+                            onChange={e => setNewTour(prev => ({ ...prev, outbound_flight_number: e.target.value.toUpperCase() }))}
+                            placeholder="航班號碼"
+                            className="text-sm"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleSearchOutbound}
+                          disabled={loadingOutbound || !newTour.outbound_flight_number}
+                          className="h-9 gap-1"
+                        >
+                          {loadingOutbound ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Search size={14} />
+                          )}
+                          查詢
+                        </Button>
+                        <div className="flex-1">
+                          <Input
+                            value={newTour.outbound_flight_text || ''}
+                            onChange={e => setNewTour(prev => ({ ...prev, outbound_flight_text: e.target.value }))}
+                            placeholder="查詢後自動帶入，或手動輸入"
+                            className="text-sm"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-xs text-morandi-secondary">回程航班</label>
-                      <Input
-                        value={newTour.return_flight_text || ''}
-                        onChange={e => setNewTour(prev => ({ ...prev, return_flight_text: e.target.value }))}
-                        placeholder="例：BR 191 13:00-16:30"
-                        className="mt-1"
-                      />
+
+                    {/* 回程航班 */}
+                    <div className="bg-morandi-container/20 p-3 rounded-lg">
+                      <label className="text-xs font-medium text-morandi-secondary mb-2 block">回程航班</label>
+                      <div className="flex gap-2">
+                        <div className="w-28">
+                          <Input
+                            value={newTour.return_flight_number || ''}
+                            onChange={e => setNewTour(prev => ({ ...prev, return_flight_number: e.target.value.toUpperCase() }))}
+                            placeholder="航班號碼"
+                            className="text-sm"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleSearchReturn}
+                          disabled={loadingReturn || !newTour.return_flight_number}
+                          className="h-9 gap-1"
+                        >
+                          {loadingReturn ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Search size={14} />
+                          )}
+                          查詢
+                        </Button>
+                        <div className="flex-1">
+                          <Input
+                            value={newTour.return_flight_text || ''}
+                            onChange={e => setNewTour(prev => ({ ...prev, return_flight_text: e.target.value }))}
+                            placeholder="查詢後自動帶入，或手動輸入"
+                            className="text-sm"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
