@@ -241,54 +241,6 @@ export function TourForm({
             <div className="h-full overflow-y-auto">
               <h3 className="text-lg font-medium text-morandi-primary mb-4">旅遊團資訊</h3>
               <div className="space-y-4">
-                {/* 關聯行程表或報價單（僅在新增模式顯示） */}
-                {mode === 'create' && (
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
-                    <div>
-                      <label className="text-sm font-medium text-morandi-primary">關聯行程表（選填）</label>
-                      <Combobox
-                        options={[
-                          { value: '', label: '獨立旅遊團（無行程表）' },
-                          ...availableItineraries.map(itinerary => ({
-                            value: itinerary.id,
-                            label: `${itinerary.tour_code || '無編號'} - ${itinerary.title || '未命名'}`,
-                          })),
-                        ]}
-                        value={selectedItineraryId || ''}
-                        onChange={handleItinerarySelect}
-                        placeholder="搜尋或選擇行程表..."
-                        emptyMessage="找不到行程表"
-                        className="mt-1"
-                        disabled={!!selectedQuoteId}
-                      />
-                      <p className="text-xs text-morandi-secondary mt-1">
-                        選擇後自動帶入行程資料
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-morandi-primary">關聯報價單（選填）</label>
-                      <Combobox
-                        options={[
-                          { value: '', label: '獨立旅遊團（無報價單）' },
-                          ...availableQuotes.map(quote => ({
-                            value: quote.id,
-                            label: `${quote.code || '無編號'} - ${quote.name || '未命名'}`,
-                          })),
-                        ]}
-                        value={selectedQuoteId || ''}
-                        onChange={handleQuoteSelect}
-                        placeholder="搜尋或選擇報價單..."
-                        emptyMessage="找不到報價單"
-                        className="mt-1"
-                        disabled={!!selectedItineraryId}
-                      />
-                      <p className="text-xs text-morandi-secondary mt-1">
-                        選擇後自動帶入報價資料
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 <div>
                   <label className="text-sm font-medium text-morandi-primary">旅遊團名稱</label>
                   <Input
@@ -565,6 +517,57 @@ export function TourForm({
           {/* Right side - Order info */}
           <div className="flex-1 pl-6">
             <div className="h-full overflow-y-auto">
+              {/* 關聯行程表或報價單（僅在新增模式顯示） */}
+              {mode === 'create' && (
+                <div className="mb-6 pb-4 border-b border-border">
+                  <h3 className="text-lg font-medium text-morandi-primary mb-4">關聯文件（選填）</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">關聯行程表</label>
+                      <Combobox
+                        options={[
+                          { value: '', label: '獨立旅遊團（無行程表）' },
+                          ...availableItineraries.map(itinerary => ({
+                            value: itinerary.id,
+                            label: `${itinerary.tour_code || '無編號'} - ${itinerary.title || '未命名'}`,
+                          })),
+                        ]}
+                        value={selectedItineraryId || ''}
+                        onChange={handleItinerarySelect}
+                        placeholder="搜尋或選擇行程表..."
+                        emptyMessage="找不到行程表"
+                        className="mt-1"
+                        disabled={!!selectedQuoteId}
+                      />
+                      <p className="text-xs text-morandi-secondary mt-1">
+                        選擇後自動帶入行程資料
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-morandi-primary">關聯報價單</label>
+                      <Combobox
+                        options={[
+                          { value: '', label: '獨立旅遊團（無報價單）' },
+                          ...availableQuotes.map(quote => ({
+                            value: quote.id,
+                            label: `${quote.code || '無編號'} - ${quote.name || '未命名'}`,
+                          })),
+                        ]}
+                        value={selectedQuoteId || ''}
+                        onChange={handleQuoteSelect}
+                        placeholder="搜尋或選擇報價單..."
+                        emptyMessage="找不到報價單"
+                        className="mt-1"
+                        disabled={!!selectedItineraryId}
+                      />
+                      <p className="text-xs text-morandi-secondary mt-1">
+                        選擇後自動帶入報價資料
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <h3 className="text-lg font-medium text-morandi-primary mb-4">
                 同時新增訂單（選填）
               </h3>
