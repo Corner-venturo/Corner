@@ -191,36 +191,6 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
         </div>
       </div>
 
-      {/* 團員人數和訂單金額 */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium text-morandi-primary">團員人數</label>
-          <Input
-            type="number"
-            value={formData.member_count || ''}
-            onChange={e => {
-              const value = e.target.value
-              updateFormData?.({
-                ...formData,
-                member_count: value === '' ? undefined : Number(value),
-              })
-            }}
-            placeholder="1"
-            className="mt-1"
-            min="0"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-morandi-primary">訂單金額</label>
-          <Input
-            type="number"
-            value={formData.total_amount || 0}
-            onChange={e => updateFormData?.({ ...formData, total_amount: Number(e.target.value) })}
-            placeholder="0"
-            className="mt-1"
-          />
-        </div>
-      </div>
 
       {/* 按鈕（只在獨立模式顯示） */}
       {!isEmbedded && (

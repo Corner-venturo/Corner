@@ -222,6 +222,12 @@ export const ToursPage: React.FC = () => {
     if (dialog.type === 'edit' && dialog.data) {
       const tour = dialog.data as Tour
 
+      // 確保 regions 已載入
+      if (countries.length === 0) {
+        fetchRegions()
+        return // 等待 regions 載入後 useEffect 會重新執行
+      }
+
       let countryCode = ''
       let cityCode = ''
 
@@ -276,11 +282,27 @@ export const ToursPage: React.FC = () => {
         cityCode = '__custom__'
       }
 
+      // 從航班 JSON 提取資訊
+      const outboundFlight = tour.outbound_flight as { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
+      const returnFlight = tour.return_flight as { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
+
+      const outbound_flight_number = outboundFlight?.flightNumber || ''
+      const outbound_flight_text = outboundFlight
+        ? `${outboundFlight.airline || ''} ${outboundFlight.flightNumber || ''} ${outboundFlight.departureTime || ''}-${outboundFlight.arrivalTime || ''}`.trim()
+        : ''
+
+      const return_flight_number = returnFlight?.flightNumber || ''
+      const return_flight_text = returnFlight
+        ? `${returnFlight.airline || ''} ${returnFlight.flightNumber || ''} ${returnFlight.departureTime || ''}-${returnFlight.arrivalTime || ''}`.trim()
+        : ''
+
       setNewTour({
         name: tour.name,
         countryCode,
         cityCode,
         customLocation: countryCode === '__custom__' ? (tour.location || undefined) : undefined,
+        customCountry: countryCode === '__custom__' ? undefined : undefined,
+        customCityCode: countryCode === '__custom__' ? (tour.code?.substring(0, 3) || undefined) : undefined,
         departure_date: tour.departure_date || '',
         return_date: tour.return_date || '',
         price: tour.price ?? 0,
@@ -288,10 +310,15 @@ export const ToursPage: React.FC = () => {
         isSpecial: tour.status === 'special',
         max_participants: tour.max_participants || 20,
         description: tour.description || '',
+        outbound_flight_number,
+        outbound_flight_text,
+        return_flight_number,
+        return_flight_text,
+        enable_checkin: tour.enable_checkin || false,
       })
     }
-     
-  }, [dialog.type, dialog.data, activeCountries])
+
+  }, [dialog.type, dialog.data, activeCountries, countries.length, fetchRegions])
 
   // Handle navigation from quote
   useEffect(() => {
