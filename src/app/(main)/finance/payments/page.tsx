@@ -17,16 +17,17 @@ import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Eye } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Eye, CheckSquare } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 
 // Components
-import { ReceiptSearchDialog } from './components'
+import { ReceiptSearchDialog, BatchConfirmReceiptDialog } from './components'
 import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
 import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
 
 // Hooks
 import { usePaymentData } from './hooks/usePaymentData'
+import { useAuthStore } from '@/stores'
 
 // Utils
 import { exportReceiptsToExcel } from '@/lib/excel/receipt-excel'
@@ -41,10 +42,17 @@ export default function PaymentsPage() {
 
   // 資料與業務邏輯
   const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
+  const { user } = useAuthStore()
+
+  // 檢查是否為可批量確認的角色（管理員、會計、超級管理員）
+  const canBatchConfirm = user?.roles?.some(role =>
+    ['super_admin', 'admin', 'accountant'].includes(role)
+  )
 
   // UI 狀態
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
+  const [isBatchConfirmDialogOpen, setIsBatchConfirmDialogOpen] = useState(false)
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
@@ -152,6 +160,17 @@ export default function PaymentsPage() {
               <FileDown size={16} className="mr-2" />
               匯出 Excel
             </Button>
+            {canBatchConfirm && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsBatchConfirmDialogOpen(true)}
+                className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+              >
+                <CheckSquare size={16} className="mr-2" />
+                批量確認
+              </Button>
+            )}
             <Button
               size="sm"
               onClick={() => setIsBatchDialogOpen(true)}
@@ -218,6 +237,13 @@ export default function PaymentsPage() {
 
       {/* 批量收款對話框 */}
       <BatchReceiptDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
+
+      {/* 批量確認收款對話框 */}
+      <BatchConfirmReceiptDialog
+        open={isBatchConfirmDialogOpen}
+        onOpenChange={setIsBatchConfirmDialogOpen}
+        onSuccess={fetchReceipts}
+      />
     </div>
   )
 }
