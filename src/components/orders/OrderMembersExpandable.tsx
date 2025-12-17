@@ -950,7 +950,8 @@ export function OrderMembersExpandable({
       // 統計
       let successCount = 0
       let duplicateCount = 0
-      let syncedCustomerCount = 0
+      let matchedCustomerCount = 0  // 比對到現有顧客
+      let newCustomerCount = 0      // 新建顧客
       const failedItems: string[] = []
       const duplicateItems: string[] = []
 
@@ -1095,7 +1096,7 @@ export function OrderMembersExpandable({
                     .eq('id', existingCustomer.id)
                 }
 
-                syncedCustomerCount++
+                matchedCustomerCount++
                 logger.info(`✅ 顧客已存在，已關聯: ${existingCustomer.name}`)
               } else {
                 // 沒找到，建立新顧客
@@ -1122,7 +1123,7 @@ export function OrderMembersExpandable({
                     .from('order_members')
                     .update({ customer_id: newCustomer.id })
                     .eq('id', newMember.id)
-                  syncedCustomerCount++
+                  newCustomerCount++
                   logger.info(`✅ 新建顧客: ${newCustomer.name}`)
                 }
               }
@@ -1138,8 +1139,11 @@ export function OrderMembersExpandable({
 
       // 顯示結果
       let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員`
-      if (syncedCustomerCount > 0) {
-        message += `\n✅ 已同步 ${syncedCustomerCount} 位顧客資料`
+      if (matchedCustomerCount > 0) {
+        message += `\n✅ 已比對 ${matchedCustomerCount} 位現有顧客`
+      }
+      if (newCustomerCount > 0) {
+        message += `\n✅ 已新增 ${newCustomerCount} 位顧客資料`
       }
       if (duplicateCount > 0) {
         message += `\n\n⚠️ 跳過 ${duplicateCount} 位重複成員：\n${duplicateItems.join('\n')}`
