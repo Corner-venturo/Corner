@@ -4,7 +4,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, Check, Crop, Settings2, Loader2 } from 'lucide-react'
+import { Upload, Check, Crop, Settings2, Loader2, Monitor, Smartphone } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -53,6 +53,8 @@ export function CoverInfoSection({
   const [showPositionEditor, setShowPositionEditor] = useState(false)
   // 封面設定 Modal
   const [showCoverSettings, setShowCoverSettings] = useState(false)
+  // 預覽模式
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop')
 
   // 取得當前選擇城市的圖片
   const cityImages = useMemo(() => {
@@ -708,68 +710,140 @@ export function CoverInfoSection({
             </div>
 
             {/* 右側：實時預覽 */}
-            <div className="w-1/2 bg-slate-900 flex items-center justify-center overflow-hidden relative">
-              {/* 封面預覽 */}
-              <div className="absolute inset-0">
-                {/* 背景圖片 */}
-                <img
-                  src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=75&auto=format&fit=crop'}
-                  alt="封面預覽"
-                  className="w-full h-full object-cover"
-                  style={{ filter: 'brightness(0.7)' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
-              </div>
-
-              {/* 封面內容 */}
-              <div className="relative z-10 text-center p-8">
-                {/* 標籤 */}
-                <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 text-xs font-medium mb-4">
-                  {data.tagline || 'Venturo Travel 2025 秋季精選'}
-                </span>
-
-                {/* 主標題 */}
-                <h1 className="text-3xl font-bold text-white mb-2">
-                  {data.title || '行程標題'}
-                </h1>
-
-                {/* 副標題 */}
-                <p className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-4">
-                  {data.subtitle || '副標題'}
-                </p>
-
-                {/* 描述 */}
-                <p className="text-sm text-white/80 max-w-md mx-auto mb-6">
-                  {data.description || '此處顯示行程描述'}
-                </p>
-
-                {/* 資訊卡片 */}
-                <div className="flex justify-center gap-4">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-center">
-                    <div className="text-xs text-white/70">出發日期</div>
-                    <div className="font-bold text-sm text-white">{data.departureDate || '2025/01/01'}</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-center">
-                    <div className="text-xs text-white/70">行程代碼</div>
-                    <div className="font-bold text-sm text-white">{data.tourCode || 'CODE'}</div>
-                  </div>
-                  {data.price && (
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-center">
-                      <div className="text-xs text-white/70">每人</div>
-                      <div className="font-bold text-sm text-white">${data.price}{data.priceNote || ''}</div>
-                    </div>
+            <div className="w-1/2 bg-slate-800 flex flex-col overflow-hidden">
+              {/* 版本切換按鈕 */}
+              <div className="flex items-center justify-center gap-2 p-3 bg-slate-900 border-b border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode('desktop')}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors',
+                    previewMode === 'desktop'
+                      ? 'bg-white text-slate-900'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
                   )}
-                </div>
+                >
+                  <Monitor size={16} />
+                  電腦版
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode('mobile')}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors',
+                    previewMode === 'mobile'
+                      ? 'bg-white text-slate-900'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  )}
+                >
+                  <Smartphone size={16} />
+                  手機版
+                </button>
               </div>
 
-              {/* 風格標籤 */}
-              <div className="absolute top-4 right-4">
-                <span
-                  className="px-3 py-1 rounded-full text-white text-xs font-medium"
-                  style={{ backgroundColor: currentStyleColor }}
+              {/* 預覽區域 */}
+              <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+                <div
+                  className={cn(
+                    'relative overflow-hidden shadow-2xl transition-all duration-300',
+                    previewMode === 'mobile'
+                      ? 'w-[280px] h-[500px] rounded-[2rem] border-4 border-slate-600'
+                      : 'w-full h-full rounded-lg'
+                  )}
                 >
-                  {currentStyleOption?.label || '經典全屏'}
-                </span>
+                  {/* 封面預覽 */}
+                  <div className="absolute inset-0">
+                    {/* 背景圖片 */}
+                    <img
+                      src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=75&auto=format&fit=crop'}
+                      alt="封面預覽"
+                      className="w-full h-full object-cover"
+                      style={{ filter: 'brightness(0.7)' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
+                  </div>
+
+                  {/* 封面內容 */}
+                  <div className={cn(
+                    'relative z-10 h-full flex flex-col items-center justify-center text-center',
+                    previewMode === 'mobile' ? 'p-4' : 'p-8'
+                  )}>
+                    {/* 標籤 */}
+                    <span className={cn(
+                      'inline-block bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 font-medium mb-3',
+                      previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'
+                    )}>
+                      {data.tagline || 'Venturo Travel 2025 秋季精選'}
+                    </span>
+
+                    {/* 主標題 */}
+                    <h1 className={cn(
+                      'font-bold text-white mb-1',
+                      previewMode === 'mobile' ? 'text-xl' : 'text-3xl'
+                    )}>
+                      {data.title || '行程標題'}
+                    </h1>
+
+                    {/* 副標題 */}
+                    <p className={cn(
+                      'text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-3',
+                      previewMode === 'mobile' ? 'text-sm' : 'text-xl'
+                    )}>
+                      {data.subtitle || '副標題'}
+                    </p>
+
+                    {/* 描述 */}
+                    <p className={cn(
+                      'text-white/80 max-w-md mx-auto mb-4',
+                      previewMode === 'mobile' ? 'text-[10px] leading-tight' : 'text-sm'
+                    )}>
+                      {data.description || '此處顯示行程描述'}
+                    </p>
+
+                    {/* 資訊卡片 */}
+                    <div className={cn(
+                      'flex justify-center',
+                      previewMode === 'mobile' ? 'gap-2 flex-wrap' : 'gap-4'
+                    )}>
+                      <div className={cn(
+                        'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
+                        previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
+                      )}>
+                        <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>出發日期</div>
+                        <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>{data.departureDate || '2025/01/01'}</div>
+                      </div>
+                      <div className={cn(
+                        'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
+                        previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
+                      )}>
+                        <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>行程代碼</div>
+                        <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>{data.tourCode || 'CODE'}</div>
+                      </div>
+                      {data.price && (
+                        <div className={cn(
+                          'bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center',
+                          previewMode === 'mobile' ? 'px-2 py-1' : 'px-4 py-2'
+                        )}>
+                          <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')}>每人</div>
+                          <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>${data.price}{data.priceNote || ''}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 風格標籤 */}
+                  <div className={cn('absolute', previewMode === 'mobile' ? 'top-2 right-2' : 'top-4 right-4')}>
+                    <span
+                      className={cn(
+                        'rounded-full text-white font-medium',
+                        previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'
+                      )}
+                      style={{ backgroundColor: currentStyleColor }}
+                    >
+                      {currentStyleOption?.label || '經典全屏'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
