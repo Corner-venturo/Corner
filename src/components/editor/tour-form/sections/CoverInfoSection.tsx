@@ -761,32 +761,44 @@ export function CoverInfoSection({
                       ) : null}
                     </div>
                   ) : data.coverStyle === 'art' ? (
-                    /* Art 風格：雜誌風格、紅色調 */
-                    <div className="absolute inset-0" style={{ backgroundColor: '#1a1a1a' }}>
-                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover opacity-60" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                        <span className={cn('uppercase tracking-[0.3em] mb-2', previewMode === 'mobile' ? 'text-[8px]' : 'text-xs')} style={{ color: '#E63946' }}>
-                          {data.tagline || 'ODYSSEY'}
-                        </span>
-                        <h1 className={cn('font-black text-white mb-1', previewMode === 'mobile' ? 'text-2xl' : 'text-4xl')} style={{ fontFamily: "'Playfair Display', serif" }}>
+                    /* Art 風格：米色紙張背景 + 左右佈局 + 雜誌排版 */
+                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#f4f1ea' }}>
+                      {/* 斜切色塊裝飾 */}
+                      <div className="absolute top-0 right-0 w-1/2 h-full pointer-events-none" style={{ backgroundColor: 'rgba(199,109,84,0.03)', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0 100%)' }} />
+                      {/* 左側文字區 */}
+                      <div className={cn('relative z-10 flex flex-col justify-center', previewMode === 'mobile' ? 'w-full p-3' : 'w-1/2 p-5')}>
+                        {/* 標籤 */}
+                        <div className="inline-block border rounded-full px-2 py-0.5 mb-3 w-fit" style={{ borderColor: '#1a1a1a' }}>
+                          <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#1a1a1a' }}>{data.tagline || 'COLLECTION'}</span>
+                        </div>
+                        {/* 主標題 */}
+                        <h1 className={cn('font-bold leading-none tracking-tight mb-1', previewMode === 'mobile' ? 'text-2xl' : 'text-4xl')} style={{ color: '#1a1a1a', fontFamily: 'serif' }}>
                           {data.title || '行程標題'}
                         </h1>
-                        <div className="w-12 h-0.5 my-2" style={{ backgroundColor: '#E63946' }} />
-                        <p className={cn('text-white/60 mb-2', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
+                        {/* 副標題 */}
+                        <p className={cn('italic mb-3', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#c76d54', fontFamily: 'serif' }}>
                           {data.subtitle || 'Odyssey'}
                         </p>
-                        <div className="flex gap-2 flex-wrap justify-center">
-                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
+                        {/* 資訊列 */}
+                        <div className="flex gap-4 pt-2 border-t" style={{ borderColor: 'rgba(26,26,26,0.1)' }}>
+                          <div>
+                            <span className="block text-[8px] uppercase tracking-wider text-gray-400">Departure</span>
+                            <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{data.departureDate || '日期'}</span>
                           </div>
-                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
-                          </div>
-                          <div className={cn('border rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ borderColor: '#E63946' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
+                          <div>
+                            <span className="block text-[8px] uppercase tracking-wider text-gray-400">Price</span>
+                            <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
                           </div>
                         </div>
                       </div>
+                      {/* 右側圖片區 */}
+                      {previewMode !== 'mobile' && (
+                        <div className="w-1/2 relative p-3">
+                          <div className="w-full h-full rounded-lg overflow-hidden shadow-xl">
+                            <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : data.coverStyle === 'serene' ? (
                     /* Serene 風格：全屏背景 + 左側垂直標題 + 底部玻璃卡片 */
