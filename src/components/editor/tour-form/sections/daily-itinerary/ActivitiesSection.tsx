@@ -3,6 +3,8 @@
 import React, { useRef, useState } from 'react'
 import { List, LayoutGrid } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase/client'
+import { toast } from 'sonner'
 import {
   DndContext,
   closestCenter,
@@ -69,6 +71,39 @@ export function ActivitiesSection({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // 將景點存到資料庫
+  const handleSaveToDatabase = async (activity: Activity, _dayIndex: number, actIndex: number) => {
+    try {
+      // 建立新的景點資料（country_id 使用預設值，之後可在景點管理編輯）
+      const newAttraction = {
+        name: activity.title,
+        description: activity.description || null,
+        thumbnail: activity.image || null,
+        images: activity.image ? [activity.image] : [],
+        is_active: true,
+        display_order: 0,
+        country_id: 'unknown', // 預設值，可在景點管理中修改
+      }
+
+      const { data, error } = await supabase
+        .from('attractions')
+        .insert(newAttraction)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // 更新活動的 attraction_id 為新建立的資料庫 ID
+      if (data) {
+        updateActivity(dayIndex, actIndex, 'attraction_id', data.id)
+        toast.success(`已將「${activity.title}」存到景點資料庫`)
+      }
+    } catch (error) {
+      console.error('儲存景點失敗:', error)
+      toast.error('儲存失敗，請稍後再試')
+    }
+  }
 
   // 處理拖曳結束
   const handleDragEnd = (event: DragEndEvent) => {
@@ -186,6 +221,7 @@ export function ActivitiesSection({
                     setActivityDragOver={setActivityDragOver}
                     activityFileInputRefs={activityFileInputRefs}
                     onOpenPositionEditor={onOpenPositionEditor}
+                    onSaveToDatabase={handleSaveToDatabase}
                   />
                 )
               })}

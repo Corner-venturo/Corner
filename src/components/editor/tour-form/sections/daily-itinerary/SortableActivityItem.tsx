@@ -3,7 +3,7 @@
 import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, ImageIcon, Loader2, X, Crop, Upload } from 'lucide-react'
+import { GripVertical, ImageIcon, Loader2, X, Crop, Upload, Database } from 'lucide-react'
 import { RelatedImagesPreviewer } from '../../../RelatedImagesPreviewer'
 import { getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { SortableActivityItemProps } from './types'
@@ -20,7 +20,22 @@ export function SortableActivityItem({
   setActivityDragOver,
   activityFileInputRefs,
   onOpenPositionEditor,
+  onSaveToDatabase,
 }: SortableActivityItemProps) {
+  const [isSaving, setIsSaving] = React.useState(false)
+
+  // 判斷是否可以存到資料庫（手動新增或已修改的景點）
+  const canSaveToDb = !activity.attraction_id || activity.attraction_id.startsWith('manual_')
+
+  const handleSaveToDb = async () => {
+    if (!onSaveToDatabase || isSaving) return
+    setIsSaving(true)
+    try {
+      await onSaveToDatabase(activity, dayIndex, actIndex)
+    } finally {
+      setIsSaving(false)
+    }
+  }
   const {
     attributes,
     listeners,
@@ -187,12 +202,31 @@ export function SortableActivityItem({
             />
           )}
         </div>
-        <button
-          onClick={() => removeActivity(dayIndex, actIndex)}
-          className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
-        >
-          ✕ 刪除
-        </button>
+        <div className="flex items-center gap-2">
+          {/* 存到資料庫按鈕 - 只有手動新增的景點顯示 */}
+          {canSaveToDb && onSaveToDatabase && activity.title && (
+            <button
+              type="button"
+              onClick={handleSaveToDb}
+              disabled={isSaving}
+              className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-blue hover:text-morandi-blue/80 hover:bg-morandi-blue/10 rounded transition-colors disabled:opacity-50"
+              title="將此景點儲存到景點資料庫"
+            >
+              {isSaving ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Database size={12} />
+              )}
+              存到資料庫
+            </button>
+          )}
+          <button
+            onClick={() => removeActivity(dayIndex, actIndex)}
+            className="px-2 py-1 text-morandi-red hover:text-morandi-red/80 text-xs transition-colors"
+          >
+            ✕ 刪除
+          </button>
+        </div>
       </div>
     </div>
   )

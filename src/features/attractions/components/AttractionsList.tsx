@@ -1,9 +1,10 @@
-import { MapPin, Trash2, Power, Edit2, ChevronUp, ChevronDown } from 'lucide-react'
+import { MapPin, Trash2, Power, Edit2, ChevronUp, ChevronDown, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { Attraction } from '../types'
+import { Attraction, hasMissingData } from '../types'
 import type { Country, City } from '@/stores/region-store'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // ============================================
 // 景點列表組件（使用 EnhancedTable）
@@ -63,14 +64,31 @@ export function AttractionsList({
       key: 'name',
       label: '景點名稱',
       sortable: true,
-      render: (_: unknown, attraction: Attraction) => (
-        <div className="min-w-[180px]">
-          <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
-          {attraction.name_en && (
-            <div className="text-xs text-morandi-muted line-clamp-1">{attraction.name_en}</div>
-          )}
-        </div>
-      ),
+      render: (_: unknown, attraction: Attraction) => {
+        const missing = hasMissingData(attraction)
+        return (
+          <div className="min-w-[180px] flex items-start gap-1.5">
+            {missing.length > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertTriangle size={14} className="text-amber-500 mt-1 flex-shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>缺少：{missing.join('、')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <div>
+              <div className="font-medium text-morandi-primary line-clamp-1">{attraction.name}</div>
+              {attraction.name_en && (
+                <div className="text-xs text-morandi-muted line-clamp-1">{attraction.name_en}</div>
+              )}
+            </div>
+          </div>
+        )
+      },
     },
     {
       key: 'city',

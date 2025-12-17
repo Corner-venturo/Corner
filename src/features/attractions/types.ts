@@ -25,8 +25,20 @@ export interface Attraction {
   is_active: boolean
   display_order: number
   notes?: string
+  ticket_price?: string
+  data_verified?: boolean
   created_at: string
   updated_at: string
+}
+
+// 檢查景點是否有缺失資料
+export function hasMissingData(attraction: Attraction): string[] {
+  const missing: string[] = []
+  if (!attraction.latitude || !attraction.longitude) missing.push('座標')
+  if (!attraction.ticket_price) missing.push('門票')
+  if (!attraction.notes) missing.push('介紹')
+  if (!attraction.duration_minutes) missing.push('時長')
+  return missing
 }
 
 export type SortField = 'name' | 'city' | 'category' | 'duration' | 'status'

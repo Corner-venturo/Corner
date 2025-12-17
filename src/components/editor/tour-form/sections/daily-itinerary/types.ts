@@ -68,6 +68,7 @@ export interface SortableActivityItemProps {
   setActivityDragOver: (value: { dayIndex: number; actIndex: number } | null) => void
   activityFileInputRefs: React.MutableRefObject<{ [key: string]: HTMLInputElement | null }>
   onOpenPositionEditor: (dayIndex: number, actIndex: number) => void
+  onSaveToDatabase?: (activity: Activity, dayIndex: number, actIndex: number) => Promise<void>
 }
 
 export interface SortableActivityGridItemProps {
