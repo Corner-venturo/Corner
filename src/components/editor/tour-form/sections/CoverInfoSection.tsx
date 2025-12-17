@@ -12,6 +12,12 @@ import { toHalfWidth } from '@/lib/utils/text'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
+// Hero 組件
+import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
+import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
+import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
+import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
+import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -713,8 +719,8 @@ export function CoverInfoSection({
                 </button>
               </div>
 
-              {/* 預覽區域 */}
-              <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+              {/* 預覽區域 - 直接使用真實 Hero 組件 */}
+              <div className="flex-1 flex items-center justify-center p-4 overflow-auto bg-slate-100">
                 <div
                   className={cn(
                     'relative overflow-hidden shadow-2xl transition-all duration-300',
@@ -723,199 +729,36 @@ export function CoverInfoSection({
                       : 'w-full h-[520px] rounded-lg border border-slate-600'
                   )}
                 >
-                  {/* 根據風格顯示不同的封面預覽 */}
-                  {data.coverStyle === 'luxury' ? (
-                    /* Luxury 風格：左右分欄、米色背景 */
-                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#FDFBF7' }}>
-                      {/* 左側文字 */}
-                      <div className={cn('flex flex-col justify-center', previewMode === 'mobile' ? 'w-full p-3' : 'w-1/2 p-6')}>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border text-[10px] mb-2 w-fit" style={{ borderColor: '#C69C6D30', color: '#C69C6D' }}>
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#8F4F4F' }} />
-                          {data.tagline || 'LUXURY COLLECTION'}
-                        </span>
-                        <h1 className={cn('font-bold mb-1', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')} style={{ color: '#2C5F4D', fontFamily: "'Noto Serif TC', serif" }}>
-                          {data.title || '行程標題'}
-                        </h1>
-                        <p className={cn('', previewMode === 'mobile' ? 'text-xs' : 'text-sm')} style={{ color: '#636E72' }}>
-                          {data.subtitle || '副標題'}
-                        </p>
-                        <p className="text-[10px] text-gray-400 mb-2 line-clamp-2">{data.description || '描述文字'}</p>
-                        <div className="flex gap-2 mt-2 flex-wrap">
-                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
-                            <div className="text-[8px] text-white/70">出發</div>
-                            <div className="text-xs font-bold text-white">{data.departureDate || '日期'}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#C69C6D' }}>
-                            <div className="text-[8px] text-white/70">代碼</div>
-                            <div className="text-xs font-bold text-white">{data.tourCode || 'CODE'}</div>
-                          </div>
-                          <div className="px-2 py-1 rounded text-center" style={{ backgroundColor: '#2C5F4D' }}>
-                            <div className="text-[8px] text-white/70">價格</div>
-                            <div className="text-xs font-bold text-white">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</div>
-                          </div>
-                        </div>
-                      </div>
-                      {/* 右側圖片 */}
-                      {!previewMode || previewMode === 'desktop' ? (
-                        <div className="w-1/2 relative">
-                          <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : data.coverStyle === 'art' ? (
-                    /* Art 風格：米色紙張背景 + 左右佈局 + 雜誌排版 */
-                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#f4f1ea' }}>
-                      {/* 斜切色塊裝飾 */}
-                      <div className="absolute top-0 right-0 w-1/2 h-full pointer-events-none" style={{ backgroundColor: 'rgba(199,109,84,0.03)', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0 100%)' }} />
-                      {/* 左側文字區 */}
-                      <div className={cn('relative z-10 flex flex-col justify-center', previewMode === 'mobile' ? 'w-full p-3' : 'w-1/2 p-5')}>
-                        {/* 標籤 */}
-                        <div className="inline-block border rounded-full px-2 py-0.5 mb-3 w-fit" style={{ borderColor: '#1a1a1a' }}>
-                          <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#1a1a1a' }}>{data.tagline || 'COLLECTION'}</span>
-                        </div>
-                        {/* 主標題 */}
-                        <h1 className={cn('font-bold leading-none tracking-tight mb-1', previewMode === 'mobile' ? 'text-2xl' : 'text-4xl')} style={{ color: '#1a1a1a', fontFamily: 'serif' }}>
-                          {data.title || '行程標題'}
-                        </h1>
-                        {/* 副標題 */}
-                        <p className={cn('italic', previewMode === 'mobile' ? 'text-sm' : 'text-xl')} style={{ color: '#c76d54', fontFamily: 'serif' }}>
-                          {data.subtitle || '副標題'}
-                        </p>
-                        {/* 描述 */}
-                        <p className="text-[10px] text-gray-500 mb-2 line-clamp-2">{data.description || '描述文字'}</p>
-                        {/* 資訊列 */}
-                        <div className="flex gap-4 pt-2 border-t" style={{ borderColor: 'rgba(26,26,26,0.1)' }}>
-                          <div>
-                            <span className="block text-[8px] uppercase tracking-wider text-gray-400">Departure</span>
-                            <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{data.departureDate || '日期'}</span>
-                          </div>
-                          <div>
-                            <span className="block text-[8px] uppercase tracking-wider text-gray-400">Price</span>
-                            <span className="text-xs font-medium" style={{ color: '#1a1a1a' }}>{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
-                          </div>
-                        </div>
-                      </div>
-                      {/* 右側圖片區 */}
-                      {previewMode !== 'mobile' && (
-                        <div className="w-1/2 relative p-3">
-                          <div className="w-full h-full rounded-lg overflow-hidden shadow-xl">
-                            <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : data.coverStyle === 'nature' ? (
-                    /* Nature 風格：和紙背景 + 左側垂直文字 + 右側大圖 */
-                    <div className="absolute inset-0 flex" style={{ backgroundColor: '#f9f9f7' }}>
-                      {/* 左側垂直文字 */}
-                      <div className={cn('flex gap-1 justify-center items-center', previewMode === 'mobile' ? 'px-2' : 'px-4')}>
-                        <h1
-                          className={cn('text-[#2c3e50] font-black tracking-wider', previewMode === 'mobile' ? 'text-base' : 'text-xl')}
-                          style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
-                        >
-                          {data.title || '行程標題'}
-                        </h1>
-                        <h2
-                          className={cn('text-[#30abe8] font-bold tracking-wider', previewMode === 'mobile' ? 'text-xs' : 'text-sm')}
-                          style={{ writingMode: 'vertical-lr', textOrientation: 'mixed' }}
-                        >
-                          {data.subtitle || '副標題'}
-                        </h2>
-                      </div>
-                      {/* 右側圖片 */}
-                      <div className="flex-1 relative">
-                        <div className={cn('w-full h-full overflow-hidden', previewMode === 'mobile' ? 'rounded-t-[20px] rounded-b-lg' : 'rounded-t-[40px] rounded-b-lg')}>
-                          <div className="absolute inset-0 bg-[#30abe8]/10 mix-blend-overlay z-10" />
-                          <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
-                          {/* 底部標籤 */}
-                          <div className={cn('absolute z-20', previewMode === 'mobile' ? 'bottom-2 left-2 right-2' : 'bottom-3 left-3 right-3')}>
-                            <p className="text-[10px] text-white bg-black/40 backdrop-blur-sm rounded px-2 py-1 mb-1 line-clamp-2">{data.description || '描述文字'}</p>
-                            <div className="flex flex-wrap gap-1">
-                              <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                                <span className="text-[10px] font-bold text-[#2c3e50]">{data.tagline || 'Travel'}</span>
-                              </div>
-                              <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                                <span className="text-[10px] text-[#2c3e50]">{data.departureDate || '日期'}</span>
-                              </div>
-                              <div className="bg-white/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                                <span className="text-[10px] text-[#2c3e50]">{data.price ? `$${Number(data.price).toLocaleString()}` : '價格'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : data.coverStyle === 'gemini' ? (
-                    /* Gemini 風格：金色主題、底部對齊 */
-                    <div className="absolute inset-0">
-                      <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#3a3633]/90 via-[#3a3633]/40 to-transparent" />
-                      <div className={cn('absolute bottom-0 left-0 right-0 text-white', previewMode === 'mobile' ? 'p-3' : 'p-5')}>
-                        <span className={cn('inline-block rounded-full font-bold tracking-wider mb-2', previewMode === 'mobile' ? 'px-2 py-0.5 text-[8px]' : 'px-3 py-1 text-[10px]')} style={{ backgroundColor: '#c9aa7c', color: '#3a3633' }}>
-                          CORNER TRAVEL
-                        </span>
-                        {data.tagline && (
-                          <p className={cn('mb-1', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')} style={{ color: '#c9aa7c' }}>
-                            {data.tagline}
-                          </p>
-                        )}
-                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-lg' : 'text-2xl')}>
-                          {data.title || '行程標題'}
-                        </h1>
-                        <p className={cn('text-white/80', previewMode === 'mobile' ? 'text-[10px]' : 'text-sm')}>
-                          {data.subtitle || '副標題'}
-                        </p>
-                        <p className="text-[10px] text-white/60 mb-1 line-clamp-2">{data.description || '描述文字'}</p>
-                        <div className="flex gap-2 mt-1 flex-wrap">
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</span>
-                          </div>
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</span>
-                          </div>
-                          <div className={cn('rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-0.5' : 'px-3 py-1')} style={{ backgroundColor: 'rgba(201,170,124,0.2)', border: '1px solid #c9aa7c' }}>
-                            <span className={cn('text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Original/Default 風格：經典全屏 */
-                    <>
-                      <div className="absolute inset-0">
-                        <img src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800'} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
-                      </div>
-                      <div className={cn('relative z-10 h-full flex flex-col items-center justify-center text-center', previewMode === 'mobile' ? 'p-4' : 'p-6')}>
-                        <span className={cn('inline-block bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/90 font-medium mb-3', previewMode === 'mobile' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs')}>
-                          {data.tagline || 'Venturo Travel'}
-                        </span>
-                        <h1 className={cn('font-bold text-white mb-1', previewMode === 'mobile' ? 'text-xl' : 'text-2xl')}>
-                          {data.title || '行程標題'}
-                        </h1>
-                        <p className={cn('text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2', previewMode === 'mobile' ? 'text-sm' : 'text-lg')}>
-                          {data.subtitle || '副標題'}
-                        </p>
-                        <p className={cn('text-white/80 mb-3', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>
-                          {data.description || '此處顯示行程描述'}
-                        </p>
-                        <div className="flex gap-2 flex-wrap justify-center">
-                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
-                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>出發</div>
-                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.departureDate || '日期'}</div>
-                          </div>
-                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
-                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>代碼</div>
-                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.tourCode || 'CODE'}</div>
-                          </div>
-                          <div className={cn('bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-center', previewMode === 'mobile' ? 'px-2 py-1' : 'px-3 py-1.5')}>
-                            <div className={cn('text-white/70', previewMode === 'mobile' ? 'text-[8px]' : 'text-[10px]')}>價格</div>
-                            <div className={cn('font-bold text-white', previewMode === 'mobile' ? 'text-[10px]' : 'text-xs')}>{data.price ? `$${Number(data.price).toLocaleString()}${data.priceUnit || '/人'}` : '價格'}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  <div className="w-full h-full overflow-hidden" style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
+                    {(() => {
+                      const heroData = {
+                        coverImage: data.coverImage,
+                        tagline: data.tagline || 'Corner Travel',
+                        title: data.title || '行程標題',
+                        subtitle: data.subtitle || '副標題',
+                        description: data.description || '此處顯示行程描述',
+                        departureDate: data.departureDate || '2025/01/01',
+                        tourCode: data.tourCode || 'CODE',
+                        price: data.price || '',
+                        priceNote: data.priceUnit || '/人',
+                        country: selectedCountry || '',
+                      }
+                      const viewMode = previewMode
+
+                      switch (data.coverStyle) {
+                        case 'luxury':
+                          return <TourHeroLuxury data={heroData} viewMode={viewMode} />
+                        case 'art':
+                          return <TourHeroArt data={heroData} viewMode={viewMode} />
+                        case 'nature':
+                          return <TourHeroNature data={heroData} viewMode={viewMode} />
+                        case 'gemini':
+                          return <TourHeroGemini data={heroData} viewMode={viewMode} />
+                        default:
+                          return <TourHeroSection data={heroData} viewMode={viewMode} />
+                      }
+                    })()}
+                  </div>
 
                   {/* 風格標籤 */}
                   <div className={cn('absolute z-20', previewMode === 'mobile' ? 'top-2 right-2' : 'top-3 right-3')}>
