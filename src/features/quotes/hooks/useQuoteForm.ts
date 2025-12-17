@@ -126,6 +126,7 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
       // 新增報價單並取得完整物件
       const newQuoteObj = await addQuote({
         ...formData,
+        quote_type: 'standard', // 團體報價單類型
         group_size: groupSize,
         ...(selectedTourId && { tour_id: selectedTourId }),
         ...(quoteCode && { code: quoteCode }),
