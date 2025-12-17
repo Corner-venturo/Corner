@@ -310,20 +310,21 @@ export function CoverInfoSection({
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">封面風格</label>
               {templatesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
-                  <span className="ml-2 text-sm text-morandi-secondary">載入模板中...</span>
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex gap-2">
                   {coverStyleOptions.map((option) => {
                     const isSelected = (data.coverStyle || 'original') === option.value
+                    // 取第一個字作為代表
+                    const shortLabel = option.value === 'gemini' ? 'G' : option.label.charAt(0)
                     return (
                       <button
                         key={option.value}
                         type="button"
+                        title={option.label}
                         onClick={() => {
-                          // 使用 onChange 一次更新多個欄位，避免狀態覆蓋問題
                           onChange({
                             ...data,
                             coverStyle: option.value,
@@ -331,49 +332,19 @@ export function CoverInfoSection({
                           })
                         }}
                         className={cn(
-                          'relative flex flex-col items-start p-2 rounded-lg border-2 transition-all text-left',
+                          'w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center font-medium',
                           isSelected
-                            ? 'ring-2 ring-offset-1 bg-white'
+                            ? 'ring-2 ring-offset-1'
                             : 'border-morandi-container hover:border-opacity-70 bg-white'
                         )}
                         style={{
                           borderColor: isSelected ? option.color : undefined,
+                          backgroundColor: isSelected ? option.color : undefined,
+                          color: isSelected ? 'white' : option.color,
                           ...(isSelected ? { ['--tw-ring-color' as string]: `${option.color}40` } : {})
                         }}
                       >
-                        {/* 預覽圖（如果有） */}
-                        {option.previewImage && (
-                          <div className="w-full h-16 mb-2 rounded overflow-hidden bg-morandi-container/30">
-                            <img
-                              src={option.previewImage}
-                              alt={option.label}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-1.5">
-                            <div
-                              className="w-2.5 h-2.5 rounded-full"
-                              style={{ backgroundColor: option.color }}
-                            />
-                            <span
-                              className="font-medium text-sm"
-                              style={{ color: isSelected ? option.color : undefined }}
-                            >
-                              {option.label}
-                            </span>
-                          </div>
-                          {isSelected && (
-                            <div
-                              className="w-4 h-4 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: option.color }}
-                            >
-                              <Check size={10} className="text-white" />
-                            </div>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-morandi-secondary leading-tight mt-0.5">{option.description}</span>
+                        {shortLabel}
                       </button>
                     )
                   })}
