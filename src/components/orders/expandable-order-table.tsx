@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useTourStore, useOrderStore } from '@/stores'
 import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { OrderMemberView, MemberTableRef } from '@/components/members/OrderMemberView'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
+import { useAuthStore } from '@/stores'
 import { Order } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -34,9 +35,9 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
   const tours = tourStore.items
   const orderStore = useOrderStore()
   const deleteOrder = orderStore.delete
+  const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
   const [expandedOrders, setExpandedOrders] = useState<string[]>([])
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({})
-  const memberTableRefs = useRef<Record<string, MemberTableRef | null>>({})
 
   const toggleOrderExpand = (order_id: string) => {
     setExpandedOrders(prev =>
@@ -302,25 +303,6 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
 
                                 {/* 各分頁的專屬按鈕 */}
                                 <div className="flex items-center space-x-2 px-4">
-                                  {activeTabs[order.id] === 'members' && (
-                                    <Button
-                                      onClick={e => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        const tableRef = memberTableRefs.current[order.id]
-                                        if (tableRef) {
-                                          tableRef.addRow()
-                                        } else {
-                                        }
-                                      }}
-                                      size="sm"
-                                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                                    >
-                                      <Plus size={14} className="mr-1" />
-                                      新增行
-                                    </Button>
-                                  )}
-
                                   {/* 統一的詳細頁面按鈕 */}
                                   <Button
                                     onClick={() => {
@@ -339,17 +321,11 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
 
                             {/* 分頁內容 */}
                             {activeTabs[order.id] === 'members' ? (
-                              <OrderMemberView
-                                ref={ref => {
-                                  if (ref) memberTableRefs.current[order.id] = ref
-                                }}
-                                order_id={order.id}
-                                departure_date={
-                                  tourDepartureDate ||
-                                  tours.find(t => t.id === order.tour_id)?.departure_date ||
-                                  ''
-                                }
-                                member_count={order.member_count}
+                              <OrderMembersExpandable
+                                orderId={order.id}
+                                tourId={order.tour_id || ''}
+                                workspaceId={workspaceId}
+                                onClose={() => setActiveTab(order.id, 'overview')}
                               />
                             ) : (
                               <div className="px-6 py-4">
