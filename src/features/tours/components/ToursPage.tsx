@@ -148,10 +148,11 @@ export const ToursPage: React.FC = () => {
   //   }
   // }, [countries.length]);
 
-  // Get active countries from new region store
+  // Get active countries from new region store (sorted by display_order)
   const activeCountries = useMemo(() => {
     return countries
       .filter(c => c.is_active)
+      .sort((a, b) => a.display_order - b.display_order)
       .map(c => ({ id: c.id, code: c.code || '', name: c.name }))
   }, [countries])
 
