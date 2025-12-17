@@ -76,8 +76,7 @@ const menuItems: MenuItem[] = [
     requiredPermission: 'database',
     children: [
       { href: '/customers', label: '顧客管理', icon: Users, requiredPermission: 'customers' },
-      { href: '/database/regions', label: '地區管理', icon: MapPin, requiredPermission: 'database' },
-      { href: '/database/attractions', label: '景點管理', icon: MapPin, requiredPermission: 'database' },
+      { href: '/database/attractions', label: '旅遊資料庫', icon: MapPin, requiredPermission: 'database' },
       { href: '/database/transportation-rates', label: '車資管理', icon: Bus, requiredPermission: 'database' },
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
       { href: '/database/tour-leaders', label: '領隊資料', icon: Users, requiredPermission: 'database' },
