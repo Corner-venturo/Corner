@@ -289,7 +289,7 @@ export function CoverInfoSection({
 
       {/* 封面設定 Modal */}
       <Dialog open={showCoverSettings} onOpenChange={setShowCoverSettings}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
+        <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0">
           <div className="flex h-full">
             {/* 左側：設定表單 */}
             <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-morandi-container">
@@ -747,8 +747,8 @@ export function CoverInfoSection({
                   className={cn(
                     'relative overflow-hidden shadow-2xl transition-all duration-300',
                     previewMode === 'mobile'
-                      ? 'w-[320px] h-[580px] rounded-[2.5rem] border-[8px] border-slate-600 bg-slate-600'
-                      : 'w-[600px] h-[420px] rounded-lg border border-slate-600'
+                      ? 'w-[340px] h-[620px] rounded-[2.5rem] border-[8px] border-slate-600 bg-slate-600'
+                      : 'w-full h-[520px] rounded-lg border border-slate-600'
                   )}
                 >
                   {/* 根據風格顯示不同的封面預覽 */}
