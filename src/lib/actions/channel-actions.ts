@@ -1,39 +1,18 @@
 'use server'
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { getServerAuth, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
 
 export async function getOrCreateDmChannel(otherUserId: string) {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-      },
-    }
-  )
+  // 使用統一的認證服務
+  const auth = await getServerAuth()
 
-  // Get the current user
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    console.error('DM Action Auth Error:', authError)
-    throw new Error('User not authenticated.')
+  if (!auth.success) {
+    throw new Error(auth.error.error)
   }
 
-  // The workspace ID should be stored in the user's app_metadata or a related table.
-  // Assuming it's in user_metadata for this example.
-  // @ts-ignore
-  const workspaceId = user.user_metadata?.workspace_id
-  if (!workspaceId) {
-    throw new Error('Workspace ID not found for the current user.')
-  }
+  const { user, workspaceId } = auth.data
+  const supabase = await getAuthenticatedSupabase()
 
   // Call the RPC function
   const { data, error } = await supabase.rpc('get_or_create_dm_channel', {

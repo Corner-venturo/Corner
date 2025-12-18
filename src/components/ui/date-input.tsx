@@ -1,8 +1,10 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { format, parse, isValid } from 'date-fns'
 
 interface DateInputProps {
   value: string // ISO 8601 格式 (YYYY-MM-DD)
@@ -23,6 +25,7 @@ export function DateInput({
   min,
   max,
 }: DateInputProps) {
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   // 將 ISO 格式轉換為顯示格式
   const formatToDisplay = (isoDate: string): { year: string; month: string; day: string } => {
     if (!isoDate || isoDate.length < 10) {
@@ -149,37 +152,23 @@ export function DateInput({
     }
   }
 
-  const handleCalendarClick = () => {
-    const input = document.createElement('input')
-    input.type = 'date'
-    input.value = value || ''
-    input.style.position = 'absolute'
-    input.style.opacity = '0'
-    input.style.pointerEvents = 'none'
-    input.style.left = '-9999px'
-    document.body.appendChild(input)
+  // 轉換為 Date 物件供 Calendar 使用
+  const dateValue = value && value.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(value, 'yyyy-MM-dd', new Date())
+    : undefined
+  const minDate = min && min.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(min, 'yyyy-MM-dd', new Date())
+    : undefined
+  const maxDate = max && max.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? parse(max, 'yyyy-MM-dd', new Date())
+    : undefined
 
-    const cleanup = () => {
-      if (document.body.contains(input)) {
-        document.body.removeChild(input)
-      }
-    }
-
-    input.addEventListener('change', () => {
-      if (input.value) {
-        onChange(input.value)
-      }
-      cleanup()
-    })
-
-    input.addEventListener('blur', cleanup)
-    input.addEventListener('cancel', cleanup)
-
-    try {
-      input.showPicker()
-    } catch (error) {
-      logger.error('showPicker failed:', error)
-      cleanup()
+  // 從日曆選擇日期
+  const handleCalendarSelect = (date: Date | undefined) => {
+    if (date && isValid(date)) {
+      const formatted = format(date, 'yyyy-MM-dd')
+      onChange(formatted)
+      setIsCalendarOpen(false)
     }
   }
 
@@ -233,30 +222,46 @@ export function DateInput({
         style={{ boxShadow: 'none' }}
         maxLength={2}
       />
-      <button
-        type="button"
-        onClick={handleCalendarClick}
-        disabled={disabled}
-        className="ml-auto text-morandi-secondary hover:text-morandi-primary transition-colors"
-        aria-label="選擇日期"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      </button>
+      <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            disabled={disabled}
+            className="ml-auto text-morandi-secondary hover:text-morandi-primary transition-colors"
+            aria-label="選擇日期"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="end" sideOffset={4}>
+          <Calendar
+            mode="single"
+            selected={dateValue && isValid(dateValue) ? dateValue : undefined}
+            onSelect={handleCalendarSelect}
+            disabled={
+              minDate || maxDate
+                ? { before: minDate, after: maxDate }
+                : undefined
+            }
+            defaultMonth={dateValue && isValid(dateValue) ? dateValue : undefined}
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

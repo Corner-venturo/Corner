@@ -1,7 +1,17 @@
 'use server'
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { getServerAuth, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
+
+interface WorkspaceMember {
+  id: string
+  full_name: string
+  avatar_url: string | null
+}
+
+interface ProfileData {
+  name: string | null
+  avatar_url: string | null
+}
 
 /**
  * Fetches all members of the current user's workspace, excluding the user themselves.
@@ -10,47 +20,28 @@ import { cookies } from 'next/headers'
  * then queries for all employees in that workspace, joining with
  * the profiles table to get their public information.
  */
-export async function getWorkspaceMembers() {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-      },
-    }
-  )
+export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
+  // 使用統一的認證服務
+  const auth = await getServerAuth()
 
-  // Get the current user
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
+  if (!auth.success) {
     // User not authenticated yet, return empty array instead of throwing
     return []
   }
 
-  // @ts-ignore
-  const workspaceId = user.user_metadata?.workspace_id
-  if (!workspaceId) {
-    throw new Error('Workspace ID not found for the current user.')
-  }
+  const { user, workspaceId } = auth.data
+  const supabase = await getAuthenticatedSupabase()
 
   // Query for all employees in the workspace and join with their profiles
   const { data: members, error: queryError } = await supabase
     .from('employees')
-    .select(
-      `
+    .select(`
       id,
       profiles (
-        full_name,
+        name,
         avatar_url
       )
-    `
-    )
+    `)
     .eq('workspace_id', workspaceId)
     .neq('id', user.id) // Exclude the current user
 
@@ -59,15 +50,16 @@ export async function getWorkspaceMembers() {
     throw new Error('Could not fetch workspace members.')
   }
 
-  // The data structure from the query will be nested, e.g., { id, profiles: { full_name, ... } }
+  // The data structure from the query will be nested, e.g., { id, profiles: { name, ... } }
   // We'll flatten it for easier use in the UI.
-  const formattedMembers = members.map(member => ({
-    id: member.id,
-    // @ts-ignore
-    full_name: member.profiles?.full_name || 'Unnamed User',
-    // @ts-ignore
-    avatar_url: member.profiles?.avatar_url || null,
-  }))
+  const formattedMembers: WorkspaceMember[] = (members || []).map(member => {
+    const profile = member.profiles as ProfileData | null
+    return {
+      id: member.id,
+      full_name: profile?.name || 'Unnamed User',
+      avatar_url: profile?.avatar_url || null,
+    }
+  })
 
   return formattedMembers
 }

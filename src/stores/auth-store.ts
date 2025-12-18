@@ -158,6 +158,23 @@ export const useAuthStore = create<AuthState>()(
 
           logger.log('✅ Supabase Auth session created:', authData.user?.id)
 
+          // 同步 workspace_id 和 employee_id 到 user_metadata
+          // 這樣 Server Actions 可以直接從 user_metadata 讀取，不用每次查 DB
+          if (employeeData.workspace_id) {
+            try {
+              await supabase.auth.updateUser({
+                data: {
+                  workspace_id: employeeData.workspace_id,
+                  employee_id: employeeData.id
+                }
+              })
+              logger.log('✅ Synced workspace_id to user_metadata')
+            } catch (metadataError) {
+              // 非關鍵錯誤，只記錄警告
+              logger.warn('⚠️ Failed to sync user_metadata:', metadataError)
+            }
+          }
+
           // 查詢 workspace code（如果有 workspace_id）
           let workspaceCode: string | undefined = undefined
           if (employeeData.workspace_id) {
