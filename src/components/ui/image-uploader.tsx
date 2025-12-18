@@ -171,19 +171,34 @@ export function ImageUploader({
   const fetchAndUploadImage = useCallback(async (imageUrl: string) => {
     setUploading(true)
     try {
-      const response = await fetch(imageUrl)
-      if (!response.ok) throw new Error('無法下載圖片')
+      // 嘗試透過後端 API 下載（避免 CORS 問題）
+      const response = await fetch('/api/fetch-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: imageUrl }),
+      })
 
-      const blob = await response.blob()
-      if (!blob.type.startsWith('image/')) {
-        throw new Error('URL 不是圖片')
+      if (!response.ok) {
+        // 如果後端 API 不存在，嘗試直接下載
+        const directResponse = await fetch(imageUrl, { mode: 'cors' })
+        if (!directResponse.ok) throw new Error('無法下載圖片')
+
+        const blob = await directResponse.blob()
+        if (!blob.type.startsWith('image/')) {
+          throw new Error('URL 不是圖片')
+        }
+
+        const file = new File([blob], 'dragged-image.jpg', { type: blob.type })
+        await uploadFile(file)
+        return
       }
 
-      const file = new File([blob], 'dragged-image.jpg', { type: blob.type })
+      const blob = await response.blob()
+      const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
       await uploadFile(file)
     } catch (error) {
       console.error('下載圖片失敗:', error)
-      void alert('無法從該網址下載圖片', 'warning')
+      void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
     } finally {
       setUploading(false)
     }
@@ -196,23 +211,54 @@ export function ImageUploader({
 
     if (disabled) return
 
+    // 方法 1: 檢查 files（本地拖曳的檔案）
     const files = e.dataTransfer.files
     if (files.length > 0) {
       const file = files[0]
       if (file.type.startsWith('image/')) {
         void uploadFile(file)
-      } else {
-        void alert('請拖曳圖片檔案', 'warning')
+        return
       }
-      return // 有檔案就不處理 URL
     }
 
-    // 處理從網頁拖曳的圖片 URL（只有沒有檔案時才處理）
+    // 方法 2: 檢查 items（瀏覽器拖曳的圖片可能在這裡）
+    const items = e.dataTransfer.items
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        // 如果是圖片類型的 file
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            void uploadFile(file)
+            return
+          }
+        }
+      }
+    }
+
+    // 方法 3: 嘗試從 HTML 中解析圖片 URL
+    const html = e.dataTransfer.getData('text/html')
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^"]+)"/)
+      if (match && match[1]) {
+        const imgSrc = match[1]
+        if (imgSrc.startsWith('http://') || imgSrc.startsWith('https://')) {
+          void fetchAndUploadImage(imgSrc)
+          return
+        }
+      }
+    }
+
+    // 方法 4: 處理純 URL
     const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
     if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
-      // 嘗試下載並上傳
       void fetchAndUploadImage(imageUrl)
+      return
     }
+
+    // 都沒有找到圖片
+    void alert('請拖曳圖片檔案', 'warning')
   }, [disabled, uploadFile, fetchAndUploadImage])
 
   // 刪除圖片
