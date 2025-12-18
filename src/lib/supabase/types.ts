@@ -7865,6 +7865,83 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_custom_cost_fields: {
+        Row: {
+          id: string
+          tour_id: string
+          field_name: string
+          display_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          tour_id: string
+          field_name: string
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          tour_id?: string
+          field_name?: string
+          display_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_custom_cost_fields_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_custom_cost_values: {
+        Row: {
+          id: string
+          field_id: string
+          member_id: string
+          value: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          field_id: string
+          member_id: string
+          value?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          field_id?: string
+          member_id?: string
+          value?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_custom_cost_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "tour_custom_cost_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_custom_cost_values_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_room_assignments: {
         Row: {
           bed_number: number | null

@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus, Coins, Plane } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus, Coins, Plane, Home } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
@@ -160,6 +160,10 @@ export function OrderMembersExpandable({
   const [showPnrColumn, setShowPnrColumn] = useState(false)
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
 
+  // 團體模式：訂房欄位
+  const [showHotelColumn, setShowHotelColumn] = useState(false)
+  const [hotelValues, setHotelValues] = useState<Record<string, string>>({})
+
   // 定義可編輯欄位的順序（用於方向鍵導航）
   const editableFields = showIdentityColumn
     ? ['identity', 'chinese_name', 'passport_name', 'birth_date', 'gender', 'id_number', 'passport_number', 'passport_expiry', 'special_meal']
@@ -171,13 +175,128 @@ export function OrderMembersExpandable({
     loadTourDepartureDate()
     // 載入顧客資料（用於編輯模式搜尋）
     fetchCustomers()
-    // 團體模式：載入分房分車資訊
+    // 團體模式：載入分房分車資訊、自訂費用欄位
     if (mode === 'tour') {
       loadRoomAssignments()
       loadVehicleAssignments()
+      loadCustomCostFields()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, tourId, mode])
+
+  // 團體模式：載入自訂費用欄位
+  const loadCustomCostFields = async () => {
+    if (!tourId) return
+    try {
+      // 1. 載入欄位定義
+      const { data: fields, error: fieldsError } = await supabase
+        .from('tour_custom_cost_fields')
+        .select('id, field_name, display_order')
+        .eq('tour_id', tourId)
+        .order('display_order', { ascending: true })
+
+      if (fieldsError) throw fieldsError
+      if (!fields || fields.length === 0) {
+        setCustomCostFields([])
+        return
+      }
+
+      // 2. 載入所有值
+      const { data: values, error: valuesError } = await supabase
+        .from('tour_custom_cost_values')
+        .select('field_id, member_id, value')
+        .in('field_id', fields.map(f => f.id))
+
+      if (valuesError) throw valuesError
+
+      // 3. 組合成前端需要的格式
+      const formattedFields: CustomCostField[] = fields.map(field => {
+        const fieldValues: Record<string, string> = {}
+        values?.forEach(v => {
+          if (v.field_id === field.id && v.member_id) {
+            fieldValues[v.member_id] = v.value || ''
+          }
+        })
+        return {
+          id: field.id,
+          name: field.field_name,
+          values: fieldValues,
+        }
+      })
+
+      setCustomCostFields(formattedFields)
+    } catch (error) {
+      logger.error('載入自訂費用欄位失敗:', error)
+    }
+  }
+
+  // 團體模式：新增自訂費用欄位
+  const addCustomCostField = async (fieldName: string) => {
+    if (!tourId || !fieldName.trim()) return
+    try {
+      const { data, error } = await supabase
+        .from('tour_custom_cost_fields')
+        .insert({
+          tour_id: tourId,
+          field_name: fieldName.trim(),
+          display_order: customCostFields.length,
+        })
+        .select('id, field_name')
+        .single()
+
+      if (error) throw error
+      if (data) {
+        setCustomCostFields(prev => [
+          ...prev,
+          { id: data.id, name: data.field_name, values: {} },
+        ])
+      }
+    } catch (error) {
+      logger.error('新增自訂費用欄位失敗:', error)
+    }
+  }
+
+  // 團體模式：刪除自訂費用欄位
+  const deleteCustomCostField = async (fieldId: string) => {
+    try {
+      const { error } = await supabase
+        .from('tour_custom_cost_fields')
+        .delete()
+        .eq('id', fieldId)
+
+      if (error) throw error
+      setCustomCostFields(prev => prev.filter(f => f.id !== fieldId))
+    } catch (error) {
+      logger.error('刪除自訂費用欄位失敗:', error)
+    }
+  }
+
+  // 團體模式：更新自訂費用欄位值
+  const updateCustomCostFieldValue = async (fieldId: string, memberId: string, value: string) => {
+    // 立即更新本地狀態
+    setCustomCostFields(prev => prev.map(f =>
+      f.id === fieldId
+        ? { ...f, values: { ...f.values, [memberId]: value } }
+        : f
+    ))
+
+    // 背景儲存到資料庫
+    try {
+      const { error } = await supabase
+        .from('tour_custom_cost_values')
+        .upsert({
+          field_id: fieldId,
+          member_id: memberId,
+          value: value,
+        }, {
+          onConflict: 'field_id,member_id',
+        })
+
+      if (error) throw error
+    } catch (error) {
+      logger.error('更新自訂費用欄位值失敗:', error)
+    }
+  }
 
   const loadTourDepartureDate = async () => {
     try {
@@ -1605,6 +1724,19 @@ export function OrderMembersExpandable({
               <Button
                 size="sm"
                 variant="ghost"
+                onClick={() => setShowHotelColumn(!showHotelColumn)}
+                className={cn(
+                  "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-orange-50",
+                  showHotelColumn && "bg-orange-50 text-orange-600"
+                )}
+                title="顯示/隱藏訂房欄位"
+              >
+                <Home size={14} />
+                訂房
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={() => setShowPnrColumn(!showPnrColumn)}
                 className={cn(
                   "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-sky-50",
@@ -1692,21 +1824,32 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-amber-50/50">
                   飲食禁忌
                 </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  訂房代號
-                </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  應付金額
-                </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  訂金
-                </th>
-                <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
-                  尾款
-                </th>
+                {/* 訂單模式才顯示：訂房代號、應付金額、訂金、尾款 */}
+                {mode !== 'tour' && (
+                  <>
+                    <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
+                      訂房代號
+                    </th>
+                    <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
+                      應付金額
+                    </th>
+                    <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
+                      訂金
+                    </th>
+                    <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
+                      尾款
+                    </th>
+                  </>
+                )}
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   備註
                 </th>
+                {/* 團體模式：訂房欄位 */}
+                {mode === 'tour' && showHotelColumn && (
+                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-orange-50/50">
+                    訂房
+                  </th>
+                )}
                 {/* 團體模式：PNR 欄位 */}
                 {mode === 'tour' && showPnrColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-sky-50/50">
@@ -1722,7 +1865,7 @@ export function OrderMembersExpandable({
                     <div className="flex items-center gap-1">
                       <span>{field.name}</span>
                       <button
-                        onClick={() => setCustomCostFields(prev => prev.filter(f => f.id !== field.id))}
+                        onClick={() => deleteCustomCostField(field.id)}
                         className="text-morandi-secondary/50 hover:text-red-500 transition-colors"
                         title="移除此欄位"
                       >
@@ -1988,56 +2131,61 @@ export function OrderMembersExpandable({
                     />
                   </td>
 
-                  {/* 訂房代號 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      value={member.hotel_confirmation || ''}
-                      onChange={e => updateField(member.id, 'hotel_confirmation', e.target.value)}
-                      onCompositionStart={() => setIsComposing(true)}
-                      onCompositionEnd={(e) => {
-                        const value = e.currentTarget.value
-                        setIsComposing(false)
-                        setTimeout(() => {
-                          updateField(member.id, 'hotel_confirmation', value)
-                        }, 0)
-                      }}
-                      data-member={member.id}
-                      data-field="hotel_confirmation"
-                      className="w-full bg-transparent text-xs font-mono"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                      placeholder="輸入訂房代號"
-                    />
-                  </td>
+                  {/* 訂單模式才顯示：訂房代號、應付金額、訂金、尾款 */}
+                  {mode !== 'tour' && (
+                    <>
+                      {/* 訂房代號 */}
+                      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                        <input
+                          type="text"
+                          value={member.hotel_confirmation || ''}
+                          onChange={e => updateField(member.id, 'hotel_confirmation', e.target.value)}
+                          onCompositionStart={() => setIsComposing(true)}
+                          onCompositionEnd={(e) => {
+                            const value = e.currentTarget.value
+                            setIsComposing(false)
+                            setTimeout(() => {
+                              updateField(member.id, 'hotel_confirmation', value)
+                            }, 0)
+                          }}
+                          data-member={member.id}
+                          data-field="hotel_confirmation"
+                          className="w-full bg-transparent text-xs font-mono"
+                          style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                          placeholder="輸入訂房代號"
+                        />
+                      </td>
 
-                  {/* 應付金額 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={member.total_payable || ''}
-                      onChange={e => handleNumberInput(member.id, 'total_payable', e.target.value)}
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                    />
-                  </td>
+                      {/* 應付金額 */}
+                      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={member.total_payable || ''}
+                          onChange={e => handleNumberInput(member.id, 'total_payable', e.target.value)}
+                          className="w-full bg-transparent text-xs"
+                          style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        />
+                      </td>
 
-                  {/* 訂金 */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={member.deposit_amount || ''}
-                      onChange={e => handleNumberInput(member.id, 'deposit_amount', e.target.value)}
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                    />
-                  </td>
+                      {/* 訂金 */}
+                      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={member.deposit_amount || ''}
+                          onChange={e => handleNumberInput(member.id, 'deposit_amount', e.target.value)}
+                          className="w-full bg-transparent text-xs"
+                          style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        />
+                      </td>
 
-                  {/* 尾款 (自動計算: 應付金額 - 訂金) */}
-                  <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50 text-xs text-center text-morandi-secondary">
-                    {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
-                  </td>
+                      {/* 尾款 (自動計算: 應付金額 - 訂金) */}
+                      <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50 text-xs text-center text-morandi-secondary">
+                        {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
+                      </td>
+                    </>
+                  )}
 
                   {/* 備註 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
@@ -2058,14 +2206,28 @@ export function OrderMembersExpandable({
                     />
                   </td>
 
+                  {/* 團體模式：訂房欄位 */}
+                  {mode === 'tour' && showHotelColumn && (
+                    <td className="border border-morandi-gold/20 px-2 py-1 bg-orange-50/50">
+                      <input
+                        type="text"
+                        value={member.hotel_confirmation || ''}
+                        onChange={e => updateField(member.id, 'hotel_confirmation', e.target.value)}
+                        className="w-full bg-transparent text-xs font-mono"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="輸入訂房代號"
+                      />
+                    </td>
+                  )}
+
                   {/* 團體模式：PNR 欄位 */}
                   {mode === 'tour' && showPnrColumn && (
                     <td className="border border-morandi-gold/20 px-2 py-1 bg-sky-50/50">
                       <input
                         type="text"
-                        value={pnrValues[member.id] || ''}
-                        onChange={e => setPnrValues(prev => ({ ...prev, [member.id]: e.target.value }))}
-                        className="w-full bg-transparent text-xs"
+                        value={member.pnr || ''}
+                        onChange={e => updateField(member.id, 'pnr', e.target.value)}
+                        className="w-full bg-transparent text-xs font-mono"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                         placeholder="輸入 PNR"
                       />
@@ -2081,14 +2243,7 @@ export function OrderMembersExpandable({
                       <input
                         type="text"
                         value={field.values[member.id] || ''}
-                        onChange={e => {
-                          const newValue = e.target.value
-                          setCustomCostFields(prev => prev.map(f =>
-                            f.id === field.id
-                              ? { ...f, values: { ...f.values, [member.id]: newValue } }
-                              : f
-                          ))
-                        }}
+                        onChange={e => updateCustomCostFieldValue(field.id, member.id, e.target.value)}
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                         placeholder="輸入金額"
@@ -3068,16 +3223,9 @@ export function OrderMembersExpandable({
               取消
             </Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 if (newCostFieldName.trim()) {
-                  setCustomCostFields(prev => [
-                    ...prev,
-                    {
-                      id: `cost_${Date.now()}`,
-                      name: newCostFieldName.trim(),
-                      values: {},
-                    },
-                  ])
+                  await addCustomCostField(newCostFieldName.trim())
                   setNewCostFieldName('')
                   setShowAddCostFieldDialog(false)
                 }

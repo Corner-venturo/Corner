@@ -30,6 +30,13 @@ interface MessageInputProps {
   onShowNewTask: () => void
 }
 
+// 全形轉半形
+function toHalfWidth(str: string): string {
+  return str
+    .replace(/[\uff01-\uff5e]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))
+    .replace(/\u3000/g, ' ') // 全形空格
+}
+
 export function MessageInput({
   channel,
   isAdmin,
@@ -50,6 +57,7 @@ export function MessageInput({
 }: MessageInputProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [showQuickMenu, setShowQuickMenu] = useState(false)
+  const [isComposing, setIsComposing] = useState(false) // IME 組字狀態
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
@@ -342,10 +350,17 @@ export function MessageInput({
         <div className="flex-1 relative" ref={messageInputRef} onPaste={handlePaste}>
           <textarea
             value={value}
-            onChange={e => onChange(e.target.value)}
+            onChange={e => {
+              // 全形轉半形
+              const converted = toHalfWidth(e.target.value)
+              onChange(converted)
+            }}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={e => {
               // Shift+Enter 換行，Enter 送出
-              if (e.key === 'Enter' && !e.shiftKey) {
+              // 注意：IME 組字中不送出
+              if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
                 e.preventDefault()
                 if (value.trim() || attachedFiles.length > 0) {
                   onSubmit(e as unknown as React.FormEvent)

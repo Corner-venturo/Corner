@@ -15,9 +15,8 @@ function renderMessageContent(content: string) {
   const parts = content.split(urlRegex)
 
   return parts.map((part, index) => {
-    if (urlRegex.test(part)) {
-      // 重設 lastIndex 因為 global flag
-      urlRegex.lastIndex = 0
+    // 檢查是否為 URL（使用簡單的 startsWith 檢查，避免 global regex 問題）
+    if (part.startsWith('http://') || part.startsWith('https://')) {
       return (
         <a
           key={index}
