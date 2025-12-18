@@ -17,6 +17,19 @@ import { cn } from '@/lib/utils'
 import { format, addDays, differenceInDays, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 
+// Helper: Generate UUID with fallback for older browsers
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return generateUUID()
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 interface OrderMember {
   id: string
   chinese_name: string | null
@@ -570,7 +583,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
 
   // 房間列表
   const [newRoomRows, setNewRoomRows] = useState<NewRoomRow[]>([
-    { id: crypto.randomUUID(), roomName: '', capacity: 2, count: 1, amount: '', bookingCode: '', customFields: {} }
+    { id: generateUUID(), roomName: '', capacity: 2, count: 1, amount: '', bookingCode: '', customFields: {} }
   ])
 
   const removeRoomRow = (id: string) => {
@@ -580,7 +593,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
 
   const resetRoomRows = () => {
     setNewRoomRows([
-      { id: crypto.randomUUID(), roomName: '', capacity: 2, count: 1, amount: '', bookingCode: '', customFields: {} }
+      { id: generateUUID(), roomName: '', capacity: 2, count: 1, amount: '', bookingCode: '', customFields: {} }
     ])
     setCustomFieldNames([])
   }
@@ -1148,7 +1161,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
                 {index === 0 ? (
                   <button
                     onClick={() => setNewRoomRows(prev => [{
-                      id: crypto.randomUUID(),
+                      id: generateUUID(),
                       roomName: '',
                       capacity: 2,
                       count: 1,

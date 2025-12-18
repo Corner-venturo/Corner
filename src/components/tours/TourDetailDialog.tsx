@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { useTourDetails } from '@/features/tours/hooks/useTours-advanced'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
@@ -167,6 +168,13 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col">
+        {/* Accessibility: Hidden title for screen readers */}
+        <VisuallyHidden>
+          <DialogTitle>
+            {tour ? `${tour.name} (${tour.code})` : '旅遊團詳情'}
+          </DialogTitle>
+        </VisuallyHidden>
+
         {/* Header */}
         <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b flex-shrink-0">
           <div className="flex items-center gap-4">
