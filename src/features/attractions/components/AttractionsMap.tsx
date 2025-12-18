@@ -72,9 +72,13 @@ export function AttractionsMap({
 
   // 初始化地圖
   useEffect(() => {
-    if (!mapContainerRef.current || !selectedAttraction?.latitude || !selectedAttraction?.longitude) {
+    // 確保容器和座標都準備好
+    if (!mapContainer || !selectedAttraction?.latitude || !selectedAttraction?.longitude) {
       return
     }
+
+    const container = mapContainerRef.current
+    if (!container) return
 
     const initMap = async () => {
       setIsLoading(true)
@@ -89,7 +93,7 @@ export function AttractionsMap({
       }
 
       // 創建新地圖
-      const map = L.map(mapContainerRef.current!, {
+      const map = L.map(container, {
         center: [selectedAttraction.latitude!, selectedAttraction.longitude!],
         zoom: 14,
         zoomControl: false, // 隱藏縮放控制，更簡潔

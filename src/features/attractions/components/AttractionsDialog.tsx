@@ -113,6 +113,7 @@ export function AttractionsDialog({
   const [isUploading, setIsUploading] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [imagePositions, setImagePositions] = useState<Record<string, ImagePosition>>({})
+  const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 解析 notes 中儲存的圖片位置資訊
@@ -273,6 +274,146 @@ export function AttractionsDialog({
       const allImages = [...uploadedImages, url.trim()]
       setUploadedImages(allImages)
       setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+    }
+  }
+
+  // 處理拖曳上傳
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+
+    console.log('[景點拖放] Drop event triggered')
+
+    // 方法 1: 檢查 files
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      console.log('[景點拖放] 找到', files.length, '個檔案')
+      const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+      if (imageFiles.length > 0) {
+        await uploadFiles(imageFiles)
+        return
+      }
+    }
+
+    // 方法 2: 檢查 items
+    const items = e.dataTransfer.items
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            console.log('[景點拖放] 從 items 找到檔案')
+            await uploadFiles([file])
+            return
+          }
+        }
+      }
+    }
+
+    // 方法 3: 嘗試從 HTML 解析圖片 URL
+    const html = e.dataTransfer.getData('text/html')
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^"]+)"/)
+      if (match && match[1]) {
+        console.log('[景點拖放] 從 HTML 找到圖片 URL:', match[1])
+        await fetchAndUploadImage(match[1])
+        return
+      }
+    }
+
+    // 方法 4: 嘗試純 URL
+    const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
+    if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+      console.log('[景點拖放] 找到 URL:', imageUrl)
+      await fetchAndUploadImage(imageUrl)
+      return
+    }
+
+    void alert('請拖曳圖片檔案', 'warning')
+  }
+
+  // 上傳多個檔案
+  const uploadFiles = async (files: File[]) => {
+    setIsUploading(true)
+    try {
+      const newUrls: string[] = []
+
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue
+
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
+        const filePath = `attractions/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('workspace-files')
+          .upload(filePath, file)
+
+        if (uploadError) {
+          console.error('[景點拖放] 上傳失敗:', uploadError)
+          continue
+        }
+
+        const { data } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
+        newUrls.push(data.publicUrl)
+      }
+
+      if (newUrls.length > 0) {
+        const allImages = [...uploadedImages, ...newUrls]
+        setUploadedImages(allImages)
+        setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
+      }
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  // 從 URL 下載並上傳圖片
+  const fetchAndUploadImage = async (imageUrl: string) => {
+    setIsUploading(true)
+    try {
+      // 嘗試透過後端 API 下載
+      const response = await fetch('/api/fetch-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: imageUrl }),
+      })
+
+      let blob: Blob
+      if (response.ok) {
+        blob = await response.blob()
+      } else {
+        // 嘗試直接下載
+        const directResponse = await fetch(imageUrl, { mode: 'cors' })
+        if (!directResponse.ok) throw new Error('無法下載圖片')
+        blob = await directResponse.blob()
+      }
+
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('URL 不是圖片')
+      }
+
+      const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
+      await uploadFiles([file])
+    } catch (error) {
+      console.error('[景點拖放] 下載圖片失敗:', error)
+      void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
+    } finally {
+      setIsUploading(false)
     }
   }
 
