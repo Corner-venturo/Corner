@@ -393,7 +393,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                         >
                           <div className="flex flex-col flex-1">
                             <span className="font-medium">
-                              {version.name || `版本 ${version.version}`}
+                              {stripHtml(version.name) || `版本 ${version.version}`}
                             </span>
                             <span className="text-xs text-morandi-secondary">
                               {formatDateTime(version.created_at)}

@@ -550,6 +550,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                     onChange={e => updateFlightField('outboundFlight', 'departureDate', e.target.value)}
                     className="text-xs h-8"
                     placeholder="02/19"
+                    enableMathCalculation={false}
                   />
                 </div>
                 <div>
@@ -691,6 +692,7 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                     onChange={e => updateFlightField('returnFlight', 'departureDate', e.target.value)}
                     className="text-xs h-8"
                     placeholder="02/23"
+                    enableMathCalculation={false}
                   />
                 </div>
                 <div>

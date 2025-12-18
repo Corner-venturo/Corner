@@ -27,6 +27,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
+
+// 移除 HTML 標籤
+const stripHtml = (html: string | undefined): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
 import { PrintableQuickQuote } from './PrintableQuickQuote'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -280,7 +286,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       return
     }
 
-    const confirmed = await confirm(`確定要刪除「${versions[versionIndex].name || `版本 ${versions[versionIndex].version}`}」嗎？`, {
+    const confirmed = await confirm(`確定要刪除「${stripHtml(versions[versionIndex].name) || `版本 ${versions[versionIndex].version}`}」嗎？`, {
       title: '刪除版本',
       type: 'warning',
     })
@@ -420,7 +426,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                           >
                             <div className="flex flex-col flex-1">
                               <span className="font-medium">
-                                {(version as any).version_name || `版本 ${version.version}`}
+                                {stripHtml((version as any).version_name) || `版本 ${version.version}`}
                               </span>
                               <span className="text-xs text-morandi-secondary">
                                 {formatDateTime(version.created_at)}
