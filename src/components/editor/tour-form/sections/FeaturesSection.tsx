@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react'
-import { TourFormData, Feature } from '../types'
-import { Loader2, X, Plus, GripVertical } from 'lucide-react'
+import React, { useState, useRef, useMemo } from 'react'
+import { TourFormData, Feature, FeaturesStyleType } from '../types'
+import { Loader2, X, Plus, GripVertical, Palette } from 'lucide-react'
+import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -16,6 +17,7 @@ const TAG_COLOR_OPTIONS = [
 
 interface FeaturesSectionProps {
   data: TourFormData
+  updateField: (field: string, value: unknown) => void
   addFeature: () => void
   updateFeature: (index: number, field: string, value: string | string[]) => void
   removeFeature: (index: number) => void
@@ -24,12 +26,26 @@ interface FeaturesSectionProps {
 
 export function FeaturesSection({
   data,
+  updateField,
   addFeature,
   updateFeature,
   removeFeature,
   reorderFeature,
 }: FeaturesSectionProps) {
   const [uploadingImage, setUploadingImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
+
+  // 從資料庫載入模板
+  const { featuresTemplates, loading: templatesLoading } = useTemplates()
+
+  // 從資料庫載入的特色風格選項
+  const featuresStyleOptions = useMemo(() => {
+    return featuresTemplates.map(template => ({
+      value: template.id as FeaturesStyleType,
+      label: template.name,
+      description: template.description || '',
+      color: getTemplateColor(template.id),
+    }))
+  }, [featuresTemplates])
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({})
   const [draggedImage, setDraggedImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
   const [dragOverImage, setDragOverImage] = useState<{ featureIndex: number; imageIndex: number } | null>(null)
@@ -259,7 +275,28 @@ export function FeaturesSection({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center border-b-2 border-morandi-gold pb-2">
-        <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
+          {/* 模板選擇器 */}
+          <div className="flex items-center gap-2">
+            <Palette size={14} className="text-morandi-secondary" />
+            {templatesLoading ? (
+              <Loader2 size={14} className="animate-spin text-morandi-secondary" />
+            ) : (
+              <select
+                value={data.featuresStyle || 'original'}
+                onChange={e => updateField('featuresStyle', e.target.value as FeaturesStyleType)}
+                className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
+              >
+                {featuresStyleOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        </div>
         <button
           onClick={addFeature}
           className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold-hover"

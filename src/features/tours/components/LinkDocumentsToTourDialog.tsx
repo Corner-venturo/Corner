@@ -418,7 +418,7 @@ export function LinkDocumentsToTourDialog({
                       >
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs text-morandi-gold">{itinerary.tour_code}</span>
-                          <span className="text-morandi-text truncate text-sm">{itinerary.title || '未命名'}</span>
+                          <span className="text-morandi-text truncate text-sm">{stripHtml(itinerary.title) || '未命名'}</span>
                         </div>
                       </button>
                       <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -503,7 +503,7 @@ export function LinkDocumentsToTourDialog({
                             </span>
                           )}
                           <span className={`truncate ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-text'}`}>
-                            {itinerary.title || '未命名'}
+                            {stripHtml(itinerary.title) || '未命名'}
                           </span>
                           {itinerary.is_template && (
                             <span className="text-[10px] bg-morandi-primary/10 text-morandi-primary px-1 py-0.5 rounded">

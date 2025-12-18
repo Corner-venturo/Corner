@@ -15,7 +15,7 @@ interface TourData {
   hotels?: HotelData[]
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourHotelsSectionProps {
   data: TourData

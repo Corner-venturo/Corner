@@ -31,6 +31,7 @@ import {
   ImageIcon,
   Bus,
   CheckSquare,
+  FolderTree,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -364,6 +365,25 @@ export function Sidebar() {
               />
             </li>
           )}
+
+          {/* 開發者地圖 */}
+          <li>
+            <Link
+              href="/dev-map"
+              prefetch={false}
+              onClick={closeSidebar}
+              className={cn(
+                'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
+                'hover:bg-morandi-gold/5 hover:text-morandi-gold',
+                mounted && pathname === '/dev-map' && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
+              )}
+            >
+              <FolderTree size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
+              {isExpanded && (
+                <span className="ml-12 block text-left leading-9">開發者地圖</span>
+              )}
+            </Link>
+          </li>
 
           {/* 設定 */}
           <li>

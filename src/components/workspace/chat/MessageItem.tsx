@@ -1,5 +1,6 @@
 'use client'
 
+import { memo, useCallback } from 'react'
 import { Trash2, Download, FileText, Image as ImageIcon, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Message, MessageAttachment } from '@/stores/workspace-store'
@@ -42,7 +43,8 @@ interface MessageItemProps {
   replyCount?: number
 }
 
-export function MessageItem({ message, currentUserId, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
+// 使用 memo 避免不必要的重新渲染
+export const MessageItem = memo(function MessageItem({ message, currentUserId, onReaction, onDelete, onReply, replyCount = 0 }: MessageItemProps) {
   const handleDownloadAttachment = async (attachment: MessageAttachment) => {
     const fileName = attachment.fileName || attachment.name || '未命名檔案'
     const targetUrl = resolveAttachmentUrl(attachment)
@@ -240,4 +242,4 @@ export function MessageItem({ message, currentUserId, onReaction, onDelete, onRe
       </div>
     </div>
   )
-}
+})

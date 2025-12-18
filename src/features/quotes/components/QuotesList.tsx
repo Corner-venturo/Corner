@@ -14,6 +14,12 @@ import { cn } from '@/lib/utils'
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
 
+// 去除 HTML 標籤
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 interface QuotesListProps {
   quotes: Quote[]
   tours: Tour[]
@@ -64,7 +70,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         render: (value, row) => {
           const quote = row as Quote
           // 快速報價單顯示 customer_name，團體報價單顯示 name
-          const displayName = quote.quote_type === 'quick' ? quote.customer_name : quote.name
+          const displayName = quote.quote_type === 'quick' ? quote.customer_name : stripHtml(quote.name)
           // 版本數量
           const versions = (quote as Quote & { versions?: Array<unknown> }).versions
           const versionCount = versions?.length || 0

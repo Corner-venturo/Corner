@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { format } from 'date-fns'
 
 interface SalaryPaymentDialogProps {
   open: boolean
@@ -134,12 +136,11 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                     請款日期 <span className="text-morandi-red">*</span>
                   </label>
                   <div className="flex items-center space-x-1">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       id="isSpecialBilling"
                       checked={isSpecialBilling}
-                      onChange={e => {
-                        setIsSpecialBilling(e.target.checked)
+                      onCheckedChange={checked => {
+                        setIsSpecialBilling(checked)
                         setRequestDate('')
                       }}
                       className="rounded border-border"
@@ -165,12 +166,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                     <SelectContent>
                       {upcomingThursdays.map(date => (
                         <SelectItem key={date} value={date}>
-                          {new Date(date).toLocaleDateString('zh-TW', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            weekday: 'short',
-                          })}
+                          {format(new Date(date), 'yyyy/MM/dd (eee)')}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -208,10 +204,9 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       isSelected ? 'bg-morandi-gold/10 border-morandi-gold' : 'bg-white border-border'
                     )}
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={isSelected}
-                      onChange={() => toggleEmployee(employee.id)}
+                      onCheckedChange={() => toggleEmployee(employee.id)}
                       className="w-4 h-4 rounded border-morandi-container"
                     />
                     <div className="flex-1 min-w-0">

@@ -335,6 +335,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
         {data.showFeatures !== false && (
           <FeaturesSection
             data={data}
+            updateField={handlers.updateField}
             addFeature={handlers.addFeature}
             updateFeature={handlers.updateFeature}
             removeFeature={handlers.removeFeature}

@@ -25,6 +25,12 @@ import {
 import { useItineraryStore, useQuoteStore } from '@/stores'
 import type { Itinerary, Quote } from '@/stores/types'
 
+// 去除 HTML 標籤
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 interface CreateTourSourceDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -196,7 +202,7 @@ export function CreateTourSourceDialog({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-morandi-text truncate">
-                          {itinerary.title || '未命名行程'}
+                          {stripHtml(itinerary.title) || '未命名行程'}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
                           {itinerary.city && (
@@ -272,7 +278,7 @@ export function CreateTourSourceDialog({
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
                           <span className="font-medium text-morandi-text truncate">
-                            {quote.name || quote.destination || '未命名報價單'}
+                            {stripHtml(quote.name) || stripHtml(quote.destination) || '未命名報價單'}
                           </span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">

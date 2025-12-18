@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 import { SectionTitle } from './SectionTitle'
+import { TourFeaturesSectionCollage, type FeatureCardStyle } from './TourFeaturesSectionCollage'
 
 interface TourFeature {
   icon: string
@@ -10,9 +11,12 @@ interface TourFeature {
   description: string
   images?: string[] // 圖片陣列（支援任意數量）
   iconComponent?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+  cardStyle?: FeatureCardStyle // Collage 風格專用：polaroid | diptych | frame | recipe
+  tags?: string[] // Collage recipe 風格用的標籤
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type FeaturesStyleType = 'original' | 'luxury' | 'collage'
 
 interface TourData {
   features?: TourFeature[]
@@ -23,9 +27,26 @@ interface TourFeaturesSectionProps {
   data: TourData
   viewMode: 'desktop' | 'mobile'
   coverStyle?: CoverStyleType
+  featuresStyle?: FeaturesStyleType // 優先使用此欄位決定風格
+  collageDisplayMode?: 'large' | 'small' // Collage 專用：large=3列大卡, small=4列小卡(recipe)
 }
 
-export function TourFeaturesSection({ data, viewMode, coverStyle = 'original' }: TourFeaturesSectionProps) {
+export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', featuresStyle, collageDisplayMode = 'large' }: TourFeaturesSectionProps) {
+  // 決定實際使用的風格：優先使用 featuresStyle，否則根據 coverStyle 推斷
+  const effectiveStyle = featuresStyle || (coverStyle === 'collage' ? 'collage' : 'original')
+
+  // Collage 風格使用專用組件
+  if (effectiveStyle === 'collage') {
+    return (
+      <TourFeaturesSectionCollage
+        data={data}
+        viewMode={viewMode}
+        coverStyle={coverStyle}
+        displayMode={collageDisplayMode}
+      />
+    )
+  }
+
   const features = data.features || []
   const [lightboxImages, setLightboxImages] = useState<string[]>([])
   const [lightboxIndex, setLightboxIndex] = useState(0)

@@ -166,13 +166,41 @@ export const useChatStore = () => {
         parent_message_id: message.parent_message_id || null,
       }
 
-      // 🔥 樂觀更新：先更新 UI，再發送到資料庫
-      // 這樣用戶可以立即看到自己的訊息
+      // 🔥 樂觀更新：先更新 UI
       const currentMessages = uiStore.channelMessages[newMessage.channel_id] || []
-      uiStore.setCurrentChannelMessages(newMessage.channel_id, [...currentMessages, newMessage])
+      const optimisticMessages = [...currentMessages, newMessage]
+      uiStore.setCurrentChannelMessages(newMessage.channel_id, optimisticMessages)
 
-      // 使用 createStore 的 create 方法（自動處理離線/線上）
-      await messageStore.create(newMessage)
+      try {
+        // 直接寫入 Supabase（不透過 messageStore 避免重複更新）
+        const { error } = await supabase
+          .from('messages')
+          .insert({
+            id: newMessage.id,
+            channel_id: newMessage.channel_id,
+            author_id: newMessage.author_id,
+            content: newMessage.content,
+            author: newMessage.author,
+            attachments: newMessage.attachments,
+            reactions: newMessage.reactions,
+            parent_message_id: newMessage.parent_message_id,
+            created_at: newMessage.created_at,
+          } as any)
+
+        if (error) {
+          // 回滾樂觀更新
+          logger.error('sendMessage 失敗:', error)
+          uiStore.setCurrentChannelMessages(newMessage.channel_id, currentMessages)
+          throw error
+        }
+
+        logger.log('✅ 訊息發送成功:', newMessage.id)
+      } catch (error) {
+        // 回滾樂觀更新
+        logger.error('sendMessage 例外:', error)
+        uiStore.setCurrentChannelMessages(newMessage.channel_id, currentMessages)
+        throw error
+      }
     },
 
     addMessage: async (message: Omit<Message, 'id' | 'created_at' | 'reactions'>) => {
@@ -210,37 +238,79 @@ export const useChatStore = () => {
     },
 
     deleteMessage: async (messageId: string) => {
-      // 🔥 先找到訊息，取得附件路徑
-      const message = messageStore.items.find(m => m.id === messageId)
+      // 🔥 先找到訊息，取得 channel_id 和附件路徑
+      // 從所有頻道的訊息中找
+      let message: Message | undefined
+      let channelId: string | null = null
 
-      // 刪除 Storage 上的附件檔案
-      if (message?.attachments && message.attachments.length > 0) {
-        const paths = message.attachments
-          .map(att => att.path)
-          .filter((path): path is string => !!path)
-
-        if (paths.length > 0) {
-          const { error } = await supabase.storage
-            .from('workspace-files')
-            .remove(paths)
-
-          if (error) {
-            logger.warn('刪除附件檔案失敗:', error)
-            // 繼續刪除訊息，不阻止流程
-          } else {
-            logger.log(`✅ 已刪除 ${paths.length} 個附件檔案`)
-          }
+      for (const [cId, messages] of Object.entries(uiStore.channelMessages)) {
+        const found = messages.find(m => m.id === messageId)
+        if (found) {
+          message = found
+          channelId = cId
+          break
         }
       }
 
-      await messageStore.delete(messageId)
+      // 也檢查 currentChannelId 作為備選
+      if (!channelId) {
+        channelId = uiStore.currentChannelId
+      }
 
-      // 更新 UI 狀態
-      if (uiStore.currentChannelId) {
-        // 🔥 使用緩存函數（避免重複計算）
-        const channelMessages = getChannelMessages(messageStore.items, uiStore.currentChannelId)
+      const currentMessages = channelId ? (uiStore.channelMessages[channelId] || []) : []
 
-        uiStore.setCurrentChannelMessages(uiStore.currentChannelId, channelMessages)
+      logger.log('🗑️ 準備刪除訊息:', { messageId, channelId, found: !!message })
+
+      // 🔥 樂觀更新：先從 UI 移除
+      if (channelId) {
+        const filteredMessages = currentMessages.filter(m => m.id !== messageId)
+        uiStore.setCurrentChannelMessages(channelId, filteredMessages)
+        logger.log('✅ UI 已更新，剩餘訊息數:', filteredMessages.length)
+      }
+
+      try {
+        // 刪除 Storage 上的附件檔案
+        if (message?.attachments && message.attachments.length > 0) {
+          const paths = message.attachments
+            .map(att => att.path)
+            .filter((path): path is string => !!path)
+
+          if (paths.length > 0) {
+            const { error } = await supabase.storage
+              .from('workspace-files')
+              .remove(paths)
+
+            if (error) {
+              logger.warn('刪除附件檔案失敗:', error)
+            } else {
+              logger.log(`✅ 已刪除 ${paths.length} 個附件檔案`)
+            }
+          }
+        }
+
+        // 直接從 Supabase 刪除
+        const { error } = await supabase
+          .from('messages')
+          .delete()
+          .eq('id', messageId)
+
+        if (error) {
+          // 回滾樂觀更新
+          logger.error('deleteMessage 失敗:', error)
+          if (channelId) {
+            uiStore.setCurrentChannelMessages(channelId, currentMessages)
+          }
+          throw error
+        }
+
+        logger.log('✅ 訊息刪除成功:', messageId)
+      } catch (error) {
+        // 回滾樂觀更新
+        logger.error('deleteMessage 例外:', error)
+        if (channelId) {
+          uiStore.setCurrentChannelMessages(channelId, currentMessages)
+        }
+        throw error
       }
     },
 

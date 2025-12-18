@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+
 interface TourHeroSereneProps {
   data: {
     coverImage?: string | null
@@ -196,15 +198,15 @@ export function TourHeroSerene({ data, viewMode }: TourHeroSereneProps) {
 
           {/* 按鈕區 */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="h-12 px-8 rounded-full bg-[#111e21] text-white text-sm font-bold tracking-wide hover:scale-105 transition-transform">
+            <Button size="lg" className="h-12 rounded-full font-bold tracking-wide transition-transform hover:scale-105">
               Start Journey
-            </button>
-            <button className="h-12 px-8 rounded-full bg-white/50 backdrop-blur-md border border-white/40 text-[#111e21] text-sm font-bold tracking-wide hover:bg-white/70 transition-colors flex items-center gap-2 group">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
+            </Button>
+            <Button variant="outline" size="lg" className="group h-12 rounded-full border-white/40 bg-white/50 font-bold tracking-wide text-[#111e21] backdrop-blur-md hover:bg-white/70 hover:text-[#111e21]">
+              <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
               </svg>
-              Watch Film
-            </button>
+              <span>Watch Film</span>
+            </Button>
           </div>
 
           {/* 價格資訊（如果有） */}

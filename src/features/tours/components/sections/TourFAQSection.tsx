@@ -10,7 +10,7 @@ interface FAQ {
   answer: string
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourFAQSectionProps {
   data: {

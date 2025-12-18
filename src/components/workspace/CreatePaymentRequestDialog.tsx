@@ -9,6 +9,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -107,9 +108,9 @@ export function CreatePaymentRequestDialog({
           <h3 className="text-lg font-semibold text-morandi-primary">
             {isBatch ? `批次請款 (${itemsArray.length} 筆)` : '建立請款單'}
           </h3>
-          <button onClick={onClose} className="btn-icon-morandi !w-8 !h-8">
+          <Button variant="ghost" size="iconSm" onClick={onClose}>
             <X size={16} />
-          </button>
+          </Button>
         </div>
 
         {/* 內容 */}
@@ -188,12 +189,12 @@ export function CreatePaymentRequestDialog({
 
         {/* 底部操作按鈕 */}
         <div className="flex gap-2 justify-end pt-3 border-t border-morandi-gold/20">
-          <button className="btn-morandi-secondary !py-2 !px-4" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose}>
             取消
-          </button>
-          <button className="btn-morandi-primary !py-2 !px-4" onClick={handleCreate}>
+          </Button>
+          <Button onClick={handleCreate}>
             建立請款單
-          </button>
+          </Button>
         </div>
       </div>
     </div>

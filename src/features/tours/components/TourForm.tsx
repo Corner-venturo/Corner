@@ -535,7 +535,7 @@ export function TourForm({
                           { value: '', label: '獨立旅遊團（無行程表）' },
                           ...availableItineraries.map(itinerary => ({
                             value: itinerary.id,
-                            label: `${itinerary.tour_code || '無編號'} - ${itinerary.title || '未命名'}`,
+                            label: `${itinerary.tour_code || '無編號'} - ${stripHtml(itinerary.title) || '未命名'}`,
                           })),
                         ]}
                         value={selectedItineraryId || ''}

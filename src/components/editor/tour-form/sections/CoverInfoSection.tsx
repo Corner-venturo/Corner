@@ -24,6 +24,8 @@ import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNat
 import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
 import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
 import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
+import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHeroDreamscape'
+import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCollage'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -126,6 +128,10 @@ export function CoverInfoSection({
         return 'luxury'
       case 'art':
         return 'art'
+      case 'dreamscape':
+        return 'dreamscape'
+      case 'collage':
+        return 'collage'
       default:
         return 'original'
     }
@@ -475,6 +481,7 @@ export function CoverInfoSection({
                   price: data.price || '',
                   priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || '/人'),
                   country: selectedCountry || '',
+                  city: data.city || '',
                   dailyItinerary: data.dailyItinerary,
                 }
 
@@ -487,6 +494,10 @@ export function CoverInfoSection({
                     return <TourHeroNature data={heroData} viewMode={viewMode} />
                   case 'gemini':
                     return <TourHeroGemini data={heroData} viewMode={viewMode} />
+                  case 'dreamscape':
+                    return <TourHeroDreamscape data={heroData} viewMode={viewMode} />
+                  case 'collage':
+                    return <TourHeroCollage data={heroData} viewMode={viewMode} />
                   default:
                     return <TourHeroSection data={heroData} viewMode={viewMode} />
                 }

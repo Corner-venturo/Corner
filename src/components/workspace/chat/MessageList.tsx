@@ -1,7 +1,7 @@
 'use client'
 
-import { forwardRef, useMemo } from 'react'
-import { Virtuoso } from 'react-virtuoso'
+import { forwardRef, useMemo, useRef, useEffect } from 'react'
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import type { Message, AdvanceList, SharedOrderList } from '@/stores/workspace-store'
 import { useEmployeeStore } from '@/stores'
 import { MessageItem } from './MessageItem'
@@ -77,6 +77,24 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
     return items
   }, [messages, advanceLists, sharedOrderLists])
 
+  // 🔥 所有 Hooks 必須在 early return 之前
+  const virtuosoRef = useRef<VirtuosoHandle>(null)
+
+  // 當訊息數量變化時，滾動到底部
+  useEffect(() => {
+    if (allItems.length > 0) {
+      // 使用 setTimeout 確保 DOM 更新後再滾動
+      setTimeout(() => {
+        virtuosoRef.current?.scrollToIndex({
+          index: allItems.length - 1,
+          behavior: 'smooth',
+          align: 'end',
+        })
+      }, 100)
+    }
+  }, [allItems.length])
+
+  // Early returns 必須在所有 Hooks 之後
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
@@ -99,8 +117,11 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   return (
     <div ref={ref} className="flex-1 bg-white" style={{ height: '100%' }}>
       <Virtuoso
+        ref={virtuosoRef}
         data={allItems}
         followOutput="smooth"
+        initialTopMostItemIndex={allItems.length - 1}
+        alignToBottom
         className="p-6"
         itemContent={(index, item) => {
           // 為每個項目添加間距

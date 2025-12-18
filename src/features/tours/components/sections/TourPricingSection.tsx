@@ -17,7 +17,7 @@ interface PricingDetails {
   notes: string[]
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'art'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourPricingSectionProps {
   data: {

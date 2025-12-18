@@ -55,6 +55,9 @@ export interface DailyImage {
 // 每日行程展示風格
 export type DayDisplayStyle = 'single-image' | 'multi-image' | 'card-grid' | 'timeline'
 
+// Dreamscape 每日行程佈局風格
+export type DreamscapeDayLayout = 'blobLeft' | 'blobRight' | 'fullHero' | 'glassCard'
+
 export interface DailyItinerary {
   dayLabel: string
   date: string
@@ -73,6 +76,7 @@ export interface DailyItinerary {
   isAlternative?: boolean // 是否為建議方案（替代行程），如 Day 3-B, Day 3-C
   locationLabel?: string // Luxury 模板專用：地點標籤（如「京都」、「大阪」）
   displayStyle?: DayDisplayStyle // 每日行程展示風格（單張大圖、多圖輪播、卡片網格、時間軸）
+  dreamscapeLayout?: DreamscapeDayLayout // Dreamscape 模板專用：每日佈局風格
 }
 
 export interface LeaderInfo {
@@ -145,7 +149,9 @@ export interface TourCountry {
 // - serene: 藍色靜謐風格（日期浮水印效果）
 // - luxury: 奢華質感風格（左右分欄 + 襯線字體 + 深色酒店區塊）
 // - art: 藝術雜誌風格（全螢幕大圖 + 高對比 + 不規則佈局）
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art'
+// - dreamscape: 夢幻漫遊風格（blob 遮罩 + 玻璃擬態 + 浮動動畫）
+// - collage: 互動拼貼風格（Pop Art + 拍立得 + 登機證）
+export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 // 航班卡片風格類型：
 // - original: 經典莫蘭迪金色風格
@@ -154,13 +160,22 @@ export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxu
 // - luxury: 奢華質感風格（表格式 + 深色調）
 // - art: 藝術雜誌風格（Brutalist + 高對比）
 // - none: 國內無航班（台灣行程不需要航班）
-export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none'
+// - dreamscape: 夢幻漫遊風格（節點路徑圖 + 玻璃卡片）
+// - collage: 互動拼貼風格（登機證 + Pop Art）
+export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
 
 // 每日行程風格類型：
 // - original: 經典時間軸風格
 // - luxury: 奢華質感風格（卡片式 + 深色調）
 // - art: 藝術雜誌風格（12欄網格 + 垂直導航 + Brutalist）
-export type ItineraryStyleType = 'original' | 'luxury' | 'art'
+// - dreamscape: 夢幻漫遊風格（blob 遮罩 + 玻璃卡片 + 浮動動畫）
+export type ItineraryStyleType = 'original' | 'luxury' | 'art' | 'dreamscape'
+
+// 行程特色風格類型：
+// - original: 經典莫蘭迪金色風格
+// - luxury: 奢華質感風格（深色調 + 襯線字體）
+// - collage: 互動拼貼風格（Pop Art + 拍立得 + 便條紙）
+export type FeaturesStyleType = 'original' | 'luxury' | 'collage'
 
 export interface TourFormData {
   tagline: string
@@ -183,6 +198,7 @@ export interface TourFormData {
   returnFlight: FlightInfo
   flightStyle?: FlightStyleType // 航班卡片風格
   itineraryStyle?: ItineraryStyleType // 每日行程風格
+  featuresStyle?: FeaturesStyleType // 行程特色風格
   features: Feature[]
   focusCards: FocusCard[]
   leader: LeaderInfo

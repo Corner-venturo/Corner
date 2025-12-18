@@ -170,6 +170,8 @@ export const templateColors: Record<string, string> = {
   serene: '#4a6fa5',     // serene blue
   luxury: '#2C5F4D',     // luxury green
   art: '#E63946',        // art red
+  dreamscape: '#9370db', // dreamscape purple
+  collage: '#FF0080',    // collage pink (pop art)
   // 航班模板
   chinese: '#8B4513',    // chinese brown
   japanese: '#30abe8',   // japanese blue

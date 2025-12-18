@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { Plane, Calendar, Clock, Luggage, UtensilsCrossed } from 'lucide-react'
 import { TourFlightSectionLuxury } from './TourFlightSectionLuxury'
 import { TourFlightSectionArt } from './TourFlightSectionArt'
+import { TourFlightSectionDreamscape } from './TourFlightSectionDreamscape'
+import { TourFlightSectionCollage } from './TourFlightSectionCollage'
 
 interface FlightInfo {
   airline?: string | null
@@ -22,7 +24,7 @@ interface FlightInfo {
 }
 
 // 航班卡片風格類型
-type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none'
+type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
 
 interface TourDisplayData {
   outboundFlight?: FlightInfo | null
@@ -31,7 +33,7 @@ interface TourDisplayData {
   flightStyle?: FlightStyleType // 航班卡片風格
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourFlightSectionProps {
   data: TourDisplayData
@@ -583,6 +585,10 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
       effectiveFlightStyle = 'chinese'
     } else if (coverStyle === 'luxury') {
       effectiveFlightStyle = 'luxury'
+    } else if (coverStyle === 'dreamscape') {
+      effectiveFlightStyle = 'dreamscape'
+    } else if (coverStyle === 'collage') {
+      effectiveFlightStyle = 'collage'
     }
   }
 
@@ -591,9 +597,38 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
     return null
   }
 
-  // Art 風格直接使用專屬組件（透過 flightStyle 或 coverStyle）
-  if (effectiveFlightStyle === 'art' || coverStyle === 'art') {
+  // Art 風格直接使用專屬組件
+  // 注意：只檢查 effectiveFlightStyle，因為 coverStyle fallback 已經在上方處理
+  if (effectiveFlightStyle === 'art') {
     return <TourFlightSectionArt data={data} viewMode={viewMode} />
+  }
+
+  // Dreamscape 夢幻漫遊風格
+  if (effectiveFlightStyle === 'dreamscape') {
+    return (
+      <TourFlightSectionDreamscape
+        data={{
+          outboundFlight: data.outboundFlight,
+          returnFlight: data.returnFlight,
+          departureDate: undefined, // 會從 outboundFlight.departureDate 取得
+        }}
+        viewMode={viewMode}
+      />
+    )
+  }
+
+  // Collage 互動拼貼風格
+  if (effectiveFlightStyle === 'collage') {
+    return (
+      <TourFlightSectionCollage
+        data={{
+          outboundFlight: data.outboundFlight,
+          returnFlight: data.returnFlight,
+          departureDate: undefined,
+        }}
+        viewMode={viewMode}
+      />
+    )
   }
 
   // 如果沒有航班資料，不顯示

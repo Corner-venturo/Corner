@@ -26,6 +26,12 @@ import { Input } from '@/components/ui/input'
 import { useItineraryStore } from '@/stores'
 import type { Tour, Itinerary } from '@/stores/types'
 
+// 去除 HTML 標籤
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 interface LinkItineraryToTourDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -266,7 +272,7 @@ export function LinkItineraryToTourDialog({
                         {itinerary.tour_code && (
                           <span className="font-mono text-sm text-morandi-gold">{itinerary.tour_code}</span>
                         )}
-                        <span className="text-morandi-text truncate">{itinerary.title || '未命名'}</span>
+                        <span className="text-morandi-text truncate">{stripHtml(itinerary.title) || '未命名'}</span>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
                         {itinerary.city && (
@@ -362,7 +368,7 @@ export function LinkItineraryToTourDialog({
                         {itinerary.tour_code && (
                           <span className="font-mono text-sm text-morandi-gold">{itinerary.tour_code}</span>
                         )}
-                        <span className="text-morandi-text truncate">{itinerary.title || '未命名'}</span>
+                        <span className="text-morandi-text truncate">{stripHtml(itinerary.title) || '未命名'}</span>
                         {itinerary.is_template && (
                           <span className="text-xs bg-morandi-primary/10 text-morandi-primary px-1.5 py-0.5 rounded">
                             公司範例

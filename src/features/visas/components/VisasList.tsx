@@ -7,6 +7,7 @@ import { getVisaStatusLabel } from '@/constants/status-maps'
 import type { Visa } from '@/stores/types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
+import { Button } from '@/components/ui/button'
 
 interface VisasListProps {
   filteredVisas: Visa[]
@@ -141,7 +142,9 @@ export function VisasList({
 
     return (
       <div className="flex items-center gap-1">
-        <button
+        <Button
+          variant="ghost"
+          size="iconSm"
           onClick={e => {
             e.stopPropagation()
             onEdit?.(visa)
@@ -150,8 +153,10 @@ export function VisasList({
           title="編輯"
         >
           <Edit2 size={14} />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="iconSm"
           onClick={async e => {
             e.stopPropagation()
             const confirmed = await confirm({
@@ -170,7 +175,7 @@ export function VisasList({
           title="刪除"
         >
           <Trash2 size={14} />
-        </button>
+        </Button>
       </div>
     )
   }

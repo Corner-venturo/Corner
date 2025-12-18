@@ -11,6 +11,8 @@ import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNat
 import { TourHeroSerene } from '@/features/tours/components/sections/TourHeroSerene'
 import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
 import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
+import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHeroDreamscape'
+import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCollage'
 import { TourFlightSection } from '@/features/tours/components/sections/TourFlightSection'
 import { TourFeaturesSection } from '@/features/tours/components/sections/TourFeaturesSection'
 import { TourItinerarySection } from '@/features/tours/components/sections/TourItinerarySection'
@@ -87,7 +89,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
         viewMode={viewMode}
       />
 
-      {/* Hero Section - 根據 coverStyle 切換六種風格 */}
+      {/* Hero Section - 根據 coverStyle 切換八種風格 */}
       <div id="top">
         {data.coverStyle === 'luxury' ? (
           <TourHeroLuxury data={data} viewMode={viewMode} />
@@ -99,6 +101,10 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           <TourHeroNature data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'serene' ? (
           <TourHeroSerene data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'dreamscape' ? (
+          <TourHeroDreamscape data={data} viewMode={viewMode} />
+        ) : data.coverStyle === 'collage' ? (
+          <TourHeroCollage data={data} viewMode={viewMode} />
         ) : (
           <TourHeroSection data={data} viewMode={viewMode} />
         )}
@@ -123,11 +129,18 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           </div>
 
           <div id="features">
-            {data.coverStyle === 'luxury' ? (
-              <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
-            ) : (
-              <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} />
-            )}
+            {(() => {
+              // 優先使用 featuresStyle，否則 fallback 到 coverStyle
+              const effectiveFeaturesStyle = data.featuresStyle ||
+                (data.coverStyle === 'luxury' ? 'luxury' :
+                 data.coverStyle === 'collage' ? 'collage' : 'original')
+
+              if (effectiveFeaturesStyle === 'luxury') {
+                return <TourFeaturesSectionLuxury data={data} viewMode={viewMode} />
+              } else {
+                return <TourFeaturesSection data={data} viewMode={viewMode} coverStyle={data.coverStyle} featuresStyle={effectiveFeaturesStyle} />
+              }
+            })()}
           </div>
 
           {/* Divider */}
@@ -143,7 +156,10 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       <div id="itinerary">
         {(() => {
           // 優先使用 itineraryStyle，否則 fallback 到 coverStyle
-          const effectiveStyle = data.itineraryStyle || (data.coverStyle === 'luxury' ? 'luxury' : data.coverStyle === 'art' ? 'art' : 'original')
+          const effectiveStyle = data.itineraryStyle ||
+            (data.coverStyle === 'luxury' ? 'luxury' :
+             data.coverStyle === 'art' ? 'art' :
+             data.coverStyle === 'dreamscape' ? 'dreamscape' : 'original')
 
           if (effectiveStyle === 'luxury') {
             return (
@@ -166,6 +182,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
               />
             )
           } else {
+            // 傳遞 effectiveStyle 作為 coverStyle，讓 TourItinerarySection 內部處理 dreamscape
             return (
               <TourItinerarySection
                 data={data}
@@ -173,7 +190,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                 activeDayIndex={activeDayIndex}
                 dayRefs={dayRefs}
                 handleDayNavigate={handleDayNavigate}
-                coverStyle={data.coverStyle}
+                coverStyle={effectiveStyle === 'dreamscape' ? 'dreamscape' : data.coverStyle}
               />
             )
           }

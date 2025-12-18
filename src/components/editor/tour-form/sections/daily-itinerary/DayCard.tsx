@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { DayStylePicker } from '../../components/DayStylePicker'
+import { DreamscapeLayoutPicker } from '../../components/DreamscapeLayoutPicker'
 import { DailyImagesUploader } from '../DailyImagesUploader'
 import { DayTitleSection } from './DayTitleSection'
 import { ActivitiesSection } from './ActivitiesSection'
@@ -114,6 +115,14 @@ export function DayCard({
                 updateField('dailyItinerary', newItinerary)
               }}
               departureDate={data.departureDate}
+            />
+          )}
+          {/* Dreamscape 佈局選擇器 - 只在夢幻漫遊風格時顯示 */}
+          {data.itineraryStyle === 'dreamscape' && (
+            <DreamscapeLayoutPicker
+              dayIndex={dayIndex}
+              currentLayout={day.dreamscapeLayout}
+              onLayoutChange={(layout) => updateDailyItinerary(dayIndex, 'dreamscapeLayout', layout)}
             />
           )}
           {/* 建議方案 checkbox - 不顯示在第一天 */}

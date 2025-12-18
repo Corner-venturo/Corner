@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { DailyImageCarousel } from './DailyImageCarousel'
 import { MutableRefObject, useState } from 'react'
+import { TourItinerarySectionDreamscape } from './TourItinerarySectionDreamscape'
 import {
   DayLabel,
   DateSubtitle,
@@ -24,7 +25,7 @@ interface TourItinerarySectionProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'art'
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 }
 
 // 將標題中的文字符號轉換成 SVG 圖標
@@ -103,6 +104,19 @@ export function TourItinerarySection({
   handleDayNavigate,
   coverStyle = 'original',
 }: TourItinerarySectionProps) {
+  // Dreamscape 風格使用專用組件
+  if (coverStyle === 'dreamscape') {
+    return (
+      <TourItinerarySectionDreamscape
+        data={data}
+        viewMode={viewMode}
+        activeDayIndex={activeDayIndex}
+        dayRefs={dayRefs}
+        handleDayNavigate={handleDayNavigate}
+      />
+    )
+  }
+
   const dailyItinerary = Array.isArray(data.dailyItinerary) ? data.dailyItinerary : []
   const dayLabels = calculateDayLabels(dailyItinerary)
   const [selectedActivity, setSelectedActivity] = useState<{
