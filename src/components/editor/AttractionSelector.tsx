@@ -688,19 +688,6 @@ export function AttractionSelector({
                   <AttractionsMap
                     attractions={attractions as Attraction[]}
                     selectedAttraction={selectedMapAttraction as Attraction}
-                    onSelectAttraction={(attraction) => {
-                      // 從地圖點擊景點時，選中該景點並加入勾選
-                      const found = attractions.find(a => a.id === attraction.id)
-                      if (found) {
-                        setSelectedMapAttraction(found)
-                        // 自動勾選
-                        setSelectedIds(prev => {
-                          const newSet = new Set(prev)
-                          newSet.add(attraction.id)
-                          return newSet
-                        })
-                      }
-                    }}
                     radiusKm={5}
                   />
                 </div>

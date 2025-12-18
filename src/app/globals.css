@@ -1000,24 +1000,24 @@ table input[type='number']:focus {
   border: none !important;
 }
 
-/* Leaflet Tooltip 美化 */
-.leaflet-tooltip {
+/* 簡潔地圖 Tooltip */
+.map-tooltip,
+.map-tooltip-main {
   background: white;
   border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #475569;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.map-tooltip-main {
+  background: #fef2f2;
+  color: #dc2626;
   font-weight: 500;
-  color: #334155;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .leaflet-tooltip::before {
   display: none;
-}
-
-.leaflet-tooltip.selected-tooltip {
-  background: #ef4444;
-  color: white;
-  font-weight: 600;
 }
