@@ -1,14 +1,13 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useOrderStore } from '@/stores'
 
 interface VisaApplicant {
   id: string
@@ -26,7 +25,6 @@ interface VisaApplicant {
 interface ContactInfo {
   tour_id: string
   order_id: string
-  applicant_name: string
   contact_person: string
   contact_phone: string
 }
@@ -157,13 +155,6 @@ export function AddVisaDialog({
     return options
   }, [tourOrders, contact_info.tour_id])
 
-  // 第一個辦理人自動帶入申請人姓名
-  useEffect(() => {
-    if (applicants.length > 0 && contact_info.applicant_name !== applicants[0].name) {
-      updateApplicant(applicants[0].id, 'name', contact_info.applicant_name)
-    }
-  }, [contact_info.applicant_name, applicants, updateApplicant])
-
   return (
     <FormDialog
       open={open}
@@ -212,7 +203,7 @@ export function AddVisaDialog({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">聯絡人</label>
             <Input
@@ -222,17 +213,6 @@ export function AddVisaDialog({
               }
               className="mt-1"
               placeholder="請輸入聯絡人"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">申請人</label>
-            <Input
-              value={contact_info.applicant_name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setContactInfo((prev) => ({ ...prev, applicant_name: e.target.value }))
-              }
-              className="mt-1"
-              placeholder="請輸入申請人姓名"
             />
           </div>
           <div>
@@ -260,7 +240,7 @@ export function AddVisaDialog({
             <Input
               value={applicant.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
-              placeholder={index === 0 ? '辦理人（自動帶入）' : '辦理人'}
+              placeholder="辦理人"
               className={`w-40 ${applicant.isAdditional ? 'bg-morandi-container/50' : ''}`}
               readOnly={applicant.isAdditional}
             />

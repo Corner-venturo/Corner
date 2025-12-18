@@ -142,18 +142,6 @@ export default function VisasPage() {
     }
   }, [canManageVisas, selectedRows.length, setSelectedRows])
 
-  // 第一個辦理人自動帶入申請人姓名
-  useEffect(() => {
-    if (applicants.length > 0) {
-      setApplicants(prev => {
-        const updated = [...prev]
-        updated[0].name = contact_info.applicant_name
-        return updated
-      })
-    }
-   
-  }, [contact_info.applicant_name, applicants.length])
-
   // 處理批次新增簽證
   const handleAddVisa = async () => {
     // 防止重複提交
@@ -161,7 +149,9 @@ export default function VisasPage() {
     setIsSubmitting(true)
 
     try {
-    if (!canManageVisas || !contact_info.applicant_name || !user) return
+    // 檢查是否有辦理人
+    const hasApplicant = applicants.some(a => a.name)
+    if (!canManageVisas || !hasApplicant || !user) return
 
     let selectedTour
 
@@ -218,7 +208,7 @@ export default function VisasPage() {
         tour_id: selectedTour.id,
         code: order_number,
         tour_name: selectedTour.name,
-        contact_person: contact_info.contact_person || contact_info.applicant_name,
+        contact_person: contact_info.contact_person || applicants.find(a => a.name)?.name || '',
         sales_person: user.display_name || '系統',
         assistant: user.display_name || '系統',
         member_count: applicants.filter(a => a.name).length,
@@ -677,7 +667,7 @@ export default function VisasPage() {
         addApplicantForSame={addApplicantForSame}
         removeApplicant={removeApplicant}
         updateApplicant={updateApplicant}
-        canSubmit={!!contact_info.applicant_name && applicants.some(a => a.name)}
+        canSubmit={applicants.some(a => a.name)}
         isSubmitting={isSubmitting}
       />
 

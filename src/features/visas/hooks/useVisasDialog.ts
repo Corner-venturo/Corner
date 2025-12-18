@@ -33,7 +33,6 @@ export function useVisasDialog(tours: Tour[]) {
   const [contact_info, setContactInfo] = useState({
     tour_id: '',
     order_id: '',
-    applicant_name: '',
     contact_person: '',
     contact_phone: '',
   })
@@ -251,7 +250,6 @@ export function useVisasDialog(tours: Tour[]) {
     setContactInfo({
       tour_id: defaultTourId || '',
       order_id: '',
-      applicant_name: '',
       contact_person: '',
       contact_phone: '',
     })
