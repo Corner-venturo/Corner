@@ -999,3 +999,25 @@ table input[type='number']:focus {
   background: transparent !important;
   border: none !important;
 }
+
+/* Leaflet Tooltip 美化 */
+.leaflet-tooltip {
+  background: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-tooltip::before {
+  display: none;
+}
+
+.leaflet-tooltip.selected-tooltip {
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+}
