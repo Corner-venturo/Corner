@@ -121,74 +121,42 @@ export function AttractionsMap({
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       })
 
-      // 創建帶圖片和名稱的標記函數
-      const createMarkerIcon = (name: string, thumbnail: string | undefined, isSelected: boolean) => {
-        const borderColor = isSelected ? '#ef4444' : '#3b82f6'
-        const bgColor = isSelected ? '#fef2f2' : '#eff6ff'
-        const size = isSelected ? 80 : 70
+      // 創建簡潔的標記（只顯示名稱標籤）
+      const createMarkerIcon = (name: string, isSelected: boolean) => {
+        const bgColor = isSelected ? '#ef4444' : '#3b82f6'
 
         return L.divIcon({
           className: '',
           html: `
-            <div style="
-              width: ${size}px;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              transform: translateX(-50%);
-            ">
+            <div style="display: flex; flex-direction: column; align-items: center; transform: translateX(-50%);">
               <div style="
-                width: ${size}px;
-                height: ${size * 0.6}px;
-                border-radius: 8px;
-                overflow: hidden;
-                border: 3px solid ${borderColor};
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                padding: 4px 8px;
                 background: ${bgColor};
-              ">
-                ${thumbnail
-                  ? `<img src="${thumbnail}" style="width: 100%; height: 100%; object-fit: cover;" />`
-                  : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: ${bgColor};">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${borderColor}" stroke-width="2">
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                      </svg>
-                    </div>`
-                }
-              </div>
-              <div style="
-                margin-top: 4px;
-                padding: 2px 6px;
-                background: ${borderColor};
                 color: white;
-                font-size: 11px;
-                font-weight: 600;
-                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 500;
+                border-radius: 6px;
                 white-space: nowrap;
-                max-width: ${size + 20}px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.25);
               ">${name}</div>
               <div style="
-                width: 0;
-                height: 0;
-                border-left: 6px solid transparent;
-                border-right: 6px solid transparent;
-                border-top: 8px solid ${borderColor};
+                width: 0; height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid ${bgColor};
               "></div>
             </div>
           `,
-          iconSize: [size, size + 40],
-          iconAnchor: [size / 2, size + 40],
-          popupAnchor: [0, -(size + 30)],
+          iconSize: [100, 30],
+          iconAnchor: [50, 30],
+          popupAnchor: [0, -25],
         })
       }
 
       // 添加選中景點標記
       const selectedMarker = L.marker(
         [selectedAttraction.latitude!, selectedAttraction.longitude!],
-        { icon: createMarkerIcon(selectedAttraction.name, selectedAttraction.thumbnail, true) }
+        { icon: createMarkerIcon(selectedAttraction.name, true) }
       ).addTo(map)
 
       markersRef.current.push(selectedMarker)
@@ -205,7 +173,7 @@ export function AttractionsMap({
         ).toFixed(1)
 
         const marker = L.marker([attraction.latitude, attraction.longitude], {
-          icon: createMarkerIcon(attraction.name, attraction.thumbnail, false),
+          icon: createMarkerIcon(attraction.name, false),
         })
           .addTo(map)
           .bindPopup(

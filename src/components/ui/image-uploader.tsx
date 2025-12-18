@@ -156,6 +156,7 @@ export function ImageUploader({
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    console.log('dragOver triggered')
     if (!disabled) {
       setIsDragOver(true)
     }
