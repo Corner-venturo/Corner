@@ -11,8 +11,8 @@ export function useTourPageState() {
 
   // Pagination and filtering state
   const [currentPage, setCurrentPage] = useState(1)
-  const [sortBy, setSortBy] = useState('created_at')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [sortBy, setSortBy] = useState('departure_date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [expandedRows, setExpandedRows] = useState<string[]>([])
   const [activeStatusTab, setActiveStatusTab] = useState('all')

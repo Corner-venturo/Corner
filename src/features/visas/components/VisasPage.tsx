@@ -765,24 +765,7 @@ export default function VisasPage() {
             )}
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="ghost"
-                onClick={handleSkipAll}
-                className="text-morandi-secondary"
-              >
-                全部跳過
-              </Button>
-              {pendingCustomers.length > 1 && (
-                <Button
-                  variant="outline"
-                  onClick={handleSkipCustomer}
-                >
-                  跳過此人
-                </Button>
-              )}
-            </div>
+          <DialogFooter>
             {currentPerson?.matchedCustomers.length === 0 && (
               <Button
                 onClick={handleAddNewCustomer}

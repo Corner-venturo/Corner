@@ -100,7 +100,7 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            'w-full h-10 justify-between text-left font-normal',
+            'w-full h-10 justify-between text-left font-normal bg-white',
             !value && 'text-muted-foreground',
             buttonClassName,
             className

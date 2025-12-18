@@ -50,10 +50,10 @@ export function LinkQuoteToTourDialog({
     return quotes.filter(q => q.tour_id === tour.id && !(q as { _deleted?: boolean })._deleted)
   }, [quotes, tour.id])
 
-  // 未關聯任何旅遊團的報價單（可用於連結）
+  // 未關聯任何旅遊團的報價單（可用於連結，包含標準與快速報價單）
   const availableQuotes = useMemo(() => {
     return quotes
-      .filter(q => q.quote_type === 'standard' && !q.tour_id && !(q as { _deleted?: boolean })._deleted)
+      .filter(q => !q.tour_id && !(q as { _deleted?: boolean })._deleted)
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }, [quotes])
 

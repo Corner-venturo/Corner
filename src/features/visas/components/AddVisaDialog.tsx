@@ -234,123 +234,152 @@ export function AddVisaDialog({
 
       {/* 下半部：批次辦理人列表 */}
       <div className="space-y-2">
-        {applicants.map((applicant, index) => (
-          <div key={applicant.id} className="flex gap-2 items-center">
-            {/* 追加列：名字欄位變成唯讀、顯示灰色背景 */}
-            <Input
-              value={applicant.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
-              placeholder="辦理人"
-              className={`w-40 ${applicant.isAdditional ? 'bg-morandi-container/50' : ''}`}
-              readOnly={applicant.isAdditional}
-            />
+        {/* 表頭 */}
+        <div className="flex gap-2 items-center text-xs text-morandi-secondary font-medium px-1">
+          <div className="w-28">申請人</div>
+          <div className="w-28">簽證類型</div>
+          <div className="w-12 text-center">急件</div>
+          <div className="w-32">收件日期</div>
+          <div className="w-32">回件日期</div>
+          <div className="w-20">辦理費用</div>
+          <div className="w-16">急件費用</div>
+          <div className="w-20">應收費用</div>
+          <div className="w-24"></div>
+        </div>
 
-            <Select
-              value={applicant.country}
-              onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
-            >
-              <SelectTrigger className="w-56 h-10 text-sm">
-                <SelectValue placeholder="選擇簽證類型" />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
-                <SelectItem value="護照 成人">護照 成人</SelectItem>
-                <SelectItem value="護照 兒童">護照 兒童</SelectItem>
-                <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
-                <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
-                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
-                <SelectItem value="台胞證">台胞證</SelectItem>
-                <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
-                <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
-                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
-                <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
-              </SelectContent>
-            </Select>
+        {applicants.map((applicant, index) => {
+          const baseFee = applicant.fee ?? calculateFee(applicant.country)
+          const urgentFee = applicant.is_urgent ? 1000 : 0
+          const totalFee = applicant.isAdditional ? null : baseFee + urgentFee
 
-            <DatePicker
-              value={applicant.received_date}
-              onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
-              className="w-32"
-              placeholder="收件時間"
-            />
-
-            <DatePicker
-              value={applicant.expected_issue_date}
-              onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
-              className="w-32"
-              placeholder="預計下件"
-            />
-
-            <Input
-              type="number"
-              value={applicant.fee ?? calculateFee(applicant.country)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
-              className="w-16 text-xs"
-              title="代辦費"
-            />
-
-            <Input
-              type="number"
-              value={applicant.cost}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'cost', Number(e.target.value))}
-              placeholder="成本"
-              className="w-12 text-xs"
-            />
-
-            <div className="flex items-center gap-1 w-14 flex-shrink-0">
-              <input
-                type="checkbox"
-                checked={applicant.is_urgent}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
-                className="w-4 h-4 flex-shrink-0"
-              />
-              <span className="text-xs whitespace-nowrap">急件</span>
-            </div>
-
-            {/* 按鈕區：追加 / 新增 / 刪除 */}
-            <div className="flex gap-1 flex-shrink-0">
-              {/* 追加按鈕：所有列都顯示（追加列的 parentId 會傳給 addApplicantForSame） */}
-              <Button
-                type="button"
-                onClick={() => {
-                  // 如果是追加列，用 parentId；否則用自己的 id
-                  const targetId = applicant.isAdditional ? applicant.parentId! : applicant.id
-                  addApplicantForSame(targetId, applicant.name)
-                }}
-                size="sm"
-                className="h-8 px-3 text-xs font-medium bg-morandi-green hover:bg-morandi-green/80 text-white"
-                title="追加同一人的其他簽證"
-              >
-                ＋追加
-              </Button>
-
-              {/* 新增按鈕：只在最後一列顯示 */}
-              {index === applicants.length - 1 && (
-                <Button
-                  type="button"
-                  onClick={addApplicant}
-                  size="sm"
-                  className="h-8 w-8 p-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                  title="新增辦理人"
-                >
-                  +
-                </Button>
+          return (
+            <div key={applicant.id} className="flex gap-2 items-center">
+              {/* 申請人：追加列顯示「-」 */}
+              {applicant.isAdditional ? (
+                <div className="w-28 h-10 px-3 flex items-center text-morandi-secondary">
+                  -
+                </div>
+              ) : (
+                <Input
+                  value={applicant.name}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
+                  placeholder="申請人"
+                  className="w-28"
+                />
               )}
 
-              {/* 刪除按鈕：所有列都顯示（刪除邏輯會確保至少保留一個空的主列） */}
-              <Button
-                type="button"
-                onClick={() => removeApplicant(applicant.id)}
-                size="sm"
-                className="h-8 w-8 p-0 text-morandi-red hover:bg-red-50"
-                variant="ghost"
-                title="刪除"
+              {/* 簽證類型 */}
+              <Select
+                value={applicant.country}
+                onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
               >
-                ✕
-              </Button>
+                <SelectTrigger className="w-28 h-10 text-sm">
+                  <SelectValue placeholder="類型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
+                  <SelectItem value="護照 成人">護照 成人</SelectItem>
+                  <SelectItem value="護照 兒童">護照 兒童</SelectItem>
+                  <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
+                  <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
+                  <SelectItem value="台胞證">台胞證</SelectItem>
+                  <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
+                  <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
+                  <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* 急件 checkbox */}
+              <div className="w-12 flex justify-center">
+                <input
+                  type="checkbox"
+                  checked={applicant.is_urgent}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
+                  className="w-4 h-4"
+                />
+              </div>
+
+              {/* 收件日期 */}
+              <DatePicker
+                value={applicant.received_date}
+                onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
+                className="w-32"
+                placeholder="收件日期"
+              />
+
+              {/* 回件日期 */}
+              <DatePicker
+                value={applicant.expected_issue_date}
+                onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
+                className="w-32"
+                placeholder="回件日期"
+              />
+
+              {/* 辦理費用 */}
+              <Input
+                type="number"
+                value={baseFee}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
+                className="w-20 text-sm"
+              />
+
+              {/* 急件費用 */}
+              <div className="w-16 h-10 px-2 flex items-center justify-center text-sm text-morandi-secondary">
+                {urgentFee > 0 ? urgentFee.toLocaleString() : '0'}
+              </div>
+
+              {/* 應收費用：追加列顯示「-」 */}
+              <div className="w-20 h-10 px-2 flex items-center justify-center text-sm font-medium">
+                {totalFee !== null ? totalFee.toLocaleString() : '-'}
+              </div>
+
+              {/* 按鈕區：追加 / 刪除 */}
+              <div className="flex gap-1 flex-shrink-0 w-24 justify-end">
+                {/* 追加按鈕：只在主列顯示 */}
+                {!applicant.isAdditional && (
+                  <Button
+                    type="button"
+                    onClick={() => addApplicantForSame(applicant.id, applicant.name)}
+                    size="sm"
+                    className="h-8 w-8 p-0 text-morandi-green hover:bg-morandi-green/10"
+                    variant="ghost"
+                    title="追加同一人的其他簽證"
+                  >
+                    +
+                  </Button>
+                )}
+
+                {/* 新增按鈕：只在最後一列且非追加列顯示 */}
+                {index === applicants.length - 1 && !applicant.isAdditional && (
+                  <Button
+                    type="button"
+                    onClick={addApplicant}
+                    size="sm"
+                    className="h-8 w-8 p-0 text-morandi-gold hover:bg-morandi-gold/10"
+                    variant="ghost"
+                    title="新增辦理人"
+                  >
+                    +
+                  </Button>
+                )}
+
+                {/* 刪除按鈕 */}
+                <Button
+                  type="button"
+                  onClick={() => removeApplicant(applicant.id)}
+                  size="sm"
+                  className="h-8 w-8 p-0 text-morandi-red hover:bg-red-50"
+                  variant="ghost"
+                  title="刪除"
+                >
+                  ✕
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </FormDialog>
   )

@@ -148,20 +148,21 @@ export function useVisasDialog(tours: Tour[]) {
         const target = prev.find(a => a.id === id)
         if (!target) return prev
 
-        // 如果是追加列，直接刪除
+        let filteredList: VisaApplicant[]
+
         if (target.isAdditional) {
-          return prev.filter(a => a.id !== id)
+          // 如果是追加列，直接刪除
+          filteredList = prev.filter(a => a.id !== id)
+        } else {
+          // 如果是主列，一起刪除它的追加列
+          filteredList = prev.filter(a => a.id !== id && a.parentId !== id)
         }
 
-        // 如果是主列，一起刪除它的追加列
-        const filteredList = prev.filter(a => a.id !== id && a.parentId !== id)
-
-        // 確保至少有一個主列（非追加列）
-        const hasMainApplicant = filteredList.some(a => !a.isAdditional)
-        if (!hasMainApplicant) {
-          // 如果刪除後沒有主列了，保留一個空的主列
+        // 確保至少有一個項目
+        if (filteredList.length === 0) {
+          // 如果刪除後沒有任何項目，保留一個空的主列
           return [{
-            id: '1',
+            id: Date.now().toString(),
             name: '',
             country: '護照 成人',
             is_urgent: false,
@@ -169,6 +170,21 @@ export function useVisasDialog(tours: Tour[]) {
             expected_issue_date: '',
             cost: 0,
           }]
+        }
+
+        // 檢查是否還有主列
+        const hasMainApplicant = filteredList.some(a => !a.isAdditional)
+        if (!hasMainApplicant) {
+          // 如果只剩追加列（沒有主列），將第一個追加列轉為主列
+          const firstAdditional = filteredList[0]
+          return filteredList.map((a, index) => {
+            if (index === 0) {
+              // 第一個轉為主列
+              return { ...a, isAdditional: false, parentId: undefined }
+            }
+            // 其他追加列的 parentId 指向新的主列
+            return { ...a, parentId: firstAdditional.id }
+          })
         }
 
         return filteredList
@@ -210,33 +226,39 @@ export function useVisasDialog(tours: Tour[]) {
           }
         }
 
-        // 更新主列
-        const newList = prev.map(a => (a.id === id ? updated : a))
+        // 更新當前項目
+        let newList = prev.map(a => (a.id === id ? updated : a))
 
-        // 如果是主列（非追加列），且修改了日期或急件，同步更新追加列
-        if (!target.isAdditional && (field === 'received_date' || field === 'expected_issue_date' || field === 'is_urgent')) {
-          return newList.map(a => {
-            if (a.parentId !== id) return a
-            // 追加列的收件日期 = 主列的預計下件日期
-            const newReceivedDate = updated.expected_issue_date || ''
-            const visaTypeWithUrgent = a.is_urgent ? `${a.country} 急件` : a.country
-            const newExpectedDate = newReceivedDate
-              ? calculateReceivedDate(newReceivedDate, visaTypeWithUrgent)
-              : ''
-            return {
-              ...a,
-              received_date: newReceivedDate,
-              expected_issue_date: newExpectedDate,
-            }
-          })
-        }
+        // 找出真正的主列 ID（如果當前是追加列，用 parentId；否則用自己的 id）
+        const mainId = target.isAdditional ? target.parentId : id
 
-        // 如果是主列（非追加列），且修改了姓名，同步更新追加列的姓名
-        if (!target.isAdditional && field === 'name') {
-          return newList.map(a => {
-            if (a.parentId !== id) return a
-            return { ...a, name: value as string }
-          })
+        // 如果修改的是主列，同步更新所有追加列
+        if (!target.isAdditional) {
+          // 修改日期或急件時，同步更新追加列的日期
+          if (field === 'received_date' || field === 'expected_issue_date' || field === 'is_urgent' || field === 'country') {
+            newList = newList.map(a => {
+              if (a.parentId !== mainId) return a
+              // 追加列的收件日期 = 主列的預計下件日期
+              const newReceivedDate = updated.expected_issue_date || ''
+              const visaTypeWithUrgent = a.is_urgent ? `${a.country} 急件` : a.country
+              const newExpectedDate = newReceivedDate
+                ? calculateReceivedDate(newReceivedDate, visaTypeWithUrgent)
+                : ''
+              return {
+                ...a,
+                received_date: newReceivedDate,
+                expected_issue_date: newExpectedDate,
+              }
+            })
+          }
+
+          // 修改姓名時，同步更新追加列的姓名
+          if (field === 'name') {
+            newList = newList.map(a => {
+              if (a.parentId !== mainId) return a
+              return { ...a, name: value as string }
+            })
+          }
         }
 
         return newList
