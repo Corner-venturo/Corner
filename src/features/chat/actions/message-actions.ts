@@ -1,7 +1,7 @@
 'use server'
 
-import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getServerUser, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
 
 export async function sendMessageAction({
   channelId,
@@ -10,16 +10,20 @@ export async function sendMessageAction({
   channelId: string
   content: string
 }) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // 使用統一的認證服務
+  const auth = await getServerUser()
 
-  if (!user) {
-    return { error: 'You must be logged in to send a message.' }
+  if ('error' in auth) {
+    return { error: auth.error }
   }
+
+  const { user } = auth
 
   if (!content.trim()) {
     return { error: 'Message cannot be empty.' }
   }
+
+  const supabase = await getAuthenticatedSupabase()
 
   const { data, error } = await supabase
     .from('messages')

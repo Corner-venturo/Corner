@@ -50,10 +50,12 @@ export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
     throw new Error('Could not fetch workspace members.')
   }
 
-  // The data structure from the query will be nested, e.g., { id, profiles: { name, ... } }
+  // The data structure from the query will be nested, e.g., { id, profiles: [{ name, ... }] }
   // We'll flatten it for easier use in the UI.
   const formattedMembers: WorkspaceMember[] = (members || []).map(member => {
-    const profile = member.profiles as ProfileData | null
+    // profiles is an array from the join, get first item
+    const profilesArray = member.profiles as ProfileData[] | null
+    const profile = profilesArray?.[0]
     return {
       id: member.id,
       full_name: profile?.name || 'Unnamed User',

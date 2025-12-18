@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface TourClosingReport {
   id: string
@@ -181,7 +182,7 @@ export default function TourClosingReportPage() {
 
   // 依月份篩選
   const filteredReports = useMemo(() => {
-    if (!selectedMonth) return reports
+    if (!selectedMonth || selectedMonth === 'all') return reports
 
     return reports.filter(report => {
       const closingMonth = report.closing_date?.substring(0, 7) // YYYY-MM
@@ -352,18 +353,19 @@ export default function TourClosingReportPage() {
       headerActions={
         <div className="flex gap-3 items-center">
           {availableMonths.length > 0 && (
-            <select
-              value={selectedMonth}
-              onChange={e => setSelectedMonth(e.target.value)}
-              className="px-3 py-2 border border-border rounded-lg bg-background text-sm"
-            >
-              <option value="">全部月份</option>
-              {availableMonths.map(month => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="全部月份" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部月份</SelectItem>
+                {availableMonths.map(month => (
+                  <SelectItem key={month} value={month}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
           <Button
             onClick={() => exportToExcel()}

@@ -115,7 +115,7 @@ export default function CalendarPage() {
                   value={selectedWorkspaceId || 'all'}
                   onValueChange={(value) => onWorkspaceFilterChange(value === 'all' ? null : value)}
                 >
-                  <SelectTrigger className="h-9 w-[140px] border-border bg-card shadow-sm rounded-lg">
+                  <SelectTrigger className="h-9 w-[140px] shadow-sm">
                     <Building2 size={14} className="mr-1.5 text-morandi-blue" />
                     <SelectValue placeholder="全部分公司" />
                   </SelectTrigger>

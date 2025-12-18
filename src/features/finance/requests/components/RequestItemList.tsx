@@ -70,10 +70,10 @@ export function EditableRequestItemList({
                   updateItem(item.id, { category: value as RequestItem['category'] })
                 }
               >
-                <SelectTrigger className="bg-background h-10">
+                <SelectTrigger className="h-10">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-background">
+                <SelectContent>
                   {categoryOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
