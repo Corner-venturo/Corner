@@ -138,32 +138,36 @@ export function HotelSelector({
 
   // 國家變更
   const handleCountryChange = (countryId: string) => {
-    setSelectedCountryId(countryId)
+    const value = countryId === '__all__' ? '' : countryId
+    setSelectedCountryId(value)
     setSelectedRegionId('')
     setSelectedCityId('')
-    savedCountryId = countryId
+    savedCountryId = value
     savedRegionId = ''
     savedCityId = ''
   }
 
   // 區域變更
   const handleRegionChange = (regionId: string) => {
-    setSelectedRegionId(regionId)
+    const value = regionId === '__all__' ? '' : regionId
+    setSelectedRegionId(value)
     setSelectedCityId('')
-    savedRegionId = regionId
+    savedRegionId = value
     savedCityId = ''
   }
 
   // 城市變更
   const handleCityChange = (cityId: string) => {
-    setSelectedCityId(cityId)
-    savedCityId = cityId
+    const value = cityId === '__all__' ? '' : cityId
+    setSelectedCityId(value)
+    savedCityId = value
   }
 
   // 品牌變更
   const handleBrandChange = (brand: string) => {
-    setSelectedBrand(brand)
-    savedBrand = brand
+    const value = brand === '__all__' ? '' : brand
+    setSelectedBrand(value)
+    savedBrand = value
   }
 
   // 載入區域列表
@@ -404,12 +408,12 @@ export function HotelSelector({
           {/* 篩選區 - 第一排：國家、區域、城市 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
-            <Select value={selectedCountryId} onValueChange={handleCountryChange}>
+            <Select value={selectedCountryId || '__all__'} onValueChange={handleCountryChange}>
               <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
                 <SelectValue placeholder="全部國家" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部國家</SelectItem>
+                <SelectItem value="__all__">全部國家</SelectItem>
                 {countries.map(country => (
                   <SelectItem key={country.id} value={country.id}>
                     {country.name}
@@ -420,12 +424,12 @@ export function HotelSelector({
 
             {/* 區域選擇 */}
             {selectedCountryId && regions.length > 0 && (
-              <Select value={selectedRegionId} onValueChange={handleRegionChange}>
+              <Select value={selectedRegionId || '__all__'} onValueChange={handleRegionChange}>
                 <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
                   <SelectValue placeholder="全部區域" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部區域</SelectItem>
+                  <SelectItem value="__all__">全部區域</SelectItem>
                   {regions.map(region => (
                     <SelectItem key={region.id} value={region.id}>
                       {region.name}
@@ -437,12 +441,12 @@ export function HotelSelector({
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
-              <Select value={selectedCityId} onValueChange={handleCityChange}>
+              <Select value={selectedCityId || '__all__'} onValueChange={handleCityChange}>
                 <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
                   <SelectValue placeholder="全部城市" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部城市</SelectItem>
+                  <SelectItem value="__all__">全部城市</SelectItem>
                   {cities.map(city => (
                     <SelectItem key={city.id} value={city.id}>
                       {city.name}
@@ -453,12 +457,12 @@ export function HotelSelector({
             )}
 
             {/* 品牌選擇 */}
-            <Select value={selectedBrand} onValueChange={handleBrandChange}>
+            <Select value={selectedBrand || '__all__'} onValueChange={handleBrandChange}>
               <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
                 <SelectValue placeholder="全部品牌" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部品牌</SelectItem>
+                <SelectItem value="__all__">全部品牌</SelectItem>
                 {HOTEL_BRANDS.map(brand => (
                   <SelectItem key={brand} value={brand}>
                     {brand}

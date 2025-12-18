@@ -333,14 +333,14 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
                     </div>
                     <div className="text-morandi-secondary">→</div>
                     <Select
-                      value={mapping.systemField}
-                      onValueChange={(value) => updateMapping(mapping.excelColumn, value as SystemFieldKey | '')}
+                      value={mapping.systemField || '__none__'}
+                      onValueChange={(value) => updateMapping(mapping.excelColumn, (value === '__none__' ? '' : value) as SystemFieldKey | '')}
                     >
                       <SelectTrigger className="w-1/2">
                         <SelectValue placeholder="選擇對應欄位" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">不匯入</SelectItem>
+                        <SelectItem value="__none__">不匯入</SelectItem>
                         {SYSTEM_FIELDS.map((field) => (
                           <SelectItem key={field.key} value={field.key}>
                             {field.label} {field.required && '*'}

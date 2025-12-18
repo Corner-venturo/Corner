@@ -496,7 +496,7 @@ export function CoverInfoSection({
                       <SelectItem value="/人">/人</SelectItem>
                       <SelectItem value="起">起</SelectItem>
                       <SelectItem value="/人起">/人起</SelectItem>
-                      <SelectItem value="">(不顯示)</SelectItem>
+                      <SelectItem value="__hidden__">(不顯示)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -605,7 +605,7 @@ export function CoverInfoSection({
                   departureDate: data.departureDate || '2025/01/01',
                   tourCode: data.tourCode || 'CODE',
                   price: data.price || '',
-                  priceNote: data.priceNote || '/人',
+                  priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || '/人'),
                   country: selectedCountry || '',
                   dailyItinerary: data.dailyItinerary,
                 }

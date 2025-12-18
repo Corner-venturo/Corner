@@ -134,14 +134,14 @@ export function BankAccountDialog({
           <div className="space-y-2">
             <Label>對應會計科目</Label>
             <Select
-              value={formData.account_id || ''}
-              onValueChange={(value) => setFormData({ ...formData, account_id: value || null })}
+              value={formData.account_id || '__none__'}
+              onValueChange={(value) => setFormData({ ...formData, account_id: value === '__none__' ? null : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="選擇科目" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">不指定</SelectItem>
+                <SelectItem value="__none__">不指定</SelectItem>
                 {bankAccountOptions.map((acc) => (
                   <SelectItem key={acc.id} value={acc.id}>
                     {acc.code} {acc.name}

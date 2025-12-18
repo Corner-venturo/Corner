@@ -12,7 +12,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { addChannelMembers } from '@/services/workspace-members'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
-import { TourMembersAdvanced } from '@/components/tours/tour-members-advanced'
+import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
 import { TourDocuments } from '@/components/tours/tour-documents'
@@ -209,7 +209,7 @@ export default function TourDetailPage() {
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
-        return <TourMembersAdvanced tour={tour} />
+        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" />
       case 'payments':
         return (
           <TourPayments

@@ -165,7 +165,7 @@ export function LinkQuoteToTourDialog({
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
-                      <span className="text-morandi-text">{quote.name || '未命名'}</span>
+                      <span className="text-morandi-text">{quote.name || quote.destination || '未命名'}</span>
                       {quote.versions && quote.versions.length > 0 && (
                         <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-1.5 py-0.5 rounded">
                           {quote.versions.length} 版
@@ -196,7 +196,7 @@ export function LinkQuoteToTourDialog({
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
-                      <span className="text-morandi-text">{quote.name || '未命名'}</span>
+                      <span className="text-morandi-text">{quote.name || quote.destination || '未命名'}</span>
                       {quote.versions && quote.versions.length > 0 && (
                         <span className="text-xs bg-morandi-container text-morandi-secondary px-1.5 py-0.5 rounded">
                           {quote.versions.length} 版

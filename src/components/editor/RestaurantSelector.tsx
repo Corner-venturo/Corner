@@ -165,32 +165,36 @@ export function RestaurantSelector({
 
   // 國家變更
   const handleCountryChange = (countryId: string) => {
-    setSelectedCountryId(countryId)
+    const value = countryId === '__all__' ? '' : countryId
+    setSelectedCountryId(value)
     setSelectedRegionId('')
     setSelectedCityId('')
-    savedCountryId = countryId
+    savedCountryId = value
     savedRegionId = ''
     savedCityId = ''
   }
 
   // 區域變更
   const handleRegionChange = (regionId: string) => {
-    setSelectedRegionId(regionId)
+    const value = regionId === '__all__' ? '' : regionId
+    setSelectedRegionId(value)
     setSelectedCityId('')
-    savedRegionId = regionId
+    savedRegionId = value
     savedCityId = ''
   }
 
   // 城市變更
   const handleCityChange = (cityId: string) => {
-    setSelectedCityId(cityId)
-    savedCityId = cityId
+    const value = cityId === '__all__' ? '' : cityId
+    setSelectedCityId(value)
+    savedCityId = value
   }
 
   // 分類變更
   const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category)
-    savedCategory = category
+    const value = category === '__all__' ? '' : category
+    setSelectedCategory(value)
+    savedCategory = value
   }
 
   // 載入區域列表
@@ -482,12 +486,12 @@ export function RestaurantSelector({
           {/* 篩選區 - 國家、區域、城市 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
-            <Select value={selectedCountryId} onValueChange={handleCountryChange}>
+            <Select value={selectedCountryId || '__all__'} onValueChange={handleCountryChange}>
               <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
                 <SelectValue placeholder="全部國家" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部國家</SelectItem>
+                <SelectItem value="__all__">全部國家</SelectItem>
                 {countries.map(country => (
                   <SelectItem key={country.id} value={country.id}>
                     {country.name}
@@ -498,12 +502,12 @@ export function RestaurantSelector({
 
             {/* 區域選擇 */}
             {selectedCountryId && regions.length > 0 && (
-              <Select value={selectedRegionId} onValueChange={handleRegionChange}>
+              <Select value={selectedRegionId || '__all__'} onValueChange={handleRegionChange}>
                 <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
                   <SelectValue placeholder="全部區域" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部區域</SelectItem>
+                  <SelectItem value="__all__">全部區域</SelectItem>
                   {regions.map(region => (
                     <SelectItem key={region.id} value={region.id}>
                       {region.name}
@@ -515,12 +519,12 @@ export function RestaurantSelector({
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
-              <Select value={selectedCityId} onValueChange={handleCityChange}>
+              <Select value={selectedCityId || '__all__'} onValueChange={handleCityChange}>
                 <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
                   <SelectValue placeholder="全部城市" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部城市</SelectItem>
+                  <SelectItem value="__all__">全部城市</SelectItem>
                   {cities.map(city => (
                     <SelectItem key={city.id} value={city.id}>
                       {city.name}
@@ -532,12 +536,12 @@ export function RestaurantSelector({
 
             {/* 分類選擇 */}
             {!showMichelinOnly && (
-              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+              <Select value={selectedCategory || '__all__'} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500">
                   <SelectValue placeholder="全部分類" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部分類</SelectItem>
+                  <SelectItem value="__all__">全部分類</SelectItem>
                   {RESTAURANT_CATEGORIES.map(cat => (
                     <SelectItem key={cat.value} value={cat.value}>
                       {cat.label}

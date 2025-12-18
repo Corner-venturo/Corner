@@ -550,7 +550,7 @@ export function TourForm({
                           { value: '', label: '獨立旅遊團（無報價單）' },
                           ...availableQuotes.map(quote => ({
                             value: quote.id,
-                            label: `${quote.code || '無編號'} - ${quote.name || '未命名'}`,
+                            label: `${quote.code || '無編號'} - ${quote.name || quote.destination || '未命名'}`,
                           })),
                         ]}
                         value={selectedQuoteId || ''}

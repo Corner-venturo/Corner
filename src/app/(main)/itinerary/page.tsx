@@ -56,7 +56,7 @@ export default function ItineraryPage() {
 
   // 所有 useState hooks 集中在一起
   const [statusFilter, setStatusFilter] = useState<string>('全部')
-  const [authorFilter, setAuthorFilter] = useState<string>('') // 預設空字串表示當前登入者
+  const [authorFilter, setAuthorFilter] = useState<string>('__mine__') // 預設 __mine__ 表示當前登入者
   const [searchTerm, setSearchTerm] = useState('')
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false)
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
@@ -800,7 +800,7 @@ export default function ItineraryPage() {
     }
 
     // 作者篩選
-    const effectiveAuthorFilter = authorFilter === '' ? user?.id : authorFilter
+    const effectiveAuthorFilter = authorFilter === '__mine__' ? user?.id : authorFilter
     if (effectiveAuthorFilter && effectiveAuthorFilter !== 'all') {
       filtered = filtered.filter(item => item.created_by === effectiveAuthorFilter)
     }
@@ -876,7 +876,7 @@ export default function ItineraryPage() {
                 <SelectValue placeholder="我的行程" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">我的行程</SelectItem>
+                <SelectItem value="__mine__">我的行程</SelectItem>
                 <SelectItem value="all">全部作者</SelectItem>
                 {employees
                   .filter(emp =>

@@ -34,7 +34,7 @@ const employees = [
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
   const router = useRouter()
   const { items: todos, create: addTodo } = useTodoStore()
-  const [selectedTemplate, setSelectedTemplate] = useState('')
+  const [selectedTemplate, setSelectedTemplate] = useState('__custom__')
   const [taskForm, setTaskForm] = useState({
     title: '',
     assignee: '',
@@ -59,7 +59,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId)
 
-    if (templateId && taskTemplates[templateId]) {
+    if (templateId && templateId !== '__custom__' && taskTemplates[templateId]) {
       const template = taskTemplates[templateId]
       const deadline = calculateDeadlineFromDeparture(
         tour.departure_date,
@@ -285,7 +285,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
                   <SelectValue placeholder="選擇預設模板或自訂任務" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">自訂任務</SelectItem>
+                  <SelectItem value="__custom__">自訂任務</SelectItem>
                   <SelectItem value="pre-tour">行前準備</SelectItem>
                   <SelectItem value="documents">文件準備</SelectItem>
                   <SelectItem value="booking">訂房訂車</SelectItem>

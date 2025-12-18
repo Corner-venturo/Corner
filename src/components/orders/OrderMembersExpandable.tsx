@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus } from 'lucide-react'
 import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Button } from '@/components/ui/button'
@@ -51,6 +51,8 @@ interface OrderMember {
   passport_image_url?: string | null
   // 關聯的顧客驗證狀態（從 join 查詢取得）
   customer_verification_status?: string | null
+  // 團體模式額外欄位
+  order_code?: string | null  // 訂單編號（團體模式用）
 }
 
 // PDF 轉 JPG 需要的類型
@@ -62,10 +64,11 @@ interface ProcessedFile {
 }
 
 interface OrderMembersExpandableProps {
-  orderId: string
+  orderId?: string  // 可選：單一訂單模式
   tourId: string
   workspaceId: string
-  onClose: () => void
+  onClose?: () => void  // 團體模式時可能不需要關閉按鈕
+  mode?: 'order' | 'tour'  // 'order' = 單一訂單, 'tour' = 團體模式（顯示旅遊團所有成員）
 }
 
 export function OrderMembersExpandable({
@@ -73,7 +76,10 @@ export function OrderMembersExpandable({
   tourId,
   workspaceId,
   onClose,
+  mode: propMode,
 }: OrderMembersExpandableProps) {
+  // 自動判斷模式：如果沒有 orderId 就是團體模式
+  const mode = propMode || (orderId ? 'order' : 'tour')
   const [members, setMembers] = useState<OrderMember[]>([])
   const [loading, setLoading] = useState(false)
   const [departureDate, setDepartureDate] = useState<string | null>(null)
@@ -162,17 +168,51 @@ export function OrderMembersExpandable({
   const loadMembers = async () => {
     setLoading(true)
     try {
-      // 載入訂單成員
-      const { data: membersData, error: membersError } = await supabase
-        .from('order_members')
-        .select('*')
-        .eq('order_id', orderId)
-        .order('created_at', { ascending: true })
+      let membersData: OrderMember[] = []
+      let orderCodeMap: Record<string, string> = {}
 
-      if (membersError) throw membersError
+      if (mode === 'tour') {
+        // 團體模式：載入旅遊團所有訂單的成員
+        // 1. 先查詢該旅遊團的所有訂單
+        const { data: ordersData, error: ordersError } = await supabase
+          .from('orders')
+          .select('id, order_number')
+          .eq('tour_id', tourId)
+          .order('created_at', { ascending: true })
+
+        if (ordersError) throw ordersError
+
+        if (ordersData && ordersData.length > 0) {
+          // 建立訂單編號對應表
+          orderCodeMap = Object.fromEntries(
+            ordersData.map(o => [o.id, o.order_number || ''])
+          )
+          const orderIds = ordersData.map(o => o.id)
+
+          // 2. 載入這些訂單的所有成員
+          const { data: allMembersData, error: membersError } = await supabase
+            .from('order_members')
+            .select('*')
+            .in('order_id', orderIds)
+            .order('created_at', { ascending: true })
+
+          if (membersError) throw membersError
+          membersData = allMembersData || []
+        }
+      } else if (orderId) {
+        // 單一訂單模式
+        const { data, error: membersError } = await supabase
+          .from('order_members')
+          .select('*')
+          .eq('order_id', orderId)
+          .order('created_at', { ascending: true })
+
+        if (membersError) throw membersError
+        membersData = data || []
+      }
 
       // 收集所有有 customer_id 的成員
-      const customerIds = (membersData || [])
+      const customerIds = membersData
         .map(m => m.customer_id)
         .filter(Boolean) as string[]
 
@@ -191,10 +231,11 @@ export function OrderMembersExpandable({
         }
       }
 
-      // 合併驗證狀態到成員
-      const membersWithStatus = (membersData || []).map(m => ({
+      // 合併驗證狀態和訂單編號到成員
+      const membersWithStatus = membersData.map(m => ({
         ...m,
         customer_verification_status: m.customer_id ? customerStatusMap[m.customer_id] || null : null,
+        order_code: mode === 'tour' ? orderCodeMap[m.order_id] || null : null,
       }))
 
       setMembers(membersWithStatus)
@@ -303,8 +344,11 @@ export function OrderMembersExpandable({
 
       if (memberError) throw memberError
 
-      // 2. 如果有關聯的顧客，同步更新 customers
+      // 2. 處理顧客資料
+      let newCustomerId: string | null = null
+
       if (editingMember.customer_id) {
+        // 2a. 有關聯的顧客，同步更新 customers
         const customerUpdateData: Record<string, unknown> = {
           name: editFormData.chinese_name,
           passport_romanization: editFormData.passport_name,
@@ -330,6 +374,80 @@ export function OrderMembersExpandable({
           // 更新 store
           await customerStore.fetchAll()
         }
+      } else if (editFormData.chinese_name || editFormData.passport_number || editFormData.id_number) {
+        // 2b. 沒有關聯顧客但有填寫資料，嘗試比對或建立新顧客
+        const passportNumber = editFormData.passport_number?.trim() || null
+        const idNumber = editFormData.id_number?.trim() || null
+        const birthDate = editFormData.birth_date || null
+        const cleanChineseName = editFormData.chinese_name?.replace(/\([^)]+\)$/, '').trim() || null
+
+        // 先比對現有顧客
+        const existingCustomer = customers.find(c => {
+          // 1. 優先用護照號碼比對
+          if (passportNumber && c.passport_number === passportNumber) return true
+          // 2. 其次用身分證比對
+          if (idNumber && c.national_id === idNumber) return true
+          // 3. 備用：姓名+生日比對
+          if (cleanChineseName && birthDate &&
+              c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
+              c.date_of_birth === birthDate) return true
+          return false
+        })
+
+        if (existingCustomer) {
+          // 找到現有顧客，關聯到成員
+          newCustomerId = existingCustomer.id
+          await supabase
+            .from('order_members')
+            .update({ customer_id: existingCustomer.id })
+            .eq('id', editingMember.id)
+
+          // 同時更新顧客資料
+          await supabase
+            .from('customers')
+            .update({
+              name: editFormData.chinese_name || existingCustomer.name,
+              passport_romanization: editFormData.passport_name || existingCustomer.passport_romanization,
+              date_of_birth: editFormData.birth_date || existingCustomer.date_of_birth,
+              gender: editFormData.gender || existingCustomer.gender,
+              national_id: editFormData.id_number || existingCustomer.national_id,
+              passport_number: editFormData.passport_number || existingCustomer.passport_number,
+              passport_expiry_date: editFormData.passport_expiry || existingCustomer.passport_expiry_date,
+              verification_status: 'verified',
+            })
+            .eq('id', existingCustomer.id)
+
+          logger.info(`✅ 已關聯現有顧客: ${existingCustomer.name}`)
+        } else {
+          // 沒找到，建立新顧客
+          const newCustomer = await customerStore.create({
+            name: editFormData.chinese_name || '',
+            passport_romanization: editFormData.passport_name || '',
+            passport_number: passportNumber,
+            passport_expiry_date: editFormData.passport_expiry || null,
+            national_id: idNumber,
+            date_of_birth: birthDate,
+            gender: editFormData.gender || null,
+            phone: '',
+            is_vip: false,
+            is_active: true,
+            total_spent: 0,
+            total_orders: 0,
+            verification_status: 'verified',
+          } as any)
+
+          if (newCustomer) {
+            newCustomerId = newCustomer.id
+            await supabase
+              .from('order_members')
+              .update({ customer_id: newCustomer.id })
+              .eq('id', editingMember.id)
+            logger.info(`✅ 已建立新顧客: ${newCustomer.name}`)
+          }
+        }
+
+        // 更新 store
+        await customerStore.fetchAll()
       }
 
       // 3. 更新本地狀態（儲存後即為已驗證）
@@ -338,6 +456,7 @@ export function OrderMembersExpandable({
           ? {
               ...m,
               ...memberUpdateData,
+              customer_id: newCustomerId || editingMember.customer_id,
               customer_verification_status: 'verified',
             }
           : m
@@ -388,10 +507,18 @@ export function OrderMembersExpandable({
       return
     }
 
-    // 全部編輯模式下，Enter 不跳行（讓搜尋對話框彈出）
+    // 全部編輯模式下，Enter 處理
     if (isAllEditMode && e.key === 'Enter') {
       e.preventDefault()
-      // 觸發 blur 來儲存
+      const member = members[memberIndex]
+
+      // 中文姓名欄位：按 Enter 觸發顧客搜尋
+      if (fieldName === 'chinese_name' && member) {
+        handleEditModeNameEnter(member.id, memberIndex)
+        return
+      }
+
+      // 其他欄位：觸發 blur 來儲存
       ;(e.target as HTMLInputElement).blur()
       return
     }
@@ -669,22 +796,21 @@ export function OrderMembersExpandable({
     setPendingMemberData(null)
   }
 
-  // 編輯模式下的姓名輸入處理
-  const handleEditModeNameChange = (memberId: string, value: string, memberIndex: number) => {
-    logger.log('handleEditModeNameChange called:', { memberId, value, memberIndex })
-    // 先更新本地狀態
-    const member = members.find(m => m.id === memberId)
-    if (!member) {
-      logger.log('Member not found')
-      return
-    }
-
+  // 編輯模式下的姓名輸入處理（只更新本地狀態，按 Enter 才搜尋顧客）
+  const handleEditModeNameChange = (memberId: string, value: string) => {
+    logger.log('handleEditModeNameChange called:', { memberId, value })
     setMembers(members.map(m => m.id === memberId ? { ...m, chinese_name: value } : m))
+  }
 
-    // 2字以上觸發顧客搜尋
-    if (value.trim().length >= 2) {
-      logger.log('Triggering customer search for name:', value.trim())
-      checkCustomerMatchByName(value.trim(), memberIndex, { ...member, chinese_name: value })
+  // 編輯模式下按 Enter 觸發顧客搜尋
+  const handleEditModeNameEnter = (memberId: string, memberIndex: number) => {
+    const member = members.find(m => m.id === memberId)
+    if (!member) return
+
+    const name = member.chinese_name?.trim()
+    if (name && name.length >= 2) {
+      logger.log('Triggering customer search for name:', name)
+      checkCustomerMatchByName(name, memberIndex, { ...member })
     }
   }
 
@@ -1083,6 +1209,9 @@ export function OrderMembersExpandable({
       const duplicateItems: string[] = []
 
       // 載入現有成員（用於重複檢查）
+      if (!orderId) {
+        throw new Error('需要訂單 ID 才能批次上傳')
+      }
       const { data: existingMembers } = await supabase
         .from('order_members')
         .select('passport_number, id_number, chinese_name, birth_date')
@@ -1304,22 +1433,27 @@ export function OrderMembersExpandable({
   }
 
   return (
-    <div className="p-4">
+    <div className={mode === 'tour' ? '' : 'p-4'}>
       {/* 標題列 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Users size={18} className="text-morandi-blue" />
-          <h4 className="font-medium text-morandi-primary">成員列表 ({members.length})</h4>
+          <h4 className="font-medium text-morandi-primary">
+            {mode === 'tour' ? `團員名單總覽 (${members.length} 人)` : `成員列表 (${members.length})`}
+          </h4>
         </div>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            onClick={handleAddMember}
-            className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Plus size={14} />
-            新增成員
-          </Button>
+          {/* 團體模式下隱藏新增成員按鈕（需從各訂單新增） */}
+          {mode !== 'tour' && (
+            <Button
+              size="sm"
+              onClick={handleAddMember}
+              className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Plus size={14} />
+              新增成員
+            </Button>
+          )}
           <Button
             size="sm"
             variant="ghost"
@@ -1356,15 +1490,18 @@ export function OrderMembersExpandable({
             <Printer size={14} />
             匯出
           </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={onClose}
-            className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30"
-          >
-            <X size={14} />
-            收起
-          </Button>
+          {/* 團體模式時隱藏關閉按鈕 */}
+          {mode !== 'tour' && onClose && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onClose}
+              className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30"
+            >
+              <X size={14} />
+              收起
+            </Button>
+          )}
         </div>
       </div>
 
@@ -1378,6 +1515,10 @@ export function OrderMembersExpandable({
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40">
+                {/* 團體模式：顯示訂單編號 */}
+                {mode === 'tour' && (
+                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-[80px]">訂單編號</th>
+                )}
                 {showIdentityColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">身份</th>
                 )}
@@ -1429,6 +1570,12 @@ export function OrderMembersExpandable({
                   key={member.id}
                   className="group relative hover:bg-morandi-container/20 transition-colors"
                 >
+                  {/* 團體模式：訂單編號 */}
+                  {mode === 'tour' && (
+                    <td className="border border-morandi-gold/20 px-2 py-1 bg-blue-50/50">
+                      <span className="text-xs text-blue-600 font-medium">{member.order_code || '-'}</span>
+                    </td>
+                  )}
                   {/* 身份 */}
                   {showIdentityColumn && (
                     <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
@@ -1466,13 +1613,13 @@ export function OrderMembersExpandable({
                       <input
                         type="text"
                         value={member.chinese_name || ''}
-                        onChange={e => handleEditModeNameChange(member.id, e.target.value, memberIndex)}
+                        onChange={e => handleEditModeNameChange(member.id, e.target.value)}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
                           const value = e.currentTarget.value
                           setIsComposing(false)
                           setTimeout(() => {
-                            handleEditModeNameChange(member.id, value, memberIndex)
+                            handleEditModeNameChange(member.id, value)
                           }, 0)
                         }}
                         onBlur={e => handleEditModeBlur(member.id, 'chinese_name', e.target.value)}
@@ -1481,7 +1628,7 @@ export function OrderMembersExpandable({
                         data-field="chinese_name"
                         className="w-full bg-transparent text-xs"
                         style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
-                        placeholder="輸入姓名搜尋..."
+                        placeholder="輸入姓名，按 Enter 搜尋"
                       />
                     ) : (
                       <div className="flex items-center gap-1">

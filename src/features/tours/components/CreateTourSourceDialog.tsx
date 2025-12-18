@@ -272,7 +272,7 @@ export function CreateTourSourceDialog({
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
                           <span className="font-medium text-morandi-text truncate">
-                            {quote.name || '未命名報價單'}
+                            {quote.name || quote.destination || '未命名報價單'}
                           </span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">

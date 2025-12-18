@@ -573,7 +573,7 @@ export function LinkDocumentsToTourDialog({
                       >
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs text-morandi-gold">{quote.code}</span>
-                          <span className="text-morandi-text truncate text-sm">{quote.name || '未命名'}</span>
+                          <span className="text-morandi-text truncate text-sm">{quote.name || quote.destination || '未命名'}</span>
                           {quote.versions && quote.versions.length > 0 && (
                             <span className="text-[10px] bg-morandi-gold/20 text-morandi-gold px-1 py-0.5 rounded">
                               {quote.versions.length} 版
@@ -649,7 +649,7 @@ export function LinkDocumentsToTourDialog({
                             {quote.code}
                           </span>
                           <span className={`truncate ${isLinkedToOtherTour ? 'text-morandi-secondary' : 'text-morandi-text'}`}>
-                            {quote.name || '未命名'}
+                            {quote.name || quote.destination || '未命名'}
                           </span>
                           {quote.versions && quote.versions.length > 0 && (
                             <span className="text-[10px] bg-morandi-container text-morandi-secondary px-1 py-0.5 rounded">
