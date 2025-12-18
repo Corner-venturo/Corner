@@ -30,14 +30,14 @@ function getCurrentWorkspaceId(): string | null {
 
 /**
  * 同步更新訂單的 member_count
- * 根據實際 members 數量更新
+ * 根據實際 order_members 數量更新
  */
 async function syncOrderMemberCount(orderId: string): Promise<void> {
   if (!orderId) return
 
-  // 計算該訂單的實際團員數量
+  // 計算該訂單的實際團員數量（從 order_members 表）
   const { count, error: countError } = await supabase
-    .from('members')
+    .from('order_members')
     .select('*', { count: 'exact', head: true })
     .eq('order_id', orderId)
 

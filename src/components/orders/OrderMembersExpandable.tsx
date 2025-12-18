@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer } from 'lucide-react'
 import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Button } from '@/components/ui/button'
@@ -82,6 +82,23 @@ export function OrderMembersExpandable({
   const [showIdentityColumn, setShowIdentityColumn] = useState(false) // 控制身份欄位顯示
   const [isComposing, setIsComposing] = useState(false) // 追蹤是否正在使用輸入法
   const [isAllEditMode, setIsAllEditMode] = useState(false) // 全部編輯模式
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false) // 匯出對話框
+  const [exportColumns, setExportColumns] = useState<Record<string, boolean>>({
+    identity: false,
+    chinese_name: true,
+    passport_name: true,
+    birth_date: true,
+    gender: true,
+    id_number: false,
+    passport_number: true,
+    passport_expiry: true,
+    special_meal: true,
+    hotel_confirmation: false,
+    total_payable: false,
+    deposit_amount: false,
+    balance: false,
+    remarks: false,
+  })
 
   // 顧客搜尋相關狀態
   const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
@@ -353,6 +370,12 @@ export function OrderMembersExpandable({
 
   // 鍵盤導航處理
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, memberIndex: number, fieldName: string) => {
+    // 如果正在使用輸入法（如注音），不處理按鍵事件
+    // 避免選字時 Enter 被當成確認/跳行
+    if (e.nativeEvent.isComposing || isComposing) {
+      return
+    }
+
     const currentFieldIndex = editableFields.indexOf(fieldName)
 
     // 性別欄位：Enter 切換性別
@@ -708,6 +731,110 @@ export function OrderMembersExpandable({
     } catch (error) {
       logger.error('儲存失敗:', error)
     }
+  }
+
+  // ========== 匯出列印功能 ==========
+  const exportColumnLabels: Record<string, string> = {
+    identity: '身份',
+    chinese_name: '中文姓名',
+    passport_name: '護照拼音',
+    birth_date: '出生年月日',
+    gender: '性別',
+    id_number: '身分證號',
+    passport_number: '護照號碼',
+    passport_expiry: '護照效期',
+    special_meal: '飲食禁忌',
+    hotel_confirmation: '訂房代號',
+    total_payable: '應付金額',
+    deposit_amount: '訂金',
+    balance: '尾款',
+    remarks: '備註',
+  }
+
+  const handleExportPrint = () => {
+    const selectedCols = Object.entries(exportColumns)
+      .filter(([, selected]) => selected)
+      .map(([key]) => key)
+
+    if (selectedCols.length === 0) {
+      void alert('請至少選擇一個欄位', 'warning')
+      return
+    }
+
+    // 建立列印內容
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>成員名單</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; padding: 20px; }
+          h1 { font-size: 18px; margin-bottom: 15px; text-align: center; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; }
+          th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; }
+          th { background: #f5f5f5; font-weight: 600; }
+          tr:nth-child(even) { background: #fafafa; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          @media print {
+            body { padding: 10px; }
+            h1 { font-size: 16px; }
+            table { font-size: 11px; }
+            th, td { padding: 4px 6px; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>成員名單（共 ${members.length} 人）</h1>
+        <table>
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 40px;">序</th>
+              ${selectedCols.map(col => `<th>${exportColumnLabels[col]}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${members.map((member, idx) => `
+              <tr>
+                <td class="text-center">${idx + 1}</td>
+                ${selectedCols.map(col => {
+                  let value = ''
+                  if (col === 'gender') {
+                    value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'
+                  } else if (col === 'balance') {
+                    value = ((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()
+                  } else if (col === 'total_payable' || col === 'deposit_amount') {
+                    const num = member[col as keyof OrderMember] as number
+                    value = num ? num.toLocaleString() : '-'
+                  } else {
+                    value = (member[col as keyof OrderMember] as string) || '-'
+                  }
+                  const align = ['total_payable', 'deposit_amount', 'balance'].includes(col) ? 'text-right' : ''
+                  return `<td class="${align}">${value}</td>`
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `
+
+    // 開啟列印視窗
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(printContent)
+      printWindow.document.close()
+      printWindow.focus()
+      // 等待內容載入後列印
+      setTimeout(() => {
+        printWindow.print()
+      }, 250)
+    }
+
+    setIsExportDialogOpen(false)
   }
 
   // ========== PDF 轉 JPG 函數 ==========
@@ -1221,6 +1348,17 @@ export function OrderMembersExpandable({
           <Button
             size="sm"
             variant="ghost"
+            onClick={() => setIsExportDialogOpen(true)}
+            className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30"
+            title="匯出/列印成員名單"
+            disabled={members.length === 0}
+          >
+            <Printer size={14} />
+            匯出
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={onClose}
             className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30"
           >
@@ -1301,9 +1439,10 @@ export function OrderMembersExpandable({
                           onChange={e => updateField(member.id, 'identity', e.target.value)}
                           onCompositionStart={() => setIsComposing(true)}
                           onCompositionEnd={(e) => {
+                            const value = e.currentTarget.value
                             setIsComposing(false)
                             setTimeout(() => {
-                              updateField(member.id, 'identity', e.currentTarget.value)
+                              updateField(member.id, 'identity', value)
                             }, 0)
                           }}
                           onKeyDown={e => handleKeyDown(e, memberIndex, 'identity')}
@@ -1330,9 +1469,10 @@ export function OrderMembersExpandable({
                         onChange={e => handleEditModeNameChange(member.id, e.target.value, memberIndex)}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
+                          const value = e.currentTarget.value
                           setIsComposing(false)
                           setTimeout(() => {
-                            handleEditModeNameChange(member.id, e.currentTarget.value, memberIndex)
+                            handleEditModeNameChange(member.id, value, memberIndex)
                           }, 0)
                         }}
                         onBlur={e => handleEditModeBlur(member.id, 'chinese_name', e.target.value)}
@@ -1380,9 +1520,10 @@ export function OrderMembersExpandable({
                         onChange={e => updateField(member.id, 'passport_name', e.target.value)}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={(e) => {
+                          const value = e.currentTarget.value
                           setIsComposing(false)
                           setTimeout(() => {
-                            updateField(member.id, 'passport_name', e.currentTarget.value)
+                            updateField(member.id, 'passport_name', value)
                           }, 0)
                         }}
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_name')}
@@ -1514,9 +1655,10 @@ export function OrderMembersExpandable({
                       onChange={e => updateField(member.id, 'special_meal', e.target.value)}
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
+                        const value = e.currentTarget.value
                         setIsComposing(false)
                         setTimeout(() => {
-                          updateField(member.id, 'special_meal', e.currentTarget.value)
+                          updateField(member.id, 'special_meal', value)
                         }, 0)
                       }}
                       onKeyDown={e => handleKeyDown(e, memberIndex, 'special_meal')}
@@ -1535,9 +1677,10 @@ export function OrderMembersExpandable({
                       onChange={e => updateField(member.id, 'hotel_confirmation', e.target.value)}
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
+                        const value = e.currentTarget.value
                         setIsComposing(false)
                         setTimeout(() => {
-                          updateField(member.id, 'hotel_confirmation', e.currentTarget.value)
+                          updateField(member.id, 'hotel_confirmation', value)
                         }, 0)
                       }}
                       data-member={member.id}
@@ -1585,9 +1728,10 @@ export function OrderMembersExpandable({
                       onChange={e => updateField(member.id, 'remarks', e.target.value)}
                       onCompositionStart={() => setIsComposing(true)}
                       onCompositionEnd={(e) => {
+                        const value = e.currentTarget.value
                         setIsComposing(false)
                         setTimeout(() => {
-                          updateField(member.id, 'remarks', e.currentTarget.value)
+                          updateField(member.id, 'remarks', value)
                         }, 0)
                       }}
                       className="w-full bg-transparent text-xs"
@@ -2433,6 +2577,72 @@ export function OrderMembersExpandable({
               }}
             >
               取消
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 匯出對話框 */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Printer size={20} className="text-morandi-gold" />
+              匯出成員名單
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-morandi-secondary mb-4">
+              選擇要匯出的欄位，然後點擊「列印」
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(exportColumnLabels).map(([key, label]) => (
+                <label
+                  key={key}
+                  className="flex items-center gap-2 p-2 rounded hover:bg-morandi-container/30 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={exportColumns[key] || false}
+                    onChange={e => setExportColumns({
+                      ...exportColumns,
+                      [key]: e.target.checked
+                    })}
+                    className="w-4 h-4 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                  />
+                  <span className="text-sm text-morandi-primary">{label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const allSelected = Object.values(exportColumns).every(v => v)
+                  const newValue = !allSelected
+                  setExportColumns(
+                    Object.fromEntries(
+                      Object.keys(exportColumns).map(k => [k, newValue])
+                    )
+                  )
+                }}
+                className="text-xs"
+              >
+                {Object.values(exportColumns).every(v => v) ? '取消全選' : '全選'}
+              </Button>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 pt-2 border-t">
+            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleExportPrint}
+              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white gap-1"
+            >
+              <Printer size={16} />
+              列印
             </Button>
           </div>
         </DialogContent>
