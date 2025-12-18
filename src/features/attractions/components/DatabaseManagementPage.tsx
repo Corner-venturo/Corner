@@ -1,7 +1,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
 import { MapPin, Star, Sparkles, Globe } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -68,6 +68,79 @@ export default function DatabaseManagementPage() {
   }
 
   const hasActiveFilters = selectedCountry || selectedCategory !== 'all'
+
+  // ===== 測試拖放區 =====
+  const [testDragOver, setTestDragOver] = useState(false)
+  const [testDropResult, setTestDropResult] = useState('')
+
+  const handleTestDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setTestDragOver(true)
+    console.log('[TEST] dragover', e.dataTransfer.types)
+  }, [])
+
+  const handleTestDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setTestDragOver(false)
+  }, [])
+
+  const handleTestDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setTestDragOver(false)
+
+    const types = Array.from(e.dataTransfer.types)
+    const files = e.dataTransfer.files
+    const html = e.dataTransfer.getData('text/html')
+    const uriList = e.dataTransfer.getData('text/uri-list')
+    const plainText = e.dataTransfer.getData('text/plain')
+
+    console.log('[TEST] drop!', { types, filesCount: files.length, html, uriList, plainText })
+
+    // 優先從 HTML 解析 img src
+    let imageUrl = ''
+    if (html) {
+      const match = html.match(/<img[^>]+src="([^"]+)"/)
+      if (match && match[1]) {
+        imageUrl = match[1]
+        console.log('[TEST] 從 HTML 找到圖片:', imageUrl)
+      }
+    }
+
+    // 如果 HTML 沒有，用 uri-list
+    if (!imageUrl && uriList) {
+      imageUrl = uriList.split('\n')[0] // 取第一個 URL
+      console.log('[TEST] 從 uri-list 找到:', imageUrl)
+    }
+
+    if (!imageUrl) {
+      setTestDropResult('找不到圖片 URL')
+      return
+    }
+
+    setTestDropResult(`正在下載: ${imageUrl.substring(0, 50)}...`)
+
+    try {
+      // 透過後端 API 下載圖片
+      const response = await fetch('/api/fetch-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: imageUrl }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        setTestDropResult(`✅ 成功！圖片大小: ${(blob.size / 1024).toFixed(1)} KB`)
+      } else {
+        const error = await response.text()
+        setTestDropResult(`❌ 下載失敗: ${error}`)
+      }
+    } catch (err) {
+      setTestDropResult(`❌ 錯誤: ${err}`)
+    }
+  }, [])
+  // ===== 測試拖放區結束 =====
 
   // 分類選項
   const categoryOptions = [
@@ -142,6 +215,27 @@ export default function DatabaseManagementPage() {
         onAdd={activeTab === 'attractions' ? openAdd : undefined}
         addLabel="新增景點"
       />
+
+      {/* ===== 測試拖放區（請拖曳圖片到這裡測試）===== */}
+      <div
+        onDragOver={handleTestDragOver}
+        onDragLeave={handleTestDragLeave}
+        onDrop={handleTestDrop}
+        className={`m-4 p-8 border-4 border-dashed rounded-xl text-center transition-all ${
+          testDragOver
+            ? 'border-green-500 bg-green-50 text-green-700'
+            : 'border-gray-300 bg-gray-50 text-gray-500'
+        }`}
+      >
+        <div className="text-xl font-bold mb-2">🧪 測試拖放區</div>
+        <div>從瀏覽器拖曳圖片到這裡測試</div>
+        {testDropResult && (
+          <div className="mt-2 text-sm bg-white p-2 rounded">
+            結果: {testDropResult}
+          </div>
+        )}
+      </div>
+      {/* ===== 測試拖放區結束 ===== */}
 
       <div className="flex-1 overflow-auto">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full flex flex-col">

@@ -67,6 +67,19 @@ export function DailyItinerarySection({
   // 計算所有天的標籤
   const dayLabels = calculateDayLabels(data.dailyItinerary || [])
 
+  // 收集所有已選景點的 ID（用於防止重複選取）
+  const existingAttractionIds = useMemo(() => {
+    const ids: string[] = []
+    data.dailyItinerary?.forEach(day => {
+      day.activities?.forEach(activity => {
+        if (activity.attraction_id) {
+          ids.push(activity.attraction_id)
+        }
+      })
+    })
+    return ids
+  }, [data.dailyItinerary])
+
   // 選擇器狀態
   const [showAttractionSelector, setShowAttractionSelector] = useState(false)
   const [showHotelSelector, setShowHotelSelector] = useState(false)
@@ -406,6 +419,7 @@ export function DailyItinerarySection({
         tourCountryName={data.country}
         onSelect={handleSelectAttractions}
         dayTitle={currentDayIndex >= 0 ? data.dailyItinerary[currentDayIndex]?.title : ''}
+        existingIds={existingAttractionIds}
       />
 
       {/* 飯店選擇器 */}

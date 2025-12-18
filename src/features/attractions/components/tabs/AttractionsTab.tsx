@@ -52,8 +52,8 @@ export default function AttractionsTab({
   // 當景點載入後，取得所有用到的國家和城市 ID，然後查詢這些資料
   useEffect(() => {
     if (attractions.length > 0) {
-      const countryIds = Array.from(new Set(attractions.map(a => a.country_id).filter(Boolean)))
-      const cityIds = Array.from(new Set(attractions.map(a => a.city_id).filter(Boolean)))
+      const countryIds = Array.from(new Set(attractions.map(a => a.country_id).filter((id): id is string => !!id)))
+      const cityIds = Array.from(new Set(attractions.map(a => a.city_id).filter((id): id is string => !!id)))
 
       // 載入這些國家
       if (countryIds.length > 0) {

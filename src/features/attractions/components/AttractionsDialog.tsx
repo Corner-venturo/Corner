@@ -116,32 +116,96 @@ export function AttractionsDialog({
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 全域拖曳事件監聯（除錯用）- 用 window 層級 + capture
+  // 用 ref 追蹤拖放區域
+  const dropZoneRef = useRef<HTMLDivElement>(null)
+
+  // 全域拖曳事件監聽 - 繞過 Radix Dialog 的事件攔截
   useEffect(() => {
+    console.log('[AttractionsDialog] useEffect triggered, open:', open)
     if (!open) return
 
+    console.log('[AttractionsDialog] 註冊全域事件監聽')
+    console.log('[AttractionsDialog] dropZoneRef:', dropZoneRef.current)
+
     const handleGlobalDragOver = (e: DragEvent) => {
-      // 必須 preventDefault 才能接收 drop 事件
-      e.preventDefault()
-      console.log('[window] dragover', e.dataTransfer?.types)
+      console.log('[全域dragover]', e.clientX, e.clientY)
+      // 檢查是否在拖放區域內
+      if (dropZoneRef.current) {
+        const rect = dropZoneRef.current.getBoundingClientRect()
+        const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
+                         e.clientY >= rect.top && e.clientY <= rect.bottom
+        if (isInside) {
+          e.preventDefault()
+          setIsDragOver(true)
+        } else {
+          setIsDragOver(false)
+        }
+      }
     }
 
-    const handleGlobalDrop = (e: DragEvent) => {
-      e.preventDefault()
-      console.log('[window] drop', e.dataTransfer?.files?.length, e.dataTransfer?.types)
+    const handleGlobalDragLeave = () => {
+      setIsDragOver(false)
     }
 
-    // 用 capture phase 確保最先收到事件
+    const handleGlobalDrop = async (e: DragEvent) => {
+      if (!dropZoneRef.current) return
+
+      // 檢查是否在拖放區域內
+      const rect = dropZoneRef.current.getBoundingClientRect()
+      const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
+                       e.clientY >= rect.top && e.clientY <= rect.bottom
+
+      if (!isInside) return
+
+      e.preventDefault()
+      setIsDragOver(false)
+
+      console.log('[景點全域拖放] Drop in zone!')
+
+      // 從 HTML 解析圖片 URL
+      let imageUrl = ''
+      const html = e.dataTransfer?.getData('text/html') || ''
+      if (html) {
+        const match = html.match(/<img[^>]+src="([^"]+)"/)
+        if (match && match[1]) {
+          imageUrl = match[1]
+        }
+      }
+
+      // 如果 HTML 沒有，用 uri-list
+      if (!imageUrl) {
+        const uriList = e.dataTransfer?.getData('text/uri-list') || ''
+        if (uriList) {
+          imageUrl = uriList.split('\n')[0]
+        }
+      }
+
+      // 檢查是否有檔案
+      const files = e.dataTransfer?.files
+      if (files && files.length > 0) {
+        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+        if (imageFiles.length > 0) {
+          await uploadFiles(imageFiles)
+          return
+        }
+      }
+
+      // 用 URL 下載
+      if (imageUrl) {
+        await fetchAndUploadImage(imageUrl)
+      }
+    }
+
     window.addEventListener('dragover', handleGlobalDragOver, true)
+    window.addEventListener('dragleave', handleGlobalDragLeave, true)
     window.addEventListener('drop', handleGlobalDrop, true)
-
-    console.log('[AttractionsDialog] 已註冊全域拖曳事件監聽')
 
     return () => {
       window.removeEventListener('dragover', handleGlobalDragOver, true)
+      window.removeEventListener('dragleave', handleGlobalDragLeave, true)
       window.removeEventListener('drop', handleGlobalDrop, true)
     }
-  }, [open])
+  }, [open, uploadedImages])
 
   // 解析 notes 中儲存的圖片位置資訊
   const parseImagePositions = (notes: string | undefined): Record<string, ImagePosition> => {
@@ -564,7 +628,7 @@ export function AttractionsDialog({
         <div>
           <label className="text-sm font-medium">城市（選填）</label>
           <select
-            value={formData.city_id}
+            value={formData.city_id ?? ''}
             onChange={e => setFormData(prev => ({ ...prev, city_id: e.target.value }))}
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
           >
@@ -698,9 +762,7 @@ export function AttractionsDialog({
 
         {/* 已上傳圖片預覽 + 拖放區 */}
         <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          ref={dropZoneRef}
           className={`min-h-[120px] rounded-md transition-all ${
             isDragOver ? 'bg-morandi-gold/10 border-2 border-dashed border-morandi-gold' : ''
           }`}

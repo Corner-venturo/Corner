@@ -111,9 +111,22 @@ export function FormDialog({
   // 如果沒有 onSubmit，就不需要 form 包裝
   const shouldShowFooter = showFooter && onSubmit
 
+  // 阻止 Dialog 預設的拖放行為，讓子元素可以處理
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    // 不阻止，讓事件繼續傳遞給子元素
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}>
+      <DialogContent
+        className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {subtitle && <p className="text-sm text-morandi-secondary mt-1">{subtitle}</p>}

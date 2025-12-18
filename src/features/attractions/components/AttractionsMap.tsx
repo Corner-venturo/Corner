@@ -26,6 +26,19 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c
 }
 
+// Morandi 配色
+function getCategoryColor(category?: string): string {
+  switch (category) {
+    case '神社寺廟': return '#E8C4C4'
+    case '自然景觀': return '#A8BFA6'
+    case '歷史古蹟': return '#D4C4A8'
+    case '主題樂園': return '#C4B8E0'
+    case '美術館': return '#A5BCCD'
+    case '購物': return '#E8D4C4'
+    default: return '#CFB9A5'
+  }
+}
+
 export function AttractionsMap({
   attractions,
   selectedAttraction,
@@ -56,130 +69,174 @@ export function AttractionsMap({
       return distance <= radiusKm
     })
 
-    console.log('[AttractionsMap] 附近景點:', nearby.length)
     setNearbyAttractions(nearby)
   }, [selectedAttraction, attractions, radiusKm])
 
   // 初始化地圖
   useEffect(() => {
     const container = containerRef.current
-    if (!container) {
-      console.log('[AttractionsMap] 容器不存在')
-      return
-    }
-    if (!selectedAttraction?.latitude || !selectedAttraction?.longitude) {
-      console.log('[AttractionsMap] 沒有座標')
-      return
-    }
+    if (!container) return
+    if (!selectedAttraction?.latitude || !selectedAttraction?.longitude) return
 
     // 防止重複初始化
     if (initedRef.current && mapRef.current) {
-      // 只更新中心點
       mapRef.current.setView([selectedAttraction.latitude, selectedAttraction.longitude], 14)
       return
     }
 
     const initMap = async () => {
-      console.log('[AttractionsMap] 開始初始化地圖')
       setIsLoading(true)
-
       const L = (await import('leaflet')).default
 
-      // 清理舊地圖
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
       }
 
-      // 創建地圖 - 明確啟用拖曳
+      // 創建地圖 - 隱藏縮放控制
       const map = L.map(container, {
         center: [selectedAttraction.latitude!, selectedAttraction.longitude!],
         zoom: 14,
-        dragging: true,        // 明確啟用拖曳
-        touchZoom: true,       // 觸控縮放
-        scrollWheelZoom: true, // 滾輪縮放
-        doubleClickZoom: true, // 雙擊縮放
-        boxZoom: true,
-        keyboard: true,
-        zoomControl: true,     // 顯示縮放控制
+        zoomControl: false,  // 隱藏縮放控制
+        dragging: true,
+        touchZoom: true,
+        scrollWheelZoom: true,
       })
 
-      // 標準 OpenStreetMap 圖層
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OSM',
+      // CartoDB Positron 淺色底圖
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OSM © CARTO',
+        subdomains: 'abcd',
         maxZoom: 19,
       }).addTo(map)
 
       mapRef.current = map
       initedRef.current = true
 
-      // 延遲讓地圖正確顯示
-      setTimeout(() => {
-        map.invalidateSize()
-        console.log('[AttractionsMap] invalidateSize 完成')
-      }, 200)
+      setTimeout(() => map.invalidateSize(), 200)
 
-      // 創建更明顯的標記
-      const createIcon = (color: string, size: number) => {
+      // 搜尋範圍圓圈（虛線）
+      L.circle([selectedAttraction.latitude!, selectedAttraction.longitude!], {
+        radius: radiusKm * 1000,
+        color: '#94A3B8',
+        fillColor: '#94A3B8',
+        fillOpacity: 0.08,
+        weight: 2,
+        dashArray: '8, 8',
+      }).addTo(map)
+
+      // 創建自訂標記（圓角方形 + 圖片）
+      const createMarkerIcon = (attraction: Attraction, isMain: boolean) => {
+        const color = isMain ? '#dc2626' : getCategoryColor(attraction.category)
+        const size = isMain ? 44 : 36
+        const imgSize = isMain ? 36 : 28
+        const img = attraction.thumbnail || ''
+
         return L.divIcon({
-          className: 'custom-marker',
+          className: 'custom-attraction-marker',
           html: `
             <div style="
               width: ${size}px;
               height: ${size}px;
               background: ${color};
               border: 3px solid white;
-              border-radius: 50%;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            "></div>
+              border-radius: 10px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+            ">
+              ${img ? `
+                <img
+                  src="${img}"
+                  style="width: ${imgSize}px; height: ${imgSize}px; object-fit: cover; border-radius: 6px;"
+                  onerror="this.style.display='none'"
+                />
+              ` : `
+                <div style="
+                  width: ${imgSize}px;
+                  height: ${imgSize}px;
+                  background: rgba(255,255,255,0.3);
+                  border-radius: 6px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: ${isMain ? 16 : 12}px;
+                ">📍</div>
+              `}
+            </div>
           `,
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2],
         })
       }
 
-      // 主景點標記（大紅點）
-      console.log('[AttractionsMap] 添加主標記:', selectedAttraction.name)
+      // 主景點標記
       const mainMarker = L.marker(
         [selectedAttraction.latitude!, selectedAttraction.longitude!],
-        { icon: createIcon('#dc2626', 20) }
+        { icon: createMarkerIcon(selectedAttraction, true) }
       ).addTo(map)
 
-      // 主景點名稱 tooltip（永遠顯示）
       mainMarker.bindTooltip(selectedAttraction.name, {
         permanent: true,
         direction: 'top',
-        offset: [0, -12],
+        offset: [0, -24],
         className: 'main-marker-tooltip',
       })
 
-      // 附近景點標記（藍點）
-      console.log('[AttractionsMap] 附近景點數量:', nearbyAttractions.length)
+      // 附近景點標記
       nearbyAttractions.slice(0, 8).forEach((attraction) => {
         if (!attraction.latitude || !attraction.longitude) return
 
+        const distance = calculateDistance(
+          selectedAttraction.latitude!,
+          selectedAttraction.longitude!,
+          attraction.latitude,
+          attraction.longitude
+        ).toFixed(1)
+
         const marker = L.marker([attraction.latitude, attraction.longitude], {
-          icon: createIcon('#3b82f6', 12),
+          icon: createMarkerIcon(attraction, false),
         }).addTo(map)
 
         // hover 顯示名稱
         marker.bindTooltip(attraction.name, {
           direction: 'top',
-          offset: [0, -8],
+          offset: [0, -20],
           className: 'nearby-marker-tooltip',
+        })
+
+        // 點擊顯示詳細資訊
+        marker.bindPopup(`
+          <div style="min-width: 180px; padding: 4px;">
+            ${attraction.thumbnail ? `
+              <img src="${attraction.thumbnail}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
+            ` : ''}
+            <div style="font-weight: 600; font-size: 14px; color: #334155;">${attraction.name}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+              ${attraction.category || ''} · ${distance} km
+            </div>
+            ${attraction.description ? `
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
+                ${attraction.description.slice(0, 80)}${attraction.description.length > 80 ? '...' : ''}
+              </div>
+            ` : ''}
+          </div>
+        `, {
+          closeButton: true,
+          className: 'attraction-popup',
         })
       })
 
       setIsLoading(false)
-      console.log('[AttractionsMap] 地圖初始化完成')
     }
 
     initMap()
 
-    return () => {
-      // 不在這裡清理，讓地圖保持
-    }
-  }, [selectedAttraction?.id, selectedAttraction?.latitude, selectedAttraction?.longitude, nearbyAttractions])
+    return () => {}
+  }, [selectedAttraction?.id, selectedAttraction?.latitude, selectedAttraction?.longitude, nearbyAttractions, radiusKm])
 
   // 組件卸載時清理
   useEffect(() => {
@@ -192,7 +249,6 @@ export function AttractionsMap({
     }
   }, [])
 
-  // 沒有選中景點
   if (!selectedAttraction) {
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-400">
@@ -202,7 +258,6 @@ export function AttractionsMap({
     )
   }
 
-  // 沒有座標
   if (!selectedAttraction.latitude || !selectedAttraction.longitude) {
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-400">
@@ -216,13 +271,13 @@ export function AttractionsMap({
     <div className="absolute inset-0">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-[2000]">
-          <Loader2 size={24} className="animate-spin text-blue-500" />
+          <Loader2 size={24} className="animate-spin text-slate-400" />
         </div>
       )}
       <div ref={containerRef} className="w-full h-full" style={{ minHeight: '400px' }} />
       {nearbyAttractions.length > 0 && (
-        <div className="absolute bottom-3 left-3 text-xs bg-white px-2 py-1 rounded shadow z-[1000]">
-          附近 {nearbyAttractions.length} 個景點
+        <div className="absolute bottom-3 left-3 text-xs bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-slate-600">
+          {radiusKm}km 內 {nearbyAttractions.length} 個景點
         </div>
       )}
     </div>

@@ -43,6 +43,7 @@ interface AttractionSelectorProps {
   tourCountryName?: string // 行程的國家名稱（新版，來自 CoverInfo）
   onSelect: (attractions: AttractionWithCity[]) => void
   dayTitle?: string // 當天的行程標題，用於智能建議
+  existingIds?: string[] // 已選過的景點 ID（顯示鎖定狀態）
 }
 
 // 使用 module-level 變數保存篩選狀態（半永久記憶）
@@ -92,7 +93,11 @@ export function AttractionSelector({
   tourCountryName = '',
   onSelect,
   dayTitle = '',
+  existingIds = [],
 }: AttractionSelectorProps) {
+  // 已選過的景點 ID Set（用於快速查找）
+  const existingIdsSet = useMemo(() => new Set(existingIds), [existingIds])
+
   // 從記憶中載入初始值
   const [selectedCountryId, setSelectedCountryId] = useState<string>(savedCountryId)
   const [selectedCityId, setSelectedCityId] = useState<string>(savedCityId)
@@ -557,6 +562,7 @@ export function AttractionSelector({
                     const isSelected = selectedIds.has(attraction.id)
                     const isSuggested = suggestedAttractions.some(s => s.id === attraction.id)
                     const hasCoordinates = attraction.latitude && attraction.longitude
+                    const isExisting = existingIdsSet.has(attraction.id) // 已在其他天選過
 
                     return (
                       <div
@@ -564,21 +570,24 @@ export function AttractionSelector({
                         className={`
                           relative flex gap-3 p-2.5 rounded-xl transition-all
                           border hover:shadow-sm
-                          ${isSelected
-                            ? 'border-morandi-gold bg-morandi-gold/5'
-                            : isSuggested
-                              ? 'border-amber-300 bg-amber-50/50'
-                              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+                          ${isExisting
+                            ? 'border-slate-200 bg-slate-50 opacity-60'
+                            : isSelected
+                              ? 'border-morandi-gold bg-morandi-gold/5'
+                              : isSuggested
+                                ? 'border-amber-300 bg-amber-50/50'
+                                : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
                           }
                         `}
                       >
                         {/* 勾選框 */}
-                        <label className="flex items-center cursor-pointer">
+                        <label className={`flex items-center ${isExisting ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                           <input
                             type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleSelection(attraction.id)}
-                            className="w-4 h-4 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                            checked={isSelected || isExisting}
+                            onChange={() => !isExisting && toggleSelection(attraction.id)}
+                            disabled={isExisting}
+                            className={`w-4 h-4 rounded border-gray-300 focus:ring-morandi-gold ${isExisting ? 'text-slate-400' : 'text-morandi-gold'}`}
                           />
                         </label>
 
@@ -604,6 +613,11 @@ export function AttractionSelector({
                               <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
                             )}
                             {attraction.name}
+                            {isExisting && (
+                              <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-200 text-slate-500 rounded">
+                                已選
+                              </span>
+                            )}
                           </div>
                           <div className="text-xs text-morandi-secondary mt-0.5 flex items-center gap-1.5">
                             <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
