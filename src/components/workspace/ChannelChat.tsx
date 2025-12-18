@@ -119,6 +119,7 @@ export function ChannelChat() {
               <ChatHeader
                 showMemberSidebar={showMemberSidebar}
                 onToggleMemberSidebar={() => setShowMemberSidebar(!showMemberSidebar)}
+                tourId={selectedChannel.tour_id}
               />
             }
           >
