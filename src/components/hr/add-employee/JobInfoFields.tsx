@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { EmployeeFormData } from './types'
 
 interface JobInfoFieldsProps {
@@ -17,15 +18,15 @@ export function JobInfoFields({ formData, setFormData }: JobInfoFieldsProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-morandi-primary mb-1">入職日期</label>
-          <Input
-            type="date"
+          <DatePicker
             value={formData.job_info.hire_date}
-            onChange={e =>
+            onChange={date =>
               setFormData({
                 ...formData,
-                job_info: { ...formData.job_info, hire_date: e.target.value },
+                job_info: { ...formData.job_info, hire_date: date },
               })
             }
+            placeholder="選擇日期"
           />
         </div>
         <div>

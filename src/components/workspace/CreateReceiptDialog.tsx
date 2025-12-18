@@ -6,6 +6,7 @@ import { useReceiptOrderStore } from '@/stores'
 import type { CreateInput } from '@/stores/core/types'
 import type { ReceiptOrder } from '@/types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -110,14 +111,14 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
               收款日期
             </label>
             <div className="relative">
-              <input
-                type="date"
+              <DatePicker
                 value={receiptDate}
-                onChange={e => setReceiptDate(e.target.value)}
+                onChange={date => setReceiptDate(date)}
+                placeholder="選擇日期"
                 className="pl-10"
               />
               <Calendar
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary pointer-events-none"
                 size={16}
               />
             </div>

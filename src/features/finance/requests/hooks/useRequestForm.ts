@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useTours } from '@/features/tours/hooks/useTours'
 import { useOrders } from '@/features/orders/hooks/useOrders'
-import { useSupplierStore, useEmployeeStore } from '@/stores'
+import { useSupplierStore, useEmployeeStore, useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
@@ -11,6 +11,9 @@ export function useRequestForm() {
   const employeeStore = useEmployeeStore()
   const suppliers = supplierStore.items
   const employees = employeeStore.items
+
+  // 獲取當前登入用戶
+  const currentUser = useAuthStore(state => state.user)
 
   // 載入所需資料
   useEffect(() => {
@@ -26,7 +29,7 @@ export function useRequestForm() {
     request_date: '',
     note: '',
     is_special_billing: false,
-    created_by: '1',
+    created_by: currentUser?.id || '',
   })
 
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
@@ -145,7 +148,7 @@ export function useRequestForm() {
       request_date: '',
       note: '',
       is_special_billing: false,
-      created_by: '1',
+      created_by: currentUser?.id || '',
     })
     setRequestItems([
       {
@@ -162,7 +165,7 @@ export function useRequestForm() {
     setOrderSearchValue('')
     setShowTourDropdown(false)
     setShowOrderDropdown(false)
-  }, [])
+  }, [currentUser?.id])
 
   return {
     formData,
@@ -187,5 +190,6 @@ export function useRequestForm() {
     suppliers: combinedSuppliers,
     tours,
     orders,
+    currentUser, // 當前登入用戶
   }
 }

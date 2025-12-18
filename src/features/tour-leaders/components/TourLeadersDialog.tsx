@@ -7,6 +7,7 @@
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import type { TourLeaderFormData } from '@/types/tour-leader.types'
 
@@ -121,10 +122,10 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">護照效期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.passport_expiry}
-                onChange={e => onFormFieldChange('passport_expiry', e.target.value)}
+                onChange={(date) => onFormFieldChange('passport_expiry', date)}
+                placeholder="選擇日期"
                 className="mt-1"
               />
             </div>

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   CustomerSearchDialog,
   CustomerSearchParams,
@@ -1395,22 +1396,22 @@ export default function CustomersPage() {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-morandi-primary">護照效期</label>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={newCustomer.passport_expiry_date}
-                      onChange={e => setNewCustomer(prev => ({ ...prev, passport_expiry_date: e.target.value }))}
+                      onChange={(date) => setNewCustomer(prev => ({ ...prev, passport_expiry_date: date }))}
                       className="mt-1 h-8 text-sm"
+                      placeholder="選擇日期"
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-xs font-medium text-morandi-primary">出生日期</label>
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={newCustomer.date_of_birth}
-                    onChange={e => setNewCustomer(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                    onChange={(date) => setNewCustomer(prev => ({ ...prev, date_of_birth: date }))}
                     className="mt-1 h-8 text-sm"
+                    placeholder="選擇日期"
                   />
                 </div>
               </div>
@@ -1964,11 +1965,10 @@ export default function CustomersPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-morandi-secondary mb-1">護照效期</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={verifyFormData.passport_expiry_date || ''}
-                    onChange={e => setVerifyFormData({ ...verifyFormData, passport_expiry_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                    onChange={(date) => setVerifyFormData({ ...verifyFormData, passport_expiry_date: date })}
+                    placeholder="選擇日期"
                   />
                 </div>
                 <div>
@@ -1986,11 +1986,10 @@ export default function CustomersPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-morandi-secondary mb-1">出生年月日</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={verifyFormData.date_of_birth || ''}
-                    onChange={e => setVerifyFormData({ ...verifyFormData, date_of_birth: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                    onChange={(date) => setVerifyFormData({ ...verifyFormData, date_of_birth: date })}
+                    placeholder="選擇日期"
                   />
                 </div>
                 <div>

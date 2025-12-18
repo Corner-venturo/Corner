@@ -15,6 +15,7 @@
 import { useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { formatDateForInput } from '@/lib/utils'
@@ -148,20 +149,20 @@ export function ReceiptSearchDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs text-morandi-muted">起始日期</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.dateFrom}
-                onChange={e => setFilters({ ...filters, dateFrom: e.target.value })}
+                onChange={(date) => setFilters({ ...filters, dateFrom: date })}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
             <div>
               <Label className="text-xs text-morandi-muted">結束日期</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.dateTo}
-                onChange={e => setFilters({ ...filters, dateTo: e.target.value })}
+                onChange={(date) => setFilters({ ...filters, dateTo: date })}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
           </div>

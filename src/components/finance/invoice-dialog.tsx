@@ -9,6 +9,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { FileText, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Combobox, ComboboxOption } from '@/components/ui/combobox'
@@ -283,10 +284,10 @@ export function InvoiceDialog({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label>開立日期</Label>
-              <Input
-                type="date"
+              <DatePicker
                 value={invoiceDate}
-                onChange={e => setInvoiceDate(e.target.value)}
+                onChange={(date) => setInvoiceDate(date)}
+                placeholder="選擇日期"
               />
             </div>
 

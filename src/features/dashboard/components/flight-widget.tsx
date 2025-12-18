@@ -21,6 +21,8 @@ import {
   type FlightData,
   type AirportFlightItem,
 } from '../actions/flight-actions'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type SearchMode = 'flight' | 'airport'
 type AirportDirection = 'departure' | 'arrival'
@@ -260,20 +262,18 @@ export function FlightWidget() {
                     <Building2 className="w-3.5 h-3.5" />
                     出發機場
                   </label>
-                  <div className="relative">
-                    <select
-                      value={airportCode}
-                      onChange={e => setAirportCode(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm appearance-none"
-                    >
+                  <Select value={airportCode} onValueChange={setAirportCode}>
+                    <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                      <SelectValue placeholder="選擇機場" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {COMMON_AIRPORTS.map(airport => (
-                        <option key={airport.code} value={airport.code}>
+                        <SelectItem key={airport.code} value={airport.code}>
                           {airport.code} - {airport.name}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-morandi-secondary pointer-events-none" />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
@@ -298,10 +298,10 @@ export function FlightWidget() {
                 <Calendar className="w-3.5 h-3.5" />
                 日期
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={queryDate}
-                onChange={e => setQueryDate(e.target.value)}
+                onChange={(date) => setQueryDate(date)}
+                placeholder="選擇日期"
                 className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
               />
             </div>

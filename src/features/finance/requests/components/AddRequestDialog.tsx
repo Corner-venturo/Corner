@@ -35,6 +35,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     removeItem,
     resetForm,
     suppliers,
+    tours,  // 完整的旅遊團列表（用於查找選中的團）
+    orders, // 完整的訂單列表（用於查找選中的訂單）
+    currentUser, // 當前登入用戶
   } = useRequestForm()
 
   const { generateRequestCode, createRequest } = useRequestOperations()
@@ -60,15 +63,22 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
   const handleSubmit = async () => {
     try {
       // 找到選中的旅遊團和訂單資訊
-      const selectedTour = filteredTours.find(t => t.id === formData.tour_id)
-      const selectedOrder = filteredOrders.find(o => o.id === formData.order_id)
+      // 注意：使用完整的 tours 列表查找，而不是 filteredTours（搜尋過濾後可能找不到）
+      const selectedTour = tours.find(t => t.id === formData.tour_id)
+      const selectedOrder = orders.find(o => o.id === formData.order_id)
+
+      if (!selectedTour) {
+        console.error('找不到選擇的旅遊團:', formData.tour_id)
+        return
+      }
 
       await createRequest(
         formData,
         requestItems,
-        selectedTour?.name || '',
-        selectedTour?.code || '',
-        selectedOrder?.order_number
+        selectedTour.name || '',
+        selectedTour.code || '',
+        selectedOrder?.order_number,
+        currentUser?.display_name || currentUser?.chinese_name || '' // 請款人姓名
       )
       resetForm()
       onOpenChange(false)

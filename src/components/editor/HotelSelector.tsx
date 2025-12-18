@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Building2, ImageIcon, Loader2, Star, Crown, Plus, PenLine } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 
@@ -403,64 +404,68 @@ export function HotelSelector({
           {/* 篩選區 - 第一排：國家、區域、城市 */}
           <div className="flex gap-3 flex-wrap">
             {/* 國家選擇 */}
-            <select
-              value={selectedCountryId}
-              onChange={e => handleCountryChange(e.target.value)}
-              className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-            >
-              <option value="">全部國家</option>
-              {countries.map(country => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedCountryId} onValueChange={handleCountryChange}>
+              <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                <SelectValue placeholder="全部國家" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">全部國家</SelectItem>
+                {countries.map(country => (
+                  <SelectItem key={country.id} value={country.id}>
+                    {country.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* 區域選擇 */}
             {selectedCountryId && regions.length > 0 && (
-              <select
-                value={selectedRegionId}
-                onChange={e => handleRegionChange(e.target.value)}
-                className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-              >
-                <option value="">全部區域</option>
-                {regions.map(region => (
-                  <option key={region.id} value={region.id}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedRegionId} onValueChange={handleRegionChange}>
+                <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                  <SelectValue placeholder="全部區域" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">全部區域</SelectItem>
+                  {regions.map(region => (
+                    <SelectItem key={region.id} value={region.id}>
+                      {region.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
 
             {/* 城市選擇 */}
             {selectedCountryId && cities.length > 0 && (
-              <select
-                value={selectedCityId}
-                onChange={e => handleCityChange(e.target.value)}
-                className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-              >
-                <option value="">全部城市</option>
-                {cities.map(city => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedCityId} onValueChange={handleCityChange}>
+                <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                  <SelectValue placeholder="全部城市" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">全部城市</SelectItem>
+                  {cities.map(city => (
+                    <SelectItem key={city.id} value={city.id}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
 
             {/* 品牌選擇 */}
-            <select
-              value={selectedBrand}
-              onChange={e => handleBrandChange(e.target.value)}
-              className="px-4 py-2.5 border border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-            >
-              <option value="">全部品牌</option>
-              {HOTEL_BRANDS.map(brand => (
-                <option key={brand} value={brand}>
-                  {brand}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedBrand} onValueChange={handleBrandChange}>
+              <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500">
+                <SelectValue placeholder="全部品牌" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">全部品牌</SelectItem>
+                {HOTEL_BRANDS.map(brand => (
+                  <SelectItem key={brand} value={brand}>
+                    {brand}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* 搜尋框 */}
             <div className="flex-1 relative min-w-[180px]">

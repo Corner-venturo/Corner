@@ -42,6 +42,7 @@ import { Todo } from '@/stores/types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { TodoCard } from '@/components/todos/todo-card'
+import { DatePicker } from '@/components/ui/date-picker'
 
 export const dynamic = 'force-dynamic'
 
@@ -614,10 +615,10 @@ function AddTodoForm({
 
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">期限</label>
-        <Input
-          type="date"
+        <DatePicker
           value={formData.deadline}
-          onChange={e => setFormData({ ...formData, deadline: e.target.value })}
+          onChange={date => setFormData({ ...formData, deadline: date })}
+          placeholder="選擇日期"
         />
       </div>
 

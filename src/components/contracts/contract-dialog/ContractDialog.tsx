@@ -10,8 +10,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { DatePicker } from '@/components/ui/date-picker'
 import { ContractTemplate } from '@/types/tour.types'
 import { ContractDialogProps } from './types'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useContractForm } from './useContractForm'
 import { ContractFormFields } from './ContractFormFields'
 
@@ -124,18 +126,18 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               <h3 className="text-sm font-semibold text-morandi-primary mb-3">
                 選擇訂單（旅客資料來源）
               </h3>
-              <select
-                value={selectedOrderId}
-                onChange={e => setSelectedOrderId(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
-              >
-                {tourOrders.map(order => (
-                  <option key={order.id} value={order.id}>
-                    {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'}
-                    )
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="選擇訂單" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tourOrders.map(order => (
+                    <SelectItem key={order.id} value={order.id}>
+                      {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {selectedOrder && (
                 <div className="mt-2 text-xs text-morandi-secondary bg-blue-50 border border-blue-200 rounded p-2">
                   💡 合約的旅客資訊將自動帶入此訂單的聯絡人：{selectedOrder.contact_person}
@@ -230,11 +232,11 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
             </div>
             <div>
               <h3 className="text-sm font-semibold text-morandi-primary mb-3">歸檔日期</h3>
-              <input
-                type="date"
+              <DatePicker
                 value={archivedDate}
-                onChange={e => setArchivedDate(e.target.value)}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
+                onChange={date => setArchivedDate(date)}
+                placeholder="選擇日期"
+                className="w-full"
               />
             </div>
           </div>

@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { logger } from '@/lib/utils/logger'
+import { DatePicker } from '@/components/ui/date-picker'
 
 export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSectionProps) {
   const [newSubTask, setNewSubTask] = useState('')
@@ -271,10 +272,10 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
             </div>
             <div>
               <label className="text-xs text-[#8C8C8C] mb-1 block">日期 *</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={calendarDate}
-                onChange={e => setCalendarDate(e.target.value)}
+                onChange={date => setCalendarDate(date)}
+                placeholder="選擇日期"
                 className="h-9 text-sm"
               />
             </div>

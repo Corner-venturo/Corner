@@ -3,6 +3,8 @@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EditEventDialogState } from '../types'
 
 interface EditEventDialogProps {
@@ -89,20 +91,19 @@ export function EditEventDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">開始日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={dialog.startDate}
-                onChange={e => onDialogChange({ ...dialog, startDate: e.target.value })}
+                onChange={(date) => onDialogChange({ ...dialog, startDate: date })}
+                placeholder="選擇日期"
                 className="mt-1"
               />
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">結束日期（選填）</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={dialog.endDate}
-                onChange={e => onDialogChange({ ...dialog, endDate: e.target.value })}
-                min={dialog.startDate}
+                onChange={(date) => onDialogChange({ ...dialog, endDate: date })}
+                placeholder="選擇日期"
                 className="mt-1"
               />
             </div>
@@ -121,19 +122,23 @@ export function EditEventDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">事件類型</label>
-              <select
+              <Select
                 value={dialog.visibility}
-                onChange={e =>
+                onValueChange={(value: 'personal' | 'company') =>
                   onDialogChange({
                     ...dialog,
-                    visibility: e.target.value as 'personal' | 'company',
+                    visibility: value,
                   })
                 }
-                className="mt-1"
               >
-                <option value="personal">個人行事曆</option>
-                <option value="company">公司行事曆</option>
-              </select>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="選擇事件類型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="personal">個人行事曆</SelectItem>
+                  <SelectItem value="company">公司行事曆</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

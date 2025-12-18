@@ -4,8 +4,8 @@ import {
   useWorkspaceChat,
   useWorkspaceWidgets,
   useChatStore,
-  useAuthStore, // Import useAuthStore
 } from '@/stores/workspace'
+import { useAuthStore } from '@/stores'
 import { useMessageOperations, useFileUpload, useScrollToBottom } from '../chat'
 import {
   useDialogStates,

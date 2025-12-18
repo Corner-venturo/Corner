@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -230,7 +231,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
           {/* 收款日期 */}
           <div>
             <Label>收款日期</Label>
-            <Input type="date" value={receiptDate} onChange={e => setReceiptDate(e.target.value)} />
+            <DatePicker value={receiptDate} onChange={(date) => setReceiptDate(date)} placeholder="選擇日期" />
           </div>
 
           {/* 收款項目 */}
@@ -274,11 +275,11 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                     className="w-40"
                   />
 
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={item.transaction_date}
-                    onChange={e => updatePaymentItem(index, { transaction_date: e.target.value })}
+                    onChange={(date) => updatePaymentItem(index, { transaction_date: date })}
                     className="w-40"
+                    placeholder="交易日期"
                   />
 
                   {paymentItems.length > 1 && (

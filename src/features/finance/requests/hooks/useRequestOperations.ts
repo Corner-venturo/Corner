@@ -29,7 +29,8 @@ export function useRequestOperations() {
       items: RequestItem[],
       tourName: string,
       tourCode: string,
-      orderNumber?: string
+      orderNumber?: string,
+      createdByName?: string  // 請款人姓名
     ) => {
       if (!formData.tour_id || !items || items.length === 0) return null
 
@@ -48,7 +49,9 @@ export function useRequestOperations() {
         amount: 0,
         status: 'pending',
         note: formData.note,
-        request_type: '供應商支出', // Default value for now
+        request_type: '供應商支出',
+        created_by: formData.created_by || undefined,
+        created_by_name: createdByName || undefined,
       })
 
       // Add all items sequentially

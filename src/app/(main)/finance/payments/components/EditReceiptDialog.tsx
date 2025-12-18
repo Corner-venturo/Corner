@@ -16,6 +16,7 @@
 import { useState, useEffect } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { formatDateForInput } from '@/lib/utils'
 import type { Receipt } from '@/types/receipt.types'
@@ -89,11 +90,11 @@ export function EditReceiptDialog({
           <label className="text-sm font-medium text-morandi-primary">
             收款日期 <span className="text-morandi-red">*</span>
           </label>
-          <Input
-            type="date"
+          <DatePicker
             value={formatDateForInput(formData.receipt_date)}
-            onChange={e => setFormData({ ...formData, receipt_date: e.target.value })}
+            onChange={(date) => setFormData({ ...formData, receipt_date: date })}
             className="mt-1"
+            placeholder="選擇日期"
           />
         </div>
 
@@ -161,11 +162,11 @@ export function EditReceiptDialog({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">支票日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formatDateForInput(formData.check_date)}
-                onChange={e => setFormData({ ...formData, check_date: e.target.value })}
+                onChange={(date) => setFormData({ ...formData, check_date: date })}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
           </div>

@@ -9,6 +9,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Save, Trash2, Plus, Printer, FilePlus, History, ChevronDown } from 'lucide-react'
 import {
   Dialog,
@@ -580,11 +581,11 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary">開單日期</label>
-            <Input
-              type="date"
+            <DatePicker
               value={formData.issue_date}
-              onChange={e => setFormField('issue_date', e.target.value)}
+              onChange={(date) => setFormField('issue_date', date || '')}
               disabled={!isEditing}
+              placeholder="選擇日期"
               className="mt-1"
             />
           </div>

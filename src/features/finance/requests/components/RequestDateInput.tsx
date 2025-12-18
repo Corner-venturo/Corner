@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
 
 interface RequestDateInputProps {
@@ -47,14 +48,14 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
   return (
     <div>
       <label className="text-sm font-medium text-morandi-primary">{label}</label>
-      <Input
-        type="date"
+      <DatePicker
         value={value}
-        onChange={e => handleDateChange(e.target.value)}
+        onChange={(date) => handleDateChange(date)}
         className={cn(
           'mt-1',
           isSpecialBilling ? 'bg-morandi-gold/10 border-morandi-gold/20' : 'bg-background'
         )}
+        placeholder="選擇日期"
       />
       {value && (
         <p

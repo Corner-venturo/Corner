@@ -5,7 +5,9 @@ import React, { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useOrderStore } from '@/stores'
 
 interface VisaApplicant {
@@ -263,41 +265,40 @@ export function AddVisaDialog({
               readOnly={applicant.isAdditional}
             />
 
-            <select
+            <Select
               value={applicant.country}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateApplicant(applicant.id, 'country', e.target.value)}
-              className="w-56 p-2 border border-border rounded-md bg-background h-10 text-sm"
+              onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
             >
-              <optgroup label="護照">
-                <option value="護照 成人">護照 成人</option>
-                <option value="護照 兒童">護照 兒童</option>
-                <option value="護照 成人 遺失件">護照 成人 遺失件</option>
-                <option value="護照 兒童 遺失件">護照 兒童 遺失件</option>
-              </optgroup>
-              <optgroup label="台胞證">
-                <option value="台胞證">台胞證</option>
-                <option value="台胞證 遺失件">台胞證 遺失件</option>
-                <option value="台胞證 首辦">台胞證 首辦</option>
-              </optgroup>
-              <optgroup label="美國簽證">
-                <option value="美國 ESTA">美國 ESTA</option>
-              </optgroup>
-            </select>
+              <SelectTrigger className="w-56 h-10 text-sm">
+                <SelectValue placeholder="選擇簽證類型" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
+                <SelectItem value="護照 成人">護照 成人</SelectItem>
+                <SelectItem value="護照 兒童">護照 兒童</SelectItem>
+                <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
+                <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
+                <SelectItem value="台胞證">台胞證</SelectItem>
+                <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
+                <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
+                <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <Input
-              type="date"
+            <DatePicker
               value={applicant.received_date}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'received_date', e.target.value)}
+              onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
               className="w-32"
-              title="收件時間"
+              placeholder="收件時間"
             />
 
-            <Input
-              type="date"
+            <DatePicker
               value={applicant.expected_issue_date}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'expected_issue_date', e.target.value)}
+              onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
               className="w-32"
-              title="預計下件時間"
+              placeholder="預計下件"
             />
 
             <Input

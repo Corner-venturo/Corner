@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -362,12 +363,11 @@ export default function ModulesManagementPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="expires">授權到期日（選填）</Label>
-              <Input
-                id="expires"
-                type="date"
+              <DatePicker
                 value={expiresDate}
-                onChange={e => setExpiresDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+                onChange={date => setExpiresDate(date)}
+                placeholder="選擇日期"
+                minDate={new Date().toISOString().split('T')[0]}
               />
               <p className="text-sm text-[#8C8C8C]">留空表示永久授權</p>
             </div>

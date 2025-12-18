@@ -9,6 +9,7 @@ import { Edit, Upload, FileImage, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import type { Customer } from '@/types/customer.types'
 import { usePassportUpload } from '../hooks/usePassportUpload'
 
@@ -160,22 +161,22 @@ export function CustomerAddDialog({
                 </div>
                 <div>
                   <label className="text-xs font-medium text-morandi-primary">護照效期</label>
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={newCustomer.passport_expiry_date}
-                    onChange={(e) => setNewCustomer((prev) => ({ ...prev, passport_expiry_date: e.target.value }))}
+                    onChange={(date) => setNewCustomer((prev) => ({ ...prev, passport_expiry_date: date }))}
                     className="mt-1 h-8 text-sm"
+                    placeholder="選擇日期"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="text-xs font-medium text-morandi-primary">出生日期</label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={newCustomer.date_of_birth}
-                  onChange={(e) => setNewCustomer((prev) => ({ ...prev, date_of_birth: e.target.value }))}
+                  onChange={(date) => setNewCustomer((prev) => ({ ...prev, date_of_birth: date }))}
                   className="mt-1 h-8 text-sm"
+                  placeholder="選擇日期"
                 />
               </div>
             </div>

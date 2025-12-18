@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Trash2, Plus, ChevronDown, ChevronRight, Printer } from 'lucide-react'
 import { QuickQuoteItem } from '@/types/quote.types'
 import { cn } from '@/lib/utils'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface QuickQuoteSectionProps {
   items: QuickQuoteItem[]
@@ -183,11 +184,11 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
             </div>
             <div>
               <label className="text-xs font-medium text-morandi-secondary">開單日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={customerInfo.issue_date}
-                onChange={e => setField('issue_date', e.target.value)}
+                onChange={(date) => setField('issue_date', date || '')}
                 disabled={isReadOnly}
+                placeholder="選擇日期"
                 className="mt-1 h-8 text-sm"
               />
             </div>

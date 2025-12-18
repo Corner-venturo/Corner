@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Calendar } from 'lucide-react'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
@@ -92,15 +93,15 @@ export function PersonalInfoSection({
             生日
           </label>
           {isEditing ? (
-            <Input
-              type="date"
+            <DatePicker
               value={formData.personal_info.birthday}
-              onChange={e =>
+              onChange={date =>
                 setFormData({
                   ...formData,
-                  personal_info: { ...formData.personal_info, birthday: e.target.value },
+                  personal_info: { ...formData.personal_info, birthday: date },
                 })
               }
+              placeholder="選擇日期"
             />
           ) : (
             <p className="text-morandi-primary py-2">

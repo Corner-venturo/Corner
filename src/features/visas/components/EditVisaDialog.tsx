@@ -3,6 +3,8 @@
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useVisaStore, useVendorCostStore } from '@/stores'
 import type { Visa } from '@/stores/types'
 import { getVisaStatusLabel } from '@/constants/status-maps'
@@ -142,42 +144,47 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">簽證類型</label>
-            <select
+            <Select
               value={formData.visa_type || ''}
-              onChange={e => {
-                updateField('visa_type', e.target.value)
-                updateField('country', e.target.value)
+              onValueChange={value => {
+                updateField('visa_type', value)
+                updateField('country', value)
               }}
-              className="w-full mt-1 p-2 border border-border rounded-md bg-background h-10 text-sm"
             >
-              <optgroup label="護照">
-                <option value="護照 成人">護照 成人</option>
-                <option value="護照 兒童">護照 兒童</option>
-                <option value="護照 成人 遺失件">護照 成人 遺失件</option>
-                <option value="護照 兒童 遺失件">護照 兒童 遺失件</option>
-              </optgroup>
-              <optgroup label="台胞證">
-                <option value="台胞證">台胞證</option>
-                <option value="台胞證 遺失件">台胞證 遺失件</option>
-                <option value="台胞證 首辦">台胞證 首辦</option>
-              </optgroup>
-              <optgroup label="美國簽證">
-                <option value="美國 ESTA">美國 ESTA</option>
-              </optgroup>
-            </select>
+              <SelectTrigger className="w-full mt-1 h-10">
+                <SelectValue placeholder="選擇簽證類型" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
+                <SelectItem value="護照 成人">護照 成人</SelectItem>
+                <SelectItem value="護照 兒童">護照 兒童</SelectItem>
+                <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
+                <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
+                <SelectItem value="台胞證">台胞證</SelectItem>
+                <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
+                <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
+                <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
+                <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary">狀態</label>
-            <select
+            <Select
               value={formData.status || ''}
-              onChange={e => updateField('status', e.target.value)}
-              className="w-full mt-1 p-2 border border-border rounded-md bg-background h-10 text-sm"
+              onValueChange={value => updateField('status', value)}
             >
-              <option value="pending">待送件</option>
-              <option value="submitted">已送件</option>
-              <option value="collected">已取件</option>
-              <option value="rejected">退件</option>
-            </select>
+              <SelectTrigger className="w-full mt-1 h-10">
+                <SelectValue placeholder="選擇狀態" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">待送件</SelectItem>
+                <SelectItem value="submitted">已送件</SelectItem>
+                <SelectItem value="collected">已取件</SelectItem>
+                <SelectItem value="rejected">退件</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -187,47 +194,47 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="text-xs text-morandi-secondary">收件時間</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.received_date || ''}
-                onChange={e => updateField('received_date', e.target.value)}
+                onChange={(date) => updateField('received_date', date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
             <div>
               <label className="text-xs text-morandi-secondary">預計下件</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.expected_issue_date || ''}
-                onChange={e => updateField('expected_issue_date', e.target.value)}
+                onChange={(date) => updateField('expected_issue_date', date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
             <div>
               <label className="text-xs text-morandi-secondary">送件時間</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.actual_submission_date || ''}
-                onChange={e => updateField('actual_submission_date', e.target.value)}
+                onChange={(date) => updateField('actual_submission_date', date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
             <div>
               <label className="text-xs text-morandi-secondary">證件歸還</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.documents_returned_date || ''}
-                onChange={e => updateField('documents_returned_date', e.target.value)}
+                onChange={(date) => updateField('documents_returned_date', date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
             <div>
               <label className="text-xs text-morandi-secondary">取件時間</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.pickup_date || ''}
-                onChange={e => updateField('pickup_date', e.target.value)}
+                onChange={(date) => updateField('pickup_date', date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
           </div>

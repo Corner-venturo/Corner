@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { useAccountingStore } from '@/stores/accounting-store'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { ArrowUpRight, ArrowDownRight, Plus, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AddTransactionDialogProps {
   isOpen: boolean
@@ -312,18 +314,18 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       {/* 帳戶選擇 */}
       <div>
         <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">選擇帳戶</label>
-        <select
-          value={formData.account_id}
-          onChange={e => setFormData(prev => ({ ...prev, account_id: e.target.value }))}
-          className="w-full p-3 border border-[#E8E4E0] rounded-lg bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20 transition-colors"
-        >
-          <option value="">請選擇帳戶</option>
-          {accounts.map(account => (
-            <option key={account.id} value={account.id}>
-              {account.name} (NT$ {account.balance.toLocaleString()})
-            </option>
-          ))}
-        </select>
+        <Select value={formData.account_id} onValueChange={(value) => setFormData(prev => ({ ...prev, account_id: value }))}>
+          <SelectTrigger className="h-12">
+            <SelectValue placeholder="請選擇帳戶" />
+          </SelectTrigger>
+          <SelectContent>
+            {accounts.map(account => (
+              <SelectItem key={account.id} value={account.id}>
+                {account.name} (NT$ {account.balance.toLocaleString()})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* 金額 */}
@@ -351,10 +353,10 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       {/* 日期 */}
       <div>
         <label className="text-sm font-medium text-[#8C8C8C] mb-1.5 block">日期</label>
-        <Input
-          type="date"
+        <DatePicker
           value={formData.date}
-          onChange={e => setFormData(prev => ({ ...prev, date: e.target.value }))}
+          onChange={date => setFormData(prev => ({ ...prev, date }))}
+          placeholder="選擇日期"
           className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Banknote, Search, Loader2, AlertCircle, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface RemittanceOption {
   provider: string
@@ -148,34 +149,36 @@ export function RemittanceWidget() {
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
                   匯出國
                 </label>
-                <select
-                  value={from}
-                  onChange={e => setFrom(e.target.value)}
-                  className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                >
-                  {COUNTRIES.map(country => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={from} onValueChange={setFrom}>
+                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇國家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map(country => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
                   收款國
                 </label>
-                <select
-                  value={to}
-                  onChange={e => setTo(e.target.value)}
-                  className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                >
-                  {COUNTRIES.map(country => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={to} onValueChange={setTo}>
+                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇國家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map(country => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

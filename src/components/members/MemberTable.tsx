@@ -4,6 +4,7 @@
 import React, { forwardRef } from 'react';
 import { ReactDataSheetWrapper, DataSheetColumn } from '@/components/shared/react-datasheet-wrapper';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Member } from '@/stores/types'; // Assuming Member type is still needed
 
 interface MemberTableProps {
@@ -55,10 +56,10 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
                       />
                     </td>
                     <td className="px-1 py-1">
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={member.birthday || ''}
-                        onChange={(e) => handleEditModeChange(index, 'birthday', e.target.value)}
+                        onChange={(date) => handleEditModeChange(index, 'birthday', date)}
+                        placeholder="選擇日期"
                         className="h-8 text-sm"
                       />
                     </td>
@@ -82,10 +83,10 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
                       />
                     </td>
                     <td className="px-1 py-1">
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={member.passport_expiry || ''}
-                        onChange={(e) => handleEditModeChange(index, 'passport_expiry', e.target.value)}
+                        onChange={(date) => handleEditModeChange(index, 'passport_expiry', date)}
+                        placeholder="選擇日期"
                         className="h-8 text-sm"
                       />
                     </td>

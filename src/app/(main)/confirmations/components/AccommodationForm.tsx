@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import type { ConfirmationFormData, AccommodationData } from '@/types/confirmation.types'
 
 interface AccommodationFormProps {
@@ -134,11 +135,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="checkInDate">入住日期 *</Label>
-            <Input
-              id="checkInDate"
-              type="date"
+            <DatePicker
               value={data.checkInDate || ''}
-              onChange={e => updateField('checkInDate', e.target.value)}
+              onChange={date => updateField('checkInDate', date)}
+              placeholder="選擇日期"
             />
           </div>
           <div className="space-y-2">
@@ -155,11 +155,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="checkOutDate">退房日期 *</Label>
-            <Input
-              id="checkOutDate"
-              type="date"
+            <DatePicker
               value={data.checkOutDate || ''}
-              onChange={e => updateField('checkOutDate', e.target.value)}
+              onChange={date => updateField('checkOutDate', date)}
+              placeholder="選擇日期"
             />
           </div>
           <div className="space-y-2">
@@ -236,10 +235,10 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
 
         {(data.meals || []).map((meal, index) => (
           <div key={index} className="flex gap-2">
-            <Input
-              type="date"
+            <DatePicker
               value={meal.date}
-              onChange={e => updateMeal(index, 'date', e.target.value)}
+              onChange={date => updateMeal(index, 'date', date)}
+              placeholder="選擇日期"
               className="w-40"
             />
             <Input

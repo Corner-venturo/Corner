@@ -20,9 +20,10 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Calendar, Search, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
@@ -30,6 +31,13 @@ import { cn } from '@/lib/utils'
 import { statusLabels } from '@/features/finance/requests/types'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface CreateDisbursementDialogProps {
   open: boolean
@@ -272,11 +280,11 @@ export function CreateDisbursementDialog({
             <div className="space-y-1">
               <label className="text-sm text-morandi-muted">出帳日期 *</label>
               <div className="flex items-center gap-2">
-                <Input
-                  type="date"
+                <DatePicker
                   value={disbursementDate}
-                  onChange={(e) => setDisbursementDate(e.target.value)}
+                  onChange={(date) => setDisbursementDate(date)}
                   className="flex-1"
+                  placeholder="選擇日期"
                 />
               </div>
             </div>
@@ -293,15 +301,16 @@ export function CreateDisbursementDialog({
           {/* 第二列：狀態篩選 */}
           <div className="space-y-1 flex-shrink-0">
             <label className="text-sm text-morandi-muted">狀態</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background"
-            >
-              {STATUS_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="選擇狀態" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 請款編號列表標題 + 篩選 */}
@@ -326,10 +335,9 @@ export function CreateDisbursementDialog({
                 />
               </div>
               {/* 出帳日期篩選 */}
-              <Input
-                type="date"
+              <DatePicker
                 value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
+                onChange={(date) => setDateFilter(date)}
                 placeholder="搜尋出帳日期"
                 className="w-40"
               />

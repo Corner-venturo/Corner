@@ -3,6 +3,7 @@
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useVendorCostStore, useVisaStore } from '@/stores'
 import type { Visa } from '@/stores/types'
 
@@ -157,11 +158,11 @@ export function SubmitVisaDialog({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">送件日期</label>
-            <Input
-              type="date"
+            <DatePicker
               value={submitDate}
-              onChange={e => setSubmitDate(e.target.value)}
+              onChange={(date) => setSubmitDate(date)}
               className="mt-1"
+              placeholder="選擇日期"
             />
           </div>
           <div>

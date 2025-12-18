@@ -2,6 +2,8 @@
 
 import { X } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AddEventDialogState, NewEventForm } from '../types'
 
 interface AddEventDialogProps {
@@ -104,22 +106,18 @@ export function AddEventDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#333333]/80">開始日期</label>
-              <input
-                type="date"
+              <DatePicker
                 value={dialog.selectedDate}
-                onChange={e => onDialogChange({ ...dialog, selectedDate: e.target.value })}
-                className={inputClassName}
+                onChange={(date) => onDialogChange({ ...dialog, selectedDate: date })}
+                placeholder="選擇日期"
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#333333]/80">結束日期 (選填)</label>
-              <input
-                type="date"
+              <DatePicker
                 value={newEvent.end_date}
-                onChange={e => onNewEventChange({ ...newEvent, end_date: e.target.value })}
-                min={dialog.selectedDate}
-                placeholder="年 / 月 / 日"
-                className={inputClassName}
+                onChange={(date) => onNewEventChange({ ...newEvent, end_date: date })}
+                placeholder="選擇日期"
               />
             </div>
           </div>
@@ -140,24 +138,23 @@ export function AddEventDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#333333]/80">事件類型</label>
-              <div className="relative">
-                <select
-                  value={newEvent.visibility}
-                  onChange={e =>
-                    onNewEventChange({
-                      ...newEvent,
-                      visibility: e.target.value as 'personal' | 'company',
-                    })
-                  }
-                  className={`${inputClassName} appearance-none pr-10`}
-                >
-                  <option value="personal">個人行事曆</option>
-                  <option value="company">公司行事曆</option>
-                </select>
-                <svg className="absolute right-3 top-1/2 -translate-y-1/2 text-[#333333]/60 pointer-events-none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 9l6 6 6-6"/>
-                </svg>
-              </div>
+              <Select
+                value={newEvent.visibility}
+                onValueChange={(value: 'personal' | 'company') =>
+                  onNewEventChange({
+                    ...newEvent,
+                    visibility: value,
+                  })
+                }
+              >
+                <SelectTrigger className={inputClassName}>
+                  <SelectValue placeholder="選擇事件類型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="personal">個人行事曆</SelectItem>
+                  <SelectItem value="company">公司行事曆</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

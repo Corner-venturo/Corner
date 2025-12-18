@@ -14,6 +14,7 @@ import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Search, Loader2, Plane, Clock, MapPin } from 'lucide-react'
 import { searchAirportDeparturesAction, AirportFlightItem } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -181,10 +182,10 @@ export function FlightRouteSearchDialog({
                 <label className="block text-xs font-medium text-slate-600 mb-1">
                   日期
                 </label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={searchDate}
-                  onChange={e => setSearchDate(e.target.value)}
+                  onChange={date => setSearchDate(date)}
+                  placeholder="選擇日期"
                   className="text-sm h-9"
                 />
               </div>

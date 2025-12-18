@@ -21,6 +21,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
@@ -349,18 +350,18 @@ export function CustomerVerifyDialog({
               </div>
               <div>
                 <label className="text-xs text-gray-500">護照效期</label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={formData.passport_expiry_date || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, passport_expiry_date: e.target.value }))}
+                  onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry_date: date }))}
+                  placeholder="選擇日期"
                 />
               </div>
               <div>
                 <label className="text-xs text-gray-500">出生日期</label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={formData.date_of_birth || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                  onChange={(date) => setFormData(prev => ({ ...prev, date_of_birth: date }))}
+                  placeholder="選擇日期"
                 />
               </div>
               <div>

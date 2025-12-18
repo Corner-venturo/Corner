@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import type { ConfirmationFormData, FlightData } from '@/types/confirmation.types'
 
 interface FlightFormProps {
@@ -192,14 +193,14 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label>出發日期</Label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={segment.departureDate}
-                  onChange={e => {
+                  onChange={date => {
                     const segments = [...(data.segments || [])]
-                    segments[index] = { ...segments[index], departureDate: e.target.value }
+                    segments[index] = { ...segments[index], departureDate: date }
                     updateData({ segments })
                   }}
+                  placeholder="選擇日期"
                 />
               </div>
               <div>

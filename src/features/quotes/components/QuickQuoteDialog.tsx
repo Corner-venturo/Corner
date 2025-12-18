@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface QuickQuoteItem {
   id: string
@@ -159,10 +160,10 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">開單日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={formData.issue_date}
-                onChange={e => setFormField('issue_date', e.target.value)}
+                onChange={(date) => setFormField('issue_date', date || '')}
+                placeholder="選擇日期"
                 className="mt-1"
               />
             </div>

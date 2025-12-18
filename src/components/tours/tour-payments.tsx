@@ -8,6 +8,7 @@ import type { Receipt, ReceiptType } from '@/types/receipt.types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DollarSign, TrendingUp, TrendingDown, CreditCard, FileText, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -581,10 +582,10 @@ export const TourPayments = React.memo(function TourPayments({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>開立日期</Label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={invoiceDate}
-                  onChange={e => setInvoiceDate(e.target.value)}
+                  onChange={(date) => setInvoiceDate(date)}
+                  placeholder="選擇日期"
                 />
               </div>
               <div>

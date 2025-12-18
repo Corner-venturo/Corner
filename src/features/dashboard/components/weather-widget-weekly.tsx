@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DailyWeather {
   date: string
@@ -264,17 +266,18 @@ export function WeatherWidgetWeekly() {
                   <MapPin className="w-3.5 h-3.5" />
                   城市
                 </label>
-                <select
-                  value={selectedCity.name}
-                  onChange={e => handleCityChange(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                >
-                  {CITIES.map(city => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={selectedCity.name} onValueChange={handleCityChange}>
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇城市" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CITIES.map(city => (
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -282,12 +285,12 @@ export function WeatherWidgetWeekly() {
                   <Calendar className="w-3.5 h-3.5" />
                   開始日期
                 </label>
-                <input
-                  type="date"
+                <DatePicker
                   value={startDate}
-                  onChange={e => handleDateChange(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  max={maxDate.toISOString().split('T')[0]}
+                  onChange={(date) => handleDateChange(date)}
+                  minDate={new Date().toISOString().split('T')[0]}
+                  maxDate={maxDate.toISOString().split('T')[0]}
+                  placeholder="選擇日期"
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>

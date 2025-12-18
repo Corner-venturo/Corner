@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { DollarSign, ArrowRightLeft, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function CurrencyWidget() {
   // 預設匯率（1 外幣 = ? 台幣）
@@ -161,20 +162,24 @@ export function CurrencyWidget() {
             <label className="text-xs font-semibold text-morandi-primary mb-2 block">
               選擇貨幣
             </label>
-            <select
+            <Select
               value={selectedCurrency}
-              onChange={e => {
-                setSelectedCurrency(e.target.value as keyof typeof DEFAULT_RATES)
+              onValueChange={(value) => {
+                setSelectedCurrency(value as keyof typeof DEFAULT_RATES)
                 setUseCustomRate(false)
               }}
-              className="w-full px-3.5 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
             >
-              {Object.entries(DEFAULT_RATES).map(([code, info]) => (
-                <option key={code} value={code}>
-                  {info.symbol} {info.name} ({code})
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full px-3.5 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                <SelectValue placeholder="選擇貨幣" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(DEFAULT_RATES).map(([code, info]) => (
+                  <SelectItem key={code} value={code}>
+                    {info.symbol} {info.name} ({code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Currency Conversion - Side by Side */}

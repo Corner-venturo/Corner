@@ -13,8 +13,10 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function CreateInvoicePage() {
   const router = useRouter()
@@ -147,26 +149,24 @@ export default function CreateInvoicePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="invoice_date">開立日期</Label>
-                  <Input
-                    id="invoice_date"
-                    type="date"
+                  <DatePicker
                     value={invoice_date}
-                    onChange={e => setInvoiceDate(e.target.value)}
-                    required
+                    onChange={(date) => setInvoiceDate(date)}
+                    placeholder="選擇日期"
                   />
                 </div>
                 <div>
                   <Label htmlFor="tax_type">課稅別</Label>
-                  <select
-                    id="tax_type"
-                    value={tax_type}
-                    onChange={e => setTaxType(e.target.value as 'dutiable' | 'zero' | 'free')}
-                    className="w-full h-10 px-3 border rounded-md bg-background text-sm"
-                  >
-                    <option value="dutiable">應稅</option>
-                    <option value="zero">零稅率</option>
-                    <option value="free">免稅</option>
-                  </select>
+                  <Select value={tax_type} onValueChange={(value) => setTaxType(value as 'dutiable' | 'zero' | 'free')}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="選擇課稅別" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dutiable">應稅</SelectItem>
+                      <SelectItem value="zero">零稅率</SelectItem>
+                      <SelectItem value="free">免稅</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>申報註記</Label>

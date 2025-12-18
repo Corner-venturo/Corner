@@ -11,12 +11,11 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Check, Trash2, Plus, Pencil, X, Save } from 'lucide-react'
+import { Trash2, Plus, Pencil, X, Save } from 'lucide-react'
 import { usePaymentRequestStore, usePaymentRequestItemStore, useTourStore, useSupplierStore } from '@/stores'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
 import { statusLabels, statusColors, categoryOptions } from '../types'
-import { getNextStatuses } from '../utils'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -28,7 +27,7 @@ interface RequestDetailDialogProps {
 }
 
 export function RequestDetailDialog({ request, open, onOpenChange }: RequestDetailDialogProps) {
-  const { update: updateRequest, delete: deleteRequest } = usePaymentRequestStore()
+  const { delete: deleteRequest } = usePaymentRequestStore()
   const { items: requestItems, fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
   const { items: tours } = useTourStore()
   const { items: suppliers } = useSupplierStore()
@@ -94,17 +93,6 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
       await alert('刪除請款單失敗', 'error')
-    }
-  }
-
-  // 更新狀態
-  const handleStatusChange = async (newStatus: 'pending' | 'approved' | 'paid') => {
-    try {
-      await updateRequest(request.id, { status: newStatus })
-      await alert(`狀態已更新為：${statusLabels[newStatus]}`, 'success')
-    } catch (error) {
-      logger.error('更新狀態失敗:', error)
-      await alert('更新狀態失敗', 'error')
     }
   }
 
@@ -303,17 +291,25 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       </td>
                       <td className="py-2 px-2">
                         <Input
-                          type="number"
-                          value={newItem.unit_price}
-                          onChange={(e) => setNewItem({ ...newItem, unit_price: Number(e.target.value) })}
+                          type="text"
+                          inputMode="decimal"
+                          value={newItem.unit_price || ''}
+                          onChange={(e) => {
+                            const num = parseFloat(e.target.value) || 0
+                            setNewItem({ ...newItem, unit_price: num })
+                          }}
                           className="h-8 text-xs text-right w-24"
                         />
                       </td>
                       <td className="py-2 px-2">
                         <Input
-                          type="number"
-                          value={newItem.quantity}
-                          onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
+                          type="text"
+                          inputMode="numeric"
+                          value={newItem.quantity || ''}
+                          onChange={(e) => {
+                            const num = parseInt(e.target.value) || 0
+                            setNewItem({ ...newItem, quantity: num })
+                          }}
                           className="h-8 text-xs text-right w-16"
                         />
                       </td>
@@ -384,17 +380,25 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             </td>
                             <td className="py-2 px-2">
                               <Input
-                                type="number"
-                                value={editItem.unit_price || 0}
-                                onChange={(e) => setEditItem({ ...editItem, unit_price: Number(e.target.value) })}
+                                type="text"
+                                inputMode="decimal"
+                                value={editItem.unit_price || ''}
+                                onChange={(e) => {
+                                  const num = parseFloat(e.target.value) || 0
+                                  setEditItem({ ...editItem, unit_price: num })
+                                }}
                                 className="h-8 text-xs text-right w-24"
                               />
                             </td>
                             <td className="py-2 px-2">
                               <Input
-                                type="number"
-                                value={editItem.quantity || 0}
-                                onChange={(e) => setEditItem({ ...editItem, quantity: Number(e.target.value) })}
+                                type="text"
+                                inputMode="numeric"
+                                value={editItem.quantity || ''}
+                                onChange={(e) => {
+                                  const num = parseInt(e.target.value) || 0
+                                  setEditItem({ ...editItem, quantity: num })
+                                }}
                                 className="h-8 text-xs text-right w-16"
                               />
                             </td>
@@ -469,7 +473,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           )}
 
           {/* 操作按鈕 */}
-          <div className="flex items-center justify-between pt-4 border-t border-morandi-container/20">
+          <div className="flex items-center justify-end pt-4 border-t border-morandi-container/20">
             <Button
               variant="outline"
               size="sm"
@@ -479,52 +483,6 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               <Trash2 size={16} className="mr-2" />
               刪除
             </Button>
-
-            <div className="flex gap-2">
-              {/* 根據狀態流轉規則顯示可用的操作按鈕 */}
-              {getNextStatuses(request.status || 'pending').map(nextStatus => {
-                // 按鈕樣式配置
-                const buttonConfig: Record<string, { label: string; className: string; icon?: boolean }> = {
-                  approved: {
-                    label: '核准',
-                    className: 'bg-blue-500 hover:bg-blue-600 text-white',
-                    icon: true,
-                  },
-                  rejected: {
-                    label: '駁回',
-                    className: 'bg-red-500 hover:bg-red-600 text-white',
-                  },
-                  processing: {
-                    label: '加入出帳',
-                    className: 'bg-orange-500 hover:bg-orange-600 text-white',
-                  },
-                  pending: {
-                    label: '退回',
-                    className: 'bg-gray-500 hover:bg-gray-600 text-white',
-                  },
-                  paid: {
-                    label: '標記已付款',
-                    className: 'bg-green-600 hover:bg-green-700 text-white',
-                    icon: true,
-                  },
-                }
-
-                const config = buttonConfig[nextStatus]
-                if (!config) return null
-
-                return (
-                  <Button
-                    key={nextStatus}
-                    size="sm"
-                    onClick={() => handleStatusChange(nextStatus as 'pending' | 'approved' | 'paid')}
-                    className={config.className}
-                  >
-                    {config.icon && <Check size={16} className="mr-2" />}
-                    {config.label}
-                  </Button>
-                )
-              })}
-            </div>
           </div>
         </div>
       </DialogContent>

@@ -14,7 +14,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { logger } from '@/lib/utils/logger'
 import { tourService } from '@/features/tours/services/tour.service'
 import { toast } from 'sonner'
@@ -888,20 +890,20 @@ export default function VisasPage() {
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs">護照效期</Label>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={newCustomerForm.passport_expiry_date}
-                      onChange={(e) => updateNewCustomerForm('passport_expiry_date', e.target.value)}
+                      onChange={(date) => updateNewCustomerForm('passport_expiry_date', date)}
                       className="h-9"
+                      placeholder="選擇日期"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">出生日期</Label>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={newCustomerForm.date_of_birth}
-                      onChange={(e) => updateNewCustomerForm('date_of_birth', e.target.value)}
+                      onChange={(date) => updateNewCustomerForm('date_of_birth', date)}
                       className="h-9"
+                      placeholder="選擇日期"
                     />
                   </div>
                 </div>
@@ -911,15 +913,18 @@ export default function VisasPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs">性別</Label>
-                  <select
+                  <Select
                     value={newCustomerForm.gender}
-                    onChange={(e) => updateNewCustomerForm('gender', e.target.value)}
-                    className="w-full h-9 px-3 border border-border rounded-md bg-background text-sm"
+                    onValueChange={(value) => updateNewCustomerForm('gender', value)}
                   >
-                    <option value="">選填</option>
-                    <option value="male">男</option>
-                    <option value="female">女</option>
-                  </select>
+                    <SelectTrigger className="w-full h-9">
+                      <SelectValue placeholder="選填" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">男</SelectItem>
+                      <SelectItem value="female">女</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">備註</Label>
@@ -1064,11 +1069,11 @@ export default function VisasPage() {
             </p>
             <div>
               <label className="text-sm font-medium text-morandi-primary">取件日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={pickupDate}
-                onChange={e => setPickupDate(e.target.value)}
+                onChange={(date) => setPickupDate(date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
           </div>
@@ -1113,11 +1118,11 @@ export default function VisasPage() {
             </p>
             <div>
               <label className="text-sm font-medium text-morandi-primary">退件日期</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={rejectDate}
-                onChange={e => setRejectDate(e.target.value)}
+                onChange={(date) => setRejectDate(date)}
                 className="mt-1"
+                placeholder="選擇日期"
               />
             </div>
           </div>

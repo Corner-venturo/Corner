@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Sparkles, Loader2, ImageIcon } from 'lucide-react'
 import { useRegionsStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // 型別定義
 interface DailyScheduleItem {
@@ -225,43 +226,42 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
-              <select
-                value={data.country}
-                onChange={e => updateField('country', e.target.value)}
-                className="w-full text-sm border border-gray-300 rounded-md p-2 h-9 bg-white relative z-10"
-              >
-                <option value="">選擇國家</option>
-                {countries
-                  .filter(c => c.is_active)
-                  .sort((a, b) => a.display_order - b.display_order)
-                  .map(country => (
-                    <option key={country.id} value={country.name}>
-                      {country.emoji ? `${country.emoji} ` : ''}{country.name}
-                    </option>
-                  ))}
-              </select>
+              <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="選擇國家" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries
+                    .filter(c => c.is_active)
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map(country => (
+                      <SelectItem key={country.id} value={country.name}>
+                        {country.emoji ? `${country.emoji} ` : ''}{country.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">城市</label>
-              <select
-                value={data.city}
-                onChange={e => handleCityChange(e.target.value)}
-                className="w-full text-sm border border-gray-300 rounded-md p-2 h-9 bg-white relative z-10"
-                disabled={!data.country}
-              >
-                <option value="">選擇城市</option>
-                {cities
-                  .filter(c => {
-                    const country = countries.find(co => co.name === data.country)
-                    return country && c.country_id === country.id && c.is_active
-                  })
-                  .sort((a, b) => a.display_order - b.display_order)
-                  .map(city => (
-                    <option key={city.id} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-              </select>
+              <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="選擇城市" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities
+                    .filter(c => {
+                      const country = countries.find(co => co.name === data.country)
+                      return country && c.country_id === country.id && c.is_active
+                    })
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map(city => (
+                      <SelectItem key={city.id} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

@@ -2,10 +2,13 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
-import { X, Calendar } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useTourStore, usePaymentRequestStore } from '@/stores'
 import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
 import { alert } from '@/lib/ui/alert-dialog'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Combobox } from '@/components/ui/combobox'
+import { Input } from '@/components/ui/input'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -139,39 +142,35 @@ export function CreatePaymentRequestDialog({
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
               關聯旅遊團 <span className="text-red-500">*</span>
             </label>
-            <select
+            <Combobox
               value={selectedTourId}
-              onChange={e => setSelectedTourId(e.target.value)}
-              className=""
-            >
-              <option value="">請選擇旅遊團</option>
-              {tours.map(tour => (
-                <option key={tour.id} value={tour.id}>
-                  {tour.name} ({tour.code})
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedTourId}
+              options={tours.map(tour => ({
+                value: tour.id,
+                label: `${tour.code} - ${tour.name}`,
+              }))}
+              placeholder="搜尋或選擇旅遊團..."
+              emptyMessage="找不到旅遊團"
+            />
           </div>
 
           {/* 類別 */}
           <div>
             <label className="block text-sm font-medium text-morandi-secondary mb-2">類別</label>
-            <input
+            <Input
               type="text"
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className=""
             />
           </div>
 
           {/* 供應商 */}
           <div>
             <label className="block text-sm font-medium text-morandi-secondary mb-2">供應商</label>
-            <input
+            <Input
               type="text"
               value={supplier}
               onChange={e => setSupplier(e.target.value)}
-              className=""
             />
           </div>
 
@@ -180,18 +179,10 @@ export function CreatePaymentRequestDialog({
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
               請款日期 (預設下個週四)
             </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={requestDate}
-                onChange={e => setRequestDate(e.target.value)}
-                className="input-morandi pl-10"
-              />
-              <Calendar
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
-                size={16}
-              />
-            </div>
+            <DatePicker
+              value={requestDate}
+              onChange={date => setRequestDate(date)}
+            />
           </div>
         </div>
 

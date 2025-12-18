@@ -3,6 +3,7 @@
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useVisaStore } from '@/stores'
 import type { Visa } from '@/stores/types'
 
@@ -79,11 +80,11 @@ export function ReturnDocumentsDialog({
           <label className="text-sm font-medium text-morandi-primary">
             歸還時間
           </label>
-          <Input
-            type="date"
+          <DatePicker
             value={returnDate}
-            onChange={e => setReturnDate(e.target.value)}
+            onChange={(date) => setReturnDate(date)}
             className="mt-1"
+            placeholder="選擇日期"
           />
         </div>
 

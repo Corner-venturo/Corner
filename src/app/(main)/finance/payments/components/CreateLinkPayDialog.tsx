@@ -14,6 +14,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { useLinkPayLogStore } from '@/stores'
 import { formatDateForInput } from '@/lib/utils'
@@ -143,12 +144,12 @@ export function CreateLinkPayDialog({
           <label className="text-sm font-medium text-morandi-primary">
             付款到期日 <span className="text-morandi-red">*</span>
           </label>
-          <Input
-            type="date"
+          <DatePicker
             value={formData.end_date}
-            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+            onChange={(date) => setFormData({ ...formData, end_date: date })}
             className="mt-1"
-            min={new Date().toISOString().split('T')[0]}
+            minDate={new Date()}
+            placeholder="選擇日期"
           />
           <p className="text-xs text-morandi-muted mt-1">付款連結將在到期日後失效</p>
         </div>

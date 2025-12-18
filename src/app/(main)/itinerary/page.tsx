@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit, Link2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -870,36 +871,36 @@ export default function ItineraryPage() {
 
           {/* 作者篩選 */}
           <div className="flex items-center gap-2">
-            <select
-              value={authorFilter}
-              onChange={e => setAuthorFilter(e.target.value)}
-              className="px-3 py-1 text-sm rounded-lg border border-morandi-border bg-white text-morandi-primary focus:outline-none focus:ring-2 focus:ring-morandi-gold/50"
-            >
-              <option value="">我的行程</option>
-              <option value="all">全部作者</option>
-              {employees
-                .filter(emp =>
-                  // 排除當前使用者（已有「我的行程」選項）
-                  emp.id !== user?.id &&
-                  // 只顯示有建立過行程的員工
-                  itineraries.some(it => it.created_by === emp.id)
-                )
-                .map(emp => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
-                  </option>
-                ))}
-            </select>
+            <Select value={authorFilter} onValueChange={setAuthorFilter}>
+              <SelectTrigger className="w-[180px] h-8 text-sm">
+                <SelectValue placeholder="我的行程" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">我的行程</SelectItem>
+                <SelectItem value="all">全部作者</SelectItem>
+                {employees
+                  .filter(emp =>
+                    // 排除當前使用者（已有「我的行程」選項）
+                    emp.id !== user?.id &&
+                    // 只顯示有建立過行程的員工
+                    itineraries.some(it => it.created_by === emp.id)
+                  )
+                  .map(emp => (
+                    <SelectItem key={emp.id} value={emp.id}>
+                      {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 超級管理員專用：分公司篩選 */}
           {isSuperAdmin && workspaces.length > 0 && (
             <div className="flex items-center gap-2">
               <Building2 size={14} className="text-morandi-blue" />
-              <select
+              <Select
                 value={localStorage.getItem('itinerary_workspace_filter') || 'all'}
-                onChange={e => {
-                  const value = e.target.value
+                onValueChange={(value) => {
                   if (value === 'all') {
                     localStorage.removeItem('itinerary_workspace_filter')
                   } else {
@@ -908,15 +909,19 @@ export default function ItineraryPage() {
                   // 重新整理頁面以套用篩選
                   window.location.reload()
                 }}
-                className="px-3 py-1 text-sm rounded-lg border border-morandi-blue/30 bg-white text-morandi-primary focus:outline-none focus:ring-2 focus:ring-morandi-blue/50"
               >
-                <option value="all">全部分公司</option>
-                {workspaces.map((ws: { id: string; name: string }) => (
-                  <option key={ws.id} value={ws.id}>
-                    {ws.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-[180px] h-8 text-sm border-morandi-blue/30">
+                  <SelectValue placeholder="全部分公司" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部分公司</SelectItem>
+                  {workspaces.map((ws: { id: string; name: string }) => (
+                    <SelectItem key={ws.id} value={ws.id}>
+                      {ws.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
         </div>

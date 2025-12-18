@@ -49,12 +49,12 @@ export function EditableRequestItemList({
 
       {/* Header - 固定不動 */}
       <div className="grid grid-cols-12 gap-4 px-3 text-xs font-medium text-morandi-secondary mb-3">
-        <div className="col-span-2">類別</div>
+        <div className="col-span-1">類別</div>
         <div className="col-span-3">供應商</div>
         <div className="col-span-3">項目描述</div>
         <div className="col-span-1 text-right">單價</div>
         <div className="col-span-1 text-center">數量</div>
-        <div className="col-span-1 text-right">小計</div>
+        <div className="col-span-2 text-right">小計</div>
         <div className="col-span-1"></div>
       </div>
 
@@ -63,7 +63,7 @@ export function EditableRequestItemList({
         {items.map((item, index) => (
           <div key={item.id} className="grid grid-cols-12 gap-2 items-start">
             {/* Category */}
-            <div className="col-span-2">
+            <div className="col-span-1">
               <Select
                 value={item.category}
                 onValueChange={value =>
@@ -136,8 +136,8 @@ export function EditableRequestItemList({
             </div>
 
             {/* Subtotal */}
-            <div className="col-span-1 flex items-center h-10 justify-end">
-              <span className="text-sm font-semibold text-morandi-gold">
+            <div className="col-span-2 flex items-center h-10 justify-end">
+              <span className="text-sm font-semibold text-morandi-gold whitespace-nowrap">
                 NT$ {(item.unit_price * item.quantity).toLocaleString()}
               </span>
             </div>
@@ -173,11 +173,16 @@ export function EditableRequestItemList({
 
       {/* Total */}
       <div className="mt-4 pt-4 border-t border-border">
-        <div className="flex justify-end items-center">
-          <span className="text-lg font-semibold text-morandi-primary mr-4">總金額:</span>
-          <span className="text-xl font-bold text-morandi-gold">
-            NT$ {total_amount.toLocaleString()}
-          </span>
+        <div className="grid grid-cols-12 gap-4 px-3">
+          <div className="col-span-9 flex justify-end items-center">
+            <span className="text-lg font-semibold text-morandi-primary">總金額:</span>
+          </div>
+          <div className="col-span-2 flex justify-end items-center">
+            <span className="text-xl font-bold text-morandi-gold whitespace-nowrap">
+              NT$ {total_amount.toLocaleString()}
+            </span>
+          </div>
+          <div className="col-span-1"></div>
         </div>
       </div>
     </div>

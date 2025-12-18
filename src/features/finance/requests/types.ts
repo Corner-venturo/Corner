@@ -47,12 +47,12 @@ export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
 }
 
 export const categoryOptions = [
-  { value: '住宿', label: '🏨 住宿' },
-  { value: '交通', label: '🚌 交通' },
-  { value: '餐食', label: '🍽️ 餐食' },
-  { value: '門票', label: '🎫 門票' },
-  { value: '導遊', label: '👥 導遊' },
-  { value: '其他', label: '📦 其他' },
+  { value: '住宿', label: '住宿' },
+  { value: '交通', label: '交通' },
+  { value: '餐食', label: '餐食' },
+  { value: '門票', label: '門票' },
+  { value: '導遊', label: '導遊' },
+  { value: '其他', label: '其他' },
 ] as const
 
 

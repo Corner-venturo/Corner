@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { userStoreHelpers } from '@/stores/user-store'
 import { EmployeeFormData } from './types'
 
@@ -76,15 +77,15 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
 
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">生日</label>
-        <Input
-          type="date"
+        <DatePicker
           value={formData.personal_info.birthday}
-          onChange={e =>
+          onChange={date =>
             setFormData({
               ...formData,
-              personal_info: { ...formData.personal_info, birthday: e.target.value },
+              personal_info: { ...formData.personal_info, birthday: date },
             })
           }
+          placeholder="選擇日期"
         />
       </div>
     </div>

@@ -29,8 +29,8 @@ export async function getWorkspaceMembers() {
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    console.error('Get Members Action Auth Error:', authError)
-    throw new Error('User not authenticated.')
+    // User not authenticated yet, return empty array instead of throwing
+    return []
   }
 
   // @ts-ignore

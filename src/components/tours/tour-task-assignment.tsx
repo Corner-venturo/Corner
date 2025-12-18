@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Select,
   SelectContent,
@@ -328,10 +329,10 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-morandi-primary mb-2">期限</label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={taskForm.deadline}
-                  onChange={e => setTaskForm(prev => ({ ...prev, deadline: e.target.value }))}
+                  onChange={(date) => setTaskForm(prev => ({ ...prev, deadline: date }))}
+                  placeholder="選擇日期"
                 />
               </div>
               <div>

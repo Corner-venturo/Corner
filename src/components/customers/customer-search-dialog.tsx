@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Select,
   SelectContent,
@@ -150,16 +151,14 @@ export function CustomerSearchDialog({
               <div className="col-span-1 md:col-span-2">
                 <label className="text-sm text-morandi-secondary mb-2 block">護照效期範圍</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={searchParams.passport_expiry_start || ''}
-                    onChange={e => updateParam('passport_expiry_start', e.target.value)}
+                    onChange={(date) => updateParam('passport_expiry_start', date)}
                     placeholder="起始日"
                   />
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={searchParams.passport_expiry_end || ''}
-                    onChange={e => updateParam('passport_expiry_end', e.target.value)}
+                    onChange={(date) => updateParam('passport_expiry_end', date)}
                     placeholder="結束日"
                   />
                 </div>

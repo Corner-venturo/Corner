@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface VisaResult {
   passport: string
@@ -237,18 +238,18 @@ export function VisaWidget() {
                   <Globe className="w-3.5 h-3.5" />
                   護照國家
                 </label>
-                <select
-                  value={passport}
-                  onChange={e => setPassport(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                >
-                  {PASSPORT_COUNTRIES.map(country => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={passport} onValueChange={setPassport}>
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇國家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PASSPORT_COUNTRIES.map(country => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -256,18 +257,18 @@ export function VisaWidget() {
                   <Globe className="w-3.5 h-3.5" />
                   目的地
                 </label>
-                <select
-                  value={destination}
-                  onChange={e => setDestination(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
-                >
-                  {DESTINATIONS.map(country => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={destination} onValueChange={setDestination}>
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇目的地" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DESTINATIONS.map(country => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
@@ -150,10 +151,10 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                 </div>
 
                 {isSpecialBilling ? (
-                  <Input
-                    type="date"
+                  <DatePicker
                     value={requestDate}
-                    onChange={e => setRequestDate(e.target.value)}
+                    onChange={date => setRequestDate(date)}
+                    placeholder="選擇日期"
                     className="bg-morandi-gold/10 border-morandi-container/30"
                   />
                 ) : (

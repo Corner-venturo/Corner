@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getWeatherAction } from '../actions/weather-actions'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface WeatherData {
   temperature: number
@@ -139,13 +141,29 @@ export function WeatherWidget() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />選擇城市</label>
-                <select value={selectedCity.name} onChange={e => handleCityChange(e.target.value)} className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
-                  {CITIES.map(city => (<option key={city.name} value={city.name}>{city.name}</option>))}
-                </select>
+                <Select value={selectedCity.name} onValueChange={handleCityChange}>
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectValue placeholder="選擇城市" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CITIES.map(city => (
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />選擇日期</label>
-                <input type="date" value={selectedDate} onChange={e => handleDateChange(e.target.value)} min={minDate.toISOString().split('T')[0]} max={maxDate.toISOString().split('T')[0]} className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm" />
+                <DatePicker
+                  value={selectedDate}
+                  onChange={(date) => handleDateChange(date)}
+                  minDate={minDate.toISOString().split('T')[0]}
+                  maxDate={maxDate.toISOString().split('T')[0]}
+                  placeholder="選擇日期"
+                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                />
               </div>
             </div>
           </div>

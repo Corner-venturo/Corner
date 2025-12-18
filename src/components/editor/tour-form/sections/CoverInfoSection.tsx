@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { TourFormData, CityOption, CoverStyleType, FlightStyleType } from '../types'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { Upload, Crop, Settings2, Loader2, CalendarIcon } from 'lucide-react'
@@ -487,16 +488,17 @@ export function CoverInfoSection({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-morandi-primary mb-1">單位</label>
-                  <select
-                    value={data.priceNote || '/人'}
-                    onChange={e => updateField('priceNote', e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
-                  >
-                    <option value="/人">/人</option>
-                    <option value="起">起</option>
-                    <option value="/人起">/人起</option>
-                    <option value="">(不顯示)</option>
-                  </select>
+                  <Select value={data.priceNote || '/人'} onValueChange={(value) => updateField('priceNote', value)}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="選擇單位" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="/人">/人</SelectItem>
+                      <SelectItem value="起">起</SelectItem>
+                      <SelectItem value="/人起">/人起</SelectItem>
+                      <SelectItem value="">(不顯示)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

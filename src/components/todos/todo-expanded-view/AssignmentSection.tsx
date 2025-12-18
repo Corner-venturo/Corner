@@ -8,6 +8,7 @@ import { FileText, X, UserCheck } from 'lucide-react'
 import { AssignmentSectionProps } from './types'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { DatePicker } from '@/components/ui/date-picker'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
   const router = useRouter()
@@ -83,10 +84,10 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
               </span>
             ) : (
               <>
-                <Input
-                  type="date"
+                <DatePicker
                   value={todo.deadline || ''}
-                  onChange={e => onUpdate({ deadline: e.target.value })}
+                  onChange={date => onUpdate({ deadline: date })}
+                  placeholder="選擇日期"
                   className={cn('text-sm font-medium h-9 w-[160px]', getDeadlineColor())}
                 />
                 {todo.deadline && (

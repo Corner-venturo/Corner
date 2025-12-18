@@ -14,27 +14,44 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         label: '請款單號',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => (
-          <div className="font-medium text-morandi-primary">{value as string || row.request_number || '—'}</div>
-        ),
+        render: (value: unknown, row: PaymentRequest) => {
+          // 優先顯示 code，fallback 到 request_number
+          const displayCode = (value as string) || row.request_number || ''
+          return (
+            <div className="font-medium text-morandi-primary">
+              {displayCode || <span className="text-morandi-muted">—</span>}
+            </div>
+          )
+        },
       },
       {
         key: 'tour_name',
         label: '團名',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => (
-          <div className="font-medium text-morandi-primary">{value as string || row.tour_code || '—'}</div>
-        ),
+        render: (value: unknown, row: PaymentRequest) => {
+          // 顯示團名，fallback 到團號
+          const displayName = (value as string) || row.tour_code || ''
+          return (
+            <div className="font-medium text-morandi-primary">
+              {displayName || <span className="text-morandi-muted">—</span>}
+            </div>
+          )
+        },
       },
       {
         key: 'order_number',
         label: '訂單編號',
         sortable: true,
         filterable: true,
-        render: (value: unknown, row: PaymentRequest) => (
-          <div className="text-sm text-morandi-primary">{value as string || '—'}</div>
-        ),
+        render: (value: unknown, row: PaymentRequest) => {
+          const displayValue = value as string
+          return (
+            <div className="text-sm text-morandi-primary">
+              {displayValue || <span className="text-morandi-muted">—</span>}
+            </div>
+          )
+        },
       },
       {
         key: 'request_date',

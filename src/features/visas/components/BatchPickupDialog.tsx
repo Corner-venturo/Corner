@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Upload, Loader2, X, Check, AlertTriangle, FileImage, ChevronDown } from 'lucide-react'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Upload, Loader2, X, Check, AlertTriangle, FileImage } from 'lucide-react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { Visa } from '@/stores/types'
 
 interface PassportOCRResult {
@@ -459,11 +461,11 @@ export function BatchPickupDialog({
                 <label className="text-sm font-medium text-morandi-primary whitespace-nowrap">
                   取件日期
                 </label>
-                <Input
-                  type="date"
+                <DatePicker
                   value={pickupDate}
-                  onChange={e => setPickupDate(e.target.value)}
+                  onChange={(date) => setPickupDate(date)}
                   className="w-40"
+                  placeholder="選擇日期"
                 />
               </div>
 
@@ -530,17 +532,18 @@ export function BatchPickupDialog({
                             </div>
 
                             {/* 簽證選擇下拉 */}
-                            <div className="relative">
-                              <select
-                                value={item.manualVisaId || ''}
-                                onChange={e => handleManualSelect(index, e.target.value || null)}
-                                className="w-full h-9 px-3 pr-8 border border-border rounded-md bg-white text-sm appearance-none cursor-pointer"
-                              >
-                                <option value="">-- 選擇簽證 --</option>
+                            <Select
+                              value={item.manualVisaId || ''}
+                              onValueChange={value => handleManualSelect(index, value || null)}
+                            >
+                              <SelectTrigger className="w-full h-9">
+                                <SelectValue placeholder="-- 選擇簽證 --" />
+                              </SelectTrigger>
+                              <SelectContent>
                                 {pendingVisas.map(visa => {
                                   const isSelected = selectedVisaIds.includes(visa.id) && visa.id !== item.manualVisaId
                                   return (
-                                    <option
+                                    <SelectItem
                                       key={visa.id}
                                       value={visa.id}
                                       disabled={isSelected}
@@ -548,15 +551,11 @@ export function BatchPickupDialog({
                                       {visa.applicant_name} - {visa.country}
                                       {visa.order_number && ` (${visa.order_number})`}
                                       {isSelected && ' (已選)'}
-                                    </option>
+                                    </SelectItem>
                                   )
                                 })}
-                              </select>
-                              <ChevronDown
-                                size={16}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-morandi-secondary pointer-events-none"
-                              />
-                            </div>
+                              </SelectContent>
+                            </Select>
 
                             {/* 更新顧客資訊選項 */}
                             {item.manualVisaId && (

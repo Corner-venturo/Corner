@@ -6,6 +6,7 @@
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Select,
   SelectContent,
@@ -79,11 +80,11 @@ export function PaymentItemRow({
 
         {/* 交易日期 */}
         <td className="py-2 px-3 w-36">
-          <Input
-            type="date"
+          <DatePicker
             value={item.transaction_date}
-            onChange={e => onUpdate(item.id, { transaction_date: e.target.value })}
+            onChange={(date) => onUpdate(item.id, { transaction_date: date })}
             className="h-9 border-morandi-container/30"
+            placeholder="選擇日期"
           />
         </td>
 
@@ -152,11 +153,11 @@ export function PaymentItemRow({
                     <label className="text-xs font-medium text-morandi-secondary mb-1 block">
                       付款截止日 *
                     </label>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={item.pay_dateline || ''}
-                      onChange={e => onUpdate(item.id, { pay_dateline: e.target.value })}
+                      onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
                       className="h-8 text-sm border-morandi-container/30"
+                      placeholder="選擇日期"
                     />
                   </div>
                   <div>
