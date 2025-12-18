@@ -273,7 +273,7 @@ export default function TourDetailPage() {
               <button
                 onClick={handleCreateWorkChannel}
                 disabled={isCreatingChannel}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <MessageSquare size={16} />
                 {isCreatingChannel ? '建立中...' : '建立工作頻道'}

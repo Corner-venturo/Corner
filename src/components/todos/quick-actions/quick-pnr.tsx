@@ -454,7 +454,7 @@ AP TPE 02-2712-8888`}
             {parsedData.ticketingDeadline && onUpdate && (
               <Button
                 onClick={handleAddDeadline}
-                className="flex-1 bg-morandi-gold hover:bg-morandi-gold/90 shadow-md h-9 text-xs"
+                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover shadow-md h-9 text-xs"
               >
                 <Clock size={14} className="mr-1.5" />
                 新增期限

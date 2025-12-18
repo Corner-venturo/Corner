@@ -651,7 +651,7 @@ export function DailyItinerarySection({
           </div>
           <button
             onClick={addDailyItinerary}
-            className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
+            className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold-hover"
           >
             + 新增天數
           </button>

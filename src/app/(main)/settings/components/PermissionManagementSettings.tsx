@@ -62,7 +62,7 @@ export function PermissionManagementSettings() {
             <Button
               variant="default"
               onClick={() => router.push('/settings/permissions')}
-              className="ml-4 gap-2 bg-morandi-gold hover:bg-morandi-gold/90"
+              className="ml-4 gap-2 bg-morandi-gold hover:bg-morandi-gold-hover"
             >
               <Shield className="h-4 w-4" />
               <span>權限設定</span>

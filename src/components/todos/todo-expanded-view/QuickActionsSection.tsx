@@ -270,7 +270,7 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
             <Button
               onClick={handleShareTodo}
               disabled={isSharing || !shareData.targetUserId}
-              className="w-full bg-morandi-gold hover:bg-morandi-gold/90 shadow-md h-9 text-xs"
+              className="w-full bg-morandi-gold hover:bg-morandi-gold-hover shadow-md h-9 text-xs"
             >
               <UserPlus size={14} className="mr-1.5" />
               {isSharing ? '共享中...' : '共享待辦'}

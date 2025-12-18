@@ -2030,7 +2030,7 @@ export default function CustomersPage() {
               disabled={isSavingVerify}
               size="lg"
               className={verifyingCustomer?.verification_status === 'verified'
-                ? 'bg-morandi-gold hover:bg-morandi-gold/90 text-white px-8 font-medium'
+                ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
                 : 'bg-green-600 hover:bg-green-700 text-white px-8 font-medium'
               }
             >

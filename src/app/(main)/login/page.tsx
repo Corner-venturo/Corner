@@ -128,7 +128,7 @@ export default function LoginPage() {
 
           <Button
             type="submit"
-            className="w-full bg-morandi-gold hover:bg-morandi-gold/90"
+            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover"
             disabled={isLoading}
           >
             {isLoading ? '登入中...' : '登入'}

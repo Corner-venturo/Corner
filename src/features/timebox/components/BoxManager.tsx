@@ -104,7 +104,7 @@ export default function BoxManager() {
         {!showForm && (
           <Button
             size="sm"
-            className="bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             onClick={() => setShowForm(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -183,7 +183,7 @@ export default function BoxManager() {
               <Button
                 onClick={handleSubmit}
                 disabled={!formData.name.trim()}
-                className="bg-morandi-gold hover:bg-morandi-gold/90"
+                className="bg-morandi-gold hover:bg-morandi-gold-hover"
               >
                 {editingBox ? '更新' : '建立'}
               </Button>

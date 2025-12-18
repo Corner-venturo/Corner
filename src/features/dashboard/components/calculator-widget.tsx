@@ -289,7 +289,7 @@ export function CalculatorWidget() {
             <Button
               size="sm"
               onClick={() => handleButtonClick('=')}
-              className="h-10 text-base font-bold bg-morandi-gold text-white hover:bg-morandi-gold/90 shadow-md hover:shadow-lg transition-all rounded-xl"
+              className="h-10 text-base font-bold bg-morandi-gold text-white hover:bg-morandi-gold-hover shadow-md hover:shadow-lg transition-all rounded-xl"
             >
               =
             </Button>

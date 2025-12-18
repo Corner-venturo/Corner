@@ -62,7 +62,7 @@ export function ModuleManagementSettings() {
             </div>
             <Button
               onClick={() => router.push('/settings/modules')}
-              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white gap-2"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
               管理模組
               <ChevronRight className="h-4 w-4" />

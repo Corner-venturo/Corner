@@ -186,7 +186,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
           <Button
             onClick={handlePrint}
             disabled={printing || loading}
-            className="bg-morandi-gold hover:bg-morandi-gold/90"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Printer size={16} className="mr-2" />
             {printing ? '列印中...' : '列印完整合約'}

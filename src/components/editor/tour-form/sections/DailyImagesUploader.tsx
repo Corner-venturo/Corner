@@ -767,7 +767,7 @@ export function DailyImagesUploader({
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors">
+              <div className="flex items-center gap-2 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors">
                 <Plus size={18} />
                 <span className="text-sm font-medium">選擇照片上傳</span>
               </div>

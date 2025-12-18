@@ -292,7 +292,7 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
           <Button
             onClick={() => handleSave(true)}
             disabled={isSaving}
-            className="bg-morandi-gold hover:bg-morandi-gold/90"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             完成此章
           </Button>

@@ -262,7 +262,7 @@ export function FeaturesSection({
         <h2 className="text-lg font-bold text-morandi-primary">行程特色</h2>
         <button
           onClick={addFeature}
-          className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold/90"
+          className="px-3 py-1 bg-morandi-gold text-white rounded-lg text-sm hover:bg-morandi-gold-hover"
         >
           + 新增特色
         </button>

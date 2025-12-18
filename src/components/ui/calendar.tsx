@@ -318,7 +318,7 @@ export function Calendar({
         <button
           type="button"
           onClick={goToToday}
-          className="w-full rounded-md bg-morandi-gold px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-morandi-gold/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-morandi-gold transition-colors"
+          className="w-full rounded-md bg-morandi-gold px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-morandi-gold-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-morandi-gold transition-colors"
         >
           今天
         </button>

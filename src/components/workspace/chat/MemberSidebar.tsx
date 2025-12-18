@@ -288,7 +288,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
                 <Button
                   onClick={handleAddMembers}
                   disabled={selectedEmployees.length === 0 || isAdding}
-                  className="bg-morandi-gold hover:bg-morandi-gold/90"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover"
                 >
                   {isAdding ? '新增中...' : `新增 (${selectedEmployees.length})`}
                 </Button>

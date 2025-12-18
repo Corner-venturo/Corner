@@ -91,7 +91,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
             <div className="flex gap-2">
               <Button
                 size="sm"
-                className="flex-1 h-8 bg-morandi-gold hover:bg-morandi-gold/90"
+                className="flex-1 h-8 bg-morandi-gold hover:bg-morandi-gold-hover"
                 onClick={handleQuickAdd}
                 disabled={!newBoxName.trim()}
               >

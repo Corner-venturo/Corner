@@ -101,7 +101,7 @@ export function SuccessDialog({
 
           <Button
             onClick={onClose}
-            className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white rounded-lg py-2.5"
+            className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg py-2.5"
           >
             完成
           </Button>

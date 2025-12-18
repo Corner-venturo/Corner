@@ -254,7 +254,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
           <Button
             onClick={handlePrint}
             disabled={saving || !selectedTemplate}
-            className="bg-morandi-gold hover:bg-morandi-gold/90"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover"
           >
             <Printer size={16} className="mr-2" />
             列印合約

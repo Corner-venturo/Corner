@@ -47,7 +47,7 @@ export function PendingList({
             </span>
             <Button
               onClick={onAddToDisbursement}
-              className="bg-morandi-gold hover:bg-morandi-gold/90"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover"
             >
               加入本週出帳
             </Button>

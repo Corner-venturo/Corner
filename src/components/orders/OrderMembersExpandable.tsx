@@ -1188,7 +1188,7 @@ export function OrderMembersExpandable({
           <Button
             size="sm"
             onClick={handleAddMember}
-            className="gap-1 bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+            className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             <Plus size={14} />
             新增成員
@@ -1688,7 +1688,7 @@ export function OrderMembersExpandable({
               </div>
               <Button
                 onClick={confirmAddMembers}
-                className="w-full bg-morandi-gold hover:bg-morandi-gold/90"
+                className="w-full bg-morandi-gold hover:bg-morandi-gold-hover"
               >
                 新增 {memberCountToAdd || 1} 位成員
               </Button>
@@ -1815,7 +1815,7 @@ export function OrderMembersExpandable({
                   <Button
                     onClick={handleBatchUpload}
                     disabled={isUploading}
-                    className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+                    className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                   >
                     {isUploading ? '辨識中...' : `辨識並建立 ${processedFiles.length} 位成員`}
                   </Button>
@@ -2344,7 +2344,7 @@ export function OrderMembersExpandable({
               size="lg"
               className={editMode === 'verify'
                 ? 'bg-green-600 hover:bg-green-700 text-white px-8 font-medium'
-                : 'bg-morandi-gold hover:bg-morandi-gold/90 text-white px-8 font-medium'
+                : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
               }
             >
               {isSaving ? '儲存中...' : editMode === 'verify' ? '確認驗證' : '儲存變更'}
@@ -2408,7 +2408,7 @@ export function OrderMembersExpandable({
                       <td className="px-3 py-2 border text-center">
                         <Button
                           size="sm"
-                          className="bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+                          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleSelectCustomer(customer)

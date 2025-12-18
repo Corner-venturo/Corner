@@ -201,7 +201,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                 </Button>
                 <Button
                   onClick={handleImport}
-                  className="bg-morandi-gold hover:bg-morandi-gold/90"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover"
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   匯入到確認單

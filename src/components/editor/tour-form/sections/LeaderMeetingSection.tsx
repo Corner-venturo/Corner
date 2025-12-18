@@ -137,7 +137,7 @@ export function LeaderMeetingSection({
           <button
             type="button"
             onClick={addMeetingPoint}
-            className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors text-sm"
+            className="flex items-center gap-1 px-3 py-1.5 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors text-sm"
           >
             <Plus size={16} />
             新增集合地點

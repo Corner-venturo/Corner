@@ -485,7 +485,7 @@ export function InvoiceDialog({
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="min-w-[100px] bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+              className="min-w-[100px] bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
               {isLoading ? '開立中...' : '確定開立'}
             </Button>

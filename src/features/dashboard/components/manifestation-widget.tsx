@@ -260,7 +260,7 @@ export function ManifestationWidget() {
             {view.showAction && (
               <Button
                 size="sm"
-                className="w-full bg-morandi-gold text-white hover:bg-morandi-gold/90 shadow-md hover:shadow-lg transition-all font-semibold"
+                className="w-full bg-morandi-gold text-white hover:bg-morandi-gold-hover shadow-md hover:shadow-lg transition-all font-semibold"
                 onClick={handleAction}
               >
                 前往顯化練習

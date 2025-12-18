@@ -63,7 +63,7 @@ export function EditChannelDialog({
           <button
             onClick={onSave}
             disabled={!channelName.trim()}
-            className="flex-1 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             儲存
           </button>

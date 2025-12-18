@@ -91,7 +91,7 @@ export default function TimeboxPage() {
                 onClick={() => setTimeInterval(30)}
                 className={`h-9 px-3 rounded-none transition-all ${
                   timeInterval === 30
-                    ? 'bg-morandi-gold text-white hover:bg-morandi-gold/90'
+                    ? 'bg-morandi-gold text-white hover:bg-morandi-gold-hover'
                     : 'hover:bg-morandi-container/50'
                 }`}
               >
@@ -104,7 +104,7 @@ export default function TimeboxPage() {
                 onClick={() => setTimeInterval(60)}
                 className={`h-9 px-3 rounded-none transition-all ${
                   timeInterval === 60
-                    ? 'bg-morandi-gold text-white hover:bg-morandi-gold/90'
+                    ? 'bg-morandi-gold text-white hover:bg-morandi-gold-hover'
                     : 'hover:bg-morandi-container/50'
                 }`}
               >

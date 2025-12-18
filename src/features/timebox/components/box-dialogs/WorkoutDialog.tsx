@@ -308,7 +308,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   className={`w-full transition-all duration-300 ${
                     isAdding
                       ? 'bg-green-500 border-green-500 scale-105'
-                      : 'bg-morandi-gold hover:bg-morandi-gold/90'
+                      : 'bg-morandi-gold hover:bg-morandi-gold-hover'
                   }`}
                   size="sm"
                 >

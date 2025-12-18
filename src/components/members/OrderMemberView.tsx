@@ -1041,7 +1041,7 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
                       </div>
                     ))}
                   </div>
-                  <Button onClick={handleBatchUpload} disabled={isUploading} className="w-full bg-morandi-gold hover:bg-morandi-gold/90 text-white">
+                  <Button onClick={handleBatchUpload} disabled={isUploading} className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white">
                     {isUploading ? '辨識中...' : `辨識並建立 ${processedFiles.length} 位成員`}
                   </Button>
                 </div>

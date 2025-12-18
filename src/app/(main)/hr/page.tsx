@@ -290,7 +290,7 @@ export default function HRPage() {
           <div className="flex gap-3">
             <Button
               onClick={() => setIsSalaryPaymentDialogOpen(true)}
-              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
             >
               <DollarSign className="w-4 h-4 mr-2" />
               薪資請款

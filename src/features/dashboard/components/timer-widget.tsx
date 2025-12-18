@@ -82,7 +82,7 @@ export function TimerWidget() {
                 'flex-1 rounded-xl transition-all duration-200 font-semibold',
                 isRunning
                   ? 'bg-white/90 border-2 border-white/60 text-morandi-primary hover:bg-white hover:shadow-md'
-                  : 'bg-morandi-gold text-white hover:bg-morandi-gold/90 shadow-md hover:shadow-lg'
+                  : 'bg-morandi-gold text-white hover:bg-morandi-gold-hover shadow-md hover:shadow-lg'
               )}
               onClick={() => setIsRunning(!isRunning)}
             >
