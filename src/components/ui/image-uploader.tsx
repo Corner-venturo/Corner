@@ -209,6 +209,11 @@ export function ImageUploader({
     e.stopPropagation()
     setIsDragOver(false)
 
+    console.log('=== Drop Event ===')
+    console.log('files:', e.dataTransfer.files.length)
+    console.log('items:', e.dataTransfer.items?.length)
+    console.log('types:', e.dataTransfer.types)
+
     if (disabled) return
 
     // 方法 1: 檢查 files（本地拖曳的檔案）
@@ -295,9 +300,15 @@ export function ImageUploader({
 
       {/* 上傳區域 / 預覽 */}
       {value ? (
-        // 有圖片時顯示預覽
+        // 有圖片時顯示預覽（也支援拖放更換）
         <div
-          className="relative rounded-lg overflow-hidden border-2 border-morandi-gold group"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={cn(
+            "relative rounded-lg overflow-hidden border-2 group transition-all",
+            isDragOver ? "border-morandi-gold bg-morandi-gold/20" : "border-morandi-gold"
+          )}
           style={{ height: previewHeight }}
         >
           <img
@@ -306,6 +317,15 @@ export function ImageUploader({
             className="w-full h-full object-cover"
             style={getImagePositionStyle(position)}
           />
+
+          {/* 拖放提示 */}
+          {isDragOver && (
+            <div className="absolute inset-0 bg-morandi-gold/30 flex items-center justify-center">
+              <div className="bg-white/90 px-4 py-2 rounded-lg text-sm font-medium text-morandi-primary">
+                放開以更換圖片
+              </div>
+            </div>
+          )}
 
           {/* 操作按鈕 */}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">

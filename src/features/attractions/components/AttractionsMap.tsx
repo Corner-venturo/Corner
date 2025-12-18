@@ -121,45 +121,75 @@ export function AttractionsMap({
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       })
 
-      // 創建自定義圖標
-      const selectedIcon = L.divIcon({
-        className: '',
-        html: `<div style="width: 40px; height: 40px; background-color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 3px solid white;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        </div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
-        popupAnchor: [0, -40],
-      })
+      // 創建帶圖片和名稱的標記函數
+      const createMarkerIcon = (name: string, thumbnail: string | undefined, isSelected: boolean) => {
+        const borderColor = isSelected ? '#ef4444' : '#3b82f6'
+        const bgColor = isSelected ? '#fef2f2' : '#eff6ff'
+        const size = isSelected ? 80 : 70
 
-      const nearbyIcon = L.divIcon({
-        className: '',
-        html: `<div style="width: 32px; height: 32px; background-color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid white;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        </div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
-      })
+        return L.divIcon({
+          className: '',
+          html: `
+            <div style="
+              width: ${size}px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              transform: translateX(-50%);
+            ">
+              <div style="
+                width: ${size}px;
+                height: ${size * 0.6}px;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 3px solid ${borderColor};
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                background: ${bgColor};
+              ">
+                ${thumbnail
+                  ? `<img src="${thumbnail}" style="width: 100%; height: 100%; object-fit: cover;" />`
+                  : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: ${bgColor};">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${borderColor}" stroke-width="2">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                    </div>`
+                }
+              </div>
+              <div style="
+                margin-top: 4px;
+                padding: 2px 6px;
+                background: ${borderColor};
+                color: white;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 4px;
+                white-space: nowrap;
+                max-width: ${size + 20}px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+              ">${name}</div>
+              <div style="
+                width: 0;
+                height: 0;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 8px solid ${borderColor};
+              "></div>
+            </div>
+          `,
+          iconSize: [size, size + 40],
+          iconAnchor: [size / 2, size + 40],
+          popupAnchor: [0, -(size + 30)],
+        })
+      }
 
       // 添加選中景點標記
       const selectedMarker = L.marker(
         [selectedAttraction.latitude!, selectedAttraction.longitude!],
-        { icon: selectedIcon }
-      )
-        .addTo(map)
-        .bindPopup(
-          `<div class="text-center">
-            <strong class="text-red-600">${selectedAttraction.name}</strong>
-            ${selectedAttraction.thumbnail ? `<img src="${selectedAttraction.thumbnail}" class="w-24 h-16 object-cover rounded mt-1 mx-auto"/>` : ''}
-          </div>`
-        )
+        { icon: createMarkerIcon(selectedAttraction.name, selectedAttraction.thumbnail, true) }
+      ).addTo(map)
 
       markersRef.current.push(selectedMarker)
 
@@ -175,14 +205,13 @@ export function AttractionsMap({
         ).toFixed(1)
 
         const marker = L.marker([attraction.latitude, attraction.longitude], {
-          icon: nearbyIcon,
+          icon: createMarkerIcon(attraction.name, attraction.thumbnail, false),
         })
           .addTo(map)
           .bindPopup(
-            `<div class="text-center min-w-[120px]">
-              <strong>${attraction.name}</strong>
-              <p class="text-xs text-gray-500">${distance} km</p>
-              ${attraction.thumbnail ? `<img src="${attraction.thumbnail}" class="w-24 h-16 object-cover rounded mt-1 mx-auto"/>` : ''}
+            `<div style="text-align: center; min-width: 120px;">
+              <strong style="font-size: 14px;">${attraction.name}</strong>
+              <p style="font-size: 12px; color: #666; margin: 4px 0;">${distance} km</p>
             </div>`
           )
 
