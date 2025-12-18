@@ -3,6 +3,8 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
+const DropdownMenuItemContext = React.createContext<{ onOpenChange?: (open: boolean) => void }>({})
+
 const DropdownMenu = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
@@ -107,26 +109,34 @@ const DropdownMenuContent = React.forwardRef<
   if (!isOpen) return null
 
   return (
-    <div
-      ref={contentRef}
-      className={cn(
-        'absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md',
-        'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
-        align === 'start' && 'left-0',
-        align === 'center' && 'left-1/2 -translate-x-1/2',
-        align === 'end' && 'right-0',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
+    <DropdownMenuItemContext.Provider value={{ onOpenChange }}>
+      <div
+        ref={contentRef}
+        className={cn(
+          'absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md',
+          'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
+          align === 'start' && 'left-0',
+          align === 'center' && 'left-1/2 -translate-x-1/2',
+          align === 'end' && 'right-0',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    </DropdownMenuItemContext.Provider>
   )
 })
 DropdownMenuContent.displayName = 'DropdownMenuContent'
 
-const DropdownMenuItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+const DropdownMenuItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { onOpenChange?: (open: boolean) => void }
+>(({ className, onClick, onOpenChange, ...props }, ref) => {
+  const context = React.useContext(DropdownMenuItemContext)
+  const closeMenu = onOpenChange || context.onOpenChange
+
+  return (
     <div
       ref={ref}
       className={cn(
@@ -136,10 +146,14 @@ const DropdownMenuItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
+      onClick={(e) => {
+        onClick?.(e)
+        closeMenu?.(false)
+      }}
       {...props}
     />
   )
-)
+})
 DropdownMenuItem.displayName = 'DropdownMenuItem'
 
 const DropdownMenuSeparator = React.forwardRef<
