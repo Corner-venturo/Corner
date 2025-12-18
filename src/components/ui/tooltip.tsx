@@ -75,7 +75,7 @@ export function TooltipContent({
   return (
     <div
       className={cn(
-        'absolute z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95',
+        'absolute z-50 overflow-hidden rounded-md border bg-white px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95',
         'bottom-full left-1/2 -translate-x-1/2 mb-2',
         className
       )}
