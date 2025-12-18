@@ -36,6 +36,7 @@ import { useTourChannelOperations, TourStoreActions } from './TourChannelOperati
 import { useTourActionButtons } from './TourActionButtons'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
+import { TourDetailDialog } from '@/components/tours/TourDetailDialog'
 
 export const ToursPage: React.FC = () => {
   const router = useRouter()
@@ -55,6 +56,9 @@ export const ToursPage: React.FC = () => {
     tour: Tour | null
     mode: 'create' | 'edit'
   }>({ isOpen: false, tour: null, mode: 'edit' })
+
+  // 旅遊團詳情 Dialog 狀態
+  const [detailDialogTourId, setDetailDialogTourId] = useState<string | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
@@ -413,9 +417,10 @@ export const ToursPage: React.FC = () => {
     (row: unknown) => {
       const tour = row as Tour
       setSelectedTour(tour)
-      router.push(`/tours/${tour.id}`)
+      // 改用 Dialog 而非跳轉
+      setDetailDialogTourId(tour.id)
     },
-    [router, setSelectedTour]
+    [setSelectedTour]
   )
 
   const handleDeleteTour = useCallback(async () => {
@@ -444,6 +449,7 @@ export const ToursPage: React.FC = () => {
       const mode = tour.contract_template ? 'edit' : 'create'
       setContractDialogState({ isOpen: true, tour, mode })
     },
+    onViewDetails: (tour) => setDetailDialogTourId(tour.id),
   })
 
   const renderExpanded = useCallback(
@@ -621,6 +627,16 @@ export const ToursPage: React.FC = () => {
           mode={contractDialogState.mode}
         />
       )}
+
+      {/* Tour detail dialog */}
+      <TourDetailDialog
+        isOpen={!!detailDialogTourId}
+        onClose={() => setDetailDialogTourId(null)}
+        tourId={detailDialogTourId}
+        onDataChange={() => {
+          // 資料變更後刷新列表
+        }}
+      />
     </div>
   )
 }

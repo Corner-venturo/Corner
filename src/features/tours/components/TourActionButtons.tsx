@@ -36,6 +36,8 @@ interface UseTourActionButtonsParams {
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
   onOpenContractDialog?: (tour: Tour) => void
+  // 新增：查看詳情用 Dialog
+  onViewDetails?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -53,6 +55,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenQuoteDialog,
     onOpenItineraryDialog,
     onOpenContractDialog,
+    onViewDetails,
   } = params
 
   const renderActions = useCallback(
@@ -67,7 +70,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              router.push(`/tours/${tour.id}`)
+              if (onViewDetails) {
+                onViewDetails(tour)
+              } else {
+                router.push(`/tours/${tour.id}`)
+              }
             }}
             className="p-1 text-morandi-primary/80 hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
             title="查看詳情"
@@ -194,6 +201,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       handleUnlockTour,
       onOpenQuoteDialog,
       onOpenItineraryDialog,
+      onViewDetails,
     ]
   )
 
