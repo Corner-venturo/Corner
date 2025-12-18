@@ -2,7 +2,8 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus, Coins, Plane } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,8 @@ import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useCustomerStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { TourRoomManager } from '@/components/tours/tour-room-manager'
+import { TourVehicleManager } from '@/components/tours/tour-vehicle-manager'
 
 interface OrderMember {
   id: string
@@ -135,6 +138,27 @@ export function OrderMembersExpandable({
   const imageEditor = useImageEditor()
   const { isRecognizing, recognizePassport } = useOcrRecognition()
 
+  // 團體模式：分房分車相關狀態
+  const [showRoomManager, setShowRoomManager] = useState(false)
+  const [showVehicleManager, setShowVehicleManager] = useState(false)
+  const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
+  const [vehicleAssignments, setVehicleAssignments] = useState<Record<string, string>>({})
+  const [returnDate, setReturnDate] = useState<string | null>(null)
+  const [orderCount, setOrderCount] = useState(0) // 訂單數量（用於判斷是否顯示訂單編號欄）
+
+  // 團體模式：自訂費用欄位
+  interface CustomCostField {
+    id: string
+    name: string
+    values: Record<string, string>  // memberId -> value
+  }
+  const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
+  const [showAddCostFieldDialog, setShowAddCostFieldDialog] = useState(false)
+  const [newCostFieldName, setNewCostFieldName] = useState('')
+
+  // 團體模式：PNR 欄位
+  const [showPnrColumn, setShowPnrColumn] = useState(false)
+  const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
 
   // 定義可編輯欄位的順序（用於方向鍵導航）
   const editableFields = showIdentityColumn
@@ -147,21 +171,89 @@ export function OrderMembersExpandable({
     loadTourDepartureDate()
     // 載入顧客資料（用於編輯模式搜尋）
     fetchCustomers()
+    // 團體模式：載入分房分車資訊
+    if (mode === 'tour') {
+      loadRoomAssignments()
+      loadVehicleAssignments()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, tourId])
+  }, [orderId, tourId, mode])
 
   const loadTourDepartureDate = async () => {
     try {
       const { data, error } = await supabase
         .from('tours')
-        .select('departure_date')
+        .select('departure_date, return_date')
         .eq('id', tourId)
         .single()
 
       if (error) throw error
       setDepartureDate(data?.departure_date || null)
+      setReturnDate(data?.return_date || null)
     } catch (error) {
       logger.error('載入出發日期失敗:', error)
+    }
+  }
+
+  // 團體模式：載入分房資訊
+  const loadRoomAssignments = async () => {
+    if (!tourId) return
+    try {
+      const { data: rooms } = await supabase
+        .from('tour_rooms')
+        .select('id, room_number, room_type')
+        .eq('tour_id', tourId)
+
+      if (!rooms || rooms.length === 0) return
+
+      const { data: assignments } = await supabase
+        .from('tour_room_assignments')
+        .select('order_member_id, room_id')
+        .in('room_id', rooms.map(r => r.id))
+
+      if (assignments) {
+        const map: Record<string, string> = {}
+        assignments.forEach(a => {
+          const room = rooms.find(r => r.id === a.room_id)
+          if (room) {
+            map[a.order_member_id] = room.room_number || room.room_type || '已分房'
+          }
+        })
+        setRoomAssignments(map)
+      }
+    } catch (error) {
+      logger.error('載入分房資訊失敗:', error)
+    }
+  }
+
+  // 團體模式：載入分車資訊
+  const loadVehicleAssignments = async () => {
+    if (!tourId) return
+    try {
+      const { data: vehicles } = await supabase
+        .from('tour_vehicles')
+        .select('id, vehicle_name, vehicle_type')
+        .eq('tour_id', tourId)
+
+      if (!vehicles || vehicles.length === 0) return
+
+      const { data: assignments } = await supabase
+        .from('tour_vehicle_assignments')
+        .select('order_member_id, vehicle_id')
+        .in('vehicle_id', vehicles.map(v => v.id))
+
+      if (assignments) {
+        const map: Record<string, string> = {}
+        assignments.forEach(a => {
+          const vehicle = vehicles.find(v => v.id === a.vehicle_id)
+          if (vehicle) {
+            map[a.order_member_id] = vehicle.vehicle_name || vehicle.vehicle_type || '已分車'
+          }
+        })
+        setVehicleAssignments(map)
+      }
+    } catch (error) {
+      logger.error('載入分車資訊失敗:', error)
     }
   }
 
@@ -183,9 +275,17 @@ export function OrderMembersExpandable({
         if (ordersError) throw ordersError
 
         if (ordersData && ordersData.length > 0) {
-          // 建立訂單編號對應表
+          // 設定訂單數量
+          setOrderCount(ordersData.length)
+
+          // 建立訂單編號對應表（只取序號部分，如 "01"）
           orderCodeMap = Object.fromEntries(
-            ordersData.map(o => [o.id, o.order_number || ''])
+            ordersData.map(o => {
+              const orderNum = o.order_number || ''
+              // 從 "CNX250128A-01" 提取 "01"
+              const seqMatch = orderNum.match(/-(\d+)$/)
+              return [o.id, seqMatch ? seqMatch[1] : orderNum]
+            })
           )
           const orderIds = ordersData.map(o => o.id)
 
@@ -1479,6 +1579,54 @@ export function OrderMembersExpandable({
           >
             身份
           </Button>
+          {/* 團體模式：分房分車、PNR、費用按鈕 */}
+          {mode === 'tour' && (
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowRoomManager(true)}
+                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-amber-50"
+                title="分房管理"
+              >
+                <Hotel size={14} />
+                分房
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowVehicleManager(true)}
+                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-blue-50"
+                title="分車管理"
+              >
+                <Bus size={14} />
+                分車
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowPnrColumn(!showPnrColumn)}
+                className={cn(
+                  "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-sky-50",
+                  showPnrColumn && "bg-sky-50 text-sky-600"
+                )}
+                title="顯示/隱藏 PNR 欄位"
+              >
+                <Plane size={14} />
+                PNR
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowAddCostFieldDialog(true)}
+                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-emerald-50"
+                title="新增費用欄位"
+              >
+                <Coins size={14} />
+                費用
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             variant="ghost"
@@ -1515,9 +1663,9 @@ export function OrderMembersExpandable({
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40">
-                {/* 團體模式：顯示訂單編號 */}
-                {mode === 'tour' && (
-                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-[80px]">訂單編號</th>
+                {/* 團體模式：多筆訂單時顯示訂單編號 */}
+                {mode === 'tour' && orderCount > 1 && (
+                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-[50px]">訂單</th>
                 )}
                 {showIdentityColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">身份</th>
@@ -1559,6 +1707,30 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   備註
                 </th>
+                {/* 團體模式：PNR 欄位 */}
+                {mode === 'tour' && showPnrColumn && (
+                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-sky-50/50">
+                    PNR
+                  </th>
+                )}
+                {/* 團體模式：自訂費用欄位 */}
+                {mode === 'tour' && customCostFields.map(field => (
+                  <th
+                    key={field.id}
+                    className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-emerald-50/50"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>{field.name}</span>
+                      <button
+                        onClick={() => setCustomCostFields(prev => prev.filter(f => f.id !== field.id))}
+                        className="text-morandi-secondary/50 hover:text-red-500 transition-colors"
+                        title="移除此欄位"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                  </th>
+                ))}
                 <th className="px-2 py-1.5 text-center font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 w-24">
                   操作
                 </th>
@@ -1570,9 +1742,9 @@ export function OrderMembersExpandable({
                   key={member.id}
                   className="group relative hover:bg-morandi-container/20 transition-colors"
                 >
-                  {/* 團體模式：訂單編號 */}
-                  {mode === 'tour' && (
-                    <td className="border border-morandi-gold/20 px-2 py-1 bg-blue-50/50">
+                  {/* 團體模式：多筆訂單時顯示訂單序號 */}
+                  {mode === 'tour' && orderCount > 1 && (
+                    <td className="border border-morandi-gold/20 px-2 py-1 bg-blue-50/50 text-center">
                       <span className="text-xs text-blue-600 font-medium">{member.order_code || '-'}</span>
                     </td>
                   )}
@@ -1885,6 +2057,44 @@ export function OrderMembersExpandable({
                       style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                     />
                   </td>
+
+                  {/* 團體模式：PNR 欄位 */}
+                  {mode === 'tour' && showPnrColumn && (
+                    <td className="border border-morandi-gold/20 px-2 py-1 bg-sky-50/50">
+                      <input
+                        type="text"
+                        value={pnrValues[member.id] || ''}
+                        onChange={e => setPnrValues(prev => ({ ...prev, [member.id]: e.target.value }))}
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="輸入 PNR"
+                      />
+                    </td>
+                  )}
+
+                  {/* 團體模式：自訂費用欄位 */}
+                  {mode === 'tour' && customCostFields.map(field => (
+                    <td
+                      key={field.id}
+                      className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50"
+                    >
+                      <input
+                        type="text"
+                        value={field.values[member.id] || ''}
+                        onChange={e => {
+                          const newValue = e.target.value
+                          setCustomCostFields(prev => prev.map(f =>
+                            f.id === field.id
+                              ? { ...f, values: { ...f.values, [member.id]: newValue } }
+                              : f
+                          ))
+                        }}
+                        className="w-full bg-transparent text-xs"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        placeholder="輸入金額"
+                      />
+                    </td>
+                  ))}
 
                   {/* 操作 - 警告/編輯/刪除 */}
                   <td className="border border-morandi-gold/20 px-2 py-1 bg-white text-center">
@@ -2790,6 +3000,92 @@ export function OrderMembersExpandable({
             >
               <Printer size={16} />
               列印
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 團體模式：分房管理對話框 */}
+      {mode === 'tour' && (
+        <TourRoomManager
+          tourId={tourId}
+          tour={departureDate && returnDate ? {
+            id: tourId,
+            departure_date: departureDate,
+            return_date: returnDate,
+          } : undefined}
+          members={members.map(m => ({
+            id: m.id,
+            chinese_name: m.chinese_name ?? null,
+            passport_name: m.passport_name ?? null,
+          }))}
+          open={showRoomManager}
+          onOpenChange={setShowRoomManager}
+        />
+      )}
+
+      {/* 團體模式：分車管理對話框 */}
+      {mode === 'tour' && (
+        <TourVehicleManager
+          tourId={tourId}
+          members={members.map(m => ({
+            id: m.id,
+            chinese_name: m.chinese_name ?? null,
+            passport_name: m.passport_name ?? null,
+          }))}
+          open={showVehicleManager}
+          onOpenChange={setShowVehicleManager}
+        />
+      )}
+
+      {/* 團體模式：新增費用欄位對話框 */}
+      <Dialog open={showAddCostFieldDialog} onOpenChange={setShowAddCostFieldDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>新增費用欄位</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
+                欄位名稱
+              </label>
+              <Input
+                value={newCostFieldName}
+                onChange={(e) => setNewCostFieldName(e.target.value)}
+                placeholder="例如：機票、簽證費、保險..."
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAddCostFieldDialog(false)
+                setNewCostFieldName('')
+              }}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                if (newCostFieldName.trim()) {
+                  setCustomCostFields(prev => [
+                    ...prev,
+                    {
+                      id: `cost_${Date.now()}`,
+                      name: newCostFieldName.trim(),
+                      values: {},
+                    },
+                  ])
+                  setNewCostFieldName('')
+                  setShowAddCostFieldDialog(false)
+                }
+              }}
+              disabled={!newCostFieldName.trim()}
+              className="bg-morandi-gold hover:bg-morandi-gold/90 text-white"
+            >
+              新增
             </Button>
           </div>
         </DialogContent>

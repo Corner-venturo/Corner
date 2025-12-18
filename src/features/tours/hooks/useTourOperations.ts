@@ -182,9 +182,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // If contact person is filled, also add order
         if (newOrder.contact_person?.trim()) {
-          const order_number = `${code}${Math.floor(Math.random() * 1000)
-            .toString()
-            .padStart(3, '0')}`
+          // 新建旅遊團的第一張訂單，編號為 -01
+          const order_number = `${code}-01`
           const memberCount = newOrder.member_count || 1
           const totalAmount = newOrder.total_amount || newTour.price * memberCount
           const orderData = {
