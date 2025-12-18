@@ -6,6 +6,7 @@ import { AttractionSelector } from '../../AttractionSelector'
 import { HotelSelector, LuxuryHotel } from '../../HotelSelector'
 import { RestaurantSelector, Restaurant, MichelinRestaurant } from '../../RestaurantSelector'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type CombinedRestaurant = (Restaurant | MichelinRestaurant) & {
   source: 'restaurant' | 'michelin'
