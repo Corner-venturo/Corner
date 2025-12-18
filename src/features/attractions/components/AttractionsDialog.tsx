@@ -669,25 +669,39 @@ export function AttractionsDialog({
           </Button>
         </div>
 
-        {/* 已上傳圖片預覽 */}
-        {uploadedImages.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3">
-            {uploadedImages.map((url, index) => (
-              <ImagePositionAdjuster
-                key={`${url}-${index}`}
-                url={url}
-                position={imagePositions[url] || 'center'}
-                onPositionChange={(pos) => handlePositionChange(url, pos)}
-                onRemove={() => handleRemoveImage(index)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="border-2 border-dashed border-border rounded-md p-6 text-center text-morandi-muted">
-            <Upload size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">尚無圖片，點擊上方按鈕上傳或貼上網址</p>
-          </div>
-        )}
+        {/* 已上傳圖片預覽 + 拖放區 */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`min-h-[120px] rounded-md transition-all ${
+            isDragOver ? 'bg-morandi-gold/10 border-2 border-dashed border-morandi-gold' : ''
+          }`}
+        >
+          {isDragOver && (
+            <div className="flex items-center justify-center h-[120px]">
+              <div className="text-morandi-gold font-medium">放開以上傳圖片</div>
+            </div>
+          )}
+          {!isDragOver && uploadedImages.length > 0 ? (
+            <div className="grid grid-cols-3 gap-3">
+              {uploadedImages.map((url, index) => (
+                <ImagePositionAdjuster
+                  key={`${url}-${index}`}
+                  url={url}
+                  position={imagePositions[url] || 'center'}
+                  onPositionChange={(pos) => handlePositionChange(url, pos)}
+                  onRemove={() => handleRemoveImage(index)}
+                />
+              ))}
+            </div>
+          ) : !isDragOver ? (
+            <div className="border-2 border-dashed border-border rounded-md p-6 text-center text-morandi-muted cursor-pointer hover:border-morandi-gold/50 transition-colors">
+              <Upload size={24} className="mx-auto mb-2 opacity-50" />
+              <p className="text-sm">拖曳圖片到此處，或點擊上方按鈕上傳</p>
+            </div>
+          ) : null}
+        </div>
         <p className="text-xs text-morandi-muted mt-2">
           滑鼠移到圖片上可調整顯示位置（頂部/中間/底部）。建議尺寸 1920x1080，支援 JPG、PNG 格式
         </p>
