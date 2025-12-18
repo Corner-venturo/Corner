@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin, Navigation, Loader2 } from 'lucide-react'
 import type { Attraction } from '../types'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import type L from 'leaflet'
 
 interface AttractionsMapProps {
   attractions: Attraction[]
@@ -79,9 +78,12 @@ export function AttractionsMap({
       return
     }
 
-    const initMap = () => {
+    const initMap = async () => {
       console.log('[AttractionsMap] 開始初始化地圖')
       setIsLoading(true)
+
+      // 動態載入 Leaflet（避免 SSR 問題）
+      const L = (await import('leaflet')).default
 
       // 清理舊地圖
       if (mapRef.current) {
