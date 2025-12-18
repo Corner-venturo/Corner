@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, Crop, Settings2, Loader2, CalendarIcon } from 'lucide-react'
+import { Settings2, Loader2, CalendarIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toHalfWidth } from '@/lib/utils/text'
 import { RichTextInput } from '@/components/ui/rich-text-input'
-import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from '@/components/ui/image-position-editor'
+import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
+import { ImageUploader } from '@/components/ui/image-uploader'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { PreviewPanel } from '../components/PreviewPanel'
@@ -57,11 +58,8 @@ export function CoverInfoSection({
 }: CoverInfoSectionProps) {
   const { cities, updateCity: updateCityInStore } = useRegionsStore()
   const { coverTemplates, loading: templatesLoading } = useTemplates()
-  const [uploading, setUploading] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [uploadedImageUrl, setUploadedImageUrl] = useState('')
-  // 位置調整功能相關狀態
-  const [showPositionEditor, setShowPositionEditor] = useState(false)
   // 封面設定 Modal
   const [showCoverSettings, setShowCoverSettings] = useState(false)
 
@@ -87,112 +85,6 @@ export function CoverInfoSection({
     }
     return images
   }, [data.city, cities])
-
-  // 從 URL 提取檔名（用於刪除舊圖片）
-  const extractFileNameFromUrl = (url: string): string | null => {
-    if (!url) return null
-    // URL 格式: https://xxx.supabase.co/storage/v1/object/public/city-backgrounds/itinerary_xxx.jpg
-    const match = url.match(/city-backgrounds\/([^?]+)/)
-    return match ? match[1] : null
-  }
-
-  // 刪除 Storage 中的圖片
-  const deleteStorageImage = async (url: string) => {
-    const fileName = extractFileNameFromUrl(url)
-    if (!fileName) return
-
-    // 只刪除 itinerary_ 開頭的圖片（避免刪除城市預設圖片）
-    if (!fileName.startsWith('itinerary_')) return
-
-    try {
-      const { error } = await supabase.storage
-        .from('city-backgrounds')
-        .remove([fileName])
-
-      if (error) {
-        console.warn('刪除舊圖片失敗:', error)
-      }
-    } catch (err) {
-      console.warn('刪除舊圖片時發生錯誤:', err)
-    }
-  }
-
-  // 選擇圖片後直接上傳（不裁切）
-  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // 檢查檔案大小 (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      void alert('檔案太大！請選擇小於 5MB 的圖片', 'warning')
-      return
-    }
-
-    // 檢查檔案類型
-    if (!file.type.startsWith('image/')) {
-      void alert('請選擇圖片檔案', 'warning')
-      return
-    }
-
-    // 清除 input 值，讓使用者可以再次選擇同一個檔案
-    event.target.value = ''
-
-    setUploading(true)
-
-    // 記錄舊圖片 URL（上傳成功後刪除）
-    const oldCoverImage = data.coverImage
-
-    try {
-      // 生成唯一檔名
-      const timestamp = Date.now()
-      const randomStr = Math.random().toString(36).substring(2, 8)
-      const fileExt = file.name.split('.').pop() || 'jpg'
-      const fileName = `itinerary_${timestamp}_${randomStr}.${fileExt}`
-      const filePath = `${fileName}`
-
-      // 上傳到 Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('city-backgrounds')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        })
-
-      if (uploadError) throw uploadError
-
-      // 取得公開網址
-      const { data: urlData } = supabase.storage.from('city-backgrounds').getPublicUrl(filePath)
-
-      // 刪除舊的自訂上傳圖片（如果有）
-      if (oldCoverImage) {
-        await deleteStorageImage(oldCoverImage)
-      }
-
-      // 更新表單資料（圖片 + 重置位置設定）
-      updateField('coverImage', urlData.publicUrl)
-      updateField('coverImagePosition', { x: 50, y: 50, scale: 1 })
-
-      // 儲存圖片網址，準備詢問是否更新資料庫
-      setUploadedImageUrl(urlData.publicUrl)
-
-      // 如果有選擇城市，詢問是否更新預設圖片
-      if (data.city) {
-        setShowUpdateDialog(true)
-      } else {
-        void alert('圖片上傳成功！', 'success')
-      }
-    } catch (error) {
-      console.error('上傳失敗:', error)
-      void alert('圖片上傳失敗，請稍後再試', 'error')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  // 位置調整確認
-  const handlePositionConfirm = (settings: ImagePositionSettings) => {
-    updateField('coverImagePosition', settings)
-  }
 
   // 更新城市預設圖片
   const handleUpdateCityImage = async (imageNumber: 1 | 2) => {
@@ -507,7 +399,7 @@ export function CoverInfoSection({
             <div className="space-y-3">
               <label className="block text-sm font-medium text-morandi-primary">封面圖片</label>
 
-              {/* 城市圖片選擇 */}
+              {/* 城市預設圖片選擇 */}
               {cityImages.length > 0 && (
                 <div className="grid grid-cols-2 gap-2">
                   {cityImages.map((image, index) => (
@@ -533,50 +425,26 @@ export function CoverInfoSection({
                 </div>
               )}
 
-              {/* 上傳圖片 */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  disabled={uploading}
-                  className="hidden"
-                  id="cover-image-upload-modal"
-                />
-                <label
-                  htmlFor="cover-image-upload-modal"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg text-sm cursor-pointer transition-colors ${
-                    uploading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <Upload size={14} />
-                  {uploading ? '上傳中...' : '上傳圖片'}
-                </label>
-                <span className="text-xs text-morandi-secondary">最大 5MB</span>
-              </div>
-
-              {/* 目前圖片預覽 */}
-              {data.coverImage && (
-                <div
-                  className="relative rounded-lg overflow-hidden border-2 border-morandi-gold cursor-pointer group"
-                  onClick={() => setShowPositionEditor(true)}
-                >
-                  <img
-                    src={data.coverImage}
-                    alt="封面預覽"
-                    className="w-full h-28 object-cover transition-all group-hover:brightness-75"
-                    style={getImagePositionStyle(data.coverImagePosition)}
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setShowPositionEditor(true) }}
-                    className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 hover:bg-black/80 rounded text-white text-xs flex items-center gap-1"
-                  >
-                    <Crop size={12} />
-                    調整位置
-                  </button>
-                </div>
-              )}
+              {/* 上傳圖片（支援拖曳） */}
+              <ImageUploader
+                value={data.coverImage}
+                onChange={(url) => {
+                  const oldImage = data.coverImage
+                  updateField('coverImage', url)
+                  // 如果上傳了新圖片且有城市，詢問是否設為預設
+                  if (url && data.city && oldImage !== url) {
+                    setUploadedImageUrl(url)
+                    setShowUpdateDialog(true)
+                  }
+                }}
+                position={data.coverImagePosition as ImagePositionSettings}
+                onPositionChange={(pos) => updateField('coverImagePosition', pos)}
+                bucket="city-backgrounds"
+                filePrefix="itinerary"
+                previewHeight="112px"
+                aspectRatio={16 / 9}
+                placeholder="拖曳圖片到此處，或點擊上傳"
+              />
             </div>
 
             {/* 完成按鈕 */}
@@ -627,17 +495,6 @@ export function CoverInfoSection({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* 圖片位置調整器 */}
-      <ImagePositionEditor
-        open={showPositionEditor}
-        onClose={() => setShowPositionEditor(false)}
-        imageSrc={data.coverImage || ''}
-        currentPosition={data.coverImagePosition}
-        onConfirm={handlePositionConfirm}
-        aspectRatio={16 / 9}
-        title="調整封面圖片"
-      />
 
       {/* 更新城市預設圖片對話框 */}
       <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>

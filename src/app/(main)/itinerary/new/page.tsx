@@ -1283,6 +1283,9 @@ function NewItineraryPageContent() {
               data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
               currentVersionIndex={currentVersionIndex}
               onVersionChange={handleVersionChange}
+              onVersionRecordsChange={(versionRecords) => {
+                setTourData(prev => ({ ...prev, version_records: versionRecords }))
+              }}
             />
           </div>
         }

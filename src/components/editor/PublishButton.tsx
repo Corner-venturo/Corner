@@ -49,9 +49,10 @@ interface PublishButtonProps {
   data: PublishButtonData
   currentVersionIndex: number // -1 表示主版本, 0+ 表示 version_records 的索引
   onVersionChange: (index: number, versionData?: ItineraryVersionRecord) => void
+  onVersionRecordsChange?: (versionRecords: ItineraryVersionRecord[]) => void // 儲存後更新版本記錄
 }
 
-export function PublishButton({ data, currentVersionIndex, onVersionChange }: PublishButtonProps) {
+export function PublishButton({ data, currentVersionIndex, onVersionChange, onVersionRecordsChange }: PublishButtonProps) {
   const [saving, setSaving] = useState(false)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [showSaveAsNewDialog, setShowSaveAsNewDialog] = useState(false)
@@ -156,6 +157,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
             updatedRecords = [firstVersion]
           }
           await update(data.id, { ...convertedData, version_records: updatedRecords })
+          // 通知父組件更新版本記錄
+          onVersionRecordsChange?.(updatedRecords)
         } else {
           // 更新特定版本記錄
           const updatedRecords = [...versionRecords]
@@ -169,6 +172,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
             hotels: data.hotels,
           }
           await update(data.id, { version_records: updatedRecords })
+          // 通知父組件更新版本記錄
+          onVersionRecordsChange?.(updatedRecords)
         }
       } else {
         // 第一次建立，自動建立版本 1（名稱 = 行程名稱）
@@ -227,6 +232,8 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
 
       const updatedRecords = [...versionRecords, newVersion]
       await update(data.id, { version_records: updatedRecords })
+      // 通知父組件更新版本記錄
+      onVersionRecordsChange?.(updatedRecords)
 
       setShowSaveDialog(false)
       setVersionNote('')
