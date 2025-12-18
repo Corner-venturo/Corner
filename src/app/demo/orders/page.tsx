@@ -17,6 +17,7 @@ import {
   XCircle,
   Filter
 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { demoOrders, formatCurrency, getStatusDisplay } from '@/lib/demo/demo-data'
 
 export default function DemoOrdersPage() {
@@ -112,17 +113,18 @@ export default function DemoOrdersPage() {
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
-          >
-            <option value="all">全部狀態</option>
-            <option value="pending">待確認</option>
-            <option value="confirmed">已確認</option>
-            <option value="paid">已付清</option>
-            <option value="cancelled">已取消</option>
-          </select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="全部狀態" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部狀態</SelectItem>
+              <SelectItem value="pending">待確認</SelectItem>
+              <SelectItem value="confirmed">已確認</SelectItem>
+              <SelectItem value="paid">已付清</SelectItem>
+              <SelectItem value="cancelled">已取消</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

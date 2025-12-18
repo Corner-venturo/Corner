@@ -15,6 +15,7 @@ import {
   Copy,
   Trash2
 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { demoTours, formatCurrency, getStatusDisplay } from '@/lib/demo/demo-data'
 
 export default function DemoToursPage() {
@@ -62,18 +63,19 @@ export default function DemoToursPage() {
           </div>
 
           {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
-          >
-            <option value="all">全部狀態</option>
-            <option value="draft">草稿</option>
-            <option value="published">已發布</option>
-            <option value="confirmed">已成團</option>
-            <option value="departed">出團中</option>
-            <option value="completed">已結束</option>
-          </select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="全部狀態" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部狀態</SelectItem>
+              <SelectItem value="draft">草稿</SelectItem>
+              <SelectItem value="published">已發布</SelectItem>
+              <SelectItem value="confirmed">已成團</SelectItem>
+              <SelectItem value="departed">出團中</SelectItem>
+              <SelectItem value="completed">已結束</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* View Toggle */}
           <div className="flex items-center bg-slate-100 rounded-lg p-1">

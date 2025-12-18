@@ -16,6 +16,7 @@ import {
   Calendar,
   Filter
 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { demoPayments, demoStats, formatCurrency, getStatusDisplay } from '@/lib/demo/demo-data'
 
 export default function DemoFinancePage() {
@@ -50,16 +51,17 @@ export default function DemoFinancePage() {
           <p className="text-slate-500 mt-1">收款記錄與財務統計</p>
         </div>
         <div className="flex items-center gap-2">
-          <select
-            value={periodFilter}
-            onChange={(e) => setPeriodFilter(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 bg-white"
-          >
-            <option value="week">本週</option>
-            <option value="month">本月</option>
-            <option value="quarter">本季</option>
-            <option value="year">今年</option>
-          </select>
+          <Select value={periodFilter} onValueChange={setPeriodFilter}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="本月" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">本週</SelectItem>
+              <SelectItem value="month">本月</SelectItem>
+              <SelectItem value="quarter">本季</SelectItem>
+              <SelectItem value="year">今年</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

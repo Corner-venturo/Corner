@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
   CustomerSearchDialog,
@@ -1994,15 +1995,18 @@ export default function CustomersPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-morandi-secondary mb-1">性別</label>
-                  <select
+                  <Select
                     value={verifyFormData.gender || ''}
-                    onChange={e => setVerifyFormData({ ...verifyFormData, gender: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+                    onValueChange={value => setVerifyFormData({ ...verifyFormData, gender: value })}
                   >
-                    <option value="">請選擇</option>
-                    <option value="M">男</option>
-                    <option value="F">女</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="請選擇" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="M">男</SelectItem>
+                      <SelectItem value="F">女</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

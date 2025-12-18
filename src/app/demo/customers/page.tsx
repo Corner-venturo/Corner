@@ -15,6 +15,7 @@ import {
   Crown,
   Award
 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { demoCustomers, formatCurrency, getStatusDisplay } from '@/lib/demo/demo-data'
 
 export default function DemoCustomersPage() {
@@ -112,17 +113,18 @@ export default function DemoCustomersPage() {
               className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
             />
           </div>
-          <select
-            value={vipFilter}
-            onChange={(e) => setVipFilter(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white"
-          >
-            <option value="all">全部等級</option>
-            <option value="platinum">白金卡</option>
-            <option value="gold">金卡</option>
-            <option value="silver">銀卡</option>
-            <option value="normal">一般</option>
-          </select>
+          <Select value={vipFilter} onValueChange={setVipFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="全部等級" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部等級</SelectItem>
+              <SelectItem value="platinum">白金卡</SelectItem>
+              <SelectItem value="gold">金卡</SelectItem>
+              <SelectItem value="silver">銀卡</SelectItem>
+              <SelectItem value="normal">一般</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
