@@ -7,6 +7,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Users, MapPin, CircleDollarSign, ExternalLink } from 'lucide-react'
 import { useQuoteStore } from '@/stores'
 
+// 去除 HTML 標籤
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 interface ChatHeaderProps {
   showMemberSidebar: boolean
   onToggleMemberSidebar: () => void
@@ -77,7 +83,7 @@ export function ChatHeader({ showMemberSidebar, onToggleMemberSidebar, tourId }:
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs text-morandi-gold">{quote.code}</span>
                         <span className="text-sm text-morandi-text truncate">
-                          {quote.name || quote.destination || '未命名'}
+                          {stripHtml(quote.name) || stripHtml(quote.destination) || '未命名'}
                         </span>
                       </div>
                       {quote.total_cost && (

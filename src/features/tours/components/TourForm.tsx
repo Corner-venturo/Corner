@@ -14,6 +14,12 @@ import type { Itinerary, Quote } from '@/stores/types'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { toast } from 'sonner'
 
+// 去除 HTML 標籤
+function stripHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
+
 interface TourFormProps {
   isOpen: boolean
   onClose: () => void
@@ -550,7 +556,7 @@ export function TourForm({
                           { value: '', label: '獨立旅遊團（無報價單）' },
                           ...availableQuotes.map(quote => ({
                             value: quote.id,
-                            label: `${quote.code || '無編號'} - ${quote.name || quote.destination || '未命名'}`,
+                            label: `${quote.code || '無編號'} - ${stripHtml(quote.name) || stripHtml(quote.destination) || '未命名'}`,
                           })),
                         ]}
                         value={selectedQuoteId || ''}
