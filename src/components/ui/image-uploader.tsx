@@ -86,7 +86,7 @@ export function ImageUploader({
   }
 
   // 上傳檔案
-  const uploadFile = async (file: File) => {
+  const uploadFile = useCallback(async (file: File) => {
     // 檢查檔案大小
     if (file.size > maxSize) {
       void alert(`檔案太大！請選擇小於 ${Math.round(maxSize / 1024 / 1024)}MB 的圖片`, 'warning')
@@ -140,7 +140,7 @@ export function ImageUploader({
     } finally {
       setUploading(false)
     }
-  }
+  }, [maxSize, bucket, filePrefix, value, onChange, onPositionChange])
 
   // 處理檔案選擇
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,33 +167,8 @@ export function ImageUploader({
     setIsDragOver(false)
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragOver(false)
-
-    if (disabled) return
-
-    const files = e.dataTransfer.files
-    if (files.length > 0) {
-      const file = files[0]
-      if (file.type.startsWith('image/')) {
-        void uploadFile(file)
-      } else {
-        void alert('請拖曳圖片檔案', 'warning')
-      }
-    }
-
-    // 處理從網頁拖曳的圖片 URL
-    const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
-    if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
-      // 嘗試下載並上傳
-      void fetchAndUploadImage(imageUrl)
-    }
-  }, [disabled])
-
-  // 從 URL 下載並上傳圖片
-  const fetchAndUploadImage = async (imageUrl: string) => {
+  // 從 URL 下載並上傳圖片（必須在 handleDrop 之前定義）
+  const fetchAndUploadImage = useCallback(async (imageUrl: string) => {
     setUploading(true)
     try {
       const response = await fetch(imageUrl)
@@ -212,7 +187,33 @@ export function ImageUploader({
     } finally {
       setUploading(false)
     }
-  }
+  }, [uploadFile])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+
+    if (disabled) return
+
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      const file = files[0]
+      if (file.type.startsWith('image/')) {
+        void uploadFile(file)
+      } else {
+        void alert('請拖曳圖片檔案', 'warning')
+      }
+      return // 有檔案就不處理 URL
+    }
+
+    // 處理從網頁拖曳的圖片 URL（只有沒有檔案時才處理）
+    const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
+    if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+      // 嘗試下載並上傳
+      void fetchAndUploadImage(imageUrl)
+    }
+  }, [disabled, uploadFile, fetchAndUploadImage])
 
   // 刪除圖片
   const handleDelete = async () => {
