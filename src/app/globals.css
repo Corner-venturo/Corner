@@ -1000,24 +1000,33 @@ table input[type='number']:focus {
   border: none !important;
 }
 
-/* 簡潔地圖 Tooltip */
-.map-tooltip,
-.map-tooltip-main {
-  background: white;
-  border: none;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
-  color: #475569;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+/* 地圖標記樣式 */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
 }
 
-.map-tooltip-main {
-  background: #fef2f2;
-  color: #dc2626;
-  font-weight: 500;
+/* 地圖 Tooltip */
+.main-marker-tooltip,
+.nearby-marker-tooltip {
+  background: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.main-marker-tooltip {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+}
+
+.nearby-marker-tooltip {
+  color: #334155 !important;
 }
 
 .leaflet-tooltip::before {
-  display: none;
+  display: none !important;
 }

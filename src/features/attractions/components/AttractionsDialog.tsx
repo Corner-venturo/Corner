@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -115,6 +115,33 @@ export function AttractionsDialog({
   const [imagePositions, setImagePositions] = useState<Record<string, ImagePosition>>({})
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 全域拖曳事件監聯（除錯用）- 用 window 層級 + capture
+  useEffect(() => {
+    if (!open) return
+
+    const handleGlobalDragOver = (e: DragEvent) => {
+      // 必須 preventDefault 才能接收 drop 事件
+      e.preventDefault()
+      console.log('[window] dragover', e.dataTransfer?.types)
+    }
+
+    const handleGlobalDrop = (e: DragEvent) => {
+      e.preventDefault()
+      console.log('[window] drop', e.dataTransfer?.files?.length, e.dataTransfer?.types)
+    }
+
+    // 用 capture phase 確保最先收到事件
+    window.addEventListener('dragover', handleGlobalDragOver, true)
+    window.addEventListener('drop', handleGlobalDrop, true)
+
+    console.log('[AttractionsDialog] 已註冊全域拖曳事件監聽')
+
+    return () => {
+      window.removeEventListener('dragover', handleGlobalDragOver, true)
+      window.removeEventListener('drop', handleGlobalDrop, true)
+    }
+  }, [open])
 
   // 解析 notes 中儲存的圖片位置資訊
   const parseImagePositions = (notes: string | undefined): Record<string, ImagePosition> => {
