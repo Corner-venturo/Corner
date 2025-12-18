@@ -233,153 +233,171 @@ export function AddVisaDialog({
       <div className="border-t border-border"></div>
 
       {/* 下半部：批次辦理人列表 */}
-      <div className="space-y-2">
-        {/* 表頭 */}
-        <div className="flex gap-2 items-center text-xs text-morandi-secondary font-medium px-1">
-          <div className="w-28">申請人</div>
-          <div className="w-28">簽證類型</div>
-          <div className="w-12 text-center">急件</div>
-          <div className="w-32">收件日期</div>
-          <div className="w-32">回件日期</div>
-          <div className="w-20">辦理費用</div>
-          <div className="w-16">急件費用</div>
-          <div className="w-20">應收費用</div>
-          <div className="w-24"></div>
-        </div>
+      <table className="w-full border-collapse border border-border">
+        <thead>
+          <tr className="text-xs text-morandi-secondary font-medium bg-morandi-container/30">
+            <th className="text-left py-2 px-3 border border-border">申請人</th>
+            <th className="text-left py-2 px-3 border border-border">簽證類型</th>
+            <th className="text-center py-2 px-3 border border-border">急件</th>
+            <th className="text-left py-2 px-3 border border-border">收件日期</th>
+            <th className="text-left py-2 px-3 border border-border">回件日期</th>
+            <th className="text-center py-2 px-3 border border-border">辦理費用</th>
+            <th className="text-center py-2 px-3 border border-border">急件費用</th>
+            <th className="text-center py-2 px-3 border border-border">應收費用</th>
+            <th className="text-center py-2 px-3 border border-border">追加辦理</th>
+            <th className="border border-border w-10"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {applicants.map((applicant, index) => {
+            const baseFee = applicant.fee ?? calculateFee(applicant.country)
+            const urgentFee = applicant.is_urgent ? 1000 : 0
 
-        {applicants.map((applicant, index) => {
-          const baseFee = applicant.fee ?? calculateFee(applicant.country)
-          const urgentFee = applicant.is_urgent ? 1000 : 0
-          const totalFee = applicant.isAdditional ? null : baseFee + urgentFee
+            // 計算應收費用：主列要加總自己和所有追加列的費用
+            let totalFee: number | null = null
+            if (!applicant.isAdditional) {
+              // 主列：自己的費用
+              const selfFee = baseFee + urgentFee
+              // 加上所有追加列的費用
+              const additionalFees = applicants
+                .filter(a => a.parentId === applicant.id)
+                .reduce((sum, a) => {
+                  const aBaseFee = a.fee ?? calculateFee(a.country)
+                  const aUrgentFee = a.is_urgent ? 1000 : 0
+                  return sum + aBaseFee + aUrgentFee
+                }, 0)
+              totalFee = selfFee + additionalFees
+            }
 
-          return (
-            <div key={applicant.id} className="flex gap-2 items-center">
-              {/* 申請人：追加列顯示「-」 */}
-              {applicant.isAdditional ? (
-                <div className="w-28 h-10 px-3 flex items-center text-morandi-secondary">
-                  -
-                </div>
-              ) : (
-                <Input
-                  value={applicant.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'name', e.target.value)}
-                  placeholder="申請人"
-                  className="w-28"
-                />
-              )}
+            return (
+              <tr key={applicant.id}>
+                {/* 申請人 */}
+                <td className="py-2 px-3 border border-border">
+                  {applicant.isAdditional ? (
+                    <span className="text-morandi-secondary">-</span>
+                  ) : (
+                    <input
+                      type="text"
+                      value={applicant.name}
+                      onChange={(e) => updateApplicant(applicant.id, 'name', e.target.value)}
+                      placeholder="申請人"
+                      className="w-full bg-transparent outline-none text-sm"
+                    />
+                  )}
+                </td>
 
-              {/* 簽證類型 */}
-              <Select
-                value={applicant.country}
-                onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
-              >
-                <SelectTrigger className="w-28 h-10 text-sm">
-                  <SelectValue placeholder="類型" />
-                </SelectTrigger>
-                <SelectContent>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
-                  <SelectItem value="護照 成人">護照 成人</SelectItem>
-                  <SelectItem value="護照 兒童">護照 兒童</SelectItem>
-                  <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
-                  <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
-                  <SelectItem value="台胞證">台胞證</SelectItem>
-                  <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
-                  <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
-                  <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* 急件 checkbox */}
-              <div className="w-12 flex justify-center">
-                <input
-                  type="checkbox"
-                  checked={applicant.is_urgent}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
-                  className="w-4 h-4"
-                />
-              </div>
-
-              {/* 收件日期 */}
-              <DatePicker
-                value={applicant.received_date}
-                onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
-                className="w-32"
-                placeholder="收件日期"
-              />
-
-              {/* 回件日期 */}
-              <DatePicker
-                value={applicant.expected_issue_date}
-                onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
-                className="w-32"
-                placeholder="回件日期"
-              />
-
-              {/* 辦理費用 */}
-              <Input
-                type="number"
-                value={baseFee}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
-                className="w-20 text-sm"
-              />
-
-              {/* 急件費用 */}
-              <div className="w-16 h-10 px-2 flex items-center justify-center text-sm text-morandi-secondary">
-                {urgentFee > 0 ? urgentFee.toLocaleString() : '0'}
-              </div>
-
-              {/* 應收費用：追加列顯示「-」 */}
-              <div className="w-20 h-10 px-2 flex items-center justify-center text-sm font-medium">
-                {totalFee !== null ? totalFee.toLocaleString() : '-'}
-              </div>
-
-              {/* 按鈕區：追加 / 刪除 */}
-              <div className="flex gap-1 flex-shrink-0 w-24 justify-end">
-                {/* 追加按鈕：只在主列顯示 */}
-                {!applicant.isAdditional && (
-                  <Button
-                    type="button"
-                    onClick={() => addApplicantForSame(applicant.id, applicant.name)}
-                    size="sm"
-                    className="h-8 w-8 p-0 text-morandi-green hover:bg-morandi-green/10"
-                    variant="ghost"
-                    title="追加同一人的其他簽證"
+                {/* 簽證類型 */}
+                <td className="py-2 px-3 border border-border">
+                  <Select
+                    value={applicant.country}
+                    onValueChange={(value) => updateApplicant(applicant.id, 'country', value)}
                   >
-                    +
-                  </Button>
-                )}
+                    <SelectTrigger className="h-auto p-0 border-0 shadow-none bg-transparent text-sm">
+                      <SelectValue placeholder="類型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary">護照</div>
+                      <SelectItem value="護照 成人">護照 成人</SelectItem>
+                      <SelectItem value="護照 兒童">護照 兒童</SelectItem>
+                      <SelectItem value="護照 成人 遺失件">護照 成人 遺失件</SelectItem>
+                      <SelectItem value="護照 兒童 遺失件">護照 兒童 遺失件</SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">台胞證</div>
+                      <SelectItem value="台胞證">台胞證</SelectItem>
+                      <SelectItem value="台胞證 遺失件">台胞證 遺失件</SelectItem>
+                      <SelectItem value="台胞證 首辦">台胞證 首辦</SelectItem>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-morandi-secondary border-t mt-1">美國簽證</div>
+                      <SelectItem value="美國 ESTA">美國 ESTA</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </td>
 
-                {/* 新增按鈕：只在最後一列且非追加列顯示 */}
-                {index === applicants.length - 1 && !applicant.isAdditional && (
-                  <Button
-                    type="button"
-                    onClick={addApplicant}
-                    size="sm"
-                    className="h-8 w-8 p-0 text-morandi-gold hover:bg-morandi-gold/10"
-                    variant="ghost"
-                    title="新增辦理人"
+                {/* 急件 */}
+                <td className="py-2 px-3 border border-border text-center">
+                  <input
+                    type="checkbox"
+                    checked={applicant.is_urgent}
+                    onChange={(e) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </td>
+
+                {/* 收件日期 */}
+                <td className="py-2 px-3 border border-border">
+                  <DatePicker
+                    value={applicant.received_date}
+                    onChange={(date) => updateApplicant(applicant.id, 'received_date', date)}
+                    placeholder="收件日期"
+                    buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
+                  />
+                </td>
+
+                {/* 回件日期 */}
+                <td className="py-2 px-3 border border-border">
+                  <DatePicker
+                    value={applicant.expected_issue_date}
+                    onChange={(date) => updateApplicant(applicant.id, 'expected_issue_date', date)}
+                    placeholder="回件日期"
+                    buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
+                  />
+                </td>
+
+                {/* 辦理費用 */}
+                <td className="py-2 px-3 border border-border text-center">
+                  <input
+                    type="number"
+                    value={baseFee}
+                    onChange={(e) => updateApplicant(applicant.id, 'fee', Number(e.target.value))}
+                    className="w-full bg-transparent outline-none text-sm text-center"
+                  />
+                </td>
+
+                {/* 急件費用 */}
+                <td className="py-2 px-3 border border-border text-center text-sm text-morandi-secondary">
+                  {urgentFee > 0 ? urgentFee.toLocaleString() : '0'}
+                </td>
+
+                {/* 應收費用 */}
+                <td className="py-2 px-3 border border-border text-center text-sm font-medium">
+                  {totalFee !== null ? totalFee.toLocaleString() : '-'}
+                </td>
+
+                {/* 追加辦理 */}
+                <td className="py-2 px-3 border border-border text-center">
+                  {!applicant.isAdditional && (
+                    <span
+                      onClick={() => addApplicantForSame(applicant.id, applicant.name)}
+                      className="text-morandi-green cursor-pointer hover:text-morandi-green/70 text-lg"
+                      title="追加同一人的其他簽證"
+                    >
+                      +
+                    </span>
+                  )}
+                </td>
+
+                {/* 刪除 */}
+                <td className="py-2 px-3 border border-border text-center">
+                  <span
+                    onClick={() => removeApplicant(applicant.id)}
+                    className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
+                    title="刪除"
                   >
-                    +
-                  </Button>
-                )}
+                    x
+                  </span>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
 
-                {/* 刪除按鈕 */}
-                <Button
-                  type="button"
-                  onClick={() => removeApplicant(applicant.id)}
-                  size="sm"
-                  className="h-8 w-8 p-0 text-morandi-red hover:bg-red-50"
-                  variant="ghost"
-                  title="刪除"
-                >
-                  ✕
-                </Button>
-              </div>
-            </div>
-          )
-        })}
+      {/* 新增辦理人 */}
+      <div className="flex justify-end mt-2 pr-2">
+        <span
+          onClick={addApplicant}
+          className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm"
+        >
+          + 新增辦理人
+        </span>
       </div>
     </FormDialog>
   )

@@ -239,18 +239,17 @@ export default function VisasPage() {
     for (const applicant of applicants) {
       if (!applicant.name) continue
       const fee = applicant.fee ?? calculateFee(applicant.country)
-      const cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
       const existing = applicantMap.get(applicant.name)
       if (existing) {
         existing.visaTypes.push(applicant.country)
         existing.totalFee += fee
-        existing.totalCost += cost
+        existing.totalCost += applicant.cost
       } else {
         applicantMap.set(applicant.name, {
           visaTypes: [applicant.country],
           totalFee: fee,
-          totalCost: cost,
+          totalCost: applicant.cost,
         })
       }
     }
@@ -260,7 +259,6 @@ export default function VisasPage() {
       if (!applicant.name) continue
 
       const fee = applicant.fee ?? calculateFee(applicant.country)
-      const total_cost = applicant.is_urgent ? applicant.cost + 900 : applicant.cost
 
       await addVisa({
         applicant_name: applicant.name,
@@ -271,7 +269,7 @@ export default function VisasPage() {
         received_date: applicant.received_date || undefined,  // 空字串轉 undefined
         expected_issue_date: applicant.expected_issue_date || undefined,  // 空字串轉 undefined
         fee,
-        cost: total_cost,
+        cost: applicant.cost,
         status: 'pending',
         order_id: targetOrder.id,
         order_number: targetOrder.order_number || '',

@@ -19,6 +19,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
+
+// 移除 HTML 標籤
+const stripHtml = (html: string | undefined): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
 

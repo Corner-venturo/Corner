@@ -986,3 +986,15 @@ table input[type='number']:focus {
     color: #666 !important;
   }
 }
+
+/* Leaflet 地圖樣式修正 */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+}
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}

@@ -342,9 +342,10 @@ function JapaneseFlightCard({
 
   // 預設圖片（日本富士山/台灣景點）
   const defaultOutboundImage = 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80'
-  const defaultReturnImage = 'https://images.unsplash.com/photo-1470004914212-05527e49370b?w=800&q=80'
+  const taiwanImage = 'https://images.unsplash.com/photo-1470004914212-05527e49370b?w=800&q=80'
 
-  const imageUrl = destinationImage || (isOutbound ? defaultOutboundImage : defaultReturnImage)
+  // 去程：用封面照片，回程：統一用台灣照片
+  const imageUrl = isOutbound ? (destinationImage || defaultOutboundImage) : taiwanImage
 
   // 顏色配置 - 和紙風格（淡墨色系）
   const cardBg = 'bg-[#faf8f5]'
@@ -457,31 +458,32 @@ function JapaneseFlightCard({
               </div>
 
               {/* 飛行動畫線 */}
-              <div className="relative flex-1 h-12 flex items-center justify-center">
-                {/* 虛線軌跡 */}
-                <div className="absolute w-full top-1/2 border-t-2 border-dashed border-[#2c2623]/20" />
+              <div className="relative flex-1 flex flex-col items-center justify-center">
+                <div className="relative w-full h-12 flex items-center justify-center">
+                  {/* 虛線軌跡 */}
+                  <div className="absolute w-full top-1/2 border-t-2 border-dashed border-[#2c2623]/20" />
 
-                {/* 飛機圖標（動畫） */}
-                <motion.div
-                  initial={{ x: '-100%' }}
-                  animate={{ x: '100%' }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'linear'
-                  }}
-                  className="absolute"
-                >
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center shadow-md"
-                    style={{ backgroundColor: accentColor }}
+                  {/* 飛機圖標（動畫） */}
+                  <motion.div
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '100%' }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'linear'
+                    }}
+                    className="absolute"
                   >
-                    <Plane className="w-4 h-4 text-white -rotate-90" />
-                  </div>
-                </motion.div>
-
-                {/* 飛行時間標籤 */}
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded text-xs text-[#756d66] shadow-sm border border-[#2c2623]/10">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      <Plane className="w-4 h-4 text-white -rotate-90" />
+                    </div>
+                  </motion.div>
+                </div>
+                {/* 飛行時間標籤 - 置中下方 */}
+                <div className="text-xs text-[#756d66] mt-1">
                   {flight?.duration || '--'}
                 </div>
               </div>
@@ -540,24 +542,13 @@ function JapaneseFlightCard({
                 }}
               >
                 <span className="text-white text-lg font-serif font-bold">
-                  {isOutbound ? arrivalCity : departureCity}
+                  {arrivalCity}
                 </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* 底部標籤 */}
-        <div className="flex items-center justify-center gap-3 mt-4 pt-4 border-t border-[#2c2623]/10 border-dashed">
-          <span className="flex items-center gap-1 text-xs text-[#756d66]">
-            <Luggage className="w-3 h-3" />
-            行李直掛
-          </span>
-          <span className="text-[#2c2623]/20">·</span>
-          <span className="text-xs text-[#756d66]">
-            當地時間
-          </span>
-        </div>
       </div>
     </motion.div>
   )

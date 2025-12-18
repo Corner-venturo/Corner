@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import {
   Dialog,
   DialogContent,
@@ -11,10 +12,23 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, MapPin, ImageIcon, Loader2, Sparkles, Plus, PenLine } from 'lucide-react'
+import { Search, MapPin, ImageIcon, Loader2, Sparkles, Plus, PenLine, Map, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { TourCountry } from './tour-form/types'
 import { Attraction } from '@/features/attractions/types'
+
+// 使用 Next.js dynamic import 並禁用 SSR
+const AttractionsMap = dynamic(
+  () => import('@/features/attractions/components/AttractionsMap').then((mod) => mod.AttractionsMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    ),
+  }
+)
 
 // 擴展型別（加入 join 查詢的欄位）
 interface AttractionWithCity extends Attraction {
@@ -94,6 +108,10 @@ export function AttractionSelector({
   const [showManualInput, setShowManualInput] = useState(false)
   const [manualAttractionName, setManualAttractionName] = useState('')
 
+  // 地圖相關狀態
+  const [selectedMapAttraction, setSelectedMapAttraction] = useState<AttractionWithCity | null>(null)
+  const [showMap, setShowMap] = useState(false)
+
   // 載入所有國家
   React.useEffect(() => {
     if (!isOpen) return
@@ -113,6 +131,8 @@ export function AttractionSelector({
   React.useEffect(() => {
     if (isOpen && countries.length > 0) {
       setSelectedIds(new Set())
+      setSelectedMapAttraction(null)
+      setShowMap(false)
 
       // 優先使用 tourCountryName（從 CoverInfo 來的國家名稱）
       if (tourCountryName) {
@@ -188,7 +208,7 @@ export function AttractionSelector({
     loadCities()
   }, [isOpen, selectedCountryId])
 
-  // 載入景點資料
+  // 載入景點資料（包含經緯度）
   React.useEffect(() => {
     if (!isOpen) return
 
@@ -215,6 +235,9 @@ export function AttractionSelector({
             country_id,
             region_id,
             city_id,
+            latitude,
+            longitude,
+            address,
             cities!inner (
               name
             )
@@ -244,6 +267,9 @@ export function AttractionSelector({
           country_id: string
           region_id: string | null
           city_id: string | null
+          latitude: number | null
+          longitude: number | null
+          address: string | null
           cities: { name: string } | null
         }): AttractionWithCity => ({
           id: item.id,
@@ -256,6 +282,9 @@ export function AttractionSelector({
           country_id: item.country_id,
           region_id: item.region_id ?? undefined,
           city_id: item.city_id ?? undefined,
+          latitude: item.latitude ?? undefined,
+          longitude: item.longitude ?? undefined,
+          address: item.address ?? undefined,
           city_name: item.cities?.name || '',
           is_active: true,
           display_order: 0,
@@ -342,6 +371,13 @@ export function AttractionSelector({
     setSelectedIds(newSet)
   }
 
+  // 點擊景點查看地圖
+  const handleViewOnMap = (attraction: AttractionWithCity) => {
+    console.log('[景點選擇器] 點擊查看地圖:', attraction.name, '座標:', attraction.latitude, attraction.longitude)
+    setSelectedMapAttraction(attraction)
+    setShowMap(true)
+  }
+
   // 確認選擇
   const handleConfirm = () => {
     const selected = attractions.filter(a => selectedIds.has(a.id))
@@ -357,6 +393,8 @@ export function AttractionSelector({
     setSearchQuery('')
     setShowManualInput(false)
     setManualAttractionName('')
+    setSelectedMapAttraction(null)
+    setShowMap(false)
     onClose()
   }
 
@@ -398,7 +436,7 @@ export function AttractionSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="w-[700px] h-[600px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="w-[1200px] h-[700px] max-w-[95vw] max-h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <MapPin className="text-morandi-gold" size={22} />
@@ -406,201 +444,272 @@ export function AttractionSelector({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden flex flex-col p-4 gap-4">
-          {/* 篩選區 */}
-          <div className="flex gap-3 flex-wrap">
-            {/* 國家選擇 */}
-            <Select value={selectedCountryId || '__all__'} onValueChange={handleCountryChange}>
-              <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-                <SelectValue placeholder="全部國家" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">全部國家</SelectItem>
-                {countries.map(country => (
-                  <SelectItem key={country.id} value={country.id}>
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* 主要內容：左右分欄 */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* 左側：景點列表 */}
+          <div className="w-1/2 flex flex-col border-r border-border">
+            <div className="p-4 space-y-3">
+              {/* 篩選區 */}
+              <div className="flex gap-2 flex-wrap">
+                {/* 國家選擇 */}
+                <Select value={selectedCountryId || '__all__'} onValueChange={handleCountryChange}>
+                  <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-white min-w-[120px]">
+                    <SelectValue placeholder="全部國家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">全部國家</SelectItem>
+                    {countries.map(country => (
+                      <SelectItem key={country.id} value={country.id}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            {/* 城市選擇 */}
-            {selectedCountryId && cities.length > 0 && (
-              <Select value={selectedCityId || '__all__'} onValueChange={handleCityChange}>
-                <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
-                  <SelectValue placeholder="全部城市" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">全部城市</SelectItem>
-                  {cities.map(city => (
-                    <SelectItem key={city.id} value={city.id}>
-                      {city.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+                {/* 城市選擇 */}
+                {selectedCountryId && cities.length > 0 && (
+                  <Select value={selectedCityId || '__all__'} onValueChange={handleCityChange}>
+                    <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-white min-w-[120px]">
+                      <SelectValue placeholder="全部城市" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">全部城市</SelectItem>
+                      {cities.map(city => (
+                        <SelectItem key={city.id} value={city.id}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
 
-            {/* 搜尋框 */}
-            <div className="flex-1 relative min-w-[200px]">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-              <Input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="搜尋景點名稱..."
-                className="pl-10 h-11 rounded-xl border-morandi-container focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
-              />
+                {/* 手動新增按鈕 */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowManualInput(!showManualInput)}
+                  className={`rounded-lg h-9 gap-1 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold/30' : ''}`}
+                >
+                  <PenLine size={14} />
+                  手動
+                </Button>
+              </div>
+
+              {/* 搜尋框 */}
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
+                <Input
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="搜尋景點名稱..."
+                  className="pl-9 h-9 rounded-lg border-morandi-container"
+                />
+              </div>
+
+              {/* 手動輸入區 */}
+              {showManualInput && (
+                <div className="flex gap-2 p-2 bg-morandi-gold/5 border border-morandi-gold/20 rounded-lg">
+                  <Input
+                    value={manualAttractionName}
+                    onChange={e => setManualAttractionName(e.target.value)}
+                    placeholder="輸入景點名稱..."
+                    className="flex-1 h-8 rounded-md text-sm"
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleManualAdd()
+                      }
+                    }}
+                    autoFocus
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleManualAdd}
+                    disabled={!manualAttractionName.trim()}
+                    size="sm"
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md h-8 px-3"
+                  >
+                    <Plus size={14} />
+                  </Button>
+                </div>
+              )}
             </div>
 
-            {/* 手動新增按鈕 */}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowManualInput(!showManualInput)}
-              className={`rounded-xl h-11 gap-1.5 ${showManualInput ? 'bg-morandi-gold/10 border-morandi-gold/30' : ''}`}
-            >
-              <PenLine size={16} />
-              手動輸入
-            </Button>
+            {/* 景點列表 */}
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+              {loading ? (
+                <div className="h-full flex items-center justify-center text-morandi-secondary">
+                  <Loader2 className="animate-spin mr-2" size={20} />
+                  載入中...
+                </div>
+              ) : filteredAttractions.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-morandi-secondary">
+                  {!selectedCountryId ? '請先選擇國家' : searchQuery ? '找不到符合的景點' : '沒有可選擇的景點'}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredAttractions.map(attraction => {
+                    const image = getAttractionImage(attraction)
+                    const isSelected = selectedIds.has(attraction.id)
+                    const isSuggested = suggestedAttractions.some(s => s.id === attraction.id)
+                    const hasCoordinates = attraction.latitude && attraction.longitude
+
+                    return (
+                      <div
+                        key={attraction.id}
+                        className={`
+                          relative flex gap-3 p-2.5 rounded-xl transition-all
+                          border hover:shadow-sm
+                          ${isSelected
+                            ? 'border-morandi-gold bg-morandi-gold/5'
+                            : isSuggested
+                              ? 'border-amber-300 bg-amber-50/50'
+                              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+                          }
+                        `}
+                      >
+                        {/* 勾選框 */}
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelection(attraction.id)}
+                            className="w-4 h-4 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                          />
+                        </label>
+
+                        {/* 縮圖 */}
+                        <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt={attraction.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
+                              <ImageIcon size={20} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 資訊 */}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-1 flex items-center gap-1">
+                            {isSuggested && (
+                              <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
+                            )}
+                            {attraction.name}
+                          </div>
+                          <div className="text-xs text-morandi-secondary mt-0.5 flex items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
+                              {attraction.city_name}
+                            </span>
+                            {attraction.category && (
+                              <span className="text-morandi-secondary/70">
+                                {attraction.category}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 查看地圖按鈕 */}
+                        {hasCoordinates && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewOnMap(attraction)}
+                            className={`h-8 px-2 rounded-lg ${selectedMapAttraction?.id === attraction.id ? 'bg-blue-100 text-blue-600' : ''}`}
+                            title="查看附近景點"
+                          >
+                            <Map size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* 已選擇提示 */}
+            {selectedIds.size > 0 && (
+              <div className="px-4 pb-4">
+                <div className="text-sm text-morandi-primary bg-morandi-gold/10 px-3 py-2 rounded-lg border border-morandi-gold/20 flex items-center gap-2">
+                  <div className="w-5 h-5 bg-morandi-gold rounded-full flex items-center justify-center text-white text-xs font-bold">
+                    {selectedIds.size}
+                  </div>
+                  已選擇 {selectedIds.size} 個景點
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* 手動輸入區 */}
-          {showManualInput && (
-            <div className="flex gap-2 p-3 bg-morandi-gold/5 border border-morandi-gold/20 rounded-xl">
-              <Input
-                value={manualAttractionName}
-                onChange={e => setManualAttractionName(e.target.value)}
-                placeholder="輸入景點名稱..."
-                className="flex-1 h-10 rounded-lg border-morandi-gold/20 focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold"
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleManualAdd()
-                  }
-                }}
-                autoFocus
-              />
-              <Button
-                type="button"
-                onClick={handleManualAdd}
-                disabled={!manualAttractionName.trim()}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg h-10 px-4 gap-1.5"
-              >
-                <Plus size={16} />
-                新增
-              </Button>
-            </div>
-          )}
-
-          {/* 景點列表 */}
-          <div className="flex-1 overflow-y-auto border border-morandi-container/50 rounded-xl bg-white">
-            {loading ? (
-              <div className="h-full flex items-center justify-center text-morandi-secondary">
-                <Loader2 className="animate-spin mr-2" size={20} />
-                載入中...
-              </div>
-            ) : filteredAttractions.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-morandi-secondary">
-                {!selectedCountryId ? '請先選擇國家' : searchQuery ? '找不到符合的景點' : '沒有可選擇的景點'}
+          {/* 右側：地圖區域 */}
+          <div className="w-1/2 flex flex-col bg-slate-50">
+            {!showMap ? (
+              // 初始提示畫面
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8">
+                <Map size={56} className="mb-4 opacity-30" />
+                <p className="text-lg font-medium text-slate-500">查看附近景點</p>
+                <p className="text-sm mt-2 text-center max-w-xs">
+                  點擊景點右側的 <Map size={14} className="inline mx-1" /> 按鈕，即可在地圖上查看該景點周圍 5 公里內的其他景點
+                </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3 p-3">
-                {filteredAttractions.map(attraction => {
-                  const image = getAttractionImage(attraction)
-                  const isSelected = selectedIds.has(attraction.id)
-                  const isSuggested = suggestedAttractions.some(s => s.id === attraction.id)
+              // 地圖區域
+              <>
+                {/* 地圖標題 */}
+                <div className="px-4 py-3 bg-white border-b border-border flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={18} className="text-red-500" />
+                    <span className="font-medium text-morandi-primary">{selectedMapAttraction?.name}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowMap(false)
+                      setSelectedMapAttraction(null)
+                    }}
+                    className="h-7 px-2"
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
 
-                  return (
-                    <label
-                      key={attraction.id}
-                      className={`
-                        relative flex gap-3 p-3 rounded-xl cursor-pointer transition-all
-                        border-2 hover:shadow-md
-                        ${isSelected
-                          ? 'border-morandi-gold bg-morandi-gold/5 shadow-sm'
-                          : isSuggested
-                            ? 'border-amber-300 bg-amber-50/50 hover:bg-amber-50'
-                            : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
-                        }
-                      `}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelection(attraction.id)}
-                        className="sr-only"
-                      />
-
-                      {/* 縮圖 */}
-                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
-                        {image ? (
-                          <img
-                            src={image}
-                            alt={attraction.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
-                            <ImageIcon size={24} />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 資訊 */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-2 flex items-center gap-1">
-                          {isSuggested && (
-                            <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
-                          )}
-                          {attraction.name}
-                        </div>
-                        {attraction.name_en && (
-                          <div className="text-xs text-gray-400 truncate mt-0.5">
-                            {attraction.name_en}
-                          </div>
-                        )}
-                        <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5">
-                          <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
-                            {attraction.city_name}
-                          </span>
-                          {attraction.category && (
-                            <span className="text-morandi-secondary/70">
-                              {attraction.category}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 選中標記 */}
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-morandi-gold rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      )}
-                    </label>
-                  )
-                })}
-              </div>
+                {/* 地圖 */}
+                <div className="flex-1 relative min-h-[400px]">
+                  <AttractionsMap
+                    attractions={attractions as Attraction[]}
+                    selectedAttraction={selectedMapAttraction as Attraction}
+                    onSelectAttraction={(attraction) => {
+                      // 從地圖點擊景點時，選中該景點並加入勾選
+                      const found = attractions.find(a => a.id === attraction.id)
+                      if (found) {
+                        setSelectedMapAttraction(found)
+                        // 自動勾選
+                        setSelectedIds(prev => {
+                          const newSet = new Set(prev)
+                          newSet.add(attraction.id)
+                          return newSet
+                        })
+                      }
+                    }}
+                    radiusKm={5}
+                  />
+                </div>
+              </>
             )}
           </div>
-
-          {/* 已選擇提示 */}
-          {selectedIds.size > 0 && (
-            <div className="text-sm text-morandi-primary bg-morandi-gold/10 px-4 py-2.5 rounded-xl border border-morandi-gold/20 flex items-center gap-2">
-              <div className="w-6 h-6 bg-morandi-gold rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {selectedIds.size}
-              </div>
-              已選擇 {selectedIds.size} 個景點
-            </div>
-          )}
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50/50">
+        <DialogFooter className="px-6 py-3 border-t bg-gray-50/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
             取消
           </Button>

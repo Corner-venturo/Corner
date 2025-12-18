@@ -217,14 +217,8 @@ export function useVisasDialog(tours: Tour[]) {
           }
         }
 
-        // 如果勾選/取消急件，自動調整成本 ±1000
-        if (field === 'is_urgent') {
-          if (value === true) {
-            updated.cost = target.cost + 1000
-          } else {
-            updated.cost = Math.max(0, target.cost - 1000)
-          }
-        }
+        // 成本是代辦商收的費用，新增時不知道，不自動計算
+        // 只有在編輯簽證時才會填入實際成本
 
         // 更新當前項目
         let newList = prev.map(a => (a.id === id ? updated : a))

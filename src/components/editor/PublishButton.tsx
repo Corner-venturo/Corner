@@ -31,6 +31,11 @@ import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2, File
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { generateUUID } from '@/lib/utils/uuid'
 
+// 移除 HTML 標籤
+const stripHtml = (html: string | undefined): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -121,12 +126,12 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       if (data.id) {
         if (currentVersionIndex === -1) {
           // 更新主版本（同時更新版本 1 的資料）
-          const updatedRecords = [...versionRecords]
+          let updatedRecords = [...versionRecords]
           if (updatedRecords.length > 0) {
             // 同步更新版本 1 的內容
             updatedRecords[0] = {
               ...updatedRecords[0],
-              note: data.title || updatedRecords[0].note, // 更新版本名稱
+              note: stripHtml(data.title) || updatedRecords[0].note, // 更新版本名稱
               daily_itinerary: data.dailyItinerary || [],
               features: data.features,
               focus_cards: data.focusCards,
@@ -134,6 +139,21 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
               meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
               hotels: data.hotels,
             }
+          } else {
+            // 如果沒有版本記錄，自動建立版本 1
+            const firstVersion: ItineraryVersionRecord = {
+              id: generateUUID(),
+              version: 1,
+              note: stripHtml(data.title) || '版本 1',
+              daily_itinerary: data.dailyItinerary || [],
+              features: data.features,
+              focus_cards: data.focusCards,
+              leader: data.leader,
+              meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
+              hotels: data.hotels,
+              created_at: new Date().toISOString(),
+            }
+            updatedRecords = [firstVersion]
           }
           await update(data.id, { ...convertedData, version_records: updatedRecords })
         } else {
@@ -155,7 +175,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
         const firstVersion: ItineraryVersionRecord = {
           id: generateUUID(),
           version: 1,
-          note: data.title || '版本 1',
+          note: stripHtml(data.title) || '版本 1',
           daily_itinerary: data.dailyItinerary || [],
           features: data.features,
           focus_cards: data.focusCards,
@@ -230,7 +250,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
       // 創建全新的行程表
       const newItinerary = await create({
         ...convertedData,
-        title: newFileName || `${data.title || '行程表'} (複本)`,
+        title: newFileName || `${stripHtml(data.title) || '行程表'} (複本)`,
         created_by: user?.id || undefined,
         version_records: [], // 新檔案不繼承版本記錄
       } as Parameters<typeof create>[0])
@@ -306,10 +326,10 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
     if (currentVersionIndex === -1) {
       // 主版本 = 版本 1
       const firstVersion = versionRecords[0]
-      return firstVersion?.note || data.title || '版本 1'
+      return stripHtml(firstVersion?.note) || stripHtml(data.title) || '版本 1'
     }
     const record = versionRecords[currentVersionIndex]
-    return record?.note || `版本 ${record?.version || currentVersionIndex + 1}`
+    return stripHtml(record?.note) || `版本 ${record?.version || currentVersionIndex + 1}`
   }
 
   return (
@@ -354,7 +374,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
               <DropdownMenuItem
                 className="flex items-center gap-2 py-2 cursor-pointer"
                 onClick={() => {
-                  setNewFileName(`${data.title || '行程表'} (複本)`)
+                  setNewFileName(`${stripHtml(data.title) || '行程表'} (複本)`)
                   setShowSaveAsNewDialog(true)
                 }}
               >
@@ -399,7 +419,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
                   >
                     <div className="flex flex-col flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{record.note || `版本 ${record.version}`}</span>
+                        <span className="font-medium">{stripHtml(record.note) || `版本 ${record.version}`}</span>
                         {isMainVersion && (
                           <span className="text-[10px] text-morandi-secondary bg-slate-100 px-1.5 py-0.5 rounded">主版本</span>
                         )}
@@ -547,7 +567,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange }: Pu
               id="new-file-name"
               value={newFileName}
               onChange={(e) => setNewFileName(e.target.value)}
-              placeholder={`${data.title || '行程表'} (複本)`}
+              placeholder={`${stripHtml(data.title) || '行程表'} (複本)`}
               className="mt-2"
             />
           </div>

@@ -182,6 +182,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
                 <SelectItem value="pending">待送件</SelectItem>
                 <SelectItem value="submitted">已送件</SelectItem>
                 <SelectItem value="collected">已取件</SelectItem>
+                <SelectItem value="returned">已歸還</SelectItem>
                 <SelectItem value="rejected">退件</SelectItem>
               </SelectContent>
             </Select>

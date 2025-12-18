@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import { TourFormData, FlightStyleType } from '../types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { CalendarPlus, Search, Loader2, Plane, Undo2, Settings2, Check, List } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -546,16 +547,9 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                   <Input
                     type="text"
                     value={data.outboundFlight?.departureDate || ''}
-                    onChange={e => {
-                      let value = e.target.value
-                      const parts = value.split('/')
-                      if (parts.length === 3 && parts[0].length === 4) {
-                        value = `${parts[1]}/${parts[2]}`
-                      }
-                      updateFlightField('outboundFlight', 'departureDate', value)
-                    }}
+                    onChange={e => updateFlightField('outboundFlight', 'departureDate', e.target.value)}
                     className="text-xs h-8"
-                    placeholder="01/21"
+                    placeholder="02/19"
                   />
                 </div>
                 <div>
@@ -694,16 +688,9 @@ export function FlightInfoSection({ data, updateFlightField, updateFlightFields,
                   <Input
                     type="text"
                     value={data.returnFlight?.departureDate || ''}
-                    onChange={e => {
-                      let value = e.target.value
-                      const parts = value.split('/')
-                      if (parts.length === 3 && parts[0].length === 4) {
-                        value = `${parts[1]}/${parts[2]}`
-                      }
-                      updateFlightField('returnFlight', 'departureDate', value)
-                    }}
+                    onChange={e => updateFlightField('returnFlight', 'departureDate', e.target.value)}
                     className="text-xs h-8"
-                    placeholder="01/25"
+                    placeholder="02/23"
                   />
                 </div>
                 <div>
