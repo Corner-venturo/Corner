@@ -7,7 +7,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { useOrderStore, useTourStore, useAuthStore } from '@/stores'
-import type { Order } from '@/stores/types'
+import type { Order, Tour } from '@/stores/types'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourPayments } from '@/components/tours/tour-payments'
 import { TourCosts } from '@/components/tours/tour-costs'
@@ -43,7 +43,7 @@ export default function OrderDetailPage() {
 
   const orderId = params.orderId as string
   const order = orders.find(o => o.id === orderId)
-  const tour = order ? tours.find(t => t.id === order.tour_id) : null
+  const tour = order ? tours.find(t => t.id === order.tour_id) as Tour | undefined : null
 
   if (!order) {
     return (

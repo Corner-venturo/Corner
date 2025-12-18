@@ -765,7 +765,7 @@ function NewItineraryPageContent() {
               time: '',
               location: '',
             },
-            hotels: (itinerary.hotels as typeof tourData.hotels) || [],
+            hotels: (itinerary.hotels as HotelInfo[]) || [],
             showHotels: itinerary.show_hotels || false,
             itinerarySubtitle: itinerary.itinerary_subtitle || '',
             dailyItinerary: itinerary.daily_itinerary || [],

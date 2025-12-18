@@ -177,7 +177,7 @@ export default function FlightItineraryPage() {
                 English
               </Button>
             </div>
-            <Button size="sm" onClick={handlePrint} className="bg-orange-500 hover:bg-orange-600">
+            <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
               <Printer size={16} className="mr-2" />
               列印 / 儲存 PDF
             </Button>

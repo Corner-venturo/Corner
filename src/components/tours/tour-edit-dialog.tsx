@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { Tour, FlightInfo } from '@/stores/types'
+import type { Json } from '@/lib/supabase/types'
 import { useRegionsStore } from '@/stores'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -329,12 +330,12 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
         }
       }
 
-      // 清理空的航班資料
-      const cleanFlightInfo = (flight: FlightInfo): FlightInfo | null => {
+      // 清理空的航班資料（轉換為 Json 類型供 Supabase 使用）
+      const cleanFlightInfo = (flight: FlightInfo): Json | null => {
         if (!flight.flightNumber && !flight.airline && !flight.departureTime && !flight.arrivalTime) {
           return null
         }
-        return flight
+        return flight as unknown as Json
       }
 
       const updates = {
