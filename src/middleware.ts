@@ -58,6 +58,7 @@ export async function middleware(request: NextRequest) {
   // 公開路由：不需要登入即可訪問
   const publicPaths = [
     '/login',
+    '/demo', // DEMO 展示頁面（公開）
     '/api/auth',
     '/api/health',
     '/api/linkpay', // Webhook 回調
