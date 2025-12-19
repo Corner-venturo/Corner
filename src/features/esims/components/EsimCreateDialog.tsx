@@ -261,8 +261,9 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           .select('*', { count: 'exact', head: true })
           .eq('tour_id', selectedTour.id)
 
-        const nextNumber = ((count || 0) + 1).toString().padStart(3, '0')
-        const newOrderNumber = `${selectedTour.code}-${nextNumber}`
+        // 訂單編號格式: {團號}-O{2位數}
+        const nextNumber = ((count || 0) + 1).toString().padStart(2, '0')
+        const newOrderNumber = `${selectedTour.code}-O${nextNumber}`
 
         await createOrder({
           order_number: newOrderNumber,

@@ -5,14 +5,15 @@ import { RequestFormData, BatchRequestFormData, RequestItem } from '../types'
 export function useRequestOperations() {
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
 
-  // 根據團號生成請款單編號：團號-R01, 團號-R02, ...
+  // 根據團號生成請款單編號：團號-I01, 團號-I02, ...
+  // I = Invoice (請款單)
   const generateRequestCode = useCallback((tourCode: string) => {
     // 找到該團已有的請款單數量
     const existingCount = payment_requests.filter(r =>
-      r.tour_code === tourCode || r.code?.startsWith(`${tourCode}-R`)
+      r.tour_code === tourCode || r.code?.startsWith(`${tourCode}-I`)
     ).length
     const nextNumber = existingCount + 1
-    return `${tourCode}-R${nextNumber.toString().padStart(2, '0')}`
+    return `${tourCode}-I${nextNumber.toString().padStart(2, '0')}`
   }, [payment_requests])
 
   // Generate request number preview (舊方法，保留向下相容)

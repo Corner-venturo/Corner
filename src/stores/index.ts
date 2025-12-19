@@ -53,12 +53,13 @@ export const useItineraryStore = createStore<Itinerary>({
 
 /**
  * 訂單 Store
- * 編號格式：O{year}{4位數} (如: O20240001)
+ * 編號格式：{團號}-O{2位數} (如: CNX250128A-O01)
+ * 編號由建立訂單時根據團號自動生成，不使用 codePrefix
  * 🔒 啟用 Workspace 隔離
  */
 export const useOrderStore = createStore<Order>({
   tableName: 'orders',
-  codePrefix: 'O',
+  // 不使用 codePrefix，訂單編號需依賴團號，由建立邏輯處理
   workspaceScoped: true,
 })
 
@@ -86,12 +87,13 @@ export const useQuoteStore = createStore<Quote>({
 
 /**
  * 請款單 Store
- * 編號格式：PR{year}{4位數} (如: PR20240001)
+ * 編號格式：{團號}-I{2位數} (如: CNX250128A-I01)
+ * 編號由建立請款單時根據團號自動生成，不使用 codePrefix
  * 🔒 啟用 Workspace 隔離
  */
 export const usePaymentRequestStore = createStore<PaymentRequest>({
   tableName: 'payment_requests',
-  codePrefix: 'PR',
+  // 不使用 codePrefix，請款單編號需依賴團號，由建立邏輯處理
   workspaceScoped: true,
 })
 
@@ -107,23 +109,25 @@ export const usePaymentRequestItemStore = createStore<PaymentRequestItem>({
 
 /**
  * 出納單 Store
- * 編號格式：DO{year}{4位數} (如: DO20240001)
+ * 編號格式：P{出帳年月日}{A-Z} (如: P250128A)
+ * 編號由建立出納單時根據出帳日期自動生成，不使用 codePrefix
  * 🔒 啟用 Workspace 隔離
  */
 export const useDisbursementOrderStore = createStore<DisbursementOrder>({
   tableName: 'disbursement_orders',
-  codePrefix: 'DO',
+  // 不使用 codePrefix，出納單編號需依賴出帳日期，由建立邏輯處理
   workspaceScoped: true,
 })
 
 /**
  * 收款單 Store
- * 編號格式：RO{year}{4位數} (如: RO20240001)
+ * 編號格式：{團號}-R{2位數} (如: CNX250128A-R01)
+ * 編號由建立收款單時根據團號自動生成，不使用 codePrefix
  * 🔒 啟用 Workspace 隔離
  */
 export const useReceiptOrderStore = createStore<ReceiptOrder>({
   tableName: 'receipt_orders',
-  codePrefix: 'RO',
+  // 不使用 codePrefix，收款單編號需依賴團號，由建立邏輯處理
   workspaceScoped: true,
 })
 

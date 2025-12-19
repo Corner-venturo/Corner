@@ -195,8 +195,10 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
         if (!response.ok) throw new Error('OCR 辨識失敗')
         const result = await response.json()
 
-        let successCount = 0, duplicateCount = 0, syncedCustomerCount = 0, replacedCount = 0
+        let successCount = 0, duplicateCount = 0, syncedCustomerCount = 0, replacedCount = 0, customerUpdatedCount = 0
         const failedItems: string[] = [], duplicateItems: { name: string; reason: string; existingMemberId: string; newData: Record<string, unknown>; fileIndex: number }[] = []
+        // 收集需要詢問是否更新護照的顧客
+        const customersToUpdate: { customer: Customer; newPassportUrl: string; ocrData: Record<string, unknown> }[] = []
 
         refetchMembers() // 確保資料是最新的
         const existingMembers = orderMembers
@@ -287,12 +289,26 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
 
           if (existingCustomer) {
             await updateMember(newMember.id, { customer_id: existingCustomer.id })
-            if (passport_image_url && !existingCustomer.passport_image_url) {
-              await useCustomerStore.getState().update(existingCustomer.id, { passport_image_url })
+            if (passport_image_url) {
+              if (!existingCustomer.passport_image_url) {
+                // 顧客沒有護照圖片，直接更新
+                await useCustomerStore.getState().update(existingCustomer.id, { passport_image_url })
+              } else {
+                // 顧客已有護照圖片，收集起來稍後詢問是否替換
+                customersToUpdate.push({
+                  customer: existingCustomer,
+                  newPassportUrl: passport_image_url,
+                  ocrData: {
+                    passport_number,
+                    passport_romanization: item.customer.passport_romanization || item.customer.english_name || '',
+                    passport_expiry_date: item.customer.passport_expiry_date || null,
+                    national_id,
+                    date_of_birth,
+                  }
+                })
+              }
             }
             syncedCustomerCount++
-          } else {
-            // ... (create new customer logic, can be simplified for now)
           }
         }
 
@@ -330,10 +346,37 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
           }
         }
 
+        // 處理需要更新護照的顧客：詢問用戶是否要替換
+        if (customersToUpdate.length > 0) {
+          const customerNames = customersToUpdate.map(c => `• ${c.customer.name}`).join('\n')
+          const shouldUpdateCustomers = await confirm(
+            `發現 ${customersToUpdate.length} 位顧客已有護照資料：\n\n${customerNames}\n\n是否要用新護照替換顧客資料？\n（適用於客人換發新護照的情況）`,
+            { title: '更新顧客護照', confirmText: '替換', cancelText: '保留舊資料' }
+          )
+
+          if (shouldUpdateCustomers) {
+            for (const item of customersToUpdate) {
+              try {
+                await useCustomerStore.getState().update(item.customer.id, {
+                  passport_image_url: item.newPassportUrl,
+                  passport_number: (item.ocrData.passport_number as string) || item.customer.passport_number,
+                  passport_romanization: (item.ocrData.passport_romanization as string) || item.customer.passport_romanization,
+                  passport_expiry_date: (item.ocrData.passport_expiry_date as string) || item.customer.passport_expiry_date,
+                  verification_status: 'unverified', // 更新後需重新驗證
+                })
+                customerUpdatedCount++
+              } catch (err) {
+                logger.error('更新顧客護照失敗:', err)
+              }
+            }
+          }
+        }
+
         let message = `✅ 成功辨識 ${result.successful}/${result.total} 張護照\n✅ 成功建立 ${successCount} 位成員`
         if (replacedCount > 0) message += `\n🔄 已替換 ${replacedCount} 位重複成員`
         else if (duplicateCount > 0) message += `\n⚠️ 跳過 ${duplicateCount} 位重複成員`
         if (syncedCustomerCount > 0) message += `\n👤 已連結 ${syncedCustomerCount} 位既有顧客`
+        if (customerUpdatedCount > 0) message += `\n📝 已更新 ${customerUpdatedCount} 位顧客護照`
         alert(message, 'success')
         
         processedFiles.forEach(pf => URL.revokeObjectURL(pf.preview))

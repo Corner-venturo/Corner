@@ -149,10 +149,10 @@ export default function OrdersPage() {
     const selectedTour = tours.find(t => t.id === orderData.tour_id)
     if (!selectedTour || !currentWorkspace) return
 
-    // 計算該團的訂單序號
+    // 計算該團的訂單序號 (格式: {團號}-O{2位數})
     const tourOrders = orders.filter(o => o.tour_id === orderData.tour_id)
     const nextOrderNumber = tourOrders.length + 1
-    const orderNumber = `${selectedTour.code}-${nextOrderNumber.toString().padStart(2, '0')}`
+    const orderNumber = `${selectedTour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
 
     await addOrder({
       order_number: orderNumber,

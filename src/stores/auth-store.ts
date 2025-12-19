@@ -42,7 +42,8 @@ interface AuthState {
   logout: () => void
   validateLogin: (
     username: string,
-    password: string
+    password: string,
+    workspaceId?: string
   ) => Promise<{ success: boolean; message?: string }>
   refreshUserData: () => Promise<void>
   toggleSidebar: () => void
@@ -101,16 +102,23 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
-      validateLogin: async (username: string, password: string) => {
+      validateLogin: async (username: string, password: string, workspaceId?: string) => {
         try {
-          logger.log('🌐 Authenticating via Supabase...', username)
+          logger.log('🌐 Authenticating via Supabase...', username, 'workspace:', workspaceId)
 
           const { supabase } = await import('@/lib/supabase/client')
-          const { data: employees, error: queryError } = await supabase
+
+          // 建立查詢，加上 workspace_id 條件（如果有提供）
+          let query = supabase
             .from('employees')
             .select('*')
             .eq('employee_number', username)
-            .single()
+
+          if (workspaceId) {
+            query = query.eq('workspace_id', workspaceId)
+          }
+
+          const { data: employees, error: queryError } = await query.single()
 
           if (queryError || !employees) {
             logger.error('❌ Supabase query failed:', queryError?.message)

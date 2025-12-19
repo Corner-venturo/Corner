@@ -194,14 +194,14 @@ export default function VisasPage() {
 
       let nextNum = 1
       if (lastOrder?.order_number) {
-        // 從最後一個訂單編號提取數字部分
-        const match = lastOrder.order_number.match(/-(\d+)$/)
+        // 從最後一個訂單編號提取數字部分 (格式: {團號}-O{2位數})
+        const match = lastOrder.order_number.match(/-O(\d+)$/)
         if (match) {
           nextNum = parseInt(match[1], 10) + 1
         }
       }
-      const nextNumber = nextNum.toString().padStart(3, '0')
-      const order_number = `${selectedTour.code}-${nextNumber}`
+      const nextNumber = nextNum.toString().padStart(2, '0')
+      const order_number = `${selectedTour.code}-O${nextNumber}`
 
       targetOrder = await addOrder({
         order_number,

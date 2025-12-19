@@ -103,6 +103,78 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 
 ---
 
+## 🔢 編號規範（固定標準，不可更改）
+
+> **重要**：以下編號格式為固定規範，所有編號生成必須遵守此標準。
+
+### 編號格式一覽表
+
+| 項目 | 格式 | 範例 | 說明 |
+|------|------|------|------|
+| **團號** | `{城市代碼}{YYMMDD}{A-Z}` | `CNX250128A` | 清邁 2025/01/28 第1團 |
+| **訂單** | `{團號}-O{2位數}` | `CNX250128A-O01` | 該團第1筆訂單 |
+| **請款單** | `{團號}-I{2位數}` | `CNX250128A-I01` | 該團第1張請款單 (I=Invoice) |
+| **收款單** | `{團號}-R{2位數}` | `CNX250128A-R01` | 該團第1張收款單 (R=Receipt) |
+| **出納單** | `P{YYMMDD}{A-Z}` | `P250128A` | 2025/01/28 第1張出納單 |
+| **客戶** | `C{6位數}` | `C000001` | 流水號 |
+| **報價單(標準)** | `Q{6位數}` | `Q000001` | 流水號 |
+| **報價單(快速)** | `X{6位數}` | `X000001` | 流水號 |
+| **員工** | `E{3位數}` | `E001` | 無辦公室前綴，入口選公司 |
+
+### 編號規則說明
+
+```
+團號規則：
+- 城市代碼：使用 IATA 機場代碼（CNX=清邁, BKK=曼谷, HND=東京...）
+- 日期：YYMMDD 格式（年後2碼+月2碼+日2碼）
+- 序號：A-Z 字母（同城市同日期的第N團）
+
+關聯編號規則：
+- 訂單/請款單/收款單：都依附於團號，格式為 {團號}-{類型}{序號}
+- 序號為 2 位數，從 01 開始
+
+獨立編號規則：
+- 出納單：以出帳日期為基準，格式為 P{日期}{字母}
+- 客戶/報價單：純流水號，6位數
+
+員工編號特殊規則：
+- 台北和台中員工都使用 E001~E999
+- 系統紀錄和登入帳號都是 E001（無辦公室前綴）
+- 登入時需選擇公司來區分
+```
+
+### 編號生成函數位置
+
+所有編號生成邏輯集中在：`src/stores/utils/code-generator.ts`
+
+```typescript
+// 團號
+generateTourCode(workspaceCode, cityCode, departureDate, existingTours)
+
+// 訂單
+generateOrderCode(tourCode, existingOrders)
+
+// 請款單
+generatePaymentRequestCode(tourCode, existingPaymentRequests)
+
+// 收款單
+generateReceiptOrderCode(tourCode, existingReceiptOrders)
+
+// 出納單
+generateDisbursementOrderCode(disbursementDate, existingDisbursementOrders)
+
+// 客戶
+generateCustomerCode(existingCustomers)
+
+// 報價單
+generateCode(workspaceCode, { quoteType: 'standard' | 'quick' }, existingQuotes)
+
+// 員工
+generateEmployeeNumber(workspaceCode, existingEmployees)
+```
+
+---
+
 ## 🎯 核心原則
 
 ### 行為控制
@@ -113,7 +185,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 ### 專案資訊
 ```
 專案名稱: Venturo (旅遊團管理系統)
-工作目錄: /Users/williamchien/Projects/venturo-erp
+工作目錄: /Users/williamchien/Projects/venturo-new
 開發端口: 3000
 技術棧:   Next.js 15.5.4 + React 19 + TypeScript 5 + Zustand 5 + Supabase
 ```

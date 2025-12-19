@@ -1,21 +1,40 @@
 /**
  * 編號生成工具
  *
- * 團號格式：{城市代號}{年後2碼}{月}{日}{A-Z}
+ * === 團號格式 ===
+ * {城市代碼}{出團年月日}{A-Z}
  * 例如：CNX250128A (清邁 2025/01/28 第1團)
  *
- * 員工編號格式：{辦公室}-E{3位數} → {辦公室}-E{字母}{2位數}
- * 例如：TP-E001, TC-E001, TP-EA01...
- * （由 user-store.ts 的 generateUserNumber 處理）
+ * === 訂單編號格式 ===
+ * {團號}-O{2位數}
+ * 例如：CNX250128A-O01 (清邁團的第1筆訂單)
  *
- * 其他編號格式（由 createCloudHook.ts 處理）：
- * - 客戶：C{6位數} (如: C000001)
- * - 訂單：O{6位數} (如: O000001)
- * - 報價單：Q{6位數} (如: Q000001)
- * - 行程表：I{6位數} (如: I000001)
- * - 請款單：PR{6位數} (如: PR000001)
- * - 出納單：DO{6位數} (如: DO000001)
- * - 收款單：RO{6位數} (如: RO000001)
+ * === 請款單編號格式 ===
+ * {團號}-I{2位數}
+ * 例如：CNX250128A-I01 (清邁團的第1張請款單)
+ *
+ * === 收款單編號格式 ===
+ * {團號}-R{2位數}
+ * 例如：CNX250128A-R01 (清邁團的第1張收款單)
+ *
+ * === 出納單編號格式 ===
+ * P{出帳年月日}{A-Z}
+ * 例如：P250128A (2025/01/28 第1張出納單)
+ *
+ * === 客戶編號格式 ===
+ * C{6位數}
+ * 例如：C000001
+ *
+ * === 報價單編號格式 ===
+ * 標準報價單：Q{6位數}
+ * 例如：Q000001
+ * 快速報價單：X{6位數}
+ * 例如：X000001
+ *
+ * === 員工編號格式 ===
+ * E{3位數}
+ * 例如：E001, E002...E999
+ * 注意：台北和台中員工都使用相同的編號範圍，入口需選擇公司
  */
 
 import { logger } from '@/lib/utils/logger'
@@ -74,16 +93,16 @@ export function generateTourCode(
 }
 
 /**
- * 生成報價單編號（字母循環系統，不含 workspace 前綴）
+ * 生成報價單編號
  *
  * @param workspaceCode - 辦公室代碼（忽略，保留參數以維持 API 相容性）
  * @param config - 配置（可包含 quoteType: 'quick' | 'standard'）
  * @param existingItems - 現有項目列表
  *
  * @example
- * generateCode('TP', { prefix: 'Q' }, existingQuotes)
- * // 標準報價單: 'A001', 'A002'... → 'AA001'... → 'AB001'...
- * // 快速報價單: 'Q001', 'Q002'... → 'QA001'... → 'QB001'...
+ * generateCode('TP', { prefix: 'Q', quoteType: 'standard' }, existingQuotes)
+ * // 標準報價單: Q000001, Q000002...
+ * // 快速報價單: X000001, X000002...
  */
 export function generateCode(
   workspaceCode: string,
@@ -101,11 +120,10 @@ export function generateCode(
     existingItemsCount: existingItems.length,
   })
 
-  // 快速報價單使用 Q 開頭
-  // 格式：Q001~Q999 → QA001~QA999 → QB001~QB999...
+  // 快速報價單使用 X 開頭
+  // 格式：X000001 ~ X999999
   if (isQuickQuote) {
-    logger.log('✅ [code-generator] 判定為快速報價單，使用 Q 系列')
-    let maxLetter = '' // 空字串表示 Q001~Q999 階段
+    logger.log('✅ [code-generator] 判定為快速報價單，使用 X 系列')
     let maxNumber = 0
 
     existingItems.forEach(item => {
@@ -114,36 +132,29 @@ export function generateCode(
         const quoteType = (item as { quote_type?: string }).quote_type
 
         if (code && quoteType === 'quick') {
-          // 匹配新格式 Q001~Q999（無前綴）
-          if (/^Q\d{3}$/.test(code)) {
-            const numberPart = code.substring(1) // 移除 "Q"
-            const number = parseInt(numberPart, 10)
-            if (!isNaN(number) && maxLetter === '' && number > maxNumber) {
-              maxNumber = number
-            }
-          }
-          // 匹配新格式 QA001~QZ999（無前綴）
-          if (/^Q[A-Z]\d{3}$/.test(code)) {
-            const letter = code[1]
-            const number = parseInt(code.substring(2), 10)
-            if (letter > maxLetter || (letter === maxLetter && number > maxNumber)) {
-              maxLetter = letter
-              maxNumber = number
-            }
-          }
-          // 向後相容：匹配舊格式 TP-Q001, TC-Q001 等
-          if (/^[A-Z]{2}-Q\d{3,}$/.test(code)) {
-            const numberPart = code.split('-Q')[1]
-            const number = parseInt(numberPart, 10)
-            if (!isNaN(number) && maxLetter === '' && number > maxNumber) {
-              maxNumber = number
-            }
-          }
-          // 向後相容：匹配舊格式 Q0001, Q000008 等（4位以上數字）
-          if (/^Q\d{4,}$/.test(code)) {
+          // 匹配新格式 X000001
+          if (/^X\d{6}$/.test(code)) {
             const numberPart = code.substring(1)
             const number = parseInt(numberPart, 10)
-            if (!isNaN(number) && maxLetter === '' && number > maxNumber) {
+            if (!isNaN(number) && number > maxNumber) {
+              maxNumber = number
+            }
+          }
+          // 向後相容：匹配舊格式 Q001, QA001, TP-Q001 等
+          if (/^Q\d{3,}$/.test(code) || /^Q[A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-Q\d{3,}$/.test(code)) {
+            // 舊格式轉換為序列號
+            let number = 0
+            if (/^Q\d{3,}$/.test(code)) {
+              number = parseInt(code.substring(1), 10)
+            } else if (/^Q[A-Z]\d{3}$/.test(code)) {
+              const letter = code[1]
+              const num = parseInt(code.substring(2), 10)
+              const letterIndex = letter.charCodeAt(0) - 'A'.charCodeAt(0)
+              number = 1000 + letterIndex * 999 + num
+            } else if (/^[A-Z]{2}-Q\d{3,}$/.test(code)) {
+              number = parseInt(code.split('-Q')[1], 10)
+            }
+            if (number > maxNumber) {
               maxNumber = number
             }
           }
@@ -151,35 +162,15 @@ export function generateCode(
       }
     })
 
-    let finalCode: string
-    if (maxLetter === '') {
-      // 還在 Q001~Q999 階段
-      if (maxNumber < 999) {
-        const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-        finalCode = `Q${nextNumber}`
-      } else {
-        // 超過 999，進入 QA001
-        finalCode = 'QA001'
-      }
-    } else {
-      // 已在 QA~QZ 階段
-      if (maxNumber < 999) {
-        const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-        finalCode = `Q${maxLetter}${nextNumber}`
-      } else {
-        // 字母進位
-        const nextLetter = String.fromCharCode(maxLetter.charCodeAt(0) + 1)
-        finalCode = `Q${nextLetter}001`
-      }
-    }
+    const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
+    const finalCode = `X${nextNumber}`
     logger.log('✅ [code-generator] 快速報價單編號生成:', finalCode)
     return finalCode
   }
 
-  // 標準報價單使用 A 開頭
-  // 格式：A001~A999 → AA001~AA999 → AB001~AB999...
-  logger.log('📋 [code-generator] 判定為標準報價單，使用 A 系列')
-  let maxLetter = '' // 空字串表示 A001~A999 階段
+  // 標準報價單使用 Q 開頭
+  // 格式：Q000001 ~ Q999999
+  logger.log('📋 [code-generator] 判定為標準報價單，使用 Q 系列')
   let maxNumber = 0
 
   existingItems.forEach(item => {
@@ -188,28 +179,28 @@ export function generateCode(
       const quoteType = (item as { quote_type?: string })?.quote_type
 
       if (code && quoteType !== 'quick') {
-        // 匹配新格式 A001~A999（無前綴）
-        if (/^A\d{3}$/.test(code)) {
-          const numberPart = code.substring(1) // 移除 "A"
+        // 匹配新格式 Q000001
+        if (/^Q\d{6}$/.test(code)) {
+          const numberPart = code.substring(1)
           const number = parseInt(numberPart, 10)
-          if (!isNaN(number) && maxLetter === '' && number > maxNumber) {
+          if (!isNaN(number) && number > maxNumber) {
             maxNumber = number
           }
         }
-        // 匹配新格式 AA001~AZ999（無前綴）
-        if (/^A[A-Z]\d{3}$/.test(code)) {
-          const letter = code[1]
-          const number = parseInt(code.substring(2), 10)
-          if (letter > maxLetter || (letter === maxLetter && number > maxNumber)) {
-            maxLetter = letter
-            maxNumber = number
+        // 向後相容：匹配舊格式 A001, AA001, TP-A001 等
+        if (/^A\d{3,}$/.test(code) || /^A[A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-A\d{3,}$/.test(code)) {
+          let number = 0
+          if (/^A\d{3,}$/.test(code)) {
+            number = parseInt(code.substring(1), 10)
+          } else if (/^A[A-Z]\d{3}$/.test(code)) {
+            const letter = code[1]
+            const num = parseInt(code.substring(2), 10)
+            const letterIndex = letter.charCodeAt(0) - 'A'.charCodeAt(0)
+            number = 1000 + letterIndex * 999 + num
+          } else if (/^[A-Z]{2}-A\d{3,}$/.test(code)) {
+            number = parseInt(code.split('-A')[1], 10)
           }
-        }
-        // 向後相容：匹配舊格式 TP-A001, TC-A001 等
-        if (/^[A-Z]{2}-A\d{3,}$/.test(code)) {
-          const numberPart = code.split('-A')[1]
-          const number = parseInt(numberPart, 10)
-          if (!isNaN(number) && maxLetter === '' && number > maxNumber) {
+          if (number > maxNumber) {
             maxNumber = number
           }
         }
@@ -217,104 +208,89 @@ export function generateCode(
     }
   })
 
-  let finalCode: string
-  if (maxLetter === '') {
-    // 還在 A001~A999 階段
-    if (maxNumber < 999) {
-      const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-      finalCode = `A${nextNumber}`
-    } else {
-      // 超過 999，進入 AA001
-      finalCode = 'AA001'
-    }
-  } else {
-    // 已在 AA~AZ 階段
-    if (maxNumber < 999) {
-      const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-      finalCode = `A${maxLetter}${nextNumber}`
-    } else {
-      // 字母進位
-      const nextLetter = String.fromCharCode(maxLetter.charCodeAt(0) + 1)
-      finalCode = `A${nextLetter}001`
-    }
-  }
-
-  logger.log('✅ [code-generator] 標準報價單編號生成:', finalCode, { maxLetter, maxNumber })
+  const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
+  const finalCode = `Q${nextNumber}`
+  logger.log('✅ [code-generator] 標準報價單編號生成:', finalCode, { maxNumber })
   return finalCode
 }
 
 /**
- * 生成客戶編號（字母循環系統 C-A001 ~ C-Z999）
+ * 生成客戶編號
  *
  * @param existingCustomers - 現有客戶列表
- * @returns 客戶編號（如 C-A001）
+ * @returns 客戶編號（如 C000001）
  *
  * @example
  * generateCustomerCode(existingCustomers)
- * // => 'C-A001', 'C-A002'...'C-A999', 'C-B001'...
+ * // => 'C000001', 'C000002'...
  */
 export function generateCustomerCode(existingCustomers: BaseEntity[]): string {
-  let maxLetter = ''
   let maxNumber = 0
 
   existingCustomers.forEach(customer => {
     if ('code' in customer) {
       const code = (customer as { code?: string }).code
-      // 匹配格式：C-A001, C-B999 等
+      // 匹配新格式：C000001
+      if (code && /^C\d{6}$/.test(code)) {
+        const numberPart = code.substring(1) // 移除 "C"
+        const number = parseInt(numberPart, 10)
+        if (!isNaN(number) && number > maxNumber) {
+          maxNumber = number
+        }
+      }
+      // 向後相容舊格式：C-A001
       if (code && /^C-[A-Z]\d{3}$/.test(code)) {
         const codePart = code.substring(2) // 移除 "C-"
         const letter = codePart[0]
         const number = parseInt(codePart.substring(1), 10)
-
-        // 比較字母和數字
-        if (letter > maxLetter || (letter === maxLetter && number > maxNumber)) {
-          maxLetter = letter
-          maxNumber = number
+        // 將舊格式轉換為序列號：A=0-999, B=1000-1999, etc.
+        const letterIndex = letter.charCodeAt(0) - 'A'.charCodeAt(0)
+        const sequenceNumber = letterIndex * 1000 + number
+        if (sequenceNumber > maxNumber) {
+          maxNumber = sequenceNumber
         }
       }
     }
   })
 
-  // 如果沒有現有編號，從 C-A001 開始
-  if (!maxLetter) {
-    return 'C-A001'
-  }
-
-  // 計算下一個編號
-  if (maxNumber < 999) {
-    // 同字母，數字 +1
-    const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
-    return `C-${maxLetter}${nextNumber}`
-  } else {
-    // 數字已達 999，字母進位
-    const nextLetter = String.fromCharCode(maxLetter.charCodeAt(0) + 1)
-    return `C-${nextLetter}001`
-  }
+  const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
+  return `C${nextNumber}`
 }
 
 /**
  * 生成員工編號
  *
- * @param workspaceCode - 辦公室代碼（如 TP, TC）
+ * @param workspaceCode - 辦公室代碼（忽略，保留參數以維持 API 相容性）
  * @param existingEmployees - 現有員工列表（同 workspace）
- * @returns 員工編號（如 TP-E001）
+ * @returns 員工編號（如 E001）
  *
  * @example
  * generateEmployeeNumber('TP', existingEmployees)
- * // => 'TP-E001' (台北第1位員工)
+ * // => 'E001' (第1位員工，無辦公室前綴)
+ *
+ * 注意：台北和台中員工都使用 E001-E999 編號
+ * 入口需要選擇公司來區分不同辦公室的員工
  */
 export function generateEmployeeNumber(
   workspaceCode: string,
   existingEmployees: BaseEntity[]
 ): string {
   let maxNumber = 0
-  const prefix = `${workspaceCode}-E`
 
   existingEmployees.forEach(employee => {
     if ('employee_number' in employee) {
       const empNumber = (employee as { employee_number?: string }).employee_number
-      if (empNumber?.startsWith(prefix)) {
-        const numberPart = empNumber.substring(prefix.length)
+      // 匹配新格式 E001
+      if (empNumber && /^E\d{3}$/.test(empNumber)) {
+        const numberPart = empNumber.substring(1) // 移除 "E"
+        const number = parseInt(numberPart, 10)
+        if (!isNaN(number) && number > maxNumber) {
+          maxNumber = number
+        }
+      }
+      // 向後相容：匹配舊格式 TP-E001, TC-E001 等
+      if (empNumber && /^[A-Z]{2}-E\d{3}$/.test(empNumber)) {
+        const numberPart = empNumber.split('-E')[1]
         const number = parseInt(numberPart, 10)
         if (!isNaN(number) && number > maxNumber) {
           maxNumber = number
@@ -324,5 +300,144 @@ export function generateEmployeeNumber(
   })
 
   const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
+  return `E${nextNumber}`
+}
+
+/**
+ * 生成訂單編號
+ *
+ * @param tourCode - 團號（如 CNX250128A）
+ * @param existingOrders - 現有訂單列表（同團）
+ * @returns 訂單編號（如 CNX250128A-O01）
+ *
+ * @example
+ * generateOrderCode('CNX250128A', existingOrders)
+ * // => 'CNX250128A-O01', 'CNX250128A-O02'...
+ */
+export function generateOrderCode(
+  tourCode: string,
+  existingOrders: { code?: string }[]
+): string {
+  const prefix = `${tourCode}-O`
+  let maxNumber = 0
+
+  existingOrders.forEach(order => {
+    const code = order.code
+    if (code?.startsWith(prefix)) {
+      const numberPart = code.substring(prefix.length)
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
   return `${prefix}${nextNumber}`
+}
+
+/**
+ * 生成請款單編號
+ *
+ * @param tourCode - 團號（如 CNX250128A）
+ * @param existingPaymentRequests - 現有請款單列表（同團）
+ * @returns 請款單編號（如 CNX250128A-I01）
+ *
+ * @example
+ * generatePaymentRequestCode('CNX250128A', existingPaymentRequests)
+ * // => 'CNX250128A-I01', 'CNX250128A-I02'...
+ */
+export function generatePaymentRequestCode(
+  tourCode: string,
+  existingPaymentRequests: { code?: string }[]
+): string {
+  const prefix = `${tourCode}-I`
+  let maxNumber = 0
+
+  existingPaymentRequests.forEach(pr => {
+    const code = pr.code
+    if (code?.startsWith(prefix)) {
+      const numberPart = code.substring(prefix.length)
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
+  return `${prefix}${nextNumber}`
+}
+
+/**
+ * 生成收款單編號
+ *
+ * @param tourCode - 團號（如 CNX250128A）
+ * @param existingReceiptOrders - 現有收款單列表（同團）
+ * @returns 收款單編號（如 CNX250128A-R01）
+ *
+ * @example
+ * generateReceiptOrderCode('CNX250128A', existingReceiptOrders)
+ * // => 'CNX250128A-R01', 'CNX250128A-R02'...
+ */
+export function generateReceiptOrderCode(
+  tourCode: string,
+  existingReceiptOrders: { code?: string }[]
+): string {
+  const prefix = `${tourCode}-R`
+  let maxNumber = 0
+
+  existingReceiptOrders.forEach(ro => {
+    const code = ro.code
+    if (code?.startsWith(prefix)) {
+      const numberPart = code.substring(prefix.length)
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
+  return `${prefix}${nextNumber}`
+}
+
+/**
+ * 生成出納單編號
+ *
+ * @param disbursementDate - 出帳日期 (ISO 8601 格式)
+ * @param existingDisbursementOrders - 現有出納單列表
+ * @returns 出納單編號（如 P250128A）
+ *
+ * @example
+ * generateDisbursementOrderCode('2025-01-28', existingDisbursementOrders)
+ * // => 'P250128A', 'P250128B'...
+ */
+export function generateDisbursementOrderCode(
+  disbursementDate: string,
+  existingDisbursementOrders: { code?: string }[]
+): string {
+  const date = new Date(disbursementDate)
+  const year = date.getFullYear().toString().slice(-2)
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+
+  // 格式：P250128A (P+年月日+字母)
+  const datePrefix = `P${year}${month}${day}`
+
+  // 找出同日期的最大字母
+  let maxLetter = ''
+  existingDisbursementOrders.forEach(order => {
+    const code = order.code
+    if (code?.startsWith(datePrefix)) {
+      const lastChar = code.slice(-1)
+      if (/^[A-Z]$/.test(lastChar) && lastChar > maxLetter) {
+        maxLetter = lastChar
+      }
+    }
+  })
+
+  // 計算下一個字母
+  const nextLetter = maxLetter ? String.fromCharCode(maxLetter.charCodeAt(0) + 1) : 'A'
+  return `${datePrefix}${nextLetter}`
 }

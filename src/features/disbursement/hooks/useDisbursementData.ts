@@ -17,29 +17,30 @@ function getNextThursday(): Date {
   return nextThursday
 }
 
-// 生成出納單號: DO + YMMDD + 序號
-function generateDisbursementNumber(existingOrders: DisbursementOrder[]): string {
-  const now = new Date()
-  const year = String(now.getFullYear()).slice(-1)
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  const dateStr = `${year}${month}${day}`
-  const prefix = `DO${dateStr}`
+// 生成出納單號: P + YYMMDD + A-Z
+// 例如: P250128A, P250128B, ...
+function generateDisbursementNumber(existingOrders: DisbursementOrder[], disbursementDate?: string): string {
+  const date = disbursementDate ? new Date(disbursementDate) : new Date()
+  const year = date.getFullYear().toString().slice(-2)
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  const datePrefix = `P${year}${month}${day}`
 
-  // 找到今天最大的序號
-  const todayOrders = existingOrders.filter(o => o.order_number?.startsWith(prefix))
-  let nextNum = 1
-  if (todayOrders.length > 0) {
-    const lastOrder = todayOrders.sort((a, b) =>
-      (b.order_number || '').localeCompare(a.order_number || '')
-    )[0]
-    const match = lastOrder.order_number?.match(/-(\d+)$/)
-    if (match) {
-      nextNum = parseInt(match[1], 10) + 1
+  // 找到同日期的最大字母
+  let maxLetter = ''
+  existingOrders.forEach(order => {
+    const orderNum = order.order_number
+    if (orderNum?.startsWith(datePrefix)) {
+      const lastChar = orderNum.slice(-1)
+      if (/^[A-Z]$/.test(lastChar) && lastChar > maxLetter) {
+        maxLetter = lastChar
+      }
     }
-  }
+  })
 
-  return `${prefix}-${String(nextNum).padStart(3, '0')}`
+  // 計算下一個字母
+  const nextLetter = maxLetter ? String.fromCharCode(maxLetter.charCodeAt(0) + 1) : 'A'
+  return `${datePrefix}${nextLetter}`
 }
 
 export function useDisbursementData() {
@@ -151,9 +152,11 @@ export function useDisbursementData() {
         .filter(r => requestIds.includes(r.id))
         .reduce((sum, r) => sum + (r.amount || 0), 0)
 
+      const disbursementDateStr = nextThursday.toISOString().split('T')[0]
+
       await createOrder({
-        order_number: generateDisbursementNumber(disbursement_orders),
-        disbursement_date: nextThursday.toISOString().split('T')[0],
+        order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
+        disbursement_date: disbursementDateStr,
         payment_request_ids: requestIds,
         amount: amount,
         status: 'pending',
@@ -216,9 +219,11 @@ export function useDisbursementData() {
       .filter(r => requestIds.includes(r.id))
       .reduce((sum, r) => sum + (r.amount || 0), 0)
 
+    const disbursementDateStr = nextThursday.toISOString().split('T')[0]
+
     await createOrder({
-      order_number: generateDisbursementNumber(disbursement_orders),
-      disbursement_date: nextThursday.toISOString().split('T')[0],
+      order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
+      disbursement_date: disbursementDateStr,
       payment_request_ids: requestIds,
       amount: amount,
       status: 'pending',
