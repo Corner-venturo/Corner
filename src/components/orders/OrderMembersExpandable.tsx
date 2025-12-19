@@ -1181,7 +1181,12 @@ export function OrderMembersExpandable({
               const fileExt = file.name.split('.').pop() || 'jpg';
               const fileName = `${workspaceId}/${orderId}/${timestamp}_${i}.${fileExt}`;
               const { data: uploadData, error: uploadError } = await supabase.storage.from('passport-images').upload(fileName, file, { contentType: file.type, upsert: false });
-              if (uploadError) logger.error('護照照片上傳失敗:', uploadError); else passportImageUrl = uploadData?.publicUrl || null;
+              if (uploadError) {
+                logger.error('護照照片上傳失敗:', uploadError);
+              } else if (uploadData?.path) {
+                const { data: urlData } = supabase.storage.from('passport-images').getPublicUrl(uploadData.path);
+                passportImageUrl = urlData?.publicUrl || null;
+              }
             }
 
             const memberData = {

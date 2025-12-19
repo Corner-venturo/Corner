@@ -187,7 +187,7 @@ export const TourMemberView = forwardRef<TourMemberViewRef, TourMemberViewProps>
           })}
           columns={tourMemberColumns}
           isEditMode={isEditMode}
-          handleEditModeChange={handleEditModeChange}
+          handleEditModeChange={handleEditModeChange as (index: number, field: string, value: string) => void}
           handleDataUpdate={handleDataUpdate as (data: unknown[]) => void}
         />
 

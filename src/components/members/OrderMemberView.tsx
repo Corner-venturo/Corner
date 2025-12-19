@@ -263,11 +263,11 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
             passport_expiry: item.customer.passport_expiry_date || null,
             birthday: date_of_birth,
             id_number: national_id,
-            gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
+            gender: (item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null) as 'M' | 'F' | null,
             passport_image_url,
-          } as Omit<Member, 'id'|'created_at'|'updated_at'|'order_id'>
+          }
 
-          const newMember = await createMember(memberData)
+          const newMember = await createMember(memberData as unknown as Parameters<typeof createMember>[0])
           if (!newMember) {
             failedItems.push(`${item.fileName} (建立失敗)`)
             continue
@@ -778,7 +778,7 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
           })}
           columns={dataSheetColumns}
           isEditMode={isEditMode}
-          handleEditModeChange={handleEditModeChange}
+          handleEditModeChange={handleEditModeChange as (index: number, field: string, value: string) => void}
           handleDataUpdate={handleDataUpdate as (data: unknown[]) => void}
           // The refetchMembers is passed down to MemberTable, in case any action in MemberTable
           // needs to trigger a refetch of the members from the useOrderMembers hook.
