@@ -14,6 +14,7 @@ import { PaymentRequest, DisbursementOrder } from '../types'
 import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 
 interface PendingListProps {
   data: PaymentRequest[]
@@ -62,7 +63,7 @@ export function PendingList({
             {data.length} 筆 • 下次出帳日：
             {typeof nextThursday === 'string'
               ? nextThursday
-              : nextThursday.toLocaleDateString('zh-TW')}
+              : formatDateTW(nextThursday)}
           </div>
         </div>
       )}

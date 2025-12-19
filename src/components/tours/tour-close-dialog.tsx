@@ -3,6 +3,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -315,20 +316,23 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
               <div className="space-y-2">
                 {salesRecipients.map((recipient, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <select
+                    <Select
                       value={recipient.employeeId}
-                      onChange={e => {
+                      onValueChange={value => {
                         const newRecipients = [...salesRecipients]
-                        newRecipients[index].employeeId = e.target.value
+                        newRecipients[index].employeeId = value
                         setSalesRecipients(newRecipients)
                       }}
-                      className="flex-1 px-3 py-2 border border-morandi-gold/30 rounded-lg text-sm"
                     >
-                      <option value="">選擇業務</option>
-                      {employees.map(emp => (
-                        <option key={emp.id} value={emp.id}>{emp.name}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="選擇業務" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Input
                       type="number"
                       value={recipient.percentage || ''}
@@ -369,20 +373,23 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
               <div className="space-y-2">
                 {opRecipients.map((recipient, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <select
+                    <Select
                       value={recipient.employeeId}
-                      onChange={e => {
+                      onValueChange={value => {
                         const newRecipients = [...opRecipients]
-                        newRecipients[index].employeeId = e.target.value
+                        newRecipients[index].employeeId = value
                         setOpRecipients(newRecipients)
                       }}
-                      className="flex-1 px-3 py-2 border border-morandi-gold/30 rounded-lg text-sm"
                     >
-                      <option value="">選擇 OP</option>
-                      {employees.map(emp => (
-                        <option key={emp.id} value={emp.id}>{emp.name}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="選擇 OP" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Input
                       type="number"
                       value={recipient.percentage || ''}

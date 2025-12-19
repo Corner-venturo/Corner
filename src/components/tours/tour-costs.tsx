@@ -6,6 +6,7 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tour, Payment } from '@/stores/types'
 import { useOrderStore, usePaymentRequestStore, useSupplierStore } from '@/stores'
 import type { PaymentRequestItem } from '@/stores/types'
@@ -414,33 +415,40 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">類別</label>
-              <select
+              <Select
                 value={newCost.category}
-                onChange={e => setNewCost(prev => ({ ...prev, category: e.target.value }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setNewCost(prev => ({ ...prev, category: value }))}
               >
-                <option value="transport">交通</option>
-                <option value="accommodation">住宿</option>
-                <option value="food">餐食</option>
-                <option value="attraction">景點</option>
-                <option value="other">其他</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="transport">交通</SelectItem>
+                  <SelectItem value="accommodation">住宿</SelectItem>
+                  <SelectItem value="food">餐食</SelectItem>
+                  <SelectItem value="attraction">景點</SelectItem>
+                  <SelectItem value="other">其他</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">供應商</label>
-              <select
+              <Select
                 value={newCost.vendor}
-                onChange={e => setNewCost(prev => ({ ...prev, vendor: e.target.value }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setNewCost(prev => ({ ...prev, vendor: value }))}
               >
-                <option value="">請選擇供應商</option>
-                {suppliers.map(supplier => (
-                  <option key={supplier.id} value={supplier.id}>
-                    {supplier.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue placeholder="請選擇供應商" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map(supplier => (
+                    <SelectItem key={supplier.id} value={supplier.id}>
+                      {supplier.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex justify-end space-x-2">

@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -626,30 +628,32 @@ function AddTodoForm({
         <label className="block text-sm font-medium text-morandi-primary mb-1">
           指派給（可選）
         </label>
-        <select
+        <Select
           value={formData.assignee}
-          onChange={e => setFormData({ ...formData, assignee: e.target.value })}
-          onFocus={handleAssigneeDropdownFocus}
-          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
+          onValueChange={value => setFormData({ ...formData, assignee: value })}
+          onOpenChange={open => open && handleAssigneeDropdownFocus()}
           disabled={isLoadingUsers}
         >
-          <option value="">{isLoadingUsers ? '載入員工資料中...' : '不指派（個人任務）'}</option>
-          {users &&
-            users.map(user => (
-              <option key={user.id} value={user.id}>
-                {user.display_name} ({user.employee_number})
-              </option>
-            ))}
-        </select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={isLoadingUsers ? '載入員工資料中...' : '不指派（個人任務）'} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">不指派（個人任務）</SelectItem>
+            {users &&
+              users.map(user => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.display_name} ({user.employee_number})
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
         <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={formData.is_public}
-            onChange={e => setFormData({ ...formData, is_public: e.target.checked })}
-            className="w-4 h-4 rounded border-morandi-container text-morandi-gold focus:ring-morandi-gold"
+            onCheckedChange={checked => setFormData({ ...formData, is_public: checked as boolean })}
           />
           <span className="text-sm font-medium text-morandi-primary">公開給全公司</span>
         </label>

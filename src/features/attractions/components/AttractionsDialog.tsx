@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
 import { supabase } from '@/lib/supabase/client'
@@ -578,67 +580,75 @@ export function AttractionsDialog({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="text-sm font-medium">國家 *</label>
-          <select
+          <Select
             value={formData.country_id}
-            onChange={e =>
+            onValueChange={value =>
               setFormData(prev => ({
                 ...prev,
-                country_id: e.target.value,
+                country_id: value,
                 region_id: '',
                 city_id: '',
               }))
             }
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-            required
           >
-            <option value="">請選擇</option>
-            {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.emoji} {c.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="請選擇" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.emoji} {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {availableRegions.length > 0 && (
           <div>
             <label className="text-sm font-medium">地區 *</label>
-            <select
+            <Select
               value={formData.region_id}
-              onChange={e =>
+              onValueChange={value =>
                 setFormData(prev => ({
                   ...prev,
-                  region_id: e.target.value,
+                  region_id: value,
                   city_id: '',
                 }))
               }
-              className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
-              required
             >
-              <option value="">請選擇</option>
-              {availableRegions.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="請選擇" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableRegions.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {r.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
         <div>
           <label className="text-sm font-medium">城市（選填）</label>
-          <select
+          <Select
             value={formData.city_id ?? ''}
-            onChange={e => setFormData(prev => ({ ...prev, city_id: e.target.value }))}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+            onValueChange={value => setFormData(prev => ({ ...prev, city_id: value }))}
           >
-            <option value="">不指定</option>
-            {availableCities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="不指定" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">不指定</SelectItem>
+              {availableCities.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -646,17 +656,21 @@ export function AttractionsDialog({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium">類別</label>
-          <select
+          <Select
             value={formData.category}
-            onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+            onValueChange={value => setFormData(prev => ({ ...prev, category: value }))}
           >
-            <option value="景點">景點</option>
-            <option value="餐廳">餐廳</option>
-            <option value="住宿">住宿</option>
-            <option value="購物">購物</option>
-            <option value="交通">交通</option>
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="景點" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="景點">景點</SelectItem>
+              <SelectItem value="餐廳">餐廳</SelectItem>
+              <SelectItem value="住宿">住宿</SelectItem>
+              <SelectItem value="購物">購物</SelectItem>
+              <SelectItem value="交通">交通</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
@@ -809,11 +823,9 @@ export function AttractionsDialog({
 
       {/* 啟用狀態 */}
       <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={formData.is_active}
-          onChange={e => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-          className="w-4 h-4"
+          onCheckedChange={checked => setFormData(prev => ({ ...prev, is_active: checked as boolean }))}
         />
         <label className="text-sm">啟用此景點</label>
       </div>

@@ -1,303 +1,231 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
-  Plane,
-  Search,
-  Filter,
-  Plus,
-  Calendar,
-  Users,
   MapPin,
-  MoreVertical,
-  Eye,
-  Edit,
-  Copy,
-  Trash2
+  Calendar,
+  FileText,
+  BarChart3,
+  FileCheck,
+  AlertCircle,
+  Archive,
+  Users,
+  Plane,
 } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { demoTours, formatCurrency, getStatusDisplay } from '@/lib/demo/demo-data'
 
-export default function DemoToursPage() {
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-
-  const filteredTours = demoTours.filter(tour => {
-    const matchesSearch = tour.tour_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          tour.tour_code.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || tour.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <Plane className="text-amber-500" />
-            行程管理
-          </h1>
-          <p className="text-slate-500 mt-1">管理所有旅遊行程</p>
-        </div>
-        <button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all">
-          <Plus size={18} />
-          新增行程
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="搜尋行程名稱或代碼..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-            />
-          </div>
-
-          {/* Status Filter */}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="全部狀態" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全部狀態</SelectItem>
-              <SelectItem value="draft">草稿</SelectItem>
-              <SelectItem value="published">已發布</SelectItem>
-              <SelectItem value="confirmed">已成團</SelectItem>
-              <SelectItem value="departed">出團中</SelectItem>
-              <SelectItem value="completed">已結束</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* View Toggle */}
-          <div className="flex items-center bg-slate-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                viewMode === 'grid' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-              }`}
-            >
-              卡片
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                viewMode === 'table' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-              }`}
-            >
-              列表
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredTours.map((tour) => (
-            <TourCard key={tour.id} tour={tour} />
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase">行程資訊</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase">目的地</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase">出發日期</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase">報名狀況</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase">狀態</th>
-                <th className="text-right px-5 py-3 text-xs font-medium text-slate-500 uppercase">團費</th>
-                <th className="text-center px-5 py-3 text-xs font-medium text-slate-500 uppercase">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredTours.map((tour) => {
-                const status = getStatusDisplay(tour.status)
-                return (
-                  <tr key={tour.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={tour.cover_image}
-                          alt={tour.tour_name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
-                        <div>
-                          <p className="font-medium text-slate-800">{tour.tour_name}</p>
-                          <p className="text-sm text-slate-500">{tour.tour_code}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                        <MapPin size={14} className="text-slate-400" />
-                        {tour.destination}
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                        <Calendar size={14} className="text-slate-400" />
-                        {tour.start_date}
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
-                            style={{ width: `${(tour.enrolled / tour.capacity) * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-sm text-slate-600">{tour.enrolled}/{tour.capacity}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}>
-                        {status.label}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 text-right font-medium text-slate-800">
-                      {formatCurrency(tour.price)}
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-center gap-1">
-                        <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-700">
-                          <Eye size={16} />
-                        </button>
-                        <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-700">
-                          <Edit size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm text-slate-500">總行程數</p>
-          <p className="text-2xl font-bold text-slate-800 mt-1">{demoTours.length}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm text-slate-500">已成團</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
-            {demoTours.filter(t => t.status === 'confirmed' || t.status === 'departed').length}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm text-slate-500">招募中</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
-            {demoTours.filter(t => t.status === 'published').length}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm text-slate-500">總報名人數</p>
-          <p className="text-2xl font-bold text-amber-600 mt-1">
-            {demoTours.reduce((sum, t) => sum + t.enrolled, 0)}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+// Demo 旅遊團列表類型
+interface DemoTourRow {
+  id: string
+  tour_code: string
+  tour_name: string
+  destination: string
+  country: string
+  start_date: string
+  end_date: string
+  days: number
+  status: 'draft' | 'published' | 'confirmed' | 'departed' | 'completed'
+  price: number
+  capacity: number
+  enrolled: number
+  cover_image: string
 }
 
-// Tour Card Component
-function TourCard({ tour }: { tour: typeof demoTours[0] }) {
-  const status = getStatusDisplay(tour.status)
-  const enrollmentRate = (tour.enrolled / tour.capacity) * 100
+// 狀態對應到分頁
+function getStatusTab(status: string): string {
+  switch (status) {
+    case 'draft':
+      return '提案'
+    case 'published':
+      return '進行中'
+    case 'confirmed':
+      return '待結案'
+    case 'departed':
+    case 'completed':
+      return '結案'
+    default:
+      return 'all'
+  }
+}
+
+export default function DemoToursPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  const filteredTours = useMemo(() => {
+    return demoTours.filter(tour => {
+      const matchesSearch = !searchQuery ||
+        tour.tour_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tour.tour_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tour.destination.toLowerCase().includes(searchQuery.toLowerCase())
+
+      let matchesStatus = true
+      if (statusFilter !== 'all') {
+        const tourTab = getStatusTab(tour.status)
+        matchesStatus = tourTab === statusFilter
+      }
+      return matchesSearch && matchesStatus
+    })
+  }, [searchQuery, statusFilter])
+
+  // 統計數據
+  const stats = useMemo(() => ({
+    total: demoTours.length,
+    confirmed: demoTours.filter(t => t.status === 'confirmed' || t.status === 'departed').length,
+    published: demoTours.filter(t => t.status === 'published').length,
+    totalEnrolled: demoTours.reduce((sum, t) => sum + t.enrolled, 0),
+  }), [])
+
+  // 表格欄位定義
+  const tableColumns: TableColumn<DemoTourRow>[] = useMemo(
+    () => [
+      {
+        key: 'tour_code',
+        label: '團號',
+        sortable: true,
+        render: (_value, tour) => (
+          <span className="text-xs text-morandi-secondary font-mono">{tour.tour_code}</span>
+        ),
+      },
+      {
+        key: 'tour_name',
+        label: '行程名稱',
+        sortable: true,
+        render: (_value, tour) => (
+          <div className="flex items-center gap-2">
+            <img
+              src={tour.cover_image}
+              alt={tour.tour_name}
+              className="w-10 h-10 rounded object-cover"
+            />
+            <div>
+              <div className="text-sm font-medium text-morandi-primary">{tour.tour_name}</div>
+              <div className="text-xs text-morandi-secondary flex items-center gap-1">
+                <MapPin size={10} />
+                {tour.destination}
+              </div>
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: 'start_date',
+        label: '出發日期',
+        sortable: true,
+        render: (_value, tour) => (
+          <div className="text-xs text-morandi-primary flex items-center gap-1">
+            <Calendar size={12} className="text-morandi-secondary" />
+            {tour.start_date}
+          </div>
+        ),
+      },
+      {
+        key: 'days',
+        label: '天數',
+        sortable: true,
+        render: (_value, tour) => (
+          <div className="text-xs text-morandi-secondary text-center">
+            {tour.days} 天
+          </div>
+        ),
+      },
+      {
+        key: 'enrolled',
+        label: '報名狀況',
+        sortable: true,
+        render: (_value, tour) => {
+          const percentage = Math.round((tour.enrolled / tour.capacity) * 100)
+          return (
+            <div className="flex items-center gap-2">
+              <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${
+                    percentage >= 80 ? 'bg-green-500' :
+                    percentage >= 50 ? 'bg-amber-500' : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+              <span className="text-xs text-morandi-secondary">
+                {tour.enrolled}/{tour.capacity}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        key: 'status',
+        label: '狀態',
+        sortable: true,
+        render: (_value, tour) => {
+          const status = getStatusDisplay(tour.status)
+          return (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+              {status.label}
+            </span>
+          )
+        },
+      },
+      {
+        key: 'price',
+        label: '團費',
+        sortable: true,
+        render: (_value, tour) => (
+          <div className="text-sm font-medium text-morandi-primary text-right">
+            {formatCurrency(tour.price)}
+          </div>
+        ),
+      },
+    ],
+    []
+  )
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all group">
-      {/* Image */}
-      <div className="relative aspect-[16/10] overflow-hidden">
-        <img
-          src={tour.cover_image}
-          alt={tour.tour_name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="旅遊團管理"
+        icon={MapPin}
+        breadcrumb={[
+          { label: '首頁', href: '/demo' },
+          { label: '旅遊團管理', href: '/demo/tours' },
+        ]}
+        showSearch={true}
+        searchTerm={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="搜尋旅遊團..."
+        tabs={[
+          { value: 'all', label: '全部', icon: BarChart3 },
+          { value: '提案', label: '提案', icon: FileText },
+          { value: '進行中', label: '進行中', icon: Calendar },
+          { value: '待結案', label: '待結案', icon: AlertCircle },
+          { value: '結案', label: '結案', icon: FileCheck },
+          { value: 'archived', label: '封存', icon: Archive },
+        ]}
+        activeTab={statusFilter}
+        onTabChange={setStatusFilter}
+        onAdd={() => alert('DEMO 模式：新增旅遊團功能')}
+        addLabel="新增旅遊團"
+      />
 
-        {/* Status Badge */}
-        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}>
-          {status.label}
-        </span>
-
-        {/* Tour Code */}
-        <span className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded text-xs font-mono">
-          {tour.tour_code}
-        </span>
-
-        {/* Tour Name */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="font-bold text-white text-lg leading-tight">{tour.tour_name}</h3>
-          <div className="flex items-center gap-1.5 mt-1 text-white/80 text-sm">
-            <MapPin size={14} />
-            {tour.country}
-          </div>
+      {/* 統計區 - 精簡版 */}
+      <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
+        <div className="flex items-center gap-6 text-xs text-morandi-secondary">
+          <span>總行程：<strong className="text-morandi-primary">{stats.total}</strong> 個</span>
+          <span>已成團：<strong className="text-green-600">{stats.confirmed}</strong> 個</span>
+          <span>招募中：<strong className="text-blue-600">{stats.published}</strong> 個</span>
+          <span>總報名：<strong className="text-amber-600">{stats.totalEnrolled}</strong> 人</span>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Date & Days */}
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-1.5 text-slate-600">
-            <Calendar size={14} className="text-slate-400" />
-            {tour.start_date}
-          </div>
-          <span className="text-slate-500">{tour.days} 天</span>
-        </div>
-
-        {/* Enrollment */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-500">報名進度</span>
-            <span className="text-slate-700 font-medium">{tour.enrolled}/{tour.capacity} 人</span>
-          </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all ${
-                enrollmentRate >= 80 ? 'bg-gradient-to-r from-green-400 to-emerald-500' :
-                enrollmentRate >= 50 ? 'bg-gradient-to-r from-amber-400 to-orange-500' :
-                'bg-gradient-to-r from-blue-400 to-indigo-500'
-              }`}
-              style={{ width: `${enrollmentRate}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Price & Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-          <div>
-            <span className="text-xs text-slate-400">團費</span>
-            <p className="font-bold text-lg text-slate-800">{formatCurrency(tour.price)}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
-              <Eye size={18} />
-            </button>
-            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
-              <Edit size={18} />
-            </button>
-            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
-              <MoreVertical size={18} />
-            </button>
-          </div>
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">
+          <EnhancedTable
+            columns={tableColumns}
+            data={filteredTours}
+            onRowClick={(tour) => alert(`DEMO 模式：查看旅遊團 ${tour.tour_name}`)}
+          />
         </div>
       </div>
     </div>

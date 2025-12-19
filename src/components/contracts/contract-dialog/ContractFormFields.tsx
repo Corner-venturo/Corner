@@ -18,38 +18,34 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">姓名</label>
-            <input
+            <Input
               type="text"
               value={contractData.travelerName || ''}
               onChange={e => onFieldChange('travelerName', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">身分證字號</label>
-            <input
+            <Input
               type="text"
               value={contractData.travelerIdNumber || ''}
               onChange={e => onFieldChange('travelerIdNumber', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
           <div className="col-span-2">
             <label className="text-xs text-morandi-secondary block mb-1">住址</label>
-            <input
+            <Input
               type="text"
               value={contractData.travelerAddress || ''}
               onChange={e => onFieldChange('travelerAddress', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">電話</label>
-            <input
+            <Input
               type="text"
               value={contractData.travelerPhone || ''}
               onChange={e => onFieldChange('travelerPhone', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
         </div>
@@ -61,7 +57,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <div className="space-y-2">
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">集合時間</label>
-            <input
+            <Input
               type="datetime-local"
               value={(() => {
                 // 將分開的年月日時分組合成 datetime-local 格式
@@ -99,17 +95,15 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
                   onFieldChange('gatherMinute', '')
                 }
               }}
-              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
             />
           </div>
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">集合地點</label>
-            <input
+            <Input
               type="text"
               value={contractData.gatherLocation || ''}
               onChange={e => onFieldChange('gatherLocation', e.target.value)}
               placeholder="集合地點（例如：桃園國際機場第一航廈）"
-              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
             />
           </div>
         </div>
@@ -121,20 +115,18 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">總金額（新台幣）</label>
-            <input
+            <Input
               type="text"
               value={contractData.totalAmount || ''}
               onChange={e => onFieldChange('totalAmount', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
           <div>
             <label className="text-xs text-morandi-secondary block mb-1">定金（新台幣）</label>
-            <input
+            <Input
               type="text"
               value={contractData.depositAmount || ''}
               onChange={e => onFieldChange('depositAmount', e.target.value)}
-              className="w-full p-2 border rounded text-sm"
             />
           </div>
         </div>
@@ -147,12 +139,11 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
           <label className="text-xs text-morandi-secondary block mb-1">
             電話分機（02-7751-6051 #）
           </label>
-          <input
+          <Input
             type="text"
             value={contractData.companyExtension || ''}
             onChange={e => onFieldChange('companyExtension', e.target.value)}
             placeholder="分機號碼"
-            className="w-full p-2 border rounded text-sm"
           />
         </div>
       </div>

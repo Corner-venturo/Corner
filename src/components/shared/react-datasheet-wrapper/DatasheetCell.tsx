@@ -3,6 +3,7 @@
 import React from 'react'
 import { X, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CellData, DataSheetColumn } from './types'
 import { CORE_FIELD_KEYS, PROTECTED_FIELD_KEYS, ERROR_MESSAGES } from './constants'
 
@@ -124,50 +125,47 @@ export function DatasheetCell({
           : 'no-bed'
         : String(memberAssignedRoom || '')
 
-      // Build room options list
-      const regularRoomOptions: React.ReactElement[] = []
-      for (const roomOption of roomOptions) {
-        const usage = getRoomUsage
-          ? getRoomUsage(roomOption.value)
-          : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
-        const isFull = isRoomFull ? isRoomFull(roomOption.value, memberId) : false
-        const isCurrentRoom = memberAssignedRoom === roomOption.value && !isChildNoBed
-
-        if (isFull && !isCurrentRoom) {
-          continue
-        }
-
-        regularRoomOptions.push(
-          <option key={roomOption.value} value={roomOption.value}>
-            {roomOption.value} ({usage.bedCount}/{usage.capacity}床
-            {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
-          </option>
-        )
-      }
-
-      // Build no-bed room options
-      const noBedRoomOptions: React.ReactElement[] = isChildNoBed
-        ? roomOptions.map(roomOption => (
-            <option key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
-              不佔床 - {roomOption.value}
-            </option>
-          ))
-        : []
-
       return (
-        <select
+        <Select
           value={selectValue}
-          onChange={() => {
+          onValueChange={() => {
             // Handler should be passed as prop if needed
           }}
-          className="w-full h-8 px-2 border border-gray-300 rounded text-xs bg-white focus:outline-none focus:ring-2 focus:ring-morandi-gold"
-          onClick={e => e.stopPropagation()}
         >
-          <option value="">未分配</option>
-          <option value="no-bed">不佔床</option>
-          {regularRoomOptions}
-          {noBedRoomOptions}
-        </select>
+          <SelectTrigger
+            className="w-full h-8 text-xs"
+            onClick={e => e.stopPropagation()}
+          >
+            <SelectValue placeholder="未分配" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">未分配</SelectItem>
+            <SelectItem value="no-bed">不佔床</SelectItem>
+            {roomOptions.filter(roomOption => {
+              const usage = getRoomUsage
+                ? getRoomUsage(roomOption.value)
+                : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
+              const isFull = isRoomFull ? isRoomFull(roomOption.value, memberId) : false
+              const isCurrentRoom = memberAssignedRoom === roomOption.value && !isChildNoBed
+              return !isFull || isCurrentRoom
+            }).map(roomOption => {
+              const usage = getRoomUsage
+                ? getRoomUsage(roomOption.value)
+                : { bedCount: 0, noBedCount: 0, totalCount: 0, capacity: roomOption.capacity }
+              return (
+                <SelectItem key={roomOption.value} value={roomOption.value}>
+                  {roomOption.value} ({usage.bedCount}/{usage.capacity}床
+                  {usage.noBedCount > 0 ? ` +${usage.noBedCount}不佔床` : ''})
+                </SelectItem>
+              )
+            })}
+            {isChildNoBed && roomOptions.map(roomOption => (
+              <SelectItem key={`no-bed-${roomOption.value}`} value={`no-bed-${roomOption.value}`}>
+                不佔床 - {roomOption.value}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )
     }
   }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Mail, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -291,32 +292,29 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-morandi-secondary block mb-1">收件人姓名 *</label>
-                <input
+                <Input
                   type="text"
                   value={recipient}
                   onChange={e => setRecipient(e.target.value)}
                   placeholder="請輸入收件人姓名"
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
               </div>
               <div>
                 <label className="text-xs text-morandi-secondary block mb-1">收件地址 *</label>
-                <input
+                <Input
                   type="text"
                   value={recipientAddress}
                   onChange={e => setRecipientAddress(e.target.value)}
                   placeholder="請輸入收件地址"
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
               </div>
               <div>
                 <label className="text-xs text-morandi-secondary block mb-1">收件人電話 *</label>
-                <input
+                <Input
                   type="text"
                   value={recipientPhone}
                   onChange={e => setRecipientPhone(e.target.value)}
                   placeholder="請輸入收件人電話"
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 text-sm"
                 />
               </div>
             </div>
@@ -329,45 +327,43 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-morandi-secondary block mb-1">公司名稱</label>
-                  <input
+                  <Input
                     type="text"
                     value={senderCompany}
                     readOnly
-                    className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary cursor-not-allowed"
+                    className="bg-gray-50 text-morandi-secondary cursor-not-allowed"
                   />
                 </div>
                 <div>
                   <label className="text-xs text-morandi-secondary block mb-1">
                     員工姓名 <span className="text-morandi-gold">*</span>
                   </label>
-                  <input
+                  <Input
                     type="text"
                     value={senderName}
                     onChange={e => setSenderName(e.target.value)}
                     placeholder="請輸入員工姓名（可修改）"
-                    className="w-full text-sm"
                   />
                 </div>
               </div>
               <div>
                 <label className="text-xs text-morandi-secondary block mb-1">公司地址</label>
-                <input
+                <Input
                   type="text"
                   value={senderAddress}
                   readOnly
-                  className="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-morandi-secondary cursor-not-allowed"
+                  className="bg-gray-50 text-morandi-secondary cursor-not-allowed"
                 />
               </div>
               <div>
                 <label className="text-xs text-morandi-secondary block mb-1">
                   聯絡電話 <span className="text-morandi-gold">*</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   value={senderPhone}
                   onChange={e => setSenderPhone(e.target.value)}
                   placeholder="請輸入聯絡電話（可修改）"
-                  className="w-full text-sm"
                 />
               </div>
             </div>

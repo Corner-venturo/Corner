@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface VisaApplicant {
   id: string
@@ -313,11 +314,9 @@ export function AddVisaDialog({
 
                 {/* 急件 */}
                 <td className="py-2 px-3 border border-border text-center">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={applicant.is_urgent}
-                    onChange={(e) => updateApplicant(applicant.id, 'is_urgent', e.target.checked)}
-                    className="w-4 h-4"
+                    onCheckedChange={(checked) => updateApplicant(applicant.id, 'is_urgent', checked as boolean)}
                   />
                 </td>
 

@@ -11,6 +11,8 @@ import {
   AlertCircle,
   Plus
 } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
 import { demoCalendarEvents, demoTours } from '@/lib/demo/demo-data'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
@@ -63,179 +65,191 @@ export default function DemoCalendarPage() {
   const demoToday = 19
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <CalendarIcon className="text-indigo-500" />
-            行事曆
-          </h1>
-          <p className="text-slate-500 mt-1">行程出團與重要事項</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={goToToday}
-            className="px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-          >
-            今天
-          </button>
-          <button className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all">
-            <Plus size={18} />
-            新增事件
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Calendar */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-          {/* Calendar Header */}
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-800">
-              {year} 年 {MONTHS[month]}
-            </h2>
-            <div className="flex items-center gap-2">
-              <button
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="行事曆"
+        icon={CalendarIcon}
+        breadcrumb={[
+          { label: '首頁', href: '/demo' },
+          { label: '行事曆', href: '/demo/calendar' },
+        ]}
+        actions={
+          <div className="flex items-center gap-3">
+            {/* 月份切換 */}
+            <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-sm">
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={prevMonth}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-l-lg"
               >
-                <ChevronLeft size={20} />
-              </button>
-              <button
+                <ChevronLeft size={16} />
+              </Button>
+              <span className="text-sm font-semibold text-morandi-primary min-w-[120px] text-center px-2">
+                {year} 年 {MONTHS[month]}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={nextMonth}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="h-9 w-9 p-0 hover:bg-morandi-container/50 hover:text-morandi-gold transition-all rounded-r-lg"
               >
-                <ChevronRight size={20} />
-              </button>
+                <ChevronRight size={16} />
+              </Button>
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToToday}
+              className="h-9 border-morandi-gold/30 bg-card text-morandi-gold hover:bg-morandi-gold hover:border-morandi-gold hover:text-white transition-all shadow-sm font-medium rounded-lg"
+            >
+              今天
+            </Button>
+
+            <Button
+              size="sm"
+              onClick={() => alert('DEMO 模式：新增事項功能')}
+              className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"
+            >
+              <Plus size={16} className="mr-1.5" />
+              新增事項
+            </Button>
           </div>
+        }
+      />
 
-          {/* Weekday Headers */}
-          <div className="grid grid-cols-7 border-b border-slate-100">
-            {WEEKDAYS.map((day, index) => (
-              <div
-                key={day}
-                className={`py-3 text-center text-sm font-medium ${
-                  index === 0 ? 'text-red-500' : index === 6 ? 'text-blue-500' : 'text-slate-500'
-                }`}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7">
-            {calendarDays.map((day, index) => {
-              const events = day ? getEventsForDate(day) : []
-              const tours = day ? getToursForDate(day) : []
-              const isToday = day === demoToday && month === 0 && year === 2025
-              const isWeekend = index % 7 === 0 || index % 7 === 6
-
-              return (
+      <div className="flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+          {/* Calendar */}
+          <div className="lg:col-span-3 bg-card rounded-xl border border-border shadow-sm flex flex-col">
+            {/* Weekday Headers */}
+            <div className="grid grid-cols-7 border-b border-border">
+              {WEEKDAYS.map((day, index) => (
                 <div
-                  key={index}
-                  className={`min-h-[100px] p-2 border-b border-r border-slate-100 ${
-                    day ? 'hover:bg-slate-50' : 'bg-slate-50/50'
-                  } transition-colors`}
+                  key={day}
+                  className={`py-3 text-center text-sm font-medium ${
+                    index === 0 ? 'text-red-500' : index === 6 ? 'text-blue-500' : 'text-morandi-secondary'
+                  }`}
                 >
-                  {day && (
-                    <>
-                      <div className="flex items-center justify-between mb-1">
-                        <span
-                          className={`w-7 h-7 flex items-center justify-center text-sm font-medium rounded-full ${
-                            isToday
-                              ? 'bg-indigo-500 text-white'
-                              : isWeekend
-                                ? index % 7 === 0
-                                  ? 'text-red-500'
-                                  : 'text-blue-500'
-                                : 'text-slate-700'
-                          }`}
-                        >
-                          {day}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        {tours.map((tour) => (
-                          <div
-                            key={tour.id}
-                            className="px-1.5 py-1 bg-blue-100 text-blue-700 rounded text-xs truncate"
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 flex-1">
+              {calendarDays.map((day, index) => {
+                const events = day ? getEventsForDate(day) : []
+                const tours = day ? getToursForDate(day) : []
+                const isToday = day === demoToday && month === 0 && year === 2025
+                const isWeekend = index % 7 === 0 || index % 7 === 6
+
+                return (
+                  <div
+                    key={index}
+                    className={`min-h-[100px] p-2 border-b border-r border-border ${
+                      day ? 'hover:bg-morandi-container/30' : 'bg-morandi-container/10'
+                    } transition-colors cursor-pointer`}
+                    onClick={() => day && alert(`DEMO 模式：點擊 ${year}/${month + 1}/${day}`)}
+                  >
+                    {day && (
+                      <>
+                        <div className="flex items-center justify-between mb-1">
+                          <span
+                            className={`w-7 h-7 flex items-center justify-center text-sm font-medium rounded-full ${
+                              isToday
+                                ? 'bg-morandi-gold text-white'
+                                : isWeekend
+                                  ? index % 7 === 0
+                                    ? 'text-red-500'
+                                    : 'text-blue-500'
+                                  : 'text-morandi-primary'
+                            }`}
                           >
-                            <span className="flex items-center gap-1">
-                              <Plane size={10} />
-                              {tour.tour_code}
-                            </span>
-                          </div>
-                        ))}
-                        {events.slice(0, 2).map((event) => {
-                          const config = eventTypeConfig[event.type]
-                          return (
+                            {day}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          {tours.map((tour) => (
                             <div
-                              key={event.id}
-                              className={`px-1.5 py-1 ${config.color} text-white rounded text-xs truncate`}
+                              key={tour.id}
+                              className="px-1.5 py-1 bg-blue-100 text-blue-700 rounded text-xs truncate"
                             >
-                              {event.title}
+                              <span className="flex items-center gap-1">
+                                <Plane size={10} />
+                                {tour.tour_code}
+                              </span>
                             </div>
-                          )
-                        })}
-                        {events.length > 2 && (
-                          <div className="text-xs text-slate-400 pl-1">
-                            +{events.length - 2} 更多
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Sidebar - Upcoming Events */}
-        <div className="space-y-4">
-          {/* Today's Events */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
-            <div className="px-4 py-3 border-b border-slate-100">
-              <h3 className="font-semibold text-slate-800">今日事項</h3>
-              <p className="text-xs text-slate-400">2025年1月19日</p>
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-slate-500 text-center py-4">今日無事項</p>
-            </div>
-          </div>
-
-          {/* Upcoming Departures */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
-            <div className="px-4 py-3 border-b border-slate-100">
-              <h3 className="font-semibold text-slate-800">即將出團</h3>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {demoTours.filter(t => t.status === 'confirmed' || t.status === 'departed').slice(0, 4).map((tour) => (
-                <div key={tour.id} className="px-4 py-3 hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-slate-800">{tour.tour_code}</span>
+                          ))}
+                          {events.slice(0, 2).map((event) => {
+                            const config = eventTypeConfig[event.type]
+                            return (
+                              <div
+                                key={event.id}
+                                className={`px-1.5 py-1 ${config.color} text-white rounded text-xs truncate`}
+                              >
+                                {event.title}
+                              </div>
+                            )
+                          })}
+                          {events.length > 2 && (
+                            <div className="text-xs text-morandi-secondary pl-1">
+                              +{events.length - 2} 更多
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 mb-1">{tour.tour_name}</p>
-                  <p className="text-xs text-slate-400">{tour.start_date} | {tour.enrolled}人</p>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
-          {/* Event Legend */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-            <h3 className="font-semibold text-slate-800 mb-3">圖例說明</h3>
-            <div className="space-y-2">
-              {Object.entries(eventTypeConfig).map(([type, config]) => (
-                <div key={type} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded ${config.color}`}></div>
-                  <span className="text-sm text-slate-600">{config.label}</span>
-                </div>
-              ))}
+          {/* Sidebar - Upcoming Events */}
+          <div className="space-y-4">
+            {/* Today's Events */}
+            <div className="bg-card rounded-xl border border-border shadow-sm">
+              <div className="px-4 py-3 border-b border-border">
+                <h3 className="font-semibold text-morandi-primary">今日事項</h3>
+                <p className="text-xs text-morandi-secondary">2025年1月19日</p>
+              </div>
+              <div className="p-4">
+                <p className="text-sm text-morandi-secondary text-center py-4">今日無事項</p>
+              </div>
+            </div>
+
+            {/* Upcoming Departures */}
+            <div className="bg-card rounded-xl border border-border shadow-sm">
+              <div className="px-4 py-3 border-b border-border">
+                <h3 className="font-semibold text-morandi-primary">即將出團</h3>
+              </div>
+              <div className="divide-y divide-border">
+                {demoTours.filter(t => t.status === 'confirmed' || t.status === 'departed').slice(0, 4).map((tour) => (
+                  <div key={tour.id} className="px-4 py-3 hover:bg-morandi-container/30 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-morandi-primary">{tour.tour_code}</span>
+                    </div>
+                    <p className="text-xs text-morandi-primary mb-1">{tour.tour_name}</p>
+                    <p className="text-xs text-morandi-secondary">{tour.start_date} | {tour.enrolled}人</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Event Legend */}
+            <div className="bg-card rounded-xl border border-border shadow-sm p-4">
+              <h3 className="font-semibold text-morandi-primary mb-3">圖例說明</h3>
+              <div className="space-y-2">
+                {Object.entries(eventTypeConfig).map(([type, config]) => (
+                  <div key={type} className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded ${config.color}`}></div>
+                    <span className="text-sm text-morandi-secondary">{config.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

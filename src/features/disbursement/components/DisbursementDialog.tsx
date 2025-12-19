@@ -7,8 +7,11 @@
 
 import { FormDialog } from '@/components/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { FileText } from 'lucide-react'
+import { formatDateTW } from '@/lib/utils/format-date'
 import { PaymentRequest } from '../types'
 import { useMemo } from 'react'
 
@@ -48,24 +51,20 @@ export function DisbursementDialog({
       {
         key: 'select',
         label: (
-          <input
-            type="checkbox"
+          <Checkbox
             checked={
               selectedRequests.length === pendingRequests.length && pendingRequests.length > 0
             }
-            onChange={onSelectAll}
-            className="rounded border-morandi-secondary"
+            onCheckedChange={onSelectAll}
           />
         ),
         width: '50px',
         render: (_value, row) => {
           const request = row as PaymentRequest
           return (
-            <input
-              type="checkbox"
+            <Checkbox
               checked={selectedRequests.includes(request.id)}
-              onChange={() => onSelectRequest(request.id)}
-              className="rounded border-morandi-secondary"
+              onCheckedChange={() => onSelectRequest(request.id)}
             />
           )
         },
@@ -113,7 +112,7 @@ export function DisbursementDialog({
       open={open}
       onOpenChange={onOpenChange}
       title="新增出納單"
-      subtitle={`${orderNumber} • ${typeof nextThursday === 'string' ? nextThursday : nextThursday.toLocaleDateString('zh-TW')}`}
+      subtitle={`${orderNumber} • ${typeof nextThursday === 'string' ? nextThursday : formatDateTW(nextThursday)}`}
       onSubmit={onCreate}
       onCancel={onCancel}
       submitLabel={`建立出納單 (${selectedRequests.length} 筆)`}
@@ -146,12 +145,12 @@ export function DisbursementDialog({
               </div>
 
               <div className="flex items-center space-x-2">
-                <input
+                <Input
                   type="text"
                   placeholder="搜尋請款單號、團號或團名..."
                   value={searchTerm}
                   onChange={e => onSearchChange(e.target.value)}
-                  className="w-64 px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary"
+                  className="w-64"
                 />
               </div>
             </div>

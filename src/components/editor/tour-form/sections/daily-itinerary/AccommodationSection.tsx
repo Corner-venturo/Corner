@@ -3,6 +3,9 @@
 import React from 'react'
 import { Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { DailyItinerary, TourFormData } from '../../types'
 
 interface AccommodationSectionProps {
@@ -25,11 +28,9 @@ export function AccommodationSection({
       {/* 續住勾選（第二天以後才顯示） */}
       {dayIndex > 0 && (
         <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={day.isSameAccommodation || false}
-            onChange={e => {
-              const checked = e.target.checked
+            onCheckedChange={checked => {
               if (checked) {
                 // 勾選續住：複製前一天的住宿資料
                 const prevDay = data.dailyItinerary[dayIndex - 1]
@@ -42,7 +43,6 @@ export function AccommodationSection({
                 updateDailyItinerary(dayIndex, 'isSameAccommodation', false)
               }
             }}
-            className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
           />
           <span className="text-sm text-morandi-secondary">
             續住
@@ -98,43 +98,46 @@ export function AccommodationSection({
       <div className={`flex flex-wrap gap-3 ${day.isSameAccommodation ? 'opacity-50' : ''}`}>
         <div className="flex-1 min-w-[200px]">
           <label className="block text-xs font-medium text-morandi-secondary mb-1">住宿名稱</label>
-          <input
+          <Input
             id={`accommodation-input-${dayIndex}`}
             type="text"
             value={day.accommodation || ''}
             onChange={e => updateDailyItinerary(dayIndex, 'accommodation', e.target.value)}
             disabled={day.isSameAccommodation}
-            className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="h-8 text-sm"
             placeholder="飯店名稱"
           />
         </div>
         <div className="w-24">
           <label className="block text-xs font-medium text-morandi-secondary mb-1">星級</label>
-          <select
-            value={day.accommodationRating ?? 5}
-            onChange={e => {
-              const val = e.target.value
+          <Select
+            value={String(day.accommodationRating ?? 5)}
+            onValueChange={val => {
               updateDailyItinerary(dayIndex, 'accommodationRating', val === '0' ? 0 : Number(val))
             }}
             disabled={day.isSameAccommodation}
-            className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
-            <option value={5}>5星</option>
-            <option value={4}>4星</option>
-            <option value={3}>3星</option>
-            <option value={2}>2星</option>
-            <option value={1}>1星</option>
-            <option value={0}>特色旅宿</option>
-          </select>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5星</SelectItem>
+              <SelectItem value="4">4星</SelectItem>
+              <SelectItem value="3">3星</SelectItem>
+              <SelectItem value="2">2星</SelectItem>
+              <SelectItem value="1">1星</SelectItem>
+              <SelectItem value="0">特色旅宿</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex-1 min-w-[180px]">
           <label className="block text-xs font-medium text-morandi-secondary mb-1">飯店連結</label>
-          <input
+          <Input
             type="url"
             value={day.accommodationUrl || ''}
             onChange={e => updateDailyItinerary(dayIndex, 'accommodationUrl', e.target.value)}
             disabled={day.isSameAccommodation}
-            className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="h-8 text-sm"
             placeholder="https://..."
           />
         </div>

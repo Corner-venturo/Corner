@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { X, DollarSign, Calendar } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useReceiptOrderStore } from '@/stores'
 import type { CreateInput } from '@/stores/core/types'
 import type { ReceiptOrder } from '@/types'
@@ -129,20 +132,24 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
               收款方式
             </label>
-            <select
+            <Select
               value={paymentMethod}
-              onChange={e => {
-                const value = e.target.value
+              onValueChange={value => {
                 if (value === '現金' || value === '匯款' || value === '刷卡' || value === '支票') {
                   setPaymentMethod(value)
                 }
               }}
             >
-              <option value="現金">現金</option>
-              <option value="匯款">匯款</option>
-              <option value="刷卡">刷卡</option>
-              <option value="支票">支票</option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="現金">現金</SelectItem>
+                <SelectItem value="匯款">匯款</SelectItem>
+                <SelectItem value="刷卡">刷卡</SelectItem>
+                <SelectItem value="支票">支票</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 收款金額 */}
@@ -150,7 +157,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
               收款金額
             </label>
-            <input
+            <Input
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
@@ -163,7 +170,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
               備註（選填）
             </label>
-            <textarea
+            <Textarea
               value={note}
               onChange={e => setNote(e.target.value)}
               rows={3}

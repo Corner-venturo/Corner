@@ -9,6 +9,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { TourLeaderFormData } from '@/types/tour-leader.types'
 
 interface TourLeadersDialogProps {
@@ -167,14 +168,18 @@ export const TourLeadersDialog: React.FC<TourLeadersDialogProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">狀態</label>
-              <select
+              <Select
                 value={formData.status}
-                onChange={e => onFormFieldChange('status', e.target.value as 'active' | 'inactive')}
-                className="mt-1 w-full px-3 py-2 border border-morandi-gold/30 rounded-lg text-sm bg-white"
+                onValueChange={value => onFormFieldChange('status', value as 'active' | 'inactive')}
               >
-                <option value="active">合作中</option>
-                <option value="inactive">停止合作</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">合作中</SelectItem>
+                  <SelectItem value="inactive">停止合作</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

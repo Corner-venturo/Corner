@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Eye, Trash2 } from 'lucide-react'
 import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
+import { formatDateTW } from '@/lib/utils/format-date'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { CreateDisbursementDialog } from './CreateDisbursementDialog'
@@ -92,7 +93,7 @@ export function DisbursementPage() {
       sortable: true,
       render: (value) => (
         <div className="text-sm text-morandi-secondary">
-          {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
+          {value ? formatDateTW(String(value)) : '-'}
         </div>
       ),
     },
@@ -134,7 +135,7 @@ export function DisbursementPage() {
       sortable: true,
       render: (value) => (
         <div className="text-sm text-morandi-secondary">
-          {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
+          {value ? formatDateTW(String(value)) : '-'}
         </div>
       ),
     },

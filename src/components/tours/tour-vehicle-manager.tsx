@@ -7,6 +7,7 @@ import { supabase as supabaseClient } from '@/lib/supabase/client'
 const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, Trash2, Users, Bus, X, Check, Phone, User } from 'lucide-react'
@@ -434,21 +435,26 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-morandi-secondary">車型</Label>
-                  <select
+                  <Select
                     value={newVehicle.vehicle_type}
-                    onChange={e => {
-                      const type = VEHICLE_TYPES.find(t => t.value === e.target.value)
+                    onValueChange={value => {
+                      const type = VEHICLE_TYPES.find(t => t.value === value)
                       setNewVehicle({
                         ...newVehicle,
-                        vehicle_type: e.target.value,
+                        vehicle_type: value,
                         capacity: type?.capacity || 45
                       })
                     }}
                   >
-                    {VEHICLE_TYPES.map(type => (
-                      <option key={type.value} value={type.value}>{type.label}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_TYPES.map(type => (
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-morandi-secondary">座位數</Label>

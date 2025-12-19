@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DollarSign, TrendingUp, TrendingDown, CreditCard, FileText, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
@@ -491,18 +492,22 @@ export const TourPayments = React.memo(function TourPayments({
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-morandi-primary">關聯訂單 (選填)</label>
-              <select
+              <Select
                 value={selectedOrderId}
-                onChange={e => setSelectedOrderId(e.target.value)}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setSelectedOrderId(value)}
               >
-                <option value="">- 不關聯特定訂單 -</option>
-                {tourOrders.map(order => (
-                  <option key={order.id} value={order.id}>
-                    {order.order_number} - {order.contact_person}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue placeholder="- 不關聯特定訂單 -" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">- 不關聯特定訂單 -</SelectItem>
+                  {tourOrders.map(order => (
+                    <SelectItem key={order.id} value={order.id}>
+                      {order.order_number} - {order.contact_person}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -528,28 +533,36 @@ export const TourPayments = React.memo(function TourPayments({
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">付款方式</label>
-              <select
+              <Select
                 value={newPayment.method}
-                onChange={e => setNewPayment(prev => ({ ...prev, method: e.target.value }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setNewPayment(prev => ({ ...prev, method: value }))}
               >
-                <option value="bank_transfer">銀行轉帳</option>
-                <option value="credit_card">信用卡</option>
-                <option value="cash">現金</option>
-                <option value="check">支票</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bank_transfer">銀行轉帳</SelectItem>
+                  <SelectItem value="credit_card">信用卡</SelectItem>
+                  <SelectItem value="cash">現金</SelectItem>
+                  <SelectItem value="check">支票</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">確認狀態</label>
-              <select
+              <Select
                 value={newPayment.status}
-                onChange={e => setNewPayment(prev => ({ ...prev, status: e.target.value as '已確認' | '待確認' }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setNewPayment(prev => ({ ...prev, status: value as '已確認' | '待確認' }))}
               >
-                <option value="已確認">已確認</option>
-                <option value="待確認">待確認</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="已確認">已確認</SelectItem>
+                  <SelectItem value="待確認">待確認</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex justify-end space-x-2">
@@ -590,10 +603,9 @@ export const TourPayments = React.memo(function TourPayments({
               </div>
               <div>
                 <Label>關聯訂單</Label>
-                <select
+                <Select
                   value={invoiceOrderId}
-                  onChange={e => {
-                    const orderId = e.target.value
+                  onValueChange={orderId => {
                     setInvoiceOrderId(orderId)
                     if (orderId) {
                       const order = tourOrders.find(o => o.id === orderId)
@@ -606,15 +618,19 @@ export const TourPayments = React.memo(function TourPayments({
                       }
                     }
                   }}
-                  className="w-full h-10 px-3 border rounded-md bg-background text-sm"
                 >
-                  <option value="">- 不關聯訂單 -</option>
-                  {tourOrders.map(order => (
-                    <option key={order.id} value={order.id}>
-                      {order.order_number} - {order.contact_person}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="- 不關聯訂單 -" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">- 不關聯訂單 -</SelectItem>
+                    {tourOrders.map(order => (
+                      <SelectItem key={order.id} value={order.id}>
+                        {order.order_number} - {order.contact_person}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label>申報註記</Label>

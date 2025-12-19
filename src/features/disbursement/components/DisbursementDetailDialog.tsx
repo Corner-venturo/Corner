@@ -18,6 +18,7 @@ import { Check, FileText } from 'lucide-react'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -102,7 +103,7 @@ export function DisbursementDetailDialog({
             <div>
               <DialogTitle className="text-xl">出納單 {order.order_number}</DialogTitle>
               <p className="text-sm text-morandi-muted mt-1">
-                出帳日期：{order.disbursement_date ? new Date(order.disbursement_date).toLocaleDateString('zh-TW') : '-'}
+                出帳日期：{order.disbursement_date ? formatDateTW(order.disbursement_date) : '-'}
               </p>
             </div>
             <Badge className={cn('text-white', status.color)}>
@@ -117,7 +118,7 @@ export function DisbursementDetailDialog({
             <InfoItem label="出納單號" value={order.order_number || '-'} />
             <InfoItem
               label="出帳日期"
-              value={order.disbursement_date ? new Date(order.disbursement_date).toLocaleDateString('zh-TW') : '-'}
+              value={order.disbursement_date ? formatDateTW(order.disbursement_date) : '-'}
             />
             <InfoItem label="請款單數" value={`${order.payment_request_ids?.length || 0} 筆`} />
             <InfoItem

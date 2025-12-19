@@ -3,6 +3,7 @@
 import { useState, memo } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface ResponsiveHeaderProps {
   title: string
@@ -154,18 +155,22 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
         {/* 篩選功能 */}
         {props.showFilter && props.filterOptions && (
           <div className="flex items-center mr-4">
-            <select
+            <Select
               value={props.filterValue || 'all'}
-              onChange={e => props.onFilterChange?.(e.target.value)}
-              className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background text-morandi-primary"
+              onValueChange={value => props.onFilterChange?.(value)}
             >
-              <option value="all">全部{props.filterLabel || '篩選'}</option>
-              {props.filterOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="h-8 text-sm min-w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部{props.filterLabel || '篩選'}</SelectItem>
+                {props.filterOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 

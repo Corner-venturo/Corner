@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 import {
   STATUS_LABELS,
   STATUS_COLORS,
@@ -210,7 +211,7 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         sortable: true,
         render: (value: unknown) => (
           <div className="text-sm text-morandi-secondary">
-            {new Date(value as string).toLocaleDateString('zh-TW')}
+            {formatDateTW(value as string)}
           </div>
         ),
       },

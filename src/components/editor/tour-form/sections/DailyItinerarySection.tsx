@@ -357,17 +357,21 @@ export function DailyItinerarySection({
             {templatesLoading ? (
               <Loader2 size={14} className="animate-spin text-morandi-secondary" />
             ) : (
-              <select
+              <Select
                 value={data.itineraryStyle || 'original'}
-                onChange={e => updateField('itineraryStyle', e.target.value as ItineraryStyleType)}
-                className="text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer pr-6"
+                onValueChange={value => updateField('itineraryStyle', value as ItineraryStyleType)}
               >
-                {itineraryStyleOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="h-7 text-xs bg-transparent border-none focus:ring-0 text-morandi-primary cursor-pointer min-w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {itineraryStyleOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           </div>
           <button

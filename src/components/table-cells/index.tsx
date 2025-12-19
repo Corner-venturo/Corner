@@ -4,6 +4,7 @@ import React from 'react'
 import { Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { formatDateTW, formatDateTime } from '@/lib/utils/format-date'
 import {
   getStatusColor,
   getStatusLabel,
@@ -84,30 +85,22 @@ export interface BadgeCellProps {
 // ========== 輔助函數 ==========
 
 /**
- * 格式化日期
+ * 格式化日期（使用統一的格式化工具）
  */
 function formatDate(date: Date, format: 'short' | 'long' | 'time' = 'short'): string {
   if (format === 'time') {
-    return date.toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return formatDateTime(date)
   }
 
   if (format === 'long') {
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short',
-    })
+    // 長格式：2024年1月15日 (週一)
+    const weekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+    const weekday = weekdays[date.getDay()]
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${weekday})`
   }
 
-  // short format (default)
-  return date.toLocaleDateString('zh-TW')
+  // short format (default) - 使用統一的 formatDateTW
+  return formatDateTW(date)
 }
 
 /**

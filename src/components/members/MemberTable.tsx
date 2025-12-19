@@ -12,21 +12,26 @@ interface MemberTableProps {
 
 export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
   ({ data, isEditMode, handleEditModeChange }, ref) => {
+    // 根據 row.id 找到 index
+    const getIndex = (row: Member) => data.findIndex(m => m.id === row.id)
+
     const tableColumns: TableColumn<Member>[] = [
       {
         key: '#',
         label: '#',
-        render: (_, __, index) => <span className="px-2 py-1 text-muted-foreground">{index! + 1}</span>,
+        render: (_value: unknown, row: Member) => (
+          <span className="px-2 py-1 text-muted-foreground">{getIndex(row) + 1}</span>
+        ),
         width: '40px',
       },
       {
         key: 'name',
         label: '姓名',
-        render: (value, row, index) =>
+        render: (value: unknown, row: Member) =>
           isEditMode ? (
             <Input
               value={row.name || ''}
-              onChange={e => handleEditModeChange(index!, 'name', e.target.value)}
+              onChange={e => handleEditModeChange(getIndex(row), 'name', e.target.value)}
               placeholder="姓名"
               className="h-8 text-sm"
             />
@@ -37,11 +42,11 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
       {
         key: 'name_en',
         label: '英文姓名',
-        render: (value, row, index) =>
+        render: (value: unknown, row: Member) =>
           isEditMode ? (
             <Input
               value={row.name_en || ''}
-              onChange={e => handleEditModeChange(index!, 'name_en', e.target.value)}
+              onChange={e => handleEditModeChange(getIndex(row), 'name_en', e.target.value)}
               placeholder="英文姓名"
               className="h-8 text-sm"
             />
@@ -52,11 +57,11 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
       {
         key: 'birthday',
         label: '生日',
-        render: (value, row, index) =>
+        render: (_value: unknown, row: Member) =>
           isEditMode ? (
             <DatePicker
               value={row.birthday || ''}
-              onChange={date => handleEditModeChange(index!, 'birthday', date)}
+              onChange={date => handleEditModeChange(getIndex(row), 'birthday', date)}
               placeholder="選擇日期"
               className="h-8 text-sm"
             />
@@ -69,16 +74,18 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
         label: '性別',
         width: '50px',
         align: 'center',
-        render: value => <span>{value === 'M' ? '男' : value === 'F' ? '女' : '-'}</span>,
+        render: (value: unknown) => (
+          <span>{value === 'M' ? '男' : value === 'F' ? '女' : '-'}</span>
+        ),
       },
       {
         key: 'id_number',
         label: '身分證字號',
-        render: (value, row, index) =>
+        render: (value: unknown, row: Member) =>
           isEditMode ? (
             <Input
               value={row.id_number || ''}
-              onChange={e => handleEditModeChange(index!, 'id_number', e.target.value)}
+              onChange={e => handleEditModeChange(getIndex(row), 'id_number', e.target.value)}
               placeholder="身分證字號"
               className="h-8 text-sm font-mono"
             />
@@ -89,11 +96,11 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
       {
         key: 'passport_number',
         label: '護照號碼',
-        render: (value, row, index) =>
+        render: (value: unknown, row: Member) =>
           isEditMode ? (
             <Input
               value={row.passport_number || ''}
-              onChange={e => handleEditModeChange(index!, 'passport_number', e.target.value)}
+              onChange={e => handleEditModeChange(getIndex(row), 'passport_number', e.target.value)}
               placeholder="護照號碼"
               className="h-8 text-sm font-mono"
             />
@@ -104,11 +111,11 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
       {
         key: 'passport_expiry',
         label: '護照效期',
-        render: (value, row, index) =>
+        render: (_value: unknown, row: Member) =>
           isEditMode ? (
             <DatePicker
               value={row.passport_expiry || ''}
-              onChange={date => handleEditModeChange(index!, 'passport_expiry', date)}
+              onChange={date => handleEditModeChange(getIndex(row), 'passport_expiry', date)}
               placeholder="選擇日期"
               className="h-8 text-sm"
             />

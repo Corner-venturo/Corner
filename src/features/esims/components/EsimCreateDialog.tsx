@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useEsimStore } from '@/stores/esim-store'
 import { useOrderStore, useTourStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
@@ -456,26 +457,29 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
             key={item.id}
             className="grid grid-cols-[140px_180px_70px_1fr_120px_40px] gap-2 items-center"
           >
-            <div className="relative">
-              <select
+            <div className="flex items-center gap-1">
+              <Select
                 value={item.product_region}
-                onChange={e => updateEsimItem(item.id, 'product_region', e.target.value)}
-                className="w-full p-2 pr-9 border border-border rounded-md bg-background h-10 appearance-none"
+                onValueChange={value => updateEsimItem(item.id, 'product_region', value)}
               >
-                <option value="">產品地區</option>
-                {PRODUCT_REGIONS.map(region => (
-                  <option key={region.value} value={region.value}>
-                    {region.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full h-10">
+                  <SelectValue placeholder="產品地區" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCT_REGIONS.map(region => (
+                    <SelectItem key={region.value} value={region.value}>
+                      {region.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={fetchProducts}
                 disabled={isLoadingProducts}
-                className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-morandi-gray/10"
+                className="h-8 w-8 p-0 hover:bg-morandi-gray/10 flex-shrink-0"
               >
                 <RefreshCw className={`h-4 w-4 ${isLoadingProducts ? 'animate-spin' : ''}`} />
               </Button>
@@ -493,17 +497,21 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
               showSearchIcon
             />
 
-            <select
-              value={item.quantity}
-              onChange={e => updateEsimItem(item.id, 'quantity', Number(e.target.value))}
-              className="w-full p-2 border border-border rounded-md bg-background h-10"
+            <Select
+              value={String(item.quantity)}
+              onValueChange={value => updateEsimItem(item.id, 'quantity', Number(value))}
             >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full h-10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                  <SelectItem key={num} value={String(num)}>
+                    {num}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Input
               type="email"

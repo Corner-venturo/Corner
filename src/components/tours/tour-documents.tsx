@@ -5,6 +5,7 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tour } from '@/stores/types'
 import {
   FileText,
@@ -249,18 +250,22 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
 
             <div>
               <label className="text-sm font-medium text-morandi-primary">文件類型</label>
-              <select
+              <Select
                 value={newDocument.type}
-                onChange={e => setNewDocument(prev => ({ ...prev, type: e.target.value }))}
-                className="mt-1 w-full p-2 border border-border rounded-md bg-background"
+                onValueChange={value => setNewDocument(prev => ({ ...prev, type: value }))}
               >
-                <option value="contract">合約</option>
-                <option value="itinerary">行程</option>
-                <option value="insurance">保險</option>
-                <option value="ticket">票務</option>
-                <option value="accommodation">住宿</option>
-                <option value="other">其他</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contract">合約</SelectItem>
+                  <SelectItem value="itinerary">行程</SelectItem>
+                  <SelectItem value="insurance">保險</SelectItem>
+                  <SelectItem value="ticket">票務</SelectItem>
+                  <SelectItem value="accommodation">住宿</SelectItem>
+                  <SelectItem value="other">其他</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
