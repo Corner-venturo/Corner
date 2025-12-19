@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
-import { Plus, FileText } from 'lucide-react'
+import { Plus, FileText, Split } from 'lucide-react'
 import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
 import { BatchRequestDialog } from '@/features/finance/requests/components/BatchRequestDialog'
+import { BatchAllocateRequestDialog } from '@/features/finance/requests/components/BatchAllocateRequestDialog'
 import { RequestDetailDialog } from '@/features/finance/requests/components/RequestDetailDialog'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
@@ -15,6 +16,7 @@ export default function RequestsPage() {
   const { payment_requests, loadPaymentRequests } = usePayments()
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
+  const [isAllocateDialogOpen, setIsAllocateDialogOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null)
 
   // 載入資料（只執行一次）
@@ -51,6 +53,13 @@ export default function RequestsPage() {
               <FileText size={16} className="mr-2" />
               批次請款
             </button>
+            <button
+              onClick={() => setIsAllocateDialogOpen(true)}
+              className="bg-morandi-accent hover:bg-morandi-accent/90 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
+            >
+              <Split size={16} className="mr-2" />
+              分配請款
+            </button>
           </>
         }
       />
@@ -69,6 +78,8 @@ export default function RequestsPage() {
       <AddRequestDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
       <BatchRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
+
+      <BatchAllocateRequestDialog open={isAllocateDialogOpen} onOpenChange={setIsAllocateDialogOpen} />
 
       <RequestDetailDialog
         request={selectedRequest}
