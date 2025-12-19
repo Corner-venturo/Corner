@@ -69,6 +69,15 @@ export default function OrdersPage() {
     return matchesFilter && matchesTour && matchesSearch
   })
 
+  // 按出發日期排序（近的在前）
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    const tourA = tours.find(t => t.id === a.tour_id)
+    const tourB = tours.find(t => t.id === b.tour_id)
+    const dateA = tourA?.departure_date ? new Date(tourA.departure_date).getTime() : 0
+    const dateB = tourB?.departure_date ? new Date(tourB.departure_date).getTime() : 0
+    return dateA - dateB
+  })
+
   // 計算待辦事項 (用戶要求移除)
   const todos: TodoItem[] = React.useMemo(() => {
     return [];
@@ -252,7 +261,7 @@ export default function OrdersPage() {
         */}
 
         {/* 訂單列表 */}
-        <SimpleOrderTable className="flex-1" orders={filteredOrders as Order[]} tours={tours} showTourInfo={true} />
+        <SimpleOrderTable className="flex-1" orders={sortedOrders as Order[]} tours={tours} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}
