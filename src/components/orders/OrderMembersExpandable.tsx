@@ -1767,8 +1767,7 @@ export function OrderMembersExpandable({
                           onKeyDown={e => handleKeyDown(e, memberIndex, 'identity')}
                           data-member={member.id}
                           data-field="identity"
-                          className="w-full bg-transparent text-xs"
-                          style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         />
                       ) : (
                         <span className="text-xs text-morandi-primary">{member.identity || '-'}</span>
@@ -1798,8 +1797,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'chinese_name')}
                         data-member={member.id}
                         data-field="chinese_name"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="輸入姓名，按 Enter 搜尋"
                       />
                     ) : (
@@ -1848,8 +1846,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_name')}
                         data-member={member.id}
                         data-field="passport_name"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                       />
                     ) : (
                       <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
@@ -1866,8 +1863,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'birth_date')}
                         data-member={member.id}
                         data-field="birth_date"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="YYYYMMDD"
                       />
                     ) : (
@@ -1883,8 +1879,7 @@ export function OrderMembersExpandable({
                         onChange={e => updateField(member.id, 'gender', e.target.value)}
                         data-member={member.id}
                         data-field="gender"
-                        className="w-full bg-transparent text-xs text-center"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs text-center border-none outline-none shadow-none"
                       >
                         <option value="">-</option>
                         <option value="M">男</option>
@@ -1908,8 +1903,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'id_number')}
                         data-member={member.id}
                         data-field="id_number"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="輸入身分證搜尋..."
                       />
                     ) : (
@@ -1927,8 +1921,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_number')}
                         data-member={member.id}
                         data-field="passport_number"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                       />
                     ) : (
                       <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
@@ -1945,8 +1938,7 @@ export function OrderMembersExpandable({
                         onKeyDown={e => handleKeyDown(e, memberIndex, 'passport_expiry')}
                         data-member={member.id}
                         data-field="passport_expiry"
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="YYYYMMDD"
                       />
                     ) : (
@@ -1983,8 +1975,7 @@ export function OrderMembersExpandable({
                       onKeyDown={e => handleKeyDown(e, memberIndex, 'special_meal')}
                       data-member={member.id}
                       data-field="special_meal"
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                     />
                   </td>
 
@@ -2004,8 +1995,7 @@ export function OrderMembersExpandable({
                       }}
                       data-member={member.id}
                       data-field="hotel_confirmation"
-                      className="w-full bg-transparent text-xs font-mono"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      className="w-full bg-transparent text-xs font-mono border-none outline-none shadow-none"
                       placeholder="輸入訂房代號"
                     />
                   </td>
@@ -2017,8 +2007,7 @@ export function OrderMembersExpandable({
                       inputMode="numeric"
                       value={member.total_payable || ''}
                       onChange={e => handleNumberInput(member.id, 'total_payable', e.target.value)}
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                     />
                   </td>
 
@@ -2029,8 +2018,7 @@ export function OrderMembersExpandable({
                       inputMode="numeric"
                       value={member.deposit_amount || ''}
                       onChange={e => handleNumberInput(member.id, 'deposit_amount', e.target.value)}
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                     />
                   </td>
 
@@ -2053,8 +2041,7 @@ export function OrderMembersExpandable({
                           updateField(member.id, 'remarks', value)
                         }, 0)
                       }}
-                      className="w-full bg-transparent text-xs"
-                      style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                      className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                     />
                   </td>
 
@@ -2065,8 +2052,7 @@ export function OrderMembersExpandable({
                         type="text"
                         value={pnrValues[member.id] || ''}
                         onChange={e => setPnrValues(prev => ({ ...prev, [member.id]: e.target.value }))}
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="輸入 PNR"
                       />
                     </td>
@@ -2089,8 +2075,7 @@ export function OrderMembersExpandable({
                               : f
                           ))
                         }}
-                        className="w-full bg-transparent text-xs"
-                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="輸入金額"
                       />
                     </td>
