@@ -1748,29 +1748,21 @@ export function OrderMembersExpandable({
                       <span className="text-xs text-blue-600 font-medium">{member.order_code || '-'}</span>
                     </td>
                   )}
-                  {/* 身份 */}
+                  {/* 身份（領隊勾選） */}
                   {showIdentityColumn && (
-                    <td className={cn("border border-morandi-gold/20 px-2 py-1", isAllEditMode ? "bg-white" : "bg-gray-50")}>
+                    <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isAllEditMode ? "bg-white" : "bg-gray-50")}>
                       {isAllEditMode ? (
                         <input
-                          type="text"
-                          value={member.identity || ''}
-                          onChange={e => updateField(member.id, 'identity', e.target.value)}
-                          onCompositionStart={() => setIsComposing(true)}
-                          onCompositionEnd={(e) => {
-                            const value = e.currentTarget.value
-                            setIsComposing(false)
-                            setTimeout(() => {
-                              updateField(member.id, 'identity', value)
-                            }, 0)
-                          }}
-                          onKeyDown={e => handleKeyDown(e, memberIndex, 'identity')}
+                          type="checkbox"
+                          checked={member.identity === '領隊'}
+                          onChange={e => updateField(member.id, 'identity', e.target.checked ? '領隊' : '大人')}
                           data-member={member.id}
                           data-field="identity"
-                          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+                          className="w-4 h-4 cursor-pointer accent-morandi-primary"
+                          title="勾選設為領隊"
                         />
                       ) : (
-                        <span className="text-xs text-morandi-primary">{member.identity || '-'}</span>
+                        <span className="text-xs text-morandi-primary">{member.identity === '領隊' ? '✓ 領隊' : '-'}</span>
                       )}
                     </td>
                   )}
