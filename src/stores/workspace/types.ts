@@ -43,6 +43,7 @@ export interface Channel {
   is_archived?: boolean | null
   archived_at?: string | null
   is_pinned?: boolean | null
+  is_announcement?: boolean | null
   group_id?: string | null
   tour_id?: string | null
   order?: number | null

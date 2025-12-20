@@ -27,7 +27,7 @@ interface CityOption {
 interface UseTourOperationsParams {
   actions: TourActions
   addOrder: (data: CreateInput<Order>) => Promise<Order>
-  updateQuote: (id: string, data: UpdateInput<Quote>) => Promise<Quote>
+  updateQuote: (id: string, data: Partial<Quote>) => Promise<void>
   updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined }) => Promise<unknown>
   quotes: Quote[]
   itineraries: { id: string; tour_id?: string | null }[]

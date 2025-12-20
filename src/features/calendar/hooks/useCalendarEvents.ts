@@ -138,9 +138,9 @@ export function useCalendarEvents() {
   // 轉換旅遊團為日曆事件（過濾掉特殊團）
   const tourEvents: FullCalendarEvent[] = useMemo(() => {
     return (tours || [])
-      .filter(tour => tour.status !== 'special') // 過濾掉簽證專用團等特殊團
+      .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
       .map(tour => {
-        const color = getEventColor('tour', tour.status || 'draft')
+        const color = getEventColor('tour', tour.status || '提案')
         const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
         const actualMembers = (members || []).filter(member =>
           tourOrders.some(order => order.id === member.order_id)

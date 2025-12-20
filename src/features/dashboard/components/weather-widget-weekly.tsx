@@ -288,8 +288,8 @@ export function WeatherWidgetWeekly() {
                 <DatePicker
                   value={startDate}
                   onChange={(date) => handleDateChange(date)}
-                  minDate={new Date().toISOString().split('T')[0]}
-                  maxDate={maxDate.toISOString().split('T')[0]}
+                  minDate={new Date()}
+                  maxDate={maxDate}
                   placeholder="選擇日期"
                   className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
                 />

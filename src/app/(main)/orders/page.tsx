@@ -79,7 +79,7 @@ export default function OrdersPage() {
   })
 
   // 計算待辦事項 (用戶要求移除)
-  const todos: TodoItem[] = React.useMemo(() => {
+  const todos: never[] = React.useMemo(() => {
     return [];
     /*
     const result: TodoItem[] = []

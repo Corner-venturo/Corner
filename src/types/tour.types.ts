@@ -58,6 +58,19 @@ export interface Tour extends BaseEntity {
   outbound_flight?: FlightInfo | null // 去程航班
   return_flight?: FlightInfo | null // 回程航班
 
+  // 版本鎖定欄位 (V2.0)
+  locked_quote_id?: string | null // 鎖定的報價單 ID
+  locked_quote_version?: number | null // 鎖定的報價單版本號
+  locked_itinerary_id?: string | null // 鎖定的行程 ID
+  locked_itinerary_version?: number | null // 鎖定的行程版本號
+  locked_at?: string | null // 版本鎖定時間
+  locked_by?: string | null // 執行鎖定的用戶 ID
+
+  // 解鎖記錄欄位 (V2.0)
+  last_unlocked_at?: string | null // 上次解鎖時間
+  last_unlocked_by?: string | null // 上次解鎖的用戶 ID
+  modification_reason?: string | null // 解鎖修改原因
+
   // 同步欄位
   _deleted?: boolean | null // 軟刪除標記
   _needs_sync?: boolean | null // 需要同步
@@ -69,15 +82,21 @@ export interface Tour extends BaseEntity {
 // ============================================
 
 /**
- * TourStatus - 旅遊團狀態（英文）
+ * TourStatus - 旅遊團狀態（中文）
+ *
+ * 生命週期流程:
+ * 提案 → 確認中 → 已確認 → 修改中 → (重新確認) → 待結案 → 結案
  */
 export type TourStatus =
-  | 'draft' // 提案階段
-  | 'active' // 進行中
-  | 'pending_close' // 待結案
-  | 'closed' // 已結案
-  | 'cancelled' // 已取消
-  | 'special' // 特殊團
+  | '提案'      // 草稿階段，可自由編輯
+  | '確認中'    // 確認精靈進行中
+  | '已確認'    // 版本已鎖定，準備出發
+  | '修改中'    // 解鎖後修改中
+  | '進行中'    // 舊狀態，保留相容
+  | '待結案'    // 出團結束，待結案
+  | '結案'      // 已完成結案
+  | '已取消'    // 已取消
+  | '特殊團'    // 特殊用途團（簽證、網卡等）
 
 /**
  * ContractStatus - 合約狀態（英文）

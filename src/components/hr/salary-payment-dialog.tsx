@@ -140,7 +140,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       id="isSpecialBilling"
                       checked={isSpecialBilling}
                       onCheckedChange={checked => {
-                        setIsSpecialBilling(checked)
+                        setIsSpecialBilling(checked === true)
                         setRequestDate('')
                       }}
                       className="rounded border-border"

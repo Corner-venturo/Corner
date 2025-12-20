@@ -86,7 +86,8 @@ export function useMemberActions(): MemberActionsReturn {
       ...(workspace_id ? { workspace_id } : {}),
     } as Member
 
-    const { error } = await supabase.from('members').insert(newMember)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await supabase.from('members').insert(newMember as any)
     if (error) throw error
 
     // 觸發 SWR revalidate，讓其他頁面的 useMembers() 同步
@@ -124,7 +125,7 @@ export function useMemberActions(): MemberActionsReturn {
         .select('order_id')
         .eq('id', id)
         .single()
-      memberOrderId = member?.order_id
+      memberOrderId = member?.order_id ?? undefined
     }
 
     const { error } = await supabase.from('members').delete().eq('id', id)

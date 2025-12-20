@@ -252,7 +252,7 @@ export function DateInput({
           <Calendar
             mode="single"
             selected={dateValue && isValid(dateValue) ? dateValue : undefined}
-            onSelect={handleCalendarSelect}
+            onSelect={handleCalendarSelect as (date: Date | { from: Date; to?: Date } | undefined) => void}
             disabled={
               minDate || maxDate
                 ? { before: minDate, after: maxDate }

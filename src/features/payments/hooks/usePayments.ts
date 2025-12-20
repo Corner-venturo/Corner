@@ -20,7 +20,7 @@ export const usePayments = () => {
 
     // ========== PaymentRequest CRUD 操作 ==========
     createPaymentRequest: async (
-      data: Omit<PaymentRequest, keyof BaseEntity | 'request_number'>
+      data: Omit<PaymentRequest, 'id' | 'created_at' | 'updated_at' | 'request_number'>
     ) => {
       return await paymentRequestService.create(data as Parameters<typeof paymentRequestService.create>[0])
     },

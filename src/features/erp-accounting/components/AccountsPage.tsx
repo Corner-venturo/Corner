@@ -56,12 +56,14 @@ export function AccountsPage() {
       return
     }
 
-    const confirmed = await confirm({
-      title: '刪除科目',
-      description: `確定要刪除科目「${account.code} ${account.name}」嗎？`,
-      confirmText: '刪除',
-      cancelText: '取消',
-    })
+    const confirmed = await confirm(
+      `確定要刪除科目「${account.code} ${account.name}」嗎？`,
+      {
+        title: '刪除科目',
+        confirmText: '刪除',
+        cancelText: '取消',
+      }
+    )
 
     if (confirmed) {
       try {
@@ -91,22 +93,22 @@ export function AccountsPage() {
   const columns: Column<Account>[] = [
     {
       key: 'code',
-      title: '科目代碼',
-      width: 120,
-      render: (value) => (
-        <span className="font-mono">{value}</span>
+      label: '科目代碼',
+      width: '120px',
+      render: (value: unknown) => (
+        <span className="font-mono">{String(value)}</span>
       ),
     },
     {
       key: 'name',
-      title: '科目名稱',
+      label: '科目名稱',
     },
     {
       key: 'account_type',
-      title: '類型',
-      width: 100,
-      render: (value: AccountType) => {
-        const config = typeConfig[value]
+      label: '類型',
+      width: '100px',
+      render: (value: unknown) => {
+        const config = typeConfig[value as AccountType]
         return (
           <span className={`px-2 py-1 rounded text-xs ${config.color}`}>
             {config.label}
@@ -116,15 +118,15 @@ export function AccountsPage() {
     },
     {
       key: 'is_system_locked',
-      title: '系統科目',
-      width: 100,
-      render: (value) => value ? <Badge variant="secondary">系統</Badge> : null,
+      label: '系統科目',
+      width: '100px',
+      render: (value: unknown) => value ? <Badge variant="secondary">系統</Badge> : null,
     },
     {
       key: 'is_active',
-      title: '狀態',
-      width: 80,
-      render: (value) => (
+      label: '狀態',
+      width: '80px',
+      render: (value: unknown) => (
         <Badge variant={value ? 'default' : 'outline'}>
           {value ? '啟用' : '停用'}
         </Badge>
@@ -132,9 +134,9 @@ export function AccountsPage() {
     },
     {
       key: 'actions',
-      title: '操作',
-      width: 100,
-      render: (_, row) => (
+      label: '操作',
+      width: '100px',
+      render: (_: unknown, row: Account) => (
         <div className="flex gap-1">
           <Button
             size="sm"

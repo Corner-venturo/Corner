@@ -17,6 +17,8 @@ export interface OrderFormData {
   contact_person: string
   sales_person: string
   assistant: string
+  member_count?: number
+  total_amount?: number
 }
 
 interface AddOrderFormProps {

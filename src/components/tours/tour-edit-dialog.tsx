@@ -108,7 +108,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
         description: tour.description || '',
         outboundFlight: tourOutbound || { ...emptyFlightInfo },
         returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
-        isSpecial: tour.status === 'special',
+        isSpecial: tour.status === '特殊團',
         enable_checkin: tour.enable_checkin || false,
       })
       return
@@ -179,7 +179,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
       description: tour.description || '',
       outboundFlight: tourOutbound || { ...emptyFlightInfo },
       returnFlight: tourReturn || { ...emptyFlightInfo, departureAirport: '', arrivalAirport: 'TPE' },
-      isSpecial: tour.status === 'special',
+      isSpecial: tour.status === '特殊團',
       enable_checkin: tour.enable_checkin || false,
     })
   }, [isOpen, tour, activeCountries, getCitiesByCountry])
@@ -348,7 +348,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
         description: formData.description.trim(),
         outbound_flight: cleanFlightInfo(formData.outboundFlight),
         return_flight: cleanFlightInfo(formData.returnFlight),
-        status: formData.isSpecial ? 'special' : tour.status,
+        status: formData.isSpecial ? '特殊團' : tour.status,
         enable_checkin: formData.enable_checkin,
         updated_at: new Date().toISOString(),
       }

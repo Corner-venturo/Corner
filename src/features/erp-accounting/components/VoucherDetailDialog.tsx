@@ -24,7 +24,7 @@ const statusConfig: Record<VoucherStatus, { label: string; variant: 'default' | 
   locked: { label: '已鎖定', variant: 'outline' },
 }
 
-interface LineWithAccount extends JournalLine {
+interface LineWithAccount extends Omit<JournalLine, 'account'> {
   account?: { code: string; name: string }
 }
 
@@ -51,7 +51,7 @@ export function VoucherDetailDialog({
         .eq('voucher_id', voucher.id)
         .order('line_no', { ascending: true })
 
-      setLines((data || []) as LineWithAccount[])
+      setLines((data || []) as unknown as LineWithAccount[])
     } catch (error) {
       console.error('載入分錄失敗:', error)
     } finally {

@@ -126,7 +126,7 @@ export function DatePicker({
         <Calendar
           mode="single"
           selected={selectedDate}
-          onSelect={handleSelect}
+          onSelect={handleSelect as (date: Date | { from: Date; to?: Date } | undefined) => void}
           defaultMonth={selectedDate || new Date()}
           disabled={disabledConfig}
         />

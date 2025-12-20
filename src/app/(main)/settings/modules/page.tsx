@@ -367,7 +367,7 @@ export default function ModulesManagementPage() {
                 value={expiresDate}
                 onChange={date => setExpiresDate(date)}
                 placeholder="選擇日期"
-                minDate={new Date().toISOString().split('T')[0]}
+                minDate={new Date()}
               />
               <p className="text-sm text-[#8C8C8C]">留空表示永久授權</p>
             </div>

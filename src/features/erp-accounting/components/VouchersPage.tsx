@@ -48,32 +48,32 @@ export function VouchersPage() {
   const columns: Column<JournalVoucher>[] = [
     {
       key: 'voucher_no',
-      title: '傳票編號',
-      width: 140,
-      render: (value) => (
-        <span className="font-mono text-sm">{value}</span>
+      label: '傳票編號',
+      width: '140px',
+      render: (value: unknown) => (
+        <span className="font-mono text-sm">{String(value)}</span>
       ),
     },
     {
       key: 'voucher_date',
-      title: '日期',
-      width: 100,
+      label: '日期',
+      width: '100px',
     },
     {
       key: 'memo',
-      title: '摘要',
-      render: (value) => (
+      label: '摘要',
+      render: (value: unknown) => (
         <span className="text-sm text-muted-foreground line-clamp-1">
-          {value || '-'}
+          {String(value) || '-'}
         </span>
       ),
     },
     {
       key: 'total_debit',
-      title: '借方',
-      width: 120,
+      label: '借方',
+      width: '120px',
       align: 'right',
-      render: (value) => (
+      render: (value: unknown) => (
         <span className="font-mono">
           {Number(value).toLocaleString()}
         </span>
@@ -81,10 +81,10 @@ export function VouchersPage() {
     },
     {
       key: 'total_credit',
-      title: '貸方',
-      width: 120,
+      label: '貸方',
+      width: '120px',
       align: 'right',
-      render: (value) => (
+      render: (value: unknown) => (
         <span className="font-mono">
           {Number(value).toLocaleString()}
         </span>
@@ -92,18 +92,18 @@ export function VouchersPage() {
     },
     {
       key: 'status',
-      title: '狀態',
-      width: 100,
-      render: (value: VoucherStatus) => {
-        const config = statusConfig[value]
+      label: '狀態',
+      width: '100px',
+      render: (value: unknown) => {
+        const config = statusConfig[value as VoucherStatus]
         return <Badge variant={config.variant}>{config.label}</Badge>
       },
     },
     {
       key: 'actions',
-      title: '操作',
-      width: 120,
-      render: (_, row) => (
+      label: '操作',
+      width: '120px',
+      render: (_: unknown, row: JournalVoucher) => (
         <div className="flex gap-1">
           <Button
             size="sm"

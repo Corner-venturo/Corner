@@ -152,7 +152,8 @@ export interface JournalLine {
   description: string | null
   debit_amount: number
   credit_amount: number
-  created_at: string
+  created_at: string | null
+  updated_at: string | null
   // 關聯
   account?: Account
 }
@@ -195,7 +196,8 @@ export interface AccountingPeriod {
   is_closed: boolean
   closed_at: string | null
   closed_by: string | null
-  created_at: string
+  created_at: string | null
+  updated_at: string | null
 }
 
 // ============================================
@@ -289,26 +291,26 @@ export interface TrialBalance {
 
 export const DEFAULT_ACCOUNTS: Omit<Account, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>[] = [
   // 資產
-  { code: '1100', name: '銀行存款', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '1110', name: '現金', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '1200', name: '預付團務成本', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預付成本' },
+  { code: '1100', name: '銀行存款', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '1110', name: '現金', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '1200', name: '預付團務成本', account_type: 'asset', type: 'asset', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預付成本' },
   // 負債
-  { code: '2100', name: '預收團款', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預收款項' },
-  { code: '2200', name: '代收稅金（應付）', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '12% 代收稅金' },
-  { code: '2300', name: '獎金應付帳款', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '2400', name: '代收款－員工自付', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '勞健保等' },
+  { code: '2100', name: '預收團款', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '未結團的預收款項' },
+  { code: '2200', name: '代收稅金（應付）', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '12% 代收稅金' },
+  { code: '2300', name: '獎金應付帳款', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '2400', name: '代收款－員工自付', account_type: 'liability', type: 'liability', parent_id: null, is_system_locked: true, is_active: true, description: '勞健保等' },
   // 收入
-  { code: '4100', name: '團費收入', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: '結團才認列' },
-  { code: '4200', name: '其他收入－行政費收入', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '4100', name: '團費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: '結團才認列' },
+  { code: '4200', name: '其他收入－行政費收入', account_type: 'revenue', type: 'revenue', parent_id: null, is_system_locked: true, is_active: true, description: null },
   // 成本
-  { code: '5100', name: '團務成本', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '結團才成立' },
-  { code: '5110', name: '團務成本－行政費', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5120', name: '團務成本－代收稅金', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '12%' },
-  { code: '5130', name: '團務成本－業務獎金', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5140', name: '團務成本－OP獎金', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
-  { code: '5150', name: '團務成本－團績獎金', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '5100', name: '團務成本', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '結團才成立' },
+  { code: '5110', name: '團務成本－行政費', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '5120', name: '團務成本－代收稅金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: '12%' },
+  { code: '5130', name: '團務成本－業務獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '5140', name: '團務成本－OP獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '5150', name: '團務成本－團績獎金', account_type: 'cost', type: 'cost', parent_id: null, is_system_locked: true, is_active: true, description: null },
   // 費用
-  { code: '6100', name: '刷卡手續費費用', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '實扣 1.68%' },
-  { code: '6200', name: '勞健保費用', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '公司負擔' },
-  { code: '6300', name: '利息費用', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: null },
+  { code: '6100', name: '刷卡手續費費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '實扣 1.68%' },
+  { code: '6200', name: '勞健保費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: '公司負擔' },
+  { code: '6300', name: '利息費用', account_type: 'expense', type: 'expense', parent_id: null, is_system_locked: true, is_active: true, description: null },
 ]

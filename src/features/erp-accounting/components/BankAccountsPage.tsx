@@ -40,12 +40,14 @@ export function BankAccountsPage() {
   }
 
   const handleDelete = async (account: BankAccount) => {
-    const confirmed = await confirm({
-      title: '刪除銀行帳戶',
-      description: `確定要刪除「${account.name}」嗎？`,
-      confirmText: '刪除',
-      cancelText: '取消',
-    })
+    const confirmed = await confirm(
+      `確定要刪除「${account.name}」嗎？`,
+      {
+        title: '刪除銀行帳戶',
+        confirmText: '刪除',
+        cancelText: '取消',
+      }
+    )
 
     if (confirmed) {
       try {
@@ -75,25 +77,25 @@ export function BankAccountsPage() {
   const columns: Column<BankAccount>[] = [
     {
       key: 'name',
-      title: '帳戶名稱',
+      label: '帳戶名稱',
     },
     {
       key: 'bank_name',
-      title: '銀行名稱',
-      render: (value) => value || '-',
+      label: '銀行名稱',
+      render: (value: unknown) => String(value) || '-',
     },
     {
       key: 'account_number',
-      title: '帳號',
-      render: (value) => (
-        <span className="font-mono text-sm">{value || '-'}</span>
+      label: '帳號',
+      render: (value: unknown) => (
+        <span className="font-mono text-sm">{String(value) || '-'}</span>
       ),
     },
     {
       key: 'is_active',
-      title: '狀態',
-      width: 80,
-      render: (value) => (
+      label: '狀態',
+      width: '80px',
+      render: (value: unknown) => (
         <Badge variant={value ? 'default' : 'outline'}>
           {value ? '啟用' : '停用'}
         </Badge>
@@ -101,9 +103,9 @@ export function BankAccountsPage() {
     },
     {
       key: 'actions',
-      title: '操作',
-      width: 100,
-      render: (_, row) => (
+      label: '操作',
+      width: '100px',
+      render: (_: unknown, row: BankAccount) => (
         <div className="flex gap-1">
           <Button
             size="sm"

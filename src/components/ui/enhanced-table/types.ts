@@ -16,6 +16,9 @@ export interface TableColumn<T extends RowData = RowData> {
   className?: string
 }
 
+// 向下相容別名
+export type Column<T extends RowData = RowData> = TableColumn<T>
+
 export interface SelectionConfig<T extends RowData = RowData> {
   selected: string[]
   onChange: (selected: string[]) => void

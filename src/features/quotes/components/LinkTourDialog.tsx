@@ -151,7 +151,7 @@ export function LinkTourDialog({
                   {availableTours.map(tour => (
                     <button
                       key={tour.id}
-                      onClick={() => handleLinkExisting(tour)}
+                      onClick={() => handleLinkExisting(tour as Tour)}
                       className="w-full flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded bg-[var(--morandi-gold)]/20 flex items-center justify-center shrink-0">
@@ -179,9 +179,7 @@ export function LinkTourDialog({
                           )}
                           {tour.status && (
                             <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
-                              {tour.status === 'draft' ? '草稿' :
-                               tour.status === 'confirmed' ? '已確認' :
-                               tour.status === 'completed' ? '已完成' : tour.status}
+                              {tour.status}
                             </span>
                           )}
                         </div>

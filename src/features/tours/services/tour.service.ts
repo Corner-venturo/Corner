@@ -153,7 +153,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       }
 
       // Tour 狀態檢查
-      if (tour.status === 'closed') {
+      if (tour.status === '結案') {
         return { canCancel: false, reason: '該旅遊團已經結案，無法取消' }
       }
 
@@ -260,7 +260,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       name: `${targetYear}年度簽證專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special',
+      status: '特殊團',
       location: '簽證專用',
       price: 0,
       max_participants: 9999,
@@ -335,7 +335,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       name: `${targetYear}年度網卡專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
       return_date: `${targetYear}-12-31`,
-      status: 'special',
+      status: '特殊團',
       location: '網卡專用',
       price: 0,
       max_participants: 9999,
@@ -358,8 +358,111 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const allTours = await this.list()
     return {
       ...allTours,
-      data: allTours.data.filter(tour => tour.status !== 'special'),
+      data: allTours.data.filter(tour => tour.status !== '特殊團'),
     }
+  }
+
+  // ============================================
+  // Tour Lifecycle V2.0 - 版本鎖定/解鎖
+  // ============================================
+
+  /**
+   * 鎖定團的報價單和行程版本
+   */
+  async lockTour(
+    tourId: string,
+    options: {
+      quoteId?: string | null
+      quoteVersion?: number | null
+      itineraryId?: string | null
+      itineraryVersion?: number | null
+      lockedBy?: string
+    }
+  ) {
+    const updates = {
+      status: '已確認',
+      locked_quote_id: options.quoteId || null,
+      locked_quote_version: options.quoteVersion || null,
+      locked_itinerary_id: options.itineraryId || null,
+      locked_itinerary_version: options.itineraryVersion || null,
+      locked_at: this.now(),
+      locked_by: options.lockedBy || null,
+      updated_at: this.now(),
+    }
+
+    await this.update(tourId, updates as unknown as Partial<Tour & BaseEntity>)
+    return { success: true }
+  }
+
+  /**
+   * 解鎖團（需先驗證密碼）
+   * 注意：密碼驗證應在 API 層進行，這裡只處理狀態更新
+   */
+  async unlockTour(
+    tourId: string,
+    options: {
+      unlockedBy: string
+      reason?: string
+    }
+  ) {
+    const tour = await this.getById(tourId)
+    if (!tour) {
+      return { success: false, error: '找不到此團' }
+    }
+
+    if (tour.status !== '已確認') {
+      return { success: false, error: '此團未處於鎖定狀態' }
+    }
+
+    const updates = {
+      status: '修改中',
+      last_unlocked_at: this.now(),
+      last_unlocked_by: options.unlockedBy,
+      modification_reason: options.reason || null,
+      updated_at: this.now(),
+    }
+
+    await this.update(tourId, updates as unknown as Partial<Tour & BaseEntity>)
+    return { success: true }
+  }
+
+  /**
+   * 重新鎖定團（修改完成後）
+   */
+  async relockTour(
+    tourId: string,
+    options: {
+      quoteId?: string | null
+      quoteVersion?: number | null
+      itineraryId?: string | null
+      itineraryVersion?: number | null
+      lockedBy?: string
+    }
+  ) {
+    const tour = await this.getById(tourId)
+    if (!tour) {
+      return { success: false, error: '找不到此團' }
+    }
+
+    if (tour.status !== '修改中' && tour.status !== '提案') {
+      return { success: false, error: '此團無法進行鎖定' }
+    }
+
+    return this.lockTour(tourId, options)
+  }
+
+  /**
+   * 判斷團是否已鎖定
+   */
+  isTourLocked(tour: Tour): boolean {
+    return tour.status === '已確認' || tour.status === '待結案' || tour.status === '結案'
+  }
+
+  /**
+   * 判斷團是否可進入確認流程
+   */
+  canConfirmTour(tour: Tour): boolean {
+    return tour.status === '提案' || tour.status === '修改中'
   }
 }
 

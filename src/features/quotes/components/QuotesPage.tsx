@@ -21,6 +21,7 @@ import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm'
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
 import { STATUS_FILTERS, TYPE_FILTERS } from '../constants'
 import { useRegionsStore } from '@/stores'
+import type { Tour } from '@/types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -46,7 +47,7 @@ export const QuotesPage: React.FC = () => {
   // Data and actions
   const {
     quotes,
-    tours,
+    tours: toursRaw,
     addQuote,
     handleDuplicateQuote,
     handleTogglePin,
@@ -54,6 +55,9 @@ export const QuotesPage: React.FC = () => {
     handleQuoteClick,
     handleRejectQuote,
   } = useQuotesData()
+
+  // 將 Supabase 類型轉換為 Tour 類型（一次性轉換避免重複斷言）
+  const tours: Tour[] = toursRaw as unknown as Tour[]
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = React.useCallback(async () => {
@@ -110,9 +114,10 @@ export const QuotesPage: React.FC = () => {
   })
 
   // Tour sync - auto-open dialog when coming from tours page
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { clearTourParam } = useQuoteTourSync({
     quotes,
-    tours,
+    tours: tours as any,
     isAddDialogOpen,
     onOpenDialog: (tourId: string) => {
       const tour = tours.find(t => t.id === tourId)
@@ -258,9 +263,10 @@ export const QuotesPage: React.FC = () => {
 
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <QuotesList
             quotes={filteredQuotes}
-            tours={tours}
+            tours={tours as any}
             searchTerm={searchTerm}
             onQuoteClick={handleQuoteClick}
             onPreview={handlePreview}
@@ -280,7 +286,7 @@ export const QuotesPage: React.FC = () => {
         }}
         formData={formData}
         setFormField={setFormField as any}
-        tours={tours}
+        tours={tours as any}
         onSubmit={handleSubmit}
         onClose={handleDialogClose}
       />

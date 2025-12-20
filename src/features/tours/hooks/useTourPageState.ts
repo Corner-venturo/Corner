@@ -46,7 +46,7 @@ export function useTourPageState() {
     departure_date: '',
     return_date: '',
     price: 0,
-    status: 'draft',
+    status: '提案',
     isSpecial: false,
     max_participants: 20,
     description: '',

@@ -253,7 +253,7 @@ export function LinkQuoteToTourDialog({
                     {salesPeople.map(emp => (
                       emp.id !== currentUser?.id && (
                         <SelectItem key={emp.id} value={emp.id}>
-                          {emp.name}
+                          {emp.display_name || emp.chinese_name || emp.id}
                         </SelectItem>
                       )
                     ))}

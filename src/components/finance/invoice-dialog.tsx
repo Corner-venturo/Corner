@@ -90,7 +90,7 @@ export function InvoiceDialog({
         buyerEmail: '',
         buyerMobile: fixedOrder.contact_phone || '',
       })
-      setCustomNo(generateCustomNo(fixedOrder.id, fixedOrder.order_number))
+      setCustomNo(generateCustomNo(fixedOrder.id, fixedOrder.order_number || ''))
     } else if (selectedOrderId) {
       const order = allOrders.find(o => o.id === selectedOrderId)
       if (order) {
@@ -122,7 +122,7 @@ export function InvoiceDialog({
           buyerEmail: '',
           buyerMobile: fixedOrder.contact_phone || '',
         })
-        setCustomNo(generateCustomNo(fixedOrder.id, fixedOrder.order_number))
+        setCustomNo(generateCustomNo(fixedOrder.id, fixedOrder.order_number || ''))
       } else {
         setBuyerInfo({ buyerName: '', buyerUBN: '', buyerEmail: '', buyerMobile: '' })
         setCustomNo('')

@@ -49,7 +49,7 @@ interface LocalTourData {
   coverImage?: string
   coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   flightStyle?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班風格
-  itineraryStyle?: 'original' | 'luxury' | 'art' // 每日行程風格
+  itineraryStyle?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
   price?: string | null // 價格
   priceNote?: string | null // 價格備註
   country: string

@@ -37,6 +37,8 @@ import { useTourActionButtons } from './TourActionButtons'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourDetailDialog } from '@/components/tours/TourDetailDialog'
+import { TourConfirmationWizard } from './TourConfirmationWizard'
+import { TourUnlockDialog } from './TourUnlockDialog'
 
 export const ToursPage: React.FC = () => {
   const router = useRouter()
@@ -56,6 +58,10 @@ export const ToursPage: React.FC = () => {
     tour: Tour | null
     mode: 'create' | 'edit'
   }>({ isOpen: false, tour: null, mode: 'edit' })
+
+  // V2.0：確認精靈 & 解鎖對話框狀態
+  const [confirmWizardTour, setConfirmWizardTour] = useState<Tour | null>(null)
+  const [unlockDialogTour, setUnlockDialogTour] = useState<Tour | null>(null)
 
   // 旅遊團詳情 Dialog 狀態
   const [detailDialogTourId, setDetailDialogTourId] = useState<string | null>(null)
@@ -126,7 +132,7 @@ export const ToursPage: React.FC = () => {
         departure_date: '',
         return_date: '',
         price: 0,
-        status: 'draft',
+        status: '提案',
         isSpecial: false,
         max_participants: 20,
         description: '',
@@ -310,8 +316,8 @@ export const ToursPage: React.FC = () => {
         departure_date: tour.departure_date || '',
         return_date: tour.return_date || '',
         price: tour.price ?? 0,
-        status: (tour.status || 'draft') as Tour['status'],
-        isSpecial: tour.status === 'special',
+        status: (tour.status || '提案') as Tour['status'],
+        isSpecial: tour.status === '特殊團',
         max_participants: tour.max_participants || 20,
         description: tour.description || '',
         outbound_flight_number,
@@ -365,7 +371,7 @@ export const ToursPage: React.FC = () => {
       departure_date: '',
       return_date: '',
       price: 0,
-      status: 'draft',
+      status: '提案',
       isSpecial: false,
       max_participants: 20,
       description: '',
@@ -450,6 +456,9 @@ export const ToursPage: React.FC = () => {
       setContractDialogState({ isOpen: true, tour, mode })
     },
     onViewDetails: (tour) => setDetailDialogTourId(tour.id),
+    // V2.0：確認出團 & 解鎖
+    onConfirmTour: (tour) => setConfirmWizardTour(tour),
+    onUnlockLockedTour: (tour) => setUnlockDialogTour(tour),
   })
 
   const renderExpanded = useCallback(
@@ -637,6 +646,32 @@ export const ToursPage: React.FC = () => {
           // 資料變更後刷新列表
         }}
       />
+
+      {/* V2.0：確認精靈 */}
+      {confirmWizardTour && (
+        <TourConfirmationWizard
+          tour={confirmWizardTour}
+          open={!!confirmWizardTour}
+          onOpenChange={(open) => !open && setConfirmWizardTour(null)}
+          onConfirmed={() => {
+            setConfirmWizardTour(null)
+            // 刷新列表
+          }}
+        />
+      )}
+
+      {/* V2.0：解鎖對話框 */}
+      {unlockDialogTour && (
+        <TourUnlockDialog
+          tour={unlockDialogTour}
+          open={!!unlockDialogTour}
+          onOpenChange={(open) => !open && setUnlockDialogTour(null)}
+          onUnlocked={() => {
+            setUnlockDialogTour(null)
+            // 刷新列表
+          }}
+        />
+      )}
     </div>
   )
 }

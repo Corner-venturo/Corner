@@ -233,6 +233,235 @@ export type Database = {
           },
         ]
       }
+      // === 手動添加的 ERP 會計表格 (2025-12-20) ===
+      accounting_events: {
+        Row: {
+          id: string
+          workspace_id: string
+          event_type: string
+          source_type: string | null
+          source_id: string | null
+          group_id: string | null
+          tour_id: string | null
+          event_date: string
+          currency: string
+          meta: Json
+          status: string
+          reversal_event_id: string | null
+          memo: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          event_type: string
+          source_type?: string | null
+          source_id?: string | null
+          group_id?: string | null
+          tour_id?: string | null
+          event_date: string
+          currency?: string
+          meta?: Json
+          status?: string
+          reversal_event_id?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          event_type?: string
+          source_type?: string | null
+          source_id?: string | null
+          group_id?: string | null
+          tour_id?: string | null
+          event_date?: string
+          currency?: string
+          meta?: Json
+          status?: string
+          reversal_event_id?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chart_of_accounts: {
+        Row: {
+          id: string
+          workspace_id: string
+          code: string
+          name: string
+          account_type: string
+          type: string | null
+          parent_id: string | null
+          is_system_locked: boolean
+          is_active: boolean
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          code: string
+          name: string
+          account_type: string
+          type?: string | null
+          parent_id?: string | null
+          is_system_locked?: boolean
+          is_active?: boolean
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          code?: string
+          name?: string
+          account_type?: string
+          type?: string | null
+          parent_id?: string | null
+          is_system_locked?: boolean
+          is_active?: boolean
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      erp_bank_accounts: {
+        Row: {
+          id: string
+          workspace_id: string
+          name: string
+          bank_name: string | null
+          account_number: string | null
+          account_id: string | null
+          is_active: boolean
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          name: string
+          bank_name?: string | null
+          account_number?: string | null
+          account_id?: string | null
+          is_active?: boolean
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          name?: string
+          bank_name?: string | null
+          account_number?: string | null
+          account_id?: string | null
+          is_active?: boolean
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_lines: {
+        Row: {
+          id: string
+          voucher_id: string
+          line_no: number
+          account_id: string
+          subledger_type: string | null
+          subledger_id: string | null
+          description: string | null
+          debit_amount: number
+          credit_amount: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          voucher_id: string
+          line_no: number
+          account_id: string
+          subledger_type?: string | null
+          subledger_id?: string | null
+          description?: string | null
+          debit_amount?: number
+          credit_amount?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          voucher_id?: string
+          line_no?: number
+          account_id?: string
+          subledger_type?: string | null
+          subledger_id?: string | null
+          description?: string | null
+          debit_amount?: number
+          credit_amount?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      journal_vouchers: {
+        Row: {
+          id: string
+          workspace_id: string
+          voucher_no: string
+          voucher_date: string
+          memo: string | null
+          company_unit: string
+          event_id: string | null
+          status: string
+          total_debit: number
+          total_credit: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          voucher_no: string
+          voucher_date: string
+          memo?: string | null
+          company_unit?: string
+          event_id?: string | null
+          status?: string
+          total_debit?: number
+          total_credit?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          voucher_no?: string
+          voucher_date?: string
+          memo?: string | null
+          company_unit?: string
+          event_id?: string | null
+          status?: string
+          total_debit?: number
+          total_credit?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       accounting_transactions: {
         Row: {
           account_id: string
@@ -1348,6 +1577,7 @@ export type Database = {
           description: string | null
           group_id: string | null
           id: string
+          is_announcement: boolean | null
           is_archived: boolean | null
           is_company_wide: boolean | null
           is_favorite: boolean | null
@@ -1372,6 +1602,7 @@ export type Database = {
           description?: string | null
           group_id?: string | null
           id?: string
+          is_announcement?: boolean | null
           is_archived?: boolean | null
           is_company_wide?: boolean | null
           is_favorite?: boolean | null
@@ -1396,6 +1627,7 @@ export type Database = {
           description?: string | null
           group_id?: string | null
           id?: string
+          is_announcement?: boolean | null
           is_archived?: boolean | null
           is_company_wide?: boolean | null
           is_favorite?: boolean | null
@@ -8142,6 +8374,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tour_leaders: {
+        Row: {
+          id: string
+          code: string | null
+          name: string
+          name_en: string | null
+          phone: string | null
+          email: string | null
+          address: string | null
+          national_id: string | null
+          passport_number: string | null
+          passport_expiry: string | null
+          languages: string[] | null
+          specialties: string[] | null
+          license_number: string | null
+          notes: string | null
+          status: string | null
+          display_order: number | null
+          workspace_id: string | null
+          created_at: string | null
+          updated_at: string | null
+          _deleted: boolean | null
+          _needs_sync: boolean | null
+          _synced_at: string | null
+        }
+        Insert: {
+          id?: string
+          code?: string | null
+          name: string
+          name_en?: string | null
+          phone?: string | null
+          email?: string | null
+          address?: string | null
+          national_id?: string | null
+          passport_number?: string | null
+          passport_expiry?: string | null
+          languages?: string[] | null
+          specialties?: string[] | null
+          license_number?: string | null
+          notes?: string | null
+          status?: string | null
+          display_order?: number | null
+          workspace_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+        }
+        Update: {
+          id?: string
+          code?: string | null
+          name?: string
+          name_en?: string | null
+          phone?: string | null
+          email?: string | null
+          address?: string | null
+          national_id?: string | null
+          passport_number?: string | null
+          passport_expiry?: string | null
+          languages?: string[] | null
+          specialties?: string[] | null
+          license_number?: string | null
+          notes?: string | null
+          status?: string | null
+          display_order?: number | null
+          workspace_id?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+        }
+        Relationships: []
       }
       tours: {
         Row: {

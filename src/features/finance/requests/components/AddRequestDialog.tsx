@@ -8,6 +8,7 @@ import { RequestDateInput } from './RequestDateInput'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
+import type { Order } from '@/stores/types'
 
 interface AddRequestDialogProps {
   open: boolean
@@ -77,7 +78,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
         requestItems,
         selectedTour.name || '',
         selectedTour.code || '',
-        selectedOrder?.order_number,
+        selectedOrder?.order_number ?? undefined,
         currentUser?.display_name || currentUser?.chinese_name || '' // 請款人姓名
       )
       resetForm()
@@ -128,7 +129,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
                   }))
                   setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
                 }}
-                orders={filteredOrders}
+                orders={filteredOrders as Order[]}
                 showDropdown={showOrderDropdown}
                 onShowDropdown={setShowOrderDropdown}
                 disabled={!formData.tour_id}

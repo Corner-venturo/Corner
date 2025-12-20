@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Search, X } from 'lucide-react'
+import { Search, X, Calendar } from 'lucide-react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
@@ -262,7 +262,7 @@ export function CreateDisbursementDialog({
     }
     return (
       <Badge className={cn('text-white text-xs', colors[status] || 'bg-gray-500')}>
-        {statusLabels[status] || status}
+        {(statusLabels as Record<string, string>)[status] || status}
       </Badge>
     )
   }

@@ -4,3 +4,4 @@
 export { CustomerAddDialog } from './CustomerAddDialog'
 export { CustomerDetailDialog } from './CustomerDetailDialog'
 export { CustomerVerifyDialog } from './CustomerVerifyDialog'
+export { ResetPasswordDialog } from './ResetPasswordDialog'

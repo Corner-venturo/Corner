@@ -17,18 +17,8 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
   // Cast tour to ensure proper types
   const tour = tourProp as Tour & Record<string, unknown>
 
-  // 狀態標籤
-  const statusLabels: Record<string, string> = {
-    pending: '待確認',
-    confirmed: '已確認',
-    in_progress: '進行中',
-    completed: '已完成',
-    cancelled: '已取消',
-    archived: '已封存',
-  }
-
-  // 處理 status 可能是 unknown 的情況
-  const statusValue = String(tour.status || 'pending')
+  // 狀態值（已為中文）
+  const statusValue = String(tour.status || '提案')
 
   return (
     <div
@@ -58,7 +48,7 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
             getStatusColor(statusValue) as string
           )}
         >
-          {statusLabels[statusValue] || statusValue}
+          {statusValue}
         </span>
       </div>
 

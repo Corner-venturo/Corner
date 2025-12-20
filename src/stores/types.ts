@@ -387,7 +387,7 @@ export interface Itinerary {
   status: 'draft' | 'published'
   cover_style?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   flight_style?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班卡片風格
-  itinerary_style?: 'original' | 'luxury' | 'art' // 每日行程風格
+  itinerary_style?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
   price?: string | null // 價格（如：39,800）
   price_note?: string | null // 價格備註（如：起、/人）
 
@@ -579,6 +579,7 @@ export interface Quote {
   contact_address?: string // 通訊地址（快速報價單用）
   tour_code?: string // 團體編號（快速報價單用）
   handler_name?: string // 承辦業務（快速報價單用）
+  created_by?: string // 建立人 ID
   created_by_name?: string // 建立人姓名（冗餘欄位，便於顯示）
   issue_date?: string // 開單日期（快速報價單用）
   received_amount?: number // 已收金額（快速報價單用）

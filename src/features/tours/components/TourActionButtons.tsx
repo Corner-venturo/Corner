@@ -14,8 +14,10 @@ import {
   FileSignature,
   MessageSquare,
   LockOpen,
+  Lock,
   Eye,
   Link,
+  CheckCircle2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -38,6 +40,9 @@ interface UseTourActionButtonsParams {
   onOpenContractDialog?: (tour: Tour) => void
   // 新增：查看詳情用 Dialog
   onViewDetails?: (tour: Tour) => void
+  // V2.0：確認出團 & 解鎖
+  onConfirmTour?: (tour: Tour) => void
+  onUnlockLockedTour?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -56,6 +61,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenItineraryDialog,
     onOpenContractDialog,
     onViewDetails,
+    onConfirmTour,
+    onUnlockLockedTour,
   } = params
 
   const renderActions = useCallback(
@@ -81,6 +88,41 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           >
             <Eye size={14} />
           </button>
+
+          {/* V2.0：確認出團（僅提案/修改中狀態可見） */}
+          {(tour.status === '提案' || tour.status === '修改中') && onConfirmTour && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onConfirmTour(tour)
+              }}
+              className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+              title="確認出團"
+            >
+              <CheckCircle2 size={14} />
+            </button>
+          )}
+
+          {/* V2.0：解鎖版本（僅已確認狀態可見） */}
+          {tour.status === '已確認' && onUnlockLockedTour && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onUnlockLockedTour(tour)
+              }}
+              className="p-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors"
+              title="解鎖修改"
+            >
+              <LockOpen size={14} />
+            </button>
+          )}
+
+          {/* 已鎖定標示 */}
+          {tour.status === '已確認' && (
+            <span className="p-1 text-morandi-gold" title="版本已鎖定">
+              <Lock size={14} />
+            </span>
+          )}
 
           {/* 編輯 */}
           <button
@@ -202,6 +244,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onOpenQuoteDialog,
       onOpenItineraryDialog,
       onViewDetails,
+      onConfirmTour,
+      onUnlockLockedTour,
     ]
   )
 

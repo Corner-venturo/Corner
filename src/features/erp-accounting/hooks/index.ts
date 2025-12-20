@@ -9,42 +9,13 @@ import type {
   AccountingPeriod,
 } from '@/types/accounting.types'
 
-// 基礎實體擴展
-interface AccountEntity extends Account {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
-
-interface BankAccountEntity extends BankAccount {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
-
-interface AccountingEventEntity extends AccountingEvent {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
-
-interface JournalVoucherEntity extends JournalVoucher {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
-
-interface JournalLineEntity extends JournalLine {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
-
-interface AccountingPeriodEntity extends AccountingPeriod {
-  id: string
-  created_at: string | null
-  updated_at: string | null
-}
+// 基礎實體類型別名（已包含所有必要欄位）
+type AccountEntity = Account
+type BankAccountEntity = BankAccount
+type AccountingEventEntity = AccountingEvent
+type JournalVoucherEntity = JournalVoucher
+type JournalLineEntity = JournalLine
+type AccountingPeriodEntity = AccountingPeriod
 
 // 科目表 Hook
 export const useAccounts = createCloudHook<AccountEntity>(

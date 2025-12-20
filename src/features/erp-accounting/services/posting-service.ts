@@ -5,6 +5,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
+import type { Json } from '@/lib/supabase/types'
 import type {
   AccountingEventType,
   AccountingEventMeta,
@@ -13,6 +14,17 @@ import type {
   PostSupplierPaymentRequest,
   PostGroupSettlementRequest,
 } from '@/types/accounting.types'
+
+// 分錄插入類型
+type JournalLineInsert = {
+  id: string
+  voucher_id: string
+  line_no: number
+  account_id: string
+  description?: string | null
+  debit_amount: number
+  credit_amount: number
+}
 
 // ============================================
 // 工具函數
@@ -132,7 +144,7 @@ export async function postCustomerReceipt(
       source_id: request.receipt_id,
       tour_id,
       event_date: eventDate,
-      meta: eventMeta,
+      meta: eventMeta as Json,
       status: 'posted',
       created_by: userId,
       created_at: now,
@@ -178,7 +190,7 @@ export async function postCustomerReceipt(
   }
 
   // 建立分錄
-  const lines: Partial<JournalLine>[] = []
+  const lines: JournalLineInsert[] = []
   let lineNo = 1
 
   // Dr 銀行存款/現金
@@ -304,7 +316,7 @@ export async function postSupplierPayment(
     return { success: false, error: voucherError.message }
   }
 
-  const lines: Partial<JournalLine>[] = []
+  const lines: JournalLineInsert[] = []
   let lineNo = 1
 
   // Dr 預付團務成本
@@ -403,7 +415,7 @@ export async function postGroupSettlement(
       source_type: 'group',
       tour_id,
       event_date: eventDate,
-      meta: eventMeta,
+      meta: eventMeta as Json,
       status: 'posted',
       created_by: userId,
       created_at: now,
@@ -476,7 +488,7 @@ export async function postGroupSettlement(
     bankAcctId,
   ] = accounts
 
-  const lines: Partial<JournalLine>[] = []
+  const lines: JournalLineInsert[] = []
   let lineNo = 1
 
   // A) 轉列：預收 → 收入、預付 → 成本
@@ -689,7 +701,15 @@ export async function reverseVoucher(
     .from('journal_vouchers')
     .select('*, journal_lines(*)')
     .eq('id', voucherId)
-    .single()
+    .single() as { data: {
+      id: string
+      voucher_no: string
+      status: string
+      total_debit: number
+      total_credit: number
+      event_id: string | null
+      journal_lines: JournalLine[] | null
+    } | null, error: unknown }
 
   if (fetchError || !originalVoucher) {
     return { success: false, error: '找不到原傳票' }
@@ -714,7 +734,7 @@ export async function reverseVoucher(
       source_type: 'reversal',
       source_id: voucherId,
       event_date: eventDate,
-      meta: { reason, original_voucher_no: originalVoucher.voucher_no },
+      meta: { reason, original_voucher_no: originalVoucher.voucher_no } as Json,
       status: 'posted',
       created_by: userId,
       created_at: now,

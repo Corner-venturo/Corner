@@ -1,0 +1,194 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Tour } from '@/types/tour.types'
+import { toast } from 'sonner'
+import { Unlock, Loader2, AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
+
+interface TourUnlockDialogProps {
+  tour: Tour
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onUnlocked?: () => void
+}
+
+export function TourUnlockDialog({
+  tour,
+  open,
+  onOpenChange,
+  onUnlocked,
+}: TourUnlockDialogProps) {
+  const [password, setPassword] = useState('')
+  const [reason, setReason] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleUnlock = async () => {
+    if (!password) {
+      setError('請輸入密碼')
+      return
+    }
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      // 取得當前 session token
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        setError('請先登入')
+        setSubmitting(false)
+        return
+      }
+
+      // 呼叫解鎖 API
+      const response = await fetch(`/api/tours/${tour.id}/unlock`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          password,
+          reason: reason.trim() || undefined,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || '解鎖失敗')
+        setSubmitting(false)
+        return
+      }
+
+      toast.success('已解鎖，可進行修改')
+      setPassword('')
+      setReason('')
+      onOpenChange(false)
+      onUnlocked?.()
+    } catch (err) {
+      console.error('Unlock error:', err)
+      setError('發生錯誤，請稍後再試')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleClose = () => {
+    setPassword('')
+    setReason('')
+    setError(null)
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Unlock className="h-5 w-5 text-morandi-gold" />
+            解鎖確認
+          </DialogTitle>
+          <DialogDescription>
+            請輸入您的登入密碼以解鎖此團進行修改
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* 警告訊息 */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <div className="flex gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-700">
+                <p className="font-medium">{tour.name}</p>
+                <p className="mt-1">解鎖後可修改報價單和行程，完成後請記得重新鎖定。</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 密碼輸入 */}
+          <div className="space-y-2">
+            <Label htmlFor="password">登入密碼</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError(null)
+                }}
+                placeholder="請輸入您的登入密碼"
+                className="pr-10"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleUnlock()
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* 修改原因 */}
+          <div className="space-y-2">
+            <Label htmlFor="reason">修改原因（選填）</Label>
+            <Textarea
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="例如：客戶要求變更行程日期"
+              rows={2}
+            />
+          </div>
+
+          {/* 錯誤訊息 */}
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+              {error}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} disabled={submitting}>
+            取消
+          </Button>
+          <Button
+            onClick={handleUnlock}
+            disabled={submitting || !password}
+            className="bg-morandi-gold hover:bg-morandi-gold/90"
+          >
+            {submitting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Unlock className="h-4 w-4 mr-2" />
+            )}
+            確認解鎖
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

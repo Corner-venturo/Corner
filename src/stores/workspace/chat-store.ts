@@ -366,13 +366,12 @@ export const useChatStore = () => {
     // Realtime Subscription
     // ============================================
     subscribeToMessages: () => {
-      // The underlying createStore now handles the subscription logic
-      messageStore.subscribe()
+      // Placeholder: Realtime subscription could be added here if needed
+      // For now, the store uses SWR for data fetching
     },
 
     unsubscribeFromMessages: () => {
-      // The underlying createStore now handles the unsubscription logic
-      messageStore.unsubscribe()
+      // Placeholder: Realtime unsubscription could be added here if needed
     },
   }
 }

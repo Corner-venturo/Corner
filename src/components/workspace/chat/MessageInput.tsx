@@ -62,7 +62,7 @@ export function MessageInput({
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
 
-  const isAnnouncementChannel = channel.is_announcement
+  const isAnnouncementChannel = !!channel.is_announcement
   const isDisabled = isAnnouncementChannel && !isAdmin
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -2,7 +2,7 @@
  * 頻道列表區塊組件
  */
 
-import { ChevronDown, ChevronRight, Hash, Star, Plus, UserPlus } from 'lucide-react'
+import { ChevronDown, ChevronRight, Hash, Star, Plus, UserPlus, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SortableChannelItem } from './SortableChannelItem'
 import { DroppableGroupHeader } from './DroppableGroupHeader'
@@ -22,7 +22,7 @@ interface ChannelListSectionProps {
   isExpanded: boolean
   onToggleExpanded: () => void
   title: string
-  icon: 'star' | 'hash' | 'userPlus'
+  icon: 'star' | 'hash' | 'userPlus' | 'user'
   showAddButton?: boolean
   onAddClick?: () => void
 }
@@ -47,7 +47,7 @@ export function ChannelListSection({
 }: ChannelListSectionProps) {
   if (channels.length === 0) return null
 
-  const Icon = icon === 'star' ? Star : icon === 'userPlus' ? UserPlus : Hash
+  const Icon = icon === 'star' ? Star : icon === 'userPlus' ? UserPlus : icon === 'user' ? User : Hash
 
   return (
     <div className="px-2 py-2">
