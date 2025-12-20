@@ -170,7 +170,7 @@ function FlightNode({
             animate={{ y: [0, -3, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <Plane className="w-5 h-5 rotate-90" />
+            <Plane className="w-5 h-5 -rotate-90" />
           </motion.span>
           <span className="text-xs" style={{ fontFamily: 'monospace', color: `${DREAM.text}99` }}>
             {flightInfo || '航班資訊'}

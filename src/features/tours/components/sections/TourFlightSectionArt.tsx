@@ -168,7 +168,7 @@ function FlightCard({
                 style={{ borderColor: `${ART.ink}30` }}
               />
               <Plane
-                className="w-5 h-5 mx-2 rotate-90 transition-colors duration-300 group-hover:text-white"
+                className="w-5 h-5 mx-2 -rotate-90 transition-colors duration-300 group-hover:text-white"
                 style={{ color: ART.ink }}
               />
               <div
