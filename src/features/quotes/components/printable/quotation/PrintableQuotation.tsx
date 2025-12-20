@@ -114,12 +114,9 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
               display: none !important;
             }
 
-            /* 顯示列印版本的 table（覆蓋 inline style display:none） */
-            table.print-wrapper,
-            table[data-print-only="true"],
-            #printable-quotation table.print-wrapper {
+            /* 顯示列印版本的 table（覆蓋 hidden class） */
+            table.print-wrapper {
               display: table !important;
-              visibility: visible !important;
             }
 
             table.print-wrapper tbody > tr {
@@ -140,7 +137,7 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
         <div className="bg-white p-8 print:p-0" id="printable-quotation">
           {/* 列印版本 - 使用 table 結構 */}
-          <table className="print-wrapper" style={{ display: 'none' }} data-print-only="true">
+          <table className="print-wrapper print:table hidden">
             <thead>
               <tr>
                 <td>
