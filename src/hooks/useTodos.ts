@@ -1,9 +1,11 @@
 // src/hooks/useTodos.ts
 // Phase 1: 純雲端架構的 Todos Hook (使用 SWR)
+// 使用資料存取層 (DAL) 進行資料查詢
 
 import { useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
+import { getAllTodos } from '@/lib/data/todos'
 import type { Todo } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -47,25 +49,12 @@ function getCurrentWorkspaceId(): string | null {
   return null
 }
 
-// Supabase fetcher
-async function fetchTodos(): Promise<Todo[]> {
-  const { data, error } = await supabase
-    .from('todos')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data || []) as unknown as Todo[]
-}
-
 // ===== 主要 Hook =====
 export function useTodos() {
+  // 使用 DAL 的 getAllTodos 作為 SWR fetcher
   const { data: todos = [], error, isLoading, isValidating } = useSWR<Todo[]>(
     TODOS_KEY,
-    fetchTodos,
+    getAllTodos,
     {
       revalidateOnFocus: true,     // 視窗切回來時重新驗證
       revalidateOnReconnect: true, // 網路恢復時重新驗證

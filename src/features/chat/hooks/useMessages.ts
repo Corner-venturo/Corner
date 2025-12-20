@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { getChannelMessages, getMessageAuthor } from '@/lib/data/messages'
 import { logger } from '@/lib/utils/logger'
 import type { Message } from '@/stores/workspace/types'
 
@@ -19,23 +20,13 @@ export function useMessages(channelId: string) {
       return
     }
 
-    // 1. Fetch initial messages
+    // 1. Fetch initial messages (使用 DAL)
     const fetchInitialMessages = async () => {
       setLoading(true)
       setError(null)
       try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select(`
-            *,
-            author:employees ( id, display_name )
-          `)
-          .eq('channel_id', channelId)
-          .order('created_at', { ascending: true })
-
-        if (error) throw error
-
-        setMessages((data as unknown as Message[]) || [])
+        const data = await getChannelMessages({ channelId, limit: 50 })
+        setMessages(data as unknown as Message[])
       } catch (err) {
         logger.error('Error fetching initial messages:', err)
         setError('Failed to load messages.')
@@ -58,17 +49,8 @@ export function useMessages(channelId: string) {
           filter: `channel_id=eq.${channelId}`
         },
         async (payload) => {
-          // The payload doesn't contain the author's name, so we fetch it.
-          // This is a simplification; a more optimized approach might use a DB function.
-          const { data: author, error } = await supabase
-            .from('employees')
-            .select('id, display_name')
-            .eq('id', payload.new.author_id)
-            .single()
-            
-          if (error) {
-            logger.error("Failed to fetch author for new message:", error)
-          }
+          // 使用 DAL 獲取作者資訊
+          const author = await getMessageAuthor(payload.new.author_id)
 
           const newMessage = {
             ...payload.new,
