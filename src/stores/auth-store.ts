@@ -43,7 +43,8 @@ interface AuthState {
   validateLogin: (
     username: string,
     password: string,
-    workspaceId?: string
+    workspaceId?: string,
+    rememberMe?: boolean
   ) => Promise<{ success: boolean; message?: string }>
   refreshUserData: () => Promise<void>
   toggleSidebar: () => void
@@ -102,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
-      validateLogin: async (username: string, password: string, workspaceId?: string) => {
+      validateLogin: async (username: string, password: string, workspaceId?: string, rememberMe: boolean = true) => {
         try {
           logger.log('🌐 Authenticating via Supabase...', username, 'workspace:', workspaceId)
 
@@ -237,7 +238,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const token = generateToken(authPayload)
-          setSecureCookie(token, false)
+          setSecureCookie(token, rememberMe)
 
           get().setUser(user);
           

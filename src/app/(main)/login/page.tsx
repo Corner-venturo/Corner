@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(true) // 預設勾選記住我
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(true)
   const [error, setError] = useState('')
@@ -102,7 +103,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const result = await validateLogin(username, password, selectedWorkspace)
+      const result = await validateLogin(username, password, selectedWorkspace, rememberMe)
 
       if (result.success) {
         // 登入成功，記住選擇的 workspace
@@ -218,6 +219,20 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+          </div>
+
+          {/* 記住我 */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={e => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-morandi-secondary cursor-pointer select-none">
+              記住我（30 天內免重新登入）
+            </label>
           </div>
 
           <Button
