@@ -10,6 +10,7 @@ import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { Trash2, GripVertical, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { confirm } from '@/lib/ui/alert-dialog'
 
  
 const supabase = supabaseClient as any
@@ -346,8 +347,16 @@ export const TourMembers = React.memo(function TourMembers({
   }
 
   // 刪除成員
-  const deleteRow = (index: number) => {
+  const deleteRow = async (index: number) => {
     const member = tableMembers[index]
+    const memberName = member.name || member.nameEn || '此成員'
+
+    const confirmed = await confirm(`確定要刪除「${memberName}」嗎？`, {
+      title: '刪除成員',
+      type: 'warning',
+    })
+    if (!confirmed) return
+
     if (member.id && !member.isNew) {
       deleteMember(member.id)
     }
@@ -607,7 +616,11 @@ export const TourMembers = React.memo(function TourMembers({
                 return (
                   <tr
                     key={member.id || `row-${index}`}
-                    className={cn(bgColor, draggedRow === index && 'opacity-50')}
+                    className={cn(
+                      bgColor,
+                      draggedRow === index && 'opacity-50',
+                      'hover:bg-morandi-gold/10 transition-colors cursor-pointer'
+                    )}
                     draggable={true}
                     onDragStart={e => handleDragStart(e, index)}
                     onDragOver={e => handleDragOver(e, index)}

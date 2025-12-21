@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
-import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus, Coins, Plane } from 'lucide-react'
+import { Users, Plus, Trash2, X, Hash, Upload, FileImage, Eye, FileText, AlertTriangle, Pencil, Check, ZoomIn, ZoomOut, RotateCcw, RotateCw, FlipHorizontal, Crop, RefreshCw, Save, Printer, Hotel, Bus, Coins, Plane, Settings2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useImageEditor, useOcrRecognition } from '@/hooks'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
@@ -141,7 +141,9 @@ export function OrderMembersExpandable({
   // 團體模式：分房分車相關狀態
   const [showRoomManager, setShowRoomManager] = useState(false)
   const [showVehicleManager, setShowVehicleManager] = useState(false)
+  const [showRoomColumn, setShowRoomColumn] = useState(false)  // 控制分房欄位顯示
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
+  const [roomSortKeys, setRoomSortKeys] = useState<Record<string, number>>({})  // 成員排序權重（用於分房排序）
   const [vehicleAssignments, setVehicleAssignments] = useState<Record<string, string>>({})
   const [returnDate, setReturnDate] = useState<string | null>(null)
   const [orderCount, setOrderCount] = useState(0) // 訂單數量（用於判斷是否顯示訂單編號欄）
@@ -201,10 +203,16 @@ export function OrderMembersExpandable({
     try {
       const { data: rooms } = await supabase
         .from('tour_rooms')
-        .select('id, room_number, room_type')
+        .select('id, room_number, room_type, display_order, night_number, hotel_name')
         .eq('tour_id', tourId)
+        .order('night_number')
+        .order('display_order')
 
-      if (!rooms || rooms.length === 0) return
+      if (!rooms || rooms.length === 0) {
+        setRoomAssignments({})
+        setRoomSortKeys({})
+        return
+      }
 
       const { data: assignments } = await supabase
         .from('tour_room_assignments')
@@ -213,13 +221,51 @@ export function OrderMembersExpandable({
 
       if (assignments) {
         const map: Record<string, string> = {}
+        const sortKeys: Record<string, number> = {}
+
+        // 只處理第一晚的房間順序（作為主要排序依據）
+        const firstNightRooms = rooms.filter(r => r.night_number === 1)
+
+        // 計算每種房型的編號（用於顯示）
+        const roomCounters: Record<string, number> = {}
+        const roomNumbers: Record<string, number> = {}
+        firstNightRooms.forEach(room => {
+          const roomKey = `${room.hotel_name || ''}_${room.room_type}`
+          if (!roomCounters[roomKey]) {
+            roomCounters[roomKey] = 1
+          }
+          roomNumbers[room.id] = roomCounters[roomKey]++
+        })
+
+        // 建立 room_id -> display_order 的映射（用於排序）
+        const roomOrderMap: Record<string, number> = {}
+        firstNightRooms.forEach((room, index) => {
+          roomOrderMap[room.id] = index
+        })
+
         assignments.forEach(a => {
           const room = rooms.find(r => r.id === a.room_id)
           if (room) {
-            map[a.order_member_id] = room.room_number || room.room_type || '已分房'
+            // 只有第一晚的房間用於顯示和排序
+            if (room.night_number === 1) {
+              const roomNum = roomNumbers[room.id] || 1
+              const typeLabel = room.room_type === 'single' ? '單人房' :
+                               room.room_type === 'double' ? '雙人房' :
+                               room.room_type === 'triple' ? '三人房' :
+                               room.room_type === 'quad' ? '四人房' : room.room_type
+              const prefix = room.hotel_name ? `${room.hotel_name} ` : ''
+              map[a.order_member_id] = `${prefix}${typeLabel} ${roomNum}`
+
+              // 設定排序權重：房間順序 * 10 + 房間內成員順序
+              const roomOrder = roomOrderMap[room.id] ?? 999
+              const existingSortKeys = Object.values(sortKeys).filter(v => Math.floor(v / 10) === roomOrder)
+              sortKeys[a.order_member_id] = roomOrder * 10 + existingSortKeys.length
+            }
           }
         })
+
         setRoomAssignments(map)
+        setRoomSortKeys(sortKeys)
       }
     } catch (error) {
       logger.error('載入分房資訊失敗:', error)
@@ -378,7 +424,11 @@ export function OrderMembersExpandable({
   }
 
   const handleDeleteMember = async (memberId: string) => {
-    const confirmed = await confirm('確定要刪除此成員嗎？', {
+    // 找到要刪除的成員，顯示名稱讓使用者確認
+    const memberToDelete = members.find(m => m.id === memberId)
+    const memberName = memberToDelete?.chinese_name || memberToDelete?.passport_name || '此成員'
+
+    const confirmed = await confirm(`確定要刪除「${memberName}」嗎？`, {
       title: '刪除成員',
       type: 'warning',
     })
@@ -1585,13 +1635,27 @@ export function OrderMembersExpandable({
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => setShowRoomManager(true)}
-                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-amber-50"
-                title="分房管理"
+                onClick={() => setShowRoomColumn(!showRoomColumn)}
+                className={cn(
+                  "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-amber-50",
+                  showRoomColumn && "bg-amber-50 text-amber-600"
+                )}
+                title="顯示/隱藏分房欄位"
               >
                 <Hotel size={14} />
                 分房
               </Button>
+              {showRoomColumn && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowRoomManager(true)}
+                  className="gap-1 text-amber-600 hover:text-amber-700 hover:bg-amber-100"
+                  title="分房管理設定"
+                >
+                  <Settings2 size={14} />
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
@@ -1707,6 +1771,12 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   備註
                 </th>
+                {/* 團體模式：分房欄位 */}
+                {mode === 'tour' && showRoomColumn && (
+                  <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-amber-50/50">
+                    分房
+                  </th>
+                )}
                 {/* 團體模式：PNR 欄位 */}
                 {mode === 'tour' && showPnrColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-sky-50/50">
@@ -1737,7 +1807,17 @@ export function OrderMembersExpandable({
               </tr>
             </thead>
             <tbody>
-              {members.map((member, memberIndex) => (
+              {(() => {
+                // 當顯示分房欄位時，按照分房順序排序成員
+                const sortedMembers = showRoomColumn && Object.keys(roomSortKeys).length > 0
+                  ? [...members].sort((a, b) => {
+                      const keyA = roomSortKeys[a.id] ?? 9999
+                      const keyB = roomSortKeys[b.id] ?? 9999
+                      return keyA - keyB
+                    })
+                  : members
+
+                return sortedMembers.map((member, memberIndex) => (
                 <tr
                   key={member.id}
                   className="group relative hover:bg-morandi-container/20 transition-colors"
@@ -2037,6 +2117,15 @@ export function OrderMembersExpandable({
                     />
                   </td>
 
+                  {/* 團體模式：分房欄位 */}
+                  {mode === 'tour' && showRoomColumn && (
+                    <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50">
+                      <span className="text-xs text-amber-700">
+                        {roomAssignments[member.id] || '未分房'}
+                      </span>
+                    </td>
+                  )}
+
                   {/* 團體模式：PNR 欄位 */}
                   {mode === 'tour' && showPnrColumn && (
                     <td className="border border-morandi-gold/20 px-2 py-1 bg-sky-50/50">
@@ -2105,7 +2194,8 @@ export function OrderMembersExpandable({
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              })()}
             </tbody>
           </table>
         </div>
@@ -2997,7 +3087,13 @@ export function OrderMembersExpandable({
             passport_name: m.passport_name ?? null,
           }))}
           open={showRoomManager}
-          onOpenChange={setShowRoomManager}
+          onOpenChange={(open) => {
+            setShowRoomManager(open)
+            // 關閉對話框時重新載入分房資訊
+            if (!open) {
+              loadRoomAssignments()
+            }
+          }}
         />
       )}
 
