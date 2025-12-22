@@ -20,6 +20,8 @@ export interface TourRoom extends BaseEntity {
   night_number: number
   notes: string | null
   display_order: number
+  booking_code: string | null
+  amount: number | null
 }
 
 /**
@@ -52,6 +54,8 @@ export interface CreateTourRoomData {
   night_number?: number
   notes?: string
   display_order?: number
+  booking_code?: string
+  amount?: number
 }
 
 /**

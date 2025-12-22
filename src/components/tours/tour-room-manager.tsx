@@ -8,7 +8,7 @@ const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Trash2, Users, Hotel, X, Check, BedDouble, Copy, Plus, UserMinus, Loader2 } from 'lucide-react'
+import { Trash2, Users, Hotel, X, Check, BedDouble, Copy, Plus, UserMinus, Loader2, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
@@ -65,6 +65,17 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
   const [loading, setLoading] = useState(true)
   const [selectedNight, setSelectedNight] = useState(1)
   const [isSorting, setIsSorting] = useState(false)
+
+  // 編輯房間
+  const [editingRoom, setEditingRoom] = useState<TourRoomStatus | null>(null)
+  const [editRoomOpen, setEditRoomOpen] = useState(false)
+  const [editRoomData, setEditRoomData] = useState({
+    hotel_name: '',
+    room_type: 'double',
+    capacity: 2,
+    booking_code: '',
+    amount: '',
+  })
 
   const handleSortAndClose = async () => {
     setIsSorting(true)
@@ -432,6 +443,49 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
     }
   }
 
+  // 打開編輯房間對話框
+  const handleEditRoom = (room: TourRoomStatus) => {
+    setEditingRoom(room)
+    setEditRoomData({
+      hotel_name: room.hotel_name || '',
+      room_type: room.room_type || 'double',
+      capacity: room.capacity || 2,
+      booking_code: room.booking_code || '',
+      amount: room.amount?.toString() || '',
+    })
+    setEditRoomOpen(true)
+  }
+
+  // 儲存房間編輯
+  const handleSaveRoomEdit = async () => {
+    if (!editingRoom) return
+
+    try {
+      const updateData: Record<string, unknown> = {
+        hotel_name: editRoomData.hotel_name.trim() || null,
+        room_type: editRoomData.room_type,
+        capacity: editRoomData.capacity,
+        booking_code: editRoomData.booking_code.trim() || null,
+        amount: editRoomData.amount ? parseFloat(editRoomData.amount) : null,
+      }
+
+      const { error } = await supabase
+        .from('tour_rooms')
+        .update(updateData)
+        .eq('id', editingRoom.id)
+
+      if (error) throw error
+
+      toast.success('房間已更新')
+      setEditRoomOpen(false)
+      setEditingRoom(null)
+      loadRooms()
+    } catch (error) {
+      console.error('更新房間失敗:', error)
+      toast.error('更新房間失敗')
+    }
+  }
+
   const handleClearRoom = async (roomId: string) => {
     const roomAssignments = assignments.filter(a => a.room_id === roomId)
     if (roomAssignments.length === 0) {
@@ -655,6 +709,8 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
         capacity: number
         night_number: number
         display_order: number
+        booking_code: string | null
+        amount: number | null
       }> = []
       let order = currentNightRooms.length
 
@@ -667,6 +723,8 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
             capacity: row.capacity,
             night_number: selectedNight,
             display_order: order++,
+            booking_code: row.bookingCode?.trim() || null,
+            amount: row.amount ? parseFloat(row.amount) : null,
           })
         }
       }
@@ -911,6 +969,13 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
                               </button>
                             )}
                             <button
+                              onClick={() => handleEditRoom(room)}
+                              className="text-morandi-muted hover:text-morandi-blue transition-colors"
+                              title="編輯房間"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
                               onClick={() => handleDeleteRoom(room.id)}
                               className="text-morandi-muted hover:text-morandi-red transition-colors"
                               title="刪除房間"
@@ -919,6 +984,13 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
                             </button>
                           </div>
                         </div>
+                        {/* 顯示訂房代號和費用 */}
+                        {(room.booking_code || room.amount) && (
+                          <div className="text-xs text-morandi-muted mb-1">
+                            {room.booking_code && <span className="mr-2">代號: {room.booking_code}</span>}
+                            {room.amount && <span>費用: ${room.amount.toLocaleString()}</span>}
+                          </div>
+                        )}
                         <div className="flex flex-wrap gap-1 min-h-[24px]">
                           {roomMembers.map(({ assignment, member }) => (
                             <span
@@ -1208,6 +1280,77 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
               </Button>
             </div>
           </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* 編輯房間對話框 */}
+    <Dialog open={editRoomOpen} onOpenChange={setEditRoomOpen}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Pencil className="h-5 w-5 text-morandi-blue" />
+            編輯房間
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          {/* 飯店名稱 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-secondary mb-1">飯店名稱</label>
+            <Input
+              value={editRoomData.hotel_name}
+              onChange={e => setEditRoomData(prev => ({ ...prev, hotel_name: e.target.value }))}
+              placeholder="輸入飯店名稱"
+            />
+          </div>
+
+          {/* 房型 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-secondary mb-1">房型</label>
+            <select
+              value={editRoomData.room_type}
+              onChange={e => {
+                const type = e.target.value
+                const capacity = type === 'single' ? 1 : type === 'double' ? 2 : type === 'triple' ? 3 : 4
+                setEditRoomData(prev => ({ ...prev, room_type: type, capacity }))
+              }}
+              className="w-full h-10 px-3 border border-input rounded-md bg-background text-sm"
+            >
+              {ROOM_TYPES.map(type => (
+                <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* 訂房代號 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-secondary mb-1">訂房代號</label>
+            <Input
+              value={editRoomData.booking_code}
+              onChange={e => setEditRoomData(prev => ({ ...prev, booking_code: e.target.value }))}
+              placeholder="輸入訂房代號"
+            />
+          </div>
+
+          {/* 費用 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-secondary mb-1">費用</label>
+            <Input
+              type="number"
+              value={editRoomData.amount}
+              onChange={e => setEditRoomData(prev => ({ ...prev, amount: e.target.value }))}
+              placeholder="輸入費用"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => setEditRoomOpen(false)}>
+            取消
+          </Button>
+          <Button onClick={handleSaveRoomEdit}>
+            儲存
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
