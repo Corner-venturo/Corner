@@ -128,35 +128,22 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
   }
 
   // 準備版本資料的通用函數（QuickQuote 專用）
-  // 返回完整的 QuoteVersion 類型
+  // 返回完整的 QuoteVersion 類型（簡易模式）
   const prepareVersionData = (versionNumber: number, versionName: string): QuoteVersion => ({
     id: Date.now().toString(),
     version: versionNumber,
-    name: versionName, // QuoteVersion uses 'name' not 'version_name'
-    // QuickQuote 不使用以下欄位，但為了類型兼容性添加默認值
-    categories: [],
-    total_cost: totalCost,
-    accommodation_days: 0,
-    participant_counts: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
-    selling_prices: { adult: 0, child_with_bed: 0, child_no_bed: 0, single_room: 0, infant: 0 },
-    // 以下是額外的 QuickQuote 專用欄位（透過 as any 擴展）
-    ...(({
-      quote_id: quote.id,
-      customer_name: formData.customer_name,
-      contact_phone: formData.contact_phone,
-      contact_address: formData.contact_address,
-      tour_code: formData.tour_code,
-      handler_name: formData.handler_name,
-      issue_date: formData.issue_date,
-      expense_description: formData.expense_description,
-      total_amount: totalAmount,
-      received_amount: formData.received_amount,
-      balance_amount: totalAmount - formData.received_amount,
-      items: items,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-       
-    }) as any),
+    mode: 'simple', // 簡易模式
+    name: versionName,
+    created_at: new Date().toISOString(),
+    // 簡易模式專用欄位
+    quick_quote_items: items,
+    customer_name: formData.customer_name,
+    contact_phone: formData.contact_phone,
+    contact_address: formData.contact_address,
+    handler_name: formData.handler_name,
+    issue_date: formData.issue_date,
+    received_amount: formData.received_amount,
+    expense_description: formData.expense_description,
   })
 
   // 儲存變更
