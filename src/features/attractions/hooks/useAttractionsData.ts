@@ -54,6 +54,10 @@ export function useAttractionsData() {
   const updateAttraction = useCallback(
     async (id: string, formData: AttractionFormData) => {
       try {
+        logger.log('[Attractions] 更新景點:', id)
+        logger.log('[Attractions] formData:', formData)
+        logger.log('[Attractions] formData.images type:', typeof formData.images, formData.images)
+
         // 轉換表單資料為 Attraction 格式
         const attractionData: Partial<Attraction> = {
           ...formData,
@@ -62,9 +66,12 @@ export function useAttractionsData() {
           region_id: formData.region_id || undefined,
         }
 
+        logger.log('[Attractions] attractionData:', attractionData)
         await store.update(id, attractionData as Attraction)
+        logger.log('[Attractions] 更新成功!')
         return { success: true }
       } catch (error) {
+        logger.error('[Attractions] 更新失敗:', error)
         return { success: false, error }
       }
     },

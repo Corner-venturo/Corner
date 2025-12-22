@@ -281,7 +281,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
           const city = cities.find(c => c.id === experience.city_id)
           return (
             <div className="text-sm text-morandi-secondary line-clamp-1">
-              {country?.emoji} {city?.name || '-'}
+              {city?.name || '-'}
             </div>
           )
         },

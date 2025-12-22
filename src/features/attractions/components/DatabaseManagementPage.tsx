@@ -184,7 +184,7 @@ export default function DatabaseManagementPage() {
                   { value: '', label: '所有國家' },
                   ...countries.map(country => ({
                     value: country.id,
-                    label: `${country.emoji} ${country.name}`,
+                    label: country.name,
                   })),
                 ]}
                 placeholder="選擇國家..."

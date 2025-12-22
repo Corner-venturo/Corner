@@ -232,9 +232,7 @@ export const QuotesPage: React.FC = () => {
             </Select>
           </>
         }
-        onAdd={handleOpenTypeSelect}
-        addLabel="新增報價單"
-      />
+              />
 
       {/* 類型選擇對話框 */}
       <Dialog open={isTypeSelectOpen} onOpenChange={setIsTypeSelectOpen}>

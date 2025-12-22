@@ -20,6 +20,8 @@ import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
 import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
+import { LinkQuoteToTourDialog } from '@/features/tours/components/LinkQuoteToTourDialog'
+import { LinkItineraryToTourDialog } from '@/features/tours/components/LinkItineraryToTourDialog'
 import { MessageSquare, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
@@ -47,6 +49,8 @@ export default function TourDetailPage() {
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showDepartureDialog, setShowDepartureDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showQuoteDialog, setShowQuoteDialog] = useState(false)
+  const [showItineraryDialog, setShowItineraryDialog] = useState(false)
 
   // 建立頻道對話框狀態
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
@@ -205,7 +209,14 @@ export default function TourDetailPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <TourOverview tour={tour} onEdit={() => setShowEditDialog(true)} />
+        return (
+          <TourOverview
+            tour={tour}
+            onEdit={() => setShowEditDialog(true)}
+            onManageQuote={() => setShowQuoteDialog(true)}
+            onManageItinerary={() => setShowItineraryDialog(true)}
+          />
+        )
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
@@ -338,6 +349,20 @@ export default function TourDetailPage() {
           // 重新載入旅遊團資料
           window.location.reload()
         }}
+      />
+
+      {/* 管理報價單對話框 */}
+      <LinkQuoteToTourDialog
+        isOpen={showQuoteDialog}
+        onClose={() => setShowQuoteDialog(false)}
+        tour={tour}
+      />
+
+      {/* 管理行程表對話框 */}
+      <LinkItineraryToTourDialog
+        isOpen={showItineraryDialog}
+        onClose={() => setShowItineraryDialog(false)}
+        tour={tour}
       />
     </div>
   )

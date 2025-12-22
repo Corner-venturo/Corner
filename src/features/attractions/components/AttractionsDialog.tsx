@@ -538,7 +538,7 @@ export function AttractionsDialog({
       title={attraction ? '編輯景點' : '新增景點'}
       onSubmit={handleSubmit}
       submitLabel={attraction ? '更新' : '新增'}
-      submitDisabled={!formData.name || !formData.country_id || !formData.region_id}
+      submitDisabled={!formData.name || !formData.country_id}
       maxWidth="2xl"
       contentClassName="max-h-[90vh] overflow-y-auto"
     >
@@ -597,7 +597,7 @@ export function AttractionsDialog({
             <SelectContent>
               {countries.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
-                  {c.emoji} {c.name}
+                  {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -606,7 +606,7 @@ export function AttractionsDialog({
 
         {availableRegions.length > 0 && (
           <div>
-            <label className="text-sm font-medium">地區 *</label>
+            <label className="text-sm font-medium">地區（選填）</label>
             <Select
               value={formData.region_id}
               onValueChange={value =>

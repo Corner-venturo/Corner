@@ -475,16 +475,17 @@ export function OrderMembersExpandable({
       const customerStore = useCustomerStore.getState()
 
       // 1. 更新 order_members
+      // 空字串轉 null（日期欄位不接受空字串）
       const memberUpdateData: Record<string, unknown> = {
-        chinese_name: editFormData.chinese_name,
-        passport_name: editFormData.passport_name,
-        birth_date: editFormData.birth_date,
-        gender: editFormData.gender,
-        id_number: editFormData.id_number,
-        passport_number: editFormData.passport_number,
-        passport_expiry: editFormData.passport_expiry,
-        special_meal: editFormData.special_meal,
-        remarks: editFormData.remarks,
+        chinese_name: editFormData.chinese_name || null,
+        passport_name: editFormData.passport_name || null,
+        birth_date: editFormData.birth_date || null,
+        gender: editFormData.gender || null,
+        id_number: editFormData.id_number || null,
+        passport_number: editFormData.passport_number || null,
+        passport_expiry: editFormData.passport_expiry || null,
+        special_meal: editFormData.special_meal || null,
+        remarks: editFormData.remarks || null,
       }
 
       const { error: memberError } = await supabase
@@ -499,14 +500,15 @@ export function OrderMembersExpandable({
 
       if (editingMember.customer_id) {
         // 2a. 有關聯的顧客，同步更新 customers
+        // 空字串轉 null（日期欄位不接受空字串）
         const customerUpdateData: Record<string, unknown> = {
-          name: editFormData.chinese_name,
-          passport_romanization: editFormData.passport_name,
-          date_of_birth: editFormData.birth_date,
-          gender: editFormData.gender,
-          national_id: editFormData.id_number,
-          passport_number: editFormData.passport_number,
-          passport_expiry_date: editFormData.passport_expiry,
+          name: editFormData.chinese_name || null,
+          passport_romanization: editFormData.passport_name || null,
+          date_of_birth: editFormData.birth_date || null,
+          gender: editFormData.gender || null,
+          national_id: editFormData.id_number || null,
+          passport_number: editFormData.passport_number || null,
+          passport_expiry_date: editFormData.passport_expiry || null,
         }
 
         // 儲存時自動更新驗證狀態為 verified（無論是編輯或驗證模式）

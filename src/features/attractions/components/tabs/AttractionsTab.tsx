@@ -1,7 +1,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRegionsStore } from '@/stores'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
 import { useAttractionsFilters } from '../../hooks/useAttractionsFilters'
@@ -12,7 +12,7 @@ import { SortableAttractionsList } from '../SortableAttractionsList'
 import { AttractionsDialog } from '../AttractionsDialog'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, List } from 'lucide-react'
+import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
 import type { Country, City } from '@/stores/region-store'
 
 // ============================================
@@ -48,6 +48,7 @@ export default function AttractionsTab({
   const [displayCities, setDisplayCities] = useState<City[]>([])
   // 排序模式控制
   const [isReorderMode, setIsReorderMode] = useState(false)
+  const [isSorting, setIsSorting] = useState(false)
 
   const { attractions, loading, addAttraction, updateAttraction, deleteAttraction, toggleStatus } =
     useAttractionsData()
@@ -103,7 +104,16 @@ export default function AttractionsTab({
     selectedCity: '', // 不再使用城市篩選
   })
 
-  const { countries, regions, cities } = useRegionsStore()
+  const { countries, regions, cities, fetchCountries } = useRegionsStore()
+  const regionsLoadedRef = useRef(false)
+
+  // 載入國家/地區/城市資料供對話框使用（只執行一次）
+  useEffect(() => {
+    if (!regionsLoadedRef.current) {
+      regionsLoadedRef.current = true
+      fetchCountries()
+    }
+  }, [fetchCountries])
 
   const getRegionsByCountry = (countryId: string) => {
     return regions.filter(r => r.country_id === countryId)
@@ -142,10 +152,48 @@ export default function AttractionsTab({
     return { success: false }
   }
 
+  // 按名稱排序所有景點
+  const handleSortByName = async () => {
+    if (isSorting || attractions.length === 0) return
+
+    setIsSorting(true)
+    try {
+      // 按名稱排序（使用 localeCompare 支援中文排序）
+      const sorted = [...attractions].sort((a, b) =>
+        a.name.localeCompare(b.name, 'zh-TW')
+      )
+
+      // 批量更新 display_order
+      await reorderAttractions(sorted)
+      logger.log('[Attractions] 按名稱排序完成')
+    } catch (error) {
+      logger.error('[Attractions] 排序失敗:', error)
+    } finally {
+      setIsSorting(false)
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* 視圖切換按鈕 */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4 px-4">
+        {/* 左側：排序按鈕 */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleSortByName}
+          disabled={isSorting || attractions.length === 0}
+          className="h-8"
+        >
+          {isSorting ? (
+            <Loader2 size={14} className="mr-1.5 animate-spin" />
+          ) : (
+            <SortAsc size={14} className="mr-1.5" />
+          )}
+          {isSorting ? '排序中...' : '按名稱排序'}
+        </Button>
+
+        {/* 右側：檢視切換 */}
         <div className="flex items-center gap-2">
           <Button
             variant={isReorderMode ? "outline" : "default"}

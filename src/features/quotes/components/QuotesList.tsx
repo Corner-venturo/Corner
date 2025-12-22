@@ -195,6 +195,14 @@ export const QuotesList: React.FC<QuotesListProps> = ({
       searchTerm={searchTerm}
       onRowClick={row => onQuoteClick((row as Quote).id)}
       bordered={true}
+      rowClassName={row => {
+        const quote = row as Quote
+        // 孤兒資料（沒有 tour_id）顯示紅色背景
+        if (!quote.tour_id) {
+          return 'bg-red-50/50 hover:bg-red-100/50'
+        }
+        return ''
+      }}
       actions={row => {
         const quote = row as Quote
         return (

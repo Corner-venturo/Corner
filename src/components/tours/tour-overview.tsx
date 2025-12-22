@@ -14,6 +14,8 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle,
+  Calculator,
+  Route,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -21,12 +23,16 @@ interface TourOverviewProps {
   tour: Tour
   orderFilter?: string // 選填：顯示特定訂單的總覽信息
   onEdit?: () => void // 選填：編輯基本資料的回調
+  onManageQuote?: () => void // 選填：管理報價單的回調
+  onManageItinerary?: () => void // 選填：管理行程表的回調
 }
 
 export const TourOverview = React.memo(function TourOverview({
   tour,
   orderFilter,
   onEdit,
+  onManageQuote,
+  onManageItinerary,
 }: TourOverviewProps) {
   const { items: orders } = useOrderStore()
 
@@ -167,19 +173,27 @@ export const TourOverview = React.memo(function TourOverview({
           <h3 className="text-lg font-semibold text-morandi-primary mb-4">快速操作</h3>
           <div className="space-y-2">
             <Button
-              onClick={onEdit}
+              onClick={onManageQuote}
               className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white justify-start"
+            >
+              <Calculator size={16} className="mr-2" />
+              製作報價單
+            </Button>
+            <Button
+              onClick={onManageItinerary}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <Route size={16} className="mr-2" />
+              製作行程表
+            </Button>
+            <Button
+              onClick={onEdit}
+              variant="outline"
+              className="w-full justify-start"
             >
               <FileText size={16} className="mr-2" />
               編輯基本資料
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <CheckCircle size={16} className="mr-2" />
-              更新合約狀態
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <DollarSign size={16} className="mr-2" />
-              查看財務報表
             </Button>
           </div>
         </div>

@@ -220,7 +220,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
           const city = cities.find(c => c.id === restaurant.city_id)
           return (
             <div className="text-sm text-morandi-secondary line-clamp-1">
-              {country?.emoji} {city?.name || '-'}
+              {city?.name || '-'}
             </div>
           )
         },

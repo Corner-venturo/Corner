@@ -1080,8 +1080,6 @@ export default function ItineraryPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="搜尋行程..."
-        onAdd={handleOpenTypeSelect}
-        addLabel="新增行程"
       >
         {/* 狀態篩選 + 作者篩選 */}
         <div className="flex items-center gap-4">
@@ -1554,8 +1552,13 @@ export default function ItineraryPage() {
             onRowClick={(itinerary) => handleRowClick(itinerary as Itinerary)}
             rowClassName={(row) => {
               const itinerary = row as Itinerary
+              // 已綁定旅遊團的顯示藍色背景
               if (itinerary.tour_id) {
                 return 'bg-morandi-blue/5 hover:bg-morandi-blue/10'
+              }
+              // 孤兒資料（沒有 tour_id 且不是公司範例）顯示紅色背景
+              if (!itinerary.tour_id && !itinerary.is_template) {
+                return 'bg-red-50/50 hover:bg-red-100/50'
               }
               return ''
             }}

@@ -114,7 +114,7 @@ function SortableAttractionItem({
               )}
               <div className="flex items-center gap-4 mt-2">
                 <span className="text-sm text-morandi-secondary">
-                  {country?.emoji} {city?.name || attraction.city_id}
+                  {city?.name || attraction.city_id}
                 </span>
                 {attraction.category && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-morandi-blue/10 text-morandi-blue">

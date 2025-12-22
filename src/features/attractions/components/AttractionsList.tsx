@@ -99,7 +99,7 @@ export function AttractionsList({
         const city = cities.find(c => c.id === attraction.city_id)
         return (
           <div className="text-sm text-morandi-secondary line-clamp-1">
-            {country?.emoji} {city?.name || attraction.city_id}
+            {city?.name || attraction.city_id}
           </div>
         )
       },
