@@ -6,7 +6,6 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourForm } from '@/components/editor/TourForm'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
-import { CreateQuoteFromItineraryButton } from '@/components/editor/CreateQuoteFromItineraryButton'
 import { PrintItineraryForm } from '@/features/itinerary/components/PrintItineraryForm'
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
 import { Button } from '@/components/ui/button'
@@ -1198,10 +1197,6 @@ function NewItineraryPageContent() {
         onBack={() => router.push('/itinerary')}
         actions={
           <div className="flex items-center gap-3">
-            <CreateQuoteFromItineraryButton
-              tourData={tourData}
-              itineraryId={itineraryId}
-            />
             <PublishButton
               data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
               currentVersionIndex={currentVersionIndex}
