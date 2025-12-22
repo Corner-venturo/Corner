@@ -10135,6 +10135,31 @@ export type Database = {
           },
         ]
       }
+      // === 手動添加的表格類型 (2025-12-22) ===
+      tour_destinations: {
+        Row: {
+          id: string
+          country: string
+          city: string
+          airport_code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          country: string
+          city: string
+          airport_code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          country?: string
+          city?: string
+          airport_code?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       tour_rooms_status: {

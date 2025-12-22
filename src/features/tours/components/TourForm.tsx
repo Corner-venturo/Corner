@@ -10,6 +10,7 @@ import { AddOrderForm, type OrderFormData } from '@/components/orders/add-order-
 import { AlertCircle, Search, Loader2 } from 'lucide-react'
 import { NewTourData } from '../types'
 import { useItineraryStore, useQuoteStore } from '@/stores'
+import { useTourDestinations } from '../hooks/useTourDestinations'
 import type { Itinerary, Quote } from '@/stores/types'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { toast } from 'sonner'
@@ -28,10 +29,6 @@ interface TourFormProps {
   setNewTour: React.Dispatch<React.SetStateAction<NewTourData>>
   newOrder: Partial<OrderFormData>
   setNewOrder: React.Dispatch<React.SetStateAction<Partial<OrderFormData>>>
-  activeCountries: Array<{ id: string; code: string; name: string }>
-  availableCities: Array<{ id: string; code: string; name: string }>
-  setAvailableCities: React.Dispatch<React.SetStateAction<any[]>>
-  getCitiesByCountryId: (countryId: string) => Array<{ id: string; code: string; name: string }>
   submitting: boolean
   formError: string | null
   onSubmit: () => void
@@ -50,10 +47,6 @@ export function TourForm({
   setNewTour,
   newOrder,
   setNewOrder,
-  activeCountries,
-  availableCities,
-  setAvailableCities,
-  getCitiesByCountryId,
   submitting,
   formError,
   onSubmit,
@@ -66,9 +59,27 @@ export function TourForm({
   const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
   const { items: quotes, fetchAll: fetchQuotes } = useQuoteStore()
 
+  // 使用新的目的地系統
+  const {
+    destinations,
+    countries,
+    loading: destinationsLoading,
+    getCitiesByCountry,
+    getAirportCode,
+    addDestination,
+  } = useTourDestinations()
+
   // 航班查詢狀態
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
+
+  // 目的地輸入狀態
+  const [cityInput, setCityInput] = useState('')
+  const [showAirportCodeDialog, setShowAirportCodeDialog] = useState(false)
+  const [newAirportCode, setNewAirportCode] = useState('')
+  const [pendingCity, setPendingCity] = useState('')
+  const [pendingCountry, setPendingCountry] = useState('')
+  const [savingDestination, setSavingDestination] = useState(false)
 
   // 查詢去程航班
   const handleSearchOutbound = useCallback(async () => {
@@ -256,108 +267,85 @@ export function TourForm({
                   />
                 </div>
 
-                {/* Destination selection */}
+                {/* Destination selection - 簡化版 */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary">國家/地區</label>
+                    <label className="text-sm font-medium text-morandi-primary">國家</label>
                     <Combobox
                       value={newTour.countryCode}
-                      onChange={countryCode => {
-                        const selectedCountry = activeCountries.find(c => c.code === countryCode)
-                        const cities =
-                          countryCode === '__custom__'
-                            ? []
-                            : selectedCountry
-                              ? getCitiesByCountryId(selectedCountry.id)
-                              : []
-                        setAvailableCities(cities)
+                      onChange={country => {
                         setNewTour(prev => ({
                           ...prev,
-                          countryCode,
-                          cityCode: countryCode === '__custom__' ? '__custom__' : '', // 不要自動帶入第一個城市
+                          countryCode: country,
+                          cityCode: '', // 清空城市選擇
                         }))
+                        setCityInput('')
                       }}
                       options={[
-                        ...activeCountries.map(country => ({
-                          value: country.code,
-                          label: country.name,
+                        ...countries.map(country => ({
+                          value: country,
+                          label: country,
                         })),
-                        { value: '__custom__', label: '+ 新增其他目的地' },
                       ]}
-                      placeholder="搜尋或選擇國家..."
-                      emptyMessage="找不到符合的國家"
+                      placeholder={destinationsLoading ? '載入中...' : '選擇或輸入國家...'}
+                      emptyMessage="找不到國家，請直接輸入"
                       showSearchIcon={true}
                       showClearButton={true}
+                      allowCustomValue={true}
                       className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-morandi-primary">城市</label>
-                    {newTour.countryCode === '__custom__' ? (
-                      <Input
-                        value={newTour.customLocation || ''}
-                        onChange={e =>
-                          setNewTour(prev => ({ ...prev, customLocation: e.target.value }))
-                        }
-                        placeholder="輸入城市名稱 (如：曼谷)"
-                        className="mt-1"
-                      />
-                    ) : (
-                      <Combobox
-                        value={newTour.cityCode}
-                        onChange={cityCode => setNewTour(prev => ({ ...prev, cityCode }))}
-                        options={availableCities.map(city => ({
-                          value: city.code || `__no_code_${city.id}`,
-                          label: city.code
-                            ? `${city.name} (${city.code})`
-                            : `${city.name} ⚠️ 未設定機場代碼`,
-                          disabled: !city.code,
-                        }))}
-                        placeholder="輸入或選擇城市..."
-                        emptyMessage="找不到符合的城市"
-                        showSearchIcon={true}
-                        showClearButton={true}
-                        disabled={!newTour.countryCode || newTour.countryCode === '__custom__'}
-                        className="mt-1"
-                      />
-                    )}
+                    <label className="text-sm font-medium text-morandi-primary">城市 (機場代碼)</label>
+                    {(() => {
+                      const citiesForCountry = newTour.countryCode ? getCitiesByCountry(newTour.countryCode) : []
+                      return (
+                        <Combobox
+                          value={newTour.cityCode}
+                          onChange={cityCode => {
+                            setNewTour(prev => ({ ...prev, cityCode }))
+                            setCityInput('')
+                          }}
+                          options={citiesForCountry.map(c => ({
+                            value: c.airport_code,
+                            label: `${c.city} (${c.airport_code})`,
+                          }))}
+                          placeholder={!newTour.countryCode ? '請先選擇國家' : '選擇或輸入城市...'}
+                          emptyMessage="找不到城市，請輸入新城市"
+                          showSearchIcon={true}
+                          showClearButton={true}
+                          allowCustomValue={true}
+                          disabled={!newTour.countryCode}
+                          className="mt-1"
+                          onCustomValueSubmit={(value) => {
+                            // 當輸入自定義城市時，檢查是否需要輸入機場代碼
+                            const existingCity = citiesForCountry.find(
+                              c => c.city.toLowerCase() === value.toLowerCase() ||
+                                   c.airport_code.toLowerCase() === value.toLowerCase()
+                            )
+                            if (existingCity) {
+                              // 如果城市已存在，直接使用其機場代碼
+                              setNewTour(prev => ({ ...prev, cityCode: existingCity.airport_code }))
+                            } else {
+                              // 新城市，需要輸入機場代碼
+                              setPendingCity(value)
+                              setPendingCountry(newTour.countryCode)
+                              setNewAirportCode('')
+                              setShowAirportCodeDialog(true)
+                            }
+                          }}
+                        />
+                      )
+                    })()}
                   </div>
                 </div>
 
-                {/* Custom destination details */}
-                {newTour.countryCode === '__custom__' && (
-                  <>
-                    <div>
-                      <label className="text-sm font-medium text-morandi-primary">國家名稱</label>
-                      <Input
-                        value={newTour.customCountry || ''}
-                        onChange={e =>
-                          setNewTour(prev => ({ ...prev, customCountry: e.target.value }))
-                        }
-                        placeholder="輸入國家名稱 (如：泰國)"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-morandi-primary">
-                        3 碼城市代號
-                      </label>
-                      <Input
-                        value={newTour.customCityCode || ''}
-                        onChange={e => {
-                          const value = e.target.value.toUpperCase().slice(0, 3)
-                          setNewTour(prev => ({ ...prev, customCityCode: value }))
-                        }}
-                        placeholder="輸入 3 碼代號 (如：BKK)"
-                        className="mt-1"
-                        maxLength={3}
-                      />
-                      <p className="text-xs text-morandi-secondary mt-1">
-                        💡 用於生成團號，建議使用國際機場代碼或城市縮寫
-                      </p>
-                    </div>
-                  </>
+                {/* 顯示當前選擇的城市代碼 */}
+                {newTour.cityCode && (
+                  <p className="text-xs text-morandi-secondary">
+                    團號城市代碼：<span className="font-mono font-semibold">{newTour.cityCode}</span>
+                  </p>
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
@@ -608,6 +596,82 @@ export function TourForm({
                 : '新增旅遊團'}
           </Button>
         </div>
+
+        {/* 新增城市機場代碼對話框 */}
+        <Dialog open={showAirportCodeDialog} onOpenChange={setShowAirportCodeDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>輸入機場代碼</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-morandi-secondary">
+                新城市「<span className="font-medium text-morandi-primary">{pendingCity}</span>」需要輸入 3 位數的機場代碼 (IATA Code)。
+              </p>
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">機場代碼</label>
+                <Input
+                  value={newAirportCode}
+                  onChange={e => setNewAirportCode(e.target.value.toUpperCase().slice(0, 3))}
+                  placeholder="例如: CNX, BKK, NRT"
+                  className="mt-1 font-mono uppercase"
+                  maxLength={3}
+                />
+                <p className="text-xs text-morandi-secondary mt-1">
+                  提示：請輸入該城市主要機場的 IATA 代碼
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAirportCodeDialog(false)
+                  setPendingCity('')
+                  setPendingCountry('')
+                  setNewAirportCode('')
+                }}
+                disabled={savingDestination}
+              >
+                取消
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (newAirportCode.length !== 3) {
+                    toast.error('機場代碼必須是 3 個字母')
+                    return
+                  }
+                  setSavingDestination(true)
+                  try {
+                    const result = await addDestination(pendingCountry, pendingCity, newAirportCode)
+                    if (result.success) {
+                      setNewTour(prev => ({ ...prev, cityCode: newAirportCode }))
+                      toast.success(`已新增目的地: ${pendingCity} (${newAirportCode})`)
+                      setShowAirportCodeDialog(false)
+                      setPendingCity('')
+                      setPendingCountry('')
+                      setNewAirportCode('')
+                    } else {
+                      toast.error(result.error || '新增失敗')
+                    }
+                  } finally {
+                    setSavingDestination(false)
+                  }
+                }}
+                disabled={savingDestination || newAirportCode.length !== 3}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                {savingDestination ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin mr-1" />
+                    儲存中...
+                  </>
+                ) : (
+                  '確認新增'
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   )

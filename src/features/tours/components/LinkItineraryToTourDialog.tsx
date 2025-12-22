@@ -214,10 +214,10 @@ export function LinkItineraryToTourDialog({
     try {
       setIsUnlinking(true)
       await update(itinerary.id, {
-        tour_id: undefined,
-        tour_code: undefined,
+        tour_id: null,
+        tour_code: null,
         status: '提案', // 解除綁定後自動變更為提案
-      })
+      } as Partial<Itinerary>)
       await fetchAll()
     } catch (error) {
       console.error('斷開連結失敗:', error)
