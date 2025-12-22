@@ -79,6 +79,19 @@ export const TourMembers = React.memo(function TourMembers({
     stayDays: 5,
   })
 
+  // 監聽外部觸發的入境卡列印事件
+  useEffect(() => {
+    const handleOpenEntryCard = (e: CustomEvent<{ tourId: string }>) => {
+      if (e.detail.tourId === tour.id) {
+        setShowEntryCardDialog(true)
+      }
+    }
+    window.addEventListener('openEntryCardDialog', handleOpenEntryCard as EventListener)
+    return () => {
+      window.removeEventListener('openEntryCardDialog', handleOpenEntryCard as EventListener)
+    }
+  }, [tour.id])
+
   // 載入房間分配資訊
   const loadRoomAssignments = useCallback(async () => {
     if (!tour.id) return
@@ -572,19 +585,6 @@ export const TourMembers = React.memo(function TourMembers({
 
   return (
     <div>
-      {/* 工具列 */}
-      <div className="flex items-center justify-end px-4 py-2 border-b border-morandi-gold/20 bg-card">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowEntryCardDialog(true)}
-          className="bg-rose-50 hover:bg-rose-100 border-rose-200"
-        >
-          <FileText size={16} className="mr-1" />
-          列印入境卡
-        </Button>
-      </div>
-
       {/* 統一團員表格 */}
       <div className="overflow-hidden bg-card">
         <div className="w-full overflow-x-auto">

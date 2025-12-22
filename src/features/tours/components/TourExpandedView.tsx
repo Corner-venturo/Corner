@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Edit2,
   MessageSquare,
+  Printer,
 } from 'lucide-react'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { cn } from '@/lib/utils'
@@ -203,6 +204,19 @@ export function TourExpandedView({
             >
               <Plus size={14} className="mr-1" />
               新增支出
+            </button>
+          )}
+          {activeTabs[tour.id] === 'members' && (
+            <button
+              onClick={() => {
+                // 觸發 TourMembers 組件內的入境卡列印對話框
+                const event = new CustomEvent('openEntryCardDialog', { detail: { tourId: tour.id } })
+                window.dispatchEvent(event)
+              }}
+              className="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
+            >
+              <Printer size={14} className="mr-1" />
+              列印入境卡
             </button>
           )}
         </div>
