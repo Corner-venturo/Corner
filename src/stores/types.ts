@@ -643,28 +643,42 @@ export interface QuickQuoteItem {
 export interface QuoteVersion {
   id: string
   version: number
+  mode: 'detailed' | 'simple' // 版本模式：詳細（成本分析）或 簡易（請款單）
   name?: string // 版本名稱（如：客戶名稱、報價單名稱）- 可選以向下兼容
-  categories: QuoteCategory[]
-  total_cost: number
+  note?: string // 修改說明
+  created_at: string
+  updated_at?: string // 版本更新時間（選填）
+
+  // === 詳細模式 (detailed) 專用欄位 ===
+  categories?: QuoteCategory[] // 成本分類
+  total_cost?: number // 總成本
   group_size?: number // 團體人數
-  accommodation_days: number // 住宿天數
-  participant_counts: {
+  accommodation_days?: number // 住宿天數
+  participant_counts?: {
     adult: number
     child_with_bed: number
     child_no_bed: number
     single_room: number
     infant: number
   } // 多身份人數統計
-  selling_prices: {
+  selling_prices?: {
     adult: number
     child_with_bed: number
     child_no_bed: number
     single_room: number
     infant: number
   } // 多身份售價
-  note?: string // 修改說明
-  created_at: string
-  updated_at?: string // 版本更新時間（選填）
+
+  // === 簡易模式 (simple) 專用欄位 ===
+  quick_quote_items?: QuickQuoteItem[] // 報價項目
+  customer_name?: string // 客戶名稱
+  contact_person?: string // 聯絡人
+  contact_phone?: string // 聯絡電話
+  contact_address?: string // 通訊地址
+  handler_name?: string // 承辦業務
+  issue_date?: string // 開單日期
+  received_amount?: number // 已收金額
+  expense_description?: string // 費用說明
 }
 
 export interface QuoteCategory {

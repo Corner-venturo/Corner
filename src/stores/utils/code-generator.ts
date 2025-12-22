@@ -26,10 +26,8 @@
  * 例如：C000001
  *
  * === 報價單編號格式 ===
- * 標準報價單：Q{6位數}
- * 例如：Q000001
- * 快速報價單：X{6位數}
- * 例如：X000001
+ * Q{6位數}
+ * 例如：Q000001, Q000002...
  *
  * === 員工編號格式 ===
  * E{3位數}
@@ -96,109 +94,56 @@ export function generateTourCode(
  * 生成報價單編號
  *
  * @param workspaceCode - 辦公室代碼（忽略，保留參數以維持 API 相容性）
- * @param config - 配置（可包含 quoteType: 'quick' | 'standard'）
+ * @param config - 配置（忽略 quoteType，統一使用 Q 前綴）
  * @param existingItems - 現有項目列表
  *
  * @example
- * generateCode('TP', { prefix: 'Q', quoteType: 'standard' }, existingQuotes)
- * // 標準報價單: Q000001, Q000002...
- * // 快速報價單: X000001, X000002...
+ * generateCode('TP', {}, existingQuotes)
+ * // 統一格式: Q000001, Q000002...
  */
 export function generateCode(
   workspaceCode: string,
   config: CodeConfig,
   existingItems: BaseEntity[]
 ): string {
-  const configWithQuoteType = config as CodeConfig & { quoteType?: 'quick' | 'standard' }
-  const isQuickQuote = configWithQuoteType.quoteType === 'quick'
-
   logger.log('🔍 [code-generator] generateCode 參數:', {
     workspaceCode,
     config,
-    configQuoteType: configWithQuoteType.quoteType,
-    isQuickQuote,
     existingItemsCount: existingItems.length,
   })
 
-  // 快速報價單使用 X 開頭
-  // 格式：X000001 ~ X999999
-  if (isQuickQuote) {
-    logger.log('✅ [code-generator] 判定為快速報價單，使用 X 系列')
-    let maxNumber = 0
-
-    existingItems.forEach(item => {
-      if ('code' in item && 'quote_type' in item) {
-        const code = (item as { code?: string; quote_type?: string }).code
-        const quoteType = (item as { quote_type?: string }).quote_type
-
-        if (code && quoteType === 'quick') {
-          // 匹配新格式 X000001
-          if (/^X\d{6}$/.test(code)) {
-            const numberPart = code.substring(1)
-            const number = parseInt(numberPart, 10)
-            if (!isNaN(number) && number > maxNumber) {
-              maxNumber = number
-            }
-          }
-          // 向後相容：匹配舊格式 Q001, QA001, TP-Q001 等
-          if (/^Q\d{3,}$/.test(code) || /^Q[A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-Q\d{3,}$/.test(code)) {
-            // 舊格式轉換為序列號
-            let number = 0
-            if (/^Q\d{3,}$/.test(code)) {
-              number = parseInt(code.substring(1), 10)
-            } else if (/^Q[A-Z]\d{3}$/.test(code)) {
-              const letter = code[1]
-              const num = parseInt(code.substring(2), 10)
-              const letterIndex = letter.charCodeAt(0) - 'A'.charCodeAt(0)
-              number = 1000 + letterIndex * 999 + num
-            } else if (/^[A-Z]{2}-Q\d{3,}$/.test(code)) {
-              number = parseInt(code.split('-Q')[1], 10)
-            }
-            if (number > maxNumber) {
-              maxNumber = number
-            }
-          }
-        }
-      }
-    })
-
-    const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
-    const finalCode = `X${nextNumber}`
-    logger.log('✅ [code-generator] 快速報價單編號生成:', finalCode)
-    return finalCode
-  }
-
-  // 標準報價單使用 Q 開頭
+  // 統一使用 Q 開頭
   // 格式：Q000001 ~ Q999999
-  logger.log('📋 [code-generator] 判定為標準報價單，使用 Q 系列')
   let maxNumber = 0
 
   existingItems.forEach(item => {
     if ('code' in item) {
       const code = (item as { code?: string }).code
-      const quoteType = (item as { quote_type?: string })?.quote_type
 
-      if (code && quoteType !== 'quick') {
-        // 匹配新格式 Q000001
-        if (/^Q\d{6}$/.test(code)) {
+      if (code) {
+        // 匹配新格式 Q000001 或 X000001（向後相容）
+        if (/^[QX]\d{6}$/.test(code)) {
           const numberPart = code.substring(1)
           const number = parseInt(numberPart, 10)
           if (!isNaN(number) && number > maxNumber) {
             maxNumber = number
           }
         }
-        // 向後相容：匹配舊格式 A001, AA001, TP-A001 等
-        if (/^A\d{3,}$/.test(code) || /^A[A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-A\d{3,}$/.test(code)) {
+        // 向後相容：匹配舊格式 A001, AA001, TP-A001, Q001 等
+        if (/^[AQ]\d{3,}$/.test(code) || /^[AQ][A-Z]\d{3}$/.test(code) || /^[A-Z]{2}-[AQ]\d{3,}$/.test(code)) {
           let number = 0
-          if (/^A\d{3,}$/.test(code)) {
+          if (/^[AQ]\d{3,}$/.test(code)) {
             number = parseInt(code.substring(1), 10)
-          } else if (/^A[A-Z]\d{3}$/.test(code)) {
+          } else if (/^[AQ][A-Z]\d{3}$/.test(code)) {
             const letter = code[1]
             const num = parseInt(code.substring(2), 10)
             const letterIndex = letter.charCodeAt(0) - 'A'.charCodeAt(0)
             number = 1000 + letterIndex * 999 + num
-          } else if (/^[A-Z]{2}-A\d{3,}$/.test(code)) {
-            number = parseInt(code.split('-A')[1], 10)
+          } else if (/^[A-Z]{2}-[AQ]\d{3,}$/.test(code)) {
+            const parts = code.split(/-[AQ]/)
+            if (parts[1]) {
+              number = parseInt(parts[1], 10)
+            }
           }
           if (number > maxNumber) {
             maxNumber = number
@@ -210,7 +155,7 @@ export function generateCode(
 
   const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
   const finalCode = `Q${nextNumber}`
-  logger.log('✅ [code-generator] 標準報價單編號生成:', finalCode, { maxNumber })
+  logger.log('✅ [code-generator] 報價單編號生成:', finalCode, { maxNumber })
   return finalCode
 }
 

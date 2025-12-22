@@ -172,9 +172,10 @@ export const useQuoteActions = ({
 
         // 第一次儲存：沒有版本記錄，自動創建 versions[0]
         if (existingVersions.length === 0) {
-          const firstVersion = {
+          const firstVersion: QuoteVersion = {
             id: Date.now().toString(),
             version: 1,
+            mode: 'detailed', // 預設為詳細模式
             name: quoteName || quote.customer_name || '版本 1', // 優先使用行程代碼（quoteName）
             categories: updatedCategories,
             total_cost,
@@ -283,9 +284,10 @@ export const useQuoteActions = ({
         // 創建新的版本記錄
         // 優先使用傳入的 newVersionName，其次使用 versionName state，最後使用預設名稱
         const finalVersionName = newVersionName || versionName || `版本 ${newVersion}`
-        const newVersionRecord = {
+        const newVersionRecord: QuoteVersion = {
           id: Date.now().toString(),
           version: newVersion,
+          mode: 'detailed', // 預設為詳細模式
           name: finalVersionName, // 版本名稱
           categories: updatedCategories,
           total_cost,
@@ -362,9 +364,10 @@ export const useQuoteActions = ({
     )
     const newVersion = maxVersion + 1
 
-    const finalizeVersionRecord = {
+    const finalizeVersionRecord: QuoteVersion = {
       id: Date.now().toString(),
       version: newVersion,
+      mode: 'detailed', // 預設為詳細模式
       name: `最終版本 ${newVersion}`,
       categories: updatedCategories,
       total_cost,
@@ -415,9 +418,10 @@ export const useQuoteActions = ({
     )
     const newVersion = maxVersion + 1
 
-    const createTourVersionRecord = {
+    const createTourVersionRecord: QuoteVersion = {
       id: Date.now().toString(),
       version: newVersion,
+      mode: 'detailed', // 預設為詳細模式
       name: `開團版本 ${newVersion}`,
       categories: updatedCategories,
       total_cost,
