@@ -120,13 +120,10 @@ export default function AttractionsTab({
   const handleEditSubmit = async (formData: import('../../types').AttractionFormData) => {
     if (!editingAttraction) return { success: false }
 
-    const result = await updateAttraction(editingAttraction.id, {
-      ...formData,
-      tags: formData.tags ? formData.tags.split(',').map((t: string) => t.trim()) : [],
-      images: formData.images ? formData.images.split(',').map((i: string) => i.trim()) : [],
-    } as unknown as Parameters<typeof updateAttraction>[1])
+    // updateAttraction 內部已處理 tags/images 轉換，直接傳遞 formData
+    const result = await updateAttraction(editingAttraction.id, formData)
 
-    if (result) {
+    if (result?.success) {
       closeEdit()
       return { success: true }
     }
