@@ -634,14 +634,14 @@ export function AttractionsDialog({
         <div>
           <label className="text-sm font-medium">城市（選填）</label>
           <Select
-            value={formData.city_id ?? ''}
-            onValueChange={value => setFormData(prev => ({ ...prev, city_id: value }))}
+            value={formData.city_id || '_none_'}
+            onValueChange={value => setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="不指定" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">不指定</SelectItem>
+              <SelectItem value="_none_">不指定</SelectItem>
               {availableCities.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
