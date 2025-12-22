@@ -37,7 +37,8 @@ interface UseItineraryImportResult {
   isLinkingItinerary: boolean
   linkItineraryId: string | null
   shouldCreateNewVersion: boolean
-  importDataToCategories: (categories: CostCategory[]) => CostCategory[]
+  importDataToCategories: (categories: CostCategory[], skipCheck?: boolean) => CostCategory[]
+  markAsImported: () => void
 }
 
 export const useItineraryImport = (): UseItineraryImportResult => {
@@ -108,22 +109,29 @@ export const useItineraryImport = (): UseItineraryImportResult => {
   }
 
   // 將行程資料匯入到報價分類中
-  const importDataToCategories = (categories: CostCategory[]): CostCategory[] => {
+  // skipCheck: 跳過 hasImportedData 檢查（用於 useState 初始化時）
+  const importDataToCategories = (categories: CostCategory[], skipCheck: boolean = false): CostCategory[] => {
     console.log('[useItineraryImport] importDataToCategories called', {
       isFromItinerary,
       hasImportedData,
+      skipCheck,
       mealsCount: mealsData.length,
       hotelsCount: hotelsData.length,
       activitiesCount: activitiesData.length,
     })
 
-    if (!isFromItinerary || hasImportedData || (mealsData.length === 0 && hotelsData.length === 0 && activitiesData.length === 0)) {
-      console.log('[useItineraryImport] Skipping import')
+    // 如果不是從行程來的，或沒有資料，直接返回
+    if (!isFromItinerary || (mealsData.length === 0 && hotelsData.length === 0 && activitiesData.length === 0)) {
+      console.log('[useItineraryImport] Skipping import - no data')
       return categories
     }
 
-    // 標記為已匯入，避免重複匯入
-    setHasImportedData(true)
+    // 如果已經匯入過且不是跳過檢查模式，直接返回
+    if (hasImportedData && !skipCheck) {
+      console.log('[useItineraryImport] Skipping import - already imported')
+      return categories
+    }
+
     console.log('[useItineraryImport] Starting import...')
 
     const updatedCategories = [...categories]
@@ -161,6 +169,11 @@ export const useItineraryImport = (): UseItineraryImportResult => {
     return updatedCategories
   }
 
+  // 標記為已匯入（供外部調用）
+  const markAsImported = () => {
+    setHasImportedData(true)
+  }
+
   return {
     isFromItinerary,
     mealsData,
@@ -170,6 +183,7 @@ export const useItineraryImport = (): UseItineraryImportResult => {
     isLinkingItinerary,
     linkItineraryId,
     shouldCreateNewVersion,
-    importDataToCategories
+    importDataToCategories,
+    markAsImported,
   }
 }
