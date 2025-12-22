@@ -35,7 +35,8 @@ import { ArchiveReasonDialog, ArchiveReason } from './ArchiveReasonDialog'
 import { useTourTableColumns } from './TourTableColumns'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
-import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
+import { LinkQuoteToTourDialog } from './LinkQuoteToTourDialog'
+import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourDetailDialog } from '@/components/tours/TourDetailDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
@@ -50,8 +51,10 @@ export const ToursPage: React.FC = () => {
   const [selectedItineraryId, setSelectedItineraryId] = useState<string | null>(null)
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
 
-  // 連結文件對話框狀態（合併行程表和報價單）
-  const [documentsDialogTour, setDocumentsDialogTour] = useState<Tour | null>(null)
+  // 報價單對話框狀態
+  const [quoteDialogTour, setQuoteDialogTour] = useState<Tour | null>(null)
+  // 行程表對話框狀態
+  const [itineraryDialogTour, setItineraryDialogTour] = useState<Tour | null>(null)
 
   // 合約對話框狀態
   const [contractDialogState, setContractDialogState] = useState<{
@@ -453,8 +456,8 @@ export const ToursPage: React.FC = () => {
     setDeleteConfirm,
     handleCreateChannel,
     handleUnlockTour,
-    onOpenQuoteDialog: (tour) => setDocumentsDialogTour(tour),
-    onOpenItineraryDialog: (tour) => setDocumentsDialogTour(tour),
+    onOpenQuoteDialog: (tour) => setQuoteDialogTour(tour),
+    onOpenItineraryDialog: (tour) => setItineraryDialogTour(tour),
     onOpenContractDialog: (tour) => {
       const mode = tour.contract_template ? 'edit' : 'create'
       setContractDialogState({ isOpen: true, tour, mode })
@@ -633,12 +636,21 @@ export const ToursPage: React.FC = () => {
         }}
       />
 
-      {/* Link documents to tour dialog (combined) */}
-      {documentsDialogTour && (
-        <LinkDocumentsToTourDialog
-          isOpen={!!documentsDialogTour}
-          onClose={() => setDocumentsDialogTour(null)}
-          tour={documentsDialogTour}
+      {/* 報價單對話框 */}
+      {quoteDialogTour && (
+        <LinkQuoteToTourDialog
+          isOpen={!!quoteDialogTour}
+          onClose={() => setQuoteDialogTour(null)}
+          tour={quoteDialogTour}
+        />
+      )}
+
+      {/* 行程表對話框 */}
+      {itineraryDialogTour && (
+        <LinkItineraryToTourDialog
+          isOpen={!!itineraryDialogTour}
+          onClose={() => setItineraryDialogTour(null)}
+          tour={itineraryDialogTour}
         />
       )}
 

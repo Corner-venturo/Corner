@@ -16,7 +16,8 @@ import {
   LockOpen,
   Lock,
   Eye,
-  Link,
+  Calculator,
+  FileText,
   CheckCircle2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -151,7 +152,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <MessageSquare size={14} />
           </button>
 
-          {/* 連結文件（報價單/行程表） */}
+          {/* 報價單 */}
           <button
             onClick={e => {
               e.stopPropagation()
@@ -164,10 +165,27 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/quotes?tour_id=${tour.id}`)
               }
             }}
-            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
-            title="連結文件"
+            className="p-1 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors"
+            title="報價單"
           >
-            <Link size={14} />
+            <Calculator size={14} />
+          </button>
+
+          {/* 行程表 */}
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              setSelectedTour(tour)
+              if (onOpenItineraryDialog) {
+                onOpenItineraryDialog(tour)
+              } else {
+                router.push(`/itinerary?tour_id=${tour.id}`)
+              }
+            }}
+            className="p-1 text-morandi-primary hover:text-morandi-primary/80 hover:bg-morandi-primary/10 rounded transition-colors"
+            title="行程表"
+          >
+            <FileText size={14} />
           </button>
 
           {/* 合約管理 */}
