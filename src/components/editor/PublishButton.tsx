@@ -89,7 +89,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
     price_note: data.priceNote || null,
     country: data.country,
     city: data.city,
-    status: (data.status || 'draft') as 'draft' | 'published',
+    status: (data.status || '提案') as '提案' | '進行中',
     outbound_flight: data.outboundFlight,
     return_flight: data.returnFlight,
     features: data.features,

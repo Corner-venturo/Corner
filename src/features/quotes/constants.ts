@@ -10,6 +10,7 @@ import { Calculator, FileText, Zap, Users } from 'lucide-react'
 export const STATUS_FILTERS = [
   { value: 'all', label: '全部', icon: Calculator },
   { value: 'proposed', label: '提案', icon: FileText },
+  { value: '進行中', label: '進行中', icon: FileText },
   { value: 'approved', label: '已核准', icon: FileText },
 ] as const
 
@@ -27,6 +28,7 @@ export const TYPE_FILTERS = [
  */
 export const STATUS_COLORS: Record<string, string> = {
   proposed: 'text-morandi-gold',
+  '進行中': 'text-blue-600',
   approved: 'text-green-600',
 }
 

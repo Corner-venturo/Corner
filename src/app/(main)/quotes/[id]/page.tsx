@@ -488,8 +488,8 @@ export default function QuoteDetailPage() {
   // 處理新建旅遊團
   const handleCreateNewTour = React.useCallback(() => {
     if (!quote) return
-    // 先更新狀態為成交
-    updateQuote(quote.id, { status: 'approved' })
+    // 先更新狀態為進行中（綁定旅遊團後自動變更）
+    updateQuote(quote.id, { status: '進行中' })
     // 呼叫原本的建立旅遊團功能
     handleCreateTour()
   }, [quote, updateQuote, handleCreateTour])
@@ -497,9 +497,9 @@ export default function QuoteDetailPage() {
   // 處理關聯現有旅遊團
   const handleLinkExistingTour = React.useCallback(async (tour: { id: string; code: string }) => {
     if (!quote) return
-    // 更新報價單狀態和關聯旅遊團
+    // 更新報價單狀態和關聯旅遊團（綁定後自動變更為進行中）
     await updateQuote(quote.id, {
-      status: 'approved',
+      status: '進行中',
       tour_id: tour.id
     })
     // 更新旅遊團的 quote_id

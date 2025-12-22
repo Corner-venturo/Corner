@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Globe, FileEdit, Link2 } from 'lucide-react'
+import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Link2, Plane, Search, CalendarDays, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DatePicker } from '@/components/ui/date-picker'
+import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
 import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -18,7 +20,7 @@ import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 
-const statusFilters = ['全部', '草稿', '已發布', '公司範例', '結案']
+const statusFilters = ['全部', '提案', '進行中', '公司範例', '結案']
 
 // 公司密碼（統編）
 const COMPANY_PASSWORD = '83212711'
@@ -68,6 +70,70 @@ export default function ItineraryPage() {
   const [duplicateTitle, setDuplicateTitle] = useState('')
   const [isDuplicating, setIsDuplicating] = useState(false)
 
+  // 簡易新增行程表單 state
+  const [newItineraryTitle, setNewItineraryTitle] = useState('')
+  const [newItineraryTourCode, setNewItineraryTourCode] = useState('')
+  const [newItineraryCountry, setNewItineraryCountry] = useState('')
+  const [newItineraryCity, setNewItineraryCity] = useState('')
+  const [newItineraryDepartureDate, setNewItineraryDepartureDate] = useState('')
+  const [newItineraryDays, setNewItineraryDays] = useState('')
+  const [newItineraryOutboundFlight, setNewItineraryOutboundFlight] = useState<{
+    flightNumber: string
+    airline: string
+    departureAirport: string
+    arrivalAirport: string
+    departureTime: string
+    arrivalTime: string
+    departureDate: string
+  } | null>(null)
+  const [newItineraryReturnFlight, setNewItineraryReturnFlight] = useState<{
+    flightNumber: string
+    airline: string
+    departureAirport: string
+    arrivalAirport: string
+    departureTime: string
+    arrivalTime: string
+    departureDate: string
+  } | null>(null)
+  const [isCreatingItinerary, setIsCreatingItinerary] = useState(false)
+  const [loadingOutboundFlight, setLoadingOutboundFlight] = useState(false)
+  const [loadingReturnFlight, setLoadingReturnFlight] = useState(false)
+
+  // 出發日期變更時，自動填入去程航班日期
+  useEffect(() => {
+    if (newItineraryDepartureDate) {
+      const date = new Date(newItineraryDepartureDate)
+      const dateStr = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
+      setNewItineraryOutboundFlight(prev => ({
+        flightNumber: prev?.flightNumber || '',
+        airline: prev?.airline || '',
+        departureAirport: prev?.departureAirport || 'TPE',
+        arrivalAirport: prev?.arrivalAirport || '',
+        departureTime: prev?.departureTime || '',
+        arrivalTime: prev?.arrivalTime || '',
+        departureDate: dateStr,
+      }))
+    }
+  }, [newItineraryDepartureDate])
+
+  // 天數變更時，自動填入回程航班日期
+  useEffect(() => {
+    if (newItineraryDepartureDate && newItineraryDays) {
+      const returnDate = new Date(newItineraryDepartureDate)
+      returnDate.setDate(returnDate.getDate() + parseInt(newItineraryDays) - 1)
+      const dateStr = `${String(returnDate.getMonth() + 1).padStart(2, '0')}/${String(returnDate.getDate()).padStart(2, '0')}`
+      setNewItineraryReturnFlight(prev => ({
+        flightNumber: prev?.flightNumber || '',
+        airline: prev?.airline || '',
+        departureAirport: prev?.departureAirport || '',
+        arrivalAirport: prev?.arrivalAirport || 'TPE',
+        departureTime: prev?.departureTime || '',
+        arrivalTime: prev?.arrivalTime || '',
+        departureDate: dateStr,
+      }))
+    }
+  }, [newItineraryDepartureDate, newItineraryDays])
+
   // 載入地區資料（只執行一次）
   React.useEffect(() => {
     regionsStore.fetchAll()
@@ -102,23 +168,219 @@ export default function ItineraryPage() {
     return tour?.code || null
   }, [tours])
 
-  // 打開類型選擇對話框
+  // 打開新增行程對話框
   const handleOpenTypeSelect = useCallback(() => {
+    // 重置表單
+    setNewItineraryTitle('')
+    setNewItineraryTourCode('')
+    setNewItineraryCountry('')
+    setNewItineraryCity('')
+    setNewItineraryDepartureDate('')
+    setNewItineraryDays('')
+    setNewItineraryOutboundFlight(null)
+    setNewItineraryReturnFlight(null)
     setIsTypeSelectOpen(true)
   }, [])
 
-  // 選擇網頁版行程表
-  const handleSelectWeb = () => {
-    setIsTypeSelectOpen(false)
-    router.push('/itinerary/new')
-  }
+  // 查詢去程航班
+  const handleSearchOutboundFlight = useCallback(async () => {
+    const flightNumber = newItineraryOutboundFlight?.flightNumber
+    if (!flightNumber) {
+      await alertError('請先輸入航班號碼')
+      return
+    }
 
+    setLoadingOutboundFlight(true)
+    try {
+      const result = await searchFlightAction(flightNumber, newItineraryDepartureDate || new Date().toISOString().split('T')[0])
+      if (result.error) {
+        await alertError(result.error)
+        return
+      }
+      if (result.data) {
+        setNewItineraryOutboundFlight(prev => ({
+          flightNumber: flightNumber,
+          airline: result.data.airline,
+          departureAirport: result.data.departure.iata,
+          arrivalAirport: result.data.arrival.iata,
+          departureTime: result.data.departure.time,
+          arrivalTime: result.data.arrival.time,
+          departureDate: prev?.departureDate || '',
+        }))
+      }
+    } catch {
+      await alertError('查詢航班時發生錯誤')
+    } finally {
+      setLoadingOutboundFlight(false)
+    }
+  }, [newItineraryOutboundFlight?.flightNumber, newItineraryDepartureDate])
 
-  // 選擇 Gemini AI 行程表
-  const handleSelectGemini = () => {
-    setIsTypeSelectOpen(false)
-    router.push('/itinerary/new?type=gemini')
-  }
+  // 查詢回程航班
+  const handleSearchReturnFlight = useCallback(async () => {
+    const flightNumber = newItineraryReturnFlight?.flightNumber
+    if (!flightNumber) {
+      await alertError('請先輸入航班號碼')
+      return
+    }
+
+    // 計算回程日期
+    let returnDateStr = new Date().toISOString().split('T')[0]
+    if (newItineraryDepartureDate && newItineraryDays) {
+      const returnDate = new Date(newItineraryDepartureDate)
+      returnDate.setDate(returnDate.getDate() + parseInt(newItineraryDays) - 1)
+      returnDateStr = returnDate.toISOString().split('T')[0]
+    }
+
+    setLoadingReturnFlight(true)
+    try {
+      const result = await searchFlightAction(flightNumber, returnDateStr)
+      if (result.error) {
+        await alertError(result.error)
+        return
+      }
+      if (result.data) {
+        setNewItineraryReturnFlight(prev => ({
+          flightNumber: flightNumber,
+          airline: result.data.airline,
+          departureAirport: result.data.departure.iata,
+          arrivalAirport: result.data.arrival.iata,
+          departureTime: result.data.departure.time,
+          arrivalTime: result.data.arrival.time,
+          departureDate: prev?.departureDate || '',
+        }))
+      }
+    } catch {
+      await alertError('查詢航班時發生錯誤')
+    } finally {
+      setLoadingReturnFlight(false)
+    }
+  }, [newItineraryReturnFlight?.flightNumber, newItineraryDepartureDate, newItineraryDays])
+
+  // 建立行程
+  const handleCreateItinerary = useCallback(async () => {
+    if (!newItineraryTitle.trim()) {
+      await alertError('請填寫行程名稱')
+      return
+    }
+    if (!newItineraryDepartureDate || !newItineraryDays) {
+      await alertError('請填寫出發日期和行程天數')
+      return
+    }
+
+    const days = parseInt(newItineraryDays)
+
+    // 計算回程日期
+    const returnDate = new Date(newItineraryDepartureDate)
+    returnDate.setDate(returnDate.getDate() + days - 1)
+    const returnDateStr = returnDate.toISOString().split('T')[0]
+
+    setIsCreatingItinerary(true)
+    try {
+      // 產生每日行程框架
+      const dailyItinerary = []
+      for (let i = 1; i <= days; i++) {
+        const date = new Date(newItineraryDepartureDate)
+        date.setDate(date.getDate() + i - 1)
+        const dateStr = date.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })
+        const weekday = date.toLocaleDateString('zh-TW', { weekday: 'short' })
+
+        dailyItinerary.push({
+          dayLabel: `Day ${i}`,
+          date: `${dateStr} (${weekday})`,
+          title: i === 1 ? '抵達目的地' : i === days ? '返回台灣' : '',
+          highlight: '',
+          description: '',
+          images: [],
+          activities: [],
+          recommendations: [],
+          meals: {
+            breakfast: i === 1 ? '溫暖的家' : '飯店內早餐',
+            lunch: '敬請自理',
+            dinner: '敬請自理',
+          },
+          accommodation: i === days ? '' : '待確認',
+        })
+      }
+
+      // 格式化日期顯示
+      const formatDateForDisplay = (dateStr: string) => {
+        const date = new Date(dateStr)
+        return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/')
+      }
+
+      const newItinerary = {
+        tagline: 'Corner Travel 2025',
+        title: newItineraryTitle.trim(),
+        subtitle: '',
+        description: '',
+        departure_date: formatDateForDisplay(newItineraryDepartureDate),
+        tour_code: newItineraryTourCode.trim() || '',
+        cover_image: '',
+        country: newItineraryCountry,
+        city: newItineraryCity,
+        status: '提案' as const,
+        outbound_flight: newItineraryOutboundFlight ? {
+          airline: newItineraryOutboundFlight.airline,
+          flightNumber: newItineraryOutboundFlight.flightNumber,
+          departureAirport: newItineraryOutboundFlight.departureAirport,
+          departureTime: newItineraryOutboundFlight.departureTime,
+          departureDate: newItineraryOutboundFlight.departureDate,
+          arrivalAirport: newItineraryOutboundFlight.arrivalAirport,
+          arrivalTime: newItineraryOutboundFlight.arrivalTime,
+          duration: '',
+        } : {
+          airline: '',
+          flightNumber: '',
+          departureAirport: 'TPE',
+          departureTime: '',
+          departureDate: new Date(newItineraryDepartureDate).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }).replace(/\//g, '/'),
+          arrivalAirport: '',
+          arrivalTime: '',
+          duration: '',
+        },
+        return_flight: newItineraryReturnFlight ? {
+          airline: newItineraryReturnFlight.airline,
+          flightNumber: newItineraryReturnFlight.flightNumber,
+          departureAirport: newItineraryReturnFlight.departureAirport,
+          departureTime: newItineraryReturnFlight.departureTime,
+          departureDate: newItineraryReturnFlight.departureDate,
+          arrivalAirport: newItineraryReturnFlight.arrivalAirport,
+          arrivalTime: newItineraryReturnFlight.arrivalTime,
+          duration: '',
+        } : {
+          airline: '',
+          flightNumber: '',
+          departureAirport: '',
+          departureTime: '',
+          departureDate: returnDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }).replace(/\//g, '/'),
+          arrivalAirport: 'TPE',
+          arrivalTime: '',
+          duration: '',
+        },
+        features: [],
+        focus_cards: [],
+        leader: { name: '', domesticPhone: '', overseasPhone: '' },
+        meeting_info: { time: '', location: '' },
+        itinerary_subtitle: `${days}天${days - 1}夜精彩旅程規劃`,
+        daily_itinerary: dailyItinerary,
+        created_by: user?.id,
+      }
+
+      const createdItinerary = await createItinerary(newItinerary)
+
+      if (createdItinerary?.id) {
+        setIsTypeSelectOpen(false)
+        router.push(`/itinerary/new?itinerary_id=${createdItinerary.id}`)
+      } else {
+        await alertError('建立失敗，請稍後再試')
+      }
+    } catch (error) {
+      console.error('建立行程失敗:', error)
+      await alertError('建立失敗，請稍後再試')
+    } finally {
+      setIsCreatingItinerary(false)
+    }
+  }, [newItineraryTitle, newItineraryTourCode, newItineraryCountry, newItineraryCity, newItineraryDepartureDate, newItineraryDays, newItineraryOutboundFlight, newItineraryReturnFlight, createItinerary, user?.id, router])
 
   // 打開複製行程對話框
   const handleOpenDuplicateDialog = useCallback((itinerary: Itinerary) => {
@@ -157,7 +419,7 @@ export default function ItineraryPage() {
         ...restData,
         tour_code: duplicateTourCode.trim(),
         title: duplicateTitle.trim(),
-        status: 'draft' as const, // 複製的行程預設為草稿
+        status: '提案' as const, // 複製的行程預設為草稿
         created_by: user?.id, // 作者為當前登入者
       }
 
@@ -204,7 +466,7 @@ export default function ItineraryPage() {
           contact_email: undefined,
           contact_address: undefined,
           // 重置狀態
-          status: 'draft' as const,
+          status: 'proposed' as const,
           received_amount: undefined,
           balance_amount: undefined,
           converted_to_tour: false,
@@ -382,49 +644,11 @@ export default function ItineraryPage() {
     [updateItinerary]
   )
 
-  // 發布行程
-  const handlePublish = useCallback(
-    async (id: string) => {
-      const confirmed = await confirm('確定要發布這個行程嗎？發布後需要密碼才能編輯。', {
-        type: 'warning',
-        title: '發布行程',
-      })
-      if (confirmed) {
-        try {
-          await updateItinerary(id, { status: 'published' })
-          await alertSuccess('已發布！')
-        } catch (error) {
-          await alertError('發布失敗，請稍後再試')
-        }
-      }
-    },
-    [updateItinerary]
-  )
-
-  // 取消發布（改回草稿）
-  const handleUnpublish = useCallback(
-    async (id: string) => {
-      const confirmed = await confirm('確定要取消發布嗎？行程將變回草稿狀態。', {
-        type: 'warning',
-        title: '取消發布',
-      })
-      if (confirmed) {
-        try {
-          await updateItinerary(id, { status: 'draft' })
-          await alertSuccess('已改回草稿！')
-        } catch (error) {
-          await alertError('操作失敗，請稍後再試')
-        }
-      }
-    },
-    [updateItinerary]
-  )
-
-  // 處理行程點擊（已發布需密碼解鎖）
+  // 處理行程點擊（進行中需密碼解鎖）
   const handleRowClick = useCallback(
     (itinerary: Itinerary) => {
-      // 如果是已發布狀態，需要密碼解鎖
-      if (itinerary.status === 'published') {
+      // 如果是進行中狀態（已綁定旅遊團），需要密碼解鎖
+      if (itinerary.status === '進行中') {
         setPendingEditId(itinerary.id)
         setPasswordInput('')
         setIsPasswordDialogOpen(true)
@@ -562,16 +786,16 @@ export default function ItineraryPage() {
             )
           }
           // 一般狀態
-          if (itinerary.status === 'published') {
+          if (itinerary.status === '進行中') {
             return (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-green/10 text-morandi-green">
-                已發布
+                進行中
               </span>
             )
           }
           return (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-morandi-muted/20 text-morandi-secondary">
-              草稿
+              提案
             </span>
           )
         },
@@ -603,44 +827,17 @@ export default function ItineraryPage() {
           const isArchived = !!itinerary.archived_at
           const isClosed = isItineraryClosed(itinerary)
           const isTemplate = itinerary.is_template
-          const isPublished = itinerary.status === 'published'
-          const isDraft = itinerary.status === 'draft' || !itinerary.status
 
           return (
             <div className="flex items-center gap-1">
-              {/* 發布/取消發布 - 只有非公司範例才顯示 */}
-              {!isTemplate && !isClosed && !isArchived && (
-                isPublished ? (
-                  <button
-                    onClick={e => {
-                      e.stopPropagation()
-                      handleUnpublish(itinerary.id)
-                    }}
-                    className="p-1 text-morandi-green hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
-                    title="取消發布（改回草稿）"
-                  >
-                    <FileEdit size={14} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={e => {
-                      e.stopPropagation()
-                      handlePublish(itinerary.id)
-                    }}
-                    className="p-1 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 rounded transition-colors"
-                    title="發布行程"
-                  >
-                    <Globe size={14} />
-                  </button>
-                )
-              )}
-
               {/* 產生分享連結 */}
               <button
                 onClick={e => {
                   e.stopPropagation()
                   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-                  const shareUrl = `${baseUrl}/view/${itinerary.id}`
+                  const shareUrl = itinerary.tour_code
+                    ? `${baseUrl}/view/${itinerary.tour_code}`
+                    : `${baseUrl}/view/${itinerary.id}`
                   navigator.clipboard
                     .writeText(shareUrl)
                     .then(() => {
@@ -774,16 +971,16 @@ export default function ItineraryPage() {
 
     // 狀態篩選（移除封存分頁，改用新的五種分頁）
     switch (statusFilter) {
-      case '草稿':
-        // 草稿：未發布、未結案、未封存
+      case '提案':
+        // 提案：未綁定、未結案、未封存
         filtered = filtered.filter(
-          item => item.status === 'draft' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '提案' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
-      case '已發布':
-        // 已發布：已發布、未結案、未封存、非公司範例
+      case '進行中':
+        // 進行中：已綁定旅遊團、未結案、未封存、非公司範例
         filtered = filtered.filter(
-          item => item.status === 'published' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '進行中' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':
@@ -872,7 +1069,7 @@ export default function ItineraryPage() {
           {/* 作者篩選 */}
           <div className="flex items-center gap-2">
             <Select value={authorFilter} onValueChange={setAuthorFilter}>
-              <SelectTrigger className="w-[180px] h-8 text-sm">
+              <SelectTrigger className="w-auto min-w-[100px] h-8 text-sm">
                 <SelectValue placeholder="我的行程" />
               </SelectTrigger>
               <SelectContent>
@@ -910,7 +1107,7 @@ export default function ItineraryPage() {
                   window.location.reload()
                 }}
               >
-                <SelectTrigger className="w-[180px] h-8 text-sm border-morandi-blue/30">
+                <SelectTrigger className="w-auto min-w-[100px] h-8 text-sm border-morandi-blue/30">
                   <SelectValue placeholder="全部分公司" />
                 </SelectTrigger>
                 <SelectContent>
@@ -927,27 +1124,278 @@ export default function ItineraryPage() {
         </div>
       </ResponsiveHeader>
 
-      {/* 類型選擇對話框 */}
+      {/* 新增行程對話框 */}
       <Dialog open={isTypeSelectOpen} onOpenChange={setIsTypeSelectOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>選擇行程表類型</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <Button
-              onClick={handleSelectWeb}
-              className="w-full h-20 flex-col bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              <div className="text-lg font-bold">網頁版行程表</div>
-              <div className="text-xs opacity-80">可編輯的動態行程表（適合線上分享）</div>
-            </Button>
-            <Button
-              onClick={handleSelectGemini}
-              className="w-full h-20 flex-col bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
-            >
-              <div className="text-lg font-bold">✨ Gemini AI 行程表</div>
-              <div className="text-xs opacity-80">AI 智慧生成內容與插圖（實驗功能）</div>
-            </Button>
+        <DialogContent className="max-w-5xl h-[90vh] overflow-hidden p-0">
+          <div className="flex h-full">
+            {/* 左側：基本資訊 */}
+            <div className="w-1/2 p-6 overflow-y-auto">
+              <DialogHeader className="mb-4">
+                <DialogTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-morandi-gold" />
+                  新增行程表
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {/* 行程名稱 */}
+                <div className="space-y-2">
+                  <Label htmlFor="newItineraryTitle">行程名稱 *</Label>
+                  <Input
+                    id="newItineraryTitle"
+                    placeholder="例：沖繩五日遊"
+                    value={newItineraryTitle}
+                    onChange={e => setNewItineraryTitle(e.target.value)}
+                  />
+                </div>
+
+                {/* 行程編號 */}
+                <div className="space-y-2">
+                  <Label htmlFor="newItineraryTourCode">行程編號（選填）</Label>
+                  <Input
+                    id="newItineraryTourCode"
+                    placeholder="例：25JOK21CIG"
+                    value={newItineraryTourCode}
+                    onChange={e => setNewItineraryTourCode(e.target.value)}
+                  />
+                </div>
+
+                {/* 國家 + 城市 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>國家</Label>
+                    <Select
+                      value={newItineraryCountry}
+                      onValueChange={(value) => {
+                        setNewItineraryCountry(value)
+                        setNewItineraryCity('') // 切換國家時清空城市
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="選擇國家" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map(country => (
+                          <SelectItem key={country.id} value={country.id}>
+                            {country.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>城市</Label>
+                    <Select
+                      value={newItineraryCity}
+                      onValueChange={setNewItineraryCity}
+                      disabled={!newItineraryCountry}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="選擇城市" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cities
+                          .filter(city => city.country_id === newItineraryCountry)
+                          .map(city => (
+                            <SelectItem key={city.id} value={city.id}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* 出發日期 + 天數 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>出發日期 *</Label>
+                    <DatePicker
+                      value={newItineraryDepartureDate}
+                      onChange={date => setNewItineraryDepartureDate(date)}
+                      placeholder="選擇出發日期"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>行程天數 *</Label>
+                    <Select
+                      value={newItineraryDays}
+                      onValueChange={setNewItineraryDays}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="選擇天數" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[3, 4, 5, 6, 7, 8, 9, 10].map(day => (
+                          <SelectItem key={day} value={String(day)}>
+                            {day} 天
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* 航班資訊 */}
+                <div className="pt-4 mt-4 relative">
+                  <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-morandi-muted/40 to-transparent" />
+                  <Label className="text-morandi-secondary mb-3 block">航班資訊（選填）</Label>
+                  <div className="space-y-3">
+                    {/* 去程航班 */}
+                    <div className="p-2 rounded-lg border border-morandi-muted/30 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-slate-600">去程</span>
+                          {newItineraryOutboundFlight?.departureDate && (
+                            <span className="text-xs text-morandi-gold font-medium">({newItineraryOutboundFlight.departureDate})</span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSearchOutboundFlight}
+                          disabled={loadingOutboundFlight || !newItineraryOutboundFlight?.flightNumber}
+                          className="h-5 text-[10px] gap-1 px-2"
+                        >
+                          {loadingOutboundFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                          查詢
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-6 gap-1">
+                        <Input placeholder="航班" value={newItineraryOutboundFlight?.flightNumber || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="航空" value={newItineraryOutboundFlight?.airline || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="出發" value={newItineraryOutboundFlight?.departureAirport || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="抵達" value={newItineraryOutboundFlight?.arrivalAirport || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="起飛" value={newItineraryOutboundFlight?.departureTime || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="降落" value={newItineraryOutboundFlight?.arrivalTime || ''} onChange={e => setNewItineraryOutboundFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                      </div>
+                    </div>
+
+                    {/* 回程航班 */}
+                    <div className="p-2 rounded-lg border border-morandi-muted/30 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-slate-600">回程</span>
+                          {newItineraryReturnFlight?.departureDate && (
+                            <span className="text-xs text-morandi-gold font-medium">({newItineraryReturnFlight.departureDate})</span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSearchReturnFlight}
+                          disabled={loadingReturnFlight || !newItineraryReturnFlight?.flightNumber}
+                          className="h-5 text-[10px] gap-1 px-2"
+                        >
+                          {loadingReturnFlight ? <Loader2 size={10} className="animate-spin" /> : <Search size={10} />}
+                          查詢
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-6 gap-1">
+                        <Input placeholder="航班" value={newItineraryReturnFlight?.flightNumber || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="航空" value={newItineraryReturnFlight?.airline || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="出發" value={newItineraryReturnFlight?.departureAirport || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, departureAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="抵達" value={newItineraryReturnFlight?.arrivalAirport || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, arrivalAirport: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="起飛" value={newItineraryReturnFlight?.departureTime || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, departureTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                        <Input placeholder="降落" value={newItineraryReturnFlight?.arrivalTime || ''} onChange={e => setNewItineraryReturnFlight(prev => ({ ...prev, arrivalTime: e.target.value, flightNumber: prev?.flightNumber || '', airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 按鈕 */}
+                <div className="flex justify-end gap-2 pt-4 mt-2 relative">
+                  <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-morandi-muted/40 to-transparent" />
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsTypeSelectOpen(false)}
+                    disabled={isCreatingItinerary}
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    onClick={handleCreateItinerary}
+                    disabled={isCreatingItinerary || !newItineraryTitle.trim() || !newItineraryDepartureDate || !newItineraryDays}
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+                  >
+                    {isCreatingItinerary ? (
+                      <>建立中...</>
+                    ) : (
+                      <>
+                        <Plane size={14} />
+                        建立行程
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* 中間分隔線 - 文青風格 */}
+            <div className="flex items-center py-8">
+              <div className="w-px h-full bg-gradient-to-b from-transparent via-morandi-muted/40 to-transparent" />
+            </div>
+
+            {/* 右側：每日行程預覽 */}
+            <div className="w-1/2 p-6 overflow-y-auto">
+              <h3 className="text-sm font-bold text-morandi-primary mb-4">每日行程</h3>
+              {newItineraryDays ? (
+                <div className="space-y-3">
+                  {Array.from({ length: parseInt(newItineraryDays) }, (_, i) => {
+                    const dayNum = i + 1
+                    const isFirst = dayNum === 1
+                    const isLast = dayNum === parseInt(newItineraryDays)
+                    // 計算日期
+                    let dateLabel = ''
+                    if (newItineraryDepartureDate) {
+                      const date = new Date(newItineraryDepartureDate)
+                      date.setDate(date.getDate() + i)
+                      dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
+                    }
+                    return (
+                      <div key={dayNum} className="p-3 rounded-lg border border-morandi-muted/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-morandi-gold text-white text-xs font-bold px-2 py-0.5 rounded">
+                            Day {dayNum}
+                          </span>
+                          {dateLabel && <span className="text-xs text-slate-500">({dateLabel})</span>}
+                        </div>
+                        <Input
+                          placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '每日標題'}
+                          className="h-8 text-sm mb-2"
+                        />
+                        <div className="grid grid-cols-3 gap-2">
+                          <Input
+                            placeholder={isFirst ? '溫暖的家' : '早餐'}
+                            className="h-8 text-xs"
+                          />
+                          <Input
+                            placeholder="午餐"
+                            className="h-8 text-xs"
+                          />
+                          <Input
+                            placeholder="晚餐"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                        {!isLast && (
+                          <Input
+                            placeholder="住宿飯店"
+                            className="h-8 text-xs mt-2"
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
+                  請先選擇行程天數
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -956,11 +1404,11 @@ export default function ItineraryPage() {
       <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>編輯已發布行程</DialogTitle>
+            <DialogTitle>編輯進行中行程</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-sm text-morandi-secondary mb-4">
-              此行程已發布，為避免誤觸修改，請輸入公司密碼以解鎖編輯。
+              此行程已綁定旅遊團，為避免誤觸修改，請輸入公司密碼以解鎖編輯。
             </p>
             <Input
               type="password"

@@ -341,7 +341,10 @@ export function LinkDocumentsToTourDialog({
   const handleLinkQuote = async (quote: Quote) => {
     try {
       setIsLinkingQuote(true)
-      await updateQuote(quote.id, { tour_id: tour.id })
+      await updateQuote(quote.id, {
+        tour_id: tour.id,
+        status: '進行中', // 綁定旅遊團後自動變更為進行中
+      })
       await fetchQuotes() // 重新載入以更新列表
     } catch (error) {
       console.error('連結報價單失敗:', error)
@@ -354,7 +357,10 @@ export function LinkDocumentsToTourDialog({
     e.stopPropagation()
     try {
       setIsUnlinkingQuote(true)
-      await updateQuote(quote.id, { tour_id: undefined })
+      await updateQuote(quote.id, {
+        tour_id: undefined,
+        status: 'proposed', // 解除綁定後自動變更為提案
+      })
       await fetchQuotes()
     } catch (error) {
       console.error('斷開連結失敗:', error)

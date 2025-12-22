@@ -177,6 +177,7 @@ export function LinkItineraryToTourDialog({
           tour_code: tour.code,
           is_template: false, // 複製出來的不是範例
           title: itinerary.title || tour.name,
+          status: '進行中', // 綁定旅遊團後自動變更為進行中
         } as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
         if (newItinerary?.id) {
@@ -188,6 +189,7 @@ export function LinkItineraryToTourDialog({
         await update(itinerary.id, {
           tour_id: tour.id,
           tour_code: tour.code,
+          status: '進行中', // 綁定旅遊團後自動變更為進行中
         })
 
         onClose()
@@ -214,6 +216,7 @@ export function LinkItineraryToTourDialog({
       await update(itinerary.id, {
         tour_id: undefined,
         tour_code: undefined,
+        status: '提案', // 解除綁定後自動變更為提案
       })
       await fetchAll()
     } catch (error) {

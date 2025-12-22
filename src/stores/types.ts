@@ -384,7 +384,7 @@ export interface Itinerary {
   cover_image: string
   country: string
   city: string
-  status: 'draft' | 'published'
+  status: '提案' | '進行中'
   cover_style?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   flight_style?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班卡片風格
   itinerary_style?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
@@ -556,10 +556,11 @@ export interface Quote {
   name?: string // 團體名稱（標準報價單必填，快速報價單選填）
   destination?: string // 目的地（向後相容）
   days?: number // 天數（向後相容）
-  status: 'draft' | 'proposed' | 'revised' | 'approved' | 'converted' | 'rejected'
+  status: 'draft' | 'proposed' | 'revised' | '進行中' | 'approved' | 'converted' | 'rejected'
   // draft: 草稿
   // proposed: 提案
   // revised: 修改中
+  // 進行中: 綁定旅遊團後自動變更
   // approved: 已核准
   // converted: 已轉單
   // rejected: 已拒絕

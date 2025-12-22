@@ -168,7 +168,7 @@ function BlockEditorPageContent() {
         price_note: data.priceNote || null,
         country: data.country,
         city: data.city,
-        status: 'draft' as const,
+        status: '提案' as const,
         outbound_flight: data.outboundFlight,
         return_flight: data.returnFlight,
         features: data.features,

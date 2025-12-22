@@ -28,7 +28,7 @@ interface UseTourOperationsParams {
   actions: TourActions
   addOrder: (data: CreateInput<Order>) => Promise<Order>
   updateQuote: (id: string, data: Partial<Quote>) => Promise<void>
-  updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined }) => Promise<unknown>
+  updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined; status?: '提案' | '進行中' }) => Promise<unknown>
   quotes: Quote[]
   itineraries: { id: string; tour_id?: string | null }[]
   availableCities: CityOption[]
@@ -248,13 +248,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // 1. 斷開關聯的報價單
         const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
         for (const quote of linkedQuotes) {
-          await updateQuote(quote.id, { tour_id: undefined })
+          await updateQuote(quote.id, { tour_id: undefined, status: 'proposed' })
         }
 
         // 2. 斷開關聯的行程表
         const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
         for (const itinerary of linkedItineraries) {
-          await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined })
+          await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined, status: '提案' })
         }
 
         // 3. 刪除旅遊團
@@ -276,13 +276,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
           // 1. 斷開關聯的報價單
           const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
           for (const quote of linkedQuotes) {
-            await updateQuote(quote.id, { tour_id: undefined })
+            await updateQuote(quote.id, { tour_id: undefined, status: 'proposed' })
           }
 
           // 2. 斷開關聯的行程表
           const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
           for (const itinerary of linkedItineraries) {
-            await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined })
+            await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined, status: '提案' })
           }
 
           logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)

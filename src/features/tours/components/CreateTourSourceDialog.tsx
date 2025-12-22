@@ -67,10 +67,10 @@ export function CreateTourSourceDialog({
     }
   }, [isOpen])
 
-  // 過濾可用的行程表（已發布的）
+  // 過濾可用的行程表（未關聯旅遊團的）
   const availableItineraries = useMemo(() => {
     return itineraries
-      .filter(i => i.status === 'published' && !i.tour_id)
+      .filter(i => !i.tour_id)
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [itineraries])
 

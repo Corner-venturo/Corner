@@ -490,6 +490,7 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
         itinerary_id: undefined, // 清除新欄位
         tour_id: undefined, // 同時清除舊欄位（向後相容）
         tour_code: undefined,
+        status: 'proposed', // 解除綁定後自動變更為提案
       })
       // 重新載入
       await fetchAll()
