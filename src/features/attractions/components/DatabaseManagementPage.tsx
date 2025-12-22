@@ -28,7 +28,7 @@ export default function DatabaseManagementPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedCountry, setSelectedCountry] = useState('')
-  const { openAdd } = useAttractionsDialog()
+  const { openAdd, isAddOpen, closeAdd, initialFormData } = useAttractionsDialog()
 
   // 地區資料 - 只載入國家列表
   const [countries, setCountries] = useState<Country[]>([])
@@ -267,6 +267,9 @@ export default function DatabaseManagementPage() {
                     setSelectedCategory={setSelectedCategory}
                     selectedCountry={selectedCountry}
                     openAdd={openAdd}
+                    isAddOpen={isAddOpen}
+                    closeAdd={closeAdd}
+                    initialFormData={initialFormData}
                   />
                 </Suspense>
               )}

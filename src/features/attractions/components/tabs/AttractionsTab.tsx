@@ -27,6 +27,9 @@ export interface AttractionsTabProps {
   setSelectedCategory: (category: string) => void
   selectedCountry: string
   openAdd: () => void
+  isAddOpen: boolean
+  closeAdd: () => void
+  initialFormData: import('../../types').AttractionFormData
 }
 
 export default function AttractionsTab({
@@ -36,6 +39,9 @@ export default function AttractionsTab({
   setSelectedCategory,
   selectedCountry,
   openAdd,
+  isAddOpen,
+  closeAdd,
+  initialFormData,
 }: AttractionsTabProps) {
   // 用於顯示的國家和城市資料（從景點載入後，按需從資料庫查詢）
   const [displayCountries, setDisplayCountries] = useState<Country[]>([])
@@ -127,6 +133,18 @@ export default function AttractionsTab({
     return { success: false }
   }
 
+  // 新增景點
+  const handleAddSubmit = async (formData: import('../../types').AttractionFormData) => {
+    // addAttraction 內部已處理 tags/images 轉換
+    const result = await addAttraction(formData)
+
+    if (result?.success) {
+      closeAdd()
+      return { success: true }
+    }
+    return { success: false }
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* 視圖切換按鈕 */}
@@ -195,25 +213,24 @@ export default function AttractionsTab({
           getRegionsByCountry={getRegionsByCountry}
           getCitiesByCountry={getCitiesByCountry}
           getCitiesByRegion={getCitiesByRegion}
-          initialFormData={{
-            name: '',
-            name_en: '',
-            description: '',
-            country_id: '',
-            region_id: '',
-            city_id: '',
-            category: '景點',
-            tags: '',
-            duration_minutes: 60,
-            address: '',
-            phone: '',
-            website: '',
-            images: '',
-            notes: '',
-            is_active: true,
-          }}
+          initialFormData={initialFormData}
         />
       )}
+
+      {/* 新增對話框 */}
+      <AttractionsDialog
+        open={isAddOpen}
+        onClose={closeAdd}
+        onSubmit={handleAddSubmit}
+        attraction={null}
+        countries={countries}
+        regions={regions}
+        cities={cities}
+        getRegionsByCountry={getRegionsByCountry}
+        getCitiesByCountry={getCitiesByCountry}
+        getCitiesByRegion={getCitiesByRegion}
+        initialFormData={initialFormData}
+      />
     </div>
   )
 }
