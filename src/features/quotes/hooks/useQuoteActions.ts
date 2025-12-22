@@ -149,7 +149,11 @@ export const useQuoteActions = ({
   // 新邏輯：所有版本都存在 versions[] 陣列，current_version_index 追蹤當前編輯的版本
   const handleSave = useCallback(
     (setCurrentEditingVersion?: (index: number) => void) => {
-      if (!quote) return
+      console.log('[handleSave] 被調用, quote:', quote?.id, 'quote存在:', !!quote)
+      if (!quote) {
+        console.error('[handleSave] quote 為 undefined，無法儲存')
+        return
+      }
 
       try {
         const existingVersions = quote.versions || []
@@ -187,6 +191,7 @@ export const useQuoteActions = ({
             created_at: new Date().toISOString(),
           }
 
+          console.log('[handleSave] 第一次儲存，創建版本 1')
           updateQuote(quote.id, {
             name: quoteName,
             versions: [firstVersion],
@@ -203,6 +208,7 @@ export const useQuoteActions = ({
             // 快速報價單資料
             ...quickQuoteData,
           })
+          console.log('[handleSave] 第一次儲存 updateQuote 已調用')
 
           // 設定當前編輯版本為 0
           if (setCurrentEditingVersion) {
@@ -226,6 +232,7 @@ export const useQuoteActions = ({
             }
           }
 
+          console.log('[handleSave] 更新現有版本, versionIndex:', versionIndex)
           updateQuote(quote.id, {
             name: quoteName,
             versions: updatedVersions,
@@ -242,11 +249,14 @@ export const useQuoteActions = ({
             // 快速報價單資料
             ...quickQuoteData,
           })
+          console.log('[handleSave] 更新版本 updateQuote 已調用')
         }
 
+        console.log('[handleSave] 儲存成功，顯示成功提示')
         setSaveSuccess(true)
         setTimeout(() => setSaveSuccess(false), UI_DELAYS.SUCCESS_MESSAGE)
       } catch (error) {
+        console.error('[handleSave] 儲存失敗:', error)
         logger.error('儲存失敗:', error)
       }
     },

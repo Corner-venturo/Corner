@@ -385,10 +385,31 @@ export function OrderMembersExpandable({
       }))
 
       setMembers(membersWithStatus)
+
+      // 初始化 PNR 值
+      const initialPnrValues: Record<string, string> = {}
+      membersWithStatus.forEach(m => {
+        if (m.pnr) {
+          initialPnrValues[m.id] = m.pnr
+        }
+      })
+      setPnrValues(initialPnrValues)
     } catch (error) {
       logger.error('載入成員失敗:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // 儲存 PNR 值到資料庫
+  const handlePnrBlur = async (memberId: string, value: string) => {
+    try {
+      await supabase
+        .from('order_members')
+        .update({ pnr: value || null })
+        .eq('id', memberId)
+    } catch (error) {
+      logger.error('儲存 PNR 失敗:', error)
     }
   }
 
@@ -2111,6 +2132,7 @@ export function OrderMembersExpandable({
                         type="text"
                         value={pnrValues[member.id] || ''}
                         onChange={e => setPnrValues(prev => ({ ...prev, [member.id]: e.target.value }))}
+                        onBlur={e => handlePnrBlur(member.id, e.target.value)}
                         className="w-full bg-transparent text-xs border-none outline-none shadow-none"
                         placeholder="輸入 PNR"
                       />

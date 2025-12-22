@@ -8225,6 +8225,8 @@ export type Database = {
       }
       tour_rooms: {
         Row: {
+          amount: number | null
+          booking_code: string | null
           capacity: number
           created_at: string | null
           display_order: number | null
@@ -8238,6 +8240,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          amount?: number | null
+          booking_code?: string | null
           capacity?: number
           created_at?: string | null
           display_order?: number | null
@@ -8251,6 +8255,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          amount?: number | null
+          booking_code?: string | null
           capacity?: number
           created_at?: string | null
           display_order?: number | null

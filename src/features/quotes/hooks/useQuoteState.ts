@@ -35,7 +35,7 @@ export const useQuoteState = () => {
 
   // 檢查是否為特殊團報價單
   const relatedTour = quote?.tour_id ? tours.find(t => t.id === quote.tour_id) : null
-  const isSpecialTour = relatedTour?.status === 'special'
+  const isSpecialTour = relatedTour?.status === '特殊團' // 使用中文狀態值
   const isReadOnly = isSpecialTour // 特殊團報價單設為唯讀
 
   // 計算旅遊團的實際預計人數（從訂單的 member_count 加總）
