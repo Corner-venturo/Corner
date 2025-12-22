@@ -269,7 +269,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
   )
 
   const handleArchiveTour = useCallback(
-    async (tour: Tour) => {
+    async (tour: Tour, reason?: string) => {
       try {
         // 封存時斷開連結，解除封存不需要
         if (!tour.archived) {
@@ -288,8 +288,12 @@ export function useTourOperations(params: UseTourOperationsParams) {
           logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
         }
 
-        await actions.update(tour.id, { archived: !tour.archived })
-        logger.info(tour.archived ? '已解除封存旅遊團' : '已封存旅遊團')
+        // 封存時記錄原因，解除封存時清除原因
+        await actions.update(tour.id, {
+          archived: !tour.archived,
+          archive_reason: tour.archived ? null : reason,
+        } as Partial<Tour>)
+        logger.info(tour.archived ? '已解除封存旅遊團' : `已封存旅遊團，原因：${reason}`)
       } catch (err) {
         logger.error('封存/解封旅遊團失敗:', err)
       }

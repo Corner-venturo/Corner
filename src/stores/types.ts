@@ -452,6 +452,8 @@ export interface Itinerary {
   created_by?: string // 建立者的 employee ID
   updated_by?: string // 最後修改者的 employee ID
   archived_at?: string | null
+  archived?: boolean // 是否已封存
+  archive_reason?: string | null // 封存原因：no_deal、cancelled、test_error
 
   // 離線同步支援
   _deleted?: boolean

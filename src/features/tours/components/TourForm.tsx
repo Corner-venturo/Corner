@@ -279,65 +279,64 @@ export function TourForm({
                           countryCode: country,
                           cityCode: '', // 清空城市選擇
                         }))
-                        setCityInput('')
                       }}
-                      options={[
-                        ...countries.map(country => ({
-                          value: country,
-                          label: country,
-                        })),
-                      ]}
-                      placeholder={destinationsLoading ? '載入中...' : '選擇或輸入國家...'}
-                      emptyMessage="找不到國家，請直接輸入"
+                      options={countries.map(country => ({
+                        value: country,
+                        label: country,
+                      }))}
+                      placeholder={destinationsLoading ? '載入中...' : '選擇國家...'}
+                      emptyMessage="找不到國家"
                       showSearchIcon={true}
                       showClearButton={true}
-                      allowCustomValue={true}
                       className="mt-1"
                     />
                   </div>
 
                   <div>
                     <label className="text-sm font-medium text-morandi-primary">城市 (機場代碼)</label>
-                    {(() => {
-                      const citiesForCountry = newTour.countryCode ? getCitiesByCountry(newTour.countryCode) : []
-                      return (
-                        <Combobox
-                          value={newTour.cityCode}
-                          onChange={cityCode => {
-                            setNewTour(prev => ({ ...prev, cityCode }))
-                            setCityInput('')
-                          }}
-                          options={citiesForCountry.map(c => ({
-                            value: c.airport_code,
-                            label: `${c.city} (${c.airport_code})`,
-                          }))}
-                          placeholder={!newTour.countryCode ? '請先選擇國家' : '選擇或輸入城市...'}
-                          emptyMessage="找不到城市，請輸入新城市"
-                          showSearchIcon={true}
-                          showClearButton={true}
-                          allowCustomValue={true}
-                          disabled={!newTour.countryCode}
-                          className="mt-1"
-                          onCustomValueSubmit={(value) => {
-                            // 當輸入自定義城市時，檢查是否需要輸入機場代碼
-                            const existingCity = citiesForCountry.find(
-                              c => c.city.toLowerCase() === value.toLowerCase() ||
-                                   c.airport_code.toLowerCase() === value.toLowerCase()
-                            )
-                            if (existingCity) {
-                              // 如果城市已存在，直接使用其機場代碼
-                              setNewTour(prev => ({ ...prev, cityCode: existingCity.airport_code }))
-                            } else {
-                              // 新城市，需要輸入機場代碼
-                              setPendingCity(value)
-                              setPendingCountry(newTour.countryCode)
-                              setNewAirportCode('')
-                              setShowAirportCodeDialog(true)
-                            }
-                          }}
-                        />
-                      )
-                    })()}
+                    <div className="flex gap-2 mt-1">
+                      {(() => {
+                        const citiesForCountry = newTour.countryCode ? getCitiesByCountry(newTour.countryCode) : []
+                        return (
+                          <Combobox
+                            value={newTour.cityCode}
+                            onChange={cityCode => {
+                              setNewTour(prev => ({ ...prev, cityCode }))
+                            }}
+                            options={citiesForCountry.map(c => ({
+                              value: c.airport_code,
+                              label: `${c.city} (${c.airport_code})`,
+                            }))}
+                            placeholder={!newTour.countryCode ? '請先選擇國家' : '選擇城市...'}
+                            emptyMessage="找不到城市"
+                            showSearchIcon={true}
+                            showClearButton={true}
+                            disabled={!newTour.countryCode}
+                            className="flex-1"
+                          />
+                        )
+                      })()}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (!newTour.countryCode) {
+                            toast.warning('請先選擇國家')
+                            return
+                          }
+                          setPendingCity('')
+                          setPendingCountry(newTour.countryCode)
+                          setNewAirportCode('')
+                          setShowAirportCodeDialog(true)
+                        }}
+                        disabled={!newTour.countryCode}
+                        className="h-9 px-2 shrink-0"
+                        title="新增城市"
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -601,14 +600,23 @@ export function TourForm({
         <Dialog open={showAirportCodeDialog} onOpenChange={setShowAirportCodeDialog}>
           <DialogContent className="max-w-sm">
             <DialogHeader>
-              <DialogTitle>輸入機場代碼</DialogTitle>
+              <DialogTitle>新增目的地城市</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <p className="text-sm text-morandi-secondary">
-                新城市「<span className="font-medium text-morandi-primary">{pendingCity}</span>」需要輸入 3 位數的機場代碼 (IATA Code)。
+                為「<span className="font-medium text-morandi-primary">{pendingCountry}</span>」新增城市
               </p>
               <div>
-                <label className="text-sm font-medium text-morandi-primary">機場代碼</label>
+                <label className="text-sm font-medium text-morandi-primary">城市名稱</label>
+                <Input
+                  value={pendingCity}
+                  onChange={e => setPendingCity(e.target.value)}
+                  placeholder="例如: 清邁、曼谷"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">機場代碼 (IATA)</label>
                 <Input
                   value={newAirportCode}
                   onChange={e => setNewAirportCode(e.target.value.toUpperCase().slice(0, 3))}
@@ -617,7 +625,7 @@ export function TourForm({
                   maxLength={3}
                 />
                 <p className="text-xs text-morandi-secondary mt-1">
-                  提示：請輸入該城市主要機場的 IATA 代碼
+                  請輸入該城市主要機場的 3 位數 IATA 代碼
                 </p>
               </div>
             </div>

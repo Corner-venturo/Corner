@@ -27,7 +27,7 @@ interface UseTourActionButtonsParams {
   activeStatusTab: string
   user: User | null
   operations: {
-    handleArchiveTour: (tour: Tour) => Promise<void>
+    handleArchiveTour: (tour: Tour, reason?: string) => Promise<void>
   }
   openDialog: (type: string, data?: Tour) => void
   setSelectedTour: (tour: Tour) => void
@@ -43,6 +43,8 @@ interface UseTourActionButtonsParams {
   // V2.0：確認出團 & 解鎖
   onConfirmTour?: (tour: Tour) => void
   onUnlockLockedTour?: (tour: Tour) => void
+  // 封存對話框
+  onOpenArchiveDialog?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -63,6 +65,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onViewDetails,
     onConfirmTour,
     onUnlockLockedTour,
+    onOpenArchiveDialog,
   } = params
 
   const renderActions = useCallback(
@@ -187,7 +190,16 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              operations.handleArchiveTour(tour)
+              if (tour.archived) {
+                // 解除封存：直接執行
+                operations.handleArchiveTour(tour)
+              } else if (onOpenArchiveDialog) {
+                // 封存：打開對話框選擇原因
+                onOpenArchiveDialog(tour)
+              } else {
+                // 沒有對話框時直接封存（向後相容）
+                operations.handleArchiveTour(tour)
+              }
             }}
             className={cn(
               'p-1 rounded transition-colors',
@@ -246,6 +258,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onViewDetails,
       onConfirmTour,
       onUnlockLockedTour,
+      onOpenArchiveDialog,
     ]
   )
 

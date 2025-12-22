@@ -31,6 +31,7 @@ import { TourForm } from './TourForm'
 import { TourExpandedView } from './TourExpandedView'
 import { TourMobileCard } from './TourMobileCard'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
+import { ArchiveReasonDialog, ArchiveReason } from './ArchiveReasonDialog'
 import { useTourTableColumns } from './TourTableColumns'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
@@ -65,6 +66,9 @@ export const ToursPage: React.FC = () => {
 
   // 旅遊團詳情 Dialog 狀態
   const [detailDialogTourId, setDetailDialogTourId] = useState<string | null>(null)
+
+  // 封存原因對話框狀態
+  const [archiveDialogTour, setArchiveDialogTour] = useState<Tour | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
@@ -459,6 +463,8 @@ export const ToursPage: React.FC = () => {
     // V2.0：確認出團 & 解鎖
     onConfirmTour: (tour) => setConfirmWizardTour(tour),
     onUnlockLockedTour: (tour) => setUnlockDialogTour(tour),
+    // 封存對話框
+    onOpenArchiveDialog: (tour) => setArchiveDialogTour(tour),
   })
 
   const renderExpanded = useCallback(
@@ -616,6 +622,19 @@ export const ToursPage: React.FC = () => {
         tour={deleteConfirm.tour}
         onClose={() => setDeleteConfirm({ isOpen: false, tour: null })}
         onConfirm={handleDeleteTour}
+      />
+
+      {/* Archive reason dialog */}
+      <ArchiveReasonDialog
+        isOpen={!!archiveDialogTour}
+        tour={archiveDialogTour}
+        onClose={() => setArchiveDialogTour(null)}
+        onConfirm={(reason: ArchiveReason) => {
+          if (archiveDialogTour) {
+            operations.handleArchiveTour(archiveDialogTour, reason)
+            setArchiveDialogTour(null)
+          }
+        }}
       />
 
       {/* Link documents to tour dialog (combined) */}
