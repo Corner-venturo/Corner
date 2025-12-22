@@ -78,6 +78,7 @@ export function LinkQuoteToTourDialog({
         tour_id: tour.id,
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
+        customer_name: '', // 必填欄位，預設空字串
       } as any)
 
 
