@@ -517,9 +517,18 @@ export const CreateQuoteFromItineraryButton: React.FC<CreateQuoteFromItineraryBu
     }
   }
 
-  // 前往報價單
+  // 前往報價單（同步最新行程資料）
   const handleGoToQuote = (quoteId: string) => {
-    router.push(`/quotes/${quoteId}`)
+    const { mealsData, hotelsData, activitiesData } = createQuoteFromTourData(tourData)
+
+    const urlParams = new URLSearchParams({
+      meals: JSON.stringify(mealsData),
+      hotels: JSON.stringify(hotelsData),
+      activities: JSON.stringify(activitiesData),
+      from_itinerary: 'true',
+    })
+
+    router.push(`/quotes/${quoteId}?${urlParams.toString()}`)
   }
 
   // 如果有已關聯的報價單，顯示管理介面
