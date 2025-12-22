@@ -2135,8 +2135,8 @@ export function OrderMembersExpandable({
                     />
                   </td>
 
-                  {/* 團體模式：分房欄位 */}
-                  {mode === 'tour' && showRoomColumn && (
+                  {/* 分房欄位 */}
+                  {showRoomColumn && (
                     <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50">
                       <span className="text-xs text-amber-700">
                         {roomAssignments[member.id] || '未分房'}
@@ -2144,8 +2144,8 @@ export function OrderMembersExpandable({
                     </td>
                   )}
 
-                  {/* 團體模式：PNR 欄位 */}
-                  {mode === 'tour' && showPnrColumn && (
+                  {/* PNR 欄位 */}
+                  {showPnrColumn && (
                     <td className="border border-morandi-gold/20 px-2 py-1 bg-sky-50/50">
                       <input
                         type="text"
@@ -2158,8 +2158,8 @@ export function OrderMembersExpandable({
                     </td>
                   )}
 
-                  {/* 團體模式：自訂費用欄位 */}
-                  {mode === 'tour' && customCostFields.map(field => (
+                  {/* 自訂費用欄位 */}
+                  {customCostFields.map(field => (
                     <td
                       key={field.id}
                       className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50"
@@ -3121,46 +3121,42 @@ export function OrderMembersExpandable({
         </DialogContent>
       </Dialog>
 
-      {/* 團體模式：分房管理對話框 */}
-      {mode === 'tour' && (
-        <TourRoomManager
-          tourId={tourId}
-          tour={departureDate && returnDate ? {
-            id: tourId,
-            departure_date: departureDate,
-            return_date: returnDate,
-          } : undefined}
-          members={members.map(m => ({
-            id: m.id,
-            chinese_name: m.chinese_name ?? null,
-            passport_name: m.passport_name ?? null,
-          }))}
-          open={showRoomManager}
-          onOpenChange={(open) => {
-            setShowRoomManager(open)
-            // 關閉對話框時重新載入分房資訊
-            if (!open) {
-              loadRoomAssignments()
-            }
-          }}
-        />
-      )}
+      {/* 分房管理對話框 */}
+      <TourRoomManager
+        tourId={tourId}
+        tour={departureDate && returnDate ? {
+          id: tourId,
+          departure_date: departureDate,
+          return_date: returnDate,
+        } : undefined}
+        members={members.map(m => ({
+          id: m.id,
+          chinese_name: m.chinese_name ?? null,
+          passport_name: m.passport_name ?? null,
+        }))}
+        open={showRoomManager}
+        onOpenChange={(open) => {
+          setShowRoomManager(open)
+          // 關閉對話框時重新載入分房資訊
+          if (!open) {
+            loadRoomAssignments()
+          }
+        }}
+      />
 
-      {/* 團體模式：分車管理對話框 */}
-      {mode === 'tour' && (
-        <TourVehicleManager
-          tourId={tourId}
-          members={members.map(m => ({
-            id: m.id,
-            chinese_name: m.chinese_name ?? null,
-            passport_name: m.passport_name ?? null,
-          }))}
-          open={showVehicleManager}
-          onOpenChange={setShowVehicleManager}
-        />
-      )}
+      {/* 分車管理對話框 */}
+      <TourVehicleManager
+        tourId={tourId}
+        members={members.map(m => ({
+          id: m.id,
+          chinese_name: m.chinese_name ?? null,
+          passport_name: m.passport_name ?? null,
+        }))}
+        open={showVehicleManager}
+        onOpenChange={setShowVehicleManager}
+      />
 
-      {/* 團體模式：新增費用欄位對話框 */}
+      {/* 新增費用欄位對話框 */}
       <Dialog open={showAddCostFieldDialog} onOpenChange={setShowAddCostFieldDialog}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
