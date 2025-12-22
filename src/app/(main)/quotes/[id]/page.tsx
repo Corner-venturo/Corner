@@ -126,6 +126,12 @@ export default function QuoteDetailPage() {
   })
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
 
+  // 切換顯示模式：'standard' 團體報價單 | 'quick' 快速報價單
+  // 初始值根據 quote_type 設定（向後相容舊的快速報價單）
+  const [viewMode, setViewMode] = React.useState<'standard' | 'quick'>(() =>
+    quote?.quote_type === 'quick' ? 'quick' : 'standard'
+  )
+
   // 建立行程表
   const handleCreateItinerary = useCallback(() => {
     if (!quote) return
@@ -443,25 +449,49 @@ export default function QuoteDetailPage() {
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
-      setCategories(versionData.categories || [])
-      setAccommodationDays(versionData.accommodation_days || 0)
-      if (versionData.participant_counts) {
-        setParticipantCounts(versionData.participant_counts)
+      // 根據版本模式切換視圖
+      const versionMode = versionData.mode || 'detailed'
+      setViewMode(versionMode === 'simple' ? 'quick' : 'standard')
+
+      if (versionMode === 'simple') {
+        // 載入簡易模式資料
+        if (versionData.quick_quote_items) {
+          setQuickQuoteItems(versionData.quick_quote_items)
+        }
+        if (versionData.customer_name !== undefined) {
+          setQuickQuoteCustomerInfo({
+            customer_name: versionData.customer_name || '',
+            contact_person: versionData.contact_person || '',
+            contact_phone: versionData.contact_phone || '',
+            contact_address: versionData.contact_address || '',
+            tour_code: versionData.name || '', // 使用版本名稱作為團號
+            handler_name: versionData.handler_name || 'William',
+            issue_date: versionData.issue_date || new Date().toISOString().split('T')[0],
+            received_amount: versionData.received_amount || 0,
+            expense_description: versionData.expense_description || '',
+          })
+        }
+      } else {
+        // 載入詳細模式資料
+        setCategories(versionData.categories || [])
+        setAccommodationDays(versionData.accommodation_days || 0)
+        if (versionData.participant_counts) {
+          setParticipantCounts(versionData.participant_counts)
+        }
+        if (versionData.selling_prices) {
+          setSellingPrices(versionData.selling_prices)
+        }
       }
-      if (versionData.selling_prices) {
-        setSellingPrices(versionData.selling_prices)
-      }
+
       // 記錄當前編輯的版本索引（-1 表示主版本，null 表示初始狀態）
       setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
     },
-    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion]
+    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion, setViewMode, setQuickQuoteItems, setQuickQuoteCustomerInfo]
   )
 
 
   // 報價單預覽
   const [showQuotationPreview, setShowQuotationPreview] = React.useState(false)
-  // 切換顯示模式：'standard' 團體報價單 | 'quick' 快速報價單
-  const [viewMode, setViewMode] = React.useState<'standard' | 'quick'>('standard')
   // 關聯旅遊團對話框
   const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
   // 匯入餐飲對話框
@@ -668,12 +698,7 @@ export default function QuoteDetailPage() {
     )
   }
 
-  // ✅ 如果是快速報價單類型，顯示快速報價單介面
-  if (quote.quote_type === 'quick') {
-    return <QuickQuoteDetail quote={quote} onUpdate={(data) => updateQuote(quote.id, data)} />
-  }
-
-  // ✅ 如果切換到快速報價單模式，顯示快速報價單介面（但資料存在同一個報價單）
+  // ✅ 如果是簡易模式（快速報價單），顯示簡易介面
   if (viewMode === 'quick') {
     return (
       <QuickQuoteDetail

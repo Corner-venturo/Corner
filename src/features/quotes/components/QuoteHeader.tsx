@@ -402,7 +402,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="text-xs text-morandi-secondary">
-                              NT$ {version.total_cost.toLocaleString()}
+                              {version.mode === 'simple' ? '簡易模式' : `NT$ ${(version.total_cost || 0).toLocaleString()}`}
                             </div>
                             {isCurrentEditing && (
                               <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>

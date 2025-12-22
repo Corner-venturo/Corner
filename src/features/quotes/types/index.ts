@@ -81,15 +81,37 @@ export interface AccommodationSummaryItem {
 export interface VersionRecord {
   id: string
   version: number
+  mode?: 'detailed' | 'simple' // 版本模式：詳細（成本分析）或 簡易（請款單）
   name?: string // 版本名稱（如：客戶名稱、報價單名稱）- 可選以向下兼容
-  categories: CostCategory[]
-  total_cost: number
-  group_size?: number
-  accommodation_days: number
-  participant_counts: ParticipantCounts
-  selling_prices: SellingPrices
   note?: string // 版本備註
   created_at: string
+
+  // === 詳細模式 (detailed) 專用欄位 ===
+  categories?: CostCategory[]
+  total_cost?: number
+  group_size?: number
+  accommodation_days?: number
+  participant_counts?: ParticipantCounts
+  selling_prices?: SellingPrices
+
+  // === 簡易模式 (simple) 專用欄位 ===
+  quick_quote_items?: Array<{
+    id: string
+    description: string
+    quantity: number
+    cost?: number
+    unit_price: number
+    amount: number
+    notes: string
+  }>
+  customer_name?: string
+  contact_person?: string
+  contact_phone?: string
+  contact_address?: string
+  handler_name?: string
+  issue_date?: string
+  received_amount?: number
+  expense_description?: string
 }
 
 export const costCategories: CostCategory[] = [
