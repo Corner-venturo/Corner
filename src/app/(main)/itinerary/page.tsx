@@ -98,6 +98,14 @@ export default function ItineraryPage() {
   const [isCreatingItinerary, setIsCreatingItinerary] = useState(false)
   const [loadingOutboundFlight, setLoadingOutboundFlight] = useState(false)
   const [loadingReturnFlight, setLoadingReturnFlight] = useState(false)
+  // 每日行程資料
+  const [newItineraryDailyData, setNewItineraryDailyData] = useState<Array<{
+    title: string
+    breakfast: string
+    lunch: string
+    dinner: string
+    accommodation: string
+  }>>([])
 
   // 出發日期變更時，自動填入去程航班日期
   useEffect(() => {
@@ -133,6 +141,28 @@ export default function ItineraryPage() {
       }))
     }
   }, [newItineraryDepartureDate, newItineraryDays])
+
+  // 天數變更時，初始化每日行程資料
+  useEffect(() => {
+    if (newItineraryDays) {
+      const days = parseInt(newItineraryDays)
+      const initialData = Array.from({ length: days }, (_, i) => {
+        const dayNum = i + 1
+        const isFirst = dayNum === 1
+        const isLast = dayNum === days
+        return {
+          title: isFirst ? '抵達目的地' : isLast ? '返回台灣' : '',
+          breakfast: isFirst ? '溫暖的家' : '飯店內早餐',
+          lunch: '敬請自理',
+          dinner: '敬請自理',
+          accommodation: isLast ? '' : '待確認',
+        }
+      })
+      setNewItineraryDailyData(initialData)
+    } else {
+      setNewItineraryDailyData([])
+    }
+  }, [newItineraryDays])
 
   // 載入地區資料（只執行一次）
   React.useEffect(() => {
@@ -179,6 +209,7 @@ export default function ItineraryPage() {
     setNewItineraryDays('')
     setNewItineraryOutboundFlight(null)
     setNewItineraryReturnFlight(null)
+    setNewItineraryDailyData([])
     setIsTypeSelectOpen(true)
   }, [])
 
@@ -276,7 +307,7 @@ export default function ItineraryPage() {
 
     setIsCreatingItinerary(true)
     try {
-      // 產生每日行程框架
+      // 產生每日行程框架（使用用戶填入的資料）
       const dailyItinerary = []
       for (let i = 1; i <= days; i++) {
         const date = new Date(newItineraryDepartureDate)
@@ -284,21 +315,24 @@ export default function ItineraryPage() {
         const dateStr = date.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })
         const weekday = date.toLocaleDateString('zh-TW', { weekday: 'short' })
 
+        // 使用用戶填入的資料，如果沒有則用預設值
+        const dayData = newItineraryDailyData[i - 1]
+
         dailyItinerary.push({
           dayLabel: `Day ${i}`,
           date: `${dateStr} (${weekday})`,
-          title: i === 1 ? '抵達目的地' : i === days ? '返回台灣' : '',
+          title: dayData?.title || (i === 1 ? '抵達目的地' : i === days ? '返回台灣' : ''),
           highlight: '',
           description: '',
           images: [],
           activities: [],
           recommendations: [],
           meals: {
-            breakfast: i === 1 ? '溫暖的家' : '飯店內早餐',
-            lunch: '敬請自理',
-            dinner: '敬請自理',
+            breakfast: dayData?.breakfast || (i === 1 ? '溫暖的家' : '飯店內早餐'),
+            lunch: dayData?.lunch || '敬請自理',
+            dinner: dayData?.dinner || '敬請自理',
           },
-          accommodation: i === days ? '' : '待確認',
+          accommodation: dayData?.accommodation || (i === days ? '' : '待確認'),
         })
       }
 
@@ -835,9 +869,11 @@ export default function ItineraryPage() {
                 onClick={e => {
                   e.stopPropagation()
                   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+                  // 優先使用 tour_code，沒有的話用 ID 前 8 碼（更短、更友善）
+                  const shortId = itinerary.id.replace(/-/g, '').substring(0, 8)
                   const shareUrl = itinerary.tour_code
                     ? `${baseUrl}/view/${itinerary.tour_code}`
-                    : `${baseUrl}/view/${itinerary.id}`
+                    : `${baseUrl}/view/${shortId}`
                   navigator.clipboard
                     .writeText(shareUrl)
                     .then(() => {
@@ -1354,6 +1390,14 @@ export default function ItineraryPage() {
                       date.setDate(date.getDate() + i)
                       dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
                     }
+                    const dayData = newItineraryDailyData[i] || { title: '', breakfast: '', lunch: '', dinner: '', accommodation: '' }
+                    const updateDayData = (field: string, value: string) => {
+                      setNewItineraryDailyData(prev => {
+                        const updated = [...prev]
+                        updated[i] = { ...updated[i], [field]: value }
+                        return updated
+                      })
+                    }
                     return (
                       <div key={dayNum} className="p-3 rounded-lg border border-morandi-muted/30">
                         <div className="flex items-center gap-2 mb-2">
@@ -1365,25 +1409,35 @@ export default function ItineraryPage() {
                         <Input
                           placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '每日標題'}
                           className="h-8 text-sm mb-2"
+                          value={dayData.title}
+                          onChange={e => updateDayData('title', e.target.value)}
                         />
                         <div className="grid grid-cols-3 gap-2">
                           <Input
                             placeholder={isFirst ? '溫暖的家' : '早餐'}
                             className="h-8 text-xs"
+                            value={dayData.breakfast}
+                            onChange={e => updateDayData('breakfast', e.target.value)}
                           />
                           <Input
                             placeholder="午餐"
                             className="h-8 text-xs"
+                            value={dayData.lunch}
+                            onChange={e => updateDayData('lunch', e.target.value)}
                           />
                           <Input
                             placeholder="晚餐"
                             className="h-8 text-xs"
+                            value={dayData.dinner}
+                            onChange={e => updateDayData('dinner', e.target.value)}
                           />
                         </div>
                         {!isLast && (
                           <Input
                             placeholder="住宿飯店"
                             className="h-8 text-xs mt-2"
+                            value={dayData.accommodation}
+                            onChange={e => updateDayData('accommodation', e.target.value)}
                           />
                         )}
                       </div>

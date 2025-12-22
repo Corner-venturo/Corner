@@ -44,15 +44,47 @@ export async function GET(
       )
     }
 
-    // 判斷是 UUID 還是 tourCode
+    // 判斷查詢類型：
+    // 1. 完整 UUID（36 字元，含連字號）
+    // 2. 短碼（8 個十六進位字元，是 UUID 前 8 碼去掉連字號）
+    // 3. tour_code（其他格式）
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+    const isShortId = /^[0-9a-f]{8}$/i.test(id) // 8 個十六進位字元
 
-    // 查詢行程資料（支援 id 或 tour_code）
-    const { data: itinerary, error } = await supabaseAdmin
-      .from('itineraries')
-      .select('*')
-      .eq(isUUID ? 'id' : 'tour_code', id)
-      .single()
+    let itinerary = null
+    let error = null
+
+    if (isUUID) {
+      // 用完整 UUID 查詢
+      const result = await supabaseAdmin
+        .from('itineraries')
+        .select('*')
+        .eq('id', id)
+        .single()
+      itinerary = result.data
+      error = result.error
+    } else if (isShortId) {
+      // 用短碼查詢（ID 前 8 碼，需要用 like 查詢）
+      // 將短碼轉換成 UUID 前綴格式：xxxxxxxx-
+      const uuidPrefix = `${id.substring(0, 8)}`
+      const result = await supabaseAdmin
+        .from('itineraries')
+        .select('*')
+        .ilike('id', `${uuidPrefix}%`)
+        .limit(1)
+        .single()
+      itinerary = result.data
+      error = result.error
+    } else {
+      // 用 tour_code 查詢
+      const result = await supabaseAdmin
+        .from('itineraries')
+        .select('*')
+        .eq('tour_code', id)
+        .single()
+      itinerary = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('查詢行程失敗:', error)
