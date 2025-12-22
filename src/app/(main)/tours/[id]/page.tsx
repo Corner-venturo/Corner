@@ -22,7 +22,11 @@ import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
 import { LinkQuoteToTourDialog } from '@/features/tours/components/LinkQuoteToTourDialog'
 import { LinkItineraryToTourDialog } from '@/features/tours/components/LinkItineraryToTourDialog'
-import { MessageSquare, FileText } from 'lucide-react'
+import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { MessageSquare, FileText, Printer } from 'lucide-react'
 import { toast } from 'sonner'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
 
@@ -51,6 +55,52 @@ export default function TourDetailPage() {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showQuoteDialog, setShowQuoteDialog] = useState(false)
   const [showItineraryDialog, setShowItineraryDialog] = useState(false)
+  const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
+  const [entryCardSettings, setEntryCardSettings] = useState({
+    flightNumber: '',
+    hotelName: '',
+    hotelAddress: '',
+    hotelPhone: '',
+    stayDays: 5,
+  })
+  const [tourMembers, setTourMembers] = useState<Array<{
+    id: string
+    passport_name?: string | null
+    birth_date?: string | null
+    passport_number?: string | null
+  }>>([])
+
+  // 載入團員資料（用於入境卡列印）
+  useEffect(() => {
+    const loadMembers = async () => {
+      if (!tour?.id) return
+      const { supabase } = await import('@/lib/supabase/client')
+
+      // 找出屬於這個團的所有訂單
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tour_id', tour.id)
+
+      if (!orders || orders.length === 0) return
+
+      const orderIds = orders.map(o => o.id)
+
+      // 取得團員資料
+      const { data: members } = await supabase
+        .from('order_members')
+        .select('id, passport_name, birth_date, passport_number')
+        .in('order_id', orderIds)
+
+      if (members) {
+        setTourMembers(members)
+      }
+    }
+
+    if (showEntryCardDialog) {
+      loadMembers()
+    }
+  }, [tour?.id, showEntryCardDialog])
 
   // 建立頻道對話框狀態
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
@@ -176,6 +226,8 @@ export default function TourDetailPage() {
           return '新增成本'
         case 'orders':
           return '新增訂單'
+        case 'members':
+          return '列印入境卡'
         default:
           return null // 不顯示按鈕
       }
@@ -199,6 +251,9 @@ export default function TourDetailPage() {
             break
           case 'orders':
             // 功能: 新增訂單
+            break
+          case 'members':
+            setShowEntryCardDialog(true)
             break
         }
       },
@@ -364,6 +419,92 @@ export default function TourDetailPage() {
         onClose={() => setShowItineraryDialog(false)}
         tour={tour}
       />
+
+      {/* 入境卡列印對話框 */}
+      <Dialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
+          <div className="no-print flex items-center justify-between mb-4">
+            <DialogHeader>
+              <DialogTitle>列印日本入境卡</DialogTitle>
+            </DialogHeader>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEntryCardDialog(false)}
+              >
+                關閉
+              </Button>
+              <Button
+                onClick={() => window.print()}
+              >
+                <Printer size={16} className="mr-1" />
+                列印
+              </Button>
+            </div>
+          </div>
+
+          {/* 設定區域 */}
+          <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">航班號碼</label>
+              <Input
+                value={entryCardSettings.flightNumber}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
+                placeholder="例：BR-108"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店名稱</label>
+              <Input
+                value={entryCardSettings.hotelName}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelName: e.target.value }))}
+                placeholder="例：東京灣希爾頓"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店地址</label>
+              <Input
+                value={entryCardSettings.hotelAddress}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
+                placeholder="例：東京都港區..."
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店電話</label>
+              <Input
+                value={entryCardSettings.hotelPhone}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
+                placeholder="例：03-1234-5678"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">停留天數</label>
+              <Input
+                type="number"
+                min={1}
+                max={90}
+                value={entryCardSettings.stayDays}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, stayDays: parseInt(e.target.value) || 5 }))}
+                className="text-sm"
+              />
+            </div>
+          </div>
+
+          {/* 預覽區域 */}
+          <JapanEntryCardPrint
+            members={tourMembers}
+            flightNumber={entryCardSettings.flightNumber || 'BR-XXX'}
+            hotelName={entryCardSettings.hotelName}
+            hotelAddress={entryCardSettings.hotelAddress}
+            hotelPhone={entryCardSettings.hotelPhone}
+            stayDays={entryCardSettings.stayDays}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
