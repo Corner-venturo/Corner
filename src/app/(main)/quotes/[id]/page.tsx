@@ -705,7 +705,8 @@ export default function QuoteDetailPage() {
         quote={{
           ...quote,
           // 合併快速報價單客戶資訊（團體報價的聯絡資訊會自動帶入）
-          customer_name: quickQuoteCustomerInfo.customer_name || quote.customer_name,
+          // 優先順序：quickQuoteCustomerInfo > quote.customer_name > quoteName（團體名稱）
+          customer_name: quickQuoteCustomerInfo.customer_name || quote.customer_name || quoteName,
           contact_person: quickQuoteCustomerInfo.contact_person || quote.contact_person,
           contact_phone: quickQuoteCustomerInfo.contact_phone || quote.contact_phone,
           contact_address: quickQuoteCustomerInfo.contact_address || quote.contact_address,

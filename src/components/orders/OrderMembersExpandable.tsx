@@ -147,6 +147,9 @@ export function OrderMembersExpandable({
   const [vehicleAssignments, setVehicleAssignments] = useState<Record<string, string>>({})
   const [returnDate, setReturnDate] = useState<string | null>(null)
   const [orderCount, setOrderCount] = useState(0) // 訂單數量（用於判斷是否顯示訂單編號欄）
+  const [tourOrders, setTourOrders] = useState<{ id: string; order_number: string | null }[]>([]) // 團體模式：訂單列表
+  const [selectedOrderIdForAdd, setSelectedOrderIdForAdd] = useState<string | null>(null) // 團體模式：新增成員時選擇的訂單
+  const [showOrderSelectDialog, setShowOrderSelectDialog] = useState(false) // 團體模式：訂單選擇對話框
 
   // 團體模式：自訂費用欄位
   interface CustomCostField {
@@ -321,8 +324,9 @@ export function OrderMembersExpandable({
         if (ordersError) throw ordersError
 
         if (ordersData && ordersData.length > 0) {
-          // 設定訂單數量
+          // 設定訂單數量和訂單列表
           setOrderCount(ordersData.length)
+          setTourOrders(ordersData)
 
           // 建立訂單編號對應表（只取序號部分，如 "01"）
           orderCodeMap = Object.fromEntries(
@@ -414,16 +418,39 @@ export function OrderMembersExpandable({
   }
 
   const handleAddMember = async () => {
-    setIsAddDialogOpen(true)
+    if (mode === 'tour') {
+      // 團體模式：需要先選擇訂單
+      if (tourOrders.length === 0) {
+        await alert('此團尚無訂單，請先建立訂單', 'warning')
+        return
+      }
+      if (tourOrders.length === 1) {
+        // 只有一個訂單，直接使用
+        setSelectedOrderIdForAdd(tourOrders[0].id)
+        setIsAddDialogOpen(true)
+      } else {
+        // 多個訂單，顯示選擇對話框
+        setShowOrderSelectDialog(true)
+      }
+    } else {
+      setIsAddDialogOpen(true)
+    }
   }
 
   const confirmAddMembers = async () => {
     // 如果是空白或無效數字，預設為 1
     const count = typeof memberCountToAdd === 'number' ? memberCountToAdd : 1
 
+    // 團體模式使用選擇的訂單 ID，單一訂單模式使用 prop 的 orderId
+    const targetOrderId = mode === 'tour' ? selectedOrderIdForAdd : orderId
+    if (!targetOrderId) {
+      await alert('請選擇訂單', 'warning')
+      return
+    }
+
     try {
       const newMembers = Array.from({ length: count }, () => ({
-        order_id: orderId,
+        order_id: targetOrderId,
         workspace_id: workspaceId,
         member_type: 'adult',
         identity: '大人',
@@ -1382,13 +1409,14 @@ export function OrderMembersExpandable({
       const duplicateItems: string[] = []
 
       // 載入現有成員（用於重複檢查）
-      if (!orderId) {
+      const targetOrderId = mode === 'tour' ? selectedOrderIdForAdd : orderId
+      if (!targetOrderId) {
         throw new Error('需要訂單 ID 才能批次上傳')
       }
       const { data: existingMembers } = await supabase
         .from('order_members')
         .select('passport_number, id_number, chinese_name, birth_date')
-        .eq('order_id', orderId)
+        .eq('order_id', targetOrderId)
 
       const existingPassports = new Set(existingMembers?.map(m => m.passport_number).filter(Boolean) || [])
       const existingIdNumbers = new Set(existingMembers?.map(m => m.id_number).filter(Boolean) || [])
@@ -1465,7 +1493,7 @@ export function OrderMembersExpandable({
 
             // 3. 建立訂單成員（包含護照照片 URL）
             const memberData = {
-              order_id: orderId,
+              order_id: targetOrderId,
               workspace_id: workspaceId,
               customer_id: null, // 稍後背景同步
               chinese_name: cleanChineseName || '', // 使用清理後的中文名（移除括號內的拼音）
@@ -1616,17 +1644,14 @@ export function OrderMembersExpandable({
           </h4>
         </div>
         <div className="flex gap-2">
-          {/* 團體模式下隱藏新增成員按鈕（需從各訂單新增） */}
-          {mode !== 'tour' && (
-            <Button
-              size="sm"
-              onClick={handleAddMember}
-              className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              <Plus size={14} />
-              新增成員
-            </Button>
-          )}
+          <Button
+            size="sm"
+            onClick={handleAddMember}
+            className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            <Plus size={14} />
+            新增成員
+          </Button>
           <Button
             size="sm"
             variant="ghost"
@@ -2201,11 +2226,41 @@ export function OrderMembersExpandable({
         </div>
       )}
 
+      {/* 團體模式：訂單選擇對話框 */}
+      <Dialog open={showOrderSelectDialog} onOpenChange={setShowOrderSelectDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>選擇訂單</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-morandi-secondary mb-4">
+              此團有多筆訂單，請選擇要新增成員的訂單：
+            </p>
+            <div className="space-y-2">
+              {tourOrders.map(order => (
+                <button
+                  key={order.id}
+                  onClick={() => {
+                    setSelectedOrderIdForAdd(order.id)
+                    setShowOrderSelectDialog(false)
+                    setIsAddDialogOpen(true)
+                  }}
+                  className="w-full p-3 text-left rounded-lg border border-morandi-gold/30 hover:bg-morandi-gold/10 hover:border-morandi-gold transition-colors"
+                >
+                  <span className="font-mono text-morandi-primary">{order.order_number || '未命名訂單'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* 新增成員對話框 - 左右兩半 */}
       <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
         setIsAddDialogOpen(open)
         if (!open) {
           setMemberCountToAdd(1)
+          setSelectedOrderIdForAdd(null)
         }
       }}>
         <DialogContent className="max-w-2xl">

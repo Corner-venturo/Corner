@@ -169,7 +169,7 @@ export const useQuoteState = () => {
       }
       // 快速報價單客戶資訊
       setQuickQuoteCustomerInfo({
-        customer_name: quote.customer_name || '',
+        customer_name: quote.customer_name || quote.name || '', // 優先用 customer_name，否則用團體名稱
         contact_person: quote.contact_person || '',
         contact_phone: quote.contact_phone || '',
         contact_address: quote.contact_address || '',
@@ -232,7 +232,7 @@ export const useQuoteState = () => {
     (quote?.quick_quote_items as QuickQuoteItem[]) || []
   )
   const [quickQuoteCustomerInfo, setQuickQuoteCustomerInfo] = useState({
-    customer_name: quote?.customer_name || '',
+    customer_name: quote?.customer_name || quote?.name || '', // 優先用 customer_name，否則用團體名稱
     contact_person: quote?.contact_person || '',
     contact_phone: quote?.contact_phone || '',
     contact_address: quote?.contact_address || '',
