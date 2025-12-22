@@ -176,11 +176,9 @@ export function OrderMembersExpandable({
     loadTourDepartureDate()
     // 載入顧客資料（用於編輯模式搜尋）
     fetchCustomers()
-    // 團體模式：載入分房分車資訊
-    if (mode === 'tour') {
-      loadRoomAssignments()
-      loadVehicleAssignments()
-    }
+    // 載入分房分車資訊（兩種模式都載入）
+    loadRoomAssignments()
+    loadVehicleAssignments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, tourId, mode])
 
@@ -1677,68 +1675,64 @@ export function OrderMembersExpandable({
           >
             身份
           </Button>
-          {/* 團體模式：分房分車、PNR、費用按鈕 */}
-          {mode === 'tour' && (
-            <>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowRoomColumn(!showRoomColumn)}
-                className={cn(
-                  "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-amber-50",
-                  showRoomColumn && "bg-amber-50 text-amber-600"
-                )}
-                title="顯示/隱藏分房欄位"
-              >
-                <Hotel size={14} />
-                分房
-              </Button>
-              {showRoomColumn && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setShowRoomManager(true)}
-                  className="gap-1 text-amber-600 hover:text-amber-700 hover:bg-amber-100"
-                  title="分房管理設定"
-                >
-                  <Settings2 size={14} />
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowVehicleManager(true)}
-                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-blue-50"
-                title="分車管理"
-              >
-                <Bus size={14} />
-                分車
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowPnrColumn(!showPnrColumn)}
-                className={cn(
-                  "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-sky-50",
-                  showPnrColumn && "bg-sky-50 text-sky-600"
-                )}
-                title="顯示/隱藏 PNR 欄位"
-              >
-                <Plane size={14} />
-                PNR
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowAddCostFieldDialog(true)}
-                className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-emerald-50"
-                title="新增費用欄位"
-              >
-                <Coins size={14} />
-                費用
-              </Button>
-            </>
+          {/* 分房分車、PNR、費用按鈕（兩種模式都顯示） */}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowRoomColumn(!showRoomColumn)}
+            className={cn(
+              "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-amber-50",
+              showRoomColumn && "bg-amber-50 text-amber-600"
+            )}
+            title="顯示/隱藏分房欄位"
+          >
+            <Hotel size={14} />
+            分房
+          </Button>
+          {showRoomColumn && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowRoomManager(true)}
+              className="gap-1 text-amber-600 hover:text-amber-700 hover:bg-amber-100"
+              title="分房管理設定"
+            >
+              <Settings2 size={14} />
+            </Button>
           )}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowVehicleManager(true)}
+            className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-blue-50"
+            title="分車管理"
+          >
+            <Bus size={14} />
+            分車
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowPnrColumn(!showPnrColumn)}
+            className={cn(
+              "gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-sky-50",
+              showPnrColumn && "bg-sky-50 text-sky-600"
+            )}
+            title="顯示/隱藏 PNR 欄位"
+          >
+            <Plane size={14} />
+            PNR
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setShowAddCostFieldDialog(true)}
+            className="gap-1 text-morandi-secondary hover:text-morandi-primary hover:bg-emerald-50"
+            title="新增費用欄位"
+          >
+            <Coins size={14} />
+            費用
+          </Button>
           <Button
             size="sm"
             variant="ghost"
@@ -1816,20 +1810,20 @@ export function OrderMembersExpandable({
                 <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20">
                   備註
                 </th>
-                {/* 團體模式：分房欄位 */}
-                {mode === 'tour' && showRoomColumn && (
+                {/* 分房欄位 */}
+                {showRoomColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-amber-50/50">
                     分房
                   </th>
                 )}
-                {/* 團體模式：PNR 欄位 */}
-                {mode === 'tour' && showPnrColumn && (
+                {/* PNR 欄位 */}
+                {showPnrColumn && (
                   <th className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-sky-50/50">
                     PNR
                   </th>
                 )}
-                {/* 團體模式：自訂費用欄位 */}
-                {mode === 'tour' && customCostFields.map(field => (
+                {/* 自訂費用欄位 */}
+                {customCostFields.map(field => (
                   <th
                     key={field.id}
                     className="px-2 py-1.5 text-left font-medium text-morandi-secondary text-[11px] border border-morandi-gold/20 bg-emerald-50/50"

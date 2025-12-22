@@ -10,11 +10,12 @@ import { Tour } from '@/types/tour.types'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, GripVertical, Printer, Eye, Hotel, Bus } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Printer, Eye, Hotel, Bus, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { TourRoomManager } from './tour-room-manager'
 import { TourVehicleManager } from './tour-vehicle-manager'
+import { JapanEntryCardPrint } from './JapanEntryCardPrint'
 import {
   DndContext,
   closestCenter,
@@ -253,6 +254,15 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   // 分房分車對話框
   const [showRoomManager, setShowRoomManager] = useState(false)
   const [showVehicleManager, setShowVehicleManager] = useState(false)
+  // 入境卡列印
+  const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
+  const [entryCardSettings, setEntryCardSettings] = useState({
+    flightNumber: '',
+    hotelName: '',
+    hotelAddress: '',
+    hotelPhone: '',
+    stayDays: 5,
+  })
   // 分房資訊: member_id -> 房間名稱
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
   // 分車資訊: member_id -> 車輛名稱
@@ -766,6 +776,15 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => setShowEntryCardDialog(true)}
+            className="bg-rose-50 hover:bg-rose-100 border-rose-200"
+          >
+            <FileText size={16} className="mr-1" />
+            列印入境卡
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowPrintPreview(true)}
           >
             <Printer size={16} className="mr-1" />
@@ -928,6 +947,92 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
         open={showVehicleManager}
         onOpenChange={setShowVehicleManager}
       />
+
+      {/* 入境卡列印 Dialog */}
+      <Dialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
+          <div className="no-print flex items-center justify-between mb-4">
+            <DialogHeader>
+              <DialogTitle>列印日本入境卡</DialogTitle>
+            </DialogHeader>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEntryCardDialog(false)}
+              >
+                關閉
+              </Button>
+              <Button
+                onClick={() => window.print()}
+              >
+                <Printer size={16} className="mr-1" />
+                列印
+              </Button>
+            </div>
+          </div>
+
+          {/* 設定區域 */}
+          <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">航班號碼</label>
+              <Input
+                value={entryCardSettings.flightNumber}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
+                placeholder="例：BR-108"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店名稱</label>
+              <Input
+                value={entryCardSettings.hotelName}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelName: e.target.value }))}
+                placeholder="例：東京灣希爾頓"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店地址</label>
+              <Input
+                value={entryCardSettings.hotelAddress}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
+                placeholder="例：東京都港區..."
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店電話</label>
+              <Input
+                value={entryCardSettings.hotelPhone}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
+                placeholder="例：03-1234-5678"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-morandi-secondary mb-1 block">停留天數</label>
+              <Input
+                type="number"
+                min={1}
+                max={90}
+                value={entryCardSettings.stayDays}
+                onChange={e => setEntryCardSettings(prev => ({ ...prev, stayDays: parseInt(e.target.value) || 5 }))}
+                className="text-sm"
+              />
+            </div>
+          </div>
+
+          {/* 預覽區域 */}
+          <JapanEntryCardPrint
+            members={members}
+            flightNumber={entryCardSettings.flightNumber || 'BR-XXX'}
+            hotelName={entryCardSettings.hotelName}
+            hotelAddress={entryCardSettings.hotelAddress}
+            hotelPhone={entryCardSettings.hotelPhone}
+            stayDays={entryCardSettings.stayDays}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
