@@ -294,7 +294,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       }
 
       try {
-        // 先刪除當前晚的房間
+        // 先刪除當前晚的房間（會自動刪除關聯的 assignments）
         const currentNightRoomIds = rooms.filter(r => r.night_number === nightNumber).map(r => r.id)
         if (currentNightRoomIds.length > 0) {
           const { error: deleteError } = await supabase
@@ -304,7 +304,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
           if (deleteError) throw deleteError
         }
 
-        // 複製前一晚的房間到這一晚
+        // 複製前一晚的房間到這一晚（包含 booking_code 和 amount）
         const newRooms = sourceRooms.map((room, index) => ({
           tour_id: tourId,
           hotel_name: room.hotel_name,
@@ -312,15 +312,53 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
           capacity: room.capacity,
           night_number: nightNumber,
           display_order: index,
+          booking_code: room.booking_code,
+          amount: room.amount,
         }))
 
-        const { error: insertError } = await supabase
+        const { data: insertedRooms, error: insertError } = await supabase
           .from('tour_rooms')
           .insert(newRooms)
+          .select('id')
         if (insertError) throw insertError
 
+        // 複製團員分配
+        if (insertedRooms && insertedRooms.length > 0) {
+          // 取得源房間的分配記錄
+          const sourceRoomIds = sourceRooms.map(r => r.id)
+          const sourceAssignments = assignments.filter(a => sourceRoomIds.includes(a.room_id))
+
+          if (sourceAssignments.length > 0) {
+            // 建立源房間 ID 到新房間 ID 的映射（按 display_order 順序對應）
+            const roomIdMapping: Record<string, string> = {}
+            sourceRooms.forEach((sourceRoom, index) => {
+              if (insertedRooms[index]) {
+                roomIdMapping[sourceRoom.id] = insertedRooms[index].id
+              }
+            })
+
+            // 建立新的分配記錄
+            const newAssignments = sourceAssignments
+              .filter(a => roomIdMapping[a.room_id]) // 確保有對應的新房間
+              .map(a => ({
+                room_id: roomIdMapping[a.room_id],
+                order_member_id: a.order_member_id,
+              }))
+
+            if (newAssignments.length > 0) {
+              const { error: assignError } = await supabase
+                .from('tour_room_assignments')
+                .insert(newAssignments)
+              if (assignError) {
+                console.error('複製分配失敗:', assignError)
+                // 不中斷流程，房間已經建立成功
+              }
+            }
+          }
+        }
+
         setContinueFromPrevious(newContinued)
-        toast.success(`已複製第 ${sourceNight} 晚的房間設定`)
+        toast.success(`已複製第 ${sourceNight} 晚的房間設定及分配`)
         loadRooms()
         loadAssignments()
       } catch (error) {
