@@ -104,19 +104,34 @@ const extractMealsFromItinerary = (tourData: LocalTourData) => {
 }
 
 // 從行程資料提取住宿資訊
-// 只提取主行程，排除備選行程（isAlternative = true）
+// 優先從 hotels 陣列提取，其次從每日行程的 accommodation 欄位
 const extractHotelsFromItinerary = (tourData: LocalTourData) => {
   const hotels: Array<{ day: number; name: string; note?: string }> = []
+  const addedDays = new Set<number>()
 
+  // 1. 優先從 hotels 陣列提取（如果存在）
+  if (tourData.hotels && Array.isArray(tourData.hotels)) {
+    tourData.hotels.forEach((hotel: { day?: number; name?: string; note?: string }) => {
+      if (hotel.name && hotel.name.trim()) {
+        const day = hotel.day || 1
+        hotels.push({ day, name: hotel.name, note: hotel.note })
+        addedDays.add(day)
+      }
+    })
+  }
+
+  // 2. 從每日行程的 accommodation 欄位補充（避免重複）
   if (tourData.dailyItinerary) {
-    // 只取主行程（非備選）
     const mainItinerary = tourData.dailyItinerary.filter(day => !day.isAlternative)
 
     mainItinerary.forEach((day, index) => {
-      if (day.hotel || day.accommodation) {
-        const hotelName = day.hotel || day.accommodation
-        if (hotelName && hotelName.trim()) {
-          hotels.push({ day: index + 1, name: hotelName, note: day.note || day.description })
+      const dayNumber = index + 1
+      if (!addedDays.has(dayNumber)) {
+        if (day.hotel || day.accommodation) {
+          const hotelName = day.hotel || day.accommodation
+          if (hotelName && hotelName.trim()) {
+            hotels.push({ day: dayNumber, name: hotelName, note: day.note || day.description })
+          }
         }
       }
     })

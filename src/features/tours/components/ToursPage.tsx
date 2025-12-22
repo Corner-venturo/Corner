@@ -603,10 +603,6 @@ export const ToursPage: React.FC = () => {
         setNewTour={setNewTour}
         newOrder={newOrder}
         setNewOrder={setNewOrder}
-        activeCountries={activeCountries}
-        availableCities={availableCities}
-        setAvailableCities={setAvailableCities}
-        getCitiesByCountryId={getCitiesByCountryId}
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}

@@ -46,11 +46,27 @@ interface HotelSelectorProps {
   onSelect: (hotels: LuxuryHotel[]) => void
 }
 
-// 保存篩選狀態
-let savedCountryId = ''
-let savedRegionId = ''
-let savedCityId = ''
-let savedBrand = ''
+// 使用 localStorage 保存篩選狀態（避免全域變數導致的狀態不一致）
+const STORAGE_KEY = 'hotel-selector-filters'
+
+function getSavedFilters() {
+  if (typeof window === 'undefined') return { countryId: '', regionId: '', cityId: '', brand: '' }
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) : { countryId: '', regionId: '', cityId: '', brand: '' }
+  } catch {
+    return { countryId: '', regionId: '', cityId: '', brand: '' }
+  }
+}
+
+function saveFilters(filters: { countryId: string; regionId: string; cityId: string; brand: string }) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filters))
+  } catch {
+    // ignore
+  }
+}
 
 // 品牌列表
 const HOTEL_BRANDS = [
@@ -77,10 +93,14 @@ export function HotelSelector({
   tourCountryName = '',
   onSelect,
 }: HotelSelectorProps) {
-  const [selectedCountryId, setSelectedCountryId] = useState<string>(savedCountryId)
-  const [selectedRegionId, setSelectedRegionId] = useState<string>(savedRegionId)
-  const [selectedCityId, setSelectedCityId] = useState<string>(savedCityId)
-  const [selectedBrand, setSelectedBrand] = useState<string>(savedBrand)
+  // 使用 ref 來追蹤是否已初始化
+  const filtersInitialized = useRef(false)
+  const savedFilters = useRef(getSavedFilters())
+
+  const [selectedCountryId, setSelectedCountryId] = useState<string>('')
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('')
+  const [selectedCityId, setSelectedCityId] = useState<string>('')
+  const [selectedBrand, setSelectedBrand] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
   const [hotels, setHotels] = useState<LuxuryHotel[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -114,24 +134,26 @@ export function HotelSelector({
     if (isOpen && countries.length > 0) {
       setSelectedIds(new Set())
 
+      // 重新讀取 localStorage
+      savedFilters.current = getSavedFilters()
+
       if (tourCountryName) {
         const matchedCountry = countries.find(c => c.name === tourCountryName)
-        if (matchedCountry && matchedCountry.id !== savedCountryId) {
+        if (matchedCountry && matchedCountry.id !== savedFilters.current.countryId) {
           setSelectedCountryId(matchedCountry.id)
-          savedCountryId = matchedCountry.id
           setSelectedRegionId('')
-          savedRegionId = ''
           setSelectedCityId('')
-          savedCityId = ''
+          setSelectedBrand('')
+          saveFilters({ countryId: matchedCountry.id, regionId: '', cityId: '', brand: '' })
           return
         }
       }
 
-      if (savedCountryId) {
-        setSelectedCountryId(savedCountryId)
-        setSelectedRegionId(savedRegionId)
-        setSelectedCityId(savedCityId)
-        setSelectedBrand(savedBrand)
+      if (savedFilters.current.countryId) {
+        setSelectedCountryId(savedFilters.current.countryId)
+        setSelectedRegionId(savedFilters.current.regionId)
+        setSelectedCityId(savedFilters.current.cityId)
+        setSelectedBrand(savedFilters.current.brand)
       }
     }
   }, [isOpen, tourCountryName, countries])
@@ -142,9 +164,7 @@ export function HotelSelector({
     setSelectedCountryId(value)
     setSelectedRegionId('')
     setSelectedCityId('')
-    savedCountryId = value
-    savedRegionId = ''
-    savedCityId = ''
+    saveFilters({ countryId: value, regionId: '', cityId: '', brand: selectedBrand })
   }
 
   // 區域變更
@@ -152,22 +172,21 @@ export function HotelSelector({
     const value = regionId === '__all__' ? '' : regionId
     setSelectedRegionId(value)
     setSelectedCityId('')
-    savedRegionId = value
-    savedCityId = ''
+    saveFilters({ countryId: selectedCountryId, regionId: value, cityId: '', brand: selectedBrand })
   }
 
   // 城市變更
   const handleCityChange = (cityId: string) => {
     const value = cityId === '__all__' ? '' : cityId
     setSelectedCityId(value)
-    savedCityId = value
+    saveFilters({ countryId: selectedCountryId, regionId: selectedRegionId, cityId: value, brand: selectedBrand })
   }
 
   // 品牌變更
   const handleBrandChange = (brand: string) => {
     const value = brand === '__all__' ? '' : brand
     setSelectedBrand(value)
-    savedBrand = value
+    saveFilters({ countryId: selectedCountryId, regionId: selectedRegionId, cityId: selectedCityId, brand: value })
   }
 
   // 載入區域列表

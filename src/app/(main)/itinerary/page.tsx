@@ -229,13 +229,14 @@ export default function ItineraryPage() {
         return
       }
       if (result.data) {
+        const flightData = result.data
         setNewItineraryOutboundFlight(prev => ({
           flightNumber: flightNumber,
-          airline: result.data.airline,
-          departureAirport: result.data.departure.iata,
-          arrivalAirport: result.data.arrival.iata,
-          departureTime: result.data.departure.time,
-          arrivalTime: result.data.arrival.time,
+          airline: flightData.airline,
+          departureAirport: flightData.departure.iata,
+          arrivalAirport: flightData.arrival.iata,
+          departureTime: flightData.departure.time,
+          arrivalTime: flightData.arrival.time,
           departureDate: prev?.departureDate || '',
         }))
       }
@@ -270,13 +271,14 @@ export default function ItineraryPage() {
         return
       }
       if (result.data) {
+        const flightData = result.data
         setNewItineraryReturnFlight(prev => ({
           flightNumber: flightNumber,
-          airline: result.data.airline,
-          departureAirport: result.data.departure.iata,
-          arrivalAirport: result.data.arrival.iata,
-          departureTime: result.data.departure.time,
-          arrivalTime: result.data.arrival.time,
+          airline: flightData.airline,
+          departureAirport: flightData.departure.iata,
+          arrivalAirport: flightData.arrival.iata,
+          departureTime: flightData.departure.time,
+          arrivalTime: flightData.arrival.time,
           departureDate: prev?.departureDate || '',
         }))
       }

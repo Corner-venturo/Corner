@@ -140,12 +140,18 @@ export function useTourFormHandlers(
 
   // 逐日行程管理
   const addDailyItinerary = () => {
+    // 計算正確的天數編號：只計算主要天數（排除建議方案 isAlternative）
+    const mainDays = (data.dailyItinerary || []).filter(
+      (day: { isAlternative?: boolean }) => !day.isAlternative
+    )
+    const nextDayNumber = mainDays.length + 1
+
     onChange({
       ...data,
       dailyItinerary: [
         ...(data.dailyItinerary || []),
         {
-          dayLabel: `Day ${(data.dailyItinerary?.length || 0) + 1}`,
+          dayLabel: `Day ${nextDayNumber}`,
           date: '',
           title: '',
           highlight: '',
