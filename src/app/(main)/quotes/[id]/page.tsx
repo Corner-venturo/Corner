@@ -19,7 +19,6 @@ import {
   PrintableQuotation,
   QuickQuoteDetail,
   LinkTourDialog,
-  LinkItineraryDialog,
   ImportMealsDialog,
   ImportActivitiesDialog,
 } from '@/features/quotes/components'
@@ -465,8 +464,6 @@ export default function QuoteDetailPage() {
   const [viewMode, setViewMode] = React.useState<'standard' | 'quick'>('standard')
   // 關聯旅遊團對話框
   const [showLinkTourDialog, setShowLinkTourDialog] = React.useState(false)
-  // 關聯行程表對話框
-  const [showLinkItineraryDialog, setShowLinkItineraryDialog] = React.useState(false)
   // 匯入餐飲對話框
   const [showImportMealsDialog, setShowImportMealsDialog] = React.useState(false)
   // 匯入景點對話框
@@ -507,37 +504,6 @@ export default function QuoteDetailPage() {
     useTourStore.getState().update(tour.id, { quote_id: quote.id })
     toast.success(`已關聯旅遊團：${tour.code}`)
   }, [quote, updateQuote])
-
-  // 處理點擊「行程表」按鈕
-  const handleItineraryButtonClick = React.useCallback(() => {
-    if (!quote) return
-    // 如果已經有關聯的行程表，直接跳轉
-    if (quote.itinerary_id) {
-      router.push(`/itinerary/${quote.itinerary_id}`)
-    } else {
-      // 否則顯示選擇對話框
-      setShowLinkItineraryDialog(true)
-    }
-  }, [quote, router])
-
-  // 處理新建行程表
-  const handleCreateNewItinerary = React.useCallback(() => {
-    handleCreateItinerary()
-  }, [handleCreateItinerary])
-
-  // 處理關聯現有行程表
-  const handleLinkExistingItinerary = React.useCallback(async (itinerary: Itinerary) => {
-    if (!quote) return
-    // 更新報價單的 itinerary_id
-    await updateQuote(quote.id, {
-      itinerary_id: itinerary.id
-    })
-    // 更新行程表的 quote_id
-    await updateItinerary(itinerary.id, {
-      quote_id: quote.id
-    })
-    toast.success(`已關聯行程表：${itinerary.code || itinerary.name}`)
-  }, [quote, updateQuote, updateItinerary])
 
   // 取得行程表的餐飲和景點資料
   const itineraryMealsData = useMemo(() => {
@@ -613,8 +579,7 @@ export default function QuoteDetailPage() {
   // 開啟匯入對話框（需要先有關聯的行程表）
   const handleOpenMealsImportDialog = React.useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('請先關聯行程表')
-      setShowLinkItineraryDialog(true)
+      toast.error('此報價單沒有關聯的行程表')
       return
     }
     setShowImportMealsDialog(true)
@@ -622,8 +587,7 @@ export default function QuoteDetailPage() {
 
   const handleOpenActivitiesImportDialog = React.useCallback(() => {
     if (!quote?.itinerary_id) {
-      toast.error('請先關聯行程表')
-      setShowLinkItineraryDialog(true)
+      toast.error('此報價單沒有關聯的行程表')
       return
     }
     setShowImportActivitiesDialog(true)
@@ -778,7 +742,6 @@ export default function QuoteDetailPage() {
         handleCreateTour={handleCreateTour}
         handleGenerateQuotation={handleGenerateQuotation}
         handleDeleteVersion={handleDeleteVersion}
-        handleCreateItinerary={handleItineraryButtonClick}
         handleSyncToItinerary={handleSyncToItinerary}
         handleSyncAccommodationFromItinerary={handleSyncAccommodationFromItinerary}
         onSwitchToQuickQuote={() => setViewMode('quick')}
@@ -922,15 +885,6 @@ export default function QuoteDetailPage() {
         onClose={() => setShowLinkTourDialog(false)}
         onCreateNew={handleCreateNewTour}
         onLinkExisting={handleLinkExistingTour}
-      />
-
-      {/* 關聯行程表對話框 */}
-      <LinkItineraryDialog
-        isOpen={showLinkItineraryDialog}
-        onClose={() => setShowLinkItineraryDialog(false)}
-        onCreateNew={handleCreateNewItinerary}
-        onLinkExisting={handleLinkExistingItinerary}
-        currentItineraryId={quote?.itinerary_id}
       />
 
       {/* 匯入餐飲對話框 */}

@@ -3,8 +3,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { CostCategory, ParticipantCounts, SellingPrices, costCategories, VersionRecord, TierPricing } from '../types'
-import { useItineraryImport } from './useItineraryImport'
+import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing } from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
 
 export const useQuoteState = () => {
@@ -14,13 +13,6 @@ export const useQuoteState = () => {
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
-  const { importDataToCategories, isFromItinerary, shouldCreateNewVersion, mealsData, hotelsData, activitiesData } = useItineraryImport()
-
-  // 追蹤是否已經建立過新版本，避免重複建立
-  const hasCreatedNewVersion = useRef(false)
-
-  // 追蹤是否已經從行程匯入過資料（避免被 quote 載入覆蓋）
-  const hasImportedFromItinerary = useRef(false)
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
@@ -30,7 +22,7 @@ export const useQuoteState = () => {
     if (workspaces.length === 0) {
       loadWorkspaces()
     }
-     
+
   }, [])
 
   // 自動載入 quotes（如果還沒載入）
@@ -38,7 +30,7 @@ export const useQuoteState = () => {
     if (quotes.length === 0) {
       loadQuotes()
     }
-     
+
   }, [])
 
   // 檢查是否為特殊團報價單
@@ -61,13 +53,6 @@ export const useQuoteState = () => {
       ...cat,
       total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
     }))
-
-    // 如果是從行程頁面來的，自動匯入行程資料
-    if (isFromItinerary && (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)) {
-      console.log('[useQuoteState] 初始化時匯入行程資料')
-      processedCategories = importDataToCategories(processedCategories)
-      hasImportedFromItinerary.current = true
-    }
 
     // 修復住宿天數與項目不一致的問題：
     // 如果 accommodation_days > 0 但住宿項目為空，根據天數初始化空的住宿項目
@@ -159,17 +144,14 @@ export const useQuoteState = () => {
   // 當 quote 載入後，更新所有狀態
   useEffect(() => {
     if (quote) {
-      // 如果已經從行程匯入過資料，不要用資料庫的 categories 覆蓋
-      if (quote.categories && !hasImportedFromItinerary.current) {
+      if (quote.categories) {
         const loadedCategories = quote.categories.map(cat => ({
           ...cat,
           total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
         }))
         setCategories(loadedCategories)
-      } else if (hasImportedFromItinerary.current) {
-        console.log('[useQuoteState] 跳過 categories 載入（已從行程匯入）')
       }
-      if (quote.accommodation_days !== undefined && !hasImportedFromItinerary.current) {
+      if (quote.accommodation_days !== undefined) {
         setAccommodationDays(quote.accommodation_days)
       }
       if (quote.participant_counts) {
@@ -274,99 +256,6 @@ export const useQuoteState = () => {
       router.push('/quotes')
     }
   }, [quote, quotes.length, router])
-
-  // 追蹤是否已經自動儲存過行程匯入的資料
-  const hasAutoSavedImportedData = useRef(false)
-
-  // 自動儲存從行程表匯入的資料（非新建版本模式）
-  // 這確保切換快速/團體模式時資料不會丟失
-  useEffect(() => {
-    if (
-      isFromItinerary &&
-      !shouldCreateNewVersion &&
-      quote &&
-      hasImportedFromItinerary.current &&
-      !hasAutoSavedImportedData.current &&
-      (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)
-    ) {
-      hasAutoSavedImportedData.current = true
-      console.log('[useQuoteState] 自動儲存從行程匯入的資料')
-
-      // 儲存匯入的資料到資料庫
-      updateQuote(quote.id, {
-        categories: categories,
-        accommodation_days: hotelsData.length > 0 ? Math.max(accommodationDays, hotelsData.length) : accommodationDays,
-      }).then(() => {
-        console.log('[useQuoteState] 行程資料已自動儲存')
-        // 清除 URL 參數
-        const url = new URL(window.location.href)
-        url.searchParams.delete('from_itinerary')
-        url.searchParams.delete('meals')
-        url.searchParams.delete('hotels')
-        url.searchParams.delete('activities')
-        url.searchParams.delete('link_itinerary')
-        window.history.replaceState({}, '', url.pathname)
-      })
-    }
-  }, [isFromItinerary, shouldCreateNewVersion, quote, categories, mealsData, hotelsData, activitiesData, accommodationDays, updateQuote])
-
-  // 自動建立新版本（從行程頁面帶入資料時）
-  useEffect(() => {
-    if (
-      shouldCreateNewVersion &&
-      quote &&
-      !hasCreatedNewVersion.current &&
-      (mealsData.length > 0 || hotelsData.length > 0 || activitiesData.length > 0)
-    ) {
-      hasCreatedNewVersion.current = true
-
-      // 先匯入行程資料到 categories
-      const importedCategories = importDataToCategories(categories)
-
-      // 計算新版本號
-      const existingVersions = quote.versions || []
-      const maxVersion = existingVersions.reduce((max: number, v: { version?: number }) =>
-        Math.max(max, v.version || 0), 0
-      )
-      const newVersionNum = maxVersion + 1
-
-      // 建立新版本
-      const newVersion: VersionRecord = {
-        id: Date.now().toString(),
-        version: newVersionNum,
-        name: `從行程帶入 - ${new Date().toLocaleDateString('zh-TW')}`,
-        created_at: new Date().toISOString(),
-        note: '自動從行程資料建立',
-        categories: importedCategories,
-        accommodation_days: accommodationDays,
-        participant_counts: participantCounts,
-        selling_prices: sellingPrices,
-        total_cost: importedCategories.reduce((sum, cat) => sum + (cat.total || 0), 0),
-      }
-
-      // 更新到資料庫
-      const newVersionIndex = existingVersions.length
-      updateQuote(quote.id, {
-        current_version_index: newVersionIndex,
-        versions: [...existingVersions, newVersion],
-      }).then(() => {
-        // 更新本地 state
-        setCategories(importedCategories)
-        // 設定當前編輯版本為新建立的版本
-        setCurrentEditingVersion(existingVersions.length)
-
-        // 清除 URL 參數
-        const url = new URL(window.location.href)
-        url.searchParams.delete('create_new_version')
-        url.searchParams.delete('from_itinerary')
-        url.searchParams.delete('meals')
-        url.searchParams.delete('hotels')
-        url.searchParams.delete('activities')
-        url.searchParams.delete('link_itinerary')
-        window.history.replaceState({}, '', url.pathname)
-      })
-    }
-  }, [shouldCreateNewVersion, quote, mealsData, hotelsData, activitiesData])
 
   return {
     quote_id,
