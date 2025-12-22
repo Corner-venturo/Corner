@@ -1347,17 +1347,26 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
             <label className="block text-sm font-medium text-morandi-secondary mb-1">房型</label>
             <select
               value={editRoomData.room_type}
-              onChange={e => {
-                const type = e.target.value
-                const capacity = type === 'single' ? 1 : type === 'double' ? 2 : type === 'triple' ? 3 : 4
-                setEditRoomData(prev => ({ ...prev, room_type: type, capacity }))
-              }}
+              onChange={e => setEditRoomData(prev => ({ ...prev, room_type: e.target.value }))}
               className="w-full h-10 px-3 border border-input rounded-md bg-background text-sm"
             >
               {ROOM_TYPES.map(type => (
                 <option key={type.value} value={type.value}>{type.label}</option>
               ))}
             </select>
+          </div>
+
+          {/* 入住人數 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-secondary mb-1">入住人數</label>
+            <Input
+              type="number"
+              min={1}
+              max={10}
+              value={editRoomData.capacity}
+              onChange={e => setEditRoomData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 1 }))}
+              placeholder="輸入入住人數"
+            />
           </div>
 
           {/* 訂房代號 */}
