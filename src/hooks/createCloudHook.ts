@@ -1,3 +1,5 @@
+'use client'
+
 // src/hooks/createCloudHook.ts
 // 通用 SWR Hook 工廠函數 - 純雲端架構
 

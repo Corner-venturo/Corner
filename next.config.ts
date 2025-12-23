@@ -59,18 +59,8 @@ const nextConfig: NextConfig = {
   // ✅ 啟用 standalone 輸出模式（適合 Docker/Vercel 部署）
   output: 'standalone',
 
-  // 修復 WebSocket HMR 連接問題
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      config.watchOptions = {
-        ...config.watchOptions,
-        ignored: /node_modules/,
-        poll: 1000,
-        aggregateTimeout: 300,
-      }
-    }
-    return config
-  },
+  // Next.js 16 使用 Turbopack 作為預設打包工具
+  turbopack: {},
 }
 
 export default nextConfig

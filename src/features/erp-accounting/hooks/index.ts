@@ -1,3 +1,5 @@
+'use client'
+
 // ERP 會計模組 Hooks
 import { createCloudHook } from '@/hooks/createCloudHook'
 import type {
