@@ -12,7 +12,7 @@
  */
 
 import { aesEncrypt, aesDecrypt, generateTransactionNo, convertTaxType, formatInvoiceDate } from './crypto'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 // API 端點
 const API_ENDPOINTS = {
@@ -90,14 +90,7 @@ interface QueryParams {
  * 從 Supabase 獲取藍新金流設定
  */
 async function getNewebPayConfig(): Promise<NewebPayConfig> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase 設定不完整')
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const supabase = getSupabaseAdminClient()
 
   // 從 system_settings 表獲取設定
   const { data, error } = await supabase

@@ -37,18 +37,18 @@ const defaultFormOptions = {
  * }
  * ```
  */
-export function useZodForm<TSchema extends z.ZodType>(
-  props: Omit<UseFormProps<z.infer<TSchema>>, 'resolver'> & {
-    schema: TSchema
+export function useZodForm<TFieldValues extends FieldValues>(
+  props: Omit<UseFormProps<TFieldValues>, 'resolver'> & {
+    schema: z.ZodType<TFieldValues>
   }
 ) {
   const { schema, ...formProps } = props
 
-  return useForm<z.infer<TSchema>>({
+  return useForm<TFieldValues>({
     ...defaultFormOptions,
     ...formProps,
     resolver: zodResolver(schema),
-  })
+  } as UseFormProps<TFieldValues>)
 }
 
 /**

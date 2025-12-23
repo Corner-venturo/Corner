@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase/client'
 
 interface NewebPayConfig {
   merchantId: string
@@ -14,9 +14,6 @@ interface NewebPayConfig {
   hashIV: string
   isProduction: boolean
 }
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export function NewebPaySettings() {
   const [config, setConfig] = useState<NewebPayConfig>({
@@ -39,7 +36,6 @@ export function NewebPaySettings() {
 
   const fetchConfig = async () => {
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey)
       const { data, error } = await supabase
         .from('system_settings')
         .select('settings')
@@ -55,7 +51,7 @@ export function NewebPaySettings() {
       }
 
       if (data?.settings) {
-        setConfig(data.settings as NewebPayConfig)
+        setConfig(data.settings as unknown as NewebPayConfig)
       }
     } catch (error) {
       console.error('載入設定失敗:', error)
@@ -70,13 +66,11 @@ export function NewebPaySettings() {
     setMessage(null)
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey)
-
       const { error } = await supabase
         .from('system_settings')
         .upsert({
           category: 'newebpay',
-          settings: config,
+          settings: config as unknown as Record<string, unknown>,
           description: '藍新金流旅行業代轉發票設定',
           updated_at: new Date().toISOString(),
         }, {

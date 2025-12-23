@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 /**
  * API 用量追蹤工具
@@ -29,11 +29,7 @@ export async function checkApiUsage(
   requestCount: number = 1
 ): Promise<ApiUsageCheckResult> {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-
+    const supabase = getSupabaseAdminClient()
     const monthlyLimit = API_LIMITS[apiName]
     const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
 
@@ -93,11 +89,7 @@ export async function updateApiUsage(
   count: number = 1
 ): Promise<{ success: boolean; newCount: number }> {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-
+    const supabase = getSupabaseAdminClient()
     const currentMonth = new Date().toISOString().slice(0, 7)
 
     // 先查詢當前使用量
@@ -148,11 +140,7 @@ export async function getApiUsage(apiName: ApiName): Promise<{
   percentage: number
 }> {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-
+    const supabase = getSupabaseAdminClient()
     const currentMonth = new Date().toISOString().slice(0, 7)
     const { data } = await supabase
       .from('api_usage')

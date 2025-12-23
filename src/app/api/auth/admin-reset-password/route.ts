@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/utils/logger';
-
-// 使用 service role key 來管理使用者
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // POST /api/auth/admin-reset-password - 管理員重置會員密碼
 export async function POST(request: NextRequest) {
@@ -26,6 +20,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const supabaseAdmin = getSupabaseAdminClient();
 
     // 先透過 email 找到使用者
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();

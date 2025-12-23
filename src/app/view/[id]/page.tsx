@@ -1,11 +1,6 @@
 import { Metadata } from 'next'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import PublicViewClient from './client'
-
-// Supabase Admin Client（繞過 RLS）
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -16,6 +11,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params
 
   try {
+    const supabase = getSupabaseAdminClient()
     const { data: itinerary } = await supabase
       .from('itineraries')
       .select('title, tour_code, description, cover_image')
