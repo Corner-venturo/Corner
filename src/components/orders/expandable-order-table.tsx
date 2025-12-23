@@ -157,10 +157,6 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                 <React.Fragment key={order.id}>
                   <tr
                     onClick={() => toggleOrderExpand(order.id)}
-                    onDoubleClick={() => {
-                      // 雙擊跳轉到訂單詳細頁面
-                      router.push(`/orders/${order.id}`)
-                    }}
                     className={cn(
                       'relative transition-colors cursor-pointer',
                       !expandedOrders.includes(order.id) && 'hover:bg-morandi-container/30'
@@ -301,21 +297,6 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                                   })}
                                 </div>
 
-                                {/* 各分頁的專屬按鈕 */}
-                                <div className="flex items-center space-x-2 px-4">
-                                  {/* 統一的詳細頁面按鈕 */}
-                                  <Button
-                                    onClick={() => {
-                                      // 跳轉到統一的訂單詳細頁面
-                                      router.push(`/orders/${order.id}`)
-                                    }}
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-morandi-container hover:bg-morandi-container text-morandi-secondary hover:text-morandi-primary"
-                                  >
-                                    詳
-                                  </Button>
-                                </div>
                               </div>
                             </div>
 

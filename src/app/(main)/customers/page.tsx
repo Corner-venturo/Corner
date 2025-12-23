@@ -123,8 +123,8 @@ export default function CustomersPage() {
         }
       )
 
-      if (goToOrder && linkedMembers[0]?.order_id) {
-        router.push(`/orders/${linkedMembers[0].order_id}`)
+      if (goToOrder) {
+        router.push('/orders')
       }
       return
     }

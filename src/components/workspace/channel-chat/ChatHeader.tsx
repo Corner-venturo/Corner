@@ -44,7 +44,7 @@ export function ChatHeader({ showMemberSidebar, onToggleMemberSidebar, tourId }:
           variant="ghost"
           size="icon"
           className="w-8 h-8 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10"
-          onClick={() => router.push(`/tours/${tourId}`)}
+          onClick={() => router.push(`/tours?highlight=${tourId}`)}
           title="前往旅遊團詳情"
         >
           <MapPin size={16} />

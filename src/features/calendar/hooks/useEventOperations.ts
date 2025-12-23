@@ -127,7 +127,7 @@ export function useEventOperations() {
 
     if (eventType === 'tour') {
       const tour_id = info.event.extendedProps.tourId
-      router.push(`/tours/${tour_id}`)
+      router.push(`/tours?highlight=${tour_id}`)
     } else if (eventType === 'birthday') {
       // 跳轉到會員資料頁面
       const member_id = info.event.extendedProps.memberId

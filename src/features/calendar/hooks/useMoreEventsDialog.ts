@@ -69,7 +69,7 @@ export function useMoreEventsDialog() {
 
   const handleDialogEventClick = (event: FullCalendarEvent) => {
     if (event.extendedProps.type === 'tour') {
-      router.push(`/tours/${event.extendedProps.tour_id}`)
+      router.push(`/tours?highlight=${event.extendedProps.tour_id}`)
     }
     handleCloseDialog()
   }

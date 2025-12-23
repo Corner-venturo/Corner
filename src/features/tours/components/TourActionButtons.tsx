@@ -84,7 +84,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               if (onViewDetails) {
                 onViewDetails(tour)
               } else {
-                router.push(`/tours/${tour.id}`)
+                router.push(`/tours?highlight=${tour.id}`)
               }
             }}
             className="p-1 text-morandi-primary/80 hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
