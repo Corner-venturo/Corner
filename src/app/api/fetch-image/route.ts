@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 後端 API 代理下載圖片
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Fetch image error:', error)
+    logger.error('Fetch image error:', error)
     return NextResponse.json({ error: '下載圖片失敗' }, { status: 500 })
   }
 }

@@ -4,11 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { issueAllowance } from '@/lib/newebpay'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +21,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getSupabaseAdminClient()
 
     // 取得發票資訊
     const { data: invoice, error: fetchError } = await supabase
@@ -42,6 +40,14 @@ export async function POST(request: NextRequest) {
     if (invoice.status !== 'issued') {
       return NextResponse.json(
         { success: false, error: '只能對已開立的發票開立折讓' },
+        { status: 400 }
+      )
+    }
+
+    // 確保必要欄位存在
+    if (!invoice.invoice_number || !invoice.invoice_date) {
+      return NextResponse.json(
+        { success: false, error: '發票資料不完整' },
         { status: 400 }
       )
     }
@@ -78,7 +84,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (updateError) {
-      console.error('更新發票狀態失敗:', updateError)
+      logger.error('更新發票狀態失敗:', updateError)
       return NextResponse.json({
         success: true,
         message: '折讓已開立，但更新狀態時發生錯誤',
@@ -93,7 +99,7 @@ export async function POST(request: NextRequest) {
       data,
     })
   } catch (error) {
-    console.error('開立折讓錯誤:', error)
+    logger.error('開立折讓錯誤:', error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : '開立折讓失敗' },
       { status: 500 }

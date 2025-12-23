@@ -8,6 +8,7 @@ import { RequestDateInput } from './RequestDateInput'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
+import { logger } from '@/lib/utils/logger'
 import type { Order } from '@/stores/types'
 
 interface AddRequestDialogProps {
@@ -69,7 +70,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       const selectedOrder = orders.find(o => o.id === formData.order_id)
 
       if (!selectedTour) {
-        console.error('找不到選擇的旅遊團:', formData.tour_id)
+        logger.error('找不到選擇的旅遊團:', formData.tour_id)
         return
       }
 
@@ -84,7 +85,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
       resetForm()
       onOpenChange(false)
     } catch (error) {
-      console.error('新增請款單失敗:', error)
+      logger.error('新增請款單失敗:', error)
     }
   }
 

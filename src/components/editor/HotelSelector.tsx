@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Building2, ImageIcon, Loader2, Star, Crown, Plus, PenLine } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 // 飯店型別
 export interface LuxuryHotel {
@@ -306,7 +307,7 @@ export function HotelSelector({
 
         setHotels(formatted)
       } catch (error) {
-        console.error('Error loading hotels:', error)
+        logger.error('Error loading hotels:', error)
       } finally {
         setLoading(false)
       }

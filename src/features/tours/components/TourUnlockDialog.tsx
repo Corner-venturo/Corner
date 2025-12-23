@@ -17,6 +17,7 @@ import { Tour } from '@/types/tour.types'
 import { toast } from 'sonner'
 import { Unlock, Loader2, AlertTriangle, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface TourUnlockDialogProps {
   tour: Tour
@@ -82,9 +83,9 @@ export function TourUnlockDialog({
       onOpenChange(false)
       onUnlocked?.()
     } catch (err) {
-      console.error('Unlock error:', err)
+      logger.error('解鎖錯誤:', err)
       setError('發生錯誤，請稍後再試')
-    } finally {
+    } finally{
       setSubmitting(false)
     }
   }

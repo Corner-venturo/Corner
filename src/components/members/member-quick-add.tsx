@@ -12,6 +12,7 @@ import type { Customer } from '@/types/customer.types'
 import type { Member } from '@/stores/types'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface MemberQuickAddProps {
   orderId: string
@@ -123,7 +124,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
         .upload(filePath, file, { upsert: true })
 
       if (error) {
-        console.error('上傳護照照片失敗:', error)
+        logger.error('上傳護照照片失敗:', error)
         // 檢查是否是空間不足
         if (error.message?.includes('quota') || error.message?.includes('limit') || error.message?.includes('exceeded')) {
           toast.error('雲端儲存空間已滿，護照照片無法儲存。請聯繫管理員升級方案。')
@@ -138,7 +139,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
 
       return urlData?.publicUrl || null
     } catch (error) {
-      console.error('上傳護照照片失敗:', error)
+      logger.error('上傳護照照片失敗:', error)
       return null
     }
   }
@@ -238,7 +239,7 @@ export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: Membe
       setMode(null)
       onMembersAdded?.()
     } catch (error) {
-      console.error('OCR 錯誤:', error)
+      logger.error('OCR 錯誤:', error)
       toast.error('辨識失敗，請重試')
     } finally {
       setIsUploading(false)

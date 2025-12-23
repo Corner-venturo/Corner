@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 
 // 多 API Key 輪替機制
 const GEMINI_API_KEYS = [
@@ -37,7 +38,7 @@ function markKeyAsBlocked(key: string, retryAfterSeconds: number = 60) {
     blocked: true,
     blockedUntil: Date.now() + (retryAfterSeconds * 1000),
   }
-  console.log(`[Gemini] Key ${key.slice(-6)} blocked for ${retryAfterSeconds}s`)
+  logger.log(`[Gemini] Key ${key.slice(-6)} blocked for ${retryAfterSeconds}s`)
 }
 
 // Gemini Imagen 3 API endpoint
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       }
 
       triedKeys++
-      console.log(`[Gemini] Trying key ${apiKey.slice(-6)}... (attempt ${triedKeys}/${GEMINI_API_KEYS.length})`)
+      logger.log(`[Gemini] Trying key ${apiKey.slice(-6)}... (attempt ${triedKeys}/${GEMINI_API_KEYS.length})`)
 
       // 先嘗試 Gemini 2.0 Flash（支援圖片生成）
       const result = await tryGenerateWithKey(apiKey, fullPrompt)
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
 
   } catch (error) {
-    console.error('Generate image error:', error)
+    logger.error('Generate image error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to generate image' },
       { status: 500 }

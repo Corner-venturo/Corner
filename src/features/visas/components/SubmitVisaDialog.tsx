@@ -5,6 +5,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useVendorCostStore, useVisaStore } from '@/stores'
+import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
 
 interface SubmitVisaDialogProps {
@@ -109,15 +110,13 @@ export function SubmitVisaDialog({
         } else {
           // 建立新記錄
           try {
-            console.log('[SubmitVisaDialog] 建立代辦商成本:', { vendor_name: vendor, visa_type: visaType, cost })
             await createVendorCost({
               vendor_name: vendor,
               visa_type: visaType,
               cost,
             })
-            console.log('[SubmitVisaDialog] 代辦商成本建立成功')
           } catch (err) {
-            console.error('[SubmitVisaDialog] 代辦商成本建立失敗:', err)
+            logger.error('代辦商成本建立失敗:', err)
           }
         }
       }

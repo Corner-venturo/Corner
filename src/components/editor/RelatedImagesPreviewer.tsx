@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ImageIcon, RefreshCw } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { logger } from '@/lib/utils/logger'
 
 interface RelatedImage {
   id: string
@@ -59,7 +60,7 @@ export function RelatedImagesPreviewer({
         .limit(1)
 
       if (checkError) {
-        console.error('圖庫表格不存在:', checkError)
+        logger.error('圖庫表格不存在:', checkError)
         setRelatedImages([])
         return
       }
@@ -80,7 +81,7 @@ export function RelatedImagesPreviewer({
         .limit(6)
 
       if (error) {
-        console.error('載入相關圖片失敗:', error)
+        logger.error('載入相關圖片失敗:', error)
         
         // 如果 OR 查詢失敗，回退到簡單搜尋
         const { data: fallbackData, error: fallbackError } = await supabase
@@ -93,7 +94,7 @@ export function RelatedImagesPreviewer({
           .limit(6)
 
         if (fallbackError) {
-          console.error('回退搜尋也失敗:', fallbackError)
+          logger.error('回退搜尋也失敗:', fallbackError)
           setRelatedImages([])
           return
         }
@@ -113,7 +114,7 @@ export function RelatedImagesPreviewer({
 
       setRelatedImages(filteredImages)
     } catch (error) {
-      console.error('載入相關圖片錯誤:', error)
+      logger.error('載入相關圖片錯誤:', error)
       setRelatedImages([])
     } finally {
       setLoading(false)

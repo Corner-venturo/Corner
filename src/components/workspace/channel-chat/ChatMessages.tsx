@@ -7,6 +7,7 @@ import { Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Message, AdvanceList, SharedOrderList, Channel } from '@/stores/workspace'
 import { alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 interface MessageListTheme {
   colors: {
@@ -119,24 +120,17 @@ export function ChatMessages({
     e.stopPropagation()
     setIsDragging(false)
 
-    console.log('🔥 handleDrop triggered')
-
     const droppedFiles = Array.from(e.dataTransfer.files)
     const validFiles: File[] = []
     const errors: string[] = []
 
-    console.log('🔥 droppedFiles count:', droppedFiles.length)
-
     // 處理直接拖曳的檔案
     droppedFiles.forEach(file => {
-      console.log('🔥 Processing file:', file.name, file.type, file.size)
       const validation = validateFile(file)
       if (validation.valid) {
         validFiles.push(file)
-        console.log('🔥 File valid:', file.name)
       } else if (validation.error) {
         errors.push(validation.error)
-        console.log('🔥 File invalid:', validation.error)
       }
     })
 
@@ -175,7 +169,6 @@ export function ChatMessages({
       }
 
       if (imageUrl) {
-        console.log('🔥 嘗試下載網頁圖片:', imageUrl)
         try {
           const response = await fetch(imageUrl, { mode: 'cors' })
           if (!response.ok) throw new Error('無法下載圖片')
@@ -199,30 +192,22 @@ export function ChatMessages({
 
           if (validation.valid) {
             validFiles.push(file)
-            console.log('🔥 成功下載並轉換為檔案:', fileName)
           } else if (validation.error) {
             errors.push(validation.error)
           }
         } catch (err) {
-          console.warn('🔥 無法下載圖片（可能是 CORS 限制）:', imageUrl)
+          logger.log('無法下載圖片（可能是 CORS 限制）:', imageUrl)
           errors.push('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
         }
       }
     }
 
     if (errors.length > 0) {
-      console.log('🔥 Errors:', errors)
       void alert(errors.join('\n'), 'error')
     }
 
-    console.log('🔥 validFiles count:', validFiles.length)
-    console.log('🔥 current attachedFiles:', attachedFiles.length)
-
     if (validFiles.length > 0) {
-      console.log('🔥 Calling onFilesChange with', [...attachedFiles, ...validFiles].length, 'files')
       onFilesChange([...attachedFiles, ...validFiles])
-    } else {
-      console.log('🔥 No valid files to add')
     }
   }
 

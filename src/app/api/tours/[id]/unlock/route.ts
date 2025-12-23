@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// 使用 Service Role Key 進行密碼驗證
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 interface UnlockRequest {
   password: string
@@ -38,6 +33,7 @@ export async function POST(
     }
 
     const token = authHeader.split(' ')[1]
+    const supabaseAdmin = getSupabaseAdminClient()
 
     // 驗證 token 並取得用戶資訊
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
@@ -66,7 +62,7 @@ export async function POST(
     // 這裡簡化處理，實際可以加入更複雜的權限檢查
     const { data: tour, error: tourError } = await supabaseAdmin
       .from('tours')
-      .select('id, status, locked_by')
+      .select('id, status')
       .eq('id', tourId)
       .single()
 
@@ -98,7 +94,7 @@ export async function POST(
       .eq('id', tourId)
 
     if (updateError) {
-      console.error('Error unlocking tour:', updateError)
+      logger.error('Error unlocking tour:', updateError)
       return NextResponse.json(
         { error: '解鎖失敗' },
         { status: 500 }
@@ -110,7 +106,7 @@ export async function POST(
       message: '已解鎖，可進行修改',
     })
   } catch (error) {
-    console.error('Unlock API error:', error)
+    logger.error('Unlock API error:', error)
     return NextResponse.json(
       { error: '伺服器錯誤' },
       { status: 500 }

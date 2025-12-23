@@ -1,7 +1,26 @@
 # Claude Code 工作規範 (Venturo 專案)
 
-> **最後更新**: 2025-12-11
+> **最後更新**: 2025-12-23 (新增效能開發規範)
 > **專案狀態**: 核心功能完成，代碼品質強化中
+
+---
+
+## 📍 必讀：專案網站地圖
+
+**在探索專案結構前，請先查閱：**
+
+```
+/Users/williamchien/Projects/SITEMAP.md
+```
+
+此檔案包含：
+- 兩個專案的完整頁面路由
+- API 路由列表
+- Store 結構
+- 關鍵檔案位置
+- 資料庫連接關係
+
+**避免重複探索整個 codebase，先查 SITEMAP！**
 
 ---
 
@@ -73,6 +92,80 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 - [ ] `npm run type-check` 通過
 - [ ] `npm run lint` 通過
 - [ ] 功能正常運作
+
+---
+
+## 🚨 效能開發規範 (重要！)
+
+> **背景**: 2025-12 venturo-online 效能優化發現的問題，同樣適用於 ERP。
+> 以下規範確保新功能不會造成效能問題。
+
+### ❌ 絕對禁止的效能殺手
+
+```typescript
+// ❌ 1. 禁止在 API route 內直接 createClient
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(url, key)  // 每次請求都建新連線，浪費 200-500ms
+
+// ❌ 2. 禁止 N+1 查詢 (map + await)
+const results = await Promise.all(
+  items.map(async (item) => {
+    return await supabase.from('table').select().eq('id', item.id) // 10 筆 = 10 次查詢
+  })
+)
+
+// ❌ 3. 禁止 waterfall 查詢（等前一個完成才開始下一個）
+const users = await supabase.from('users').select()
+const orders = await supabase.from('orders').select()  // 等 users 完成才開始
+const items = await supabase.from('items').select()    // 等 orders 完成才開始
+```
+
+### ✅ 正確做法
+
+```typescript
+// ✅ 1. 使用單例模式（如果已建立）
+// 若有 supabase-server.ts：
+import { getSupabase } from '@/lib/supabase-server'
+const supabase = getSupabase()  // 重用連線
+
+// ✅ 2. 批量查詢取代 N+1
+const itemIds = items.map(i => i.id)
+const { data } = await supabase
+  .from('table')
+  .select()
+  .in('id', itemIds)  // 1 次查詢取得所有
+
+// ✅ 3. 平行查詢 Promise.all（獨立查詢同時執行）
+const [users, orders, items] = await Promise.all([
+  supabase.from('users').select(),
+  supabase.from('orders').select(),
+  supabase.from('items').select(),
+])
+
+// ✅ 4. 使用 join 減少查詢次數
+const { data } = await supabase
+  .from('orders')
+  .select(`
+    *,
+    customer:customers(*),
+    items:order_items(*)
+  `)
+```
+
+### 效能檢查清單（新增 API 時）
+
+- [ ] 是否重用 Supabase 連線（單例模式）？
+- [ ] 是否有 `.map(async)` 內做資料庫查詢？（改用 `.in()` 批量）
+- [ ] 多個獨立查詢是否用 `Promise.all` 平行執行？
+- [ ] 能否用 join/select 減少查詢次數？
+
+### 效能工具檔案
+
+| 檔案 | 用途 |
+|------|------|
+| `src/lib/supabase/admin.ts` | API 用 Supabase 單例 ⭐️ |
+| `src/lib/request-dedup.ts` | 請求去重 + SWR 快取 ⭐️ |
+| `src/lib/api-utils.ts` | API 回應快取標頭 ⭐️ |
 
 ---
 

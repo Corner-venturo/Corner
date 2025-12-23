@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useVisaStore, useVendorCostStore } from '@/stores'
+import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
 import { getVisaStatusLabel } from '@/constants/status-maps'
 
@@ -60,9 +61,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
   }
 
   const handleSubmit = async () => {
-    console.log('[EditVisaDialog] handleSubmit called, visa:', visa?.id)
     if (!visa) {
-      console.log('[EditVisaDialog] No visa, returning')
       return
     }
     setIsSubmitting(true)
@@ -86,12 +85,10 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
         cleanedData.contact_phone = ''
       }
 
-      console.log('[EditVisaDialog] Updating visa with:', cleanedData)
       await updateVisa(visa.id, cleanedData)
-      console.log('[EditVisaDialog] Update successful')
       onClose()
     } catch (error) {
-      console.error('[EditVisaDialog] 更新簽證失敗:', error)
+      logger.error('更新簽證失敗:', error)
       // 錯誤已在 store 中設置，這裡不需要額外處理
     } finally {
       setIsSubmitting(false)

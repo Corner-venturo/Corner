@@ -24,6 +24,7 @@ import {
 import { Activity, DailyItinerary } from '../../types'
 import { SortableActivityItem } from './SortableActivityItem'
 import { SortableActivityGridItem } from './SortableActivityGridItem'
+import { logger } from '@/lib/utils/logger'
 
 interface ActivitiesSectionProps {
   day: DailyItinerary
@@ -100,7 +101,7 @@ export function ActivitiesSection({
         toast.success(`已將「${activity.title}」存到景點資料庫`)
       }
     } catch (error) {
-      console.error('儲存景點失敗:', error)
+      logger.error('儲存景點失敗:', error)
       toast.error('儲存失敗，請稍後再試')
     }
   }

@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 export interface TourDestination {
   id: string
@@ -31,7 +32,7 @@ export function useTourDestinations() {
       if (error) throw error
       setDestinations(data || [])
     } catch (error) {
-      console.error('載入目的地失敗:', error)
+      logger.error('載入目的地失敗:', error)
     } finally {
       setLoading(false)
     }
@@ -84,7 +85,7 @@ export function useTourDestinations() {
         setDestinations(prev => [...prev, data])
         return { success: true, data }
       } catch (error: any) {
-        console.error('新增目的地失敗:', error)
+        logger.error('新增目的地失敗:', error)
         return { success: false, error: error.message }
       }
     },
@@ -110,7 +111,7 @@ export function useTourDestinations() {
         await fetchDestinations()
         return { success: true }
       } catch (error: any) {
-        console.error('更新目的地失敗:', error)
+        logger.error('更新目的地失敗:', error)
         return { success: false, error: error.message }
       }
     },
@@ -131,7 +132,7 @@ export function useTourDestinations() {
         setDestinations(prev => prev.filter(d => d.id !== id))
         return { success: true }
       } catch (error: any) {
-        console.error('刪除目的地失敗:', error)
+        logger.error('刪除目的地失敗:', error)
         return { success: false, error: error.message }
       }
     },

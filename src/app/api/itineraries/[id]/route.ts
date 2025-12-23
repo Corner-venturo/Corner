@@ -1,41 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// 檢查環境變數
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-// 優先使用 service role key，fallback 到 anon key
-// 注意：RLS 已在 Venturo 專案中禁用，所以 anon key 也可以查詢
-const supabaseAdmin = createClient(
-  supabaseUrl || '',
-  supabaseServiceKey || supabaseAnonKey || ''
-)
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 檢查 Supabase 配置
-    if (!supabaseUrl) {
-      console.error('缺少 NEXT_PUBLIC_SUPABASE_URL 環境變數')
-      return NextResponse.json(
-        { error: '伺服器配置錯誤' },
-        { status: 500 }
-      )
-    }
-
-    if (!supabaseServiceKey && !supabaseAnonKey) {
-      console.error('缺少 Supabase API key 環境變數')
-      return NextResponse.json(
-        { error: '伺服器配置錯誤' },
-        { status: 500 }
-      )
-    }
-
     const { id } = await params
+    const supabaseAdmin = getSupabaseAdminClient()
 
     if (!id) {
       return NextResponse.json(
@@ -87,7 +60,7 @@ export async function GET(
     }
 
     if (error) {
-      console.error('查詢行程失敗:', error)
+      logger.error('查詢行程失敗:', error)
       if (error.code === 'PGRST116') {
         return NextResponse.json(
           { error: '找不到此行程' },
@@ -160,7 +133,7 @@ export async function GET(
 
     return NextResponse.json(formattedItinerary)
   } catch (error) {
-    console.error('API 錯誤:', error)
+    logger.error('API 錯誤:', error)
     return NextResponse.json(
       { error: '伺服器錯誤' },
       { status: 500 }

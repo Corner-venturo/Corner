@@ -17,6 +17,7 @@ import {
 import { Plus, FileText, Loader2, ExternalLink, Calendar, MapPin } from 'lucide-react'
 import { useItineraryStore } from '@/stores'
 import type { Tour, Itinerary } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // 去除 HTML 標籤
 function stripHtml(html: string | null | undefined): string {
@@ -103,7 +104,7 @@ export function LinkItineraryToTourDialog({
         router.push(`/itinerary/new?id=${newItinerary.id}`)
       }
     } catch (error) {
-      console.error('建立行程表失敗:', error)
+      logger.error('建立行程表失敗:', error)
     } finally {
       setIsCreating(false)
     }

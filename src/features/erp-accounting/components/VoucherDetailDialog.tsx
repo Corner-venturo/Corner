@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { JournalVoucher, JournalLine, VoucherStatus } from '@/types/accounting.types'
 
 interface VoucherDetailDialogProps {
@@ -53,7 +54,7 @@ export function VoucherDetailDialog({
 
       setLines((data || []) as unknown as LineWithAccount[])
     } catch (error) {
-      console.error('載入分錄失敗:', error)
+      logger.error('載入分錄失敗:', error)
     } finally {
       setIsLoading(false)
     }

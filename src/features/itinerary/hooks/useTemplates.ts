@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import { Database } from '@/lib/supabase/types'
 
 // 類型定義
@@ -106,7 +107,7 @@ export function useTemplates(): UseTemplatesResult {
     } catch (err) {
       const message = err instanceof Error ? err.message : '載入模板失敗'
       setError(message)
-      console.error('載入模板失敗:', err)
+      logger.error('載入模板失敗:', err)
     } finally {
       setLoading(false)
     }

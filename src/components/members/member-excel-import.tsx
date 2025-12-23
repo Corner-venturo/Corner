@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useMemberStore, useCustomerStore } from '@/stores'
 import { toast } from 'sonner'
 import * as XLSX from 'xlsx'
+import { logger } from '@/lib/utils/logger'
 
 interface MemberExcelImportProps {
   orderId: string
@@ -114,7 +115,7 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
         setStep('mapping')
         toast.success(`讀取到 ${rows.length} 筆資料`)
       } catch (error) {
-        console.error('讀取 Excel 失敗:', error)
+        logger.error('讀取 Excel 失敗:', error)
         toast.error('讀取 Excel 失敗，請確認檔案格式')
       }
     }

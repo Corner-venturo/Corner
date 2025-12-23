@@ -20,6 +20,7 @@ import { useQuoteStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // 去除 HTML 標籤
 function stripHtml(html: string | null | undefined): string {
@@ -87,7 +88,7 @@ export function LinkQuoteToTourDialog({
         router.push(`/quotes/${newQuote.id}`)
       }
     } catch (error) {
-      console.error('建立報價單失敗:', error)
+      logger.error('建立報價單失敗:', error)
     } finally {
       setIsCreating(false)
     }

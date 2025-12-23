@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
- 
+
 const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -16,6 +16,7 @@ import { confirm } from '@/lib/ui/alert-dialog'
 import { VEHICLE_TYPES } from '@/types/room-vehicle.types'
 import type { TourVehicleStatus, TourVehicleAssignment } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 interface OrderMember {
   id: string
@@ -63,7 +64,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       if (error) throw error
       setVehicles((data || []) as TourVehicleStatus[])
     } catch (error) {
-      console.error('載入車輛失敗:', error)
+      logger.error('載入車輛失敗:', error)
     } finally {
       setLoading(false)
     }
@@ -91,7 +92,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       if (error) throw error
       setAssignments((data || []) as TourVehicleAssignment[])
     } catch (error) {
-      console.error('載入分配失敗:', error)
+      logger.error('載入分配失敗:', error)
     }
   }
 
@@ -127,7 +128,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       })
       loadVehicles()
     } catch (error) {
-      console.error('新增車輛失敗:', error)
+      logger.error('新增車輛失敗:', error)
       toast.error('新增車輛失敗')
     }
   }
@@ -151,7 +152,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       loadVehicles()
       loadAssignments()
     } catch (error) {
-      console.error('刪除車輛失敗:', error)
+      logger.error('刪除車輛失敗:', error)
       toast.error('刪除車輛失敗')
     }
   }
@@ -181,7 +182,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       loadVehicles()
       loadAssignments()
     } catch (error) {
-      console.error('分配失敗:', error)
+      logger.error('分配失敗:', error)
       toast.error('分配失敗')
     }
   }
@@ -199,7 +200,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
       loadVehicles()
       loadAssignments()
     } catch (error) {
-      console.error('移除失敗:', error)
+      logger.error('移除失敗:', error)
       toast.error('移除失敗')
     }
   }

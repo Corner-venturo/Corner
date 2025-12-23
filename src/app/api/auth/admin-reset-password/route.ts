@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 // 使用 service role key 來管理使用者
 const supabaseAdmin = createClient(
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
 
     if (listError) {
-      console.error('List users error:', listError);
+      logger.error('List users error:', listError);
       return NextResponse.json(
         { error: '查詢使用者失敗' },
         { status: 500 }
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (updateError) {
-      console.error('Update password error:', updateError);
+      logger.error('Update password error:', updateError);
       return NextResponse.json(
         { error: '重置密碼失敗：' + updateError.message },
         { status: 500 }
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
       message: '密碼已重置成功'
     });
   } catch (error) {
-    console.error('Admin reset password error:', error);
+    logger.error('Admin reset password error:', error);
     return NextResponse.json(
       { error: '伺服器錯誤' },
       { status: 500 }

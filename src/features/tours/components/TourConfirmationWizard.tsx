@@ -24,6 +24,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 // 報價單資訊
 interface QuoteInfo {
@@ -129,7 +130,7 @@ export function TourConfirmationWizard({
         setSelectedItineraryId(itinerariesWithVersion[0].id)
       }
     } catch (error) {
-      console.error('Error loading data:', error)
+      logger.error('載入資料失敗:', error)
       toast.error('載入資料失敗')
     } finally {
       setLoading(false)
@@ -187,7 +188,7 @@ export function TourConfirmationWizard({
       onOpenChange(false)
       onConfirmed?.()
     } catch (error) {
-      console.error('Error confirming tour:', error)
+      logger.error('鎖定失敗:', error)
       toast.error('鎖定失敗，請稍後再試')
     } finally {
       setSubmitting(false)

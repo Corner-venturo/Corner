@@ -6,6 +6,7 @@
 import { useCallback } from 'react'
 import { useAttractionStore } from '@/stores/attraction-store'
 import { Attraction } from '../types'
+import { logger } from '@/lib/utils/logger'
 
 export function useAttractionsReorder() {
   const { update: updateAttraction } = useAttractionStore()
@@ -18,20 +19,18 @@ export function useAttractionsReorder() {
     try {
       // 批量更新每個景點的 display_order
       const updatePromises = attractions.map((attraction, index) =>
-        updateAttraction(attraction.id, { 
-          display_order: index 
+        updateAttraction(attraction.id, {
+          display_order: index
         }).catch((error) => {
-          console.error(`更新景點 ${attraction.name} 排序失敗:`, error)
+          logger.error(`更新景點 ${attraction.name} 排序失敗:`, error)
           return null
         })
       )
 
       // 等待所有更新完成
       await Promise.allSettled(updatePromises)
-      
-      console.log('景點排序更新完成')
     } catch (error) {
-      console.error('批量更新景點排序失敗:', error)
+      logger.error('批量更新景點排序失敗:', error)
       throw error
     }
   }, [updateAttraction])
@@ -45,7 +44,7 @@ export function useAttractionsReorder() {
     try {
       await updateAttraction(attractionId, { display_order: newOrder })
     } catch (error) {
-      console.error('更新景點順序失敗:', error)
+      logger.error('更新景點順序失敗:', error)
       throw error
     }
   }, [updateAttraction])
@@ -70,7 +69,7 @@ export function useAttractionsReorder() {
         updateAttraction(targetAttraction.id, { display_order: currentOrder }),
       ])
     } catch (error) {
-      console.error('上移景點失敗:', error)
+      logger.error('上移景點失敗:', error)
       throw error
     }
   }, [updateAttraction])
@@ -95,7 +94,7 @@ export function useAttractionsReorder() {
         updateAttraction(targetAttraction.id, { display_order: currentOrder }),
       ])
     } catch (error) {
-      console.error('下移景點失敗:', error)
+      logger.error('下移景點失敗:', error)
       throw error
     }
   }, [updateAttraction])

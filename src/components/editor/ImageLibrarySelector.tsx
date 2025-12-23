@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 
 interface ImageLibraryItem {
   id: string
@@ -71,7 +72,7 @@ export function ImageLibrarySelector({
         .limit(50)
 
       if (error) {
-        console.error('載入圖庫失敗:', error)
+        logger.error('載入圖庫失敗:', error)
         toast.error('載入圖庫失敗')
         return
       }
@@ -82,7 +83,7 @@ export function ImageLibrarySelector({
         tags: item.tags ?? []
       })))
     } catch (error) {
-      console.error('載入圖庫錯誤:', error)
+      logger.error('載入圖庫錯誤:', error)
       toast.error('載入圖庫發生錯誤')
     } finally {
       setLoading(false)

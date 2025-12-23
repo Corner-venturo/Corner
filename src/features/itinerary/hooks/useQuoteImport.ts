@@ -91,12 +91,6 @@ export const useQuoteImport = (): UseQuoteImportResult => {
       return dailyItinerary
     }
 
-    console.log('[useQuoteImport] importDataToItinerary called', {
-      mealsCount: mealsData.length,
-      hotelsCount: hotelsData.length,
-      activitiesCount: activitiesData.length,
-    })
-
     // 複製一份避免直接修改
     const updatedItinerary = dailyItinerary.map(day => ({
       ...day,
@@ -144,7 +138,6 @@ export const useQuoteImport = (): UseQuoteImportResult => {
       }
     })
 
-    console.log('[useQuoteImport] Import complete')
     return updatedItinerary
   }
 

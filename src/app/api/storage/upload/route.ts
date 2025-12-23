@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +27,7 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
+    const supabaseAdmin = getSupabaseAdminClient()
     const { data, error } = await supabaseAdmin.storage
       .from(bucket)
       .upload(path, buffer, {
@@ -39,7 +36,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (error) {
-      console.error('Storage upload error:', error)
+      logger.error('Storage upload error:', error)
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -56,7 +53,7 @@ export async function POST(request: NextRequest) {
       publicUrl: publicUrlData.publicUrl,
     })
   } catch (error) {
-    console.error('Upload API error:', error)
+    logger.error('Upload API error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -85,12 +82,13 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+    const supabaseAdmin = getSupabaseAdminClient()
     const { error } = await supabaseAdmin.storage
       .from(bucket)
       .remove([path])
 
     if (error) {
-      console.error('Storage delete error:', error)
+      logger.error('Storage delete error:', error)
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -99,7 +97,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Delete API error:', error)
+    logger.error('Delete API error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

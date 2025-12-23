@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 // Google Vision 每月免費額度限制（每個 Key 980 次）
 const GOOGLE_VISION_LIMIT_PER_KEY = 980
@@ -87,11 +88,6 @@ export async function POST(request: NextRequest) {
             (availableKey && canUseGoogleVision) ? callGoogleVision(img.data, availableKey) : Promise.resolve(null),
           ])
 
-          console.log('🔍 OCR.space 原始文字:', ocrSpaceResult)
-          if (googleVisionResult) {
-            console.log('🔍 Google Vision 原始文字:', googleVisionResult)
-          }
-
           // 解析護照資訊（合併兩個 API 的結果）
           const customerData = parsePassportText(ocrSpaceResult, googleVisionResult, img.name)
 
@@ -103,7 +99,7 @@ export async function POST(request: NextRequest) {
             imageBase64: img.data, // 🔥 回傳圖片 base64 給前端儲存
           }
         } catch (error) {
-          console.error(`辨識失敗 (${img.name}):`, error)
+          logger.error(`辨識失敗 (${img.name}):`, error)
           return {
             success: false,
             fileName: img.name,
@@ -133,7 +129,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('護照辨識錯誤:', error)
+    logger.error('護照辨識錯誤:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '處理失敗' },
       { status: 500 }
@@ -199,7 +195,7 @@ async function callGoogleVision(base64Image: string, apiKey: string): Promise<st
   const data = await response.json()
 
   if (data.error) {
-    console.error('Google Vision 錯誤:', data.error)
+    logger.error('Google Vision 錯誤:', data.error)
     return ''
   }
 
@@ -336,8 +332,6 @@ function validateChineseNameByPinyin(chineseName: string, romanization: string):
   // 3. 實際字數 < 預期字數 → 可能 OCR 漏字，不接受
   const valid = actualLength >= expectedLength
 
-  console.log(`🔍 拼音驗證: ${romanization} → 姓 "${surname}"(${surnameChars}字) + 名 "${givenName}"(${givenNameChars}字) = 預期 ${expectedLength} 字, 實際 "${chineseName}" ${actualLength} 字, ${valid ? '✓' : '✗'}`)
-
   return { valid, expectedLength }
 }
 
@@ -380,17 +374,11 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   // 優先嘗試 Google Vision（更準確）
   if (cleanGoogleText) {
     mrzLine1Match = cleanGoogleText.match(/P<([A-Z]{3})([A-Z<]{2,39})/i)
-    if (mrzLine1Match) {
-      console.log('📝 從 Google Vision 解析 MRZ Line 1（優先使用）')
-    }
   }
 
   // 如果 Google Vision 沒找到，才用 OCR.space
   if (!mrzLine1Match) {
     mrzLine1Match = cleanText.match(/P<([A-Z]{3})([A-Z<]{2,39})/i)
-    if (mrzLine1Match) {
-      console.log('📝 從 OCR.space 解析 MRZ Line 1（備用）')
-    }
   }
 
   // 備用方案：如果上面沒找到，嘗試更寬鬆的匹配（處理 OCR 誤讀 < 為 I 的情況）
@@ -405,7 +393,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
         relaxedMatch[1],
         relaxedMatch[2].replace(/[I\|]/g, '<')
       ] as RegExpMatchArray
-      console.log('📝 使用寬鬆模式解析 MRZ Line 1，已修正誤讀字元')
     }
   }
 
@@ -435,7 +422,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       customerData.english_name = surname
       customerData.name = surname
     }
-    console.log('✅ MRZ Line 1 解析成功:', { countryCode, namePart })
   }
 
   // ========== 第二行 MRZ：解析詳細資料 ==========
@@ -450,9 +436,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     mrzLine2Match = cleanGoogleText.match(
       /(\d{9})(\d)([A-Z]{3})(\d{6})(\d)([MF])(\d{6})(\d)([A-Z0-9<]+)/i
     )
-    if (mrzLine2Match) {
-      console.log('📝 從 Google Vision 解析 MRZ Line 2（優先使用）')
-    }
   }
 
   // 如果 Google Vision 沒找到，才用 OCR.space
@@ -460,9 +443,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     mrzLine2Match = cleanText.match(
       /(\d{9})(\d)([A-Z]{3})(\d{6})(\d)([MF])(\d{6})(\d)([A-Z0-9<]+)/i
     )
-    if (mrzLine2Match) {
-      console.log('📝 從 OCR.space 解析 MRZ Line 2（備用）')
-    }
   }
 
   if (mrzLine2Match) {
@@ -497,10 +477,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
         customerData.national_id = nationalIdMatch[1]
       }
     }
-    console.log('✅ MRZ Line 2 解析成功:', mrzLine2Match)
   } else {
-    console.log('❌ MRZ Line 2 解析失敗，嘗試備用方案')
-
     // 備用方案：嘗試從護照資訊區域抓取（兩個來源都試）
     const textToSearch = cleanText || cleanGoogleText
 
@@ -509,7 +486,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     if (passportMatch && passportMatch.length > 0) {
       // 第一個 9 碼數字通常是護照號碼
       customerData.passport_number = passportMatch[0]
-      console.log('✅ 備用方案找到護照號碼:', passportMatch[0])
     }
 
     // 找身分證號（1英文+9數字）
@@ -518,7 +494,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       customerData.national_id = nationalIdMatch[0]
       // 從身分證第二碼判斷性別
       customerData.sex = nationalIdMatch[0].charAt(1) === '1' ? '男' : '女'
-      console.log('✅ 備用方案找到身分證:', nationalIdMatch[0])
     }
 
     // 找日期格式（DD MMM YYYY 或 YYYY-MM-DD）
@@ -544,11 +519,9 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
 
     if (expiryMatch && !customerData.passport_expiry_date) {
       customerData.passport_expiry_date = formatDate(expiryMatch)
-      console.log('✅ 備用方案找到效期 (標籤):', customerData.passport_expiry_date)
     }
     if (birthMatch && !customerData.date_of_birth) {
       customerData.date_of_birth = formatDate(birthMatch)
-      console.log('✅ 備用方案找到生日 (標籤):', customerData.date_of_birth)
     }
 
     // 如果標籤沒找到，再用日期推斷（但排除發照日期）
@@ -570,12 +543,10 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
             // 效期：2024 以後的日期（更嚴格）
             if (year >= 2024 && !customerData.passport_expiry_date) {
               customerData.passport_expiry_date = formattedDate
-              console.log('✅ 備用方案找到效期 (推斷):', formattedDate)
             }
             // 生日：1920-2015 之間
             else if (year >= 1920 && year <= 2015 && !customerData.date_of_birth) {
               customerData.date_of_birth = formattedDate
-              console.log('✅ 備用方案找到生日 (推斷):', formattedDate)
             }
           }
         }
@@ -610,8 +581,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     // 常見 OCR 錯字（這些字很少出現在人名中）
     const suspiciousChars = ['仔', '佬', '的', '是', '在', '了', '有', '個', '這', '那', '和', '與', '或', '為', '被', '把', '給', '讓', '著', '過']
 
-    console.log('🔍 開始解析中文名，Google Vision 原文:', googleVisionText.substring(0, 500))
-
     // 策略 0 (新增): 直接找 "姓名" 或 "Name" 標籤後緊鄰的中文名
     // 台灣護照格式: 姓名 / Name (Surname, Given names)
     //              王薇琦
@@ -622,7 +591,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       if (!excludeWords.some(word => candidate.includes(word))) {
         chineseName = candidate
         chineseNameConfidence = 'high'
-        console.log('✅ Google Vision 找到中文名 (姓名標籤後):', candidate)
       }
     }
 
@@ -649,7 +617,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
             if (!excludeWords.some(word => candidate.includes(word))) {
               chineseName = candidate
               chineseNameConfidence = 'high' // 策略1找到的信心度高
-              console.log('✅ Google Vision 找到中文名 (Name區塊後):', candidate)
               break
             }
           }
@@ -661,7 +628,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
             if (inlineChineseMatch && !excludeWords.some(word => inlineChineseMatch[1].includes(word))) {
               chineseName = inlineChineseMatch[1]
               chineseNameConfidence = 'high'
-              console.log('✅ Google Vision 找到中文名 (與英文同行):', chineseName)
             }
             break // 已經過了中文名的位置
           }
@@ -690,7 +656,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
               if (!excludeWords.some(word => candidate.includes(word))) {
                 chineseName = candidate
                 chineseNameConfidence = 'medium' // 策略2信心度中等
-                console.log('✅ Google Vision 找到中文名 (英文名前):', candidate)
                 break
               }
             }
@@ -702,13 +667,11 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     // 策略 3: 備用方案 - 但標記為低信心度，需要人工確認
     // 改進：不再隨便抓，而是跳過這步驟，讓使用者手動輸入
     if (!chineseName) {
-      console.log('⚠️ 無法從護照影像中可靠辨識中文名，將使用拼音')
       chineseNameConfidence = 'none'
     }
 
     // 檢查中文名是否可疑（含有常見 OCR 錯字）
     if (chineseName && suspiciousChars.some(char => chineseName.includes(char))) {
-      console.log('⚠️ 中文名含可疑字元:', chineseName)
       chineseNameConfidence = 'low'
     }
 
@@ -718,10 +681,8 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     if (chineseName && romanizationForValidation) {
       const validation = validateChineseNameByPinyin(chineseName, romanizationForValidation)
       if (!validation.valid) {
-        console.log(`⚠️ 中文名字數不符: 預期 ${validation.expectedLength} 字, 實際 ${chineseName.length} 字`)
         // 如果字數差太多，直接放棄這個中文名
         if (Math.abs(validation.expectedLength - chineseName.length) > 1) {
-          console.log('❌ 字數差異過大，放棄使用此中文名')
           chineseName = ''
           chineseNameConfidence = 'none'
         } else {
@@ -745,7 +706,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
         englishName = `${nameMatch[1]} ${nameMatch[2]}`
         customerData.english_name = englishName
         customerData.passport_romanization = `${nameMatch[1]}/${nameMatch[2]}`
-        console.log('✅ OCR.space 找到英文姓名:', englishName)
         break
       }
     }
@@ -762,19 +722,16 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     if (englishName) {
       customerData.english_name = englishName
     }
-    console.log('✅ 使用高信心度中文名:', chineseName)
   } else if (chineseName && chineseNameConfidence === 'medium') {
     // 中等信心度，加上標記提醒確認
     customerData.name = `${chineseName}⚠️`
     if (englishName) {
       customerData.english_name = englishName
     }
-    console.log('⚠️ 使用中信心度中文名:', chineseName)
   } else if (chineseName && chineseNameConfidence === 'low') {
     // 低信心度，加上拼音方便核對
     if (customerData.passport_romanization) {
       customerData.name = `${chineseName}(${customerData.passport_romanization})⚠️`
-      console.log('⚠️ 中文名不可靠，使用組合格式:', customerData.name)
     } else {
       customerData.name = `${chineseName}⚠️`
     }
@@ -786,7 +743,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     const [surname, givenName] = customerData.passport_romanization.split('/')
     customerData.name = givenName ? `${surname} ${givenName}` : surname
     customerData.english_name = customerData.name
-    console.log('📝 使用 MRZ 拼音作為姓名:', customerData.name)
   } else if (englishName) {
     customerData.name = englishName
   }
@@ -799,7 +755,6 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
   // 移除內部用的臨時欄位（不存入資料庫）
   delete (customerData as Record<string, unknown>)._romanization_with_dash
 
-  console.log('📋 最終解析結果:', customerData)
   return customerData
 }
 
@@ -828,10 +783,7 @@ async function checkGoogleVisionUsage(
   }
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = getSupabaseAdminClient()
 
     const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
     const totalLimit = GOOGLE_VISION_LIMIT_PER_KEY * apiKeys.length
@@ -866,10 +818,7 @@ async function checkGoogleVisionUsage(
       if (newUsage <= GOOGLE_VISION_LIMIT_PER_KEY) {
         availableKey = apiKeys[i]
         availableKeyId = keyId
-        console.log(`✅ 使用 Google Vision Key ${i + 1} (${apiKeys[i].slice(0, 12)}...) - 使用量: ${usage}/${GOOGLE_VISION_LIMIT_PER_KEY}`)
         break
-      } else {
-        console.log(`⚠️ Google Vision Key ${i + 1} 額度已滿 (${usage}/${GOOGLE_VISION_LIMIT_PER_KEY})，嘗試下一個...`)
       }
     }
 
@@ -902,7 +851,7 @@ async function checkGoogleVisionUsage(
       warning,
     }
   } catch (error) {
-    console.error('檢查 API 使用量失敗:', error)
+    logger.error('檢查 API 使用量失敗:', error)
     // 發生錯誤時使用第一個 Key（避免因為 DB 問題影響正常功能）
     return {
       canUseGoogleVision: true,
@@ -919,10 +868,7 @@ async function checkGoogleVisionUsage(
  */
 async function updateGoogleVisionUsage(count: number, usedKey: string): Promise<void> {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = getSupabaseAdminClient()
 
     const currentMonth = new Date().toISOString().slice(0, 7)
     const apiKeys = getGoogleVisionKeys()
@@ -957,11 +903,9 @@ async function updateGoogleVisionUsage(count: number, usedKey: string): Promise<
       )
 
     if (error) {
-      console.error('upsert 失敗:', error)
-    } else {
-      console.log(`📊 Google Vision Key ${keyIndex + 1} 使用量更新: ${newCount}/${GOOGLE_VISION_LIMIT_PER_KEY}`)
+      logger.error('upsert 失敗:', error)
     }
   } catch (error) {
-    console.error('更新 API 使用量失敗:', error)
+    logger.error('更新 API 使用量失敗:', error)
   }
 }

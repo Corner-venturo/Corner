@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 interface ImageCropperProps {
   open: boolean
@@ -111,7 +112,7 @@ export function ImageCropper({
       onCropComplete(croppedBlob)
       onClose()
     } catch (error) {
-      console.error('裁切圖片失敗:', error)
+      logger.error('裁切圖片失敗:', error)
       void alert('裁切圖片失敗，請重試', 'error')
     } finally {
       setIsProcessing(false)

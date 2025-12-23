@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
 
- 
+
 const supabase = supabaseClient as any
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -16,6 +16,7 @@ import type { TourRoomStatus, TourRoomAssignment } from '@/types/room-vehicle.ty
 import { cn } from '@/lib/utils'
 import { format, addDays, differenceInDays, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { logger } from '@/lib/utils/logger'
 
 // Helper: Generate UUID with fallback for older browsers
 function generateUUID(): string {
@@ -122,7 +123,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       if (allUpdates.length > 0) {
         const { error } = await supabase.from('tour_rooms').upsert(allUpdates)
         if (error) {
-          console.error('Supabase upsert error:', error)
+          logger.error('Supabase upsert error:', error)
           throw error
         };
       }
@@ -130,7 +131,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       toast.success("房間順序已儲存")
       onOpenChange(false)
     } catch (error) {
-      console.error("排序失敗:", error)
+      logger.error("排序失敗:", error)
       toast.error("儲存排序失敗")
     } finally {
       setIsSorting(false)
@@ -219,7 +220,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       if (error) throw error
       setRooms((data || []) as TourRoomStatus[])
     } catch (error) {
-      console.error('載入房間失敗:', error)
+      logger.error('載入房間失敗:', error)
     } finally {
       setLoading(false)
     }
@@ -247,7 +248,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       if (error) throw error
       setAssignments((data || []) as TourRoomAssignment[])
     } catch (error) {
-      console.error('載入分配失敗:', error)
+      logger.error('載入分配失敗:', error)
     }
   }
 
@@ -350,7 +351,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
                 .from('tour_room_assignments')
                 .insert(newAssignments)
               if (assignError) {
-                console.error('複製分配失敗:', assignError)
+                logger.error('複製分配失敗:', assignError)
                 // 不中斷流程，房間已經建立成功
               }
             }
@@ -362,7 +363,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
         loadRooms()
         loadAssignments()
       } catch (error) {
-        console.error('續住設定失敗:', error)
+        logger.error('續住設定失敗:', error)
         toast.error('續住設定失敗')
       }
     }
@@ -450,7 +451,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       loadRooms()
       loadAssignments()
     } catch (error) {
-      console.error('套用設定失敗:', error)
+      logger.error('套用設定失敗:', error)
       toast.error('套用設定失敗')
     }
   }
@@ -476,7 +477,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       loadRooms()
       loadAssignments()
     } catch (error) {
-      console.error('刪除房間失敗:', error)
+      logger.error('刪除房間失敗:', error)
       toast.error('刪除房間失敗')
     }
   }
@@ -519,7 +520,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       setEditingRoom(null)
       loadRooms()
     } catch (error) {
-      console.error('更新房間失敗:', error)
+      logger.error('更新房間失敗:', error)
       toast.error('更新房間失敗')
     }
   }
@@ -543,7 +544,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       loadRooms()
       loadAssignments()
     } catch (error) {
-      console.error('清空房間失敗:', error)
+      logger.error('清空房間失敗:', error)
       toast.error('清空房間失敗')
     }
   }
@@ -567,17 +568,13 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
     }
 
     try {
-      console.log('正在分配:', { roomId, memberId })
-
       const result = await supabase.from('tour_room_assignments').insert({
         room_id: roomId,
         order_member_id: memberId,
       }).select()
 
-      console.log('Supabase 完整回應:', result)
-
       if (result.error) {
-        console.error('Supabase 錯誤詳情:', JSON.stringify(result.error, null, 2))
+        logger.error('Supabase 錯誤詳情:', result.error)
         if (result.error.code === '23505') {
           toast.error('此團員已分配到這個房間')
         } else {
@@ -587,7 +584,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       }
 
       if (!result.data || result.data.length === 0) {
-        console.error('插入成功但無返回資料')
+        logger.error('插入成功但無返回資料')
         // 可能操作成功了，重新載入資料
       }
 
@@ -595,7 +592,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       loadRooms()
       loadAssignments()
     } catch (error) {
-      console.error('分配失敗 (catch):', error)
+      logger.error('分配失敗 (catch):', error)
       const err = error as Error
       toast.error(`分配失敗: ${err.message || '未知錯誤'}`)
     }
@@ -614,7 +611,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       loadRooms()
       loadAssignments()
     } catch (error) {
-      console.error('移除失敗:', error)
+      logger.error('移除失敗:', error)
       toast.error('移除失敗')
     }
   }
@@ -776,7 +773,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       resetRoomRows()
       loadRooms()
     } catch (error) {
-      console.error('新增房間失敗:', error)
+      logger.error('新增房間失敗:', error)
       toast.error('新增房間失敗')
     }
   }

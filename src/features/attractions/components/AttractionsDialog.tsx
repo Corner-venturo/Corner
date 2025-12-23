@@ -9,6 +9,7 @@ import type { Country, Region, City } from '@/stores/region-store'
 import { supabase } from '@/lib/supabase/client'
 import { Upload, X, Loader2, ChevronUp, ChevronDown, Minus } from 'lucide-react'
 import { prompt, alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 // 圖片位置類型
 type ImagePosition = 'top' | 'center' | 'bottom'
@@ -123,14 +124,9 @@ export function AttractionsDialog({
 
   // 全域拖曳事件監聽 - 繞過 Radix Dialog 的事件攔截
   useEffect(() => {
-    console.log('[AttractionsDialog] useEffect triggered, open:', open)
     if (!open) return
 
-    console.log('[AttractionsDialog] 註冊全域事件監聽')
-    console.log('[AttractionsDialog] dropZoneRef:', dropZoneRef.current)
-
     const handleGlobalDragOver = (e: DragEvent) => {
-      console.log('[全域dragover]', e.clientX, e.clientY)
       // 檢查是否在拖放區域內
       if (dropZoneRef.current) {
         const rect = dropZoneRef.current.getBoundingClientRect()
@@ -161,8 +157,6 @@ export function AttractionsDialog({
 
       e.preventDefault()
       setIsDragOver(false)
-
-      console.log('[景點全域拖放] Drop in zone!')
 
       // 從 HTML 解析圖片 URL
       let imageUrl = ''
@@ -263,24 +257,17 @@ export function AttractionsDialog({
 
   // 上傳圖片
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('[景點圖片上傳] 開始處理')
     const files = e.target.files
     if (!files || files.length === 0) {
-      console.log('[景點圖片上傳] 沒有選擇檔案')
       return
     }
-
-    console.log('[景點圖片上傳] 選擇了', files.length, '個檔案')
     setIsUploading(true)
     try {
       const newUrls: string[] = []
 
       for (const file of Array.from(files)) {
-        console.log('[景點圖片上傳] 處理檔案:', file.name, file.type, file.size)
-
         // 檢查檔案類型
         if (!file.type.startsWith('image/')) {
-          console.log('[景點圖片上傳] 非圖片檔案:', file.name)
           void alert(`${file.name} 不是圖片檔案`, 'warning')
           continue
         }
@@ -289,7 +276,6 @@ export function AttractionsDialog({
         const fileExt = file.name.split('.').pop()
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
         const filePath = `attractions/${fileName}`
-        console.log('[景點圖片上傳] 準備上傳到:', filePath)
 
         // 上傳到 Supabase Storage
         const { data: uploadData, error: uploadError } = await supabase.storage
@@ -297,31 +283,27 @@ export function AttractionsDialog({
           .upload(filePath, file)
 
         if (uploadError) {
-          console.error('[景點圖片上傳] 上傳失敗:', uploadError)
+          logger.error('上傳失敗:', uploadError)
           void alert(`${file.name} 上傳失敗: ${uploadError.message}`, 'error')
           continue
         }
-
-        console.log('[景點圖片上傳] 上傳成功:', uploadData)
 
         // 取得公開 URL
         const { data } = supabase.storage
           .from('workspace-files')
           .getPublicUrl(filePath)
 
-        console.log('[景點圖片上傳] 公開 URL:', data.publicUrl)
         newUrls.push(data.publicUrl)
       }
 
       // 更新圖片列表
       if (newUrls.length > 0) {
         const allImages = [...uploadedImages, ...newUrls]
-        console.log('[景點圖片上傳] 更新圖片列表:', allImages.length, '張')
         setUploadedImages(allImages)
         setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
       }
     } catch (error) {
-      console.error('[景點圖片上傳] 意外錯誤:', error)
+      logger.error('上傳過程發生錯誤:', error)
       void alert('上傳過程發生錯誤', 'error')
     } finally {
       setIsUploading(false)
@@ -329,7 +311,6 @@ export function AttractionsDialog({
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
-      console.log('[景點圖片上傳] 處理完成')
     }
   }
 
@@ -388,12 +369,9 @@ export function AttractionsDialog({
     e.stopPropagation()
     setIsDragOver(false)
 
-    console.log('[景點拖放] Drop event triggered')
-
     // 方法 1: 檢查 files
     const files = e.dataTransfer.files
     if (files.length > 0) {
-      console.log('[景點拖放] 找到', files.length, '個檔案')
       const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
       if (imageFiles.length > 0) {
         await uploadFiles(imageFiles)
@@ -409,7 +387,6 @@ export function AttractionsDialog({
         if (item.kind === 'file' && item.type.startsWith('image/')) {
           const file = item.getAsFile()
           if (file) {
-            console.log('[景點拖放] 從 items 找到檔案')
             await uploadFiles([file])
             return
           }
@@ -422,7 +399,6 @@ export function AttractionsDialog({
     if (html) {
       const match = html.match(/<img[^>]+src="([^"]+)"/)
       if (match && match[1]) {
-        console.log('[景點拖放] 從 HTML 找到圖片 URL:', match[1])
         await fetchAndUploadImage(match[1])
         return
       }
@@ -431,7 +407,6 @@ export function AttractionsDialog({
     // 方法 4: 嘗試純 URL
     const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
     if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
-      console.log('[景點拖放] 找到 URL:', imageUrl)
       await fetchAndUploadImage(imageUrl)
       return
     }
@@ -457,7 +432,7 @@ export function AttractionsDialog({
           .upload(filePath, file)
 
         if (uploadError) {
-          console.error('[景點拖放] 上傳失敗:', uploadError)
+          logger.error('上傳失敗:', uploadError)
           continue
         }
 
@@ -503,7 +478,7 @@ export function AttractionsDialog({
       const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
       await uploadFiles([file])
     } catch (error) {
-      console.error('[景點拖放] 下載圖片失敗:', error)
+      logger.error('下載圖片失敗:', error)
       void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
     } finally {
       setIsUploading(false)
@@ -746,8 +721,6 @@ export function AttractionsDialog({
             variant="outline"
             size="sm"
             onClick={() => {
-              console.log('[景點] 上傳按鈕被點擊')
-              console.log('[景點] fileInputRef.current:', fileInputRef.current)
               fileInputRef.current?.click()
             }}
             disabled={isUploading}

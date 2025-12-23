@@ -24,6 +24,7 @@ import { supabase } from '@/lib/supabase/client'
 import { PrintDisbursementPreview } from './PrintDisbursementPreview'
 import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
 import { alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 interface DisbursementPrintDialogProps {
   order: DisbursementOrder | null
@@ -69,7 +70,7 @@ export function DisbursementPrintDialog({
         setPaymentRequests((requests || []) as unknown as PaymentRequest[])
         setPaymentRequestItems((items || []) as unknown as PaymentRequestItem[])
       } catch (error) {
-        console.error('載入資料失敗:', error)
+        logger.error('載入資料失敗:', error)
       } finally {
         setLoading(false)
       }
@@ -170,7 +171,7 @@ export function DisbursementPrintDialog({
         paymentRequestItems,
       })
     } catch (error) {
-      console.error('下載 PDF 失敗:', error)
+      logger.error('下載 PDF 失敗:', error)
       void alert('下載 PDF 失敗', 'error')
     }
   }, [order, paymentRequests, paymentRequestItems])

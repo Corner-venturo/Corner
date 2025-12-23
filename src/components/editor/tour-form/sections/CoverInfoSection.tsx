@@ -18,6 +18,7 @@ import { ImageUploader } from '@/components/ui/image-uploader'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { PreviewPanel } from '../components/PreviewPanel'
+import { logger } from '@/lib/utils/logger'
 // Hero 組件
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
@@ -114,7 +115,7 @@ export function CoverInfoSection({
       void alert(`已將圖片設為「${data.city}」的預設圖片 ${imageNumber}！`, 'success')
       setShowUpdateDialog(false)
     } catch (error) {
-      console.error('更新城市圖片失敗:', error)
+      logger.error('更新城市圖片失敗:', error)
       void alert('更新失敗，請稍後再試', 'error')
     }
   }

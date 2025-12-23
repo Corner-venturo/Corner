@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { Search, Loader2, Plane } from 'lucide-react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
+import { logger } from '@/lib/utils/logger'
 
 interface TourEditDialogProps {
   isOpen: boolean
@@ -371,7 +372,7 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
       onSuccess?.(data as Tour)
       onClose()
     } catch (error) {
-      console.error('更新旅遊團失敗:', error)
+      logger.error('更新旅遊團失敗:', error)
       toast.error('更新失敗，請稍後再試')
     } finally {
       setSubmitting(false)

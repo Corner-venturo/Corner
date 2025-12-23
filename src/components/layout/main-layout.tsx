@@ -16,6 +16,7 @@ import {
   SIDEBAR_WIDTH_COLLAPSED_PX,
   LAYOUT_TRANSITION_DURATION,
 } from '@/lib/constants/layout'
+import { logger } from '@/lib/utils/logger'
 
 const STORAGE_KEY_LAST_VISITED = 'last-visited-path'
 
@@ -84,7 +85,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               await workspaceStore.fetchAll()
             }
           } catch (_error) {
-            console.error('Failed to load workspaces:', _error)
+            logger.error('Failed to load workspaces:', _error)
           }
         }
 

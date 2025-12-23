@@ -10,6 +10,7 @@ import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickAc
 import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
+import { logger } from '@/lib/utils/logger'
 
 interface MessageInputProps {
   channel: Channel
@@ -138,8 +139,7 @@ export function MessageInput({
               onFilesChange([...attachedFiles, file])
               return
             }
-          } catch (err) {
-            console.log('無法下載圖片（可能是 CORS 限制）:', imageUrl)
+          } catch {
             void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
             return
           }
@@ -171,7 +171,7 @@ export function MessageInput({
             return
           }
         } catch (err) {
-          console.log('無法下載圖片（可能是 CORS 限制）:', url)
+          logger.log('無法下載圖片（可能是 CORS 限制）:', url)
           void alert('此網站不允許下載圖片，請改用右鍵另存圖片後上傳', 'warning')
           return
         }

@@ -4,11 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { issueInvoice } from '@/lib/newebpay'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,8 +37,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 儲存到資料庫
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    // 儲存到資料庫（使用單例）
+    const supabase = getSupabaseAdminClient()
 
     const invoiceData = {
       transaction_no: result.data!.transactionNo,
@@ -71,7 +69,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('儲存發票失敗:', error)
+      logger.error('儲存發票失敗:', error)
       // 發票已開立但儲存失敗，仍返回成功但記錄警告
       return NextResponse.json({
         success: true,
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('開立發票錯誤:', error)
+    logger.error('開立發票錯誤:', error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : '開立失敗' },
       { status: 500 }

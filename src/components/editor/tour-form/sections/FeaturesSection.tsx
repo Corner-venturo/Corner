@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react'
+import { logger } from '@/lib/utils/logger'
 import { TourFormData, Feature, FeaturesStyleType } from '../types'
 import { Loader2, X, Plus, GripVertical, Palette } from 'lucide-react'
 import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
@@ -76,7 +77,7 @@ export function FeaturesSection({
         .upload(filePath, file)
 
       if (uploadError) {
-        console.error('上傳失敗:', uploadError)
+        logger.error('上傳失敗:', uploadError)
         void alert('圖片上傳失敗', 'error')
         return
       }
@@ -98,7 +99,7 @@ export function FeaturesSection({
 
       updateFeature(featureIndex, 'images', currentImages)
     } catch (error) {
-      console.error('上傳錯誤:', error)
+      logger.error('上傳錯誤:', error)
       void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingImage(null)
@@ -154,7 +155,7 @@ export function FeaturesSection({
             .upload(filePath, file)
 
           if (uploadError) {
-            console.error(`上傳第 ${idx + 1} 張失敗:`, uploadError)
+            logger.error(`上傳第 ${idx + 1} 張失敗:`, uploadError)
             return
           }
 
@@ -176,7 +177,7 @@ export function FeaturesSection({
         void alert(`${successfulUrls.length} 張圖片上傳成功，${imageFiles.length - successfulUrls.length} 張失敗`, 'warning')
       }
     } catch (error) {
-      console.error('批量上傳錯誤:', error)
+      logger.error('批量上傳錯誤:', error)
       void alert('上傳過程發生錯誤', 'error')
     } finally {
       setUploadingImage(null)

@@ -114,33 +114,35 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
       const revenue = orders?.reduce((sum, o) => sum + (o.paid_amount || 0), 0) || 0
       setTotalRevenue(revenue)
 
-      // 2. 計算總成本（該團所有請款單，但排除 bonus 類型）
       const orderIds = orders?.map(o => o.id) || []
-      if (orderIds.length > 0) {
-        const { data: paymentRequests } = await supabase
-          .from('payment_requests')
-          .select('amount')
-          .in('order_id', orderIds)
-          .eq('status', 'paid')
+      let cost = 0
+      let members = 0
 
-        const cost = paymentRequests?.reduce((sum: number, pr: Pick<PaymentRequest, 'amount'>) => sum + (pr.amount || 0), 0) || 0
-        setTotalCost(cost)
+      if (orderIds.length > 0) {
+        // 平行查詢：成本和團員數
+        const [paymentsRes, membersRes] = await Promise.all([
+          supabase
+            .from('payment_requests')
+            .select('amount')
+            .in('order_id', orderIds)
+            .eq('status', 'paid'),
+          supabase
+            .from('order_members')
+            .select('id')
+            .in('order_id', orderIds),
+        ])
+
+        cost = paymentsRes.data?.reduce((sum: number, pr: Pick<PaymentRequest, 'amount'>) => sum + (pr.amount || 0), 0) || 0
+        members = membersRes.data?.length || 0
       }
 
-      // 3. 計算團員總人數
-      if (orderIds.length > 0) {
-        const { data: members } = await supabase
-          .from('order_members')
-          .select('id')
-          .in('order_id', orderIds)
+      setTotalCost(cost)
+      setMemberCount(members)
 
-        setMemberCount(members?.length || 0)
-      }
-
-      // 4. 計算各項數值
-      const gross = revenue - totalCost
-      const misc = memberCount * 10
-      const taxAmount = (gross - misc) * 0.12
+      // 計算各項數值
+      const gross = revenue - cost
+      const misc = members * 10
+      const taxAmount = Math.round((gross - misc) * 0.12)
       const net = gross - misc - taxAmount
 
       setGrossProfit(gross)
@@ -211,39 +213,55 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
       const orderId = firstOrder?.id
 
-      // 1. 產生業務業績請款單
+      // 批量產生獎金請款單（避免 N+1 寫入）
+      const bonusPayments: Array<{
+        order_id: string | undefined
+        supplier_name: string
+        supplier_type: string
+        amount: number
+        note: string
+        status: string
+        workspace_id: string | undefined
+      }> = []
+
+      // 1. 收集業務業績請款單
       for (const recipient of salesRecipients) {
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
-           
-          await (supabase as any).from('payment_requests').insert({
+          bonusPayments.push({
             order_id: orderId,
             supplier_name: '業務業績',
+            supplier_type: 'bonus',
             amount,
             note: `業務業績 ${recipient.percentage}%`,
             status: 'pending',
-            workspace_id: user?.workspace_id
+            workspace_id: user?.workspace_id,
           })
         }
       }
 
-      // 2. 產生 OP 獎金請款單
+      // 2. 收集 OP 獎金請款單
       for (const recipient of opRecipients) {
         if (recipient.percentage > 0) {
           const amount = Math.round(netProfit * (recipient.percentage / 100))
-           
-          await (supabase as any).from('payment_requests').insert({
+          bonusPayments.push({
             order_id: orderId,
             supplier_name: 'OP 獎金',
+            supplier_type: 'bonus',
             amount,
             note: `OP 獎金 ${recipient.percentage}%`,
             status: 'pending',
-            workspace_id: user?.workspace_id
+            workspace_id: user?.workspace_id,
           })
         }
       }
 
-      // 3. 更新團體狀態為已結團
+      // 3. 批量寫入
+      if (bonusPayments.length > 0) {
+        await (supabase as any).from('payment_requests').insert(bonusPayments)
+      }
+
+      // 4. 更新團體狀態為已結團
       const { error: updateError } = await supabase
         .from('tours')
         .update({

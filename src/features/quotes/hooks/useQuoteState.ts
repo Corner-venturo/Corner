@@ -60,7 +60,6 @@ export const useQuoteState = () => {
     if (savedAccommodationDays > 0) {
       const accommodationCategory = processedCategories.find(cat => cat.id === 'accommodation')
       if (accommodationCategory && accommodationCategory.items.length === 0) {
-        console.log('[useQuoteState] 修復住宿資料：根據天數初始化住宿項目', savedAccommodationDays)
         const newItems = []
         for (let day = 1; day <= savedAccommodationDays; day++) {
           newItems.push({

@@ -2,6 +2,7 @@ import { useVisaStore, useTourStore, useOrderStore, useMemberStore } from '@/sto
 import { useAuthStore } from '@/stores/auth-store'
 import { useMemo, useCallback } from 'react'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 簽證資料管理 Hook
@@ -29,7 +30,7 @@ export function useVisasData() {
     // 找到要刪除的簽證
     const visa = visas.find(v => v.id === visaId)
     if (!visa) {
-      console.error('找不到簽證:', visaId)
+      logger.error('找不到簽證:', visaId)
       return
     }
 
@@ -78,7 +79,7 @@ export function useVisasData() {
         toast.success('已刪除簽證')
       }
     } catch (error) {
-      console.error('刪除簽證失敗:', error)
+      logger.error('刪除簽證失敗:', error)
       toast.error('刪除簽證失敗')
     }
   }, [visas, orders, members, deleteVisaFromStore, deleteMember, deleteOrder, updateOrder])

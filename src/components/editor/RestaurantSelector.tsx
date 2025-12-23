@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, UtensilsCrossed, ImageIcon, Loader2, Users, Star } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 // 餐廳型別
 export interface Restaurant {
@@ -391,7 +392,7 @@ export function RestaurantSelector({
 
         setRestaurants(results)
       } catch (error) {
-        console.error('Error loading restaurants:', error)
+        logger.error('Error loading restaurants:', error)
       } finally {
         setLoading(false)
       }

@@ -4,10 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +17,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getSupabaseAdminClient()
 
     let query = supabase
       .from('travel_invoices')
@@ -51,7 +49,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query
 
     if (error) {
-      console.error('查詢發票失敗:', error)
+      logger.error('查詢發票失敗:', error)
       return NextResponse.json(
         { success: false, error: '查詢失敗' },
         { status: 500 }
@@ -102,7 +100,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('查詢發票錯誤:', error)
+    logger.error('查詢發票錯誤:', error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : '查詢失敗' },
       { status: 500 }

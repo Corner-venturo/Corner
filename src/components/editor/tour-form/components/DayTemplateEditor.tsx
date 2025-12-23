@@ -7,6 +7,7 @@ import { DailyItinerary, Activity, DayDisplayStyle } from '../types'
 import { X, Upload, Save, ImageIcon, Loader2, MapPin, Utensils, Building2, Plus, Image, Images, LayoutGrid, GitBranch } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 
 // 使用從 types.ts 引入的 DayDisplayStyle
 export type { DayDisplayStyle } from '../types'
@@ -119,7 +120,7 @@ export function DayTemplateEditor({
 
       toast.success('圖片上傳成功')
     } catch (error) {
-      console.error('上傳失敗:', error)
+      logger.error('上傳失敗:', error)
       toast.error('圖片上傳失敗')
     } finally {
       setUploading(null)

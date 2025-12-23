@@ -378,7 +378,6 @@ export function AttractionSelector({
 
   // 點擊景點查看地圖
   const handleViewOnMap = (attraction: AttractionWithCity) => {
-    console.log('[景點選擇器] 點擊查看地圖:', attraction.name, '座標:', attraction.latitude, attraction.longitude)
     setSelectedMapAttraction(attraction)
     setShowMap(true)
   }

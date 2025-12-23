@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 /**
  * API 設定資訊端點
@@ -20,10 +20,7 @@ interface ApiConfig {
 // 獲取 API 使用量
 async function getApiUsage(apiName: string, monthlyLimit: number): Promise<string | undefined> {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = getSupabaseAdminClient()
 
     const currentMonth = new Date().toISOString().slice(0, 7)
     const { data } = await supabase

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reverseVoucher } from '@/features/erp-accounting/services/posting-service'
+import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('反沖傳票失敗:', error)
+    logger.error('反沖傳票失敗:', error)
     return NextResponse.json(
       { success: false, error: '伺服器錯誤' },
       { status: 500 }

@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 /**
  * Health Check API
@@ -37,29 +34,22 @@ export async function GET() {
   // 檢查 Supabase 連線
   try {
     const dbStartTime = Date.now()
+    const supabase = getSupabaseAdminClient()
 
-    if (!supabaseUrl || !supabaseKey) {
+    // 簡單查詢測試連線
+    const { error } = await supabase
+      .from('employees')
+      .select('count', { count: 'exact', head: true })
+
+    checks.services.database.responseTime = Date.now() - dbStartTime
+
+    if (error) {
       checks.services.database.status = 'error'
-      checks.services.database.message = 'Supabase credentials not configured'
+      checks.services.database.message = error.message
       checks.status = 'degraded'
     } else {
-      const supabase = createClient(supabaseUrl, supabaseKey)
-
-      // 簡單查詢測試連線
-      const { error } = await supabase
-        .from('employees')
-        .select('count', { count: 'exact', head: true })
-
-      checks.services.database.responseTime = Date.now() - dbStartTime
-
-      if (error) {
-        checks.services.database.status = 'error'
-        checks.services.database.message = error.message
-        checks.status = 'degraded'
-      } else {
-        checks.services.database.status = 'ok'
-        checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`
-      }
+      checks.services.database.status = 'ok'
+      checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`
     }
   } catch (error) {
     checks.services.database.status = 'error'

@@ -77,7 +77,6 @@ export default function DatabaseManagementPage() {
     e.preventDefault()
     e.stopPropagation()
     setTestDragOver(true)
-    console.log('[TEST] dragover', e.dataTransfer.types)
   }, [])
 
   const handleTestDragLeave = useCallback((e: React.DragEvent) => {
@@ -96,22 +95,18 @@ export default function DatabaseManagementPage() {
     const uriList = e.dataTransfer.getData('text/uri-list')
     const plainText = e.dataTransfer.getData('text/plain')
 
-    console.log('[TEST] drop!', { types, filesCount: files.length, html, uriList, plainText })
-
     // 優先從 HTML 解析 img src
     let imageUrl = ''
     if (html) {
       const match = html.match(/<img[^>]+src="([^"]+)"/)
       if (match && match[1]) {
         imageUrl = match[1]
-        console.log('[TEST] 從 HTML 找到圖片:', imageUrl)
       }
     }
 
     // 如果 HTML 沒有，用 uri-list
     if (!imageUrl && uriList) {
       imageUrl = uriList.split('\n')[0] // 取第一個 URL
-      console.log('[TEST] 從 uri-list 找到:', imageUrl)
     }
 
     if (!imageUrl) {

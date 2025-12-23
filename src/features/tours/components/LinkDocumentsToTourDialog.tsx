@@ -38,6 +38,7 @@ import { useItineraryStore, useQuoteStore, useTourStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Itinerary, Quote } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // 去除 HTML 標籤
 function stripHtml(html: string | null | undefined): string {
@@ -207,7 +208,7 @@ export function LinkDocumentsToTourDialog({
         router.push(`/itinerary/new?id=${newItinerary.id}`)
       }
     } catch (error) {
-      console.error('建立行程表失敗:', error)
+      logger.error('建立行程表失敗:', error)
     } finally {
       setIsCreatingItinerary(false)
     }
@@ -241,7 +242,7 @@ export function LinkDocumentsToTourDialog({
         await fetchItineraries()
       }
     } catch (error) {
-      console.error('連結行程表失敗:', error)
+      logger.error('連結行程表失敗:', error)
     } finally {
       setIsLinkingItinerary(false)
     }
@@ -257,7 +258,7 @@ export function LinkDocumentsToTourDialog({
       })
       await fetchItineraries()
     } catch (error) {
-      console.error('斷開連結失敗:', error)
+      logger.error('斷開連結失敗:', error)
     } finally {
       setIsUnlinkingItinerary(false)
     }
@@ -332,7 +333,7 @@ export function LinkDocumentsToTourDialog({
         router.push(`/quotes/${newQuote.id}`)
       }
     } catch (error) {
-      console.error('建立報價單失敗:', error)
+      logger.error('建立報價單失敗:', error)
     } finally {
       setIsCreatingQuote(false)
     }
@@ -347,7 +348,7 @@ export function LinkDocumentsToTourDialog({
       })
       await fetchQuotes() // 重新載入以更新列表
     } catch (error) {
-      console.error('連結報價單失敗:', error)
+      logger.error('連結報價單失敗:', error)
     } finally {
       setIsLinkingQuote(false)
     }
@@ -363,7 +364,7 @@ export function LinkDocumentsToTourDialog({
       })
       await fetchQuotes()
     } catch (error) {
-      console.error('斷開連結失敗:', error)
+      logger.error('斷開連結失敗:', error)
     } finally {
       setIsUnlinkingQuote(false)
     }

@@ -30,6 +30,7 @@ import { Label } from '@/components/ui/label'
 import { Save, FilePlus, History, Link2, Check, Copy, ExternalLink, Trash2, Files } from 'lucide-react'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { generateUUID } from '@/lib/utils/uuid'
+import { logger } from '@/lib/utils/logger'
 
 // 移除 HTML 標籤
 const stripHtml = (html: string | undefined): string => {
@@ -201,7 +202,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
         }
       }
     } catch (error) {
-      console.error('儲存失敗:', error)
+      logger.error('儲存失敗:', error)
       await alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setSaving(false)
@@ -241,7 +242,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
       // 切換到新版本
       onVersionChange(updatedRecords.length - 1, newVersion)
     } catch (error) {
-      console.error('另存新版本失敗:', error)
+      logger.error('另存新版本失敗:', error)
       await alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setSaving(false)
@@ -270,7 +271,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
         window.location.href = `/itinerary/new?itinerary_id=${newItinerary.id}`
       }
     } catch (error) {
-      console.error('另存新檔失敗:', error)
+      logger.error('另存新檔失敗:', error)
       await alert('另存新檔失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     } finally {
       setSaving(false)
@@ -314,7 +315,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
         onVersionChange(currentVersionIndex - 1, versionRecords[currentVersionIndex - 1])
       }
     } catch (error) {
-      console.error('刪除版本失敗:', error)
+      logger.error('刪除版本失敗:', error)
       await alert('刪除版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
     }
   }

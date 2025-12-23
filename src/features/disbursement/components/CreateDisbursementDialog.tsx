@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils'
 import { statusLabels } from '@/features/finance/requests/types'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 import {
   Select,
   SelectContent,
@@ -201,11 +202,9 @@ export function CreateDisbursementDialog({
         .single()
 
       if (error) {
-        console.error('Supabase 錯誤:', error)
+        logger.error('Supabase 錯誤:', error)
         throw new Error(error.message)
       }
-
-      console.log('✅ 出納單已建立:', data)
 
       // 更新請款單狀態為 approved（已確認，已加入出納單）
       for (const id of selectedRequestIds) {
@@ -224,7 +223,7 @@ export function CreateDisbursementDialog({
       setStatusFilter('all')
       onSuccess()
     } catch (error) {
-      console.error('建立出納單失敗:', error)
+      logger.error('建立出納單失敗:', error)
       const errorMessage = error instanceof Error ? error.message : '未知錯誤'
       await alert(`建立出納單失敗: ${errorMessage}`, 'error')
     } finally {

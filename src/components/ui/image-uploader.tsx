@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { ImagePositionEditor, ImagePositionSettings, getImagePositionStyle } from './image-position-editor'
+import { logger } from '@/lib/utils/logger'
 
 export interface ImageUploaderProps {
   /** 當前圖片 URL */
@@ -81,7 +82,7 @@ export function ImageUploader({
     try {
       await supabase.storage.from(bucket).remove([fileName])
     } catch (err) {
-      console.warn('刪除圖片失敗:', err)
+      logger.error('刪除圖片失敗:', err)
     }
   }
 
@@ -135,7 +136,7 @@ export function ImageUploader({
         onPositionChange({ x: 50, y: 50, scale: 1 })
       }
     } catch (error) {
-      console.error('上傳失敗:', error)
+      logger.error('上傳失敗:', error)
       void alert('圖片上傳失敗，請稍後再試', 'error')
     } finally {
       setUploading(false)
@@ -156,7 +157,6 @@ export function ImageUploader({
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('dragOver triggered')
     if (!disabled) {
       setIsDragOver(true)
     }
@@ -198,7 +198,7 @@ export function ImageUploader({
       const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
       await uploadFile(file)
     } catch (error) {
-      console.error('下載圖片失敗:', error)
+      logger.error('下載圖片失敗:', error)
       void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
     } finally {
       setUploading(false)
@@ -209,11 +209,6 @@ export function ImageUploader({
     e.preventDefault()
     e.stopPropagation()
     setIsDragOver(false)
-
-    console.log('=== Drop Event ===')
-    console.log('files:', e.dataTransfer.files.length)
-    console.log('items:', e.dataTransfer.items?.length)
-    console.log('types:', e.dataTransfer.types)
 
     if (disabled) return
 
@@ -492,7 +487,7 @@ export function MultiImageUploader({
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName)
       return urlData.publicUrl
     } catch (error) {
-      console.error('上傳失敗:', error)
+      logger.error('上傳失敗:', error)
       return null
     }
   }
@@ -568,7 +563,7 @@ export function MultiImageUploader({
       try {
         await supabase.storage.from(bucket).remove([fileName])
       } catch (err) {
-        console.warn('刪除圖片失敗:', err)
+        logger.error('刪除圖片失敗:', err)
       }
     }
   }

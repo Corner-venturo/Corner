@@ -5,6 +5,7 @@ import { Tour, Order } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import type { Order as OrderType } from '@/types/order.types'
+import { logger } from '@/lib/utils/logger'
 
 interface TourOrdersProps {
   tour: Tour
@@ -27,7 +28,7 @@ export function TourOrders({ tour }: TourOrdersProps) {
         if (error) throw error
         setOrders((data || []) as Order[])
       } catch (err) {
-        console.error('載入訂單失敗:', err)
+        logger.error('載入訂單失敗:', err)
       } finally {
         setLoading(false)
       }

@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 /**
  * Detailed Health Check API
@@ -51,63 +48,58 @@ export async function GET() {
 
   // 檢查 Supabase 連線和表資料
   try {
-    if (!supabaseUrl || !supabaseKey) {
-      checks.services.database.status = 'error'
-      checks.services.database.message = 'Supabase credentials not configured'
-      checks.status = 'degraded'
-    } else {
-      const dbStartTime = Date.now()
-      const supabase = createClient(supabaseUrl, supabaseKey)
+    const dbStartTime = Date.now()
+    const supabase = getSupabaseAdminClient()
 
-      // 並行查詢所有表的數量
-      const tablePromises = coreTables.map(async tableName => {
-        try {
-          const { count, error } = await supabase
-            .from(tableName)
-            .select('*', { count: 'exact', head: true })
+    // 並行查詢所有表的數量
+    const tablePromises = coreTables.map(async tableName => {
+      try {
+        // 使用 type assertion 因為 tableName 是動態的
+        const { count, error } = await supabase
+          .from(tableName as 'employees')
+          .select('*', { count: 'exact', head: true })
 
-          if (error) {
-            return {
-              tableName,
-              result: { count: null, error: error.message },
-            }
-          }
-
+        if (error) {
           return {
             tableName,
-            result: { count },
-          }
-        } catch (err) {
-          return {
-            tableName,
-            result: {
-              count: null,
-              error: err instanceof Error ? err.message : 'Unknown error',
-            },
+            result: { count: null, error: error.message },
           }
         }
-      })
 
-      const results = await Promise.all(tablePromises)
-
-      // 整理結果
-      results.forEach(({ tableName, result }) => {
-        checks.services.database.tables[tableName] = result
-      })
-
-      checks.services.database.responseTime = Date.now() - dbStartTime
-
-      // 檢查是否有錯誤
-      const hasErrors = results.some(r => r.result.error)
-
-      if (hasErrors) {
-        checks.services.database.status = 'degraded'
-        checks.services.database.message = 'Some tables have errors'
-        checks.status = 'degraded'
-      } else {
-        checks.services.database.status = 'ok'
-        checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`
+        return {
+          tableName,
+          result: { count },
+        }
+      } catch (err) {
+        return {
+          tableName,
+          result: {
+            count: null,
+            error: err instanceof Error ? err.message : 'Unknown error',
+          },
+        }
       }
+    })
+
+    const results = await Promise.all(tablePromises)
+
+    // 整理結果
+    results.forEach(({ tableName, result }) => {
+      checks.services.database.tables[tableName] = result
+    })
+
+    checks.services.database.responseTime = Date.now() - dbStartTime
+
+    // 檢查是否有錯誤
+    const hasErrors = results.some(r => r.result.error)
+
+    if (hasErrors) {
+      checks.services.database.status = 'degraded'
+      checks.services.database.message = 'Some tables have errors'
+      checks.status = 'degraded'
+    } else {
+      checks.services.database.status = 'ok'
+      checks.services.database.message = `Connected (${checks.services.database.responseTime}ms)`
     }
   } catch (error) {
     checks.services.database.status = 'error'

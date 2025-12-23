@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Loader2, X, GripVertical, Plus, Move, ZoomIn, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 import {
   DndContext,
   closestCenter,
@@ -436,16 +437,11 @@ export function DailyImagesUploader({
 
   // 上傳多張圖片
   const handleMultipleUpload = async (files: FileList | File[]) => {
-    console.log('[DailyImagesUploader] 開始上傳，檔案數量:', files.length)
-
     const imageFiles = Array.from(files).filter((file) =>
       file.type.startsWith('image/')
     )
 
-    console.log('[DailyImagesUploader] 篩選後的圖片數量:', imageFiles.length)
-
     if (imageFiles.length === 0) {
-      console.log('[DailyImagesUploader] 沒有有效的圖片檔案')
       return
     }
 
@@ -457,55 +453,44 @@ export function DailyImagesUploader({
 
     try {
       for (const file of imageFiles) {
-        console.log('[DailyImagesUploader] 處理檔案:', file.name, file.type, file.size)
-
         const fileExt = file.name.split('.').pop()
         const fileName = `day-${dayIndex + 1}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
         const filePath = `tour-daily-images/${fileName}`
-
-        console.log('[DailyImagesUploader] 上傳到路徑:', filePath)
 
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('workspace-files')
           .upload(filePath, file)
 
         if (uploadError) {
-          console.error('[DailyImagesUploader] 上傳失敗:', uploadError)
+          logger.error('[DailyImagesUploader] 上傳失敗:', uploadError)
           toast.error(`圖片上傳失敗: ${uploadError.message}`)
           continue
         }
-
-        console.log('[DailyImagesUploader] 上傳成功:', uploadData)
 
         const { data } = supabase.storage
           .from('workspace-files')
           .getPublicUrl(filePath)
 
-        console.log('[DailyImagesUploader] 公開 URL:', data.publicUrl)
         newImages.push(createDailyImage(data.publicUrl))
         completed++
         setUploadProgress(Math.round((completed / imageFiles.length) * 100))
       }
 
       if (newImages.length > 0) {
-        console.log('[DailyImagesUploader] 更新圖片列表，新增:', newImages.length, '張')
         onImagesChange([...images, ...newImages])
       }
     } catch (error) {
-      console.error('[DailyImagesUploader] 意外錯誤:', error)
+      logger.error('[DailyImagesUploader] 意外錯誤:', error)
       toast.error(`上傳過程發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
     } finally {
       setIsUploading(false)
       setUploadProgress(0)
-      console.log('[DailyImagesUploader] 上傳流程結束')
     }
   }
 
   // 處理檔案選擇
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('[DailyImagesUploader] handleFileChange 被觸發')
     const files = e.target.files
-    console.log('[DailyImagesUploader] 選擇的檔案:', files?.length, '個')
     if (files && files.length > 0) {
       handleMultipleUpload(files)
     }
@@ -524,7 +509,7 @@ export function DailyImagesUploader({
         response = await fetch(imageUrl, { mode: 'cors' })
       } catch (fetchError) {
         // CORS 錯誤 - 嘗試用 no-cors 模式（但這樣無法取得內容）
-        console.warn('CORS 錯誤，無法下載此圖片:', imageUrl)
+        logger.error('CORS 錯誤，無法下載此圖片:', imageUrl)
         toast.error('此網站不允許下載圖片，請改用右鍵另存圖片後上傳')
         return null
       }
@@ -567,7 +552,7 @@ export function DailyImagesUploader({
         .upload(filePath, blob, { contentType })
 
       if (uploadError) {
-        console.error('Supabase 上傳失敗:', uploadError)
+        logger.error('Supabase 上傳失敗:', uploadError)
         toast.error('上傳到伺服器失敗')
         return null
       }
@@ -582,7 +567,7 @@ export function DailyImagesUploader({
       return data.publicUrl
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-      console.error('上傳圖片失敗:', errorMessage)
+      logger.error('上傳圖片失敗:', errorMessage)
       toast.error(`上傳失敗: ${errorMessage}`)
       return null
     } finally {
@@ -753,8 +738,6 @@ export function DailyImagesUploader({
             images.length > 0 ? 'border-t border-morandi-container/50 mt-2 pt-4' : ''
           }`}
           onClick={() => {
-            console.log('[DailyImagesUploader] 上傳按鈕被點擊')
-            console.log('[DailyImagesUploader] fileInputRef.current:', fileInputRef.current)
             fileInputRef.current?.click()
           }}
         >

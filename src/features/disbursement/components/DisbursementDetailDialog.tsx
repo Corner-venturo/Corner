@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 interface DisbursementDetailDialogProps {
   order: DisbursementOrder | null
@@ -85,7 +86,7 @@ export function DisbursementDetailDialog({
       await alert('出納單已標記為已出帳', 'success')
       onOpenChange(false)
     } catch (error) {
-      console.error('更新出納單失敗:', error)
+      logger.error('更新出納單失敗:', error)
       await alert('更新出納單失敗', 'error')
     }
   }

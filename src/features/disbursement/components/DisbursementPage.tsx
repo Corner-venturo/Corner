@@ -24,6 +24,7 @@ import { CreateDisbursementDialog } from './CreateDisbursementDialog'
 import { DisbursementDetailDialog } from './DisbursementDetailDialog'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 // 出納單狀態
 const DISBURSEMENT_STATUS = {
@@ -209,7 +210,7 @@ export function DisbursementPage() {
       await deleteDisbursementOrder(order.id)
       await alert('出納單已刪除', 'success')
     } catch (error) {
-      console.error('刪除出納單失敗:', error)
+      logger.error('刪除出納單失敗:', error)
       await alert('刪除出納單失敗', 'error')
     }
   }, [deleteDisbursementOrder])

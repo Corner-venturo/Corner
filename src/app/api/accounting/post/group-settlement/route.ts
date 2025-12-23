@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { postGroupSettlement } from '@/features/erp-accounting/services/posting-service'
 import type { PostGroupSettlementRequest } from '@/types/accounting.types'
+import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('結團過帳失敗:', error)
+    logger.error('結團過帳失敗:', error)
     return NextResponse.json(
       { success: false, error: '伺服器錯誤' },
       { status: 500 }
