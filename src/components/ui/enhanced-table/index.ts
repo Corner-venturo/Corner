@@ -1,4 +1,5 @@
 export { EnhancedTable } from './EnhancedTable'
+export { VirtualizedTable } from './VirtualizedTable'
 export { TableBody } from './TableBody'
 export { TableHeader } from './TableHeader'
 export { TablePagination } from './TablePagination'
