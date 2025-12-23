@@ -26,7 +26,7 @@
 
 ## 🚨🚨🚨 絕對禁止規則 (Zero Tolerance) 🚨🚨🚨
 
-### ❌ 四大禁令 - 違反立即停止
+### ❌ 六大禁令 - 違反立即停止
 
 | 禁令 | 說明 | 後果 |
 |------|------|------|
@@ -35,6 +35,7 @@
 | **禁止忽略資料庫** | 修改功能前必須檢查 Supabase 表格結構 | 必須確認欄位存在 |
 | **禁止盲目修改** | 每次修改前必須先讀取並理解現有代碼 | 必須先 Read 再 Edit |
 | **禁止自訂版面** | 列表頁面必須使用標準組件 | 必須用 EnhancedTable |
+| **禁止詳細頁跳轉** | 不要建立 `/xxx/[id]/page.tsx` 詳細頁 | 用 Dialog 或展開功能 |
 
 ### ✅ 正確做法
 
@@ -72,26 +73,69 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
     <EnhancedTable columns={columns} data={data} ... />
   </div>
 </div>
+
+// ❌ 錯誤：建立詳細頁面路由
+// /app/(main)/orders/[orderId]/page.tsx  ← 不要這樣做！
+router.push(`/orders/${order.id}`)  // 跳轉到詳細頁
+
+// ✅ 正確：使用 Dialog 或展開功能
+// 方式1: Dialog
+const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+<ItemDetailDialog item={selectedItem} onClose={() => setSelectedItem(null)} />
+
+// 方式2: 展開列表
+<EnhancedTable expandable={{ renderExpanded: (row) => <ItemDetails item={row} /> }} />
+
+// 方式3: URL 參數展開
+router.push(`/tours?highlight=${tourId}`)  // 跳轉並展開指定項目
 ```
 
 ### 📋 新功能開發檢查清單
 
 **寫代碼前必須確認：**
-- [ ] 相關的 Supabase 表格結構是否正確？
+- [ ] 相關的 Supabase 表格結構是否正確？（執行 `檢查表格` 指令）
 - [ ] 需要的欄位是否存在？
-- [ ] TypeScript 類型定義是否完整？
+- [ ] TypeScript 類型定義是否完整？（檢查 `src/lib/supabase/types.ts`）
 - [ ] 是否可以複用現有組件/Hook？
+- [ ] 是否需要詳細頁？（**不需要！用 Dialog 或展開**）
 
 **寫代碼時必須遵守：**
 - [ ] 單一文件不超過 300 行
 - [ ] 不使用 any 類型
 - [ ] 使用現有的可重用組件
 - [ ] 錯誤要有適當處理
+- [ ] 列表用 Dialog/展開，不建詳細頁
 
 **寫完代碼後必須驗證：**
 - [ ] `npm run type-check` 通過
 - [ ] `npm run lint` 通過
 - [ ] 功能正常運作
+- [ ] 資料可以正確儲存到資料庫
+
+### 🗄️ Supabase 表格檢查指令
+
+**新功能前必須執行：**
+```bash
+# 檢查表格是否存在
+SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
+  npx supabase db dump --project-ref pfqvdacxowpgfamuvnsn | grep "CREATE TABLE"
+
+# 檢查特定表格欄位
+SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
+  npx supabase db dump --project-ref pfqvdacxowpgfamuvnsn | grep -A 50 "CREATE TABLE.*table_name"
+
+# 重新生成 TypeScript 類型（確保同步）
+SUPABASE_ACCESS_TOKEN=sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0 \
+  npx supabase gen types typescript --project-id pfqvdacxowpgfamuvnsn > src/lib/supabase/types.ts
+```
+
+**功能完成後必須驗證：**
+```bash
+# 測試資料能否正確存入
+1. 在 UI 建立一筆測試資料
+2. 到 Supabase Dashboard 確認資料已存入
+3. 刪除測試資料
+```
 
 ---
 

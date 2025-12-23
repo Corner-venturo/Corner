@@ -689,7 +689,7 @@ export default function ItineraryPage() {
         setPasswordInput('')
         setIsPasswordDialogOpen(true)
       } else {
-        router.push(`/itinerary/${itinerary.id}`)
+        router.push(`/itinerary/new?itinerary_id=${itinerary.id}`)
       }
     },
     [router]
@@ -700,7 +700,7 @@ export default function ItineraryPage() {
     if (passwordInput === COMPANY_PASSWORD) {
       setIsPasswordDialogOpen(false)
       if (pendingEditId) {
-        router.push(`/itinerary/${pendingEditId}`)
+        router.push(`/itinerary/new?itinerary_id=${pendingEditId}`)
       }
     } else {
       alertError('密碼錯誤！')
