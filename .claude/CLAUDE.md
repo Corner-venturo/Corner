@@ -1,6 +1,6 @@
-# Claude Code 工作規範 (Venturo 專案)
+# Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2025-12-23 (新增效能開發規範)
+> **最後更新**: 2025-12-24 (升級 Next.js 16 + RSC 規範)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
@@ -169,6 +169,91 @@ const { data } = await supabase
 
 ---
 
+## 🚨 Next.js 16 RSC 邊界規範 (重要！)
+
+> **背景**: Next.js 16 使用 Turbopack，對 Server/Client Component 邊界檢查更嚴格。
+
+### ❌ 常見錯誤
+
+```typescript
+// ❌ 錯誤：在 Server Component 中使用 client hooks
+// page.tsx (Server Component)
+import { useMyHook } from './hooks'  // 會報錯！
+
+// ❌ 錯誤：barrel export 混合 server/client
+// features/index.ts
+export * from './components'  // 包含 client components
+export * from './hooks'       // 包含 client hooks
+// 當 Server Component import 這個 index 時會失敗
+```
+
+### ✅ 正確做法
+
+```typescript
+// ✅ 1. Client Hooks 檔案必須加 'use client'
+// hooks/useMyHook.ts
+'use client'
+import useSWR from 'swr'
+export function useMyHook() { ... }
+
+// ✅ 2. 使用 client hooks 的 index 也要加 'use client'
+// features/my-feature/hooks/index.ts
+'use client'
+export * from './useMyHook'
+export * from './useAnotherHook'
+
+// ✅ 3. 頁面使用 client component 包裝
+// page.tsx (Server Component)
+import { MyClientComponent } from './components/MyClientComponent'
+export default function Page() {
+  return <MyClientComponent />  // 委託給 client component
+}
+
+// ✅ 4. 或直接標記頁面為 client
+// page.tsx
+'use client'
+import { useMyHook } from './hooks'
+```
+
+### RSC 邊界檢查清單
+
+- [ ] 使用 `useState`, `useEffect`, SWR 等 hooks 的檔案有 `'use client'`
+- [ ] 使用 `onClick`, `onChange` 等事件的組件有 `'use client'`
+- [ ] barrel export (`index.ts`) 如果包含 client code，整個檔案加 `'use client'`
+- [ ] 避免 Server Component 直接 import client hooks
+
+---
+
+## 🚨 Console.log 規範 (2025-12-24 更新)
+
+> **原則**: 使用統一的 logger 工具，禁止直接使用 console
+
+### ❌ 禁止
+
+```typescript
+// ❌ 直接使用 console
+console.log('debug:', data)
+console.error('錯誤:', error)
+```
+
+### ✅ 正確做法
+
+```typescript
+// ✅ 使用 logger 工具
+import { logger } from '@/lib/utils/logger'
+
+logger.log('重要資訊:', data)
+logger.error('錯誤:', error)
+```
+
+### Logger 優勢
+- 統一格式
+- 可控制輸出級別
+- 生產環境可關閉
+- 便於追蹤問題
+
+---
+
 ## 🚨 開發前必讀：架構規範
 
 **重要**: 修改程式碼前，請先閱讀以下文件：
@@ -277,10 +362,10 @@ generateEmployeeNumber(workspaceCode, existingEmployees)
 
 ### 專案資訊
 ```
-專案名稱: Venturo (旅遊團管理系統)
-工作目錄: /Users/williamchien/Projects/venturo-new
+專案名稱: Venturo ERP (旅遊團管理系統)
+工作目錄: /Users/williamchien/Projects/venturo-erp
 開發端口: 3000
-技術棧:   Next.js 15.5.4 + React 19 + TypeScript 5 + Zustand 5 + Supabase
+技術棧:   Next.js 16 + React 19.2 + TypeScript 5 + Zustand 5 + Supabase
 ```
 
 ---
