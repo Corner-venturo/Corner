@@ -169,6 +169,85 @@ const { data } = await supabase
 
 ---
 
+## 🚨 前端效能優化規範 (2025-12-24 新增)
+
+### 1. Dynamic Import - 大型組件延遲載入
+
+```typescript
+// ❌ 錯誤：直接 import 大型 Dialog（增加首次載入時間）
+import { AddReceiptDialog } from '@/features/finance/payments'
+
+// ✅ 正確：使用 dynamic import
+import dynamic from 'next/dynamic'
+import { Loader2 } from 'lucide-react'
+
+const AddReceiptDialog = dynamic(
+  () => import('@/features/finance/payments').then(m => m.AddReceiptDialog),
+  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Loader2 className="animate-spin text-white" size={32} />
+    </div>
+  }
+)
+```
+
+**使用時機**：
+- Dialog/Modal 組件（用戶不一定會打開）
+- 大型表單組件（>300 行）
+- 圖表/視覺化組件
+
+### 2. Image Blur Placeholder - 圖片載入優化
+
+```typescript
+// ❌ 錯誤：直接使用 Image
+<Image src={url} alt="..." width={200} height={150} />
+
+// ✅ 正確：使用 blur placeholder
+import { getOptimizedImageProps } from '@/lib/image-utils'
+
+<Image
+  src={url}
+  alt="..."
+  width={200}
+  height={150}
+  {...getOptimizedImageProps(url)}
+/>
+```
+
+**效果**：載入時顯示模糊佔位符，改善視覺體驗
+
+### 3. VirtualizedTable - 大資料虛擬化
+
+```typescript
+// ❌ 錯誤：大量資料用普通表格（>100筆會卡頓）
+<EnhancedTable data={largeData} columns={columns} />
+
+// ✅ 正確：使用虛擬化表格
+import { VirtualizedTable } from '@/components/ui/enhanced-table'
+
+<VirtualizedTable
+  data={largeData}          // >100 筆資料
+  columns={columns}
+  height={600}              // 固定高度
+  estimateRowHeight={48}    // 預估行高
+  onRowClick={handleClick}
+/>
+```
+
+**使用時機**：
+- 資料量 >100 筆
+- 需要無分頁顯示全部資料
+- EnhancedTable 已有分頁功能，大部分場景不需要
+
+### 效能組件一覽表
+
+| 組件/工具 | 檔案位置 | 用途 |
+|---------|---------|------|
+| `VirtualizedTable` | `src/components/ui/enhanced-table/VirtualizedTable.tsx` | 大資料虛擬化表格 |
+| `useVirtualList` | `src/hooks/useVirtualList.ts` | 虛擬列表 Hook |
+| `getOptimizedImageProps` | `src/lib/image-utils.ts` | 圖片 blur placeholder |
+
+---
+
 ## 🚨 Next.js 16 RSC 邊界規範 (重要！)
 
 > **背景**: Next.js 16 使用 Turbopack，對 Server/Client Component 邊界檢查更嚴格。
