@@ -1,16 +1,31 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
-import { Plus, FileText, Split } from 'lucide-react'
-import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
-import { BatchRequestDialog } from '@/features/finance/requests/components/BatchRequestDialog'
-import { BatchAllocateRequestDialog } from '@/features/finance/requests/components/BatchAllocateRequestDialog'
-import { RequestDetailDialog } from '@/features/finance/requests/components/RequestDetailDialog'
+import { Plus, FileText, Split, Loader2 } from 'lucide-react'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
+
+// Dynamic imports for dialogs (reduce initial bundle)
+const AddRequestDialog = dynamic(
+  () => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog),
+  { loading: () => null }
+)
+const BatchRequestDialog = dynamic(
+  () => import('@/features/finance/requests/components/BatchRequestDialog').then(m => m.BatchRequestDialog),
+  { loading: () => null }
+)
+const BatchAllocateRequestDialog = dynamic(
+  () => import('@/features/finance/requests/components/BatchAllocateRequestDialog').then(m => m.BatchAllocateRequestDialog),
+  { loading: () => null }
+)
+const RequestDetailDialog = dynamic(
+  () => import('@/features/finance/requests/components/RequestDetailDialog').then(m => m.RequestDetailDialog),
+  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div> }
+)
 
 export default function RequestsPage() {
   const { payment_requests, loadPaymentRequests } = usePayments()

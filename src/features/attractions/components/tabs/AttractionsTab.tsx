@@ -2,6 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { useRegionsStore } from '@/stores'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
 import { useAttractionsFilters } from '../../hooks/useAttractionsFilters'
@@ -9,11 +10,16 @@ import { useAttractionsDialog } from '../../hooks/useAttractionsDialog'
 import { useAttractionsReorder } from '../../hooks/useAttractionsReorder'
 import { AttractionsList } from '../AttractionsList'
 import { SortableAttractionsList } from '../SortableAttractionsList'
-import { AttractionsDialog } from '../AttractionsDialog'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
 import type { Country, City } from '@/stores/region-store'
+
+// Dynamic import for large dialog component (807 lines)
+const AttractionsDialog = dynamic(
+  () => import('../AttractionsDialog').then(m => m.AttractionsDialog),
+  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
+)
 
 // ============================================
 // 景點管理分頁

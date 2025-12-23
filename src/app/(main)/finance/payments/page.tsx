@@ -13,16 +13,35 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Eye, CheckSquare } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2 } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
-
-// Components
-import { ReceiptSearchDialog, BatchConfirmReceiptDialog, ReceiptDetailDialog } from './components'
-import { AddReceiptDialog, BatchReceiptDialog } from '@/features/finance/payments'
 import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
+
+// Dynamic imports for dialogs (reduce initial bundle)
+const ReceiptSearchDialog = dynamic(
+  () => import('./components').then(m => m.ReceiptSearchDialog),
+  { loading: () => null }
+)
+const BatchConfirmReceiptDialog = dynamic(
+  () => import('./components').then(m => m.BatchConfirmReceiptDialog),
+  { loading: () => null }
+)
+const ReceiptDetailDialog = dynamic(
+  () => import('./components').then(m => m.ReceiptDetailDialog),
+  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
+)
+const AddReceiptDialog = dynamic(
+  () => import('@/features/finance/payments').then(m => m.AddReceiptDialog),
+  { loading: () => null }
+)
+const BatchReceiptDialog = dynamic(
+  () => import('@/features/finance/payments').then(m => m.BatchReceiptDialog),
+  { loading: () => null }
+)
 
 // Hooks
 import { usePaymentData } from './hooks/usePaymentData'
