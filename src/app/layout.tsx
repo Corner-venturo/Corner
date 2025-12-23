@@ -6,6 +6,8 @@ import { ErrorLogger } from '@/components/ErrorLogger'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AppInitializer } from '@/components/AppInitializer'
 import { GlobalDialogs } from '@/lib/ui/alert-dialog'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -51,6 +53,8 @@ export default function RootLayout({
             </ThemeProvider>
           </ErrorBoundary>
         </AppInitializer>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
