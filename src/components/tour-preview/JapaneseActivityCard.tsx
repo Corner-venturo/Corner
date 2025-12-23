@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { getOptimizedImageProps } from '@/lib/image-utils'
 
 interface JapaneseActivityCardProps {
   title: string
@@ -48,6 +49,7 @@ export function JapaneseActivityCard({
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
+            {...getOptimizedImageProps(image)}
           />
           {/* 漸層遮罩 */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />

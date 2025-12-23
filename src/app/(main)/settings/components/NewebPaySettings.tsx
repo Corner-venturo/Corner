@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/lib/supabase/client'
+import type { Json } from '@/lib/supabase/types'
 
 interface NewebPayConfig {
   merchantId: string
@@ -70,7 +71,7 @@ export function NewebPaySettings() {
         .from('system_settings')
         .upsert({
           category: 'newebpay',
-          settings: config as unknown as Record<string, unknown>,
+          settings: config as unknown as Json,
           description: '藍新金流旅行業代轉發票設定',
           updated_at: new Date().toISOString(),
         }, {

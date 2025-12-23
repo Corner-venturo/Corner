@@ -1,8 +1,10 @@
 'use client'
 
-import { useForm, UseFormProps, FieldValues, DefaultValues } from 'react-hook-form'
+import { useForm, UseFormProps, FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+
+type ZodObjectSchema = z.ZodObject<z.ZodRawShape>
 
 /**
  * 預設的表單選項
@@ -37,18 +39,18 @@ const defaultFormOptions = {
  * }
  * ```
  */
-export function useZodForm<TFieldValues extends FieldValues>(
-  props: Omit<UseFormProps<TFieldValues>, 'resolver'> & {
-    schema: z.ZodType<TFieldValues>
+export function useZodForm<TSchema extends ZodObjectSchema>(
+  props: Omit<UseFormProps<z.infer<TSchema>>, 'resolver'> & {
+    schema: TSchema
   }
 ) {
   const { schema, ...formProps } = props
 
-  return useForm<TFieldValues>({
+  return useForm<z.infer<TSchema>>({
     ...defaultFormOptions,
     ...formProps,
     resolver: zodResolver(schema),
-  } as UseFormProps<TFieldValues>)
+  } as UseFormProps<z.infer<TSchema>>)
 }
 
 /**
@@ -96,26 +98,20 @@ export const schemas = {
 
 /**
  * 表單錯誤訊息的中文對應
+ * @description 自訂 Zod 錯誤訊息
  */
-export const zodErrorMap: z.ZodErrorMap = (issue, ctx) => {
+export function getChineseErrorMessage(issue: z.ZodIssue): string {
   switch (issue.code) {
     case z.ZodIssueCode.invalid_type:
-      if (issue.expected === 'string') return { message: '請輸入文字' }
-      if (issue.expected === 'number') return { message: '請輸入數字' }
+      if (issue.expected === 'string') return '請輸入文字'
+      if (issue.expected === 'number') return '請輸入數字'
       break
     case z.ZodIssueCode.too_small:
-      if (issue.type === 'string') return { message: `至少需要 ${issue.minimum} 個字元` }
-      if (issue.type === 'number') return { message: `數值必須大於 ${issue.minimum}` }
-      break
+      return `至少需要 ${issue.minimum} 個字元或數值`
     case z.ZodIssueCode.too_big:
-      if (issue.type === 'string') return { message: `最多 ${issue.maximum} 個字元` }
-      if (issue.type === 'number') return { message: `數值必須小於 ${issue.maximum}` }
-      break
+      return `最多 ${issue.maximum} 個字元或數值`
   }
-  return { message: ctx.defaultError }
+  return issue.message || '驗證失敗'
 }
-
-// 設定全域錯誤訊息
-z.setErrorMap(zodErrorMap)
 
 export { z }

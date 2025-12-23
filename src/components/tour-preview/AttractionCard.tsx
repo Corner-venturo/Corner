@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { morandiColors } from '@/lib/constants/morandi-colors'
+import { getOptimizedImageProps } from '@/lib/image-utils'
 
 export interface AttractionCardProps {
   title: string
@@ -43,6 +44,7 @@ export function AttractionCard({
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 1200px"
+            {...getOptimizedImageProps(image)}
           />
         )}
         <div
@@ -82,6 +84,7 @@ export function AttractionCard({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 1200px"
+              {...getOptimizedImageProps(image)}
             />
           </div>
         )}
@@ -117,6 +120,7 @@ export function AttractionCard({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 400px"
+              {...getOptimizedImageProps(image)}
             />
           </div>
         )}
@@ -149,7 +153,7 @@ export function AttractionCard({
       {hasImage ? (
         <div className="flex gap-5">
           <div className="relative w-32 h-32 flex-shrink-0 rounded-[12px] overflow-hidden">
-            <Image src={image} alt={title} fill className="object-cover" sizes="128px" />
+            <Image src={image} alt={title} fill className="object-cover" sizes="128px" {...getOptimizedImageProps(image)} />
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="font-bold text-base mb-2" style={{ color: morandiColors.text.primary }}>
