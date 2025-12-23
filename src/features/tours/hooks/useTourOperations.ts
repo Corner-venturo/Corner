@@ -17,12 +17,6 @@ interface TourActions {
   delete: (id: string) => Promise<boolean | void>
 }
 
-interface CityOption {
-  id: string
-  code: string
-  name: string
-  country_id: string
-}
 
 interface UseTourOperationsParams {
   actions: TourActions
@@ -31,7 +25,6 @@ interface UseTourOperationsParams {
   updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined; status?: '提案' | '進行中' }) => Promise<unknown>
   quotes: Quote[]
   itineraries: { id: string; tour_id?: string | null }[]
-  availableCities: CityOption[]
   resetForm: () => void
   closeDialog: () => void
   setSubmitting: (value: boolean) => void
@@ -49,7 +42,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
     updateItinerary,
     quotes,
     itineraries,
-    availableCities,
     resetForm,
     closeDialog,
     setSubmitting,
@@ -96,7 +88,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
         const cityName =
           newTour.countryCode === '__custom__'
             ? newTour.customLocation!
-            : availableCities.find(c => c.code === newTour.cityCode)?.name || newTour.cityCode
+            : newTour.cityName || newTour.cityCode
 
         // 驗證城市代碼（團號需要 3 碼英文城市代碼）
         if (!cityCode || cityCode.length < 2) {
@@ -107,17 +99,9 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // Edit mode: update existing tour
         if (dialogType === 'edit' && dialogData) {
-          // Get city ID from availableCities (if not custom)
-          const selectedCity =
-            newTour.countryCode !== '__custom__'
-              ? availableCities.find(c => c.code === newTour.cityCode)
-              : undefined
-
           const tourData = {
             name: newTour.name,
             location: cityName,
-            country_id: selectedCity?.country_id || null,
-            main_city_id: selectedCity?.id || null,
             departure_date: newTour.departure_date,
             return_date: newTour.return_date,
             status: newTour.status,
@@ -136,12 +120,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
         // Create mode: create new tour
         const code = await tourService.generateTourCode(cityCode, departure_date, newTour.isSpecial)
 
-        // Get city ID from availableCities (if not custom)
-        const selectedCity =
-          newTour.countryCode !== '__custom__'
-            ? availableCities.find(c => c.code === newTour.cityCode)
-            : undefined
-
         // 解析航班文字為 FlightInfo（簡單格式：航空公司 班次 時間）
         const parseFlightText = (text?: string): import('@/stores/types').FlightInfo | null => {
           if (!text?.trim()) return null
@@ -159,8 +137,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
         const tourData = {
           name: newTour.name,
           location: cityName,
-          country_id: selectedCity?.country_id || undefined,
-          main_city_id: selectedCity?.id || undefined,
           departure_date: newTour.departure_date,
           return_date: newTour.return_date,
           status: newTour.status,
@@ -229,7 +205,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
       actions,
       addOrder,
       updateQuote,
-      availableCities,
       resetForm,
       closeDialog,
       setSubmitting,

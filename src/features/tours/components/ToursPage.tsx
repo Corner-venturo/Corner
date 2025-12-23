@@ -403,7 +403,6 @@ export const ToursPage: React.FC = () => {
     updateItinerary,
     quotes,
     itineraries,
-    availableCities,
     resetForm,
     closeDialog,
     setSubmitting,

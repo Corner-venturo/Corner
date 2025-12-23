@@ -301,7 +301,12 @@ export function TourForm({
                           <Combobox
                             value={newTour.cityCode}
                             onChange={cityCode => {
-                              setNewTour(prev => ({ ...prev, cityCode }))
+                              const selectedCity = citiesForCountry.find(c => c.airport_code === cityCode)
+                              setNewTour(prev => ({
+                                ...prev,
+                                cityCode,
+                                cityName: selectedCity?.city || cityCode
+                              }))
                             }}
                             options={citiesForCountry.map(c => ({
                               value: c.airport_code,

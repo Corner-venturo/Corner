@@ -182,8 +182,34 @@ class TourService extends BaseService<Tour & BaseEntity> {
         throw new Error('Tour not found')
       }
 
-      // 狀態轉換驗證（暫時註解，因為狀態值是中文）
-      // 待實作: 中文狀態的轉換驗證邏輯
+      const currentStatus = tour.status
+
+      // If the status is not changing, do nothing.
+      if (currentStatus === newStatus) {
+        return tour
+      }
+
+      // V2.0 State Machine Validation Logic
+      const ALLOWED_STATUS_TRANSITIONS: Record<string, (Tour['status'])[]> = {
+        '提案': ['確認中', '已取消'],
+        '確認中': ['提案', '已確認', '已取消'], // '已確認' is allowed from the confirmation wizard
+        '已確認': ['待結案', '已取消'], // To enter '修改中', the unlockTour method must be used.
+        '修改中': ['確認中', '已取消'], // To re-confirm, it must go through the '確認中' process again.
+        '待結案': ['結案', '已取消'],
+        '結案': [], // Terminal state
+        '已取消': [], // Terminal state
+        '進行中': ['待結案', '已取消', '已確認'], // Legacy status transitions
+        '特殊團': ['已取消'],
+      };
+
+
+      const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || [];
+      if (!allowedTransitions.includes(newStatus)) {
+        throw new ValidationError(
+          'status',
+          `不允許的狀態轉換：無法從 "${currentStatus}" 更新為 "${newStatus}"`
+        );
+      }
 
       return await this.update(tour_id, {
         status: newStatus,

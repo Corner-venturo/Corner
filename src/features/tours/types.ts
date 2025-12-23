@@ -2,8 +2,9 @@ import { Tour } from '@/stores/types'
 
 export interface NewTourData {
   name: string
-  countryCode: string // 國家代碼 (如: JPN, THI)
-  cityCode: string // 城市代碼 (如: TYO, BKK)
+  countryCode: string // 國家名稱 (如: 日本, 泰國)
+  cityCode: string // 機場代碼 (如: TYO, BKK)
+  cityName?: string // 城市名稱 (如: 東京, 曼谷)
   customCountry?: string // 自訂國家名稱
   customLocation?: string // 自訂城市名稱
   customCityCode?: string // 自訂城市代號
