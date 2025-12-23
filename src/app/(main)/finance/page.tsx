@@ -6,6 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { useAccountingStore } from '@/stores/accounting-store'
 import type { Transaction } from '@/stores/accounting-store'
 import {
@@ -18,7 +19,6 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export default function FinancePage() {
   const {
@@ -80,28 +80,20 @@ export default function FinancePage() {
         key: 'amount',
         label: '金額',
         sortable: true,
-        render: (_value, transaction) => {
-          const isIncome = transaction.type === 'income'
-          return (
-            <span
-              className={cn(
-                'text-sm font-medium',
-                isIncome ? 'text-morandi-green' : 'text-morandi-red'
-              )}
-            >
-              {isIncome ? '+' : '-'} NT$ {transaction.amount.toLocaleString()}
-            </span>
-          )
-        },
+        render: (_value, transaction) => (
+          <CurrencyCell
+            amount={transaction.amount}
+            variant={transaction.type === 'income' ? 'income' : 'expense'}
+            showSign
+          />
+        ),
       },
       {
         key: 'date',
         label: '日期',
         sortable: true,
         render: (_value, transaction) => (
-          <span className="text-sm text-morandi-secondary">
-            {new Date(transaction.date).toLocaleDateString()}
-          </span>
+          <DateCell date={transaction.date} showIcon={false} />
         ),
       },
     ],

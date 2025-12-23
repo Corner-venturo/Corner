@@ -6,9 +6,9 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table'
+import { DateCell, CurrencyCell, StatusCell } from '@/components/table-cells'
 import { useOrderStore } from '@/stores'
 import { ArrowLeft, CreditCard, TrendingDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export default function PaymentDetailPage() {
   const router = useRouter()
@@ -56,9 +56,7 @@ export default function PaymentDetailPage() {
         sortable: true,
         filterable: true,
         filterType: 'date',
-        render: (value) => (
-          <span className="text-morandi-primary">{value ? new Date(String(value)).toLocaleDateString() : '-'}</span>
-        ),
+        render: (value) => <DateCell date={value as string} showIcon={false} />,
       },
       {
         key: 'tour_name',
@@ -73,9 +71,7 @@ export default function PaymentDetailPage() {
         sortable: true,
         filterable: true,
         filterType: 'number',
-        render: (value) => (
-          <span className="font-medium text-morandi-red">NT$ {Number(value || 0).toLocaleString()}</span>
-        ),
+        render: (value) => <CurrencyCell amount={Number(value || 0)} variant="expense" />,
       },
       {
         key: 'status',
@@ -89,29 +85,7 @@ export default function PaymentDetailPage() {
           { value: 'confirmed', label: '已確認' },
           { value: 'paid', label: '已付款' },
         ],
-        render: (value) => {
-          const statusMap = {
-            pending: '待處理',
-            processing: '處理中',
-            confirmed: '已確認',
-            paid: '已付款',
-          }
-          const statusKey = String(value || 'pending') as keyof typeof statusMap
-          return (
-            <span
-              className={cn(
-                'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                value === 'paid'
-                  ? 'bg-morandi-green text-white'
-                  : value === 'confirmed'
-                    ? 'bg-morandi-container text-morandi-primary'
-                    : 'bg-morandi-gold text-white'
-              )}
-            >
-              {statusMap[statusKey] || statusKey}
-            </span>
-          )
-        },
+        render: (value) => <StatusCell type="payment" status={String(value || 'pending')} />,
       },
     ],
     []
