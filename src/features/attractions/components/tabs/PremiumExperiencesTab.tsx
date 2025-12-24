@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Award, Users, Clock, Edit2, Power, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { cn } from '@/lib/utils'
@@ -141,8 +142,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
 
     try {
        
-      const { error } = await (supabase as any)
-        .from('premium_experiences')
+      const { error } = await dynamicFrom('premium_experiences')
         .update(updatedData)
         .eq('id', editingExperience.id)
 

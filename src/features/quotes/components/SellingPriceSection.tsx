@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { Plus, X } from 'lucide-react'
 import {
   ParticipantCounts,
   SellingPrices,
@@ -14,8 +12,14 @@ import {
   TierPricing,
   CostCategory,
 } from '../types'
-import { calculateTierPricingCosts } from '../utils/calculateTierPricing'
-import { alert } from '@/lib/ui/alert-dialog'
+import {
+  normalizeNumber,
+  getRoomTypeCost,
+  getRoomTypeProfit,
+} from '../utils/priceCalculations'
+import { PriceInputRow } from './PriceInputRow'
+import { PriceSummaryCard } from './PriceSummaryCard'
+import { ParticipantCountEditor } from './ParticipantCountEditor'
 
 interface SellingPriceSectionProps {
   participantCounts: ParticipantCounts
@@ -41,7 +45,6 @@ interface SellingPriceSectionProps {
   ) => void
   accommodationSummary: AccommodationSummaryItem[]
   categories: CostCategory[]
-  // 新增：從外部傳入 tierPricings 來持久化儲存
   tierPricings?: TierPricing[]
   setTierPricings?: React.Dispatch<React.SetStateAction<TierPricing[]>>
 }
@@ -59,71 +62,29 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
   tierPricings: externalTierPricings,
   setTierPricings: externalSetTierPricings,
 }) => {
-  // 檻次表狀態 - 優先使用外部傳入的，否則用本地 state（向後相容）
   const [localTierPricings, setLocalTierPricings] = useState<TierPricing[]>([])
   const tierPricings = externalTierPricings ?? localTierPricings
   const setTierPricings = externalSetTierPricings ?? setLocalTierPricings
-  const [newTierCount, setNewTierCount] = useState<string>('')
 
-  // 全形轉半形數字
-  const normalizeNumber = (value: string): string => {
-    return value.replace(/[０-９]/g, char => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+  const handlePriceChange = (identity: keyof SellingPrices, value: string) => {
+    const normalized = normalizeNumber(value)
+    setSellingPrices(prev => ({ ...prev, [identity]: Number(normalized) || 0 }))
   }
 
-  // 新增檻次表
-  const handleAddTier = () => {
-    const count = Number(newTierCount)
-    if (!count || count <= 0) {
-      void alert('請輸入有效的人數', 'warning')
-      return
-    }
-
-    // 計算新的人數分布（保持原始比例）
-    const totalOriginal =
-      participantCounts.adult +
-      participantCounts.child_with_bed +
-      participantCounts.child_no_bed +
-      participantCounts.single_room
-
-    const ratio = totalOriginal > 0 ? count / totalOriginal : 1
-
-    const newCounts: ParticipantCounts = {
-      adult: Math.round(participantCounts.adult * ratio),
-      child_with_bed: Math.round(participantCounts.child_with_bed * ratio),
-      child_no_bed: Math.round(participantCounts.child_no_bed * ratio),
-      single_room: Math.round(participantCounts.single_room * ratio),
-      infant: Math.round(participantCounts.infant * ratio),
-    }
-
-    // 計算新的成本（傳入原始人數用於還原團體費用）
-    const newCosts = calculateTierPricingCosts(categories, newCounts, participantCounts)
-
-    // 建立新的檻次表（使用更可靠的 ID 生成方式）
-    const newTier: TierPricing = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      participant_count: count,
-      participant_counts: newCounts,
-      identity_costs: newCosts,
-      selling_prices: { ...sellingPrices }, // 複製原始售價
-      identity_profits: {
-        adult: sellingPrices.adult - newCosts.adult,
-        child_with_bed: sellingPrices.child_with_bed - newCosts.child_with_bed,
-        child_no_bed: sellingPrices.child_no_bed - newCosts.child_no_bed,
-        single_room: sellingPrices.single_room - newCosts.single_room,
-        infant: sellingPrices.infant - newCosts.infant,
+  const handleRoomTypePriceChange = (roomName: string, type: 'adult' | 'child', value: string) => {
+    const normalized = normalizeNumber(value)
+    setSellingPrices(prev => ({
+      ...prev,
+      room_types: {
+        ...(prev.room_types || {}),
+        [roomName]: {
+          ...(prev.room_types?.[roomName] || { adult: 0, child: 0 }),
+          [type]: Number(normalized) || 0,
+        },
       },
-    }
-
-    setTierPricings(prev => [...prev, newTier])
-    setNewTierCount('')
+    }))
   }
 
-  // 刪除檻次表
-  const handleRemoveTier = (id: string) => {
-    setTierPricings(prev => prev.filter(tier => tier.id !== id))
-  }
-
-  // 更新檻次表售價
   const handleTierPriceChange = (tierId: string, identity: keyof SellingPrices, value: string) => {
     const normalized = normalizeNumber(value)
     setTierPricings(prev =>
@@ -142,55 +103,12 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
     )
   }
 
-  const handlePriceChange = (identity: keyof SellingPrices, value: string) => {
-    const normalized = normalizeNumber(value)
-    setSellingPrices(prev => ({ ...prev, [identity]: Number(normalized) || 0 }))
+  const handleRemoveTier = (id: string) => {
+    setTierPricings(prev => prev.filter(tier => tier.id !== id))
   }
 
-  // 處理房型價格變更
-  const handleRoomTypePriceChange = (roomName: string, type: 'adult' | 'child', value: string) => {
-    const normalized = normalizeNumber(value)
-    setSellingPrices(prev => ({
-      ...prev,
-      room_types: {
-        ...(prev.room_types || {}),
-        [roomName]: {
-          ...(prev.room_types?.[roomName] || { adult: 0, child: 0 }),
-          [type]: Number(normalized) || 0,
-        },
-      },
-    }))
-  }
-
-  // 取得房型的成本（目標房型住宿 + 其他所有費用）
-  const getRoomTypeCost = (roomName: string, type: 'adult' | 'child'): number => {
-    const room = accommodationSummary.find(r => r.name === roomName)
-    if (!room) return 0
-
-    // 目標房型的住宿費（所有天數加總，已經除過人數）
-    const targetRoomCost = Math.ceil(room.total_cost)
-
-    // 基礎成本（identityCosts 已包含：機票、交通、房型1住宿、餐飲、活動、團體分攤、領隊導遊）
-    const baseCost = type === 'adult' ? identityCosts.adult : identityCosts.child_with_bed
-
-    // 取得第一個房型的住宿費
-    const firstRoom = accommodationSummary[0]
-    const firstRoomCost = firstRoom ? Math.ceil(firstRoom.total_cost) : 0
-
-    // 替換住宿費：基礎成本 - 房型1住宿 + 目標房型住宿
-    return baseCost - firstRoomCost + targetRoomCost
-  }
-
-  // 取得房型的售價
-  const getRoomTypePrice = (roomName: string, type: 'adult' | 'child'): number => {
-    return sellingPrices.room_types?.[roomName]?.[type] || 0
-  }
-
-  // 計算房型的利潤
-  const getRoomTypeProfit = (roomName: string, type: 'adult' | 'child'): number => {
-    const cost = getRoomTypeCost(roomName, type)
-    const price = getRoomTypePrice(roomName, type)
-    return price - cost
+  const handleAddTier = (tier: TierPricing) => {
+    setTierPricings(prev => [...prev, tier])
   }
 
   return (
@@ -198,7 +116,6 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
       {/* 產生報價單按鈕 */}
       <Button
         onClick={() => {
-          // 將所有檻次表的數據傳遞給報價單
           const tierPricingsData = tierPricings.map(tier => ({
             participant_count: tier.participant_count,
             selling_prices: tier.selling_prices,
@@ -212,6 +129,7 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
         產生報價單
       </Button>
 
+      {/* 主要售價表格 */}
       <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-morandi-container/40 border-b border-border/60">
@@ -231,232 +149,86 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
             </tr>
           </thead>
           <tbody>
-            {/* 單人房 */}
-            <tr className="border-b border-border">
-              <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                單人房
-              </td>
-              <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                {identityCosts.single_room.toLocaleString()}
-              </td>
-              <td className="py-2 px-2 text-center border-r border-border">
-                <input
-                  type="text" inputMode="decimal"
-                  value={sellingPrices.single_room || ''}
-                  onChange={e => handlePriceChange('single_room', e.target.value)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                />
-              </td>
-              <td
-                className={cn(
-                  'py-2 px-2 text-center text-xs font-medium',
-                  identityProfits.single_room >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                )}
-              >
-                {identityProfits.single_room.toLocaleString()}
-              </td>
-            </tr>
+            <PriceInputRow
+              label="單人房"
+              cost={identityCosts.single_room}
+              sellingPrice={sellingPrices.single_room}
+              profit={identityProfits.single_room}
+              onPriceChange={value => handlePriceChange('single_room', value)}
+              isReadOnly={isReadOnly}
+            />
+            <PriceInputRow
+              label="成人"
+              cost={identityCosts.adult}
+              sellingPrice={sellingPrices.adult}
+              profit={identityProfits.adult}
+              onPriceChange={value => handlePriceChange('adult', value)}
+              isReadOnly={isReadOnly}
+            />
+            <PriceInputRow
+              label="小孩"
+              cost={identityCosts.child_with_bed}
+              sellingPrice={sellingPrices.child_with_bed}
+              profit={identityProfits.child_with_bed}
+              onPriceChange={value => handlePriceChange('child_with_bed', value)}
+              isReadOnly={isReadOnly}
+            />
+            <PriceInputRow
+              label="不佔床"
+              cost={identityCosts.child_no_bed}
+              sellingPrice={sellingPrices.child_no_bed}
+              profit={identityProfits.child_no_bed}
+              onPriceChange={value => handlePriceChange('child_no_bed', value)}
+              isReadOnly={isReadOnly}
+            />
+            <PriceInputRow
+              label="嬰兒"
+              cost={identityCosts.infant}
+              sellingPrice={sellingPrices.infant}
+              profit={identityProfits.infant}
+              onPriceChange={value => handlePriceChange('infant', value)}
+              isReadOnly={isReadOnly}
+            />
 
-            {/* 成人 */}
-            <tr className="border-b border-border">
-              <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                成人
-              </td>
-              <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                {identityCosts.adult.toLocaleString()}
-              </td>
-              <td className="py-2 px-2 text-center border-r border-border">
-                <input
-                  type="text" inputMode="decimal"
-                  value={sellingPrices.adult || ''}
-                  onChange={e => handlePriceChange('adult', e.target.value)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                />
-              </td>
-              <td
-                className={cn(
-                  'py-2 px-2 text-center text-xs font-medium',
-                  identityProfits.adult >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                )}
-              >
-                {identityProfits.adult.toLocaleString()}
-              </td>
-            </tr>
-
-            {/* 小孩（佔床） */}
-            <tr className="border-b border-border">
-              <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                小孩
-              </td>
-              <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                {identityCosts.child_with_bed.toLocaleString()}
-              </td>
-              <td className="py-2 px-2 text-center border-r border-border">
-                <input
-                  type="text" inputMode="decimal"
-                  value={sellingPrices.child_with_bed || ''}
-                  onChange={e => handlePriceChange('child_with_bed', e.target.value)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                />
-              </td>
-              <td
-                className={cn(
-                  'py-2 px-2 text-center text-xs font-medium',
-                  identityProfits.child_with_bed >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                )}
-              >
-                {identityProfits.child_with_bed.toLocaleString()}
-              </td>
-            </tr>
-
-            {/* 不佔床 */}
-            <tr className="border-b border-border">
-              <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                不佔床
-              </td>
-              <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                {identityCosts.child_no_bed.toLocaleString()}
-              </td>
-              <td className="py-2 px-2 text-center border-r border-border">
-                <input
-                  type="text" inputMode="decimal"
-                  value={sellingPrices.child_no_bed || ''}
-                  onChange={e => handlePriceChange('child_no_bed', e.target.value)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                />
-              </td>
-              <td
-                className={cn(
-                  'py-2 px-2 text-center text-xs font-medium',
-                  identityProfits.child_no_bed >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                )}
-              >
-                {identityProfits.child_no_bed.toLocaleString()}
-              </td>
-            </tr>
-
-            {/* 嬰兒 */}
-            <tr>
-              <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                嬰兒
-              </td>
-              <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                {identityCosts.infant.toLocaleString()}
-              </td>
-              <td className="py-2 px-2 text-center border-r border-border">
-                <input
-                  type="text" inputMode="decimal"
-                  value={sellingPrices.infant || ''}
-                  onChange={e => handlePriceChange('infant', e.target.value)}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                />
-              </td>
-              <td
-                className={cn(
-                  'py-2 px-2 text-center text-xs font-medium',
-                  identityProfits.infant >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                )}
-              >
-                {identityProfits.infant.toLocaleString()}
-              </td>
-            </tr>
-
-            {/* 動態房型 - 只顯示第二個房型之後的（第一個房型 = 預設的成人/小孩） */}
+            {/* 動態房型 */}
             {accommodationSummary.length > 1 &&
               accommodationSummary.slice(1).map(room => (
                 <React.Fragment key={room.name}>
-                  {/* 房型標題列 */}
                   <tr className="bg-morandi-container/20 border-b border-border/40">
                     <td colSpan={4} className="py-2 px-3 text-xs font-medium text-morandi-primary">
                       {room.name}
                     </td>
                   </tr>
-                  {/* 房型-成人 */}
-                  <tr className="border-b border-border">
-                    <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border pl-6">
-                      成人
-                    </td>
-                    <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                      {getRoomTypeCost(room.name, 'adult').toLocaleString()}
-                    </td>
-                    <td className="py-2 px-2 text-center border-r border-border">
-                      <input
-                        type="text" inputMode="decimal"
-                        value={getRoomTypePrice(room.name, 'adult') || ''}
-                        onChange={e =>
-                          handleRoomTypePriceChange(room.name, 'adult', e.target.value)
-                        }
-                        disabled={isReadOnly}
-                        className={cn(
-                          'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                          isReadOnly && 'cursor-not-allowed opacity-60'
-                        )}
-                      />
-                    </td>
-                    <td
-                      className={cn(
-                        'py-2 px-2 text-center text-xs font-medium',
-                        getRoomTypeProfit(room.name, 'adult') >= 0
-                          ? 'text-morandi-green'
-                          : 'text-morandi-red'
-                      )}
-                    >
-                      {getRoomTypeProfit(room.name, 'adult').toLocaleString()}
-                    </td>
-                  </tr>
-                  {/* 房型-小孩 */}
-                  <tr className="border-b border-border">
-                    <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border pl-6">
-                      小孩
-                    </td>
-                    <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                      {getRoomTypeCost(room.name, 'child').toLocaleString()}
-                    </td>
-                    <td className="py-2 px-2 text-center border-r border-border">
-                      <input
-                        type="text" inputMode="decimal"
-                        value={getRoomTypePrice(room.name, 'child') || ''}
-                        onChange={e =>
-                          handleRoomTypePriceChange(room.name, 'child', e.target.value)
-                        }
-                        disabled={isReadOnly}
-                        className={cn(
-                          'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                          isReadOnly && 'cursor-not-allowed opacity-60'
-                        )}
-                      />
-                    </td>
-                    <td
-                      className={cn(
-                        'py-2 px-2 text-center text-xs font-medium',
-                        getRoomTypeProfit(room.name, 'child') >= 0
-                          ? 'text-morandi-green'
-                          : 'text-morandi-red'
-                      )}
-                    >
-                      {getRoomTypeProfit(room.name, 'child').toLocaleString()}
-                    </td>
-                  </tr>
+                  <PriceInputRow
+                    label="成人"
+                    cost={getRoomTypeCost(room.name, 'adult', accommodationSummary, identityCosts)}
+                    sellingPrice={sellingPrices.room_types?.[room.name]?.adult || 0}
+                    profit={getRoomTypeProfit(
+                      room.name,
+                      'adult',
+                      sellingPrices,
+                      accommodationSummary,
+                      identityCosts
+                    )}
+                    onPriceChange={value => handleRoomTypePriceChange(room.name, 'adult', value)}
+                    isReadOnly={isReadOnly}
+                    indented
+                  />
+                  <PriceInputRow
+                    label="小孩"
+                    cost={getRoomTypeCost(room.name, 'child', accommodationSummary, identityCosts)}
+                    sellingPrice={sellingPrices.room_types?.[room.name]?.child || 0}
+                    profit={getRoomTypeProfit(
+                      room.name,
+                      'child',
+                      sellingPrices,
+                      accommodationSummary,
+                      identityCosts
+                    )}
+                    onPriceChange={value => handleRoomTypePriceChange(room.name, 'child', value)}
+                    isReadOnly={isReadOnly}
+                    indented
+                  />
                 </React.Fragment>
               ))}
           </tbody>
@@ -465,244 +237,27 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
 
       {/* 新增檻次表 */}
       {!isReadOnly && (
-        <div className="mt-3 space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="text" inputMode="decimal"
-              value={newTierCount}
-              onChange={e => setNewTierCount(e.target.value)}
-              placeholder="輸入人數（如：20、30、40）"
-              className="flex-1 h-9 text-sm"
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleAddTier()
-              }}
-            />
-            <Button
-              onClick={handleAddTier}
-              size="sm"
-              className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              type="button"
-            >
-              <Plus size={16} className="mr-1" />
-              新增檻次表
-            </Button>
-          </div>
-        </div>
+        <ParticipantCountEditor
+          participantCounts={participantCounts}
+          sellingPrices={sellingPrices}
+          categories={categories}
+          onAddTier={handleAddTier}
+        />
       )}
 
       {/* 檻次表列表 */}
       {tierPricings.map(tier => (
-        <div
+        <PriceSummaryCard
           key={tier.id}
-          className="mt-3 bg-card border border-morandi-gold/30 rounded-xl overflow-hidden shadow-sm"
-        >
-          {/* 檻次表標題 */}
-          <div className="bg-morandi-gold/10 px-4 py-2 flex items-center justify-between border-b border-morandi-gold/30">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-morandi-primary">
-                檻次報價 - {tier.participant_count} 人
-              </span>
-              <Button
-                onClick={() => {
-                  // 用檻次表的數據產生報價單，並傳遞檻次標籤
-                  const tierLabel = `檻次報價 - ${tier.participant_count} 人`
-                  handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
-                }}
-                size="sm"
-                className="h-7 text-xs bg-morandi-secondary hover:bg-morandi-secondary/90 text-white"
-                type="button"
-              >
-                產生報價單
-              </Button>
-            </div>
-            {!isReadOnly && (
-              <button
-                onClick={() => handleRemoveTier(tier.id)}
-                className="text-morandi-red hover:bg-morandi-red/10 p-1 rounded transition-colors"
-                type="button"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-
-          {/* 檻次表內容 */}
-          <table className="w-full text-sm">
-            <thead className="bg-morandi-container/20 border-b border-border/60">
-              <tr>
-                <th className="text-left py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-                  身份
-                </th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-                  成本
-                </th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary border-r border-border">
-                  售價
-                </th>
-                <th className="text-center py-2 px-4 text-xs font-medium text-morandi-primary">
-                  利潤
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* 單人房 */}
-              <tr className="border-b border-border">
-                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                  單人房
-                </td>
-                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                  {tier.identity_costs.single_room.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center border-r border-border">
-                  <input
-                    type="text" inputMode="decimal"
-                    value={tier.selling_prices.single_room || ''}
-                    onChange={e => handleTierPriceChange(tier.id, 'single_room', e.target.value)}
-                    disabled={isReadOnly}
-                    className={cn(
-                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                      isReadOnly && 'cursor-not-allowed opacity-60'
-                    )}
-                  />
-                </td>
-                <td
-                  className={cn(
-                    'py-2 px-2 text-center text-xs font-medium',
-                    tier.identity_profits.single_room >= 0
-                      ? 'text-morandi-green'
-                      : 'text-morandi-red'
-                  )}
-                >
-                  {tier.identity_profits.single_room.toLocaleString()}
-                </td>
-              </tr>
-
-              {/* 成人 */}
-              <tr className="border-b border-border">
-                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                  成人
-                </td>
-                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                  {tier.identity_costs.adult.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center border-r border-border">
-                  <input
-                    type="text" inputMode="decimal"
-                    value={tier.selling_prices.adult || ''}
-                    onChange={e => handleTierPriceChange(tier.id, 'adult', e.target.value)}
-                    disabled={isReadOnly}
-                    className={cn(
-                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                      isReadOnly && 'cursor-not-allowed opacity-60'
-                    )}
-                  />
-                </td>
-                <td
-                  className={cn(
-                    'py-2 px-2 text-center text-xs font-medium',
-                    tier.identity_profits.adult >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                  )}
-                >
-                  {tier.identity_profits.adult.toLocaleString()}
-                </td>
-              </tr>
-
-              {/* 小孩 */}
-              <tr className="border-b border-border">
-                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                  小孩
-                </td>
-                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                  {tier.identity_costs.child_with_bed.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center border-r border-border">
-                  <input
-                    type="text" inputMode="decimal"
-                    value={tier.selling_prices.child_with_bed || ''}
-                    onChange={e => handleTierPriceChange(tier.id, 'child_with_bed', e.target.value)}
-                    disabled={isReadOnly}
-                    className={cn(
-                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                      isReadOnly && 'cursor-not-allowed opacity-60'
-                    )}
-                  />
-                </td>
-                <td
-                  className={cn(
-                    'py-2 px-2 text-center text-xs font-medium',
-                    tier.identity_profits.child_with_bed >= 0
-                      ? 'text-morandi-green'
-                      : 'text-morandi-red'
-                  )}
-                >
-                  {tier.identity_profits.child_with_bed.toLocaleString()}
-                </td>
-              </tr>
-
-              {/* 不佔床 */}
-              <tr className="border-b border-border">
-                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                  不佔床
-                </td>
-                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                  {tier.identity_costs.child_no_bed.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center border-r border-border">
-                  <input
-                    type="text" inputMode="decimal"
-                    value={tier.selling_prices.child_no_bed || ''}
-                    onChange={e => handleTierPriceChange(tier.id, 'child_no_bed', e.target.value)}
-                    disabled={isReadOnly}
-                    className={cn(
-                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                      isReadOnly && 'cursor-not-allowed opacity-60'
-                    )}
-                  />
-                </td>
-                <td
-                  className={cn(
-                    'py-2 px-2 text-center text-xs font-medium',
-                    tier.identity_profits.child_no_bed >= 0
-                      ? 'text-morandi-green'
-                      : 'text-morandi-red'
-                  )}
-                >
-                  {tier.identity_profits.child_no_bed.toLocaleString()}
-                </td>
-              </tr>
-
-              {/* 嬰兒 */}
-              <tr>
-                <td className="py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border">
-                  嬰兒
-                </td>
-                <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
-                  {tier.identity_costs.infant.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center border-r border-border">
-                  <input
-                    type="text" inputMode="decimal"
-                    value={tier.selling_prices.infant || ''}
-                    onChange={e => handleTierPriceChange(tier.id, 'infant', e.target.value)}
-                    disabled={isReadOnly}
-                    className={cn(
-                      'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                      isReadOnly && 'cursor-not-allowed opacity-60'
-                    )}
-                  />
-                </td>
-                <td
-                  className={cn(
-                    'py-2 px-2 text-center text-xs font-medium',
-                    tier.identity_profits.infant >= 0 ? 'text-morandi-green' : 'text-morandi-red'
-                  )}
-                >
-                  {tier.identity_profits.infant.toLocaleString()}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          tier={tier}
+          isReadOnly={isReadOnly}
+          onPriceChange={(identity, value) => handleTierPriceChange(tier.id, identity, value)}
+          onRemove={() => handleRemoveTier(tier.id)}
+          onGenerateQuotation={() => {
+            const tierLabel = `檻次報價 - ${tier.participant_count} 人`
+            handleGenerateQuotation(tier.participant_counts, tier.selling_prices, tierLabel)
+          }}
+        />
       ))}
     </div>
   )

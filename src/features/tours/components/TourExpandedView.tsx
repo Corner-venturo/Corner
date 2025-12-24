@@ -1,3 +1,5 @@
+'use client'
+
 import { logger } from '@/lib/utils/logger'
 import React from 'react'
 import { Tour, Order } from '@/stores/types'

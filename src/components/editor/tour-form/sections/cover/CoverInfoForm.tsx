@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { TourFormData, CityOption, CoverStyleType } from '../../../types'
+import { TourFormData, CityOption, CoverStyleType } from '../../types'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

@@ -133,7 +133,7 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, message: '帳號或密碼錯誤' }
           }
           
-          const employeeData = employees as any; // Cast to any to handle snake_case
+          const employeeData = employees as EmployeeRow
           logger.log('✅ Found employee data:', employeeData.display_name)
           
           if (employeeData.status === 'terminated') {
@@ -220,21 +220,21 @@ export const useAuthStore = create<AuthState>()(
           const user: User = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
-            english_name: employeeData.english_name,
-            display_name: employeeData.display_name,
-            chinese_name: employeeData.chinese_name || employeeData.display_name,
-            personal_info: employeeData.personal_info || {},
-            job_info: employeeData.job_info || {},
-            salary_info: employeeData.salary_info || {},
+            english_name: employeeData.english_name ?? '',
+            display_name: employeeData.display_name ?? '',
+            chinese_name: employeeData.chinese_name ?? employeeData.display_name ?? '',
+            personal_info: (employeeData.personal_info ?? {}) as User['personal_info'],
+            job_info: (employeeData.job_info ?? {}) as User['job_info'],
+            salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
             permissions: mergedPermissions, // 使用合併後的權限
             roles: userRoles as User['roles'],
-            attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
-            contracts: employeeData.contracts || [],
+            attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
+            contracts: (employeeData.contracts ?? []) as User['contracts'],
             status: employeeData.status as User['status'],
-            workspace_id: employeeData.workspace_id,
+            workspace_id: employeeData.workspace_id ?? undefined,
             workspace_code: workspaceCode, // 登入時取得的 workspace code
-            created_at: employeeData.created_at || new Date().toISOString(),
-            updated_at: employeeData.updated_at || new Date().toISOString(),
+            created_at: employeeData.created_at ?? new Date().toISOString(),
+            updated_at: employeeData.updated_at ?? new Date().toISOString(),
           }
 
           const authPayload: AuthPayload = {
@@ -281,7 +281,7 @@ export const useAuthStore = create<AuthState>()(
             return
           }
 
-          const employeeData = data as any
+          const employeeData = data as EmployeeRow
 
           // 如果帳號已停用，自動登出
           if (employeeData.status === 'terminated') {
@@ -318,21 +318,21 @@ export const useAuthStore = create<AuthState>()(
           const updatedUser: User = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
-            english_name: employeeData.english_name,
-            display_name: employeeData.display_name,
-            chinese_name: employeeData.chinese_name || employeeData.display_name,
-            personal_info: employeeData.personal_info || {},
-            job_info: employeeData.job_info || {},
-            salary_info: employeeData.salary_info || {},
+            english_name: employeeData.english_name ?? '',
+            display_name: employeeData.display_name ?? '',
+            chinese_name: employeeData.chinese_name ?? employeeData.display_name ?? '',
+            personal_info: (employeeData.personal_info ?? {}) as User['personal_info'],
+            job_info: (employeeData.job_info ?? {}) as User['job_info'],
+            salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
             permissions: mergedPermissions, // 使用合併後的權限
             roles: userRoles as User['roles'],
-            attendance: employeeData.attendance || { leave_records: [], overtime_records: [] },
-            contracts: employeeData.contracts || [],
+            attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
+            contracts: (employeeData.contracts ?? []) as User['contracts'],
             status: employeeData.status as User['status'],
-            workspace_id: employeeData.workspace_id,
+            workspace_id: employeeData.workspace_id ?? undefined,
             workspace_code: workspaceCode, // 保留或更新 workspace code
-            created_at: employeeData.created_at || new Date().toISOString(),
-            updated_at: employeeData.updated_at || new Date().toISOString(),
+            created_at: employeeData.created_at ?? new Date().toISOString(),
+            updated_at: employeeData.updated_at ?? new Date().toISOString(),
           }
 
           get().setUser(updatedUser);

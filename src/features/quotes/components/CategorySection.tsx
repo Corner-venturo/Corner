@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { RatesDetailDialog } from '@/features/transportation-rates/components/RatesDetailDialog'
 import { TransportationRate } from '@/types/transportation-rates.types'
 
@@ -118,8 +118,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       return
     }
 
-    const { data } = await (supabase as any)
-      .from('transportation_rates')
+    const { data } = await dynamicFrom('transportation_rates')
       .select('country_name')
       .eq('is_active', true)
 
@@ -138,8 +137,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
     setSelectedCountry(countryName)
     setLoading(true)
 
-    const { data } = await (supabase as any)
-      .from('transportation_rates')
+    const { data } = await dynamicFrom('transportation_rates')
       .select('*')
       .eq('country_name', countryName)
       .eq('is_active', true)
@@ -157,8 +155,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const refreshRates = async () => {
     if (!selectedCountry) return
 
-    const { data } = await (supabase as any)
-      .from('transportation_rates')
+    const { data } = await dynamicFrom('transportation_rates')
       .select('*')
       .eq('country_name', selectedCountry)
       .eq('is_active', true)

@@ -9,7 +9,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 
@@ -146,8 +146,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
       // 直接使用 Supabase 建立出納單（繞過 store 的 workspace_id 檢查）
 
-      const { data, error } = await (supabase as any)
-        .from('disbursement_orders')
+      const { data, error } = await dynamicFrom('disbursement_orders')
         .insert({
           id: crypto.randomUUID(),
           code: orderNumber,

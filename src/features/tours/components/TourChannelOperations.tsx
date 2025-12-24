@@ -9,6 +9,7 @@ import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 
 export interface TourStoreActions {
   fetchAll: () => Promise<void>
@@ -159,8 +160,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
 
     try {
        
-      const { error } = await (supabase as any)
-        .from('tours')
+      const { error } = await dynamicFrom('tours')
         .update({
           closing_status: 'open',
         })

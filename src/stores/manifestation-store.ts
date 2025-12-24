@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { ManifestationEntry, ManifestationProgress } from '@/types/manifestation'
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 import { useAuthStore } from './auth-store'
 
 interface ManifestationState {
@@ -40,16 +40,15 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // TypeScript requires literal table names, but manifestation_entries is not in Database type
-      const { data, error } = await supabase
-        .from('manifestation_entries' as any)
+      // 使用 dynamicFrom 處理動態表名（manifestation_entries 未在 Database 類型中定義）
+      const { data, error } = await dynamicFrom('manifestation_entries')
         .select('*')
         .eq('user_id', user.id)
         .order('chapter_number', { ascending: true })
 
       if (error) throw error
 
-      set({ entries: (data as unknown as ManifestationEntry[]) || [], isLoading: false })
+      set({ entries: castRows<ManifestationEntry>(data), isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取記錄失敗',
@@ -69,9 +68,8 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // TypeScript requires literal table names, but manifestation_entries is not in Database type
-      const { data, error } = await supabase
-        .from('manifestation_entries' as any)
+      // 使用 dynamicFrom 處理動態表名
+      const { data, error } = await dynamicFrom('manifestation_entries')
         .select('*')
         .eq('user_id', user.id)
         .eq('chapter_number', chapterNumber)
@@ -84,7 +82,7 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         throw error
       }
 
-      set({ currentEntry: (data as unknown as ManifestationEntry) || null, isLoading: false })
+      set({ currentEntry: castRow<ManifestationEntry>(data), isLoading: false })
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : '獲取章節記錄失敗',
@@ -111,16 +109,15 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         updated_at: new Date().toISOString(),
       }
 
-      // TypeScript requires literal table names, but manifestation_entries is not in Database type
-      const { data, error } = await supabase
-        .from('manifestation_entries' as any)
-        .insert(newEntry)
+      // 使用 dynamicFrom 處理動態表名
+      const { data, error } = await dynamicFrom('manifestation_entries')
+        .insert(newEntry as Record<string, unknown>)
         .select()
         .single()
 
       if (error) throw error
 
-      const result = data as unknown as ManifestationEntry
+      const result = castRow<ManifestationEntry>(data) as ManifestationEntry
       // 更新本地狀態
       set(state => ({
         entries: [...state.entries, result],
@@ -146,20 +143,19 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // TypeScript requires literal table names, but manifestation_entries is not in Database type
-      const { data, error } = await supabase
-        .from('manifestation_entries' as any)
+      // 使用 dynamicFrom 處理動態表名
+      const { data, error } = await dynamicFrom('manifestation_entries')
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
-        })
+        } as Record<string, unknown>)
         .eq('id', id)
         .select()
         .single()
 
       if (error) throw error
 
-      const result = data as unknown as ManifestationEntry
+      const result = castRow<ManifestationEntry>(data) as ManifestationEntry
       // 更新本地狀態
       set(state => ({
         entries: state.entries.map(e => (e.id === id ? result : e)),
@@ -187,8 +183,8 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      // TypeScript requires literal table names, but manifestation_entries is not in Database type
-      const { error } = await supabase.from('manifestation_entries' as any).delete().eq('id', id)
+      // 使用 dynamicFrom 處理動態表名
+      const { error } = await dynamicFrom('manifestation_entries').delete().eq('id', id)
 
       if (error) throw error
 
@@ -218,9 +214,8 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
     if (!user) return
 
     try {
-      // TypeScript requires literal table names, but manifestation_user_progress is not in Database type
-      const { data, error } = await supabase
-        .from('manifestation_user_progress' as any)
+      // 使用 dynamicFrom 處理動態表名
+      const { data, error } = await dynamicFrom('manifestation_user_progress')
         .select('*')
         .eq('user_id', user.id)
         .single()
@@ -229,8 +224,10 @@ export const useManifestationStore = create<ManifestationState>((set, get) => ({
         throw error
       }
 
-      set({ progress: (data || null) as ManifestationProgress | null })
-    } catch (error) {}
+      set({ progress: castRow<ManifestationProgress>(data) })
+    } catch {
+      // 忽略錯誤
+    }
   },
 
   // 設置當前記錄

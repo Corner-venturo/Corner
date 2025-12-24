@@ -69,8 +69,8 @@ function ImagePositionAdjuster({ url, position, onPositionChange, onRemove }: Im
 }
 
 interface AttractionImageUploadProps {
-  fileInputRef: React.RefObject<HTMLInputElement>
-  dropZoneRef: React.RefObject<HTMLDivElement>
+  fileInputRef: React.RefObject<HTMLInputElement | null>
+  dropZoneRef: React.RefObject<HTMLDivElement | null>
   isUploading: boolean
   uploadedImages: string[]
   imagePositions: Record<string, ImagePosition>

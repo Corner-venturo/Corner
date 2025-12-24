@@ -13,12 +13,12 @@ interface CreateChannelDialogProps {
   channelName: string
   channelDescription: string
   channelType: 'public' | 'private'
-  channelScope?: 'workspace' | 'company_wide' // 新增：頻道範圍
+  channelScope?: 'workspace' | 'company' // 新增：頻道範圍
   selectedMembers: string[] // 新增：選中的成員 ID
   onChannelNameChange: (name: string) => void
   onChannelDescriptionChange: (desc: string) => void
   onChannelTypeChange: (type: 'public' | 'private') => void
-  onChannelScopeChange?: (scope: 'workspace' | 'company_wide') => void // 新增：範圍變更回調
+  onChannelScopeChange?: (scope: 'workspace' | 'company') => void // 新增：範圍變更回調
   onMembersChange: (members: string[]) => void // 新增：成員變更回調
   onClose: () => void
   onCreate: () => void
@@ -59,7 +59,7 @@ export function CreateChannelDialog({
   }, [isOpen, employees.length, isSuperAdmin, workspaces.length, loadWorkspaces])
 
   // 根據範圍顯示員工列表
-  const displayEmployees = channelScope === 'company_wide'
+  const displayEmployees = channelScope === 'company'
     ? employees // 全集團：顯示所有員工
     : employees.filter(emp => (emp as unknown as { workspace_id?: string }).workspace_id === user?.workspace_id)
 
@@ -180,13 +180,13 @@ export function CreateChannelDialog({
                 <button
                   type="button"
                   onClick={() => {
-                    onChannelScopeChange('company_wide')
+                    onChannelScopeChange('company')
                     // 切換範圍時清空已選成員（除了自己）
                     onMembersChange([user?.id || ''])
                   }}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-colors',
-                    channelScope === 'company_wide'
+                    channelScope === 'company'
                       ? 'bg-morandi-blue/10 border-morandi-blue text-morandi-primary'
                       : 'border-morandi-blue/20 text-morandi-secondary hover:bg-morandi-secondary/5'
                   )}
@@ -207,7 +207,7 @@ export function CreateChannelDialog({
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
               邀請成員
-              {channelScope === 'company_wide' && (
+              {channelScope === 'company' && (
                 <span className="ml-2 text-xs text-morandi-blue">(全集團)</span>
               )}
             </label>
@@ -216,7 +216,7 @@ export function CreateChannelDialog({
                 const isCreator = employee.id === user?.id
                 const isSelected = selectedMembers.includes(employee.id)
                 const empWorkspaceId = (employee as unknown as { workspace_id?: string }).workspace_id
-                const workspaceName = channelScope === 'company_wide' ? getWorkspaceName(empWorkspaceId) : ''
+                const workspaceName = channelScope === 'company' ? getWorkspaceName(empWorkspaceId) : ''
 
                 return (
                   <button

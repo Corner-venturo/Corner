@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, Dispatch, SetStateAction } from 'react'
 import { MapPin } from 'lucide-react'
 import { Tour, Order } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TourMobileCard } from './TourMobileCard'
 import { TourExpandedView } from './TourExpandedView'
 import { useTourTableColumns } from './TourTableColumns'
+import { TourExtraFields } from '../types'
 
 interface TourTableProps {
   tours: Tour[]
@@ -14,18 +15,18 @@ interface TourTableProps {
   orders: Order[]
   expandedRows: string[]
   activeTabs: Record<string, string>
-  tourExtraFields: Record<string, Record<string, string>>
-  triggerAddOnAdd: boolean
-  triggerPaymentAdd: boolean
-  triggerCostAdd: boolean
+  tourExtraFields: Record<string, TourExtraFields>
+  triggerAddOnAdd: Record<string, boolean>
+  triggerPaymentAdd: Record<string, boolean>
+  triggerCostAdd: Record<string, boolean>
   onSort: (field: string, order: 'asc' | 'desc') => void
   onExpand: (id: string) => void
   onRowClick: (row: unknown) => void
   onActiveTabChange: (tourId: string, tab: string) => void
-  onTourExtraFieldsChange: (fields: Record<string, Record<string, string>>) => void
-  onTriggerAddOnAdd: (value: boolean) => void
-  onTriggerPaymentAdd: (value: boolean) => void
-  onTriggerCostAdd: (value: boolean) => void
+  onTourExtraFieldsChange: Dispatch<SetStateAction<Record<string, TourExtraFields>>>
+  onTriggerAddOnAdd: Dispatch<SetStateAction<Record<string, boolean>>>
+  onTriggerPaymentAdd: Dispatch<SetStateAction<Record<string, boolean>>>
+  onTriggerCostAdd: Dispatch<SetStateAction<Record<string, boolean>>>
   openDialog: (type: string, data?: Tour) => void
   renderActions: (row: unknown) => React.ReactNode
   getStatusColor: (status: string) => string

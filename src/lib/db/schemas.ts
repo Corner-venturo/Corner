@@ -58,6 +58,12 @@ export const TABLES = {
   LINKPAY_LOGS: 'linkpay_logs',
   VENDOR_COSTS: 'vendor_costs',
   TOUR_LEADERS: 'tour_leaders',
+  // 會計系統
+  ACCOUNTING_SUBJECTS: 'accounting_subjects',
+  VOUCHERS: 'vouchers',
+  VOUCHER_ENTRIES: 'voucher_entries',
+  // Workspace 模組
+  WORKSPACE_MODULES: 'workspace_modules',
 } as const
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES]

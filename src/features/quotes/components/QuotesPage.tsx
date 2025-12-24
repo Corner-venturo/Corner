@@ -14,14 +14,15 @@ import { QuoteDialog } from './QuoteDialog'
 import { QuickQuoteDialog } from './QuickQuoteDialog'
 import { PrintableQuickQuote } from './PrintableQuickQuote'
 import { PrintableQuotation } from './PrintableQuotation'
+import type { Quote as AppQuoteType, QuickQuoteItem } from '@/types/quote.types'
+import type { Quote as DbQuoteType } from '@/types/models'
 import { useQuotesData } from '../hooks/useQuotesData'
 import { useQuotesFilters } from '../hooks/useQuotesFilters'
 import { useQuoteForm } from '../hooks/useQuoteForm'
 import { useQuickQuoteForm } from '../hooks/useQuickQuoteForm'
 import { useQuoteTourSync } from '../hooks/useQuoteTourSync'
 import { STATUS_FILTERS, TYPE_FILTERS } from '../constants'
-import { useRegionsStore } from '@/stores'
-import type { Tour } from '@/types'
+import type { Tour } from '@/types/tour.types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -42,7 +43,7 @@ export const QuotesPage: React.FC = () => {
   const [isQuickDialogOpen, setIsQuickDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [previewQuoteId, setPreviewQuoteId] = useState<string | null>(null)
-  const [previewQuoteItems, setPreviewQuoteItems] = useState<Array<{ id: string; quote_id: string; name: string; quantity: number; unit_price: number; total: number; created_at: string }>>([])
+  const [previewQuoteItems, setPreviewQuoteItems] = useState<QuickQuoteItem[]>([])
 
   // Data and actions
   const {
@@ -56,8 +57,8 @@ export const QuotesPage: React.FC = () => {
     handleRejectQuote,
   } = useQuotesData()
 
-  // 將 Supabase 類型轉換為 Tour 類型（一次性轉換避免重複斷言）
-  const tours: Tour[] = toursRaw as unknown as Tour[]
+  // 將 Store 類型轉換為 Tour 類型（使用 unknown 中轉比 any 更安全）
+  const tours = toursRaw as unknown as Tour[]
 
   // 打開類型選擇對話框
   const handleOpenTypeSelect = React.useCallback(async () => {
@@ -97,8 +98,9 @@ export const QuotesPage: React.FC = () => {
   const authors = React.useMemo(() => {
     const authorSet = new Set<string>()
     quotes.forEach(quote => {
-      const quoteWithCreator = quote as { created_by_name?: string; handler_name?: string }
-      const author = quoteWithCreator.created_by_name || quote.handler_name
+      // Quote 類型已包含 handler_name，created_by_name 為擴展欄位
+      const extendedQuote = quote as typeof quote & { created_by_name?: string }
+      const author = extendedQuote.created_by_name || quote.handler_name
       if (author) authorSet.add(author)
     })
     return Array.from(authorSet).sort()
@@ -114,10 +116,9 @@ export const QuotesPage: React.FC = () => {
   })
 
   // Tour sync - auto-open dialog when coming from tours page
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { clearTourParam } = useQuoteTourSync({
     quotes,
-    tours: tours as any,
+    tours,
     isAddDialogOpen,
     onOpenDialog: (tourId: string) => {
       const tour = tours.find(t => t.id === tourId)
@@ -170,7 +171,17 @@ export const QuotesPage: React.FC = () => {
         .order('created_at', { ascending: true })
 
       logger.log('📦 Quick quote items:', items, 'Error:', error)
-      setPreviewQuoteItems((items || []) as any)
+      // 轉換 quote_items 資料為 QuickQuoteItem 格式
+      setPreviewQuoteItems(
+        (items || []).map(item => ({
+          id: item.id,
+          description: item.description ?? '',
+          quantity: item.quantity ?? 0,
+          unit_price: item.unit_price ?? 0,
+          amount: item.total_price ?? 0,
+          notes: item.notes ?? '',
+        }))
+      )
     } else {
       setPreviewQuoteItems([])
     }
@@ -261,10 +272,9 @@ export const QuotesPage: React.FC = () => {
 
       <div className="flex-1 overflow-hidden">
         <div className="h-full">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <QuotesList
             quotes={filteredQuotes}
-            tours={tours as any}
+            tours={tours}
             searchTerm={searchTerm}
             onQuoteClick={handleQuoteClick}
             onPreview={handlePreview}
@@ -283,8 +293,8 @@ export const QuotesPage: React.FC = () => {
           setIsAddDialogOpen(open)
         }}
         formData={formData}
-        setFormField={setFormField as any}
-        tours={tours as any}
+        setFormField={(field, value) => setFormField(field as keyof typeof formData, value as typeof formData[keyof typeof formData])}
+        tours={tours}
         onSubmit={handleSubmit}
         onClose={handleDialogClose}
       />
@@ -296,35 +306,35 @@ export const QuotesPage: React.FC = () => {
           setIsQuickDialogOpen(open)
         }}
         formData={quickFormData}
-        setFormField={setQuickFormField as any}
+        setFormField={(field, value) => setQuickFormField(field as keyof typeof quickFormData, value as typeof quickFormData[keyof typeof quickFormData])}
         onSubmit={handleQuickSubmit}
         onClose={handleQuickDialogClose}
       />
 
       {/* 預覽對話框 */}
       {previewQuote && (() => {
-        const previewQuoteWithType = previewQuote as typeof previewQuote & { quote_type?: string }
-        const isQuickQuote = previewQuoteWithType.quote_type === 'quick'
+        const storeQuote = previewQuote as typeof previewQuote & { quote_type?: string }
+        const isQuickQuote = storeQuote.quote_type === 'quick'
 
         return (
           <>
-            {/* 快速報價單 */}
+            {/* 快速報價單 - PrintableQuickQuote expects @/types/quote.types.Quote */}
             {isQuickQuote && previewQuoteItems.length > 0 && (
               <PrintableQuickQuote
-                quote={previewQuoteWithType as any}
-                items={previewQuoteItems as any}
+                quote={storeQuote as unknown as AppQuoteType}
+                items={previewQuoteItems}
                 isOpen={!!previewQuoteId}
                 onClose={() => setPreviewQuoteId(null)}
                 onPrint={() => window.print()}
               />
             )}
 
-            {/* 團體報價單 */}
+            {/* 團體報價單 - PrintableQuotation expects @/types/models.Quote (Supabase type) */}
             {!isQuickQuote &&
               previewQuote.categories &&
               previewQuote.categories.length > 0 && (
                 <PrintableQuotation
-                  quote={previewQuoteWithType as any}
+                  quote={storeQuote as unknown as DbQuoteType}
                   quoteName={previewQuote.name || ''}
                   participantCounts={
                     previewQuote.participant_counts || {

@@ -18,7 +18,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
-import type { OrderMember } from '../../../order-member.types'
+import type { OrderMember } from '../../order-member.types'
 
 interface ImageEditorState {
   zoom: number
@@ -28,7 +28,7 @@ interface ImageEditorState {
   isSaving: boolean
   position: { x: number; y: number }
   cropRect: { x: number; y: number; width: number; height: number }
-  containerRef: React.RefObject<HTMLDivElement>
+  containerRef: React.RefObject<HTMLDivElement | null>
   zoomIn: () => void
   zoomOut: () => void
   reset: () => void

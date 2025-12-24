@@ -7,7 +7,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface CalendarSettings {
+export interface CalendarSettings {
   showPersonal: boolean
   showCompany: boolean
   showTours: boolean

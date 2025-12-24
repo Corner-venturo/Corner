@@ -11,7 +11,7 @@ import type { ProcessedFile } from './useMemberView'
 
 interface UsePassportUploadProps {
   order_id: string
-  workspace_id: string
+  workspace_id: string | null
   orderMembers: Member[]
   processedFiles: ProcessedFile[]
   setProcessedFiles: (files: ProcessedFile[]) => void

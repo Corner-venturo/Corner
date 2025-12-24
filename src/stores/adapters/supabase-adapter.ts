@@ -8,6 +8,7 @@ import type { TableName } from '@/lib/db/schemas'
 import type { RemoteAdapter } from '../core/types'
 import { logger } from '@/lib/utils/logger'
 import { getWorkspaceFilterForQuery } from '@/lib/workspace-filter'
+import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 
 export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
   constructor(
@@ -24,10 +25,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      let query = supabase
-        .from(this.tableName as any) // Table name is validated by TableName type
+      // 使用 dynamicFrom 處理動態表名
+      let query = dynamicFrom(this.tableName)
         .select('*')
         .order('created_at', { ascending: true })
 
@@ -46,7 +45,7 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
 
       if (error) throw error
 
-      const items = (data || []) as unknown as T[]
+      const items = castRows<T>(data)
       logger.log(`☁️ [${this.tableName}] Supabase fetchAll:`, items.length, '筆')
 
       return items
@@ -65,17 +64,15 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      const { data: insertedData, error } = await supabase
-        .from(this.tableName as any) // Table name is validated by TableName type
-        .insert(data)
+      // 使用 dynamicFrom 處理動態表名
+      const { data: insertedData, error } = await dynamicFrom(this.tableName)
+        .insert(data as Record<string, unknown>)
         .select()
         .single()
 
       if (error) throw error
 
-      const result = insertedData as unknown as T
+      const result = castRow<T>(insertedData) as T
       logger.log(`☁️ [${this.tableName}] Supabase insert:`, (result as { id: string }).id)
       return result
     } catch (error) {
@@ -93,13 +90,12 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      const { data, error } = await supabase.from(this.tableName as any).select('*').eq('id', id).single()
+      // 使用 dynamicFrom 處理動態表名
+      const { data, error } = await dynamicFrom(this.tableName).select('*').eq('id', id).single()
 
       if (error) throw error
 
-      return data as unknown as T
+      return castRow<T>(data)
     } catch (error) {
       logger.warn(`⚠️ [${this.tableName}] Supabase getById 失敗:`, error)
       throw error
@@ -144,13 +140,11 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client')
-
       // 清理資料，移除未知欄位
       const cleanedItem = this.cleanDataForTable(item as unknown as Record<string, unknown>)
 
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      const { error } = await supabase.from(this.tableName as any).upsert(cleanedItem)
+      // 使用 dynamicFrom 處理動態表名
+      const { error } = await dynamicFrom(this.tableName).upsert(cleanedItem as Record<string, unknown>)
 
       if (error) {
         logger.error(`❌ [${this.tableName}] Supabase upsert 錯誤詳情:`, {
@@ -188,9 +182,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
       // 清理資料，移除未知欄位
       const cleanedData = this.cleanDataForTable(data)
 
-      const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      const { error } = await supabase.from(this.tableName as any).update(cleanedData).eq('id', id)
+      // 使用 dynamicFrom 處理動態表名
+      const { error } = await dynamicFrom(this.tableName).update(cleanedData as Record<string, unknown>).eq('id', id)
 
       if (error) throw error
 
@@ -210,9 +203,8 @@ export class SupabaseAdapter<T extends BaseEntity> implements RemoteAdapter<T> {
     }
 
     try {
-      const { supabase } = await import('@/lib/supabase/client')
-      // Dynamic table name - TypeScript requires literal types, but we use runtime values
-      const { error } = await supabase.from(this.tableName as any).delete().eq('id', id)
+      // 使用 dynamicFrom 處理動態表名
+      const { error } = await dynamicFrom(this.tableName).delete().eq('id', id)
 
       if (error) throw error
 

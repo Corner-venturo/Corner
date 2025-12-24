@@ -68,7 +68,7 @@ export function useCoverInfo({ data, onChange }: UseCoverInfoProps) {
         label: template.name,
         description: template.description || '',
         color: getTemplateColor(template.id),
-        previewImage: template.preview_image_url,
+        previewImage: template.preview_image_url ?? undefined,
       }))
   }, [coverTemplates])
 

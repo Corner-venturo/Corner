@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { useOrderStore, useMemberStore, useCustomerStore, useEmployeeStore, useAuthStore } from '@/stores'
+import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useEmployeeStore, useAuthStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
 

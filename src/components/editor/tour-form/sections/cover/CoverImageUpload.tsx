@@ -5,7 +5,7 @@ import type { ImagePositionSettings } from '@/components/ui/image-position-edito
 
 interface CoverImageUploadProps {
   cityImages: Array<{ url: string; label: string }>
-  selectedImage: string
+  selectedImage?: string
   onImageSelect: (url: string) => void
   onImageUpload: (url: string) => void
   position?: ImagePositionSettings

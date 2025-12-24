@@ -11,7 +11,7 @@ import type { Visa } from '@/stores/types'
 export function useBatchOperations(
   visas: Visa[],
   selectedRows: string[],
-  updateVisa: (id: string, updates: Record<string, unknown>) => Promise<void>,
+  updateVisa: (id: string, updates: Record<string, unknown>) => Promise<void | Visa>,
   onComplete: () => void
 ) {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false)

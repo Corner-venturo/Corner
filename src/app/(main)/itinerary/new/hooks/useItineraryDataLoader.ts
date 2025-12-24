@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useTourStore, useRegionsStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import type { LocalTourData } from './useItineraryEditor'
-import type { DailyItinerary, HotelInfo } from '@/components/editor/tour-form/types'
+import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 
 interface UseItineraryDataLoaderProps {
   setTourData: (data: LocalTourData) => void

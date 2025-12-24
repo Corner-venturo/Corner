@@ -111,7 +111,7 @@ export function InvoiceDialog({
 
           <InvoicePreview
             totalAmount={totalAmount}
-            currentOrder={currentOrder}
+            currentOrder={currentOrder as Order | undefined}
           />
 
           {/* 按鈕 */}

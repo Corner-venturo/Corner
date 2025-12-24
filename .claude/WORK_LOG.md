@@ -73,6 +73,12 @@
 
 **詳細報告**: `.claude/PERFORMANCE_FIX_REPORT_2025-12-24.md`
 
+### [2025-12-24 12:00] EntryCardDialog 類型相容性修復
+- ✅ 新增 `GenericMember` 介面同時支援 snake_case 和 camelCase
+- ✅ 添加內部 `entryCardSettings` 狀態管理（不需外部傳入）
+- ✅ 成員映射自動處理兩種格式
+- **修改檔案**: `src/components/tours/components/EntryCardDialog.tsx`
+
 ---
 
 ## 如何繼續工作

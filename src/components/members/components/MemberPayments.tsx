@@ -10,7 +10,7 @@ interface MemberPaymentsProps {
   onOpenChange: (open: boolean) => void
   customers: Customer[]
   matchType: 'name' | 'id_number'
-  pendingMemberData: { name?: string; id_number?: string } | null
+  pendingMemberData: { name?: string | null; id_number?: string | null } | null
   onSelectCustomer: (customer: Customer) => void
   onCancel: () => void
 }

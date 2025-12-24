@@ -29,10 +29,10 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  typescript: {
-    // 暫時停用以讓建置通過，待修正所有型別問題後再啟用
-    ignoreBuildErrors: true,
-  },
+  // TypeScript 錯誤已全部修復，不再需要忽略
+  // typescript: {
+  //   ignoreBuildErrors: true,
+  // },
 
   experimental: {
     serverActions: {

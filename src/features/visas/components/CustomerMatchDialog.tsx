@@ -173,7 +173,7 @@ interface AddCustomerFormDialogProps {
     passport_image_url: string
   }
   isUploading: boolean
-  fileInputRef: React.RefObject<HTMLInputElement>
+  fileInputRef: React.RefObject<HTMLInputElement | null>
   onUpdateField: (field: string, value: string) => void
   onUploadImage: (file: File) => void
   onSave: () => void

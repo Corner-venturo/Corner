@@ -16,6 +16,7 @@ import { useTourChannelOperations, TourStoreActions } from './TourChannelOperati
 import { useTourActionButtons } from './TourActionButtons'
 import { useToursPage } from '../hooks/useToursPage'
 import { useToursDialogs } from '../hooks/useToursDialogs'
+import type { Tour } from '@/stores/types'
 import { useToursForm } from '../hooks/useToursForm'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
@@ -138,7 +139,7 @@ export const ToursPage: React.FC = () => {
     setSubmitting,
     setFormError,
     dialogType: dialog.type || 'create',
-    dialogData: dialog.data || null,
+    dialogData: (dialog.data && Object.keys(dialog.data).length > 0 ? dialog.data : null) as Tour | null,
   })
 
   const handleAddTour = useCallback(() => {
@@ -162,7 +163,7 @@ export const ToursPage: React.FC = () => {
     operations,
     openDialog: () => {},
     setSelectedTour,
-    setDeleteConfirm: openDeleteDialog,
+    setDeleteConfirm: (state) => state.tour && openDeleteDialog(state.tour),
     handleCreateChannel,
     handleUnlockTour,
     onOpenQuoteDialog: openQuoteDialog,

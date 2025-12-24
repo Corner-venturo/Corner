@@ -1,28 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Printer } from 'lucide-react'
 import { JapanEntryCardPrint } from '../JapanEntryCardPrint'
-import { OrderMember } from '../types'
+import type { EntryCardSettings } from '../hooks/useTourMemberEditor'
+
+// Generic member type that supports both OrderMember (snake_case) and EditingMember (camelCase)
+interface GenericMember {
+  id?: string
+  // snake_case (OrderMember)
+  passport_name?: string | null
+  birth_date?: string | null
+  passport_number?: string | null
+  // camelCase (EditingMember)
+  nameEn?: string
+  birthday?: string
+  passportNumber?: string
+}
 
 interface EntryCardDialogProps {
   open: boolean
+  members: GenericMember[]
+  settings?: EntryCardSettings
   onOpenChange: (open: boolean) => void
-  members: OrderMember[]
+  onSettingsChange?: (settings: EntryCardSettings) => void
 }
 
-export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialogProps) {
-  const [settings, setSettings] = useState({
-    flightNumber: '',
-    hotelName: '',
-    hotelAddress: '',
-    hotelPhone: '',
-    stayDays: 5,
-  })
+const defaultSettings: EntryCardSettings = {
+  flightNumber: '',
+  hotelName: '',
+  hotelAddress: '',
+  hotelPhone: '',
+  stayDays: 5,
+}
 
+export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
+  open,
+  members,
+  settings: externalSettings,
+  onOpenChange,
+  onSettingsChange: externalOnSettingsChange,
+}) => {
+  // Use internal state if no external settings provided
+  const [internalSettings, setInternalSettings] = useState<EntryCardSettings>(defaultSettings)
+  const settings = externalSettings ?? internalSettings
+  const onSettingsChange = externalOnSettingsChange ?? setInternalSettings
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
@@ -31,28 +56,22 @@ export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialog
             <DialogTitle>列印日本入境卡</DialogTitle>
           </DialogHeader>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               關閉
             </Button>
-            <Button
-              onClick={() => window.print()}
-            >
+            <Button onClick={() => window.print()}>
               <Printer size={16} className="mr-1" />
               列印
             </Button>
           </div>
         </div>
 
-        {/* Settings section */}
         <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
           <div>
             <label className="text-xs font-medium text-morandi-secondary mb-1 block">航班號碼</label>
             <Input
               value={settings.flightNumber}
-              onChange={e => setSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
+              onChange={e => onSettingsChange({ ...settings, flightNumber: e.target.value })}
               placeholder="例：BR-108"
               className="text-sm"
             />
@@ -61,7 +80,7 @@ export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialog
             <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店名稱</label>
             <Input
               value={settings.hotelName}
-              onChange={e => setSettings(prev => ({ ...prev, hotelName: e.target.value }))}
+              onChange={e => onSettingsChange({ ...settings, hotelName: e.target.value })}
               placeholder="例：東京灣希爾頓"
               className="text-sm"
             />
@@ -70,7 +89,7 @@ export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialog
             <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店地址</label>
             <Input
               value={settings.hotelAddress}
-              onChange={e => setSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
+              onChange={e => onSettingsChange({ ...settings, hotelAddress: e.target.value })}
               placeholder="例：東京都港區..."
               className="text-sm"
             />
@@ -79,7 +98,7 @@ export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialog
             <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店電話</label>
             <Input
               value={settings.hotelPhone}
-              onChange={e => setSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
+              onChange={e => onSettingsChange({ ...settings, hotelPhone: e.target.value })}
               placeholder="例：03-1234-5678"
               className="text-sm"
             />
@@ -91,15 +110,20 @@ export function EntryCardDialog({ open, onOpenChange, members }: EntryCardDialog
               min={1}
               max={90}
               value={settings.stayDays}
-              onChange={e => setSettings(prev => ({ ...prev, stayDays: parseInt(e.target.value) || 5 }))}
+              onChange={e => onSettingsChange({ ...settings, stayDays: parseInt(e.target.value) || 5 })}
               className="text-sm"
             />
           </div>
         </div>
 
-        {/* Preview section */}
         <JapanEntryCardPrint
-          members={members}
+          members={members.map(m => ({
+            id: m.id || '',
+            // Support both snake_case (OrderMember) and camelCase (EditingMember)
+            passport_name: m.nameEn || m.passport_name || '',
+            birth_date: m.birthday || m.birth_date || '',
+            passport_number: m.passportNumber || m.passport_number || '',
+          }))}
           flightNumber={settings.flightNumber || 'BR-XXX'}
           hotelName={settings.hotelName}
           hotelAddress={settings.hotelAddress}

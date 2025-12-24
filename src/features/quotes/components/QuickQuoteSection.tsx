@@ -43,7 +43,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
 
   // 計算金額
   const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
-  const totalCost = items.reduce((sum, item) => sum + ((item as any).cost || 0) * item.quantity, 0)
+  const totalCost = items.reduce((sum, item) => sum + (item.cost || 0) * item.quantity, 0)
   const totalProfit = totalAmount - totalCost
   const balanceAmount = totalAmount - customerInfo.received_amount
 
@@ -249,10 +249,10 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                           <Input
                             type="text"
                             inputMode="numeric"
-                            value={(item as any).cost || ''}
+                            value={item.cost || ''}
                             onChange={e => {
                               const val = e.target.value.trim()
-                              updateItem(item.id, 'cost' as any, val === '' ? 0 : Number(val) || 0)
+                              updateItem(item.id, 'cost', val === '' ? 0 : Number(val) || 0)
                             }}
                             className="h-7 text-sm text-right"
                           />
@@ -276,8 +276,8 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                       </td>
                       {!isReadOnly && (
                         <td className="px-2 py-1 text-right text-sm">
-                          <span className={((item.unit_price - ((item as any).cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
-                            {((item.unit_price - ((item as any).cost || 0)) * item.quantity).toLocaleString()}
+                          <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
+                            {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
                           </span>
                         </td>
                       )}

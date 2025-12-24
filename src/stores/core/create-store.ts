@@ -14,6 +14,7 @@ import { BaseEntity } from '@/types'
 import { TableName } from '@/lib/db/schemas'
 import { memoryCache } from '@/lib/cache/memory-cache'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -136,10 +137,8 @@ export function createStore<T extends BaseEntity>(
 
         set({ loading: true, error: null })
 
-        // 建立基礎查詢
-         
-        let query = (supabase as any)
-          .from(tableName)
+        // 建立基礎查詢（使用 dynamicFrom 處理動態表名）
+        let query = dynamicFrom(tableName)
           .select('*')
           .order('created_at', { ascending: false })
 
@@ -161,7 +160,7 @@ export function createStore<T extends BaseEntity>(
 
         if (error) throw error
 
-        const items = (data || []) as unknown as T[]
+        const items = castRows<T>(data)
         set({ items, loading: false })
         return items
       } catch (error) {
@@ -184,9 +183,7 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-         
-        const { data, error } = await supabase
-          .from(tableName as any)
+        const { data, error } = await dynamicFrom(tableName)
           .select('*')
           .eq('id', id)
           .single()
@@ -194,7 +191,7 @@ export function createStore<T extends BaseEntity>(
         if (error) throw error
 
         set({ loading: false })
-        return data as unknown as T
+        return castRow<T>(data)
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : '讀取失敗'
         set({ error: errorMessage, loading: false })
@@ -232,8 +229,7 @@ export function createStore<T extends BaseEntity>(
             const maxRetries = 5
             for (let attempt = 0; attempt < maxRetries; attempt++) {
               // 從資料庫查詢最大 code
-              const { data: maxCodeResults } = await supabase
-                .from(tableName as any)
+              const { data: maxCodeResults } = await dynamicFrom(tableName)
                 .select('code')
                 .like('code', `${codePrefix}%`)
                 .order('code', { ascending: false })
@@ -252,8 +248,7 @@ export function createStore<T extends BaseEntity>(
               const candidateCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
 
               // 檢查這個 code 是否已存在
-              const { data: existing } = await supabase
-                .from(tableName as any)
+              const { data: existing } = await dynamicFrom(tableName)
                 .select('id')
                 .eq('code', candidateCode)
                 .limit(1)
@@ -274,16 +269,14 @@ export function createStore<T extends BaseEntity>(
           ;(insertData as Record<string, unknown>).code = await generateUniqueCode()
         }
 
-         
-        const { data: newItem, error } = await supabase
-          .from(tableName as any)
-          .insert(insertData as any)
+        const { data: newItem, error } = await dynamicFrom(tableName)
+          .insert(insertData as Record<string, unknown>)
           .select()
           .single()
 
         if (error) throw error
 
-        const createdItem = newItem as unknown as T
+        const createdItem = castRow<T>(newItem) as T
         // 樂觀更新 UI
         set(state => ({
           items: [createdItem, ...state.items],
@@ -328,16 +321,15 @@ export function createStore<T extends BaseEntity>(
           updated_at: new Date().toISOString(),
         }
 
-        const { data: updatedItem, error } = await supabase
-          .from(tableName as any)
-          .update(updateData as any)
+        const { data: updatedItem, error } = await dynamicFrom(tableName)
+          .update(updateData as Record<string, unknown>)
           .eq('id', id)
           .select()
           .single()
 
         if (error) throw error
 
-        const result = updatedItem as unknown as T
+        const result = castRow<T>(updatedItem) as T
         // 樂觀更新 UI
         set(state => ({
           items: state.items.map(item => (item.id === id ? result : item)),
@@ -357,8 +349,7 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const { error } = await supabase
-          .from(tableName as any)
+        const { error } = await dynamicFrom(tableName)
           .delete()
           .eq('id', id)
 
@@ -390,8 +381,7 @@ export function createStore<T extends BaseEntity>(
 
     // 批次刪除
     deleteMany: async (ids: string[]) => {
-      const { error } = await supabase
-        .from(tableName as any)
+      const { error } = await dynamicFrom(tableName)
         .delete()
         .in('id', ids)
 

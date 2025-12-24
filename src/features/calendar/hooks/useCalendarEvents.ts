@@ -1,11 +1,45 @@
 'use client'
 
-import { useMemo, useEffect, useRef } from 'react'
-import { useCalendarStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
+import {
+  useCalendarStore,
+  useCalendarEventStore,
+  useEmployeeStore,
+  useTourStore,
+  useOrderStore,
+  useMemberStore,
+  useCustomerStore,
+  useAuthStore,
+  useWorkspaceStore,
+} from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { useCalendarFilters } from './useCalendarFilters'
 import { useCalendarTransform } from './useCalendarTransform'
+import { FullCalendarEvent } from '../types'
+
+// 從 ISO 時間字串取得顯示用的時間（HH:MM）
+const getDisplayTime = (isoString: string, allDay?: boolean): string => {
+  if (allDay) return ''
+  if (!isoString) return ''
+
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return ''
+
+    const timeStr = date.toLocaleTimeString('zh-TW', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Taipei',
+    })
+
+    if (timeStr === '00:00') return ''
+    return timeStr
+  } catch {
+    return ''
+  }
+}
 
 // 定義 CalendarEvent 類型（從 store 推斷）
 interface CalendarEvent {

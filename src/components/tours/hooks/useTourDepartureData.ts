@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 import { toast } from 'sonner'
 import type {
   TourDepartureData,
@@ -11,8 +11,6 @@ import type {
   TourDepartureActivity,
   TourDepartureOther,
 } from '@/types/tour-departure.types'
-
-const supabase = supabaseClient
 
 export function useTourDepartureData(tourId: string, open: boolean) {
   const [loading, setLoading] = useState(false)
@@ -28,8 +26,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
       setLoading(true)
 
       // 載入主表資料
-      const { data: mainData, error: mainError } = await (supabase as any)
-        .from('tour_departure_data')
+      const { data: mainData, error: mainError } = await dynamicFrom('tour_departure_data')
         .select('*')
         .eq('tour_id', tourId)
         .single()
@@ -39,50 +36,46 @@ export function useTourDepartureData(tourId: string, open: boolean) {
       }
 
       if (mainData) {
-        setData(mainData as unknown as TourDepartureData)
+        setData(castRow<TourDepartureData>(mainData) as TourDepartureData)
 
         // 載入餐食
-        const { data: mealsData } = await (supabase as any)
-          .from('tour_departure_meals')
+        const { data: mealsData } = await dynamicFrom('tour_departure_meals')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setMeals((mealsData || []) as TourDepartureMeal[])
+        setMeals(castRows<TourDepartureMeal>(mealsData))
 
         // 載入住宿
-        const { data: accomData } = await (supabase as any)
-          .from('tour_departure_accommodations')
+        const { data: accomData } = await dynamicFrom('tour_departure_accommodations')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setAccommodations((accomData || []) as TourDepartureAccommodation[])
+        setAccommodations(castRows<TourDepartureAccommodation>(accomData))
 
         // 載入活動
-        const { data: activData } = await (supabase as any)
-          .from('tour_departure_activities')
+        const { data: activData } = await dynamicFrom('tour_departure_activities')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setActivities((activData || []) as TourDepartureActivity[])
+        setActivities(castRows<TourDepartureActivity>(activData))
 
         // 載入其他
-        const { data: othersData } = await (supabase as any)
-          .from('tour_departure_others')
+        const { data: othersData } = await dynamicFrom('tour_departure_others')
           .select('*')
           .eq('departure_data_id', mainData.id)
           .order('date', { ascending: true })
           .order('display_order', { ascending: true })
-        setOthers((othersData || []) as TourDepartureOther[])
+        setOthers(castRows<TourDepartureOther>(othersData))
       } else {
         setData({
           id: '',
           tour_id: tourId,
           service_fee_per_person: 1500,
           petty_cash: 0,
-        } as unknown as TourDepartureData)
+        } as TourDepartureData)
       }
     } catch (error) {
       logger.error('載入出團資料失敗:', error)
@@ -101,8 +94,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
 
       if (!departureDataId) {
         // 新增
-        const { data: newData, error } = await (supabase as any)
-          .from('tour_departure_data')
+        const { data: newData, error } = await dynamicFrom('tour_departure_data')
           .insert({
             ...data,
             tour_id: tourId,
@@ -115,8 +107,7 @@ export function useTourDepartureData(tourId: string, open: boolean) {
         setData(prev => ({ ...prev!, id: departureDataId }))
       } else {
         // 更新
-        const { error } = await (supabase as any)
-          .from('tour_departure_data')
+        const { error } = await dynamicFrom('tour_departure_data')
           .update(data)
           .eq('id', departureDataId)
 
