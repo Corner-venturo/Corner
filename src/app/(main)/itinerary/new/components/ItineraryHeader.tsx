@@ -2,6 +2,8 @@
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { PublishButton } from '@/components/editor/PublishButton'
+import { Button } from '@/components/ui/button'
+import { BookOpen } from 'lucide-react'
 import type { LocalTourData } from '../hooks/useItineraryEditor'
 import type { ItineraryVersionRecord } from '@/stores/types'
 
@@ -12,6 +14,7 @@ interface ItineraryHeaderProps {
   onVersionChange: (index: number, versionData?: ItineraryVersionRecord) => void
   onVersionRecordsChange: (versionRecords: ItineraryVersionRecord[]) => void
   onBack: () => void
+  onPrintA5?: () => void
 }
 
 export function ItineraryHeader({
@@ -21,6 +24,7 @@ export function ItineraryHeader({
   onVersionChange,
   onVersionRecordsChange,
   onBack,
+  onPrintA5,
 }: ItineraryHeaderProps) {
   return (
     <ResponsiveHeader
@@ -34,6 +38,17 @@ export function ItineraryHeader({
       onBack={onBack}
       actions={
         <div className="flex items-center gap-3">
+          {itineraryId && onPrintA5 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onPrintA5}
+              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
+            >
+              <BookOpen size={16} className="mr-1" />
+              A5 手冊
+            </Button>
+          )}
           <PublishButton
             data={{ ...tourData, id: itineraryId || undefined, version_records: tourData.version_records }}
             currentVersionIndex={currentVersionIndex}

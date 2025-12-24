@@ -14,6 +14,7 @@ import { ItineraryHeader } from './components/ItineraryHeader'
 import { ItineraryEditor } from './components/ItineraryEditor'
 import { ItineraryPreview } from './components/ItineraryPreview'
 import { useItineraries } from '@/hooks/cloud-hooks'
+import { A5HandbookDialog } from '@/features/itinerary/components/A5HandbookDialog'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { useSearchParams } from 'next/navigation'
 
@@ -38,6 +39,12 @@ function NewItineraryPageContent() {
   } = useItineraryEditor()
 
   const { items: itineraries } = useItineraries()
+
+  // A5 手冊 Dialog 狀態
+  const [showA5Dialog, setShowA5Dialog] = useState(false)
+
+  // 取得目前編輯中的行程資料
+  const currentItinerary = itineraries.find((i) => i.id === currentItineraryId) || null
 
   // 載入資料
   useItineraryDataLoader({
@@ -237,6 +244,7 @@ function NewItineraryPageContent() {
           setTourData((prev) => ({ ...prev, version_records: versionRecords }))
         }}
         onBack={() => router.push('/itinerary')}
+        onPrintA5={() => setShowA5Dialog(true)}
       />
 
       {currentItineraryId && (
@@ -258,6 +266,13 @@ function NewItineraryPageContent() {
           <ItineraryPreview tourData={tourData} />
         </div>
       </div>
+
+      {/* A5 手冊預覽 Dialog */}
+      <A5HandbookDialog
+        open={showA5Dialog}
+        onOpenChange={setShowA5Dialog}
+        itinerary={currentItinerary}
+      />
     </div>
   )
 }

@@ -1,0 +1,405 @@
+/* A5 Handbook Print Styles */
+/* A5 尺寸: 148mm × 210mm */
+
+/* 列印設定 */
+@media print {
+  @page {
+    size: A5 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* 手冊容器 */
+.handbook {
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  font-size: 10pt;
+  line-height: 1.5;
+  color: #333;
+  background: #fff;
+}
+
+/* 每一頁 */
+.page {
+  width: 148mm;
+  min-height: 210mm;
+  padding: 12mm;
+  box-sizing: border-box;
+  page-break-after: always;
+  position: relative;
+  background: #fff;
+}
+
+@media screen {
+  .page {
+    border: 1px solid #ddd;
+    margin: 10mm auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+}
+
+/* ===== 封面頁 ===== */
+.coverPage {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
+}
+
+.coverBackground {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-color: #2C5F4D;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(44, 95, 77, 0.85) 0%, rgba(30, 60, 50, 0.9) 100%);
+}
+
+.coverContent {
+  position: relative;
+  z-index: 1;
+  padding: 20mm 15mm;
+}
+
+.tagline {
+  font-size: 9pt;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8mm;
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 22pt;
+  font-weight: 700;
+  margin: 0 0 5mm 0;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: 11pt;
+  margin: 0 0 10mm 0;
+  opacity: 0.9;
+}
+
+.tourInfo {
+  display: flex;
+  gap: 10mm;
+  justify-content: center;
+  margin-bottom: 8mm;
+}
+
+.tourCode {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 10pt;
+  background: rgba(255,255,255,0.2);
+  padding: 2mm 4mm;
+  border-radius: 2mm;
+}
+
+.departureDate {
+  font-size: 10pt;
+  background: rgba(255,255,255,0.2);
+  padding: 2mm 4mm;
+  border-radius: 2mm;
+}
+
+.duration {
+  font-size: 14pt;
+  font-weight: 600;
+  margin-top: 5mm;
+}
+
+.coverFooter {
+  position: absolute;
+  bottom: 15mm;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 9pt;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* ===== 航班資訊頁 ===== */
+.flightPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.pageTitle {
+  font-size: 14pt;
+  font-weight: 700;
+  margin: 0 0 8mm 0;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid #2C5F4D;
+  color: #2C5F4D;
+}
+
+.flightCards {
+  display: flex;
+  flex-direction: column;
+  gap: 5mm;
+  margin-bottom: 8mm;
+}
+
+.flightCard {
+  border: 1px solid #ddd;
+  border-radius: 2mm;
+  overflow: hidden;
+}
+
+.flightHeader {
+  background: #2C5F4D;
+  color: #fff;
+  padding: 2mm 4mm;
+  font-weight: 600;
+  font-size: 10pt;
+}
+
+.flightBody {
+  padding: 4mm;
+}
+
+.flightRoute {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5mm;
+  font-size: 14pt;
+  font-weight: 700;
+  margin-bottom: 3mm;
+}
+
+.airport {
+  color: #2C5F4D;
+}
+
+.flightArrow {
+  font-size: 12pt;
+  color: #999;
+}
+
+.flightDetails {
+  font-size: 9pt;
+  color: #666;
+}
+
+.flightDetails p {
+  margin: 1mm 0;
+}
+
+.contactInfo {
+  margin-top: auto;
+  padding: 4mm;
+  background: #f5f5f5;
+  border-radius: 2mm;
+}
+
+.contactInfo h3 {
+  font-size: 10pt;
+  margin: 0 0 2mm 0;
+  color: #2C5F4D;
+}
+
+.contactInfo p {
+  margin: 1mm 0;
+  font-size: 9pt;
+}
+
+/* ===== 每日行程頁 ===== */
+.dayPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  margin-bottom: 5mm;
+  padding-bottom: 3mm;
+  border-bottom: 1px solid #eee;
+}
+
+.dayBadge {
+  background: #2C5F4D;
+  color: #fff;
+  padding: 2mm 4mm;
+  border-radius: 2mm;
+  font-weight: 700;
+  font-size: 10pt;
+  white-space: nowrap;
+}
+
+.dayTitle {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 0;
+  color: #333;
+}
+
+.dayContent {
+  flex: 1;
+}
+
+/* 活動項目 */
+.activities {
+  margin-bottom: 5mm;
+}
+
+.activityItem {
+  display: flex;
+  gap: 3mm;
+  margin-bottom: 3mm;
+  padding-left: 2mm;
+  border-left: 2px solid #2C5F4D;
+}
+
+.activityTime {
+  font-size: 8pt;
+  color: #2C5F4D;
+  font-weight: 600;
+  min-width: 12mm;
+}
+
+.activityContent {
+  font-size: 9pt;
+}
+
+.activityContent strong {
+  display: block;
+  margin-bottom: 1mm;
+}
+
+.activityContent p {
+  margin: 0;
+  color: #666;
+  font-size: 8pt;
+}
+
+/* 餐食 */
+.meals {
+  display: flex;
+  gap: 4mm;
+  margin-bottom: 4mm;
+  padding: 3mm;
+  background: #fafafa;
+  border-radius: 2mm;
+}
+
+.mealItem {
+  flex: 1;
+  text-align: center;
+}
+
+.mealLabel {
+  display: block;
+  font-size: 8pt;
+  color: #999;
+  margin-bottom: 1mm;
+}
+
+.mealValue {
+  font-size: 8pt;
+  color: #333;
+}
+
+/* 住宿 */
+.accommodation {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  padding: 3mm;
+  background: #e8f4f0;
+  border-radius: 2mm;
+  font-size: 9pt;
+}
+
+.accommodationLabel {
+  font-weight: 600;
+  color: #2C5F4D;
+}
+
+.accommodationValue {
+  color: #333;
+}
+
+/* 頁腳 */
+.pageFooter {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7pt;
+  color: #999;
+  margin-top: auto;
+  padding-top: 3mm;
+  border-top: 1px solid #eee;
+}
+
+/* ===== 備註頁 ===== */
+.notesPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.notesContent {
+  flex: 1;
+}
+
+.noteSection {
+  margin-bottom: 5mm;
+}
+
+.noteSection h3 {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #2C5F4D;
+  margin: 0 0 2mm 0;
+}
+
+.noteSection ul {
+  margin: 0;
+  padding-left: 5mm;
+  font-size: 9pt;
+}
+
+.noteSection li {
+  margin-bottom: 1mm;
+}
+
+.companyInfo {
+  margin-top: auto;
+  text-align: center;
+  padding: 4mm;
+  background: #2C5F4D;
+  color: #fff;
+  border-radius: 2mm;
+}
+
+.companyInfo p {
+  margin: 1mm 0;
+  font-size: 9pt;
+}
+
+/* ===== 螢幕預覽時的額外樣式 ===== */
+@media screen {
+  .handbook {
+    max-width: 160mm;
+    margin: 0 auto;
+    padding: 20px 0;
+    background: #f0f0f0;
+  }
+}
