@@ -16,54 +16,62 @@ interface A5HandbookDialogProps {
 export function A5HandbookDialog({ open, onOpenChange, itinerary }: A5HandbookDialogProps) {
   const printRef = useRef<HTMLDivElement>(null)
 
+  // 安全取得字串值
+  const safeString = (value: unknown): string => {
+    if (value === null || value === undefined) return ''
+    if (typeof value === 'string') return value
+    if (typeof value === 'number') return String(value)
+    return ''
+  }
+
   // 轉換行程表資料為 A5 手冊格式
   const handbookData = useMemo(() => {
     if (!itinerary) return null
 
     return {
-      title: itinerary.title || '行程表',
-      subtitle: itinerary.subtitle || '',
-      tagline: itinerary.tagline || 'Corner Travel',
-      coverImage: itinerary.cover_image || '',
-      tourCode: itinerary.tour_code || '',
-      departureDate: itinerary.departure_date || '',
+      title: safeString(itinerary.title) || '行程表',
+      subtitle: safeString(itinerary.subtitle),
+      tagline: safeString(itinerary.tagline) || 'Corner Travel',
+      coverImage: safeString(itinerary.cover_image),
+      tourCode: safeString(itinerary.tour_code),
+      departureDate: safeString(itinerary.departure_date),
       outboundFlight: itinerary.outbound_flight ? {
-        airline: itinerary.outbound_flight.airline || '',
-        flightNumber: itinerary.outbound_flight.flightNumber || '',
-        departureAirport: itinerary.outbound_flight.departureAirport || 'TPE',
-        departureTime: itinerary.outbound_flight.departureTime || '',
-        arrivalAirport: itinerary.outbound_flight.arrivalAirport || '',
-        arrivalTime: itinerary.outbound_flight.arrivalTime || '',
-        departureDate: itinerary.outbound_flight.departureDate || '',
+        airline: safeString(itinerary.outbound_flight.airline),
+        flightNumber: safeString(itinerary.outbound_flight.flightNumber),
+        departureAirport: safeString(itinerary.outbound_flight.departureAirport) || 'TPE',
+        departureTime: safeString(itinerary.outbound_flight.departureTime),
+        arrivalAirport: safeString(itinerary.outbound_flight.arrivalAirport),
+        arrivalTime: safeString(itinerary.outbound_flight.arrivalTime),
+        departureDate: safeString(itinerary.outbound_flight.departureDate),
       } : undefined,
       returnFlight: itinerary.return_flight ? {
-        airline: itinerary.return_flight.airline || '',
-        flightNumber: itinerary.return_flight.flightNumber || '',
-        departureAirport: itinerary.return_flight.departureAirport || '',
-        departureTime: itinerary.return_flight.departureTime || '',
-        arrivalAirport: itinerary.return_flight.arrivalAirport || 'TPE',
-        arrivalTime: itinerary.return_flight.arrivalTime || '',
-        departureDate: itinerary.return_flight.departureDate || '',
+        airline: safeString(itinerary.return_flight.airline),
+        flightNumber: safeString(itinerary.return_flight.flightNumber),
+        departureAirport: safeString(itinerary.return_flight.departureAirport),
+        departureTime: safeString(itinerary.return_flight.departureTime),
+        arrivalAirport: safeString(itinerary.return_flight.arrivalAirport) || 'TPE',
+        arrivalTime: safeString(itinerary.return_flight.arrivalTime),
+        departureDate: safeString(itinerary.return_flight.departureDate),
       } : undefined,
       dailyItinerary: (itinerary.daily_itinerary || []).map((day, index) => ({
         day: index + 1,
-        title: day.title || `第 ${index + 1} 天`,
-        activities: day.activities?.map(act => ({
-          time: act.icon || '', // 使用 icon 作為時間/標識
-          title: act.title || '',
-          description: act.description || '',
-        })) || [],
+        title: safeString(day.title) || `第 ${index + 1} 天`,
+        activities: Array.isArray(day.activities) ? day.activities.map(act => ({
+          time: safeString(act?.icon), // 使用 icon 作為時間/標識
+          title: safeString(act?.title),
+          description: safeString(act?.description),
+        })) : [],
         meals: {
-          breakfast: day.meals?.breakfast || '',
-          lunch: day.meals?.lunch || '',
-          dinner: day.meals?.dinner || '',
+          breakfast: safeString(day.meals?.breakfast),
+          lunch: safeString(day.meals?.lunch),
+          dinner: safeString(day.meals?.dinner),
         },
-        accommodation: day.accommodation || '',
+        accommodation: safeString(day.accommodation),
       })),
       companyName: 'Corner Travel',
       companyPhone: '',
-      leaderName: itinerary.leader?.name || '',
-      leaderPhone: itinerary.leader?.domesticPhone || '',
+      leaderName: safeString(itinerary.leader?.name),
+      leaderPhone: safeString(itinerary.leader?.domesticPhone),
     }
   }, [itinerary])
 
