@@ -19,7 +19,7 @@ export function MoreEventsDialog({
 }: MoreEventsDialogProps) {
   return (
     <Dialog open={dialog.open} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg [&>button:last-child]:hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
