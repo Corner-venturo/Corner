@@ -205,7 +205,7 @@ export function LinkDocumentsToTourDialog({
 
       if (newItinerary?.id) {
         onClose()
-        router.push(`/itinerary/new?id=${newItinerary.id}`)
+        router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
       }
     } catch (error) {
       logger.error('建立行程表失敗:', error)
@@ -231,7 +231,7 @@ export function LinkDocumentsToTourDialog({
 
         if (newItinerary?.id) {
           onClose()
-          router.push(`/itinerary/new?id=${newItinerary.id}`)
+          router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
         }
       } else {
         // 連結現有行程表 → 不跳轉，只更新列表
@@ -266,7 +266,7 @@ export function LinkDocumentsToTourDialog({
 
   const handleViewItinerary = (itinerary: Itinerary) => {
     onClose()
-    router.push(`/itinerary/new?id=${itinerary.id}`)
+    router.push(`/itinerary/new?itinerary_id=${itinerary.id}`)
   }
 
   // ========== 報價單相關 ==========

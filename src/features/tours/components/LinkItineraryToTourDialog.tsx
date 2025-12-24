@@ -60,48 +60,45 @@ export function LinkItineraryToTourDialog({
     try {
       setIsCreating(true)
 
-      // 從旅遊團帶入航班資訊
-      const tourWithFlight = tour as typeof tour & {
-        outbound_flight?: { text?: string } | null
-        return_flight?: { text?: string } | null
-      }
-
       const newItinerary = await create({
         title: tour.name,
         tour_id: tour.id,
         tour_code: tour.code,
         status: 'draft',
         departure_date: tour.departure_date || '',
-        city: tour.location || '',
+        city: '', // 城市欄位已移除
         daily_itinerary: [],
-        tagline: '',
+        tagline: 'Corner Travel 2025',
         subtitle: '',
         description: '',
         cover_image: '',
-        country: '',
+        country: tour.country_id || '',
         features: [],
         focus_cards: [],
-        outbound_flight: tourWithFlight.outbound_flight?.text ? {
-          airline: '',
-          flightNumber: tourWithFlight.outbound_flight.text,
-          departureAirport: '',
-          departureTime: '',
-          arrivalAirport: '',
-          arrivalTime: '',
+        // 從旅遊團帶入完整航班資訊
+        outbound_flight: tour.outbound_flight ? {
+          airline: tour.outbound_flight.airline || '',
+          flightNumber: tour.outbound_flight.flightNumber || '',
+          departureAirport: tour.outbound_flight.departureAirport || 'TPE',
+          departureTime: tour.outbound_flight.departureTime || '',
+          arrivalAirport: tour.outbound_flight.arrivalAirport || '',
+          arrivalTime: tour.outbound_flight.arrivalTime || '',
+          departureDate: tour.outbound_flight.departureDate || '',
         } : undefined,
-        return_flight: tourWithFlight.return_flight?.text ? {
-          airline: '',
-          flightNumber: tourWithFlight.return_flight.text,
-          departureAirport: '',
-          departureTime: '',
-          arrivalAirport: '',
-          arrivalTime: '',
+        return_flight: tour.return_flight ? {
+          airline: tour.return_flight.airline || '',
+          flightNumber: tour.return_flight.flightNumber || '',
+          departureAirport: tour.return_flight.departureAirport || '',
+          departureTime: tour.return_flight.departureTime || '',
+          arrivalAirport: tour.return_flight.arrivalAirport || 'TPE',
+          arrivalTime: tour.return_flight.arrivalTime || '',
+          departureDate: tour.return_flight.departureDate || '',
         } : undefined,
       } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
 
       if (newItinerary?.id) {
         onClose()
-        router.push(`/itinerary/new?id=${newItinerary.id}`)
+        router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
       }
     } catch (error) {
       logger.error('建立行程表失敗:', error)
@@ -113,7 +110,7 @@ export function LinkItineraryToTourDialog({
   // 查看已連結的行程表
   const handleViewItinerary = (itinerary: Itinerary) => {
     onClose()
-    router.push(`/itinerary/new?id=${itinerary.id}`)
+    router.push(`/itinerary/new?itinerary_id=${itinerary.id}`)
   }
 
   return (

@@ -839,49 +839,23 @@ export default function ItineraryPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>國家</Label>
-                    <Select
-                      value={formState.newItineraryCountry}
-                      onValueChange={(value) => {
-                        formState.setNewItineraryCountry(value)
-                        formState.setNewItineraryCity('')
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="選擇國家" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries.map(country => (
-                          <SelectItem key={country.id} value={country.id}>
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>城市</Label>
-                    <Select
-                      value={formState.newItineraryCity}
-                      onValueChange={formState.setNewItineraryCity}
-                      disabled={!formState.newItineraryCountry}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="選擇城市" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities
-                          .filter(city => city.country_id === formState.newItineraryCountry)
-                          .map(city => (
-                            <SelectItem key={city.id} value={city.id}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label>國家</Label>
+                  <Select
+                    value={formState.newItineraryCountry}
+                    onValueChange={formState.setNewItineraryCountry}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="選擇國家" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map(country => (
+                        <SelectItem key={country.id} value={country.id}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

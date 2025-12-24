@@ -185,7 +185,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
         tour_code: newItineraryTourCode.trim() || '',
         cover_image: '',
         country: newItineraryCountry,
-        city: newItineraryCity,
+        city: '', // 城市欄位已移除，不再從表單取值
         status: '提案' as const,
         outbound_flight: newItineraryOutboundFlight ? {
           airline: newItineraryOutboundFlight.airline,
