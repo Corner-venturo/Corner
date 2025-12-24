@@ -4,6 +4,13 @@ import { User } from './types'
 import { generateToken, type AuthPayload } from '@/lib/auth'
 import { logger } from '@/lib/utils/logger'
 import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
+import type { Database } from '@/lib/supabase/types'
+
+/**
+ * Supabase Employee Row 類型
+ * 直接從 Database 類型推斷，確保與資料庫結構一致
+ */
+type EmployeeRow = Database['public']['Tables']['employees']['Row']
 
 /**
  * 根據員工的角色，合併角色預設權限和資料庫中的額外權限

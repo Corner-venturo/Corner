@@ -7,6 +7,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Tour } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 型別定義
@@ -65,7 +66,7 @@ export async function getPaginatedTours({
   const { data, count, error } = await query
 
   if (error) {
-    console.error('Error fetching tours:', error)
+    logger.error('Error fetching tours:', error)
     return { tours: [], count: 0 }
   }
 
@@ -88,7 +89,7 @@ export async function getTourById(id: string): Promise<Tour | null> {
     .single()
 
   if (error) {
-    console.error('Error fetching tour:', error)
+    logger.error('Error fetching tour:', error)
     return null
   }
 
@@ -109,7 +110,7 @@ export async function getActiveToursForSelect(limit = 100): Promise<Tour[]> {
     .limit(limit)
 
   if (error) {
-    console.error('Error fetching active tours:', error)
+    logger.error('Error fetching active tours:', error)
     return []
   }
 

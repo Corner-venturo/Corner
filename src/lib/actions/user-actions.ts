@@ -1,6 +1,7 @@
 'use server'
 
 import { getServerAuth, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
+import { logger } from '@/lib/utils/logger'
 
 interface WorkspaceMember {
   id: string
@@ -46,7 +47,7 @@ export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
     .neq('id', user.id) // Exclude the current user
 
   if (queryError) {
-    console.error('Error fetching workspace members:', queryError)
+    logger.error('Error fetching workspace members:', queryError)
     throw new Error('Could not fetch workspace members.')
   }
 

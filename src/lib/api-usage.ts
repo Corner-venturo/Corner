@@ -1,4 +1,5 @@
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * API 用量追蹤工具
@@ -70,7 +71,7 @@ export async function checkApiUsage(
       warning,
     }
   } catch (error) {
-    console.error(`檢查 ${apiName} API 使用量失敗:`, error)
+    logger.error(`檢查 ${apiName} API 使用量失敗:`, error)
     // 發生錯誤時仍允許使用（避免因為 DB 問題影響正常功能）
     return {
       canUse: true,
@@ -118,15 +119,15 @@ export async function updateApiUsage(
       )
 
     if (error) {
-      console.error(`更新 ${apiName} 使用量失敗:`, error)
+      logger.error(`更新 ${apiName} 使用量失敗:`, error)
       return { success: false, newCount: 0 }
     }
 
     const monthlyLimit = API_LIMITS[apiName]
-    console.log(`📊 ${apiName} 使用量更新: ${newCount}/${monthlyLimit}`)
+    logger.log(`📊 ${apiName} 使用量更新: ${newCount}/${monthlyLimit}`)
     return { success: true, newCount }
   } catch (error) {
-    console.error(`更新 ${apiName} 使用量失敗:`, error)
+    logger.error(`更新 ${apiName} 使用量失敗:`, error)
     return { success: false, newCount: 0 }
   }
 }

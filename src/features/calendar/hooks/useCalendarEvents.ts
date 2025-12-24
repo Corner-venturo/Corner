@@ -1,19 +1,11 @@
-import { useMemo, useCallback, useEffect, useRef, useState } from 'react'
-import {
-  useTourStore,
-  useOrderStore,
-  useMemberStore,
-  useCustomerStore,
-  useCalendarStore,
-  useCalendarEventStore,
-  useAuthStore,
-  useEmployeeStore,
-  useWorkspaceStore,
-} from '@/stores'
-import { Tour } from '@/stores/types'
-import { FullCalendarEvent } from '../types'
+'use client'
+
+import { useMemo, useEffect, useRef } from 'react'
+import { useCalendarStore, useCalendarEventStore, useEmployeeStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+import { useCalendarFilters } from './useCalendarFilters'
+import { useCalendarTransform } from './useCalendarTransform'
 
 // 定義 CalendarEvent 類型（從 store 推斷）
 interface CalendarEvent {
@@ -26,34 +18,6 @@ interface CalendarEvent {
   description?: string
   created_by?: string
   workspace_id?: string
-}
-
-// 從 ISO 時間字串取得顯示用的時間（HH:MM）
-// 正確轉換成台灣時區顯示
-const getDisplayTime = (isoString: string, allDay?: boolean): string => {
-  if (allDay) return ''
-  if (!isoString) return ''
-
-  try {
-    // 使用 Date 物件正確解析 ISO 時間並轉換成台灣時區
-    const date = new Date(isoString)
-    if (isNaN(date.getTime())) return ''
-
-    // 使用 toLocaleTimeString 取得台灣時區的時間
-    const timeStr = date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Taipei',
-    })
-
-    // 如果是 00:00 就不顯示（可能是全天事件）
-    if (timeStr === '00:00') return ''
-
-    return timeStr
-  } catch {
-    return ''
-  }
 }
 
 export function useCalendarEvents() {

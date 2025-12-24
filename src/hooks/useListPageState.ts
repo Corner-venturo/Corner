@@ -1,5 +1,14 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useDataFiltering } from './useDataFiltering'
+import { useListFilters, type FilterConfig } from './useListFilters'
+import { useListPagination, type PaginationConfig } from './useListPagination'
+
+/**
+ * 排序配置選項
+ */
+export interface SortConfig {
+  defaultSortBy?: string
+  defaultSortOrder?: 'asc' | 'desc'
+}
 
 /**
  * useListPageState 配置選項
@@ -9,23 +18,13 @@ export interface UseListPageStateOptions<T> {
   data: T[]
 
   // 過濾配置
-  filterConfig?: {
-    statusField?: keyof T
-    searchFields?: (keyof T)[]
-    defaultStatus?: string
-  }
+  filterConfig?: FilterConfig<T>
 
   // 排序配置
-  sortConfig?: {
-    defaultSortBy?: string
-    defaultSortOrder?: 'asc' | 'desc'
-  }
+  sortConfig?: SortConfig
 
   // 分頁配置
-  paginationConfig?: {
-    pageSize?: number
-    enabled?: boolean
-  }
+  paginationConfig?: PaginationConfig
 
   // 展開配置
   expandable?: boolean
@@ -115,23 +114,17 @@ export function useListPageState<T extends Record<string, any>>(
 ): UseListPageStateReturn<T> {
   const { data, filterConfig, sortConfig, paginationConfig, expandable = false } = options
 
-  // ========== 狀態管理 ==========
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState(filterConfig?.defaultStatus || 'all')
-  const [currentPage, setCurrentPage] = useState(1)
+  // ========== 排序狀態 ==========
   const [sortBy, setSortBy] = useState(sortConfig?.defaultSortBy || 'created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(sortConfig?.defaultSortOrder || 'desc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
-  // ========== 過濾數據 ==========
-  const filteredData = useDataFiltering(data, statusFilter, searchQuery, {
-    statusField: filterConfig?.statusField,
-    searchFields: filterConfig?.searchFields,
-  })
+  // ========== 過濾邏輯（使用 useListFilters）==========
+  const filters = useListFilters(data, filterConfig)
 
   // ========== 排序數據 ==========
   const sortedData = useMemo(() => {
-    return [...filteredData].sort((a, b) => {
+    return [...filters.filteredData].sort((a, b) => {
       const aVal = a[sortBy]
       const bVal = b[sortBy]
 
@@ -162,16 +155,10 @@ export function useListPageState<T extends Record<string, any>>(
       if (aVal > bVal) return 1 * order
       return 0
     })
-  }, [filteredData, sortBy, sortOrder])
+  }, [filters.filteredData, sortBy, sortOrder])
 
-  // ========== 分頁數據 ==========
-  const pageSize = paginationConfig?.pageSize || 20
-  const paginatedData = useMemo(() => {
-    if (!paginationConfig?.enabled) return sortedData
-
-    const start = (currentPage - 1) * pageSize
-    return sortedData.slice(start, start + pageSize)
-  }, [sortedData, currentPage, pageSize, paginationConfig?.enabled])
+  // ========== 分頁邏輯（使用 useListPagination）==========
+  const pagination = useListPagination(sortedData, paginationConfig)
 
   // ========== 展開/收合邏輯 ==========
   const toggleRow = useCallback((id: string) => {
@@ -189,9 +176,9 @@ export function useListPageState<T extends Record<string, any>>(
   const isExpanded = useCallback((id: string) => expandedRows.has(id), [expandedRows])
 
   const expandAll = useCallback(() => {
-    const allIds = new Set(paginatedData.map(item => item.id))
+    const allIds = new Set(pagination.paginatedData.map(item => item.id))
     setExpandedRows(allIds)
-  }, [paginatedData])
+  }, [pagination.paginatedData])
 
   const collapseAll = useCallback(() => {
     setExpandedRows(new Set())
@@ -201,39 +188,34 @@ export function useListPageState<T extends Record<string, any>>(
   const handleSort = useCallback((field: string, order: 'asc' | 'desc') => {
     setSortBy(field)
     setSortOrder(order)
-    setCurrentPage(1) // 重置到第一頁
-  }, [])
+    pagination.setCurrentPage(1) // 重置到第一頁
+  }, [pagination])
 
   // ========== 重置所有狀態 ==========
   const reset = useCallback(() => {
-    setSearchQuery('')
-    setStatusFilter(filterConfig?.defaultStatus || 'all')
-    setCurrentPage(1)
+    filters.resetFilters()
     setSortBy(sortConfig?.defaultSortBy || 'created_at')
     setSortOrder(sortConfig?.defaultSortOrder || 'desc')
+    pagination.resetPagination()
     setExpandedRows(new Set())
-  }, [filterConfig, sortConfig])
-
-  // ========== 計算分頁信息 ==========
-  const totalPages = Math.ceil(sortedData.length / pageSize)
-  const totalItems = sortedData.length
+  }, [filterConfig, sortConfig, filters, pagination])
 
   return {
     // 原始數據
     data,
 
     // 處理後的數據
-    filteredData,
+    filteredData: filters.filteredData,
     sortedData,
-    displayData: paginatedData,
+    displayData: pagination.paginatedData,
 
     // 搜尋
-    searchQuery,
-    setSearchQuery,
+    searchQuery: filters.searchQuery,
+    setSearchQuery: filters.setSearchQuery,
 
     // 狀態過濾
-    statusFilter,
-    setStatusFilter,
+    statusFilter: filters.statusFilter,
+    setStatusFilter: filters.setStatusFilter,
 
     // 排序
     sortBy,
@@ -243,11 +225,11 @@ export function useListPageState<T extends Record<string, any>>(
     handleSort,
 
     // 分頁
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    totalPages,
-    totalItems,
+    currentPage: pagination.currentPage,
+    setCurrentPage: pagination.setCurrentPage,
+    pageSize: pagination.pageSize,
+    totalPages: pagination.totalPages,
+    totalItems: pagination.totalItems,
 
     // 展開
     expandedRows,

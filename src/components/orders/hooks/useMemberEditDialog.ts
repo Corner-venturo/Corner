@@ -1,0 +1,263 @@
+'use client'
+
+import { useState } from 'react'
+import { logger } from '@/lib/utils/logger'
+import { supabase } from '@/lib/supabase/client'
+import { useCustomerStore } from '@/stores'
+import { alert } from '@/lib/ui/alert-dialog'
+import { useImageEditor } from '@/hooks'
+import type { CreateCustomerData } from '@/types/customer.types'
+
+interface OrderMember {
+  id: string
+  order_id: string
+  customer_id?: string | null
+  identity?: string | null
+  chinese_name?: string | null
+  passport_name?: string | null
+  birth_date?: string | null
+  age?: number | null
+  id_number?: string | null
+  gender?: string | null
+  passport_number?: string | null
+  passport_expiry?: string | null
+  special_meal?: string | null
+  pnr?: string | null
+  flight_cost?: number | null
+  hotel_1_name?: string | null
+  hotel_1_checkin?: string | null
+  hotel_1_checkout?: string | null
+  hotel_2_name?: string | null
+  hotel_2_checkin?: string | null
+  hotel_2_checkout?: string | null
+  hotel_confirmation?: string | null
+  checked_in?: boolean | null
+  checked_in_at?: string | null
+  transport_cost?: number | null
+  misc_cost?: number | null
+  total_payable?: number | null
+  deposit_amount?: number | null
+  balance_amount?: number | null
+  deposit_receipt_no?: string | null
+  balance_receipt_no?: string | null
+  remarks?: string | null
+  cost_price?: number | null
+  selling_price?: number | null
+  profit?: number | null
+  passport_image_url?: string | null
+  customer_verification_status?: string | null
+  order_code?: string | null
+}
+
+interface UseMemberEditDialogParams {
+  members: OrderMember[]
+  setMembers: React.Dispatch<React.SetStateAction<OrderMember[]>>
+}
+
+export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialogParams) {
+  const [editingMember, setEditingMember] = useState<OrderMember | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editMode, setEditMode] = useState<'verify' | 'edit'>('edit')
+  const [editFormData, setEditFormData] = useState<Partial<OrderMember>>({})
+  const [isSaving, setIsSaving] = useState(false)
+
+  const imageEditor = useImageEditor()
+  const { items: customers } = useCustomerStore()
+
+  // 打開編輯/驗證彈窗
+  const openEditDialog = (member: OrderMember, mode: 'verify' | 'edit') => {
+    setEditingMember(member)
+    setEditMode(mode)
+    setEditFormData({
+      chinese_name: member.chinese_name || '',
+      passport_name: member.passport_name || '',
+      birth_date: member.birth_date || '',
+      gender: member.gender || '',
+      id_number: member.id_number || '',
+      passport_number: member.passport_number || '',
+      passport_expiry: member.passport_expiry || '',
+      special_meal: member.special_meal || '',
+      remarks: member.remarks || '',
+    })
+    // 重置圖片編輯狀態
+    imageEditor.reset()
+    setIsEditDialogOpen(true)
+  }
+
+  // 儲存編輯/驗證（同步更新 order_members + customers）
+  // 注意：圖片旋轉/翻轉/裁剪現在由工具列即時儲存，此處只處理表單資料
+  const handleSaveEdit = async () => {
+    if (!editingMember) return
+    setIsSaving(true)
+
+    try {
+      const customerStore = useCustomerStore.getState()
+
+      // 1. 更新 order_members
+      // 空字串轉 null（日期欄位不接受空字串）
+      const memberUpdateData: Record<string, unknown> = {
+        chinese_name: editFormData.chinese_name || null,
+        passport_name: editFormData.passport_name || null,
+        birth_date: editFormData.birth_date || null,
+        gender: editFormData.gender || null,
+        id_number: editFormData.id_number || null,
+        passport_number: editFormData.passport_number || null,
+        passport_expiry: editFormData.passport_expiry || null,
+        special_meal: editFormData.special_meal || null,
+        remarks: editFormData.remarks || null,
+      }
+
+      const { error: memberError } = await supabase
+        .from('order_members')
+        .update(memberUpdateData)
+        .eq('id', editingMember.id)
+
+      if (memberError) throw memberError
+
+      // 2. 處理顧客資料
+      let newCustomerId: string | null = null
+
+      if (editingMember.customer_id) {
+        // 2a. 有關聯的顧客，同步更新 customers
+        // 空字串轉 null（日期欄位不接受空字串）
+        const customerUpdateData: Record<string, unknown> = {
+          name: editFormData.chinese_name || null,
+          passport_romanization: editFormData.passport_name || null,
+          date_of_birth: editFormData.birth_date || null,
+          gender: editFormData.gender || null,
+          national_id: editFormData.id_number || null,
+          passport_number: editFormData.passport_number || null,
+          passport_expiry_date: editFormData.passport_expiry || null,
+        }
+
+        // 儲存時自動更新驗證狀態為 verified（無論是編輯或驗證模式）
+        // 因為使用者已經看過並確認資料了
+        customerUpdateData.verification_status = 'verified'
+
+        const { error: customerError } = await supabase
+          .from('customers')
+          .update(customerUpdateData)
+          .eq('id', editingMember.customer_id)
+
+        if (customerError) {
+          logger.error('更新顧客失敗:', customerError)
+        } else {
+          // 更新 store
+          await customerStore.fetchAll()
+        }
+      } else if (editFormData.chinese_name || editFormData.passport_number || editFormData.id_number) {
+        // 2b. 沒有關聯顧客但有填寫資料，嘗試比對或建立新顧客
+        const passportNumber = editFormData.passport_number?.trim() || null
+        const idNumber = editFormData.id_number?.trim() || null
+        const birthDate = editFormData.birth_date || null
+        const cleanChineseName = editFormData.chinese_name?.replace(/\([^)]+\)$/, '').trim() || null
+
+        // 先比對現有顧客
+        const existingCustomer = customers.find(c => {
+          // 1. 優先用護照號碼比對
+          if (passportNumber && c.passport_number === passportNumber) return true
+          // 2. 其次用身分證比對
+          if (idNumber && c.national_id === idNumber) return true
+          // 3. 備用：姓名+生日比對
+          if (cleanChineseName && birthDate &&
+              c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
+              c.date_of_birth === birthDate) return true
+          return false
+        })
+
+        if (existingCustomer) {
+          // 找到現有顧客，關聯到成員
+          newCustomerId = existingCustomer.id
+          await supabase
+            .from('order_members')
+            .update({ customer_id: existingCustomer.id })
+            .eq('id', editingMember.id)
+
+          // 同時更新顧客資料
+          await supabase
+            .from('customers')
+            .update({
+              name: editFormData.chinese_name || existingCustomer.name,
+              passport_romanization: editFormData.passport_name || existingCustomer.passport_romanization,
+              date_of_birth: editFormData.birth_date || existingCustomer.date_of_birth,
+              gender: editFormData.gender || existingCustomer.gender,
+              national_id: editFormData.id_number || existingCustomer.national_id,
+              passport_number: editFormData.passport_number || existingCustomer.passport_number,
+              passport_expiry_date: editFormData.passport_expiry || existingCustomer.passport_expiry_date,
+              verification_status: 'verified',
+            })
+            .eq('id', existingCustomer.id)
+
+          logger.info(`✅ 已關聯現有顧客: ${existingCustomer.name}`)
+        } else {
+          // 沒找到，建立新顧客
+          const newCustomerData: CreateCustomerData = {
+            name: editFormData.chinese_name || '',
+            passport_romanization: editFormData.passport_name || '',
+            passport_number: passportNumber || undefined,
+            passport_expiry_date: editFormData.passport_expiry || undefined,
+            national_id: idNumber || undefined,
+            date_of_birth: birthDate || undefined,
+            gender: editFormData.gender || undefined,
+            phone: '',
+            is_vip: false,
+            is_active: true,
+            total_spent: 0,
+            total_orders: 0,
+            verification_status: 'verified',
+          }
+
+          const newCustomer = await customerStore.create(newCustomerData as Parameters<typeof customerStore.create>[0])
+
+          if (newCustomer) {
+            newCustomerId = newCustomer.id
+            await supabase
+              .from('order_members')
+              .update({ customer_id: newCustomer.id })
+              .eq('id', editingMember.id)
+            logger.info(`✅ 已建立新顧客: ${newCustomer.name}`)
+          }
+        }
+
+        // 更新 store
+        await customerStore.fetchAll()
+      }
+
+      // 3. 更新本地狀態（儲存後即為已驗證）
+      setMembers(members.map(m =>
+        m.id === editingMember.id
+          ? {
+              ...m,
+              ...memberUpdateData,
+              customer_id: newCustomerId || editingMember.customer_id,
+              customer_verification_status: 'verified',
+            }
+          : m
+      ))
+
+      // 4. 關閉彈窗
+      setIsEditDialogOpen(false)
+      setEditingMember(null)
+      void alert(editMode === 'verify' ? '驗證完成！' : '儲存成功！', 'success')
+    } catch (error) {
+      logger.error('儲存失敗:', error)
+      void alert('儲存失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  return {
+    editingMember,
+    setEditingMember,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    editMode,
+    setEditMode,
+    editFormData,
+    setEditFormData,
+    isSaving,
+    openEditDialog,
+    handleSaveEdit,
+  }
+}

@@ -20,7 +20,7 @@ import type { AccountingSubject } from '@/types/accounting-pro.types'
  * ```
  */
 export const useAccountingSubjectStore = createStore<AccountingSubject>({
-  tableName: 'accounting_subjects' as any,
+  tableName: 'accounting_subjects',
   codePrefix: 'AS',
   enableSupabase: true,
   fastInsert: true,

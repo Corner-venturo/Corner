@@ -1,89 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+'use client'
+
 import { FormDialog } from '@/components/dialog'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
 import { supabase } from '@/lib/supabase/client'
-import { Upload, X, Loader2, ChevronUp, ChevronDown, Minus } from 'lucide-react'
 import { prompt, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-
-// 圖片位置類型
-type ImagePosition = 'top' | 'center' | 'bottom'
-
-// 圖片位置調整組件
-function ImagePositionAdjuster({
-  url,
-  position,
-  onPositionChange,
-  onRemove,
-}: {
-  url: string
-  position: ImagePosition
-  onPositionChange: (pos: ImagePosition) => void
-  onRemove: () => void
-}) {
-  const positionStyles: Record<ImagePosition, string> = {
-    top: 'object-top',
-    center: 'object-center',
-    bottom: 'object-bottom',
-  }
-
-  return (
-    <div className="relative group">
-      <img
-        src={url}
-        alt="景點圖片"
-        className={`w-full h-24 object-cover rounded-md border border-border ${positionStyles[position]}`}
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Error'
-        }}
-      />
-      {/* 位置調整按鈕 */}
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          type="button"
-          onClick={() => onPositionChange('top')}
-          className={`p-1 rounded ${position === 'top' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示頂部"
-        >
-          <ChevronUp size={12} />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPositionChange('center')}
-          className={`p-1 rounded ${position === 'center' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示中間"
-        >
-          <Minus size={12} />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPositionChange('bottom')}
-          className={`p-1 rounded ${position === 'bottom' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示底部"
-        >
-          <ChevronDown size={12} />
-        </button>
-      </div>
-      {/* 刪除按鈕 */}
-      <button
-        type="button"
-        onClick={onRemove}
-        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <X size={12} />
-      </button>
-    </div>
-  )
-}
-
-// ============================================
-// 景點對話框組件（新增/編輯共用）
-// ============================================
+import { useAttractionForm } from '../hooks/useAttractionForm'
+import { AttractionForm } from './attraction-dialog/AttractionForm'
+import { AttractionImageUpload } from './attraction-dialog/AttractionImageUpload'
 
 interface AttractionsDialogProps {
   open: boolean
@@ -112,205 +37,39 @@ export function AttractionsDialog({
   getCitiesByRegion,
   initialFormData,
 }: AttractionsDialogProps) {
-  const [formData, setFormData] = useState<AttractionFormData>(initialFormData)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const [imagePositions, setImagePositions] = useState<Record<string, ImagePosition>>({})
-  const [isDragOver, setIsDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // 用 ref 追蹤拖放區域
-  const dropZoneRef = useRef<HTMLDivElement>(null)
-
-  // 全域拖曳事件監聽 - 繞過 Radix Dialog 的事件攔截
-  useEffect(() => {
-    if (!open) return
-
-    const handleGlobalDragOver = (e: DragEvent) => {
-      // 檢查是否在拖放區域內
-      if (dropZoneRef.current) {
-        const rect = dropZoneRef.current.getBoundingClientRect()
-        const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
-                         e.clientY >= rect.top && e.clientY <= rect.bottom
-        if (isInside) {
-          e.preventDefault()
-          setIsDragOver(true)
-        } else {
-          setIsDragOver(false)
-        }
-      }
-    }
-
-    const handleGlobalDragLeave = () => {
-      setIsDragOver(false)
-    }
-
-    const handleGlobalDrop = async (e: DragEvent) => {
-      if (!dropZoneRef.current) return
-
-      // 檢查是否在拖放區域內
-      const rect = dropZoneRef.current.getBoundingClientRect()
-      const isInside = e.clientX >= rect.left && e.clientX <= rect.right &&
-                       e.clientY >= rect.top && e.clientY <= rect.bottom
-
-      if (!isInside) return
-
-      e.preventDefault()
-      setIsDragOver(false)
-
-      // 從 HTML 解析圖片 URL
-      let imageUrl = ''
-      const html = e.dataTransfer?.getData('text/html') || ''
-      if (html) {
-        const match = html.match(/<img[^>]+src="([^"]+)"/)
-        if (match && match[1]) {
-          imageUrl = match[1]
-        }
-      }
-
-      // 如果 HTML 沒有，用 uri-list
-      if (!imageUrl) {
-        const uriList = e.dataTransfer?.getData('text/uri-list') || ''
-        if (uriList) {
-          imageUrl = uriList.split('\n')[0]
-        }
-      }
-
-      // 檢查是否有檔案
-      const files = e.dataTransfer?.files
-      if (files && files.length > 0) {
-        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
-        if (imageFiles.length > 0) {
-          await uploadFiles(imageFiles)
-          return
-        }
-      }
-
-      // 用 URL 下載
-      if (imageUrl) {
-        await fetchAndUploadImage(imageUrl)
-      }
-    }
-
-    window.addEventListener('dragover', handleGlobalDragOver, true)
-    window.addEventListener('dragleave', handleGlobalDragLeave, true)
-    window.addEventListener('drop', handleGlobalDrop, true)
-
-    return () => {
-      window.removeEventListener('dragover', handleGlobalDragOver, true)
-      window.removeEventListener('dragleave', handleGlobalDragLeave, true)
-      window.removeEventListener('drop', handleGlobalDrop, true)
-    }
-  }, [open, uploadedImages])
-
-  // 解析 notes 中儲存的圖片位置資訊
-  const parseImagePositions = (notes: string | undefined): Record<string, ImagePosition> => {
-    if (!notes) return {}
-    const match = notes.match(/\[IMAGE_POSITIONS:(.*?)\]/)
-    if (!match) return {}
-    try {
-      return JSON.parse(match[1])
-    } catch {
-      return {}
-    }
-  }
-
-  // 將圖片位置資訊合併到 notes
-  const mergePositionsToNotes = (notes: string, positions: Record<string, ImagePosition>): string => {
-    // 移除舊的位置資訊
-    const cleanNotes = notes.replace(/\[IMAGE_POSITIONS:.*?\]/g, '').trim()
-    if (Object.keys(positions).length === 0) return cleanNotes
-    const positionStr = `[IMAGE_POSITIONS:${JSON.stringify(positions)}]`
-    return cleanNotes ? `${cleanNotes}\n${positionStr}` : positionStr
-  }
-
-  // 編輯模式：載入景點資料
-  useEffect(() => {
-    if (attraction) {
-      setFormData({
-        name: attraction.name || '',
-        name_en: attraction.name_en || '',
-        description: attraction.description || '',
-        country_id: attraction.country_id || '',
-        region_id: attraction.region_id || '',
-        city_id: attraction.city_id || '',
-        category: attraction.category || '景點',
-        tags: attraction.tags?.join(', ') || '',
-        duration_minutes: attraction.duration_minutes || 60,
-        address: attraction.address || '',
-        phone: attraction.phone || '',
-        website: attraction.website || '',
-        images: attraction.images?.join(', ') || '',
-        notes: attraction.notes || '',
-        is_active: attraction.is_active,
-      })
-      // 載入已有的圖片
-      setUploadedImages(attraction.images || [])
-      // 載入圖片位置設定
-      setImagePositions(parseImagePositions(attraction.notes))
-    } else {
-      setFormData(initialFormData)
-      setUploadedImages([])
-      setImagePositions({})
-    }
-  }, [attraction, initialFormData])
+  const {
+    formData,
+    setFormData,
+    isUploading,
+    uploadedImages,
+    setUploadedImages,
+    imagePositions,
+    setImagePositions,
+    isDragOver,
+    setIsDragOver,
+    fileInputRef,
+    dropZoneRef,
+    mergePositionsToNotes,
+    uploadFiles,
+    fetchAndUploadImage,
+  } = useAttractionForm({ attraction, initialFormData, open })
 
   // 上傳圖片
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (!files || files.length === 0) {
+    if (!files || files.length === 0) return
+
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (imageFiles.length === 0) {
+      void alert('請選擇圖片檔案', 'warning')
       return
     }
-    setIsUploading(true)
-    try {
-      const newUrls: string[] = []
 
-      for (const file of Array.from(files)) {
-        // 檢查檔案類型
-        if (!file.type.startsWith('image/')) {
-          void alert(`${file.name} 不是圖片檔案`, 'warning')
-          continue
-        }
+    await uploadFiles(imageFiles)
 
-        // 生成唯一檔名
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-        const filePath = `attractions/${fileName}`
-
-        // 上傳到 Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('workspace-files')
-          .upload(filePath, file)
-
-        if (uploadError) {
-          logger.error('上傳失敗:', uploadError)
-          void alert(`${file.name} 上傳失敗: ${uploadError.message}`, 'error')
-          continue
-        }
-
-        // 取得公開 URL
-        const { data } = supabase.storage
-          .from('workspace-files')
-          .getPublicUrl(filePath)
-
-        newUrls.push(data.publicUrl)
-      }
-
-      // 更新圖片列表
-      if (newUrls.length > 0) {
-        const allImages = [...uploadedImages, ...newUrls]
-        setUploadedImages(allImages)
-        setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
-      }
-    } catch (error) {
-      logger.error('上傳過程發生錯誤:', error)
-      void alert('上傳過程發生錯誤', 'error')
-    } finally {
-      setIsUploading(false)
-      // 清空 input，讓同一檔案可以再次上傳
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
+    // 清空 input，讓同一檔案可以再次上傳
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
@@ -320,6 +79,7 @@ export function AttractionsDialog({
     const newImages = uploadedImages.filter((_, index) => index !== indexToRemove)
     setUploadedImages(newImages)
     setFormData(prev => ({ ...prev, images: newImages.join(', ') }))
+
     // 同時移除該圖片的位置設定
     if (removedUrl) {
       setImagePositions(prev => {
@@ -331,7 +91,7 @@ export function AttractionsDialog({
   }
 
   // 更新圖片位置
-  const handlePositionChange = (url: string, position: ImagePosition) => {
+  const handlePositionChange = (url: string, position: 'top' | 'center' | 'bottom') => {
     setImagePositions(prev => ({
       ...prev,
       [url]: position
@@ -369,7 +129,7 @@ export function AttractionsDialog({
     e.stopPropagation()
     setIsDragOver(false)
 
-    // 方法 1: 檢查 files
+    // 檢查 files
     const files = e.dataTransfer.files
     if (files.length > 0) {
       const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -379,7 +139,7 @@ export function AttractionsDialog({
       }
     }
 
-    // 方法 2: 檢查 items
+    // 檢查 items
     const items = e.dataTransfer.items
     if (items) {
       for (let i = 0; i < items.length; i++) {
@@ -394,7 +154,7 @@ export function AttractionsDialog({
       }
     }
 
-    // 方法 3: 嘗試從 HTML 解析圖片 URL
+    // 從 HTML 解析圖片 URL
     const html = e.dataTransfer.getData('text/html')
     if (html) {
       const match = html.match(/<img[^>]+src="([^"]+)"/)
@@ -404,7 +164,7 @@ export function AttractionsDialog({
       }
     }
 
-    // 方法 4: 嘗試純 URL
+    // 純 URL
     const imageUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain')
     if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
       await fetchAndUploadImage(imageUrl)
@@ -414,88 +174,12 @@ export function AttractionsDialog({
     void alert('請拖曳圖片檔案', 'warning')
   }
 
-  // 上傳多個檔案
-  const uploadFiles = async (files: File[]) => {
-    setIsUploading(true)
-    try {
-      const newUrls: string[] = []
-
-      for (const file of files) {
-        if (!file.type.startsWith('image/')) continue
-
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-        const filePath = `attractions/${fileName}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('workspace-files')
-          .upload(filePath, file)
-
-        if (uploadError) {
-          logger.error('上傳失敗:', uploadError)
-          continue
-        }
-
-        const { data } = supabase.storage.from('workspace-files').getPublicUrl(filePath)
-        newUrls.push(data.publicUrl)
-      }
-
-      if (newUrls.length > 0) {
-        const allImages = [...uploadedImages, ...newUrls]
-        setUploadedImages(allImages)
-        setFormData(prev => ({ ...prev, images: allImages.join(', ') }))
-      }
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
-  // 從 URL 下載並上傳圖片
-  const fetchAndUploadImage = async (imageUrl: string) => {
-    setIsUploading(true)
-    try {
-      // 嘗試透過後端 API 下載
-      const response = await fetch('/api/fetch-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl }),
-      })
-
-      let blob: Blob
-      if (response.ok) {
-        blob = await response.blob()
-      } else {
-        // 嘗試直接下載
-        const directResponse = await fetch(imageUrl, { mode: 'cors' })
-        if (!directResponse.ok) throw new Error('無法下載圖片')
-        blob = await directResponse.blob()
-      }
-
-      if (!blob.type.startsWith('image/')) {
-        throw new Error('URL 不是圖片')
-      }
-
-      const file = new File([blob], 'dragged-image.jpg', { type: blob.type || 'image/jpeg' })
-      await uploadFiles([file])
-    } catch (error) {
-      logger.error('下載圖片失敗:', error)
-      void alert('無法從該網址下載圖片（可能有跨域限制），請先下載到本機再上傳', 'warning')
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
   const handleSubmit = async () => {
     // 將圖片位置資訊合併到 notes 中儲存
     const updatedNotes = mergePositionsToNotes(formData.notes, imagePositions)
     const result = await onSubmit({ ...formData, notes: updatedNotes })
     if (result.success) {
       onClose()
-      if (!attraction) {
-        // 只在新增模式重置表單
-        setFormData(initialFormData)
-        setImagePositions({})
-      }
     }
   }
 
@@ -517,291 +201,29 @@ export function AttractionsDialog({
       maxWidth="2xl"
       contentClassName="max-h-[90vh] overflow-y-auto"
     >
-      <div className="grid grid-cols-2 gap-4">
-        {/* 中文名稱 */}
-        <div>
-          <label className="text-sm font-medium">中文名稱 *</label>
-          <Input
-            value={formData.name}
-            onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="例如: 太宰府天滿宮"
-            required
-          />
-        </div>
+      <AttractionForm
+        formData={formData}
+        countries={countries}
+        availableRegions={availableRegions}
+        availableCities={availableCities}
+        onFormDataChange={setFormData}
+      />
 
-        {/* 英文名稱 */}
-        <div>
-          <label className="text-sm font-medium">英文名稱</label>
-          <Input
-            value={formData.name_en}
-            onChange={e => setFormData(prev => ({ ...prev, name_en: e.target.value }))}
-            placeholder="例如: Dazaifu Tenmangu"
-          />
-        </div>
-      </div>
-
-      {/* 描述 */}
-      <div>
-        <label className="text-sm font-medium">描述</label>
-        <textarea
-          value={formData.description}
-          onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          placeholder="景點簡介..."
-          className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm min-h-[80px]"
-        />
-      </div>
-
-      {/* 地點選擇 */}
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="text-sm font-medium">國家 *</label>
-          <Select
-            value={formData.country_id}
-            onValueChange={value =>
-              setFormData(prev => ({
-                ...prev,
-                country_id: value,
-                region_id: '',
-                city_id: '',
-              }))
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="請選擇" />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {availableRegions.length > 0 && (
-          <div>
-            <label className="text-sm font-medium">地區（選填）</label>
-            <Select
-              value={formData.region_id}
-              onValueChange={value =>
-                setFormData(prev => ({
-                  ...prev,
-                  region_id: value,
-                  city_id: '',
-                }))
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="請選擇" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableRegions.map((r) => (
-                  <SelectItem key={r.id} value={r.id}>
-                    {r.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        <div>
-          <label className="text-sm font-medium">城市（選填）</label>
-          <Select
-            value={formData.city_id || '_none_'}
-            onValueChange={value => setFormData(prev => ({ ...prev, city_id: value === '_none_' ? '' : value }))}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="不指定" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="_none_">不指定</SelectItem>
-              {availableCities.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* 類別與標籤 */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium">類別</label>
-          <Select
-            value={formData.category}
-            onValueChange={value => setFormData(prev => ({ ...prev, category: value }))}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="景點" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="景點">景點</SelectItem>
-              <SelectItem value="餐廳">餐廳</SelectItem>
-              <SelectItem value="住宿">住宿</SelectItem>
-              <SelectItem value="購物">購物</SelectItem>
-              <SelectItem value="交通">交通</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium">標籤（逗號分隔）</label>
-          <Input
-            value={formData.tags}
-            onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-            placeholder="例如: 文化,神社,歷史"
-          />
-        </div>
-      </div>
-
-      {/* 建議停留時間 */}
-      <div>
-        <label className="text-sm font-medium">建議停留時間（分鐘）</label>
-        <Input
-          type="number"
-          value={formData.duration_minutes}
-          onChange={e =>
-            setFormData(prev => ({ ...prev, duration_minutes: Number(e.target.value) }))
-          }
-          min={0}
-        />
-      </div>
-
-      {/* 聯絡資訊 */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium">電話</label>
-          <Input
-            value={formData.phone}
-            onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-            placeholder="+81-92-123-4567"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium">官網</label>
-          <Input
-            value={formData.website}
-            onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))}
-            placeholder="https://..."
-          />
-        </div>
-      </div>
-
-      {/* 地址 */}
-      <div>
-        <label className="text-sm font-medium">地址</label>
-        <Input
-          value={formData.address}
-          onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
-          placeholder="完整地址..."
-        />
-      </div>
-
-      {/* 圖片上傳 */}
-      <div>
-        <label className="text-sm font-medium">景點圖片</label>
-
-        {/* 上傳按鈕區 */}
-        <div className="flex gap-2 mt-2 mb-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              fileInputRef.current?.click()
-            }}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <>
-                <Loader2 size={16} className="mr-2 animate-spin" />
-                上傳中...
-              </>
-            ) : (
-              <>
-                <Upload size={16} className="mr-2" />
-                上傳圖片
-              </>
-            )}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleAddUrlImage}
-          >
-            貼上網址
-          </Button>
-        </div>
-
-        {/* 已上傳圖片預覽 + 拖放區 */}
-        <div
-          ref={dropZoneRef}
-          className={`min-h-[120px] rounded-md transition-all ${
-            isDragOver ? 'bg-morandi-gold/10 border-2 border-dashed border-morandi-gold' : ''
-          }`}
-        >
-          {isDragOver && (
-            <div className="flex items-center justify-center h-[120px]">
-              <div className="text-morandi-gold font-medium">放開以上傳圖片</div>
-            </div>
-          )}
-          {!isDragOver && uploadedImages.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3">
-              {uploadedImages.map((url, index) => (
-                <ImagePositionAdjuster
-                  key={`${url}-${index}`}
-                  url={url}
-                  position={imagePositions[url] || 'center'}
-                  onPositionChange={(pos) => handlePositionChange(url, pos)}
-                  onRemove={() => handleRemoveImage(index)}
-                />
-              ))}
-            </div>
-          ) : !isDragOver ? (
-            <div className="border-2 border-dashed border-border rounded-md p-6 text-center text-morandi-muted cursor-pointer hover:border-morandi-gold/50 transition-colors">
-              <Upload size={24} className="mx-auto mb-2 opacity-50" />
-              <p className="text-sm">拖曳圖片到此處，或點擊上方按鈕上傳</p>
-            </div>
-          ) : null}
-        </div>
-        <p className="text-xs text-morandi-muted mt-2">
-          滑鼠移到圖片上可調整顯示位置（頂部/中間/底部）。建議尺寸 1920x1080，支援 JPG、PNG 格式
-        </p>
-      </div>
-
-      {/* 備註 */}
-      <div>
-        <label className="text-sm font-medium">內部備註</label>
-        <textarea
-          value={formData.notes}
-          onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-          placeholder="內部使用備註..."
-          className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm min-h-[60px]"
-        />
-      </div>
-
-      {/* 啟用狀態 */}
-      <div className="flex items-center gap-2">
-        <Checkbox
-          checked={formData.is_active}
-          onCheckedChange={checked => setFormData(prev => ({ ...prev, is_active: checked as boolean }))}
-        />
-        <label className="text-sm">啟用此景點</label>
-      </div>
+      <AttractionImageUpload
+        fileInputRef={fileInputRef}
+        dropZoneRef={dropZoneRef}
+        isUploading={isUploading}
+        uploadedImages={uploadedImages}
+        imagePositions={imagePositions}
+        isDragOver={isDragOver}
+        onImageUpload={handleImageUpload}
+        onRemoveImage={handleRemoveImage}
+        onPositionChange={handlePositionChange}
+        onAddUrlImage={handleAddUrlImage}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      />
     </FormDialog>
   )
 }

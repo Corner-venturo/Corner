@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { getServerAuth, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
+import { logger } from '@/lib/utils/logger'
 
 export async function getOrCreateDmChannel(otherUserId: string) {
   // 使用統一的認證服務
@@ -22,7 +23,7 @@ export async function getOrCreateDmChannel(otherUserId: string) {
   })
 
   if (error) {
-    console.error('Error calling get_or_create_dm_channel RPC:', error)
+    logger.error('Error calling get_or_create_dm_channel RPC:', error)
     throw new Error('Could not get or create DM channel.')
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
@@ -12,19 +13,31 @@ import { useAuthStore } from '@/stores/auth-store'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
-import { TourPayments } from '@/components/tours/tour-payments'
-import { TourCosts } from '@/components/tours/tour-costs'
 import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
-import { TourEditDialog } from '@/components/tours/tour-edit-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
-import { MessageSquare, FileText, X, Printer } from 'lucide-react'
+import { MessageSquare, FileText, X, Printer, Loader2 } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { Input } from '@/components/ui/input'
 import { Dialog as EntryCardDialog, DialogContent as EntryCardDialogContent, DialogHeader as EntryCardDialogHeader, DialogTitle as EntryCardDialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+
+const TourEditDialog = dynamic(
+  () => import('@/components/tours/tour-edit-dialog').then(m => m.TourEditDialog),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourPayments = dynamic(
+  () => import('@/components/tours/tour-payments').then(m => m.TourPayments),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourCosts = dynamic(
+  () => import('@/components/tours/tour-costs').then(m => m.TourCosts),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
 
 const tabs = [
   { value: 'overview', label: '總覽' },

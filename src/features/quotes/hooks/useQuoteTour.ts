@@ -1,0 +1,133 @@
+'use client'
+
+import { useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { generateTourCode } from '@/stores/utils/code-generator'
+import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import { useTourStore } from '@/stores'
+import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
+import type { Quote, Tour, QuoteVersion } from '@/stores/types'
+import type { CreateInput } from '@/stores/core/types'
+
+interface UseQuoteTourProps {
+  quote: Quote | null | undefined
+  updateQuote: (id: string, data: Partial<Quote>) => void
+  addTour: (data: CreateInput<Tour>) => Promise<Tour | undefined>
+  router: ReturnType<typeof useRouter>
+  updatedCategories: CostCategory[]
+  total_cost: number
+  groupSize: number
+  quoteName: string
+  accommodationDays: number
+  participantCounts: ParticipantCounts
+  sellingPrices: SellingPrices
+}
+
+export const useQuoteTour = ({
+  quote,
+  updateQuote,
+  addTour,
+  router,
+  updatedCategories,
+  total_cost,
+  groupSize,
+  quoteName,
+  accommodationDays,
+  participantCounts,
+  sellingPrices,
+}: UseQuoteTourProps) => {
+  // 開旅遊團
+  const handleCreateTour = useCallback(async () => {
+    if (!quote) return
+
+    // 先保存目前的報價單狀態為新版本
+    const existingVersions = quote.versions || []
+    const maxVersion = existingVersions.reduce((max: number, v: QuoteVersion) =>
+      Math.max(max, v.version || 0), 0
+    )
+    const newVersion = maxVersion + 1
+
+    const createTourVersionRecord: QuoteVersion = {
+      id: Date.now().toString(),
+      version: newVersion,
+      mode: 'detailed', // 預設為詳細模式
+      name: `開團版本 ${newVersion}`,
+      categories: updatedCategories,
+      total_cost,
+      group_size: groupSize,
+      accommodation_days: accommodationDays,
+      participant_counts: participantCounts,
+      selling_prices: sellingPrices,
+      note: '轉為旅遊團前的版本',
+      created_at: new Date().toISOString(),
+    }
+
+    // 更新報價單狀態為最終版本
+    updateQuote(quote.id, {
+      status: 'approved',
+      versions: [...existingVersions, createTourVersionRecord],
+    })
+
+    // 創建旅遊團
+    const departure_date = new Date()
+    departure_date.setDate(departure_date.getDate() + 30) // 預設30天後出發
+    const return_date = new Date(departure_date)
+    return_date.setDate(return_date.getDate() + 5) // 預設5天行程
+
+    // 使用報價單名稱作為地點（用戶可以在旅遊團頁面再修改）
+    const location = quoteName || '待定'
+
+    // 生成團號（使用預設地區代碼 'XX'）
+    const workspaceCode = getCurrentWorkspaceCode()
+    if (!workspaceCode) {
+      throw new Error('無法取得 workspace code，請重新登入')
+    }
+
+    // 獲取現有的 tours 來避免編號衝突
+    const existingTours = useTourStore.getState().items
+    const tourCode = generateTourCode(
+      workspaceCode,
+      'XX', // 預設地區代碼，用戶可以後續修改
+      departure_date.toISOString(),
+      existingTours
+    )
+
+    const newTour = await addTour({
+      name: quoteName,
+      location: location,
+      departure_date: departure_date.toISOString().split('T')[0],
+      return_date: return_date.toISOString().split('T')[0],
+      price: Math.round(total_cost / groupSize), // 每人單價
+      status: 'draft',
+      code: tourCode,
+      contract_status: 'pending',
+      total_revenue: 0,
+      total_cost: total_cost,
+      profit: 0,
+    })
+
+    // 更新報價單的 tour_id
+    if (newTour?.id) {
+      await updateQuote(quote.id, { tour_id: newTour.id })
+    }
+
+    // 跳轉到旅遊團管理頁面，並高亮新建的團
+    router.push(`/tours?highlight=${newTour?.id}`)
+  }, [
+    quote,
+    updatedCategories,
+    total_cost,
+    groupSize,
+    accommodationDays,
+    participantCounts,
+    sellingPrices,
+    updateQuote,
+    quoteName,
+    addTour,
+    router,
+  ])
+
+  return {
+    handleCreateTour,
+  }
+}

@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import type { Todo } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 查詢函式（客戶端）
@@ -22,7 +23,7 @@ export async function getAllTodos(): Promise<Todo[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching todos:', error)
+    logger.error('Error fetching todos:', error)
     throw new Error(error.message)
   }
 
@@ -40,7 +41,7 @@ export async function getTodoById(id: string): Promise<Todo | null> {
     .single()
 
   if (error) {
-    console.error('Error fetching todo:', error)
+    logger.error('Error fetching todo:', error)
     return null
   }
 
@@ -58,7 +59,7 @@ export async function getTodosByStatus(status: string): Promise<Todo[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching todos by status:', error)
+    logger.error('Error fetching todos by status:', error)
     return []
   }
 
@@ -76,7 +77,7 @@ export async function getTodosByAssignee(assigneeId: string): Promise<Todo[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching todos by assignee:', error)
+    logger.error('Error fetching todos by assignee:', error)
     return []
   }
 
@@ -95,7 +96,7 @@ export async function getTodosByEntity(entityType: string, entityId: string): Pr
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching todos by entity:', error)
+    logger.error('Error fetching todos by entity:', error)
     return []
   }
 

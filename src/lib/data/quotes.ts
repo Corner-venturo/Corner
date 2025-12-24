@@ -7,6 +7,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Quote, Tour } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 型別定義
@@ -59,7 +60,7 @@ export async function getPaginatedQuotes({
   const { data, count, error } = await query
 
   if (error) {
-    console.error('Error fetching quotes:', error)
+    logger.error('Error fetching quotes:', error)
     return { quotes: [], count: 0 }
   }
 
@@ -107,11 +108,11 @@ export async function getQuotesPageData({
   ])
 
   if (quotesResult.error) {
-    console.error('Error fetching quotes:', quotesResult.error)
+    logger.error('Error fetching quotes:', quotesResult.error)
   }
 
   if (toursResult.error) {
-    console.error('Error fetching tours:', toursResult.error)
+    logger.error('Error fetching tours:', toursResult.error)
   }
 
   return {
@@ -134,7 +135,7 @@ export async function getQuoteById(id: string): Promise<Quote | null> {
     .single()
 
   if (error) {
-    console.error('Error fetching quote:', error)
+    logger.error('Error fetching quote:', error)
     return null
   }
 

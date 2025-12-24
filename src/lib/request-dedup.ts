@@ -3,6 +3,8 @@
  * 防止同時發送多個相同的請求，共用第一個請求的結果
  */
 
+import { logger } from '@/lib/utils/logger'
+
 type PendingRequest<T> = {
   promise: Promise<T>
   timestamp: number
@@ -107,7 +109,7 @@ export async function swrFetch<T>(
       const data = await fn()
       cache.set(key, { data, timestamp: Date.now() })
       return data
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return cached.data
   }

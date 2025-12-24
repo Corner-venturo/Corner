@@ -13,6 +13,7 @@
 
 import { aesEncrypt, aesDecrypt, generateTransactionNo, convertTaxType, formatInvoiceDate } from './crypto'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 
 // API 端點
 const API_ENDPOINTS = {
@@ -160,7 +161,7 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
   const urlEncodedData = toUrlEncoded(postData)
   const encryptedData = aesEncrypt(urlEncodedData, config.hashKey, config.hashIV)
 
-  console.log('[NewebPay] 發送請求:', {
+  logger.log('[NewebPay] 發送請求:', {
     url: `${baseUrl}${path}`,
     merchantId: config.merchantId,
     isProduction: config.isProduction,
@@ -184,7 +185,7 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
   }
 
   const responseText = await response.text()
-  console.log('[NewebPay] 原始回應:', responseText.substring(0, 200))
+  logger.log('[NewebPay] 原始回應:', responseText.substring(0, 200))
 
   // 解析回應（URL encoded 格式）
   // 回應結尾會有 EndStr=## 用於確認資料完整性
@@ -197,7 +198,7 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
       const decryptedParsed = parseUrlEncodedResponse(decrypted)
       return { ...parsed, ...decryptedParsed }
     } catch (e) {
-      console.log('[NewebPay] Result 解密失敗，可能是明文:', e)
+      logger.log('[NewebPay] Result 解密失敗，可能是明文:', e)
     }
   }
 
@@ -273,12 +274,12 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     postData.BuyerPhone = params.buyerInfo.buyerMobile
   }
 
-  console.log('[NewebPay] 開立收據 PostData:', postData)
+  logger.log('[NewebPay] 開立收據 PostData:', postData)
 
   try {
     const result = await sendRequest(API_PATHS.issue, postData)
 
-    console.log('[NewebPay] 開立收據回應:', result)
+    logger.log('[NewebPay] 開立收據回應:', result)
 
     // 檢查回應狀態
     if (result.Status === 'SUCCESS' || result.Status === '1') {
@@ -301,7 +302,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
       }
     }
   } catch (error) {
-    console.error('[NewebPay] 開立收據錯誤:', error)
+    logger.error('[NewebPay] 開立收據錯誤:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '開立失敗',

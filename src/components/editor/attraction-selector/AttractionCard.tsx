@@ -1,0 +1,116 @@
+'use client'
+
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { ImageIcon, Map, Sparkles } from 'lucide-react'
+import { Attraction } from '@/features/attractions/types'
+
+interface AttractionWithCity extends Attraction {
+  city_name?: string
+  region_name?: string
+}
+
+interface AttractionCardProps {
+  attraction: AttractionWithCity
+  isSelected: boolean
+  isSuggested: boolean
+  isExisting: boolean
+  onToggleSelection: (id: string) => void
+  onViewOnMap?: (attraction: AttractionWithCity) => void
+  selectedMapAttractionId?: string
+}
+
+export function AttractionCard({
+  attraction,
+  isSelected,
+  isSuggested,
+  isExisting,
+  onToggleSelection,
+  onViewOnMap,
+  selectedMapAttractionId,
+}: AttractionCardProps) {
+  const image = attraction.thumbnail || (attraction.images && attraction.images.length > 0 ? attraction.images[0] : null)
+  const hasCoordinates = attraction.latitude && attraction.longitude
+
+  return (
+    <div
+      className={`
+        relative flex gap-3 p-2.5 rounded-xl transition-all
+        border hover:shadow-sm
+        ${isExisting
+          ? 'border-slate-200 bg-slate-50 opacity-60'
+          : isSelected
+            ? 'border-morandi-gold bg-morandi-gold/5'
+            : isSuggested
+              ? 'border-amber-300 bg-amber-50/50'
+              : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
+        }
+      `}
+    >
+      {/* 勾選框 */}
+      <label className={`flex items-center ${isExisting ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+        <input
+          type="checkbox"
+          checked={isSelected || isExisting}
+          onChange={() => !isExisting && onToggleSelection(attraction.id)}
+          disabled={isExisting}
+          className={`w-4 h-4 rounded border-gray-300 focus:ring-morandi-gold ${isExisting ? 'text-slate-400' : 'text-morandi-gold'}`}
+        />
+      </label>
+
+      {/* 縮圖 */}
+      <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-morandi-container/30">
+        {image ? (
+          <img
+            src={image}
+            alt={attraction.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-morandi-secondary/50">
+            <ImageIcon size={20} />
+          </div>
+        )}
+      </div>
+
+      {/* 資訊 */}
+      <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-1 flex items-center gap-1">
+          {isSuggested && (
+            <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
+          )}
+          {attraction.name}
+          {isExisting && (
+            <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-200 text-slate-500 rounded">
+              已選
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-morandi-secondary mt-0.5 flex items-center gap-1.5">
+          <span className="px-1.5 py-0.5 bg-morandi-container/50 rounded">
+            {attraction.city_name}
+          </span>
+          {attraction.category && (
+            <span className="text-morandi-secondary/70">
+              {attraction.category}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* 查看地圖按鈕 */}
+      {hasCoordinates && onViewOnMap && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => onViewOnMap(attraction)}
+          className={`h-8 px-2 rounded-lg ${selectedMapAttractionId === attraction.id ? 'bg-blue-100 text-blue-600' : ''}`}
+          title="查看附近景點"
+        >
+          <Map size={16} />
+        </Button>
+      )}
+    </div>
+  )
+}

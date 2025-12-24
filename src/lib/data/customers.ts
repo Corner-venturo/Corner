@@ -7,6 +7,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Customer } from '@/types/customer.types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 型別定義
@@ -53,7 +54,7 @@ export async function getPaginatedCustomers({
   const { data, count, error } = await query
 
   if (error) {
-    console.error('Error fetching customers:', error)
+    logger.error('Error fetching customers:', error)
     return { customers: [], count: 0 }
   }
 
@@ -76,7 +77,7 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
     .single()
 
   if (error) {
-    console.error('Error fetching customer:', error)
+    logger.error('Error fetching customer:', error)
     return null
   }
 
@@ -96,7 +97,7 @@ export async function checkCustomerByPassport(passportNumber: string): Promise<C
     .maybeSingle()
 
   if (error) {
-    console.error('Error checking customer by passport:', error)
+    logger.error('Error checking customer by passport:', error)
     return null
   }
 

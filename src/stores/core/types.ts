@@ -4,6 +4,13 @@
 
 import { BaseEntity } from '@/types'
 import { TableName } from '@/lib/db/schemas'
+import type { Database } from '@/lib/supabase/types'
+
+/**
+ * Supabase 表格名稱類型（用於 .from() 方法）
+ * 這是一個輔助類型，確保表格名稱在編譯時是有效的
+ */
+export type SupabaseTableName = keyof Database['public']['Tables']
 
 /**
  * 建立資料的輸入型別
@@ -76,7 +83,7 @@ export interface CodeConfig {
  */
 export interface StoreConfig {
   /** 資料表名稱 */
-  tableName: TableName
+  tableName: TableName & SupabaseTableName
   /** 編號前綴（可選，如 'T', 'O', 'C'） */
   codePrefix?: string
   /** 是否啟用 Supabase 同步（預設讀取環境變數） */

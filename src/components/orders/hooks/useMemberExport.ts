@@ -1,0 +1,191 @@
+'use client'
+
+import { useState } from 'react'
+import { alert } from '@/lib/ui/alert-dialog'
+
+interface OrderMember {
+  id: string
+  order_id: string
+  customer_id?: string | null
+  identity?: string | null
+  chinese_name?: string | null
+  passport_name?: string | null
+  birth_date?: string | null
+  age?: number | null
+  id_number?: string | null
+  gender?: string | null
+  passport_number?: string | null
+  passport_expiry?: string | null
+  special_meal?: string | null
+  pnr?: string | null
+  flight_cost?: number | null
+  hotel_1_name?: string | null
+  hotel_1_checkin?: string | null
+  hotel_1_checkout?: string | null
+  hotel_2_name?: string | null
+  hotel_2_checkin?: string | null
+  hotel_2_checkout?: string | null
+  hotel_confirmation?: string | null
+  checked_in?: boolean | null
+  checked_in_at?: string | null
+  transport_cost?: number | null
+  misc_cost?: number | null
+  total_payable?: number | null
+  deposit_amount?: number | null
+  balance_amount?: number | null
+  deposit_receipt_no?: string | null
+  balance_receipt_no?: string | null
+  remarks?: string | null
+  cost_price?: number | null
+  selling_price?: number | null
+  profit?: number | null
+  passport_image_url?: string | null
+  customer_verification_status?: string | null
+  order_code?: string | null
+}
+
+export type ExportColumns = Record<string, boolean>
+
+export const EXPORT_COLUMN_LABELS: Record<string, string> = {
+  identity: '身份',
+  chinese_name: '中文姓名',
+  passport_name: '護照拼音',
+  birth_date: '出生年月日',
+  gender: '性別',
+  id_number: '身分證號',
+  passport_number: '護照號碼',
+  passport_expiry: '護照效期',
+  special_meal: '飲食禁忌',
+  hotel_confirmation: '訂房代號',
+  total_payable: '應付金額',
+  deposit_amount: '訂金',
+  balance: '尾款',
+  remarks: '備註',
+}
+
+const DEFAULT_EXPORT_COLUMNS: ExportColumns = {
+  identity: false,
+  chinese_name: true,
+  passport_name: true,
+  birth_date: true,
+  gender: true,
+  id_number: false,
+  passport_number: true,
+  passport_expiry: true,
+  special_meal: true,
+  hotel_confirmation: false,
+  total_payable: false,
+  deposit_amount: false,
+  balance: false,
+  remarks: false,
+}
+
+export function useMemberExport(members: OrderMember[]) {
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [exportColumns, setExportColumns] = useState<ExportColumns>(DEFAULT_EXPORT_COLUMNS)
+
+  const handleExportPrint = () => {
+    const selectedCols = Object.entries(exportColumns)
+      .filter(([, selected]) => selected)
+      .map(([key]) => key)
+
+    if (selectedCols.length === 0) {
+      void alert('請至少選擇一個欄位', 'warning')
+      return
+    }
+
+    // 建立列印內容
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>成員名單</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; padding: 20px; }
+          h1 { font-size: 18px; margin-bottom: 15px; text-align: center; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; }
+          th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; }
+          th { background: #f5f5f5; font-weight: 600; }
+          tr:nth-child(even) { background: #fafafa; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          @media print {
+            body { padding: 10px; }
+            h1 { font-size: 16px; }
+            table { font-size: 11px; }
+            th, td { padding: 4px 6px; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>成員名單（共 ${members.length} 人）</h1>
+        <table>
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 40px;">序</th>
+              ${selectedCols.map(col => `<th>${EXPORT_COLUMN_LABELS[col]}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${members.map((member, idx) => `
+              <tr>
+                <td class="text-center">${idx + 1}</td>
+                ${selectedCols.map(col => {
+                  let value = ''
+                  if (col === 'gender') {
+                    value = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'
+                  } else if (col === 'balance') {
+                    value = ((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()
+                  } else if (col === 'total_payable' || col === 'deposit_amount') {
+                    const num = member[col as keyof OrderMember] as number
+                    value = num ? num.toLocaleString() : '-'
+                  } else {
+                    value = (member[col as keyof OrderMember] as string) || '-'
+                  }
+                  const align = ['total_payable', 'deposit_amount', 'balance'].includes(col) ? 'text-right' : ''
+                  return `<td class="${align}">${value}</td>`
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `
+
+    // 開啟列印視窗
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(printContent)
+      printWindow.document.close()
+      printWindow.focus()
+      // 等待內容載入後列印
+      setTimeout(() => {
+        printWindow.print()
+      }, 250)
+    }
+
+    setIsExportDialogOpen(false)
+  }
+
+  const toggleAllColumns = () => {
+    const allSelected = Object.values(exportColumns).every(v => v)
+    const newValue = !allSelected
+    setExportColumns(
+      Object.fromEntries(
+        Object.keys(exportColumns).map(k => [k, newValue])
+      )
+    )
+  }
+
+  return {
+    isExportDialogOpen,
+    setIsExportDialogOpen,
+    exportColumns,
+    setExportColumns,
+    handleExportPrint,
+    toggleAllColumns,
+  }
+}

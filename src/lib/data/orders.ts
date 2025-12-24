@@ -7,6 +7,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Order } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // 型別定義
@@ -59,7 +60,7 @@ export async function getPaginatedOrders({
   const { data, count, error } = await query
 
   if (error) {
-    console.error('Error fetching orders:', error)
+    logger.error('Error fetching orders:', error)
     return { orders: [], count: 0 }
   }
 
@@ -82,7 +83,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
     .single()
 
   if (error) {
-    console.error('Error fetching order:', error)
+    logger.error('Error fetching order:', error)
     return null
   }
 
@@ -102,7 +103,7 @@ export async function getOrdersByTourId(tourId: string): Promise<Order[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching orders by tour:', error)
+    logger.error('Error fetching orders by tour:', error)
     return []
   }
 

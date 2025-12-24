@@ -1,6 +1,7 @@
 import { logger } from '@/lib/utils/logger'
 import React from 'react'
 import { Tour, Order } from '@/stores/types'
+import dynamic from 'next/dynamic'
 import {
   Calendar,
   FileText,
@@ -18,18 +19,35 @@ import {
   Edit2,
   MessageSquare,
   Printer,
+  Loader2,
 } from 'lucide-react'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { cn } from '@/lib/utils'
 import { ExpandableOrderTable } from '@/components/orders/expandable-order-table'
-import { TourMembers } from '@/components/tours/tour-members'
-import { TourOperations } from '@/components/tours/tour-operations'
 import { TourAddOns } from '@/components/tours/tour-add-ons'
-import { TourPayments } from '@/components/tours/tour-payments'
-import { TourCosts } from '@/components/tours/tour-costs'
 import { TourTaskAssignment } from '@/components/tours/tour-task-assignment'
 import { TourOverviewTab } from './TourOverviewTab'
 import { TourOperationsAddButton } from './TourOperationsAddButton'
+
+const TourMembers = dynamic(
+  () => import('@/components/tours/tour-members').then(m => m.TourMembers),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourPayments = dynamic(
+  () => import('@/components/tours/tour-payments').then(m => m.TourPayments),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourCosts = dynamic(
+  () => import('@/components/tours/tour-costs').then(m => m.TourCosts),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourOperations = dynamic(
+  () => import('@/components/tours/tour-operations').then(m => m.TourOperations),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
 
 const tourTabs = [
   { id: 'overview', label: '總覽', icon: BarChart3 },

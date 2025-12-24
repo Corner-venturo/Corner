@@ -1,18 +1,12 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
-import { useEffect, useState } from 'react'
-import { arrayMove } from '@dnd-kit/sortable'
-import type { DragEndEvent } from '@dnd-kit/core'
-import { useAuthStore } from '@/stores/auth-store'
-import { removeChannelMember } from '@/services/workspace-members'
-import { useWorkspaceChannels, useWorkspaceMembers } from '@/stores/workspace-store'
-import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
-import { useChannelStore } from '@/stores/workspace/channel-store'
-import type { Channel, ChannelGroup } from '@/stores/workspace/types'
+import { useEffect } from 'react'
 import type { ChannelSidebarProps } from './types'
 import { useChannelSidebar } from './useChannelSidebar'
 import { useChannelState } from './hooks/useChannelState'
+import { useChannelSidebarState } from './hooks/useChannelSidebarState'
+import { createChannelHandlers } from './handlers/channelHandlers'
+import { processChannels } from './utils/channelProcessing'
 import {
   MemberManagementDialog,
   ChannelDeleteDialog,
@@ -23,519 +17,128 @@ import { CreateGroupDialog } from './CreateGroupDialog'
 import { CreateChannelDialog } from './CreateChannelDialog'
 import { EditChannelDialog } from './EditChannelDialog'
 import { ChannelList } from './ChannelList'
-import { confirm, alert } from '@/lib/ui/alert-dialog'
-import { getWorkspaceMembers } from '@/lib/actions/user-actions'
-import { getOrCreateDmChannel } from '@/lib/actions/channel-actions'
 
 export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSidebarProps) {
-  // 🔥 直接訂閱 channel store 的 items，繞過 Facade 的響應式問題
-  const channelStoreItems = useChannelStore(state => state.items)
-  const [dmMembers, setDmMembers] = useState<Awaited<ReturnType<typeof getWorkspaceMembers>>>([])
-  const [isCreatingDm, setIsCreatingDm] = useState(false)
-
-
-  // Use selective hooks for better performance
-  const {
-    channelGroups,
-    currentWorkspace,
-    searchQuery,
-    channelFilter,
-    setSearchQuery,
-    setChannelFilter,
-    createChannelGroup,
-    toggleGroupCollapse,
-    updateChannelOrder,
-    updateChannel,
-    deleteChannel,
-    deleteChannelGroup,
-    createChannel,
-    loadChannels,
-    loading,
-  } = useWorkspaceChannels()
-
-  // 🔥 使用 store 的 items 作為 channels（響應式更新）
-  const channels = channelStoreItems as Channel[]
-
-  const { channelMembers, loadChannelMembers } = useWorkspaceMembers()
-
-  const { user } = useAuthStore()
-
-  // 🔥 載入所有頻道成員資料（用於檢查是否已加入頻道）
-  const allChannelMembers = useChannelMemberStore(state => state.items)
-
-  // Use the new state hook
-  const {
-    showNewGroupDialog,
-    setShowNewGroupDialog,
-    newGroupName,
-    setNewGroupName,
-    memberToRemove,
-    isRemoveDialogOpen,
-    isRemovingMember,
-    setIsRemovingMember,
-    openRemoveMemberDialog,
-    closeRemoveMemberDialog,
-    channelToDelete,
-    isDeleteDialogOpen,
-    isDeletingChannel,
-    setIsDeletingChannel,
-    openDeleteChannelDialog,
-    closeDeleteChannelDialog,
-    groupToDelete,
-    isGroupDeleteDialogOpen,
-    isDeletingGroup,
-    setIsDeletingGroup,
-    openDeleteGroupDialog,
-    closeDeleteGroupDialog,
-    showCreateChannelDialog,
-    setShowCreateChannelDialog,
-    newChannelName,
-    setNewChannelName,
-    newChannelDescription,
-    setNewChannelDescription,
-    newChannelType,
-    setNewChannelType,
-    newChannelScope,
-    setNewChannelScope,
-    selectedMembers,
-    setSelectedMembers,
-    resetCreateChannelDialog,
-    showEditChannelDialog,
-    channelToEdit,
-    editChannelName,
-    setEditChannelName,
-    editChannelDescription,
-    setEditChannelDescription,
-    openEditChannelDialog,
-    resetEditChannelDialog,
-  } = useChannelState()
-
+  // 狀態管理
+  const sidebarState = useChannelSidebarState()
+  const channelState = useChannelState()
   const { expandedSections, setExpandedSections, filteredChannels } = useChannelSidebar(
-    channels,
-    searchQuery,
-    channelFilter
+    sidebarState.channels,
+    sidebarState.searchQuery,
+    sidebarState.channelFilter
   )
 
-  // 🔥 載入所有頻道成員資料（用於檢查是否已加入）
+  // 自動選中建立者
   useEffect(() => {
-    if (!currentWorkspace) return
+    if (
+      channelState.showCreateChannelDialog &&
+      sidebarState.user?.id &&
+      !channelState.selectedMembers.includes(sidebarState.user.id)
+    ) {
+      channelState.setSelectedMembers([sidebarState.user.id])
+    }
+  }, [channelState.showCreateChannelDialog, sidebarState.user?.id])
 
-    // 載入 channel_members store（包含所有頻道的成員資料）
-    useChannelMemberStore.getState().fetchAll()
-  }, [currentWorkspace?.id])
-
-  // Fetch workspace members for DMs
+  // 載入頻道成員
   useEffect(() => {
-    async function fetchMembers() {
-      try {
-        const members = await getWorkspaceMembers();
-        setDmMembers(members);
-      } catch (error) {
-        logger.error('Failed to fetch workspace members for DMs:', error);
-      }
-    }
-    fetchMembers();
-  }, []);
+    if (!selectedChannelId || !sidebarState.currentWorkspace) return
+    void sidebarState.loadChannelMembers(sidebarState.currentWorkspace.id, selectedChannelId)
+  }, [selectedChannelId, sidebarState.currentWorkspace?.id])
 
-  // 🔥 開啟建立頻道對話框時，自動選中建立者
-  useEffect(() => {
-    if (showCreateChannelDialog && user?.id && !selectedMembers.includes(user.id)) {
-      setSelectedMembers([user.id])
-    }
-  }, [showCreateChannelDialog, user?.id])
+  // 頻道處理邏輯
+  const processedChannels = processChannels(
+    filteredChannels,
+    sidebarState.channelGroups,
+    sidebarState.checkIsMember
+  )
 
-  // Load channel members when selectedChannelId changes
-  useEffect(() => {
-    if (!selectedChannelId || !currentWorkspace) {
-      return
-    }
+  // 操作處理函數
+  const handlers = createChannelHandlers({
+    channels: sidebarState.channels,
+    channelGroups: sidebarState.channelGroups,
+    currentWorkspace: sidebarState.currentWorkspace,
+    user: sidebarState.user,
+    updateChannel: sidebarState.updateChannel,
+    updateChannelOrder: sidebarState.updateChannelOrder,
+    createChannel: sidebarState.createChannel,
+    deleteChannel: sidebarState.deleteChannel,
+    deleteChannelGroup: sidebarState.deleteChannelGroup,
+    loadChannels: sidebarState.loadChannels,
+    createChannelGroup: sidebarState.createChannelGroup,
+    selectedMembers: channelState.selectedMembers,
+  })
 
-    void loadChannelMembers(currentWorkspace.id, selectedChannelId)
-     
-  }, [selectedChannelId, currentWorkspace?.id])
-
-  const handleSelectMember = async (memberId: string) => {
-    setIsCreatingDm(true);
-    try {
-      const dmChannel = await getOrCreateDmChannel(memberId);
-      if (dmChannel) {
-        // Since the server action revalidates the path, the new channel
-        // should appear automatically. We just need to select it.
-        onSelectChannel(dmChannel as Channel);
-      }
-    } catch (error) {
-      logger.error('Failed to create or get DM channel:', error);
-      void alert('開啟私訊失敗', 'error');
-    } finally {
-      setIsCreatingDm(false);
-    }
-  };
-
+  // 處理成員移除
   const handleRemoveMember = async () => {
-    if (!memberToRemove || !selectedChannelId || !currentWorkspace) {
+    if (!channelState.memberToRemove || !selectedChannelId || !sidebarState.currentWorkspace) {
       return
     }
 
-    setIsRemovingMember(true)
+    channelState.setIsRemovingMember(true)
     try {
-      await removeChannelMember(currentWorkspace.id, selectedChannelId, memberToRemove.id)
-      closeRemoveMemberDialog()
+      const { removeChannelMember } = await import('@/services/workspace-members')
+      await removeChannelMember(
+        sidebarState.currentWorkspace.id,
+        selectedChannelId,
+        channelState.memberToRemove.id
+      )
+      channelState.closeRemoveMemberDialog()
     } catch (error) {
+      // Error handled by service
     } finally {
-      setIsRemovingMember(false)
+      channelState.setIsRemovingMember(false)
     }
   }
 
-  const handleDeleteChannel = async () => {
-    if (!channelToDelete) {
-      return
-    }
-
-    setIsDeletingChannel(true)
-    try {
-      await deleteChannel(channelToDelete.id)
-      closeDeleteChannelDialog()
-    } catch (error) {
-    } finally {
-      setIsDeletingChannel(false)
+  // 處理選擇成員（DM）
+  const handleSelectMember = async (memberId: string) => {
+    const dmChannel = await sidebarState.handleSelectMember(memberId)
+    if (dmChannel) {
+      onSelectChannel(dmChannel)
     }
   }
 
-  const handleDeleteGroup = async () => {
-    if (!groupToDelete) {
-      return
-    }
-
-    setIsDeletingGroup(true)
-    try {
-      await deleteChannelGroup(groupToDelete.id)
-      closeDeleteGroupDialog()
-    } catch (error) {
-    } finally {
-      setIsDeletingGroup(false)
-    }
-  }
-
-  const handleDeleteGroupClick = (groupId: string) => {
-    const group = channelGroups.find((g: ChannelGroup) => g.id === groupId)
-    if (group) {
-      openDeleteGroupDialog(group)
-    }
-  }
-
+  // 處理刪除頻道點擊
   const handleDeleteClick = (channelId: string) => {
-    const channel = channels.find((ch: Channel) => ch.id === channelId)
+    const channel = sidebarState.channels.find(ch => ch.id === channelId)
     if (channel) {
-      openDeleteChannelDialog(channel)
+      channelState.openDeleteChannelDialog(channel)
     }
   }
 
-  const handleJoinChannel = async (channelId: string) => {
-    if (!user || !currentWorkspace) return
-
-    try {
-      const { addChannelMembers } = await import('@/services/workspace-members')
-      await addChannelMembers(currentWorkspace.id, channelId, [user.id], 'member')
-
-      // 🔥 重新載入頻道成員列表
-      await loadChannelMembers(currentWorkspace.id, channelId)
-
-      // 🔥 重新載入 channel_members store（更新成員數量）
-      const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
-      await useChannelMemberStore.getState().fetchAll()
-
-      // 🔥 重新載入頻道列表（更新側邊欄的「未加入」狀態）
-      await loadChannels(currentWorkspace.id)
-    } catch (error) {
-      logger.error('Failed to join channel:', error)
+  // 處理刪除群組點擊
+  const handleDeleteGroupClick = (groupId: string) => {
+    const group = sidebarState.channelGroups.find(g => g.id === groupId)
+    if (group) {
+      channelState.openDeleteGroupDialog(group)
     }
   }
 
-  const handleLeaveChannel = async (channelId: string) => {
-    if (!user || !currentWorkspace) return
-
-    const channel = channels.find((ch: Channel) => ch.id === channelId)
-    if (!channel) return
-
-    const confirmed = await confirm(`確定要離開 #${channel.name} 頻道嗎？`, {
-      title: '離開頻道',
-      type: 'warning',
-    })
-    if (!confirmed) return
-
-    try {
-      const members = channelMembers[channelId] || []
-      const currentMember = members.find(m => m.employeeId === user.id)
-
-      if (currentMember) {
-        await removeChannelMember(currentWorkspace.id, channelId, currentMember.id)
-
-        // 🔥 重新載入頻道成員列表
-        await loadChannelMembers(currentWorkspace.id, channelId)
-
-        // 🔥 重新載入 channel_members store（更新成員數量）
-        const { useChannelMemberStore } = await import('@/stores/workspace/channel-member-store')
-        await useChannelMemberStore.getState().fetchAll()
-
-        // 🔥 重新載入頻道列表（更新側邊欄的「未加入」狀態）
-        await loadChannels(currentWorkspace.id)
-      }
-    } catch (error) {
-      logger.error('Failed to leave channel:', error)
-    }
-  }
-
-  const toggleChannelPin = async (channelId: string) => {
-    const channel = channels.find((ch: Channel) => ch.id === channelId)
-    if (!channel) {
-      logger.error('toggleChannelPin: channel not found', channelId)
-      return
-    }
-
-    try {
-      // 🔥 直接使用 store 的 update，繞過 Facade，確保響應式更新
-      await useChannelStore.getState().update(channelId, {
-        is_favorite: !channel.is_favorite,
-      })
-    } catch (error) {
-      logger.error('Failed to toggle pin:', error)
-    }
-  }
-
+  // 處理編輯點擊
   const handleEditClick = (channelId: string) => {
-    const channel = channels.find((ch: Channel) => ch.id === channelId)
+    const channel = sidebarState.channels.find(ch => ch.id === channelId)
     if (channel) {
-      openEditChannelDialog(channel)
+      channelState.openEditChannelDialog(channel)
     }
   }
 
-  const handleEditChannel = async () => {
-    if (!channelToEdit || !editChannelName.trim()) return
-
-    try {
-      await updateChannel(channelToEdit.id, {
-        name: editChannelName.trim(),
-        description: editChannelDescription.trim() || undefined,
-      })
-      resetEditChannelDialog()
-    } catch (error) {
-      logger.error('Failed to update channel:', error)
-    }
-  }
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (!over || active.id === over.id) {
-      return
-    }
-
-    const draggedChannelId = active.id as string
-    const draggedChannel = channels.find((ch: Channel) => ch.id === draggedChannelId)
-
-    if (!draggedChannel) {
-      return
-    }
-
-    const targetGroup = channelGroups.find((g: ChannelGroup) => g.id === over.id)
-
-    if (targetGroup) {
-      await updateChannel(draggedChannelId, {
-        group_id: targetGroup.id,
-        is_favorite: false,
-      })
-      return
-    }
-
-    const targetChannel = channels.find((ch: Channel) => ch.id === over.id)
-
-    if (targetChannel) {
-      const bothHaveNoGroup = !draggedChannel.group_id && !targetChannel.group_id
-      const sameGroup = draggedChannel.group_id === targetChannel.group_id
-
-      if (!bothHaveNoGroup && !sameGroup) {
-        if (!targetChannel.group_id) {
-          await updateChannel(draggedChannelId, {
-            group_id: null,
-            is_favorite: false,
-          })
-        } else {
-          const targetGroupExists = channelGroups.find((g: ChannelGroup) => g.id === targetChannel.group_id)
-          if (targetGroupExists) {
-            await updateChannel(draggedChannelId, {
-              group_id: targetChannel.group_id,
-              is_favorite: false,
-            })
-          }
-        }
-      } else {
-        const groupChannels = channels.filter(
-          (ch: Channel) =>
-            (bothHaveNoGroup ? !ch.group_id : ch.group_id === draggedChannel.group_id) &&
-            ch.is_favorite === draggedChannel.is_favorite
-        )
-
-        const oldIndex = groupChannels.findIndex((ch: Channel) => ch.id === draggedChannelId)
-        const newIndex = groupChannels.findIndex((ch: Channel) => ch.id === over.id)
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const reorderedChannels = arrayMove(groupChannels, oldIndex, newIndex)
-
-          for (let i = 0; i < reorderedChannels.length; i++) {
-            await updateChannelOrder(reorderedChannels[i].id, i)
-          }
-        }
-      }
-    }
-  }
-
-  const isAdmin = user?.permissions?.includes('admin') ?? false
-
-  const checkIsMember = (channelId: string): boolean => {
-    // 🔥 優先使用 channel_members store（包含所有頻道的成員資料）
-    if (allChannelMembers.length > 0) {
-      return allChannelMembers.some(
-        m => m.channel_id === channelId && m.employee_id === user?.id
-      )
-    }
-
-    // Fallback: 使用當前載入的頻道成員列表
-    const members = channelMembers[channelId] || []
-    return members.some(m => m.employeeId === user?.id)
-  }
-
-  // Helper function: sort channels by name
-  const sortChannels = (channels: Channel[]) => {
-    return [...channels].sort((a: Channel, b: Channel) => {
-      // 🔥 已改為獨立「我的最愛」群組，這裡只需依名稱排序
-      return a.name.localeCompare(b.name, 'zh-TW')
-    })
-  }
-
-  // 1. Company announcements (system group, fixed at top)
-  const announcementGroup = channelGroups.find(
-    (g: ChannelGroup) => g.is_system && g.system_type === 'company_announcements'
-  )
-  const announcementChannels = announcementGroup
-    ? sortChannels(
-        filteredChannels.filter((ch: Channel) => ch.group_id === announcementGroup.id && !ch.is_archived)
-      )
-    : []
-
-  // 🔥 2. 我的最愛（is_favorite: true，獨立群組顯示）
-  const favoriteChannels = sortChannels(
-    filteredChannels.filter(
-      (ch: Channel) => ch.is_favorite && !ch.is_archived && checkIsMember(ch.id)
-    )
-  )
-  // 已加入最愛的頻道 ID 列表（用於排除）
-  const favoriteChannelIds = new Set(favoriteChannels.map(ch => ch.id))
-
-  // 3. User-defined groups (exclude archived and favorites)
-  const userGroups = channelGroups
-    .filter((g: ChannelGroup) => !g.is_system)
-    .sort((a: ChannelGroup, b: ChannelGroup) => (a.order || 0) - (b.order || 0))
-  const userGroupedChannels = userGroups.map((group: ChannelGroup) => ({
-    group,
-    channels: sortChannels(
-      filteredChannels.filter(
-        ch => ch.group_id === group.id && !ch.is_archived && checkIsMember(ch.id) && !favoriteChannelIds.has(ch.id)
-      )
-    ),
-  }))
-
-  // 4. Ungrouped channels (joined but not grouped, exclude archived and favorites)
-  const ungroupedChannels = sortChannels(
-    filteredChannels.filter((ch: Channel) => !ch.group_id && !ch.is_archived && checkIsMember(ch.id) && !favoriteChannelIds.has(ch.id))
-  )
-
-  // 4. Unjoined channels (public + not joined, exclude archived)
-  const unjoinedChannels = sortChannels(
-    filteredChannels.filter((ch: Channel) => ch.type === 'public' && !ch.is_archived && !checkIsMember(ch.id))
-  )
-
-  // 5. Archived (system group, fixed at bottom)
-  const archivedGroup = channelGroups.find((g: ChannelGroup) => g.is_system && g.system_type === 'archived')
-  const archivedChannels = archivedGroup
-    ? sortChannels(
-        filteredChannels.filter((ch: Channel) => ch.is_archived || ch.group_id === archivedGroup.id)
-      )
-    : []
-
-  const handleCreateGroup = () => {
-    if (newGroupName.trim() && currentWorkspace) {
-      createChannelGroup({
-        workspace_id: currentWorkspace.id,
-        name: newGroupName.trim(),
-        is_collapsed: false,
-        order: channelGroups.length,
-      })
-      setNewGroupName('')
-      setShowNewGroupDialog(false)
-    }
-  }
-
-  const handleCreateChannel = async () => {
-    if (!newChannelName.trim() || !currentWorkspace || !user || selectedMembers.length === 0) {
-      return
-    }
-
-    try {
-      // 建立頻道
-      const newChannel = await createChannel({
-        workspace_id: currentWorkspace.id,
-        name: newChannelName.trim(),
-        description: newChannelDescription.trim() || undefined,
-        type: newChannelType,
-        scope: newChannelScope, // 全集團或分公司
-        created_by: user.id,
-      } as Parameters<typeof createChannel>[0])
-
-      // 🔥 批次加入選中的成員
-      if (newChannel?.id) {
-        try {
-          const channelMemberStore = useChannelMemberStore.getState()
-
-          // 批次建立成員
-          const memberPromises = selectedMembers.map(async (employeeId) => {
-            return channelMemberStore.create({
-              workspace_id: currentWorkspace.id,
-              channel_id: newChannel.id,
-              employee_id: employeeId,
-              role: employeeId === user.id ? 'owner' : 'member', // 建立者是 owner
-              status: 'active',
-            })
-          })
-
-          await Promise.all(memberPromises)
-          logger.log(`✅ Added ${selectedMembers.length} members to channel`)
-
-          // 🔥 重新載入 channel_members store
-          await channelMemberStore.fetchAll()
-        } catch (memberError) {
-          logger.warn('⚠️ Failed to add members:', memberError)
-        }
-      }
-
-      resetCreateChannelDialog()
-    } catch (error) {
-      logger.error('Failed to create channel:', error)
-      void alert('建立頻道失敗', 'error')
-    }
-  }
+  const isAdmin = sidebarState.user?.permissions?.includes('admin') ?? false
 
   return (
     <div className="w-[280px] bg-white border-r border-morandi-gold/20 flex flex-col shrink-0">
       {/* Workspace header */}
       <WorkspaceHeader
-        workspaceName={currentWorkspace?.name || ''}
-        workspaceIcon={currentWorkspace?.icon || ''}
-        channelFilter={channelFilter}
-        onFilterChange={setChannelFilter}
-        onCreateChannel={() => setShowCreateChannelDialog(true)}
-        onCreateGroup={() => setShowNewGroupDialog(true)}
-        onRefresh={() => currentWorkspace?.id && loadChannels(currentWorkspace.id)}
-        isRefreshing={loading || isCreatingDm}
+        workspaceName={sidebarState.currentWorkspace?.name || ''}
+        workspaceIcon={sidebarState.currentWorkspace?.icon || ''}
+        channelFilter={sidebarState.channelFilter}
+        onFilterChange={sidebarState.setChannelFilter}
+        onCreateChannel={() => channelState.setShowCreateChannelDialog(true)}
+        onCreateGroup={() => channelState.setShowNewGroupDialog(true)}
+        onRefresh={() =>
+          sidebarState.currentWorkspace?.id &&
+          sidebarState.loadChannels(sidebarState.currentWorkspace.id)
+        }
+        isRefreshing={sidebarState.loading || sidebarState.isCreatingDm}
       />
 
       {/* Search input */}
@@ -543,100 +146,125 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         <input
           type="text"
           placeholder="搜尋頻道..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          value={sidebarState.searchQuery}
+          onChange={e => sidebarState.setSearchQuery(e.target.value)}
           className="h-8 text-sm"
         />
       </div>
 
       {/* Channel list */}
       <ChannelList
-        announcementChannels={announcementChannels}
-        announcementGroup={announcementGroup}
-        favoriteChannels={favoriteChannels}
-        userGroupedChannels={userGroupedChannels}
-        ungroupedChannels={ungroupedChannels}
-        unjoinedChannels={unjoinedChannels}
-        archivedChannels={archivedChannels}
-        archivedGroup={archivedGroup}
-        dmMembers={dmMembers}
+        announcementChannels={processedChannels.announcementChannels}
+        announcementGroup={processedChannels.announcementGroup}
+        favoriteChannels={processedChannels.favoriteChannels}
+        userGroupedChannels={processedChannels.userGroupedChannels}
+        ungroupedChannels={processedChannels.ungroupedChannels}
+        unjoinedChannels={processedChannels.unjoinedChannels}
+        archivedChannels={processedChannels.archivedChannels}
+        archivedGroup={processedChannels.archivedGroup}
+        dmMembers={sidebarState.dmMembers}
         selectedChannelId={selectedChannelId}
         isAdmin={isAdmin}
         expandedSections={expandedSections}
-        searchQuery={searchQuery}
+        searchQuery={sidebarState.searchQuery}
         onSelectChannel={onSelectChannel}
         onSelectMember={handleSelectMember}
-        toggleChannelFavorite={toggleChannelPin}
+        toggleChannelFavorite={sidebarState.toggleChannelPin}
         onDelete={handleDeleteClick}
         onEdit={handleEditClick}
-        onJoinChannel={handleJoinChannel}
-        onLeaveChannel={handleLeaveChannel}
-        checkIsMember={checkIsMember}
-        toggleGroupCollapse={toggleGroupCollapse}
+        onJoinChannel={sidebarState.handleJoinChannel}
+        onLeaveChannel={sidebarState.handleLeaveChannel}
+        checkIsMember={sidebarState.checkIsMember}
+        toggleGroupCollapse={sidebarState.toggleGroupCollapse}
         handleDeleteGroupClick={handleDeleteGroupClick}
         onToggleExpanded={(section: string, expanded: boolean) => {
           setExpandedSections(prev => ({ ...prev, [section]: expanded }))
         }}
-        onDragEnd={handleDragEnd}
+        onDragEnd={handlers.handleDragEnd}
       />
 
       {/* Dialogs */}
       <CreateGroupDialog
-        isOpen={showNewGroupDialog}
-        groupName={newGroupName}
-        onGroupNameChange={setNewGroupName}
-        onClose={() => setShowNewGroupDialog(false)}
-        onCreate={handleCreateGroup}
+        isOpen={channelState.showNewGroupDialog}
+        groupName={channelState.newGroupName}
+        onGroupNameChange={channelState.setNewGroupName}
+        onClose={() => channelState.setShowNewGroupDialog(false)}
+        onCreate={() => {
+          handlers.handleCreateGroup(channelState.newGroupName)
+          channelState.setNewGroupName('')
+          channelState.setShowNewGroupDialog(false)
+        }}
       />
 
       <CreateChannelDialog
-        isOpen={showCreateChannelDialog}
-        channelName={newChannelName}
-        channelDescription={newChannelDescription}
-        channelType={newChannelType}
-        channelScope={newChannelScope}
-        selectedMembers={selectedMembers}
-        onChannelNameChange={setNewChannelName}
-        onChannelDescriptionChange={setNewChannelDescription}
-        onChannelTypeChange={setNewChannelType}
-        onChannelScopeChange={setNewChannelScope}
-        onMembersChange={setSelectedMembers}
-        onClose={resetCreateChannelDialog}
-        onCreate={handleCreateChannel}
+        isOpen={channelState.showCreateChannelDialog}
+        channelName={channelState.newChannelName}
+        channelDescription={channelState.newChannelDescription}
+        channelType={channelState.newChannelType}
+        channelScope={channelState.newChannelScope}
+        selectedMembers={channelState.selectedMembers}
+        onChannelNameChange={channelState.setNewChannelName}
+        onChannelDescriptionChange={channelState.setNewChannelDescription}
+        onChannelTypeChange={channelState.setNewChannelType}
+        onChannelScopeChange={channelState.setNewChannelScope}
+        onMembersChange={channelState.setSelectedMembers}
+        onClose={channelState.resetCreateChannelDialog}
+        onCreate={async () => {
+          await handlers.handleCreateChannel(
+            channelState.newChannelName,
+            channelState.newChannelDescription,
+            channelState.newChannelType,
+            channelState.newChannelScope
+          )
+          channelState.resetCreateChannelDialog()
+        }}
       />
 
       <EditChannelDialog
-        isOpen={showEditChannelDialog}
-        channelName={editChannelName}
-        channelDescription={editChannelDescription}
-        onChannelNameChange={setEditChannelName}
-        onChannelDescriptionChange={setEditChannelDescription}
-        onClose={resetEditChannelDialog}
-        onSave={handleEditChannel}
+        isOpen={channelState.showEditChannelDialog}
+        channelName={channelState.editChannelName}
+        channelDescription={channelState.editChannelDescription}
+        onChannelNameChange={channelState.setEditChannelName}
+        onChannelDescriptionChange={channelState.setEditChannelDescription}
+        onClose={channelState.resetEditChannelDialog}
+        onSave={async () => {
+          await handlers.handleEditChannel(
+            channelState.channelToEdit,
+            channelState.editChannelName,
+            channelState.editChannelDescription
+          )
+          channelState.resetEditChannelDialog()
+        }}
       />
 
       <MemberManagementDialog
-        memberToRemove={memberToRemove}
-        isRemoveDialogOpen={isRemoveDialogOpen}
-        isRemovingMember={isRemovingMember}
-        onClose={closeRemoveMemberDialog}
+        memberToRemove={channelState.memberToRemove}
+        isRemoveDialogOpen={channelState.isRemoveDialogOpen}
+        isRemovingMember={channelState.isRemovingMember}
+        onClose={channelState.closeRemoveMemberDialog}
         onRemove={handleRemoveMember}
       />
 
       <ChannelDeleteDialog
-        channelToDelete={channelToDelete}
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        isDeletingChannel={isDeletingChannel}
-        onClose={closeDeleteChannelDialog}
-        onDelete={handleDeleteChannel}
+        channelToDelete={channelState.channelToDelete}
+        isDeleteDialogOpen={channelState.isDeleteDialogOpen}
+        isDeletingChannel={channelState.isDeletingChannel}
+        onClose={channelState.closeDeleteChannelDialog}
+        onDelete={async () => {
+          await handlers.handleDeleteChannel(channelState.channelToDelete)
+          channelState.closeDeleteChannelDialog()
+        }}
       />
 
       <GroupDeleteDialog
-        groupToDelete={groupToDelete}
-        isDeleteDialogOpen={isGroupDeleteDialogOpen}
-        isDeletingGroup={isDeletingGroup}
-        onClose={closeDeleteGroupDialog}
-        onDelete={handleDeleteGroup}
+        groupToDelete={channelState.groupToDelete}
+        isDeleteDialogOpen={channelState.isGroupDeleteDialogOpen}
+        isDeletingGroup={channelState.isDeletingGroup}
+        onClose={channelState.closeDeleteGroupDialog}
+        onDelete={async () => {
+          await handlers.handleDeleteGroup(channelState.groupToDelete)
+          channelState.closeDeleteGroupDialog()
+        }}
       />
     </div>
   )

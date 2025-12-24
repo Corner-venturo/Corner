@@ -1,24 +1,11 @@
-import React, { useMemo, useState } from 'react'
-import { TourFormData, CityOption, CoverStyleType, FlightStyleType } from '../types'
-import { Combobox } from '@/components/ui/combobox'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useRegionsStore } from '@/stores'
-import { supabase } from '@/lib/supabase/client'
-import { Settings2, Loader2, CalendarIcon } from 'lucide-react'
+import React, { useState } from 'react'
+import { TourFormData, CityOption } from '../types'
+import { Settings2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { toHalfWidth } from '@/lib/utils/text'
-import { RichTextInput } from '@/components/ui/rich-text-input'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
-import { ImageUploader } from '@/components/ui/image-uploader'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useTemplates, getTemplateColor } from '@/features/itinerary/hooks/useTemplates'
 import { PreviewPanel } from '../components/PreviewPanel'
-import { logger } from '@/lib/utils/logger'
 // Hero 組件
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
@@ -27,6 +14,10 @@ import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
 import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
 import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHeroDreamscape'
 import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCollage'
+// 拆分的模組
+import { useCoverInfo } from './cover/hooks/useCoverInfo'
+import { CoverImageUpload } from './cover/CoverImageUpload'
+import { CoverInfoForm } from './cover/CoverInfoForm'
 
 interface CoverInfoSectionProps {
   data: TourFormData
@@ -48,7 +39,6 @@ interface CoverInfoSectionProps {
 
 export function CoverInfoSection({
   data,
-  user,
   selectedCountry,
   setSelectedCountry,
   setSelectedCountryCode,
@@ -59,101 +49,70 @@ export function CoverInfoSection({
   updateCity,
   onChange,
 }: CoverInfoSectionProps) {
-  const { cities, updateCity: updateCityInStore } = useRegionsStore()
-  const { coverTemplates, loading: templatesLoading } = useTemplates()
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('')
-  // 封面設定 Modal
   const [showCoverSettings, setShowCoverSettings] = useState(false)
 
-  // 取得當前選擇城市的圖片
-  const cityImages = useMemo(() => {
-    if (!data.city) return []
+  const {
+    cityImages,
+    coverStyleOptions,
+    currentStyleOption,
+    currentStyleColor,
+    showUpdateDialog,
+    setShowUpdateDialog,
+    uploadedImageUrl,
+    setUploadedImageUrl,
+    templatesLoading,
+    handleUpdateCityImage,
+    handleCoverStyleChange,
+  } = useCoverInfo({ data, onChange })
 
-    const selectedCity = cities.find(c => c.name === data.city)
-    if (!selectedCity) return []
-
-    const images = []
-    if (selectedCity.background_image_url) {
-      images.push({
-        url: selectedCity.background_image_url,
-        label: '圖片 1',
-      })
-    }
-    if (selectedCity.background_image_url_2) {
-      images.push({
-        url: selectedCity.background_image_url_2,
-        label: '圖片 2',
-      })
-    }
-    return images
-  }, [data.city, cities])
-
-  // 更新城市預設圖片
-  const handleUpdateCityImage = async (imageNumber: 1 | 2) => {
-    if (!data.city || !uploadedImageUrl) return
-
-    const selectedCity = cities.find(c => c.name === data.city)
-    if (!selectedCity) return
-
-    try {
-      const updateData = imageNumber === 1
-        ? { background_image_url: uploadedImageUrl }
-        : { background_image_url_2: uploadedImageUrl }
-
-      // 更新資料庫
-      const { error } = await supabase
-        .from('cities')
-        .update(updateData)
-        .eq('id', selectedCity.id)
-
-      if (error) throw error
-
-      // 更新本地 store
-      await updateCityInStore(selectedCity.id, updateData)
-
-      void alert(`已將圖片設為「${data.city}」的預設圖片 ${imageNumber}！`, 'success')
-      setShowUpdateDialog(false)
-    } catch (error) {
-      logger.error('更新城市圖片失敗:', error)
-      void alert('更新失敗，請稍後再試', 'error')
+  // 處理圖片上傳
+  const handleImageUpload = (url: string) => {
+    const oldImage = data.coverImage
+    updateField('coverImage', url)
+    // 如果上傳了新圖片且有城市，詢問是否設為預設
+    if (url && data.city && oldImage !== url) {
+      setUploadedImageUrl(url)
+      setShowUpdateDialog(true)
     }
   }
 
-  // 封面風格對應的預設航班風格映射
-  const getDefaultFlightStyle = (coverStyle: CoverStyleType): FlightStyleType => {
-    switch (coverStyle) {
-      case 'nature':
-        return 'chinese'
+  // 生成預覽用資料
+  const getHeroData = () => ({
+    coverImage: data.coverImage,
+    tagline: data.tagline || 'Corner Travel',
+    title: data.title || '行程標題',
+    subtitle: data.subtitle || '副標題',
+    description: data.description || '此處顯示行程描述',
+    departureDate: data.departureDate || '2025/01/01',
+    tourCode: data.tourCode || 'CODE',
+    price: data.price || '',
+    priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || '/人'),
+    country: selectedCountry || '',
+    city: data.city || '',
+    dailyItinerary: data.dailyItinerary,
+  })
+
+  // 根據風格渲染對應的 Hero 組件
+  const renderHeroPreview = (viewMode: 'desktop' | 'mobile') => {
+    const heroData = getHeroData()
+
+    switch (data.coverStyle) {
       case 'luxury':
-        return 'luxury'
+        return <TourHeroLuxury data={heroData} viewMode={viewMode} />
       case 'art':
-        return 'art'
+        return <TourHeroArt data={heroData} viewMode={viewMode} />
+      case 'nature':
+        return <TourHeroNature data={heroData} viewMode={viewMode} />
+      case 'gemini':
+        return <TourHeroGemini data={heroData} viewMode={viewMode} />
       case 'dreamscape':
-        return 'dreamscape'
+        return <TourHeroDreamscape data={heroData} viewMode={viewMode} />
       case 'collage':
-        return 'collage'
+        return <TourHeroCollage data={heroData} viewMode={viewMode} />
       default:
-        return 'original'
+        return <TourHeroSection data={heroData} viewMode={viewMode} />
     }
   }
-
-  // 從資料庫載入的封面風格選項（排除 serene）
-  const coverStyleOptions = useMemo(() => {
-    return coverTemplates
-      .filter(template => template.id !== 'serene')
-      .map(template => ({
-        value: template.id as CoverStyleType,
-        label: template.name,
-        description: template.description || '',
-        color: getTemplateColor(template.id),
-        previewImage: template.preview_image_url,
-      }))
-  }, [coverTemplates])
-
-  // 取得當前風格的顏色
-  const currentStyleOption = coverStyleOptions.find(o => o.value === (data.coverStyle || 'original'))
-  const currentStyleColor = currentStyleOption?.color || getTemplateColor(data.coverStyle)
 
   return (
     <div className="space-y-2">
@@ -197,271 +156,41 @@ export function CoverInfoSection({
               </DialogHeader>
 
               <div className="space-y-4">
-            {/* 封面風格選擇器 */}
-            <div>
-              <label className="block text-sm font-medium text-morandi-primary mb-2">封面風格</label>
-              {templatesLoading ? (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  {coverStyleOptions.map((option) => {
-                    const isSelected = (data.coverStyle || 'original') === option.value
-                    // 取第一個字作為代表
-                    const shortLabel = option.value === 'gemini' ? 'G' : option.label.charAt(0)
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        title={option.label}
-                        onClick={() => {
-                          onChange({
-                            ...data,
-                            coverStyle: option.value,
-                            flightStyle: getDefaultFlightStyle(option.value),
-                          })
-                        }}
-                        className={cn(
-                          'w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center text-sm',
-                          isSelected
-                            ? 'ring-2 ring-offset-1'
-                            : 'border-morandi-container hover:border-opacity-70 bg-white'
-                        )}
-                        style={{
-                          borderColor: isSelected ? option.color : undefined,
-                          backgroundColor: isSelected ? option.color : undefined,
-                          color: isSelected ? 'white' : option.color,
-                          ...(isSelected ? { ['--tw-ring-color' as string]: `${option.color}40` } : {})
-                        }}
-                      >
-                        {shortLabel}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* 基本資訊 */}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">
-                  標籤文字
-                  <span className="ml-2 text-xs text-morandi-secondary font-normal">選取文字可調整樣式</span>
-                </label>
-                <RichTextInput
-                  value={data.tagline || ''}
-                  onChange={value => updateField('tagline', value)}
-                  placeholder="Venturo Travel 2025 秋季精選"
+                {/* 表單區塊 */}
+                <CoverInfoForm
+                  data={data}
+                  selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
+                  setSelectedCountryCode={setSelectedCountryCode}
+                  allDestinations={allDestinations}
+                  availableCities={availableCities}
+                  countryNameToCode={countryNameToCode}
+                  updateField={updateField}
+                  updateCity={updateCity}
+                  onChange={onChange}
+                  coverStyleOptions={coverStyleOptions}
+                  onCoverStyleChange={handleCoverStyleChange}
+                  templatesLoading={templatesLoading}
                 />
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">主標題</label>
-                  <RichTextInput
-                    value={data.title || ''}
-                    onChange={value => updateField('title', value)}
-                    placeholder="漫遊福岡"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">副標題</label>
-                  <RichTextInput
-                    value={data.subtitle || ''}
-                    onChange={value => updateField('subtitle', value)}
-                    placeholder={data.coverStyle === 'art' ? 'Odyssey' : '半自由行'}
-                  />
-                  {data.coverStyle === 'art' && !data.subtitle && (
-                    <p className="text-xs text-morandi-secondary mt-1">
-                      💡 藝術雜誌風格預設為「Odyssey」，可自訂為旅行主題
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
-                <RichTextInput
-                  value={data.description || ''}
-                  onChange={value => updateField('description', value)}
-                  placeholder="2日市區自由活動 · 保證入住溫泉飯店 · 柳川遊船 · 阿蘇火山"
-                  singleLine={false}
+                {/* 封面圖片 */}
+                <CoverImageUpload
+                  cityImages={cityImages}
+                  selectedImage={data.coverImage}
+                  onImageSelect={(url) => updateField('coverImage', url)}
+                  onImageUpload={handleImageUpload}
+                  position={data.coverImagePosition as ImagePositionSettings}
+                  onPositionChange={(pos) => updateField('coverImagePosition', pos)}
                 />
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">國家</label>
-                  <Combobox
-                    value={selectedCountry}
-                    onChange={newCountry => {
-                      setSelectedCountry(newCountry)
-                      const code = countryNameToCode[newCountry]
-                      setSelectedCountryCode(code || '')
-                      onChange({
-                        ...data,
-                        country: newCountry,
-                        city: '',
-                      })
-                    }}
-                    options={allDestinations.map(dest => ({ value: dest.name, label: dest.name }))}
-                    placeholder="搜尋或選擇國家..."
-                    showSearchIcon
-                    showClearButton
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">城市</label>
-                  <Combobox
-                    value={data.city || ''}
-                    onChange={value => updateCity(value)}
-                    options={availableCities.map(city => ({ value: city.name, label: city.name }))}
-                    placeholder="搜尋或選擇城市..."
-                    showSearchIcon
-                    showClearButton
-                    disabled={!selectedCountry}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">出發日期</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          'w-full h-9 justify-start text-left font-normal',
-                          !data.departureDate && 'text-muted-foreground'
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {data.departureDate || '選擇日期'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : undefined}
-                        onSelect={(date) => {
-                          if (date && date instanceof Date) {
-                            const formatted = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
-                            updateField('departureDate', formatted)
-                          }
-                        }}
-                        defaultMonth={data.departureDate ? new Date(data.departureDate.replace(/\//g, '-')) : new Date()}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">行程代碼</label>
-                  <Input
-                    type="text"
-                    value={data.tourCode || ''}
-                    onChange={e => updateField('tourCode', e.target.value)}
-                    placeholder="25JFO21CIG"
-                    className="h-9"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">價格</label>
-                  <Input
-                    type="text"
-                    value={data.price || ''}
-                    onChange={e => {
-                      const halfWidthValue = toHalfWidth(e.target.value)
-                      const rawValue = halfWidthValue.replace(/[^\d]/g, '')
-                      const formattedValue = rawValue ? Number(rawValue).toLocaleString('en-US') : ''
-                      updateField('price', formattedValue)
-                    }}
-                    placeholder="39,800"
-                    className="h-9"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-morandi-primary mb-1">單位</label>
-                  <Select value={data.priceNote || '/人'} onValueChange={(value) => updateField('priceNote', value)}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="選擇單位" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="/人">/人</SelectItem>
-                      <SelectItem value="起">起</SelectItem>
-                      <SelectItem value="/人起">/人起</SelectItem>
-                      <SelectItem value="__hidden__">(不顯示)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            {/* 封面圖片 */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-morandi-primary">封面圖片</label>
-
-              {/* 城市預設圖片選擇 */}
-              {cityImages.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
-                  {cityImages.map((image, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => updateField('coverImage', image.url)}
-                      className={`relative group overflow-hidden rounded-lg border-2 transition-all ${
-                        data.coverImage === image.url
-                          ? 'border-morandi-gold ring-2 ring-morandi-gold/30'
-                          : 'border-morandi-container hover:border-morandi-gold/50'
-                      }`}
-                    >
-                      <img src={image.url} alt={image.label} className="w-full h-20 object-cover" />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5">
-                        <p className="text-white text-xs">{image.label}</p>
-                      </div>
-                      {data.coverImage === image.url && (
-                        <div className="absolute top-1 right-1 bg-morandi-gold text-white text-[10px] px-1.5 py-0.5 rounded">✓</div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* 上傳圖片（支援拖曳） */}
-              <ImageUploader
-                value={data.coverImage}
-                onChange={(url) => {
-                  const oldImage = data.coverImage
-                  updateField('coverImage', url)
-                  // 如果上傳了新圖片且有城市，詢問是否設為預設
-                  if (url && data.city && oldImage !== url) {
-                    setUploadedImageUrl(url)
-                    setShowUpdateDialog(true)
-                  }
-                }}
-                position={data.coverImagePosition as ImagePositionSettings}
-                onPositionChange={(pos) => updateField('coverImagePosition', pos)}
-                bucket="city-backgrounds"
-                filePrefix="itinerary"
-                previewHeight="112px"
-                aspectRatio={16 / 9}
-                placeholder="拖曳圖片到此處，或點擊上傳"
-              />
-            </div>
-
-            {/* 完成按鈕 */}
-            <Button
-              onClick={() => setShowCoverSettings(false)}
-              className="w-full"
-              style={{ backgroundColor: currentStyleColor }}
-            >
-              完成設定
-            </Button>
+                {/* 完成按鈕 */}
+                <Button
+                  onClick={() => setShowCoverSettings(false)}
+                  className="w-full"
+                  style={{ backgroundColor: currentStyleColor }}
+                >
+                  完成設定
+                </Button>
               </div>
             </div>
 
@@ -470,39 +199,7 @@ export function CoverInfoSection({
               styleLabel={currentStyleOption?.label || '經典全屏'}
               styleColor={currentStyleColor}
             >
-              {(viewMode) => {
-                const heroData = {
-                  coverImage: data.coverImage,
-                  tagline: data.tagline || 'Corner Travel',
-                  title: data.title || '行程標題',
-                  subtitle: data.subtitle || '副標題',
-                  description: data.description || '此處顯示行程描述',
-                  departureDate: data.departureDate || '2025/01/01',
-                  tourCode: data.tourCode || 'CODE',
-                  price: data.price || '',
-                  priceNote: data.priceNote === '__hidden__' ? '' : (data.priceNote || '/人'),
-                  country: selectedCountry || '',
-                  city: data.city || '',
-                  dailyItinerary: data.dailyItinerary,
-                }
-
-                switch (data.coverStyle) {
-                  case 'luxury':
-                    return <TourHeroLuxury data={heroData} viewMode={viewMode} />
-                  case 'art':
-                    return <TourHeroArt data={heroData} viewMode={viewMode} />
-                  case 'nature':
-                    return <TourHeroNature data={heroData} viewMode={viewMode} />
-                  case 'gemini':
-                    return <TourHeroGemini data={heroData} viewMode={viewMode} />
-                  case 'dreamscape':
-                    return <TourHeroDreamscape data={heroData} viewMode={viewMode} />
-                  case 'collage':
-                    return <TourHeroCollage data={heroData} viewMode={viewMode} />
-                  default:
-                    return <TourHeroSection data={heroData} viewMode={viewMode} />
-                }
-              }}
+              {renderHeroPreview}
             </PreviewPanel>
           </div>
         </DialogContent>
@@ -512,7 +209,7 @@ export function CoverInfoSection({
       <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>✅ 圖片上傳成功！</DialogTitle>
+            <DialogTitle>圖片上傳成功！</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-morandi-secondary">
@@ -560,7 +257,6 @@ export function CoverInfoSection({
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   )
 }
