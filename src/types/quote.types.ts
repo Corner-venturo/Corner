@@ -50,6 +50,7 @@ export interface Quote extends BaseEntity {
   tour_code?: string // 團體編號（快速報價單用）
   handler_name?: string // 承辦業務（快速報價單用）
   issue_date?: string // 開單日期（快速報價單用）
+  expense_description?: string // 費用說明（快速報價單用）
   received_amount?: number // 已收金額
   balance_amount?: number // 應收餘額（自動計算）
   quick_quote_items?: QuickQuoteItem[] // 快速報價單的收費明細項目

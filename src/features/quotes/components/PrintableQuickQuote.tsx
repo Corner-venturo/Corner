@@ -521,11 +521,11 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
           </table>
 
           {/* 費用說明 - 只有有資料才顯示 */}
-          {(quote as any).expense_description && (
+          {quote.expense_description && (
             <div style={{ marginBottom: '20px', padding: '12px 16px', backgroundColor: '#FAF7F2', border: '1px solid #E5E7EB', borderRadius: '8px' }}>
               <div style={{ fontWeight: 600, color: '#333333', marginBottom: '8px', fontSize: '14px' }}>費用說明</div>
               <div style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                {(quote as any).expense_description}
+                {quote.expense_description}
               </div>
             </div>
           )}

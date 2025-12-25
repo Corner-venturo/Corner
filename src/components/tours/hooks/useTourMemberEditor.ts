@@ -87,7 +87,7 @@ export function useTourMemberEditor(
       }
       return order.tour_id === tour.id
     })
-    return filtered as any[]
+    return filtered
   }, [orders, tour.id, orderFilter])
 
   useEffect(() => {

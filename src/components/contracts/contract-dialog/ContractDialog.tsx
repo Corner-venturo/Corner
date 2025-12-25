@@ -26,7 +26,7 @@ const CONTRACT_TEMPLATES = [
   },
 ]
 
-const CONTRACT_TEMPLATE_LABELS = {
+const CONTRACT_TEMPLATE_LABELS: Record<ContractTemplate, string> = {
   domestic: '國內旅遊定型化契約',
   international: '國外旅遊定型化契約',
   individual_international: '國外個別旅遊定型化契約',
@@ -181,7 +181,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 <div>
                   <div className="text-xs text-morandi-secondary">合約範本</div>
                   <div className="text-sm text-morandi-primary font-medium">
-                    {(CONTRACT_TEMPLATE_LABELS as any)[tour.contract_template]}
+                    {tour.contract_template && CONTRACT_TEMPLATE_LABELS[tour.contract_template as ContractTemplate]}
                   </div>
                 </div>
                 <div>
