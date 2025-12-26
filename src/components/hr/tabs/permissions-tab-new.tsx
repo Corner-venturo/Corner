@@ -170,7 +170,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
       <div className="space-y-6">
         {/* 自動儲存提示 */}
         {showSavedMessage && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-green-700">
+          <div className="bg-status-success-bg border border-status-success rounded-lg p-3 flex items-center gap-2 text-status-success">
             <Check size={16} />
             <span className="text-sm font-medium">✓ 已自動儲存</span>
           </div>
@@ -191,7 +191,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
             <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">可複選</span>
             <div className="group relative">
               <Info size={16} className="text-morandi-secondary cursor-help" />
-              <div className="absolute left-0 top-6 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              <div className="absolute left-0 top-6 w-64 bg-foreground text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                 員工可以擁有多個角色。例如：超級管理員同時也可以是業務。
               </div>
             </div>
@@ -218,7 +218,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                           'w-5 h-5 rounded border-2 flex items-center justify-center',
                           isSelected
                             ? 'border-morandi-gold bg-morandi-gold'
-                            : 'border-gray-300'
+                            : 'border-border'
                         )}
                       >
                         {isSelected && <Check size={12} className="text-white" />}

@@ -108,7 +108,7 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
             return (
               <span className="flex items-center gap-1 cursor-pointer text-primary hover:underline">
                 {needsVerification && (
-                  <AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
+                  <AlertTriangle size={14} className="text-status-warning flex-shrink-0" />
                 )}
                 <ImageIcon size={12} className="text-primary flex-shrink-0" />
                 <span className="truncate">{name}</span>
@@ -140,7 +140,7 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
           <div className="text-sm text-muted-foreground">
             共 {tableMembers.length} 位成員
             {hasExistingData && !isEditMode && (
-              <span className="ml-2 text-amber-600">
+              <span className="ml-2 text-status-warning">
                 （已有 {tableMembers.filter((m) => m.name?.trim()).length} 位有資料）
               </span>
             )}
@@ -225,8 +225,8 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
                 有護照照片的成員，點擊可預覽或驗證
               </p>
               <p>
-                • <AlertTriangle size={12} className="inline text-amber-500" />{' '}
-                金色驚嘆號表示護照資料待驗證，點擊可進行驗證
+                • <AlertTriangle size={12} className="inline text-status-warning" />{' '}
+                金色驚嘆號表示護照資料待驗證,點擊可進行驗證
               </p>
             </>
           )}

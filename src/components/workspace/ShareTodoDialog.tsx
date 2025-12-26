@@ -104,8 +104,8 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
   }
 
   const getPriorityColor = (priority: number) => {
-    if (priority >= 4) return 'text-red-600'
-    if (priority === 3) return 'text-orange-600'
+    if (priority >= 4) return 'text-status-danger'
+    if (priority === 3) return 'text-status-warning'
     return 'text-morandi-secondary'
   }
 

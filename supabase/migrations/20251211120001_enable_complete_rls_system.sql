@@ -12,12 +12,13 @@ BEGIN;
 -- ============================================
 
 -- 先刪除舊的函數（如果存在且返回類型不同）
-DROP FUNCTION IF EXISTS public.get_current_user_workspace();
-DROP FUNCTION IF EXISTS public.is_super_admin();
-DROP FUNCTION IF EXISTS public.get_current_employee_id();
-DROP FUNCTION IF EXISTS public.set_current_workspace(text);
-DROP FUNCTION IF EXISTS public.set_current_workspace(uuid);
-DROP FUNCTION IF EXISTS public.set_current_workspace(varchar);
+-- 使用 CASCADE 來處理依賴的 policies
+DROP FUNCTION IF EXISTS public.get_current_user_workspace() CASCADE;
+DROP FUNCTION IF EXISTS public.is_super_admin() CASCADE;
+DROP FUNCTION IF EXISTS public.get_current_employee_id() CASCADE;
+DROP FUNCTION IF EXISTS public.set_current_workspace(text) CASCADE;
+DROP FUNCTION IF EXISTS public.set_current_workspace(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.set_current_workspace(varchar) CASCADE;
 
 -- 1. 取得當前用戶的 workspace_id
 CREATE OR REPLACE FUNCTION public.get_current_user_workspace()

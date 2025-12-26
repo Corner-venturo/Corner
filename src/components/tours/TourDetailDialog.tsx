@@ -14,6 +14,7 @@ import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { TourDocuments } from '@/components/tours/tour-documents'
+import { TourRequests } from '@/components/tours/tour-requests'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
@@ -45,6 +46,7 @@ const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'payments', label: '收款紀錄' },
   { value: 'costs', label: '成本支出' },
+  { value: 'requests', label: '需求管理' },
   { value: 'documents', label: '文件確認' },
 ]
 
@@ -220,6 +222,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         )
       case 'costs':
         return <TourCosts tour={tour} />
+      case 'requests':
+        return <TourRequests tourId={tour.id} />
       case 'documents':
         return <TourDocuments tour={tour} />
       default:

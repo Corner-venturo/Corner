@@ -185,7 +185,7 @@ export default function RegionsTab() {
         key: 'has_regions',
         label: '有地區',
         render: (_value, row) => (
-          <span className={row.has_regions ? 'text-green-600' : 'text-muted-foreground'}>
+          <span className={row.has_regions ? 'text-status-success' : 'text-muted-foreground'}>
             {row.has_regions ? '是' : '否'}
           </span>
         ),
@@ -194,7 +194,7 @@ export default function RegionsTab() {
         key: 'is_active',
         label: '狀態',
         render: (_value, row) => (
-          <span className={row.is_active ? 'text-green-600' : 'text-muted-foreground'}>
+          <span className={row.is_active ? 'text-status-success' : 'text-muted-foreground'}>
             {row.is_active ? '啟用' : '停用'}
           </span>
         ),
@@ -213,7 +213,7 @@ export default function RegionsTab() {
               className="h-8 px-3 text-xs"
             >
               {cityCount} 城市
-              {majorCount > 0 && <span className="ml-1 text-amber-600">({majorCount} 主要)</span>}
+              {majorCount > 0 && <span className="ml-1 text-morandi-gold">({majorCount} 主要)</span>}
             </Button>
           )
         },
@@ -258,7 +258,7 @@ export default function RegionsTab() {
         key: 'is_active',
         label: '狀態',
         render: (_value, row) => (
-          <span className={row.is_active ? 'text-green-600' : 'text-muted-foreground'}>
+          <span className={row.is_active ? 'text-status-success' : 'text-muted-foreground'}>
             {row.is_active ? '啟用' : '停用'}
           </span>
         ),
@@ -280,7 +280,7 @@ export default function RegionsTab() {
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteRegion(row.id)}
-              className="h-8 px-2 text-xs text-red-500 hover:text-red-600"
+              className="h-8 px-2 text-xs text-status-danger hover:text-status-danger"
             >
               刪除
             </Button>
@@ -357,7 +357,7 @@ export default function RegionsTab() {
                         />
                         <span className="text-sm">{city.name}</span>
                         {city.is_major && (
-                          <Star size={12} className="text-amber-500 fill-amber-500 ml-auto" />
+                          <Star size={12} className="text-morandi-gold fill-morandi-gold ml-auto" />
                         )}
                       </label>
                     ))}

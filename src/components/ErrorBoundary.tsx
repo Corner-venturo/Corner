@@ -61,14 +61,14 @@ export class ErrorBoundary extends React.Component<
 
               {process.env.NODE_ENV === 'development' && (
                 <>
-                  <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-md">
+                  <div className="p-4 bg-muted rounded-md">
                     <p className="text-foreground font-semibold mb-2">錯誤堆疊：</p>
                     <pre className="text-xs text-foreground overflow-auto max-h-48">
                       {this.state.error?.stack}
                     </pre>
                   </div>
 
-                  <div className="p-4 bg-gray-100 dark:bg-zinc-800 rounded-md">
+                  <div className="p-4 bg-muted rounded-md">
                     <p className="text-foreground font-semibold mb-2">組件堆疊：</p>
                     <pre className="text-xs text-foreground overflow-auto max-h-48">
                       {this.state.errorInfo?.componentStack}

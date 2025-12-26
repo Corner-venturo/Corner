@@ -225,7 +225,7 @@ export function TourConfirmationWizard({
                   className={cn(
                     'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors',
                     isActive && 'bg-morandi-gold/20 text-morandi-gold font-medium',
-                    isCompleted && 'bg-green-100 text-green-700',
+                    isCompleted && 'bg-status-success-bg text-status-success',
                     !isActive && !isCompleted && 'text-muted-foreground'
                   )}
                 >
@@ -360,12 +360,12 @@ export function TourConfirmationWizard({
               {/* Step 3: 確認鎖定 */}
               {currentStep === 'confirm' && (
                 <div className="space-y-6">
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="bg-status-warning-bg border border-status-warning/30 rounded-lg p-4">
                     <div className="flex gap-3">
-                      <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-status-warning flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-medium text-amber-800">確認鎖定版本</h4>
-                        <p className="text-sm text-amber-700 mt-1">
+                        <h4 className="font-medium text-morandi-primary">確認鎖定版本</h4>
+                        <p className="text-sm text-morandi-secondary mt-1">
                           鎖定後，報價單和行程將無法自由修改。如需修改，須先輸入密碼解鎖。
                         </p>
                       </div>

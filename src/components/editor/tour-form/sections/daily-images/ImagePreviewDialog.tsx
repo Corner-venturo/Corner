@@ -205,7 +205,7 @@ export function ImagePositionEditor({
         {/* 模擬橫向裁切框 */}
         <div
           ref={containerRef}
-          className="relative w-full aspect-[16/9] bg-gray-900 rounded-lg overflow-hidden cursor-crosshair"
+          className="relative w-full aspect-[16/9] bg-foreground rounded-lg overflow-hidden cursor-crosshair"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

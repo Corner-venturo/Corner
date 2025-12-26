@@ -107,7 +107,7 @@ export default function ResetDBPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-8">
+    <div className="min-h-screen flex items-center justify-center bg-muted p-8">
       <Card className="max-w-2xl w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -121,17 +121,17 @@ export default function ResetDBPage() {
 
         <CardContent className="space-y-6">
           {/* 說明 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-4">
             <div className="flex gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-900">
+              <AlertCircle className="h-5 w-5 text-status-info flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-morandi-primary">
                 <strong>這個工具會：</strong>
                 <ol className="list-decimal ml-4 mt-2 space-y-1">
                   <li>刪除本地 IndexedDB 的所有資料</li>
                   <li>重新整理頁面後，系統會自動重建資料庫結構</li>
                   <li>從 Supabase 雲端重新下載所有資料</li>
                 </ol>
-                <p className="mt-3 text-orange-600 font-semibold">
+                <p className="mt-3 text-status-warning font-semibold">
                   ⚠️ 注意：所有未同步到 Supabase 的資料將會遺失！
                 </p>
               </div>
@@ -139,18 +139,18 @@ export default function ResetDBPage() {
           </div>
 
           {/* 當前狀態 */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="bg-muted p-4 rounded-lg border border-border">
             <h3 className="font-semibold mb-2">將清空以下資料庫</h3>
             <div className="space-y-1 text-sm">
               <div>
                 1. <code className="bg-white px-2 py-1 rounded border">VenturoOfflineDB</code>
-                <span className="text-green-600 ml-2">✓ 當前使用</span>
+                <span className="text-status-success ml-2">✓ 當前使用</span>
               </div>
               <div>
                 2. <code className="bg-white px-2 py-1 rounded border">venturo-db</code>
-                <span className="text-gray-500 ml-2">(舊資料庫)</span>
+                <span className="text-morandi-secondary ml-2">(舊資料庫)</span>
               </div>
-              <div className="mt-2 text-gray-600">
+              <div className="mt-2 text-morandi-secondary">
                 重建後版本：<code className="bg-white px-2 py-1 rounded border">v6 (46 個表格)</code>
               </div>
             </div>
@@ -160,10 +160,10 @@ export default function ResetDBPage() {
           {status !== 'idle' && (
             <div className={`p-4 rounded-lg border ${
               status === 'success'
-                ? 'bg-green-50 border-green-200 text-green-900'
+                ? 'bg-status-success-bg border-status-success/30 text-status-success'
                 : status === 'error'
-                ? 'bg-red-50 border-red-200 text-red-900'
-                : 'bg-blue-50 border-blue-200 text-blue-900'
+                ? 'bg-status-danger-bg border-status-danger/30 text-status-danger'
+                : 'bg-status-info-bg border-status-info/30 text-status-info'
             }`}>
               <div className="flex gap-2">
                 {status === 'success' ? (
@@ -197,8 +197,8 @@ export default function ResetDBPage() {
           </div>
 
           {/* 技術說明 */}
-          <details className="text-sm text-gray-600 border-t pt-4">
-            <summary className="cursor-pointer font-semibold hover:text-gray-900">
+          <details className="text-sm text-morandi-secondary border-t pt-4">
+            <summary className="cursor-pointer font-semibold hover:text-foreground">
               為什麼需要這個工具？
             </summary>
             <div className="mt-2 space-y-2 pl-4">

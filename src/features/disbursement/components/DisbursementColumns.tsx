@@ -148,7 +148,7 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
             <button
               onClick={() => onRemove(typedRow.id)}
               disabled={currentOrder?.status !== 'pending'}
-              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 text-status-danger hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title="移除"
             >
               <X size={14} />

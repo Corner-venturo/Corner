@@ -124,7 +124,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
             團員名單總覽 ({members.length} 人)
           </h2>
           {isDragMode && (
-            <span className="text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+            <span className="text-sm text-status-warning bg-status-warning-bg px-3 py-1 rounded-full">
               拖曳模式
             </span>
           )}
@@ -155,7 +155,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
             variant="outline"
             size="sm"
             onClick={() => setShowRoomManager(true)}
-            className="bg-amber-50 hover:bg-amber-100 border-amber-200"
+            className="bg-status-warning-bg hover:bg-status-warning-bg border-morandi-gold"
           >
             <Hotel size={16} className="mr-1" />
             分房管理
@@ -164,7 +164,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
             variant="outline"
             size="sm"
             onClick={() => setShowVehicleManager(true)}
-            className="bg-blue-50 hover:bg-blue-100 border-blue-200"
+            className="bg-status-info-bg hover:bg-muted border-morandi-gold"
           >
             <Bus size={16} className="mr-1" />
             分車管理

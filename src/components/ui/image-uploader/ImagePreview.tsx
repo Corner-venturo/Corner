@@ -95,7 +95,7 @@ export function ImagePreview({
           <button
             type="button"
             onClick={onDelete}
-            className="p-2 bg-white/90 hover:bg-red-50 rounded-full text-red-500 transition-colors"
+            className="p-2 bg-white/90 hover:bg-status-danger-bg rounded-full text-status-danger transition-colors"
             title="刪除圖片"
           >
             <X size={18} />

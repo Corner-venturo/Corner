@@ -117,11 +117,11 @@ function BoardingPassCard({
         {/* 航班資訊 */}
         <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-dashed border-black/20">
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-widest">Flight</div>
+            <div className="text-xs text-morandi-secondary uppercase tracking-widest">Flight</div>
             <div className="text-lg font-bold">{flightInfo}</div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-gray-500 uppercase tracking-widest">Date</div>
+            <div className="text-xs text-morandi-secondary uppercase tracking-widest">Date</div>
             <div className="text-lg font-bold">{dateDisplay || '--'}</div>
           </div>
         </div>
@@ -163,7 +163,7 @@ function BoardingPassCard({
             >
               {toAirport}
             </div>
-            <div className="text-sm font-bold text-gray-700">
+            <div className="text-sm font-bold text-morandi-primary">
               {flight.arrivalTime || '--:--'}
             </div>
           </div>
@@ -183,7 +183,7 @@ function BoardingPassCard({
       </div>
 
       {/* 右側撕票區 */}
-      <div className="absolute top-0 right-0 w-12 h-full border-l-2 border-dashed border-black/30 flex flex-col items-center justify-center bg-gray-50">
+      <div className="absolute top-0 right-0 w-12 h-full border-l-2 border-dashed border-black/30 flex flex-col items-center justify-center bg-muted">
         <div
           className="text-xs font-bold uppercase tracking-widest"
           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}

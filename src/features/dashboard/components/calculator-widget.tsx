@@ -297,7 +297,7 @@ export function CalculatorWidget() {
               variant="outline"
               size="sm"
               onClick={() => handleButtonClick('C')}
-              className="h-10 text-sm font-semibold col-span-2 bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-red-50 hover:text-red-600 hover:border-red-400 shadow-sm hover:shadow-md transition-all rounded-xl"
+              className="h-10 text-sm font-semibold col-span-2 bg-white border-2 border-morandi-gold/30 text-morandi-primary hover:bg-status-danger-bg hover:text-status-danger hover:border-status-danger shadow-sm hover:shadow-md transition-all rounded-xl"
             >
               清除
             </Button>

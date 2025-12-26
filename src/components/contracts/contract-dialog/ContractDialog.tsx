@@ -86,7 +86,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-0 top-0 p-2 rounded-md hover:bg-gray-100 transition-colors"
+            className="absolute right-0 top-0 p-2 rounded-md hover:bg-muted transition-colors"
           >
             <X size={18} />
             <span className="sr-only">關閉</span>
@@ -139,7 +139,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                 </SelectContent>
               </Select>
               {selectedOrder && (
-                <div className="mt-2 text-xs text-morandi-secondary bg-blue-50 border border-blue-200 rounded p-2">
+                <div className="mt-2 text-xs text-morandi-secondary bg-status-info-bg border border-status-info/30 rounded p-2">
                   💡 合約的旅客資訊將自動帶入此訂單的聯絡人：{selectedOrder.contact_person}
                 </div>
               )}
@@ -158,7 +158,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                     className={`p-3 border-2 rounded-lg transition-all ${
                       selectedTemplate === template.value
                         ? 'border-morandi-gold bg-morandi-gold/10'
-                        : 'border-gray-200 hover:border-morandi-gold/50'
+                        : 'border-border hover:border-morandi-gold/50'
                     }`}
                   >
                     <div className="text-center">
@@ -198,7 +198,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
           {/* 合約填寫欄位 */}
           {(!firstOrder || tourMembers.length === 0) && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 mb-4">
+            <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3 text-sm text-status-info mb-4">
               💡 提示：尚無訂單或團員資料，所有欄位可手動填寫
             </div>
           )}
@@ -212,7 +212,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               value={contractNotes}
               onChange={e => setContractNotes(e.target.value)}
               placeholder="請輸入備註..."
-              className="w-full h-24 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
+              className="w-full h-24 p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
             />
           </div>
 

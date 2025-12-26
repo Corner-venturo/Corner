@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Hotel, Plus, Check, Loader2 } from 'lucide-react'
@@ -21,8 +21,6 @@ import { RoomList } from './components/RoomList'
 import { MemberAssignmentPanel } from './components/MemberAssignmentPanel'
 import { AddRoomDialog } from './components/AddRoomDialog'
 import { EditRoomDialog } from './components/EditRoomDialog'
-
-const supabase = supabaseClient as any
 
 interface OrderMember {
   id: string
@@ -114,10 +112,16 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
       }
 
       if (allUpdates.length > 0) {
-        const { error } = await supabase.from('tour_rooms').upsert(allUpdates)
-        if (error) {
-          logger.error('Supabase upsert error:', error)
-          throw error
+        // 使用批量 update 而非 upsert，因為只更新 display_order
+        for (const update of allUpdates) {
+          const { error } = await supabase
+            .from('tour_rooms')
+            .update({ display_order: update.display_order })
+            .eq('id', update.id)
+          if (error) {
+            logger.error('Supabase update error:', error)
+            throw error
+          }
         }
       }
 

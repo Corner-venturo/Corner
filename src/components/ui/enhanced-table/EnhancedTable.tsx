@@ -163,7 +163,7 @@ export function EnhancedTable<T extends RowData = RowData>({
           className
         )}
       >
-        <div className="flex items-center justify-center py-8 text-red-500">
+        <div className="flex items-center justify-center py-8 text-status-danger">
           <span>錯誤: {error}</span>
         </div>
       </div>

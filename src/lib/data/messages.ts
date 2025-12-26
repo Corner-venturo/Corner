@@ -6,6 +6,7 @@
  */
 
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Message } from '@/stores/workspace/types'
 
 // ============================================
@@ -50,7 +51,7 @@ export async function getChannelMessages({
     .limit(limit)
 
   if (error) {
-    console.error('Error fetching messages:', error)
+    logger.error('Error fetching messages:', error)
     return []
   }
 
@@ -75,7 +76,7 @@ export async function getChannelMessagesSimple({
     .limit(limit)
 
   if (error) {
-    console.error('Error fetching messages:', error)
+    logger.error('Error fetching messages:', error)
     return []
   }
 
@@ -96,7 +97,7 @@ export async function getMessageAuthor(authorId: string): Promise<{ id: string; 
     .single()
 
   if (error) {
-    console.error('Error fetching author:', error)
+    logger.error('Error fetching author:', error)
     return null
   }
 

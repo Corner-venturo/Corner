@@ -66,7 +66,7 @@ export function FocusCardsBlockEditor({ data, onChange }: FocusCardsBlockEditorP
               className="h-8 text-sm"
             />
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeCard(index)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeCard(index)}>
             <Trash2 size={14} />
           </Button>
         </div>
@@ -156,7 +156,7 @@ export function LeaderMeetingBlockEditor({ data, onChange }: LeaderMeetingBlockE
                 placeholder="地點"
                 className="h-8 text-sm flex-1"
               />
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removePoint(index)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removePoint(index)}>
                 <Trash2 size={14} />
               </Button>
             </div>
@@ -237,7 +237,7 @@ export function PriceTiersBlockEditor({ data, onChange }: PriceTiersBlockEditorP
             placeholder="價格"
             className="h-8 text-sm w-28"
           />
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeTier(index)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeTier(index)}>
             <Trash2 size={14} />
           </Button>
         </div>
@@ -288,7 +288,7 @@ export function FAQsBlockEditor({ data, onChange }: FAQsBlockEditorProps) {
               placeholder="問題"
               className="h-8 text-sm flex-1"
             />
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeFaq(index)}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeFaq(index)}>
               <Trash2 size={14} />
             </Button>
           </div>
@@ -338,14 +338,14 @@ export function NoticesBlockEditor({ data, onChange }: NoticesBlockEditorProps) 
     <div className="space-y-2">
       {notices.map((notice, index) => (
         <div key={index} className="flex gap-2">
-          <AlertCircle size={14} className="text-amber-500 mt-2 shrink-0" />
+          <AlertCircle size={14} className="text-status-warning mt-2 shrink-0" />
           <Input
             value={notice || ''}
             onChange={e => updateNotice(index, e.target.value)}
             placeholder="提醒事項"
             className="h-8 text-sm flex-1"
           />
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removeNotice(index)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removeNotice(index)}>
             <Trash2 size={14} />
           </Button>
         </div>
@@ -388,14 +388,14 @@ export function CancellationBlockEditor({ data, onChange }: CancellationBlockEdi
     <div className="space-y-2">
       {policies.map((policy, index) => (
         <div key={index} className="flex gap-2">
-          <XCircle size={14} className="text-red-500 mt-2 shrink-0" />
+          <XCircle size={14} className="text-status-danger mt-2 shrink-0" />
           <Input
             value={policy || ''}
             onChange={e => updatePolicy(index, e.target.value)}
             placeholder="取消政策"
             className="h-8 text-sm flex-1"
           />
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => removePolicy(index)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-status-danger" onClick={() => removePolicy(index)}>
             <Trash2 size={14} />
           </Button>
         </div>

@@ -71,7 +71,7 @@ export function DatasheetCell({
 
         {/* Column action buttons */}
         {hoveredColumn === col && (canHide || isCustomField) && (
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1 bg-white shadow-sm rounded px-1 z-10 border border-gray-200">
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1 bg-white shadow-sm rounded px-1 z-10 border border-border">
             {canHide && (
               <button
                 onClick={e => {
@@ -80,10 +80,10 @@ export function DatasheetCell({
                     onColumnHide(column.key)
                   }
                 }}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-muted rounded"
                 title="隱藏欄位"
               >
-                <EyeOff size={12} className="text-gray-500" />
+                <EyeOff size={12} className="text-morandi-secondary" />
               </button>
             )}
             {isCustomField && (
@@ -94,10 +94,10 @@ export function DatasheetCell({
                     onColumnDelete(column.key)
                   }
                 }}
-                className="p-1 hover:bg-red-100 rounded"
+                className="p-1 hover:bg-status-danger-bg rounded"
                 title="刪除欄位"
               >
-                <X size={12} className="text-red-500" />
+                <X size={12} className="text-status-danger" />
               </button>
             )}
           </div>
@@ -108,7 +108,7 @@ export function DatasheetCell({
 
   // Error display
   if (cell.displayValue === ERROR_MESSAGES.FORMULA_ERROR) {
-    return <span className="text-red-500 text-xs">{ERROR_MESSAGES.FORMULA_ERROR_DISPLAY}</span>
+    return <span className="text-status-danger text-xs">{ERROR_MESSAGES.FORMULA_ERROR_DISPLAY}</span>
   }
 
   // Special handling for room assignment

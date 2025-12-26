@@ -11,7 +11,7 @@ export const STATUS_LABELS = {
 
 export const STATUS_COLORS = {
   pending: 'bg-morandi-gold',
-  processing: 'bg-blue-500',
+  processing: 'bg-status-info',
   confirmed: 'bg-morandi-green',
   paid: 'bg-morandi-primary',
 } as const

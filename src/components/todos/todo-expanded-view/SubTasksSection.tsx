@@ -135,7 +135,7 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
               checked={task.done}
               onChange={() => toggleSubTask(task.id)}
               disabled={readOnly}
-              className="mt-1 w-5 h-5 rounded border-gray-300 text-[#C9D4C5] focus:ring-[#C9D4C5] cursor-pointer"
+              className="mt-1 w-5 h-5 rounded border-border text-[#C9D4C5] focus:ring-[#C9D4C5] cursor-pointer"
             />
 
             {/* Content */}
@@ -242,7 +242,7 @@ export function SubTasksSection({ todo, onUpdate, readOnly = false }: SubTasksSe
               onChange={e => setNewSubTask(e.target.value)}
               onKeyDown={handleSubTaskKeyDown}
               {...subTaskCompositionProps}
-              className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-[#B8A99A] focus:ring-0 p-0 text-sm text-[#333333] placeholder-gray-400"
+              className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-[#B8A99A] focus:ring-0 p-0 text-sm text-[#333333] placeholder-morandi-muted"
             />
           </div>
         )}

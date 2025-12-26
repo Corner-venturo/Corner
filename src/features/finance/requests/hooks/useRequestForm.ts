@@ -21,7 +21,7 @@ export function useRequestForm() {
     loadOrders()
     supplierStore.fetchAll()
     employeeStore.fetchAll()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])  
 
   const [formData, setFormData] = useState<RequestFormData>({
     tour_id: '',

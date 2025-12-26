@@ -140,11 +140,11 @@ const demoQuotes: DemoQuote[] = [
 
 // 狀態顯示設定
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  draft: { label: '草稿', color: 'bg-gray-100 text-gray-600', icon: <FileText size={12} /> },
-  sent: { label: '已發送', color: 'bg-blue-100 text-blue-600', icon: <Send size={12} /> },
-  approved: { label: '已核准', color: 'bg-green-100 text-green-600', icon: <CheckCircle size={12} /> },
-  rejected: { label: '已拒絕', color: 'bg-red-100 text-red-600', icon: <XCircle size={12} /> },
-  expired: { label: '已過期', color: 'bg-amber-100 text-amber-600', icon: <Clock size={12} /> },
+  draft: { label: '草稿', color: 'bg-muted text-morandi-secondary', icon: <FileText size={12} /> },
+  sent: { label: '已發送', color: 'bg-status-info-bg text-status-info', icon: <Send size={12} /> },
+  approved: { label: '已核准', color: 'bg-status-success-bg text-status-success', icon: <CheckCircle size={12} /> },
+  rejected: { label: '已拒絕', color: 'bg-status-danger-bg text-status-danger', icon: <XCircle size={12} /> },
+  expired: { label: '已過期', color: 'bg-status-warning-bg text-status-warning', icon: <Clock size={12} /> },
 }
 
 export default function DemoQuotesPage() {
@@ -313,8 +313,8 @@ export default function DemoQuotesPage() {
       <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
         <div className="flex items-center gap-6 text-xs text-morandi-secondary">
           <span>總報價：<strong className="text-morandi-primary">{stats.total}</strong> 份</span>
-          <span>已核准：<strong className="text-green-600">{stats.approved}</strong> 份</span>
-          <span>待確認：<strong className="text-blue-600">{stats.pending}</strong> 份</span>
+          <span>已核准：<strong className="text-status-success">{stats.approved}</strong> 份</span>
+          <span>待確認：<strong className="text-status-info">{stats.pending}</strong> 份</span>
           <span>核准金額：<strong className="text-morandi-gold">{formatCurrency(stats.totalAmount)}</strong></span>
         </div>
       </div>

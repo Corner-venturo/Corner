@@ -68,7 +68,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                 <p className="text-xs text-morandi-muted">津貼</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-green-600">NT$ {(baseSalary + totalAllowances).toLocaleString()}</p>
+                <p className="text-xl font-bold text-status-success">NT$ {(baseSalary + totalAllowances).toLocaleString()}</p>
                 <p className="text-xs text-morandi-muted">總薪資</p>
               </div>
             </div>

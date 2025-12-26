@@ -569,13 +569,13 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="p-1 hover:bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+      className="p-1 hover:bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
       title="複製路徑"
     >
       {copied ? (
-        <Check className="h-3 w-3 text-green-500" />
+        <Check className="h-3 w-3 text-status-success" />
       ) : (
-        <Copy className="h-3 w-3 text-gray-400" />
+        <Copy className="h-3 w-3 text-morandi-muted" />
       )}
     </button>
   )
@@ -600,48 +600,48 @@ function FolderItem({
   return (
     <div className="ml-4">
       <div
-        className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-100 rounded px-2 group"
+        className="flex items-center gap-2 py-2 cursor-pointer hover:bg-muted rounded px-2 group"
         onClick={() => setExpanded(!expanded)}
       >
         {expanded ? (
-          <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <ChevronDown className="h-4 w-4 text-morandi-muted flex-shrink-0" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <ChevronRight className="h-4 w-4 text-morandi-muted flex-shrink-0" />
         )}
-        <FolderTree className="h-4 w-4 text-amber-500 flex-shrink-0" />
+        <FolderTree className="h-4 w-4 text-morandi-gold flex-shrink-0" />
         <span className="font-medium text-sm">{name}</span>
-        {label && <span className="text-xs text-gray-500">- {label}</span>}
+        {label && <span className="text-xs text-morandi-secondary">- {label}</span>}
         <CopyButton text={path} />
       </div>
 
       {/* 資料夾說明 */}
       {desc && !expanded && (
-        <p className="ml-10 text-xs text-gray-400 -mt-1 mb-1">{desc}</p>
+        <p className="ml-10 text-xs text-morandi-muted -mt-1 mb-1">{desc}</p>
       )}
 
       {expanded && (
-        <div className="ml-6 border-l-2 border-gray-200 pl-2">
+        <div className="ml-6 border-l-2 border-border pl-2">
           {Object.entries(children).map(([subPath, files]) => (
             <div key={subPath || 'root'}>
               {subPath && subPath !== '' && (
                 <div className="flex items-center gap-2 py-1 px-2 group mt-2">
-                  <FolderTree className="h-3 w-3 text-amber-400" />
-                  <span className="text-xs font-medium text-gray-600">{subPath}/</span>
+                  <FolderTree className="h-3 w-3 text-morandi-gold" />
+                  <span className="text-xs font-medium text-morandi-secondary">{subPath}/</span>
                   <CopyButton text={`${path}/${subPath}`} />
                 </div>
               )}
               {files && files.map((file) => (
                 <div
                   key={file.name}
-                  className="flex items-start gap-2 py-1.5 px-2 ml-2 group hover:bg-blue-50 rounded"
+                  className="flex items-start gap-2 py-1.5 px-2 ml-2 group hover:bg-muted rounded"
                 >
-                  <FileCode className="h-3 w-3 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <FileCode className="h-3 w-3 text-status-info mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-800">{file.name}</span>
+                      <span className="text-xs font-medium text-foreground">{file.name}</span>
                       <CopyButton text={`${path}${subPath ? '/' + subPath : ''}/${file.name.split(' ')[0]}`} />
                     </div>
-                    <p className="text-xs text-gray-500">{file.desc}</p>
+                    <p className="text-xs text-morandi-secondary">{file.desc}</p>
                   </div>
                 </div>
               ))}
@@ -673,20 +673,20 @@ function Section({
   return (
     <div className="border rounded-lg bg-white shadow-sm">
       <div
-        className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 border-b"
+        className="flex items-center gap-3 p-4 cursor-pointer hover:bg-muted border-b"
         onClick={() => setExpanded(!expanded)}
       >
         {expanded ? (
-          <ChevronDown className="h-5 w-5 text-gray-400" />
+          <ChevronDown className="h-5 w-5 text-morandi-muted" />
         ) : (
-          <ChevronRight className="h-5 w-5 text-gray-400" />
+          <ChevronRight className="h-5 w-5 text-morandi-muted" />
         )}
-        <Icon className="h-5 w-5 text-indigo-500" />
+        <Icon className="h-5 w-5 text-status-info" />
         <div className="flex-1">
           <span className="font-semibold">{data.label}</span>
-          <p className="text-xs text-gray-500">{data.desc}</p>
+          <p className="text-xs text-morandi-secondary">{data.desc}</p>
         </div>
-        <span className="text-xs text-gray-400">{basePath}/</span>
+        <span className="text-xs text-morandi-muted">{basePath}/</span>
       </div>
 
       {expanded && (
@@ -721,13 +721,13 @@ export default function DevMapPage() {
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto p-6 space-y-4">
           {/* 說明 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-            <p className="font-medium text-blue-800 mb-2">📖 使用說明</p>
-            <ul className="text-blue-700 space-y-1">
+          <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-4 text-sm">
+            <p className="font-medium text-morandi-primary mb-2">📖 使用說明</p>
+            <ul className="text-status-info space-y-1">
               <li>• 每個項目都有<strong>功能說明</strong>，幫助你理解它是做什麼的</li>
               <li>• 點擊資料夾可展開查看內容</li>
               <li>• 滑鼠移到項目上會顯示複製按鈕</li>
-              <li>• 複製路徑後告訴 Claude：「幫我看 <code className="bg-blue-100 px-1 rounded">路徑</code>」</li>
+              <li>• 複製路徑後告訴 Claude：「幫我看 <code className="bg-status-info-bg px-1 rounded">路徑</code>」</li>
             </ul>
           </div>
 
@@ -737,7 +737,7 @@ export default function DevMapPage() {
           ))}
 
           {/* 快速參考 */}
-          <div className="bg-gray-50 border rounded-lg p-4">
+          <div className="bg-muted border rounded-lg p-4">
             <p className="font-medium mb-3">🚀 常用路徑快速複製</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
               {[
@@ -752,11 +752,11 @@ export default function DevMapPage() {
               ].map((item) => (
                 <div
                   key={item.path}
-                  className="flex items-center justify-between bg-white px-3 py-2 rounded border group hover:border-indigo-300"
+                  className="flex items-center justify-between bg-white px-3 py-2 rounded border group hover:border-status-info/30"
                 >
                   <div>
-                    <code className="text-xs text-gray-700">{item.path}</code>
-                    <p className="text-xs text-gray-400">{item.desc}</p>
+                    <code className="text-xs text-morandi-primary">{item.path}</code>
+                    <p className="text-xs text-morandi-muted">{item.desc}</p>
                   </div>
                   <CopyButton text={item.path} />
                 </div>

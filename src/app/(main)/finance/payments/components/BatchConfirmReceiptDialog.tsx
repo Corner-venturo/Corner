@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useReceiptStore, useOrderStore } from '@/stores'
-import { CheckCircle, AlertCircle, DollarSign } from 'lucide-react'
+import { CheckCircle, AlertCircle, DollarSign, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS, ReceiptStatus } from '@/types/receipt.types'
@@ -54,7 +54,7 @@ export function BatchConfirmReceiptDialog({
   const pendingReceipts = useMemo(() => {
     // Debug: 顯示所有收款單的 status 值
     if (open && receipts.length > 0) {
-      console.log('📋 所有收款單 status:', receipts.map(r => ({
+      logger.log('📋 所有收款單 status:', receipts.map(r => ({
         receipt_number: r.receipt_number,
         status: r.status,
         status_type: typeof r.status
@@ -336,14 +336,16 @@ export function BatchConfirmReceiptDialog({
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleBatchConfirm}
             disabled={stats.selected === 0 || isSubmitting}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Check size={16} />
             {isSubmitting ? '確認中...' : `確認 ${stats.selected} 筆收款`}
           </Button>
         </DialogFooter>

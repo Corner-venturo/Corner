@@ -36,7 +36,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
           const conf = row as Confirmation
           const typeConfig = {
             flight: { label: '航班', icon: '✈️', colorClass: 'text-purple-600' },
-            accommodation: { label: '住宿', icon: '🏨', colorClass: 'text-orange-600' },
+            accommodation: { label: '住宿', icon: '🏨', colorClass: 'text-status-warning' },
           }
           const config = typeConfig[conf.type]
           return (
@@ -77,9 +77,9 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
           const conf = row as Confirmation
           const statusConfig = {
             draft: { label: '草稿', colorClass: 'text-morandi-secondary' },
-            confirmed: { label: '已確認', colorClass: 'text-blue-600' },
-            sent: { label: '已寄出', colorClass: 'text-green-600' },
-            cancelled: { label: '已取消', colorClass: 'text-red-600' },
+            confirmed: { label: '已確認', colorClass: 'text-status-info' },
+            sent: { label: '已寄出', colorClass: 'text-status-success' },
+            cancelled: { label: '已取消', colorClass: 'text-status-danger' },
           }
           const config = statusConfig[conf.status]
           return (

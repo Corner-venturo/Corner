@@ -209,7 +209,7 @@ export function FlightInfoSection({
                   size="sm"
                   variant="outline"
                   onClick={onUndoItinerary}
-                  className="text-xs gap-1 border-orange-300 text-orange-600 hover:bg-orange-50"
+                  className="text-xs gap-1 border-status-warning/30 text-status-warning hover:bg-status-warning-bg"
                 >
                   <Undo2 size={14} />
                   復原

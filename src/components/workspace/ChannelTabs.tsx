@@ -127,10 +127,10 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
                 <span className="max-w-[100px] truncate">{canvas.name}</span>
                 <button
                   onClick={e => handleDeleteCanvas(canvas.id, e)}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-red-100 rounded transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-status-danger-bg rounded transition-opacity"
                   title="刪除畫布"
                 >
-                  <Trash2 size={12} className="text-red-500" />
+                  <Trash2 size={12} className="text-status-danger" />
                 </button>
                 {activeTab === canvas.id && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-morandi-gold transition-all"></div>

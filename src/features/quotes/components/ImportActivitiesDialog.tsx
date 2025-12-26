@@ -144,7 +144,7 @@ export function ImportActivitiesDialog({
                         className={`w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-colors ${
                           isSelected
                             ? 'bg-[var(--morandi-gold)]/10 border-[var(--morandi-gold)]'
-                            : 'bg-white border-gray-200 hover:border-gray-300'
+                            : 'bg-white border-border hover:border-border/80'
                         }`}
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />

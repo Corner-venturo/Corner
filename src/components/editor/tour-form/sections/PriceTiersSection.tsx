@@ -93,7 +93,7 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
       </h2>
 
       {/* 顯示開關 */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
         <div className="flex items-center gap-3">
           <Users className="h-5 w-5 text-morandi-primary" />
           <div>
@@ -133,7 +133,7 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
                 {/* 標題列 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-gray-300" />
+                    <GripVertical className="h-4 w-4 text-morandi-muted" />
                     <span className="text-sm font-medium text-morandi-secondary">
                       方案 {index + 1}
                     </span>
@@ -144,7 +144,7 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
                     size="sm"
                     onClick={() => removePriceTier(index)}
                     disabled={priceTiers.length <= 1}
-                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                    className="h-7 w-7 p-0 text-morandi-muted hover:text-status-danger"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -226,8 +226,8 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
           </Button>
 
           {/* 預覽提示 */}
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-sm text-amber-700">
+          <div className="p-3 bg-status-warning-bg border border-status-warning rounded-lg">
+            <p className="text-sm text-status-warning">
               💡 價格方案會顯示在行程頁面的「團費說明」區塊，建議設定至少 2-3 個不同人數的方案。
             </p>
           </div>

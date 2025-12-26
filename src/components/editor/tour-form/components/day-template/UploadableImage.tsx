@@ -48,15 +48,15 @@ export function UploadableImage({
 
   return (
     <div
-      className={`${emptySize} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 hover:border-[#2C5F4D] transition-colors ${className}`}
+      className={`${emptySize} bg-muted border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-morandi-container hover:border-[#2C5F4D] transition-colors ${className}`}
       onClick={() => triggerUpload(targetKey)}
     >
       {isUploading ? (
-        <Loader2 size={20} className="text-gray-400 animate-spin" />
+        <Loader2 size={20} className="text-morandi-muted animate-spin" />
       ) : (
         <>
-          <ImageIcon size={20} className="text-gray-400 mb-1" />
-          <span className="text-xs text-gray-400">上傳圖片</span>
+          <ImageIcon size={20} className="text-morandi-muted mb-1" />
+          <span className="text-xs text-morandi-muted">上傳圖片</span>
         </>
       )}
     </div>

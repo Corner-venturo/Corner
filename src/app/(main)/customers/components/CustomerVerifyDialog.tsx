@@ -168,12 +168,12 @@ export function CustomerVerifyDialog({
           <DialogTitle className="flex items-center gap-2">
             {customer.verification_status === 'verified' ? (
               <>
-                <Check className="text-green-500" size={20} />
+                <Check className="text-status-success" size={20} />
                 顧客資料（已驗證）
               </>
             ) : (
               <>
-                <AlertTriangle className="text-amber-500" size={20} />
+                <AlertTriangle className="text-status-warning" size={20} />
                 驗證顧客資料
               </>
             )}
@@ -190,29 +190,29 @@ export function CustomerVerifyDialog({
                   <button
                     type="button"
                     onClick={() => imageEditor.zoomOut()}
-                    className="p-1.5 hover:bg-gray-100 rounded-md"
+                    className="p-1.5 hover:bg-muted rounded-md"
                     title="縮小"
                   >
-                    <ZoomOut size={16} className="text-gray-600" />
+                    <ZoomOut size={16} className="text-morandi-secondary" />
                   </button>
-                  <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+                  <span className="text-xs text-morandi-secondary min-w-[3rem] text-center">
                     {Math.round(imageEditor.zoom * 100)}%
                   </span>
                   <button
                     type="button"
                     onClick={() => imageEditor.zoomIn()}
-                    className="p-1.5 hover:bg-gray-100 rounded-md"
+                    className="p-1.5 hover:bg-muted rounded-md"
                     title="放大"
                   >
-                    <ZoomIn size={16} className="text-gray-600" />
+                    <ZoomIn size={16} className="text-morandi-secondary" />
                   </button>
                   <button
                     type="button"
                     onClick={() => imageEditor.reset()}
-                    className="p-1.5 hover:bg-gray-100 rounded-md ml-1"
+                    className="p-1.5 hover:bg-muted rounded-md ml-1"
                     title="重置檢視"
                   >
-                    <X size={16} className="text-gray-600" />
+                    <X size={16} className="text-morandi-secondary" />
                   </button>
                 </div>
               )}
@@ -220,40 +220,40 @@ export function CustomerVerifyDialog({
 
             {/* 工具列 */}
             {customer.passport_image_url && !imageEditor.isCropMode && (
-              <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+              <div className="flex items-center justify-between bg-muted rounded-lg p-2">
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => imageEditor.rotateLeft()}
                     className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
                   >
-                    <RotateCcw size={16} className="text-blue-600" />
-                    <span className="text-gray-600 hidden sm:inline">左轉</span>
+                    <RotateCcw size={16} className="text-morandi-gold" />
+                    <span className="text-morandi-secondary hidden sm:inline">左轉</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => imageEditor.rotateRight()}
                     className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
                   >
-                    <RotateCw size={16} className="text-blue-600" />
-                    <span className="text-gray-600 hidden sm:inline">右轉</span>
+                    <RotateCw size={16} className="text-morandi-gold" />
+                    <span className="text-morandi-secondary hidden sm:inline">右轉</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => imageEditor.toggleFlipH()}
-                    className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-blue-100' : ''}`}
+                    className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-morandi-gold/20' : ''}`}
                   >
-                    <FlipHorizontal size={16} className="text-blue-600" />
-                    <span className="text-gray-600 hidden sm:inline">翻轉</span>
+                    <FlipHorizontal size={16} className="text-morandi-gold" />
+                    <span className="text-morandi-secondary hidden sm:inline">翻轉</span>
                   </button>
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
+                  <div className="w-px h-6 bg-border mx-1" />
                   <button
                     type="button"
                     onClick={() => imageEditor.startCrop()}
                     className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
                   >
-                    <Crop size={16} className="text-purple-600" />
-                    <span className="text-gray-600 hidden sm:inline">裁剪</span>
+                    <Crop size={16} className="text-morandi-gold" />
+                    <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export function CustomerVerifyDialog({
                       type="button"
                       onClick={handleSaveImageTransform}
                       disabled={imageEditor.isSaving}
-                      className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
+                      className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
                     >
                       <Save size={16} />
                       <span>{imageEditor.isSaving ? '儲存中...' : '儲存圖片'}</span>
@@ -285,9 +285,9 @@ export function CustomerVerifyDialog({
             {customer.passport_image_url && (
               <div
                 ref={imageContainerRef}
-                className={`relative overflow-hidden rounded-lg border bg-gray-50 ${
+                className={`relative overflow-hidden rounded-lg border bg-muted ${
                   imageEditor.isCropMode
-                    ? 'border-blue-400 cursor-crosshair'
+                    ? 'border-morandi-gold cursor-crosshair'
                     : 'cursor-grab active:cursor-grabbing'
                 }`}
                 style={{ height: '320px' }}
@@ -310,7 +310,7 @@ export function CustomerVerifyDialog({
                 {/* 裁剪框 */}
                 {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
                   <div
-                    className="absolute border-2 border-blue-500 bg-blue-500/10"
+                    className="absolute border-2 border-morandi-gold bg-morandi-gold/10"
                     style={{
                       left: imageEditor.cropRect.x,
                       top: imageEditor.cropRect.y,
@@ -328,28 +328,28 @@ export function CustomerVerifyDialog({
             <h3 className="text-sm font-medium text-morandi-primary">客戶資料</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500">中文姓名</label>
+                <label className="text-xs text-morandi-secondary">中文姓名</label>
                 <Input
                   value={formData.name || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">護照英文名</label>
+                <label className="text-xs text-morandi-secondary">護照英文名</label>
                 <Input
                   value={formData.passport_romanization || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, passport_romanization: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">護照號碼</label>
+                <label className="text-xs text-morandi-secondary">護照號碼</label>
                 <Input
                   value={formData.passport_number || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">護照效期</label>
+                <label className="text-xs text-morandi-secondary">護照效期</label>
                 <DatePicker
                   value={formData.passport_expiry_date || ''}
                   onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry_date: date }))}
@@ -357,7 +357,7 @@ export function CustomerVerifyDialog({
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">出生日期</label>
+                <label className="text-xs text-morandi-secondary">出生日期</label>
                 <DatePicker
                   value={formData.date_of_birth || ''}
                   onChange={(date) => setFormData(prev => ({ ...prev, date_of_birth: date }))}
@@ -365,7 +365,7 @@ export function CustomerVerifyDialog({
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">身分證字號</label>
+                <label className="text-xs text-morandi-secondary">身分證字號</label>
                 <Input
                   value={formData.national_id || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, national_id: e.target.value }))}
@@ -377,10 +377,12 @@ export function CustomerVerifyDialog({
 
         {/* 底部按鈕 */}
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+            <Check size={16} />
             {isSaving ? '儲存中...' : '確認驗證'}
           </Button>
         </div>

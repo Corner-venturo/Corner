@@ -230,7 +230,7 @@ export default function HotelVoucherPage() {
 
   if (!isOpen) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <Button onClick={() => setIsOpen(true)}>開啟入住憑證</Button>
       </div>
     )
@@ -253,7 +253,7 @@ export default function HotelVoucherPage() {
         onClick={e => e.stopPropagation()}
       >
         {/* 控制面板 - 只在螢幕上顯示 */}
-        <div className="print:hidden sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10 rounded-t-lg">
+        <div className="print:hidden sticky top-0 bg-white border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-lg">
           <div className="flex gap-2 flex-wrap">
             <Button
               size="sm"

@@ -31,17 +31,17 @@ export function EditingWarningBanner({
   const editorNames = otherEditors.map(e => e.name).join('、')
 
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex items-start gap-3">
-      <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+    <div className="bg-status-warning-bg border border-morandi-gold/30 rounded-lg p-3 mb-4 flex items-start gap-3">
+      <AlertTriangle className="w-5 h-5 text-morandi-gold flex-shrink-0 mt-0.5" />
       <div className="flex-1">
-        <p className="text-sm font-medium text-amber-800">
+        <p className="text-sm font-medium text-morandi-gold">
           {editorNames} 正在編輯{resourceName}
         </p>
-        <p className="text-xs text-amber-600 mt-1">
+        <p className="text-xs text-status-warning mt-1">
           同時編輯可能導致資料衝突，建議等對方編輯完成後再進行修改。
         </p>
       </div>
-      <div className="flex items-center gap-1 text-xs text-amber-600">
+      <div className="flex items-center gap-1 text-xs text-status-warning">
         <Users className="w-4 h-4" />
         <span>{currentEditors.length} 人在線</span>
       </div>

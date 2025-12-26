@@ -211,11 +211,11 @@ export function DisbursementPrintDialog({
         </DialogHeader>
 
         {/* 預覽區域 */}
-        <div className="flex-1 overflow-auto bg-gray-200 p-4">
+        <div className="flex-1 overflow-auto bg-morandi-container p-4">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
-              <span className="ml-2 text-gray-500">載入資料中...</span>
+              <Loader2 className="w-8 h-8 animate-spin text-morandi-secondary" />
+              <span className="ml-2 text-morandi-secondary">載入資料中...</span>
             </div>
           ) : (
             <div className="shadow-lg">

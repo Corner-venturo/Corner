@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 import type { Customer } from '@/types/customer.types'
 
 interface ResetPasswordDialogProps {
@@ -74,7 +75,7 @@ export function ResetPasswordDialog({
       toast.success('密碼已重置成功')
       handleClose()
     } catch (error) {
-      console.error('Reset password error:', error)
+      logger.error('Reset password error:', error)
       toast.error(error instanceof Error ? error.message : '重置密碼失敗')
     } finally {
       setIsResetting(false)
@@ -115,8 +116,8 @@ export function ResetPasswordDialog({
               />
             </div>
           ) : (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-lg">
+              <p className="text-sm text-status-warning">
                 此顧客沒有設定 Email，無法重置密碼。請先在顧客資料中填寫 Email。
               </p>
             </div>

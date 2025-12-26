@@ -52,7 +52,7 @@ export function MultiImageTemplate({
       </div>
 
       {/* 圖片輪播區 */}
-      <div className="p-4 bg-gray-50">
+      <div className="p-4 bg-muted">
         <div className="flex gap-3 overflow-x-auto pb-2">
           {editingDay.activities.map((act, i) => (
             <div key={i} className="flex-shrink-0 w-40">
@@ -71,7 +71,7 @@ export function MultiImageTemplate({
                 editingField={editingField}
                 setEditingField={setEditingField}
                 onChange={v => updateActivity(i, 'title', v)}
-                className="text-xs text-gray-600 mt-1 text-center"
+                className="text-xs text-morandi-secondary mt-1 text-center"
                 placeholder="景點名稱"
               />
             </div>
@@ -79,7 +79,7 @@ export function MultiImageTemplate({
           <button
             type="button"
             onClick={addActivity}
-            className="flex-shrink-0 w-40 h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:border-[#8da399] hover:text-[#8da399] transition-colors"
+            className="flex-shrink-0 w-40 h-28 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center text-morandi-muted hover:border-[#8da399] hover:text-[#8da399] transition-colors"
           >
             <Plus size={24} />
             <span className="text-xs mt-1">新增圖片</span>
@@ -95,7 +95,7 @@ export function MultiImageTemplate({
           editingField={editingField}
           setEditingField={setEditingField}
           onChange={v => updateField('description', v)}
-          className="text-gray-600 mb-4"
+          className="text-morandi-secondary mb-4"
           placeholder="行程描述..."
           multiline
         />
@@ -109,7 +109,7 @@ export function MultiImageTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
-              className="text-gray-700"
+              className="text-morandi-primary"
               placeholder="午餐"
             />
           </div>
@@ -121,7 +121,7 @@ export function MultiImageTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('accommodation', v)}
-              className="text-gray-700"
+              className="text-morandi-primary"
               placeholder="住宿"
             />
           </div>

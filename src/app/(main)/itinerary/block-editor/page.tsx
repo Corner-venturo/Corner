@@ -17,6 +17,7 @@ import { useItineraryStore, useAuthStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { toast } from 'sonner'
 import { Cloud, CloudOff, Sparkles } from 'lucide-react'
+import { logger } from '@/lib/utils/logger'
 
 // 區塊編輯器
 import { BlockEditor, tourDataToBlocks, blocksToTourData } from '@/components/editor/block-editor'
@@ -215,7 +216,7 @@ function BlockEditorPageContent() {
       setAutoSaveStatus('saved')
       setTimeout(() => setAutoSaveStatus('idle'), 3000)
     } catch (error) {
-      console.error('自動存檔失敗:', error)
+      logger.error('自動存檔失敗:', error)
       setAutoSaveStatus('error')
       toast.error('自動存檔失敗')
     }
@@ -272,7 +273,7 @@ function BlockEditorPageContent() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
           {/* 左側：區塊編輯器 */}
-          <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
+          <div className="w-1/2 bg-white border-r border-border flex flex-col">
             <div className="h-12 bg-morandi-gold/90 text-white px-4 flex items-center justify-between border-b">
               <div className="flex items-center gap-2">
                 <Sparkles size={16} />
@@ -292,7 +293,7 @@ function BlockEditorPageContent() {
                   </span>
                 )}
                 {autoSaveStatus === 'error' && (
-                  <span className="flex items-center gap-1 text-red-200">
+                  <span className="flex items-center gap-1 text-morandi-red/80">
                     <CloudOff size={12} />
                     存檔失敗
                   </span>
@@ -309,7 +310,7 @@ function BlockEditorPageContent() {
           </div>
 
           {/* 右側：即時預覽 */}
-          <div className="w-1/2 bg-gray-50 flex flex-col">
+          <div className="w-1/2 bg-muted flex flex-col">
             <div className="h-12 bg-white border-b px-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-morandi-primary">即時預覽</h2>
               <div className="flex gap-1 bg-morandi-container/30 rounded p-0.5">

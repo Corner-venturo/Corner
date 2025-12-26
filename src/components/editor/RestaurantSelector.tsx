@@ -198,7 +198,7 @@ export function RestaurantSelector({
           )}
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50/50">
+        <DialogFooter className="px-6 py-4 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
             取消
           </Button>

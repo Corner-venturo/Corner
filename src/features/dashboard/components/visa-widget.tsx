@@ -69,29 +69,29 @@ const VISA_STATUS = {
   'visa-free': {
     label: '免簽證',
     icon: CheckCircle,
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
+    color: 'text-status-success',
+    bgColor: 'bg-status-success-bg',
     description: '可直接入境，無需事先申請簽證',
   },
   'visa-on-arrival': {
     label: '落地簽',
     icon: Clock,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
+    color: 'text-status-info',
+    bgColor: 'bg-status-info-bg',
     description: '抵達時於機場/口岸申請簽證',
   },
   'e-visa': {
     label: '電子簽證',
     icon: Globe,
     color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
+    bgColor: 'bg-purple-50',
     description: '需事先上網申請電子簽證',
   },
   'visa-required': {
     label: '需要簽證',
     icon: XCircle,
-    color: 'text-red-600',
-    bgColor: 'bg-red-100',
+    color: 'text-status-danger',
+    bgColor: 'bg-status-danger-bg',
     description: '需事先至使館/領事館申請簽證',
   },
 }
@@ -277,7 +277,7 @@ export function VisaWidget() {
               disabled={loading}
               className={cn(
                 'w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md',
-                'bg-gradient-to-br from-emerald-200/60 to-teal-100/60 hover:from-emerald-300/60 hover:to-teal-200/60',
+                'bg-gradient-to-br from-morandi-green/60 to-teal-100/60 hover:from-morandi-green/80 hover:to-teal-200/60',
                 'text-morandi-primary disabled:opacity-50 disabled:cursor-not-allowed',
                 'flex items-center justify-center gap-2'
               )}
@@ -298,10 +298,10 @@ export function VisaWidget() {
 
           {/* 錯誤訊息 */}
           {error && (
-            <div className="rounded-xl bg-red-50/80 border border-red-200/50 p-3.5 backdrop-blur-sm">
+            <div className="rounded-xl bg-status-danger-bg/80 border border-status-danger/50 p-3.5 backdrop-blur-sm">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-red-600 font-medium">{error}</p>
+                <AlertCircle className="w-4 h-4 text-status-danger flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-status-danger font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -362,8 +362,8 @@ export function VisaWidget() {
               </div>
 
               {/* 提示 */}
-              <div className="bg-amber-50/80 rounded-lg p-3 border border-amber-200/50">
-                <p className="text-xs text-amber-800">
+              <div className="bg-status-warning-bg rounded-lg p-3 border border-status-warning/30">
+                <p className="text-xs text-morandi-primary">
                   ⚠️ 此資訊僅供參考，實際簽證要求請以目的地國家官方公告為準
                 </p>
               </div>

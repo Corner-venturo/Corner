@@ -36,8 +36,8 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
             {dayIndex + 1}
           </div>
           <div>
-            <h2 className="font-bold text-lg text-gray-900">Day {dayIndex + 1} 預覽編輯</h2>
-            <p className="text-sm text-gray-500">點擊文字直接編輯，點擊圖片上傳更換</p>
+            <h2 className="font-bold text-lg text-foreground">Day {dayIndex + 1} 預覽編輯</h2>
+            <p className="text-sm text-morandi-secondary">點擊文字直接編輯，點擊圖片上傳更換</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -53,8 +53,8 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
 
       {/* 風格選擇器 */}
       <div className="px-6 py-3 border-b bg-white flex items-center gap-2">
-        <span className="text-sm text-gray-500 mr-2">展示風格：</span>
-        <div className="flex items-center bg-gray-100 rounded-lg p-1">
+        <span className="text-sm text-morandi-secondary mr-2">展示風格：</span>
+        <div className="flex items-center bg-muted rounded-lg p-1">
           {styleOptions.map(option => (
             <button
               key={option.value}

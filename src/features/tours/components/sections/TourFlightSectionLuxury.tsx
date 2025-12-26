@@ -171,7 +171,7 @@ function FlightRow({
 
   return (
     <tr
-      className="group hover:bg-gray-50 transition-colors"
+      className="group hover:bg-muted transition-colors"
       style={{ borderBottom: `1px solid #f0f0f0` }}
     >
       {/* Type */}
@@ -240,7 +240,7 @@ function FlightRow({
           </div>
 
           {/* 箭頭 */}
-          <div className="h-px w-6 md:w-8 bg-gray-300 relative">
+          <div className="h-px w-6 md:w-8 bg-border relative">
             <div
               className="absolute -top-1 right-0 w-2 h-2 border-t border-r rotate-45"
               style={{ borderColor: '#d1d5db' }}

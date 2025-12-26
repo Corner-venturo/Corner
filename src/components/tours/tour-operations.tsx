@@ -378,8 +378,8 @@ export const TourOperations = React.memo(function TourOperations({
     <div>
       {/* 隱藏欄位控制 */}
       {hiddenColumns.length > 0 && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600 mb-2">隱藏的欄位：</div>
+        <div className="mb-4 p-3 bg-muted rounded-lg">
+          <div className="text-sm text-morandi-secondary mb-2">隱藏的欄位：</div>
           <div className="flex flex-wrap gap-2">
             {hiddenColumns.map(columnKey => {
               // 先找自定義欄位
@@ -395,7 +395,7 @@ export const TourOperations = React.memo(function TourOperations({
                 <button
                   key={columnKey}
                   onClick={() => handleColumnShow(columnKey)}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-border rounded text-xs"
                 >
                   <Eye size={12} />
                   {columnName}

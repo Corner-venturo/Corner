@@ -88,14 +88,14 @@ export const SyncToItineraryDialog: React.FC<SyncToItineraryDialogProps> = ({
                       <td className="py-2 px-3 text-morandi-primary">Day {diff.day}</td>
                       <td className="py-2 px-3 text-morandi-primary">{diff.typeLabel}</td>
                       <td className="py-2 px-3 text-morandi-secondary">
-                        {diff.oldValue || <span className="text-gray-400">（空）</span>}
+                        {diff.oldValue || <span className="text-morandi-muted">（空）</span>}
                       </td>
                       <td className="py-2 px-3 text-center">
                         <ArrowRight size={14} className="text-morandi-gold inline" />
                       </td>
                       <td className="py-2 px-3">
-                        <span className={diff.newValue === '自理' ? 'text-orange-600 font-medium' : 'text-morandi-green font-medium'}>
-                          {diff.newValue || <span className="text-gray-400">（空）</span>}
+                        <span className={diff.newValue === '自理' ? 'text-status-warning font-medium' : 'text-morandi-green font-medium'}>
+                          {diff.newValue || <span className="text-morandi-muted">（空）</span>}
                         </span>
                       </td>
                     </tr>

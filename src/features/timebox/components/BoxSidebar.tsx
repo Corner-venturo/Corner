@@ -123,7 +123,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
       {/* 箱子列表 */}
       <div className="flex-1 overflow-auto p-2">
         {error ? (
-          <div className="text-center py-8 text-red-500 text-sm">
+          <div className="text-center py-8 text-status-danger text-sm">
             <p>載入箱子失敗</p>
             <p className="text-xs mt-1">{error.message}</p>
           </div>

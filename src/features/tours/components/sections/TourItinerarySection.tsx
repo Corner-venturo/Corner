@@ -243,12 +243,12 @@ export function TourItinerarySection({
 
                   {day.highlight && (
                     <div className={cn(
-                      "flex items-start gap-2 rounded-xl bg-amber-50/80 border border-amber-200/50",
+                      "flex items-start gap-2 rounded-xl bg-status-warning-bg border border-status-warning/30",
                       viewMode === 'mobile' ? 'mb-4 px-3 py-2' : 'mb-6 px-4 py-3'
                     )}>
-                      <Sparkles size={viewMode === 'mobile' ? 14 : 16} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                      <Sparkles size={viewMode === 'mobile' ? 14 : 16} className="text-status-warning flex-shrink-0 mt-0.5" />
                       <p className={cn(
-                        "font-medium leading-relaxed text-amber-800",
+                        "font-medium leading-relaxed text-morandi-primary",
                         viewMode === 'mobile' ? 'text-xs' : 'text-sm md:text-base'
                       )}>
                         {day.highlight}

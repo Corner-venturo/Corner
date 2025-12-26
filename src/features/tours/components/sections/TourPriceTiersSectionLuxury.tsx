@@ -113,7 +113,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow duration-300"
+                className="bg-white rounded-xl overflow-hidden shadow-sm border border-border flex flex-col hover:shadow-md transition-shadow duration-300"
               >
                 {/* 卡片頭部 */}
                 <div

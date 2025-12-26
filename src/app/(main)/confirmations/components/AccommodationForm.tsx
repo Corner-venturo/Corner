@@ -85,7 +85,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
       </div>
 
       {/* 飯店資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">飯店資訊</h3>
 
         <div className="space-y-2">
@@ -129,7 +129,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
       </div>
 
       {/* 入住資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">入住資訊</h3>
 
         <div className="grid grid-cols-2 gap-4">
@@ -195,7 +195,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
       </div>
 
       {/* 房型資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">房型資訊</h3>
 
         <div className="space-y-2">
@@ -230,7 +230,7 @@ export function AccommodationForm({ formData, onChange }: AccommodationFormProps
       </div>
 
       {/* 餐點資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">餐點資訊</h3>
 
         {(data.meals || []).map((meal, index) => (

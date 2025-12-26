@@ -145,7 +145,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
     id: 'staff',
     label: '一般員工',
     description: '基本查看權限，可使用個人工作空間',
-    color: 'text-gray-600 bg-gray-50 border-gray-200',
+    color: 'text-morandi-secondary bg-muted border-border',
     permissions: [
       'calendar',        // 行事曆
       'workspace',       // 工作空間

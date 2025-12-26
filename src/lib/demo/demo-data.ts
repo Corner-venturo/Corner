@@ -637,20 +637,20 @@ export function formatCurrency(amount: number): string {
 export function getStatusDisplay(status: string): { label: string; color: string } {
   const statusMap: Record<string, { label: string; color: string }> = {
     // 行程狀態
-    draft: { label: '草稿', color: 'bg-gray-100 text-gray-600' },
-    published: { label: '已發布', color: 'bg-blue-100 text-blue-600' },
+    draft: { label: '草稿', color: 'bg-muted text-morandi-secondary' },
+    published: { label: '已發布', color: 'bg-status-info-bg text-status-info' },
     confirmed: { label: '已成團', color: 'bg-green-100 text-green-600' },
     departed: { label: '出團中', color: 'bg-purple-100 text-purple-600' },
-    completed: { label: '已結束', color: 'bg-gray-100 text-gray-600' },
+    completed: { label: '已結束', color: 'bg-muted text-morandi-secondary' },
     // 訂單狀態
     pending: { label: '待確認', color: 'bg-yellow-100 text-yellow-600' },
     paid: { label: '已付清', color: 'bg-green-100 text-green-600' },
     cancelled: { label: '已取消', color: 'bg-red-100 text-red-600' },
     // VIP 等級
-    normal: { label: '一般', color: 'bg-gray-100 text-gray-600' },
+    normal: { label: '一般', color: 'bg-muted text-morandi-secondary' },
     silver: { label: '銀卡', color: 'bg-slate-200 text-slate-700' },
     gold: { label: '金卡', color: 'bg-amber-100 text-amber-700' },
     platinum: { label: '白金', color: 'bg-purple-100 text-purple-700' }
   }
-  return statusMap[status] || { label: status, color: 'bg-gray-100 text-gray-600' }
+  return statusMap[status] || { label: status, color: 'bg-muted text-morandi-secondary' }
 }

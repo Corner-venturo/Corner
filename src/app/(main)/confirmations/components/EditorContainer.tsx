@@ -28,7 +28,7 @@ export function EditorContainer({
             onClick={() => onTypeChange('accommodation')}
             className={
               formData.type === 'accommodation'
-                ? 'bg-white text-morandi-gold hover:bg-gray-100'
+                ? 'bg-white text-morandi-gold hover:bg-muted'
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >
@@ -40,7 +40,7 @@ export function EditorContainer({
             onClick={() => onTypeChange('flight')}
             className={
               formData.type === 'flight'
-                ? 'bg-white text-morandi-gold hover:bg-gray-100'
+                ? 'bg-white text-morandi-gold hover:bg-muted'
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >

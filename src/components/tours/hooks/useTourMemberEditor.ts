@@ -5,10 +5,8 @@ import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
 import { useOrderStore, useMemberStore } from '@/stores'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
-
-const supabase = supabaseClient as any
 
 export interface EditingMember {
   id?: string

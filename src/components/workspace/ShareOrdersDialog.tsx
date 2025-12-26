@@ -221,20 +221,20 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
                       <td className="py-2 px-2 text-sm text-right text-morandi-primary">
                         ${(order.paid_amount || 0).toLocaleString()}
                       </td>
-                      <td className="py-2 px-2 text-sm text-right font-semibold text-red-600">
+                      <td className="py-2 px-2 text-sm text-right font-semibold text-status-danger">
                         ${order.gap.toLocaleString()}
                       </td>
                       <td className="py-2 px-2 text-center">
                         {isFullyUnpaid ? (
-                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-status-danger-bg text-status-danger px-2 py-0.5 rounded">
                             ❌❌ 未收款
                           </span>
                         ) : isLowRate ? (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-status-warning-bg text-status-warning px-2 py-0.5 rounded">
                             ⚠️ 收款率低
                           </span>
                         ) : (
-                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-status-warning-bg text-status-warning px-2 py-0.5 rounded">
                             部分收款
                           </span>
                         )}
@@ -257,7 +257,7 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
             </div>
             <div className="text-right">
               <div className="text-xs text-morandi-secondary">總缺口金額</div>
-              <div className="text-lg font-semibold text-red-600">
+              <div className="text-lg font-semibold text-status-danger">
                 ${selectedStats.totalGap.toLocaleString()}
               </div>
             </div>

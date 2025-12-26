@@ -205,7 +205,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
             <Dumbbell className="h-5 w-5" />
             <span>{box.name}</span>
           </DialogTitle>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-morandi-secondary">
             {formatDateTime(scheduledBox.day_of_week, scheduledBox.start_time)}
           </p>
         </DialogHeader>
@@ -307,7 +307,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   disabled={!exerciseForm.equipment.trim() || isAdding}
                   className={`w-full transition-all duration-300 ${
                     isAdding
-                      ? 'bg-green-500 border-green-500 scale-105'
+                      ? 'bg-status-success border-status-success scale-105'
                       : 'bg-morandi-gold hover:bg-morandi-gold-hover'
                   }`}
                   size="sm"
@@ -366,7 +366,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteExercise(exercise.id)}
-                            className="h-8 w-8 p-0 text-morandi-secondary hover:text-red-500"
+                            className="h-8 w-8 p-0 text-morandi-secondary hover:text-status-danger"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -394,8 +394,8 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                                 flex flex-col items-center justify-center
                                 active:scale-95
                                 ${completed
-                                  ? 'bg-green-500 border-green-500 text-white shadow-lg scale-105'
-                                  : 'border-gray-200 hover:border-morandi-gold hover:bg-morandi-gold/5 bg-white hover:scale-105'
+                                  ? 'bg-status-success border-status-success text-white shadow-lg scale-105'
+                                  : 'border-border hover:border-morandi-gold hover:bg-morandi-gold/5 bg-white hover:scale-105'
                                 }
                               `}
                               title={exercise.completedSetsTime[setIndex]
@@ -446,9 +446,9 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
           <div className="pt-4 border-t space-y-3">
             {/* 完成狀態提示 */}
             {isBoxCompleted && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-center gap-2">
-                <Check className="h-5 w-5 text-green-600" />
-                <span className="text-green-600 font-medium">
+              <div className="bg-status-success-bg border border-morandi-green/30 rounded-lg p-3 flex items-center justify-center gap-2">
+                <Check className="h-5 w-5 text-status-success" />
+                <span className="text-status-success font-medium">
                   此訓練已完成 ✓
                 </span>
               </div>
@@ -458,7 +458,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
               <Button
                 variant="outline"
                 onClick={handleDelete}
-                className="text-red-500 border-red-300 hover:bg-red-50"
+                className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg"
               >
                 <Trash2 size={16} className="mr-1" />
                 移除排程

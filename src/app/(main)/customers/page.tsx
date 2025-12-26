@@ -149,7 +149,7 @@ export default function CustomersPage() {
           <div className="flex items-center gap-2">
             <span className="text-xs text-morandi-secondary font-mono">{customer.code}</span>
             {customer.verification_status === 'unverified' && (
-              <span className="text-xs text-amber-600 font-medium">⚠️</span>
+              <span className="text-xs text-status-warning font-medium">⚠️</span>
             )}
           </div>
         ),
@@ -233,7 +233,7 @@ export default function CustomersPage() {
         label: '飲食禁忌',
         sortable: false,
         render: (_value, customer: Customer) => (
-          <div className={`text-xs ${customer.dietary_restrictions ? 'text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}>
+          <div className={`text-xs ${customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-1.5 py-0.5 rounded' : 'text-morandi-secondary'}`}>
             {customer.dietary_restrictions || '-'}
           </div>
         ),
@@ -347,7 +347,7 @@ export default function CustomersPage() {
               <div className="flex items-center gap-1">
                 {customer.verification_status === 'unverified' && customer.passport_image_url && (
                   <button
-                    className="p-1 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
                     title="驗證顧客資料"
                     onClick={(e) => {
                       e.stopPropagation()
@@ -368,7 +368,7 @@ export default function CustomersPage() {
                   <Edit size={14} />
                 </button>
                 <button
-                  className="p-1 text-morandi-secondary hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                  className="p-1 text-morandi-secondary hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors"
                   title="刪除顧客"
                   onClick={(e) => {
                     e.stopPropagation()

@@ -162,7 +162,7 @@ function StatisticsPanel({ variant = 'panel', selectedWeek = new Date() }: Stati
               </p>
             </div>
             <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-morandi-container flex items-center justify-center">
-              <div className="text-green-600 font-semibold text-xs sm:text-sm">
+              <div className="text-status-success font-semibold text-xs sm:text-sm">
                 {Math.floor(stats.totalWorkoutTime / 60)}h
               </div>
             </div>

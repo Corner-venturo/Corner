@@ -65,7 +65,7 @@ export function TimelineTemplate({
               {/* 時間點 */}
               <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4a6fa5] border-4 border-white shadow" />
 
-              <div className="flex gap-4 bg-gray-50 rounded-xl p-4">
+              <div className="flex gap-4 bg-muted rounded-xl p-4">
                 <UploadableImage
                   src={act.image}
                   alt={act.title}
@@ -82,7 +82,7 @@ export function TimelineTemplate({
                     editingField={editingField}
                     setEditingField={setEditingField}
                     onChange={v => updateActivity(i, 'title', v)}
-                    className="font-bold text-gray-900"
+                    className="font-bold text-foreground"
                     placeholder="景點名稱"
                   />
                   <EditableText
@@ -91,7 +91,7 @@ export function TimelineTemplate({
                     editingField={editingField}
                     setEditingField={setEditingField}
                     onChange={v => updateActivity(i, 'description', v)}
-                    className="text-sm text-gray-600 mt-1"
+                    className="text-sm text-morandi-secondary mt-1"
                     placeholder="景點描述..."
                     multiline
                   />
@@ -102,11 +102,11 @@ export function TimelineTemplate({
 
           {/* 新增按鈕 */}
           <div className="relative">
-            <div className="absolute -left-5 w-4 h-4 rounded-full bg-gray-300 border-4 border-white" />
+            <div className="absolute -left-5 w-4 h-4 rounded-full bg-border border-4 border-white" />
             <button
               type="button"
               onClick={addActivity}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-400 hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 border-2 border-dashed border-border rounded-xl text-morandi-muted hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
             >
               <Plus size={18} />
               <span>新增行程點</span>
@@ -115,7 +115,7 @@ export function TimelineTemplate({
         </div>
 
         {/* 餐食 + 住宿 */}
-        <div className="mt-6 pt-4 border-t border-gray-100 grid grid-cols-3 gap-4">
+        <div className="mt-6 pt-4 border-t border-border/50 grid grid-cols-3 gap-4">
           <div>
             <div className="text-xs text-[#4a6fa5] font-medium mb-1 flex items-center gap-1">
               <Utensils size={12} /> 午餐
@@ -126,7 +126,7 @@ export function TimelineTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
-              className="text-sm text-gray-700"
+              className="text-sm text-morandi-primary"
               placeholder="午餐安排"
             />
           </div>
@@ -140,7 +140,7 @@ export function TimelineTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, dinner: v })}
-              className="text-sm text-gray-700"
+              className="text-sm text-morandi-primary"
               placeholder="晚餐安排"
             />
           </div>
@@ -154,7 +154,7 @@ export function TimelineTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('accommodation', v)}
-              className="text-sm text-gray-700"
+              className="text-sm text-morandi-primary"
               placeholder="住宿飯店"
             />
           </div>

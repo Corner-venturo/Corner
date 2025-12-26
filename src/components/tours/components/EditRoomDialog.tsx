@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -10,8 +10,6 @@ import { toast } from 'sonner'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { logger } from '@/lib/utils/logger'
-
-const supabase = supabaseClient as any
 
 interface EditRoomDialogProps {
   room: TourRoomStatus | null

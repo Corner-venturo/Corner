@@ -184,15 +184,15 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
   const getExclusivityColor = (level: string) => {
     switch (level) {
       case 'ultra_exclusive':
-        return 'bg-purple-100 text-purple-800 border-purple-300'
+        return 'bg-purple-50 text-purple-600 border-purple-600/30'
       case 'highly_exclusive':
         return 'bg-rose-100 text-rose-800 border-rose-300'
       case 'exclusive':
-        return 'bg-amber-100 text-amber-800 border-amber-300'
+        return 'bg-status-warning-bg text-status-warning border-status-warning/30'
       case 'premium':
-        return 'bg-blue-100 text-blue-800 border-blue-300'
+        return 'bg-status-info-bg text-status-info border-status-info/30'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300'
+        return 'bg-muted text-foreground border-border'
     }
   }
 

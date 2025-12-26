@@ -240,6 +240,13 @@ export type Database = {
             foreignKeyName: "accounting_events_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_events_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -1558,6 +1565,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "channel_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channels_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
             referencedColumns: ["id"]
           },
           {
@@ -3757,6 +3771,13 @@ export type Database = {
             foreignKeyName: "itineraries_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itineraries_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -4509,6 +4530,13 @@ export type Database = {
             foreignKeyName: "members_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -5119,6 +5147,13 @@ export type Database = {
             foreignKeyName: "orders_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -5206,6 +5241,13 @@ export type Database = {
           workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_request_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payment_request_items_tour_id_fkey"
             columns: ["tour_id"]
@@ -8256,6 +8298,13 @@ export type Database = {
             foreignKeyName: "tour_addons_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_addons_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -8287,6 +8336,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_custom_cost_fields_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_custom_cost_fields_tour_id_fkey"
             columns: ["tour_id"]
@@ -8328,6 +8384,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tour_custom_cost_fields"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_custom_cost_values_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
           },
           {
             foreignKeyName: "tour_custom_cost_values_member_id_fkey"
@@ -8382,6 +8445,13 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_departure_data_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: true
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_departure_data_tour_id_fkey"
             columns: ["tour_id"]
@@ -8552,7 +8622,21 @@ export type Database = {
             foreignKeyName: "tour_member_fields_order_member_id_fkey"
             columns: ["order_member_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
+          },
+          {
+            foreignKeyName: "tour_member_fields_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
             referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_member_fields_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
             referencedColumns: ["id"]
           },
           {
@@ -8666,6 +8750,312 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_request_items: {
+        Row: {
+          created_at: string | null
+          day_number: number | null
+          description: string
+          id: string
+          item_type: string
+          quantity: number | null
+          reply_content: Json | null
+          reply_status: string | null
+          request_id: string
+          sort_order: number | null
+          specifications: Json | null
+          subtotal: number | null
+          unit: string | null
+          unit_price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_number?: number | null
+          description: string
+          id?: string
+          item_type: string
+          quantity?: number | null
+          reply_content?: Json | null
+          reply_status?: string | null
+          request_id: string
+          sort_order?: number | null
+          specifications?: Json | null
+          subtotal?: number | null
+          unit?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_number?: number | null
+          description?: string
+          id?: string
+          item_type?: string
+          quantity?: number | null
+          reply_content?: Json | null
+          reply_status?: string | null
+          request_id?: string
+          sort_order?: number | null
+          specifications?: Json | null
+          subtotal?: number | null
+          unit?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_request_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_request_member_vouchers: {
+        Row: {
+          created_at: string | null
+          id: string
+          member_id: string
+          member_name: string | null
+          request_id: string
+          status: string | null
+          unit_price: number | null
+          updated_at: string | null
+          voucher_code: string | null
+          voucher_data: Json | null
+          voucher_file_url: string | null
+          voucher_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          member_id: string
+          member_name?: string | null
+          request_id: string
+          status?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          voucher_code?: string | null
+          voucher_data?: Json | null
+          voucher_file_url?: string | null
+          voucher_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          member_id?: string
+          member_name?: string | null
+          request_id?: string
+          status?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          voucher_code?: string | null
+          voucher_data?: Json | null
+          voucher_file_url?: string | null
+          voucher_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_request_member_vouchers_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_request_messages: {
+        Row: {
+          attachments: Json | null
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          read_at: string | null
+          request_id: string
+          sender_id: string
+          sender_name: string | null
+          sender_type: string
+        }
+        Insert: {
+          attachments?: Json | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          request_id: string
+          sender_id: string
+          sender_name?: string | null
+          sender_type: string
+        }
+        Update: {
+          attachments?: Json | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          request_id?: string
+          sender_id?: string
+          sender_name?: string | null
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_request_messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_requests: {
+        Row: {
+          app_sync_data: Json | null
+          assignee_id: string | null
+          assignee_name: string | null
+          category: string
+          code: string
+          confirmed_at: string | null
+          confirmed_by: string | null
+          confirmed_by_name: string | null
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          currency: string | null
+          description: string | null
+          estimated_cost: number | null
+          final_cost: number | null
+          handler_type: string
+          id: string
+          member_data: Json | null
+          member_ids: string[] | null
+          order_id: string | null
+          priority: string | null
+          quantity: number | null
+          quoted_cost: number | null
+          replied_at: string | null
+          replied_by: string | null
+          reply_content: Json | null
+          reply_note: string | null
+          service_date: string | null
+          service_date_end: string | null
+          specifications: Json | null
+          status: string | null
+          supplier_id: string | null
+          supplier_name: string | null
+          supplier_type: string | null
+          sync_to_app: boolean | null
+          synced_at: string | null
+          target_workspace_id: string | null
+          title: string
+          tour_code: string | null
+          tour_id: string
+          tour_name: string | null
+          updated_at: string | null
+          updated_by: string | null
+          updated_by_name: string | null
+          workspace_id: string
+        }
+        Insert: {
+          app_sync_data?: Json | null
+          assignee_id?: string | null
+          assignee_name?: string | null
+          category: string
+          code: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_by_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          currency?: string | null
+          description?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          handler_type?: string
+          id?: string
+          member_data?: Json | null
+          member_ids?: string[] | null
+          order_id?: string | null
+          priority?: string | null
+          quantity?: number | null
+          quoted_cost?: number | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply_content?: Json | null
+          reply_note?: string | null
+          service_date?: string | null
+          service_date_end?: string | null
+          specifications?: Json | null
+          status?: string | null
+          supplier_id?: string | null
+          supplier_name?: string | null
+          supplier_type?: string | null
+          sync_to_app?: boolean | null
+          synced_at?: string | null
+          target_workspace_id?: string | null
+          title: string
+          tour_code?: string | null
+          tour_id: string
+          tour_name?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          updated_by_name?: string | null
+          workspace_id: string
+        }
+        Update: {
+          app_sync_data?: Json | null
+          assignee_id?: string | null
+          assignee_name?: string | null
+          category?: string
+          code?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_by_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          currency?: string | null
+          description?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          handler_type?: string
+          id?: string
+          member_data?: Json | null
+          member_ids?: string[] | null
+          order_id?: string | null
+          priority?: string | null
+          quantity?: number | null
+          quoted_cost?: number | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply_content?: Json | null
+          reply_note?: string | null
+          service_date?: string | null
+          service_date_end?: string | null
+          specifications?: Json | null
+          status?: string | null
+          supplier_id?: string | null
+          supplier_name?: string | null
+          supplier_type?: string | null
+          sync_to_app?: boolean | null
+          synced_at?: string | null
+          target_workspace_id?: string | null
+          title?: string
+          tour_code?: string | null
+          tour_id?: string
+          tour_name?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          updated_by_name?: string | null
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       tour_room_assignments: {
         Row: {
           bed_number: number | null
@@ -8692,6 +9082,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_room_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
+          },
           {
             foreignKeyName: "tour_room_assignments_order_member_id_fkey"
             columns: ["order_member_id"]
@@ -8766,6 +9163,13 @@ export type Database = {
             foreignKeyName: "tour_rooms_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_rooms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -8797,6 +9201,13 @@ export type Database = {
           vehicle_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_vehicle_assignments_order_member_id_fkey"
+            columns: ["order_member_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["order_member_id"]
+          },
           {
             foreignKeyName: "tour_vehicle_assignments_order_member_id_fkey"
             columns: ["order_member_id"]
@@ -8864,6 +9275,13 @@ export type Database = {
           vehicle_type?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_vehicles_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_vehicles_tour_id_fkey"
             columns: ["tour_id"]
@@ -9378,6 +9796,13 @@ export type Database = {
             foreignKeyName: "travel_invoices_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -9418,6 +9843,117 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_conversation_members: {
+        Row: {
+          conversation_id: string
+          id: string
+          is_muted: boolean | null
+          joined_at: string | null
+          last_read_at: string | null
+          last_read_message_id: string | null
+          left_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          last_read_message_id?: string | null
+          left_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          last_read_message_id?: string | null
+          left_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_conversation_members_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_conversations: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          last_message_at: string | null
+          last_message_id: string | null
+          last_message_preview: string | null
+          name: string | null
+          split_group_id: string | null
+          trip_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_id?: string | null
+          last_message_preview?: string | null
+          name?: string | null
+          split_group_id?: string | null
+          trip_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_message_at?: string | null
+          last_message_id?: string | null
+          last_message_preview?: string | null
+          name?: string | null
+          split_group_id?: string | null
+          trip_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_last_message"
+            columns: ["last_message_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_conversations_split_group_id_fkey"
+            columns: ["split_group_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_split_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_conversations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
             referencedColumns: ["id"]
           },
         ]
@@ -9585,6 +10121,66 @@ export type Database = {
           },
         ]
       }
+      traveler_messages: {
+        Row: {
+          attachments: Json | null
+          content: string | null
+          conversation_id: string
+          created_at: string | null
+          deleted_at: string | null
+          edited_at: string | null
+          id: string
+          metadata: Json | null
+          reactions: Json | null
+          reply_to_id: string | null
+          sender_id: string
+          type: string
+        }
+        Insert: {
+          attachments?: Json | null
+          content?: string | null
+          conversation_id: string
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reactions?: Json | null
+          reply_to_id?: string | null
+          sender_id: string
+          type?: string
+        }
+        Update: {
+          attachments?: Json | null
+          content?: string | null
+          conversation_id?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reactions?: Json | null
+          reply_to_id?: string | null
+          sender_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traveler_profiles: {
         Row: {
           active_group_count: number | null
@@ -9600,10 +10196,12 @@ export type Database = {
           id_verified_at: string | null
           is_founding_member: boolean | null
           is_profile_complete: boolean | null
+          last_synced_at: string | null
           location: string | null
           member_level: string | null
           member_number: number | null
           phone: string | null
+          sync_version: number | null
           updated_at: string | null
           user_type: string | null
           username: string | null
@@ -9622,10 +10220,12 @@ export type Database = {
           id_verified_at?: string | null
           is_founding_member?: boolean | null
           is_profile_complete?: boolean | null
+          last_synced_at?: string | null
           location?: string | null
           member_level?: string | null
           member_number?: number | null
           phone?: string | null
+          sync_version?: number | null
           updated_at?: string | null
           user_type?: string | null
           username?: string | null
@@ -9644,10 +10244,12 @@ export type Database = {
           id_verified_at?: string | null
           is_founding_member?: boolean | null
           is_profile_complete?: boolean | null
+          last_synced_at?: string | null
           location?: string | null
           member_level?: string | null
           member_number?: number | null
           phone?: string | null
+          sync_version?: number | null
           updated_at?: string | null
           user_type?: string | null
           username?: string | null
@@ -9817,6 +10419,101 @@ export type Database = {
           },
         ]
       }
+      traveler_tour_cache: {
+        Row: {
+          cached_at: string | null
+          chinese_name: string | null
+          departure_date: string | null
+          english_name: string | null
+          id: string
+          id_number: string
+          identity: string | null
+          itinerary_id: string | null
+          itinerary_title: string | null
+          itinerary_updated_at: string | null
+          location: string | null
+          member_type: string | null
+          needs_refresh: boolean | null
+          order_code: string | null
+          order_id: string
+          order_member_id: string
+          order_status: string | null
+          outbound_flight: Json | null
+          return_date: string | null
+          return_flight: Json | null
+          source_updated_at: string | null
+          tour_code: string
+          tour_id: string
+          tour_name: string | null
+          tour_status: string | null
+          traveler_id: string
+        }
+        Insert: {
+          cached_at?: string | null
+          chinese_name?: string | null
+          departure_date?: string | null
+          english_name?: string | null
+          id?: string
+          id_number: string
+          identity?: string | null
+          itinerary_id?: string | null
+          itinerary_title?: string | null
+          itinerary_updated_at?: string | null
+          location?: string | null
+          member_type?: string | null
+          needs_refresh?: boolean | null
+          order_code?: string | null
+          order_id: string
+          order_member_id: string
+          order_status?: string | null
+          outbound_flight?: Json | null
+          return_date?: string | null
+          return_flight?: Json | null
+          source_updated_at?: string | null
+          tour_code: string
+          tour_id: string
+          tour_name?: string | null
+          tour_status?: string | null
+          traveler_id: string
+        }
+        Update: {
+          cached_at?: string | null
+          chinese_name?: string | null
+          departure_date?: string | null
+          english_name?: string | null
+          id?: string
+          id_number?: string
+          identity?: string | null
+          itinerary_id?: string | null
+          itinerary_title?: string | null
+          itinerary_updated_at?: string | null
+          location?: string | null
+          member_type?: string | null
+          needs_refresh?: boolean | null
+          order_code?: string | null
+          order_id?: string
+          order_member_id?: string
+          order_status?: string | null
+          outbound_flight?: Json | null
+          return_date?: string | null
+          return_flight?: Json | null
+          source_updated_at?: string | null
+          tour_code?: string
+          tour_id?: string
+          tour_name?: string | null
+          tour_status?: string | null
+          traveler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_tour_cache_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traveler_trip_accommodations: {
         Row: {
           address: string | null
@@ -9872,6 +10569,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "traveler_trip_accommodations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trip_briefings: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          sort_order: number | null
+          title: string
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          sort_order?: number | null
+          title: string
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          sort_order?: number | null
+          title?: string
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_briefings_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "traveler_trips"
@@ -10014,6 +10752,86 @@ export type Database = {
           },
         ]
       }
+      traveler_trip_itinerary_items: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          day_number: number | null
+          description: string | null
+          end_time: string | null
+          estimated_cost: number | null
+          icon: string | null
+          id: string
+          item_date: string | null
+          latitude: number | null
+          location_address: string | null
+          location_name: string | null
+          location_url: string | null
+          longitude: number | null
+          notes: string | null
+          sort_order: number | null
+          start_time: string | null
+          title: string
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          day_number?: number | null
+          description?: string | null
+          end_time?: string | null
+          estimated_cost?: number | null
+          icon?: string | null
+          id?: string
+          item_date?: string | null
+          latitude?: number | null
+          location_address?: string | null
+          location_name?: string | null
+          location_url?: string | null
+          longitude?: number | null
+          notes?: string | null
+          sort_order?: number | null
+          start_time?: string | null
+          title: string
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          day_number?: number | null
+          description?: string | null
+          end_time?: string | null
+          estimated_cost?: number | null
+          icon?: string | null
+          id?: string
+          item_date?: string | null
+          latitude?: number | null
+          location_address?: string | null
+          location_name?: string | null
+          location_url?: string | null
+          longitude?: number | null
+          notes?: string | null
+          sort_order?: number | null
+          start_time?: string | null
+          title?: string
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_itinerary_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traveler_trip_members: {
         Row: {
           id: string
@@ -10070,6 +10888,7 @@ export type Database = {
           status: string | null
           title: string
           tour_code: string | null
+          trip_source: string | null
           updated_at: string | null
         }
         Insert: {
@@ -10085,6 +10904,7 @@ export type Database = {
           status?: string | null
           title: string
           tour_code?: string | null
+          trip_source?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -10100,6 +10920,7 @@ export type Database = {
           status?: string | null
           title?: string
           tour_code?: string | null
+          trip_source?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -10611,6 +11432,13 @@ export type Database = {
             foreignKeyName: "usa_esta_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usa_esta_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -10893,6 +11721,13 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visas_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
             referencedColumns: ["id"]
           },
           {
@@ -11312,6 +12147,105 @@ export type Database = {
       }
     }
     Views: {
+      my_erp_tours: {
+        Row: {
+          chinese_name: string | null
+          destination: string | null
+          end_date: string | null
+          english_name: string | null
+          id: string | null
+          member_category: string | null
+          member_type: string | null
+          order_code: string | null
+          order_id: string | null
+          order_member_id: string | null
+          order_status: string | null
+          start_date: string | null
+          status: string | null
+          title: string | null
+          tour_code: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+      my_tours: {
+        Row: {
+          cached_at: string | null
+          chinese_name: string | null
+          destination: string | null
+          end_date: string | null
+          english_name: string | null
+          id: string | null
+          identity: string | null
+          itinerary_title: string | null
+          member_type: string | null
+          order_code: string | null
+          order_status: string | null
+          outbound_flight: Json | null
+          return_flight: Json | null
+          source_updated_at: string | null
+          start_date: string | null
+          status: string | null
+          title: string | null
+          tour_code: string | null
+        }
+        Insert: {
+          cached_at?: string | null
+          chinese_name?: string | null
+          destination?: string | null
+          end_date?: string | null
+          english_name?: string | null
+          id?: string | null
+          identity?: string | null
+          itinerary_title?: string | null
+          member_type?: string | null
+          order_code?: string | null
+          order_status?: string | null
+          outbound_flight?: Json | null
+          return_flight?: Json | null
+          source_updated_at?: string | null
+          start_date?: string | null
+          status?: string | null
+          title?: string | null
+          tour_code?: string | null
+        }
+        Update: {
+          cached_at?: string | null
+          chinese_name?: string | null
+          destination?: string | null
+          end_date?: string | null
+          english_name?: string | null
+          id?: string | null
+          identity?: string | null
+          itinerary_title?: string | null
+          member_type?: string | null
+          order_code?: string | null
+          order_status?: string | null
+          outbound_flight?: Json | null
+          return_flight?: Json | null
+          source_updated_at?: string | null
+          start_date?: string | null
+          status?: string | null
+          title?: string | null
+          tour_code?: string | null
+        }
+        Relationships: []
+      }
+      tour_requests_progress: {
+        Row: {
+          cancelled_requests: number | null
+          completed_requests: number | null
+          completion_percentage: number | null
+          draft_requests: number | null
+          in_progress_requests: number | null
+          total_requests: number | null
+          tour_code: string | null
+          tour_id: string | null
+          tour_name: string | null
+          workspace_id: string | null
+        }
+        Relationships: []
+      }
       tour_rooms_status: {
         Row: {
           assigned_count: number | null
@@ -11328,6 +12262,13 @@ export type Database = {
           tour_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_rooms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_rooms_tour_id_fkey"
             columns: ["tour_id"]
@@ -11358,6 +12299,13 @@ export type Database = {
             foreignKeyName: "tour_vehicles_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_vehicles_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -11368,6 +12316,10 @@ export type Database = {
       can_manage_workspace: {
         Args: { target_workspace_id: string }
         Returns: boolean
+      }
+      check_my_tours_updates: {
+        Args: { p_last_synced_at?: string }
+        Returns: Json
       }
       create_atomic_transaction: {
         Args: {
@@ -11390,7 +12342,13 @@ export type Database = {
         Returns: string
       }
       get_current_employee_id: { Args: never; Returns: string }
+      get_current_traveler_id: { Args: never; Returns: string }
       get_current_user_workspace: { Args: never; Returns: string }
+      get_my_tour_details: { Args: { p_tour_code: string }; Returns: Json }
+      get_or_create_direct_conversation: {
+        Args: { other_user_id: string }
+        Returns: string
+      }
       get_or_create_dm_channel: {
         Args: {
           p_user_1_id: string
@@ -11430,6 +12388,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
       get_user_permission: {
         Args: { p_itinerary_id: string; p_user_id: string }
         Returns: string
@@ -11444,12 +12403,23 @@ export type Database = {
       is_admin:
         | { Args: never; Returns: boolean }
         | { Args: { p_user_id: string }; Returns: boolean }
+      is_employee: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      is_traveler: { Args: never; Returns: boolean }
+      mark_conversation_read: {
+        Args: { p_conversation_id: string }
+        Returns: undefined
+      }
       refresh_all_region_stats: { Args: never; Returns: undefined }
+      refresh_traveler_tour_cache: {
+        Args: { p_traveler_id?: string }
+        Returns: number
+      }
       set_current_workspace: {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
+      sync_my_tours: { Args: never; Returns: Json }
       update_city_stats: { Args: { p_city_id: string }; Returns: undefined }
     }
     Enums: {

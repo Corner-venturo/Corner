@@ -5,7 +5,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Edit, Upload, FileImage, Trash2 } from 'lucide-react'
+import { Edit, Upload, FileImage, Trash2, Plus, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -184,8 +184,9 @@ export function CustomerAddDialog({
             <Button
               onClick={handleAddManually}
               disabled={!newCustomer.name.trim() || !newCustomer.phone.trim()}
-              className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Plus size={16} />
               手動新增顧客
             </Button>
           </div>
@@ -201,9 +202,9 @@ export function CustomerAddDialog({
             </p>
 
             {/* 重要提醒 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <h4 className="text-xs font-semibold text-blue-900 mb-2">⚠️ 重要提醒</h4>
-              <ul className="text-xs text-blue-800 space-y-1">
+            <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
+              <h4 className="text-xs font-semibold text-morandi-primary mb-2">⚠️ 重要提醒</h4>
+              <ul className="text-xs text-morandi-secondary space-y-1">
                 <li>• OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
                 <li>• 請務必<strong>人工檢查護照資訊</strong></li>
                 <li>• 支援所有國家護照（TWN、USA、JPN 等）</li>
@@ -211,9 +212,9 @@ export function CustomerAddDialog({
             </div>
 
             {/* 拍攝提示 */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <h4 className="text-xs font-semibold text-amber-900 mb-2">📸 拍攝建議</h4>
-              <ul className="text-xs text-amber-800 space-y-1">
+            <div className="bg-status-warning-bg border border-status-warning/30 rounded-lg p-3">
+              <h4 className="text-xs font-semibold text-morandi-primary mb-2">📸 拍攝建議</h4>
+              <ul className="text-xs text-morandi-secondary space-y-1">
                 <li>✓ 確保護照<strong>最下方兩排文字</strong>清晰可見</li>
                 <li>✓ 光線充足，避免反光或陰影</li>
                 <li>✓ 拍攝角度正面，避免傾斜</li>
@@ -276,10 +277,10 @@ export function CustomerAddDialog({
                           e.stopPropagation()
                           passportUpload.removeFile(index)
                         }}
-                        className="h-6 w-6 p-0 flex items-center justify-center hover:bg-red-100 rounded transition-colors"
+                        className="h-6 w-6 p-0 flex items-center justify-center hover:bg-status-danger-bg rounded transition-colors"
                         disabled={passportUpload.isUploading}
                       >
-                        <Trash2 size={12} className="text-red-500" />
+                        <Trash2 size={12} className="text-status-danger" />
                       </button>
                     </div>
                   ))}
@@ -288,8 +289,9 @@ export function CustomerAddDialog({
                 <Button
                   onClick={passportUpload.processFiles}
                   disabled={passportUpload.isUploading}
-                  className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                 >
+                  <Upload size={16} />
                   {passportUpload.isUploading
                     ? '辨識中...'
                     : `辨識並建立 ${passportUpload.files.length} 位顧客`}
@@ -300,7 +302,8 @@ export function CustomerAddDialog({
         </div>
 
         <div className="flex justify-end pt-2 border-t">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
         </div>

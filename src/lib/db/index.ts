@@ -4,13 +4,15 @@
  * 目前架構：直接從 Supabase 即時取資料，無 IndexedDB
  */
 
+import { logger } from '@/lib/utils/logger'
+
 // 空的 localDB stub
 export const localDB = {
   clear: async () => {
-    console.warn('[localDB] 離線資料庫已棄用，此操作無效')
+    logger.warn('[localDB] 離線資料庫已棄用，此操作無效')
   },
   delete: async () => {
-    console.warn('[localDB] 離線資料庫已棄用，此操作無效')
+    logger.warn('[localDB] 離線資料庫已棄用，此操作無效')
   },
 }
 

@@ -39,9 +39,9 @@ const MODULE_INFO = {
     name: '會計模組',
     description: '完整的會計傳票系統，支援自動拋轉與財務報表',
     icon: FileText,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-status-info',
+    bgColor: 'bg-status-info-bg',
+    borderColor: 'border-status-info/30',
     features: [
       '自動產生會計傳票',
       '收款/付款自動拋轉',
@@ -55,9 +55,9 @@ const MODULE_INFO = {
     name: '庫存模組',
     description: '庫存管理系統（開發中）',
     icon: Package,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
+    color: 'text-morandi-green',
+    bgColor: 'bg-status-success-bg',
+    borderColor: 'border-status-success/30',
     features: ['庫存追蹤', '進銷存管理', '盤點功能', '庫存警報'],
   },
   bi_analytics: {
@@ -66,7 +66,7 @@ const MODULE_INFO = {
     icon: BarChart3,
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
+    borderColor: 'border-purple-600/30',
     features: ['銷售分析', '成本分析', '利潤分析', '自訂報表'],
   },
 } as const
@@ -225,7 +225,7 @@ export default function ModulesManagementPage() {
                   key={moduleName}
                   className={cn(
                     'overflow-hidden transition-all hover:shadow-lg',
-                    status.enabled && !status.expired && 'ring-2 ring-green-500 ring-offset-2'
+                    status.enabled && !status.expired && 'ring-2 ring-status-success ring-offset-2'
                   )}
                 >
                   <CardHeader className={cn('pb-4', info.bgColor, info.borderColor, 'border-b')}>
@@ -253,17 +253,17 @@ export default function ModulesManagementPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-[#8C8C8C]">狀態</span>
                       {status.enabled && !status.expired ? (
-                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                        <Badge className="bg-status-success-bg text-status-success border-status-success/30">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
                           已啟用
                         </Badge>
                       ) : status.enabled && status.expired ? (
-                        <Badge className="bg-red-100 text-red-700 border-red-300">
+                        <Badge className="bg-status-danger-bg text-status-danger border-status-danger/30">
                           <XCircle className="h-3 w-3 mr-1" />
                           已過期
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-gray-600">
+                        <Badge variant="outline" className="text-morandi-secondary">
                           <XCircle className="h-3 w-3 mr-1" />
                           未啟用
                         </Badge>
@@ -279,7 +279,7 @@ export default function ModulesManagementPage() {
                           <span
                             className={cn(
                               'font-medium',
-                              status.expired ? 'text-red-600' : 'text-[#333333]'
+                              status.expired ? 'text-status-danger' : 'text-[#333333]'
                             )}
                           >
                             {new Date(status.expiresAt).toLocaleDateString('zh-TW')}
@@ -294,7 +294,7 @@ export default function ModulesManagementPage() {
                       <ul className="space-y-1.5">
                         {info.features.map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">
-                            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 text-status-success mt-0.5 flex-shrink-0" />
                             <span>{feature}</span>
                           </li>
                         ))}
@@ -307,7 +307,7 @@ export default function ModulesManagementPage() {
                         <Button
                           onClick={() => handleDisableModule(moduleName)}
                           variant="outline"
-                          className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                          className="w-full border-status-danger/30 text-status-danger hover:bg-status-danger-bg"
                           disabled={loading}
                         >
                           停用模組
@@ -329,13 +329,13 @@ export default function ModulesManagementPage() {
           </div>
 
           {/* 說明 */}
-          <Card className="bg-blue-50 border-blue-200">
+          <Card className="bg-status-info-bg border-status-info/30">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-status-info mt-0.5" />
                 <div className="flex-1">
-                  <div className="font-semibold text-blue-900 mb-1">模組說明</div>
-                  <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                  <div className="font-semibold text-morandi-primary mb-1">模組說明</div>
+                  <ul className="text-sm text-morandi-secondary space-y-1 list-disc list-inside">
                     <li>模組需要啟用後才能使用相關功能</li>
                     <li>可設定到期日，過期後會自動停用</li>
                     <li>停用模組不會刪除已建立的資料，重新啟用後可繼續使用</li>
@@ -378,7 +378,7 @@ export default function ModulesManagementPage() {
                 <ul className="space-y-1.5">
                   {MODULE_INFO[selectedModule].features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm text-[#8C8C8C]">
-                      <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-status-success mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}

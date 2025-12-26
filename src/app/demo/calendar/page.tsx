@@ -55,10 +55,10 @@ export default function DemoCalendarPage() {
   }
 
   const eventTypeConfig = {
-    departure: { color: 'bg-blue-500', icon: Plane, label: '出團' },
-    meeting: { color: 'bg-purple-500', icon: Users, label: '會議' },
-    deadline: { color: 'bg-red-500', icon: AlertCircle, label: '截止' },
-    reminder: { color: 'bg-amber-500', icon: Clock, label: '提醒' }
+    departure: { color: 'bg-status-info', icon: Plane, label: '出團' },
+    meeting: { color: 'bg-morandi-gold', icon: Users, label: '會議' },
+    deadline: { color: 'bg-status-danger', icon: AlertCircle, label: '截止' },
+    reminder: { color: 'bg-status-warning', icon: Clock, label: '提醒' }
   }
 
   // Demo today
@@ -129,7 +129,7 @@ export default function DemoCalendarPage() {
                 <div
                   key={day}
                   className={`py-3 text-center text-sm font-medium ${
-                    index === 0 ? 'text-red-500' : index === 6 ? 'text-blue-500' : 'text-morandi-secondary'
+                    index === 0 ? 'text-status-danger' : index === 6 ? 'text-status-info' : 'text-morandi-secondary'
                   }`}
                 >
                   {day}
@@ -162,8 +162,8 @@ export default function DemoCalendarPage() {
                                 ? 'bg-morandi-gold text-white'
                                 : isWeekend
                                   ? index % 7 === 0
-                                    ? 'text-red-500'
-                                    : 'text-blue-500'
+                                    ? 'text-status-danger'
+                                    : 'text-status-info'
                                   : 'text-morandi-primary'
                             }`}
                           >
@@ -174,7 +174,7 @@ export default function DemoCalendarPage() {
                           {tours.map((tour) => (
                             <div
                               key={tour.id}
-                              className="px-1.5 py-1 bg-blue-100 text-blue-700 rounded text-xs truncate"
+                              className="px-1.5 py-1 bg-status-info-bg text-status-info rounded text-xs truncate"
                             >
                               <span className="flex items-center gap-1">
                                 <Plane size={10} />
@@ -229,7 +229,7 @@ export default function DemoCalendarPage() {
                 {demoTours.filter(t => t.status === 'confirmed' || t.status === 'departed').slice(0, 4).map((tour) => (
                   <div key={tour.id} className="px-4 py-3 hover:bg-morandi-container/30 transition-colors cursor-pointer">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-status-info rounded-full"></div>
                       <span className="text-sm font-medium text-morandi-primary">{tour.tour_code}</span>
                     </div>
                     <p className="text-xs text-morandi-primary mb-1">{tour.tour_name}</p>

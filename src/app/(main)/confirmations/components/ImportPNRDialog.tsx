@@ -139,7 +139,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
                 <div className="space-y-3 text-sm">
                   {/* 電腦代號 */}
                   {parsedData.recordLocator && (
-                    <div className="bg-white p-3 rounded border border-gray-200">
+                    <div className="bg-white p-3 rounded border border-border">
                       <span className="font-semibold text-morandi-primary">電腦代號：</span>
                       <span className="text-morandi-secondary">{parsedData.recordLocator}</span>
                     </div>
@@ -147,7 +147,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
                   {/* 旅客姓名 */}
                   {parsedData.passengerNames.length > 0 && (
-                    <div className="bg-white p-3 rounded border border-gray-200">
+                    <div className="bg-white p-3 rounded border border-border">
                       <span className="font-semibold text-morandi-primary">旅客姓名：</span>
                       <div className="mt-1 space-y-1">
                         {parsedData.passengerNames.map((name, idx) => (
@@ -161,7 +161,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
                   {/* 航班資訊 */}
                   {parsedData.segments.length > 0 && (
-                    <div className="bg-white p-3 rounded border border-gray-200">
+                    <div className="bg-white p-3 rounded border border-border">
                       <span className="font-semibold text-morandi-primary block mb-2">航班資訊：</span>
                       <div className="space-y-2">
                         {parsedData.segments.map((seg, idx) => (
@@ -180,7 +180,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
                   {/* 機票號碼 */}
                   {parsedData.ticketNumbers.length > 0 && (
-                    <div className="bg-white p-3 rounded border border-gray-200">
+                    <div className="bg-white p-3 rounded border border-border">
                       <span className="font-semibold text-morandi-primary">機票號碼：</span>
                       <div className="mt-1 space-y-1">
                         {parsedData.ticketNumbers.map((ticket, idx) => (

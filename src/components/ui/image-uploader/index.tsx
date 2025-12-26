@@ -331,7 +331,7 @@ export function MultiImageUploader({
               <button
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-status-danger rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X size={12} className="text-white" />
               </button>

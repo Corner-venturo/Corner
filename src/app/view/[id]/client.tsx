@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import TourPage from '@/components/TourPage'
 import { Loader2 } from 'lucide-react'
+import { logger } from '@/lib/utils/logger'
 
 interface ItineraryData {
   title?: string
@@ -53,7 +54,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
         const itineraryData = await response.json()
         setData(itineraryData)
       } catch (err) {
-        console.error('載入行程失敗:', err)
+        logger.error('載入行程失敗:', err)
         setError(err instanceof Error ? err.message : '載入行程時發生錯誤')
       } finally {
         setLoading(false)
@@ -78,7 +79,7 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-morandi-background">
         <div className="text-center max-w-md px-4">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-status-danger-bg flex items-center justify-center">
             <span className="text-2xl">!</span>
           </div>
           <h1 className="text-xl font-semibold text-morandi-primary mb-2">無法載入行程</h1>

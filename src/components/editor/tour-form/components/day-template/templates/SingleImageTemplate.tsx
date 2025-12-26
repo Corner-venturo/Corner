@@ -71,7 +71,7 @@ export function SingleImageTemplate({
           editingField={editingField}
           setEditingField={setEditingField}
           onChange={v => updateField('description', v)}
-          className="text-gray-600 mb-4"
+          className="text-morandi-secondary mb-4"
           placeholder="行程描述..."
           multiline
         />
@@ -79,13 +79,13 @@ export function SingleImageTemplate({
         {/* 景點列表 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">景點活動</span>
+            <span className="text-sm font-medium text-morandi-secondary">景點活動</span>
             <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
               <Plus size={12} /> 新增
             </button>
           </div>
           {editingDay.activities.map((act, i) => (
-            <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+            <div key={i} className="flex items-center gap-3 p-2 bg-muted rounded-lg">
               <UploadableImage
                 src={act.image}
                 alt={act.title}
@@ -102,7 +102,7 @@ export function SingleImageTemplate({
                   editingField={editingField}
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
-                  className="font-medium text-gray-900 text-sm"
+                  className="font-medium text-foreground text-sm"
                   placeholder="景點名稱"
                 />
               </div>
@@ -111,28 +111,28 @@ export function SingleImageTemplate({
         </div>
 
         {/* 餐食 + 住宿 */}
-        <div className="mt-4 pt-4 border-t border-gray-100 flex gap-4 text-sm">
+        <div className="mt-4 pt-4 border-t border-border/50 flex gap-4 text-sm">
           <div className="flex-1">
-            <span className="text-gray-400">午餐：</span>
+            <span className="text-morandi-muted">午餐：</span>
             <EditableText
               value={editingDay.meals?.lunch || ''}
               fieldKey="meals-lunch"
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
-              className="inline text-gray-700"
+              className="inline text-morandi-primary"
               placeholder="午餐"
             />
           </div>
           <div className="flex-1">
-            <span className="text-gray-400">住宿：</span>
+            <span className="text-morandi-muted">住宿：</span>
             <EditableText
               value={editingDay.accommodation || ''}
               fieldKey="accommodation"
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('accommodation', v)}
-              className="inline text-gray-700"
+              className="inline text-morandi-primary"
               placeholder="住宿"
             />
           </div>

@@ -319,10 +319,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       <td className="py-2 px-2 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
-                            <Save size={14} className="text-green-600" />
+                            <Save size={14} className="text-status-success" />
                           </Button>
                           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
-                            <X size={14} className="text-red-500" />
+                            <X size={14} className="text-status-danger" />
                           </Button>
                         </div>
                       </td>
@@ -408,10 +408,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             <td className="py-2 px-2 text-center">
                               <div className="flex items-center justify-center gap-1">
                                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
-                                  <Save size={14} className="text-green-600" />
+                                  <Save size={14} className="text-status-success" />
                                 </Button>
                                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
-                                  <X size={14} className="text-red-500" />
+                                  <X size={14} className="text-status-danger" />
                                 </Button>
                               </div>
                             </td>
@@ -438,7 +438,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                                     <Pencil size={14} className="text-morandi-secondary" />
                                   </Button>
                                   <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
-                                    <Trash2 size={14} className="text-red-500" />
+                                    <Trash2 size={14} className="text-status-danger" />
                                   </Button>
                                 </div>
                               </td>

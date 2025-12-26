@@ -24,7 +24,7 @@ const AttractionsMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-morandi-gold" />
       </div>
     ),
   }
@@ -225,12 +225,12 @@ export function AttractionSelector({
           </div>
 
           {/* 右側：地圖區域 */}
-          <div className="w-1/2 flex flex-col bg-slate-50">
+          <div className="w-1/2 flex flex-col bg-muted">
             {!showMap ? (
               // 初始提示畫面
-              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8">
+              <div className="flex-1 flex flex-col items-center justify-center text-morandi-secondary p-8">
                 <Map size={56} className="mb-4 opacity-30" />
-                <p className="text-lg font-medium text-slate-500">查看附近景點</p>
+                <p className="text-lg font-medium text-morandi-primary">查看附近景點</p>
                 <p className="text-sm mt-2 text-center max-w-xs">
                   點擊景點右側的 <Map size={14} className="inline mx-1" /> 按鈕，即可在地圖上查看該景點周圍 5 公里內的其他景點
                 </p>
@@ -241,7 +241,7 @@ export function AttractionSelector({
                 {/* 地圖標題 */}
                 <div className="px-4 py-3 bg-white border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <MapPin size={18} className="text-red-500" />
+                    <MapPin size={18} className="text-status-danger" />
                     <span className="font-medium text-morandi-primary">{selectedMapAttraction?.name}</span>
                   </div>
                   <Button
@@ -270,7 +270,7 @@ export function AttractionSelector({
           </div>
         </div>
 
-        <DialogFooter className="px-6 py-3 border-t bg-gray-50/50">
+        <DialogFooter className="px-6 py-3 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
             取消
           </Button>

@@ -222,7 +222,12 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
         note: string
         status: string
         workspace_id: string | undefined
+        code: string
+        request_type: string
       }> = []
+
+      // 生成流水號
+      let bonusCounter = 1
 
       // 1. 收集業務業績請款單
       for (const recipient of salesRecipients) {
@@ -236,6 +241,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             note: `業務業績 ${recipient.percentage}%`,
             status: 'pending',
             workspace_id: user?.workspace_id,
+            code: `BONUS-${tour.code}-${String(bonusCounter++).padStart(2, '0')}`,
+            request_type: 'bonus',
           })
         }
       }
@@ -252,13 +259,16 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             note: `OP 獎金 ${recipient.percentage}%`,
             status: 'pending',
             workspace_id: user?.workspace_id,
+            code: `BONUS-${tour.code}-${String(bonusCounter++).padStart(2, '0')}`,
+            request_type: 'bonus',
           })
         }
       }
 
       // 3. 批量寫入
       if (bonusPayments.length > 0) {
-        await (supabase as any).from('payment_requests').insert(bonusPayments)
+        const { error: insertError } = await supabase.from('payment_requests').insert(bonusPayments)
+        if (insertError) throw insertError
       }
 
       // 4. 更新團體狀態為已結團
@@ -302,7 +312,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">成本支出</span>
-                <span className="font-medium text-red-600">-${totalCost.toLocaleString()}</span>
+                <span className="font-medium text-status-danger">-${totalCost.toLocaleString()}</span>
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
                 <span className="font-medium">毛利</span>
@@ -310,15 +320,15 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">公司雜支 ({memberCount} 人 × $10)</span>
-                <span className="font-medium text-red-600">-${miscExpense.toLocaleString()}</span>
+                <span className="font-medium text-status-danger">-${miscExpense.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">稅金 (12%)</span>
-                <span className="font-medium text-red-600">-${tax.toLocaleString()}</span>
+                <span className="font-medium text-status-danger">-${tax.toLocaleString()}</span>
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
                 <span className="font-bold">淨利潤</span>
-                <span className="font-bold text-xl text-green-600">${netProfit.toLocaleString()}</span>
+                <span className="font-bold text-xl text-status-success">${netProfit.toLocaleString()}</span>
               </div>
             </div>
 

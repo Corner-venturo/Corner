@@ -114,7 +114,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100 flex items-center gap-6 relative overflow-hidden group"
+              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-border flex items-center gap-6 relative overflow-hidden group"
             >
               {/* 裝飾圓形 */}
               <div
@@ -186,7 +186,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100 relative overflow-hidden group"
+              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-border relative overflow-hidden group"
             >
               {/* 裝飾圓形 */}
               <div
@@ -261,7 +261,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
 
                   {/* 其他集合點 (只有當 meetingPoints 有多個時才顯示) */}
                   {meetingPoints.length > 1 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="mt-4 pt-4 border-t border-border">
                       <p
                         className="text-xs font-bold uppercase tracking-widest mb-2"
                         style={{ color: LUXURY.muted }}

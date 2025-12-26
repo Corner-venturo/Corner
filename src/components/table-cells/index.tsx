@@ -303,7 +303,7 @@ export function ActionCell({ actions, className }: ActionCellProps) {
         const buttonClass = cn(
           'p-1 rounded transition-colors',
           action.variant === 'danger' && 'text-morandi-red hover:bg-morandi-red/10',
-          action.variant === 'warning' && 'text-orange-600 hover:bg-orange-50',
+          action.variant === 'warning' && 'text-status-warning hover:bg-status-warning-bg',
           action.variant === 'success' && 'text-morandi-green hover:bg-morandi-green/10',
           (!action.variant || action.variant === 'default') &&
             'text-morandi-gold hover:bg-morandi-gold/10',
@@ -475,7 +475,7 @@ export function BadgeCell({ text, variant = 'default', className }: BadgeCellPro
     variant === 'success' && 'bg-morandi-green/10 text-morandi-green',
     variant === 'warning' && 'bg-morandi-gold/10 text-morandi-gold',
     variant === 'danger' && 'bg-morandi-red/10 text-morandi-red',
-    variant === 'info' && 'bg-blue-50 text-blue-600',
+    variant === 'info' && 'bg-status-info-bg text-status-info',
     className
   )
 

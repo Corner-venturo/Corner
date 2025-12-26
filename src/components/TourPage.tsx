@@ -80,7 +80,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   }, [])
 
   return (
-    <div className={viewMode === 'mobile' ? 'min-h-screen bg-gray-50' : 'min-h-screen bg-white'}>
+    <div className={viewMode === 'mobile' ? 'min-h-screen bg-muted' : 'min-h-screen bg-white'}>
       {/* Navigation */}
       <TourNavigation
         data={data}
@@ -291,7 +291,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
       </div>
 
       {/* Footer */}
-      <footer className="bg-slate-900 py-12">
+      <footer className="bg-morandi-primary py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Company Logo */}
@@ -312,8 +312,8 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
                 </h3>
               )}
             </div>
-            <p className="text-slate-300 mb-6 text-sm">{COMPANY.subtitle}</p>
-            <p className="text-slate-500 text-xs">© 2025 Corner Travel. All rights reserved.</p>
+            <p className="text-morandi-secondary mb-6 text-sm">{COMPANY.subtitle}</p>
+            <p className="text-morandi-secondary text-xs">© 2025 Corner Travel. All rights reserved.</p>
           </div>
         </div>
       </footer>

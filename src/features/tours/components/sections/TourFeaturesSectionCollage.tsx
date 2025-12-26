@@ -116,10 +116,10 @@ function PolaroidCard({
             <img
               src={image}
               alt={feature.title}
-              className="w-full h-full object-cover border border-gray-200 grayscale group-hover:grayscale-0 transition-all duration-500"
+              className="w-full h-full object-cover border border-border grayscale group-hover:grayscale-0 transition-all duration-500"
             />
           ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center text-4xl">
+            <div className="w-full h-full bg-muted flex items-center justify-center text-4xl">
               {feature.icon || '📷'}
             </div>
           )}
@@ -138,7 +138,7 @@ function PolaroidCard({
           className="absolute bottom-3 left-0 w-full text-center"
           style={{ fontFamily: "'Gloria Hallelujah', cursive" }}
         >
-          <h3 className="text-lg text-gray-800">{feature.title}</h3>
+          <h3 className="text-lg text-foreground">{feature.title}</h3>
         </div>
       </div>
 
@@ -193,7 +193,7 @@ function DiptychCard({
           {hasTwo ? (
             <>
               <div
-                className="overflow-hidden border border-gray-100"
+                className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 0)}
               >
                 <img
@@ -203,7 +203,7 @@ function DiptychCard({
                 />
               </div>
               <div
-                className="overflow-hidden border border-gray-100"
+                className="overflow-hidden border border-border/50"
                 onClick={() => onImageClick(images, 1)}
               >
                 <img
@@ -215,7 +215,7 @@ function DiptychCard({
             </>
           ) : images[0] ? (
             <div
-              className="overflow-hidden border border-gray-100"
+              className="overflow-hidden border border-border/50"
               onClick={() => onImageClick(images, 0)}
             >
               <img
@@ -225,7 +225,7 @@ function DiptychCard({
               />
             </div>
           ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center text-4xl">
+            <div className="w-full h-full bg-muted flex items-center justify-center text-4xl">
               {feature.icon || '🖼️'}
             </div>
           )}
@@ -244,7 +244,7 @@ function DiptychCard({
           <h3 className="font-bold text-lg" style={{ fontFamily: "'Zen Old Mincho', serif" }}>
             {feature.title}
           </h3>
-          <p className="text-xs text-gray-400 mt-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+          <p className="text-xs text-morandi-muted mt-1" style={{ fontFamily: "'Space Mono', monospace" }}>
             {feature.description.slice(0, 30)}...
           </p>
         </div>
@@ -338,13 +338,13 @@ function FrameCard({
       {/* 標題區 */}
       <div className="mt-4">
         <h3
-          className="font-bold text-lg text-gray-800"
+          className="font-bold text-lg text-foreground"
           style={{ fontFamily: "'Permanent Marker', cursive" }}
         >
           {feature.title}
         </h3>
         <p
-          className="text-sm text-gray-600 mt-1 leading-relaxed"
+          className="text-sm text-morandi-secondary mt-1 leading-relaxed"
           style={{ fontFamily: "'Patrick Hand', cursive" }}
         >
           {feature.description}
@@ -403,7 +403,7 @@ function RecipeCard({
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-3xl">
+          <div className="w-full h-full bg-gradient-to-br from-muted to-morandi-container flex items-center justify-center text-3xl">
             {feature.icon || '🍽️'}
           </div>
         )}
@@ -425,7 +425,7 @@ function RecipeCard({
         <div className="flex justify-between items-start mb-2">
           <div>
             <span
-              className="text-xs text-gray-400"
+              className="text-xs text-morandi-muted"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               FEATURE #{String(index + 1).padStart(2, '0')}
@@ -440,7 +440,7 @@ function RecipeCard({
         </div>
 
         {/* 描述 */}
-        <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+        <p className="text-xs text-morandi-secondary line-clamp-2 mb-3">
           {feature.description}
         </p>
 
@@ -581,7 +581,7 @@ export function TourFeaturesSectionCollage({
           >
             {displayMode === 'small' ? 'TASTY BITES' : 'DAILY HIGHLIGHTS'}
           </h2>
-          <p className="text-gray-500 mt-2 text-sm">
+          <p className="text-morandi-secondary mt-2 text-sm">
             {displayMode === 'small' ? '美食特輯' : '行程亮點精選'}
           </p>
         </motion.div>

@@ -100,7 +100,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 e.stopPropagation()
                 onConfirmTour(tour)
               }}
-              className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+              className="p-1 text-status-success hover:text-status-success hover:bg-status-success-bg rounded transition-colors"
               title="確認出團"
             >
               <CheckCircle2 size={14} />
@@ -114,7 +114,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 e.stopPropagation()
                 onUnlockLockedTour(tour)
               }}
-              className="p-1 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors"
+              className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
               title="解鎖修改"
             >
               <LockOpen size={14} />

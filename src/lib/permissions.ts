@@ -3,6 +3,8 @@
  * 約定大於配置：根據路由自動推斷權限需求
  */
 
+import { logger } from '@/lib/utils/logger'
+
 export interface PermissionConfig {
   id: string
   label: string
@@ -246,7 +248,7 @@ export function hasPermissionForRoute(userPermissions: string[], pathname: strin
   // 這可以防止新增路由時忘記設定權限導致的漏洞
   if (requiredPermissions.length === 0) {
     // 記錄未配置的路由以便追蹤
-    console.warn(`[permissions] 路由 ${pathname} 未配置權限，預設拒絕訪問`)
+    logger.warn(`[permissions] 路由 ${pathname} 未配置權限，預設拒絕訪問`)
     return false
   }
 

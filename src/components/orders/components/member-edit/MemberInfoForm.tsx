@@ -25,7 +25,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           type="text"
           value={formData.chinese_name || ''}
           onChange={e => onChange({ ...formData, chinese_name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -36,7 +36,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           type="text"
           value={formData.passport_name || ''}
           onChange={e => onChange({ ...formData, passport_name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -48,7 +48,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           value={formData.birth_date || ''}
           onChange={e => onChange({ ...formData, birth_date: e.target.value })}
           placeholder="YYYY-MM-DD"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -58,7 +58,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
         <select
           value={formData.gender || ''}
           onChange={e => onChange({ ...formData, gender: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         >
           <option value="">請選擇</option>
           <option value="M">男</option>
@@ -73,7 +73,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           type="text"
           value={formData.id_number || ''}
           onChange={e => onChange({ ...formData, id_number: e.target.value.toUpperCase() })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           type="text"
           value={formData.passport_number || ''}
           onChange={e => onChange({ ...formData, passport_number: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -96,7 +96,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           value={formData.passport_expiry || ''}
           onChange={e => onChange({ ...formData, passport_expiry: e.target.value })}
           placeholder="YYYY-MM-DD"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -107,7 +107,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           type="text"
           value={formData.special_meal || ''}
           onChange={e => onChange({ ...formData, special_meal: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold"
         />
       </div>
 
@@ -118,7 +118,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
           value={formData.remarks || ''}
           onChange={e => onChange({ ...formData, remarks: e.target.value })}
           rows={2}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold resize-none"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-morandi-gold resize-none"
         />
       </div>
     </div>

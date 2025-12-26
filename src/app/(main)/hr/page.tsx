@@ -46,8 +46,8 @@ export default function HRPage() {
   const getStatusColor = (status: Employee['status']) => {
     const colorMap = {
       active: 'text-morandi-primary bg-morandi-container',
-      probation: 'text-yellow-600 bg-yellow-50',
-      leave: 'text-blue-600 bg-blue-50',
+      probation: 'text-status-warning bg-status-warning-bg',
+      leave: 'text-status-info bg-status-info-bg',
       terminated: 'text-morandi-red bg-morandi-red/10',
     }
     return colorMap[status]
@@ -180,7 +180,7 @@ export default function HRPage() {
                 return (
                   <span
                     key={role}
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config?.color || 'text-gray-600 bg-gray-50 border-gray-200'}`}
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config?.color || 'text-morandi-secondary bg-muted border-border'}`}
                   >
                     {config?.label || role}
                   </span>

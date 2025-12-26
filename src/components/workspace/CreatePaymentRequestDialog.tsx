@@ -141,7 +141,7 @@ export function CreatePaymentRequestDialog({
           {/* 關聯旅遊團 */}
           <div>
             <label className="block text-sm font-medium text-morandi-secondary mb-2">
-              關聯旅遊團 <span className="text-red-500">*</span>
+              關聯旅遊團 <span className="text-status-danger">*</span>
             </label>
             <Combobox
               value={selectedTourId}

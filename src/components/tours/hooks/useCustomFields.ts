@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { MemberFieldValue } from '../types'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
-
-const supabase = supabaseClient as any
 
 /**
  * Hook for managing custom fields

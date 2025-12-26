@@ -61,10 +61,10 @@ export function MembersTable({
               {visibleColumns.birth_date && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24">生日</th>}
               {visibleColumns.gender && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-10">性別</th>}
               {visibleColumns.passport_number && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24">護照號碼</th>}
-              {visibleColumns.dietary && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-amber-50/50">飲食禁忌</th>}
-              {visibleColumns.room && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-green-50/50">分房</th>}
-              {visibleColumns.vehicle && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-blue-50/50">分車</th>}
-              {visibleColumns.notes && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-48 bg-purple-50/50">備註</th>}
+              {visibleColumns.dietary && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-status-warning-bg">飲食禁忌</th>}
+              {visibleColumns.room && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-status-success-bg">分房</th>}
+              {visibleColumns.vehicle && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-24 bg-status-info-bg">分車</th>}
+              {visibleColumns.notes && <th className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs w-48 bg-purple-50">備註</th>}
               {customFields.map(field => (
                 <th key={field} className="px-2 py-2 text-left font-medium text-morandi-secondary text-xs bg-morandi-gold/10 relative group">
                   <div className="flex items-center justify-between gap-2">
@@ -72,10 +72,10 @@ export function MembersTable({
                     {!isDragMode && (
                       <button
                         onClick={() => onDeleteField(field)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 rounded"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-status-danger-bg rounded"
                         title="刪除欄位"
                       >
-                        <Trash2 size={12} className="text-red-500" />
+                        <Trash2 size={12} className="text-status-danger" />
                       </button>
                     )}
                   </div>

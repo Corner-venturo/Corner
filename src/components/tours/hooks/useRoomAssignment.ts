@@ -1,11 +1,9 @@
 'use client'
 
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-
-const supabase = supabaseClient as any
 
 interface OrderMember {
   id: string

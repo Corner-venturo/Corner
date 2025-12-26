@@ -4,6 +4,7 @@
  */
 
 import { canCrossWorkspace, type UserRole } from './rbac-config'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 取得當前選擇的 workspace ID（如果有的話）
@@ -114,7 +115,7 @@ export async function getWorkspaceFilterForQuery(tableName: string): Promise<str
     // ✅ 一般使用者：強制使用自己的 workspace_id（不可切換）
     return user.workspace_id || null
   } catch (error) {
-    console.warn('⚠️ getWorkspaceFilterForQuery 取得 user 失敗:', error)
+    logger.warn('⚠️ getWorkspaceFilterForQuery 取得 user 失敗:', error)
     return null
   }
 }

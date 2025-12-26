@@ -223,7 +223,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                     </div>
 
                     {/* 確認單資訊 */}
-                    <div className="text-sm text-gray-600 mt-2 flex justify-between">
+                    <div className="text-sm text-morandi-secondary mt-2 flex justify-between">
                       <span>訂位代號: {confirmation.booking_number}</span>
                       {confirmation.confirmation_number && (
                         <span>確認號碼: {confirmation.confirmation_number}</span>
@@ -238,7 +238,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <tfoot>
               <tr>
                 <td>
-                  <div className="border-t border-gray-200" style={{
+                  <div className="border-t border-border" style={{
                     marginTop: '24px',
                     paddingTop: '16px'
                   }}>
@@ -268,8 +268,8 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
                   {/* 備註 */}
                   {confirmation.notes && (
                     <div className="mt-6 avoid-break">
-                      <h3 className="text-sm font-semibold text-gray-800 mb-2">備註</h3>
-                      <div className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded border border-gray-200">
+                      <h3 className="text-sm font-semibold text-foreground mb-2">備註</h3>
+                      <div className="text-sm text-morandi-primary whitespace-pre-wrap bg-muted p-4 rounded border border-border">
                         {confirmation.notes}
                       </div>
                     </div>
@@ -319,7 +319,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
               </div>
 
               {/* 確認單資訊 */}
-              <div className="text-sm text-gray-600 mt-2 flex justify-between">
+              <div className="text-sm text-morandi-secondary mt-2 flex justify-between">
                 <span>訂位代號: {confirmation.booking_number}</span>
                 {confirmation.confirmation_number && (
                   <span>確認號碼: {confirmation.confirmation_number}</span>
@@ -335,15 +335,15 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
 
             {confirmation.notes && (
               <div className="mt-6">
-                <h3 className="text-sm font-semibold text-gray-800 mb-2">備註</h3>
-                <div className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded border border-gray-200">
+                <h3 className="text-sm font-semibold text-foreground mb-2">備註</h3>
+                <div className="text-sm text-morandi-primary whitespace-pre-wrap bg-muted p-4 rounded border border-border">
                   {confirmation.notes}
                 </div>
               </div>
             )}
 
             {/* 頁尾 - 公司資訊 */}
-            <div className="border-t border-gray-200" style={{
+            <div className="border-t border-border" style={{
               marginTop: '24px',
               paddingTop: '16px'
             }}>
@@ -369,7 +369,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
   return (
     <div className="space-y-5">
       {/* 免責聲明 */}
-      <div className="text-center text-xs italic py-2 bg-amber-50 rounded" style={{ color: '#92400E' }}>
+      <div className="text-center text-xs italic py-2 bg-status-warning-bg rounded" style={{ color: '#92400E' }}>
         **** 此文件資訊僅提供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****
       </div>
 
@@ -458,7 +458,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
       </div>
 
       {/* 機票號碼 */}
-      <div className="text-sm space-y-1.5 bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <div className="text-sm space-y-1.5 bg-muted p-4 rounded-lg border border-border">
         {data.passengers?.map((passenger, idx) => (
           passenger.ticketNumber && (
             <div key={idx} style={{ color: '#374151' }}>
@@ -470,8 +470,8 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
 
       {/* 航空公司確認電話 */}
       {'airlineContacts' in data && Array.isArray(data.airlineContacts) && data.airlineContacts.length > 0 && (
-        <div className="text-sm bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="font-semibold mb-2" style={{ color: '#1E40AF' }}>
+        <div className="text-sm bg-status-info-bg p-4 rounded-lg border border-status-info/30">
+          <div className="font-semibold mb-2 text-status-info">
             航空公司確認電話:
           </div>
           <div className="space-y-1" style={{ color: '#374151' }}>
@@ -487,7 +487,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
       {/* 重要資訊 */}
       {data.importantNotes && data.importantNotes.length > 0 && (
         <div className="avoid-break">
-          <div className="text-sm space-y-2 bg-amber-50 p-4 rounded-lg border-2 border-amber-300">
+          <div className="text-sm space-y-2 bg-status-warning-bg p-4 rounded-lg border-2 border-status-warning/30">
             <div className="font-semibold mb-1" style={{ color: '#92400E' }}>
               ⚠️ 重要資訊
             </div>
@@ -510,58 +510,58 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
     <div className="space-y-6">
       {/* 飯店資訊 */}
       <div className="avoid-break">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">飯店資訊</h3>
-        <div className="bg-gray-50 p-4 rounded border border-gray-200 space-y-2 text-sm">
-          <div className="font-medium text-gray-800 text-base">{data.hotelName}</div>
-          <div className="text-gray-700">{data.hotelAddress}</div>
+        <h3 className="text-sm font-semibold text-foreground mb-3">飯店資訊</h3>
+        <div className="bg-muted p-4 rounded border border-border space-y-2 text-sm">
+          <div className="font-medium text-foreground text-base">{data.hotelName}</div>
+          <div className="text-morandi-primary">{data.hotelAddress}</div>
           {data.hotelPhone && data.hotelPhone.length > 0 && (
-            <div className="text-gray-700">電話: {data.hotelPhone.join(' / ')}</div>
+            <div className="text-morandi-primary">電話: {data.hotelPhone.join(' / ')}</div>
           )}
         </div>
       </div>
 
       {/* 入住資訊 */}
       <div className="avoid-break">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">入住資訊</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">入住資訊</h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="bg-gray-50 p-4 rounded border border-gray-200">
-            <div className="text-gray-600 mb-1">入住</div>
-            <div className="font-medium text-gray-800">
+          <div className="bg-muted p-4 rounded border border-border">
+            <div className="text-morandi-secondary mb-1">入住</div>
+            <div className="font-medium text-foreground">
               {data.checkInDate} {data.checkInTime}
             </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200">
-            <div className="text-gray-600 mb-1">退房</div>
-            <div className="font-medium text-gray-800">
+          <div className="bg-muted p-4 rounded border border-border">
+            <div className="text-morandi-secondary mb-1">退房</div>
+            <div className="font-medium text-foreground">
               {data.checkOutDate} {data.checkOutTime}
             </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200">
-            <div className="text-gray-600 mb-1">房間數量</div>
-            <div className="font-medium text-gray-800">{data.roomCount} 間</div>
+          <div className="bg-muted p-4 rounded border border-border">
+            <div className="text-morandi-secondary mb-1">房間數量</div>
+            <div className="font-medium text-foreground">{data.roomCount} 間</div>
           </div>
-          <div className="bg-gray-50 p-4 rounded border border-gray-200">
-            <div className="text-gray-600 mb-1">住宿天數</div>
-            <div className="font-medium text-gray-800">{data.nightCount} 晚</div>
+          <div className="bg-muted p-4 rounded border border-border">
+            <div className="text-morandi-secondary mb-1">住宿天數</div>
+            <div className="font-medium text-foreground">{data.nightCount} 晚</div>
           </div>
         </div>
       </div>
 
       {/* 房型資訊 */}
       <div className="avoid-break">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">房型資訊</h3>
-        <div className="bg-gray-50 p-4 rounded border border-gray-200 space-y-2 text-sm">
+        <h3 className="text-sm font-semibold text-foreground mb-3">房型資訊</h3>
+        <div className="bg-muted p-4 rounded border border-border space-y-2 text-sm">
           <div>
-            <span className="text-gray-600">房型：</span>
-            <span className="font-medium text-gray-800">{data.roomType}</span>
+            <span className="text-morandi-secondary">房型：</span>
+            <span className="font-medium text-foreground">{data.roomType}</span>
           </div>
           <div>
-            <span className="text-gray-600">旅客姓名：</span>
-            <span className="font-medium text-gray-800">{data.guestName}</span>
+            <span className="text-morandi-secondary">旅客姓名：</span>
+            <span className="font-medium text-foreground">{data.guestName}</span>
           </div>
           <div>
-            <span className="text-gray-600">入住人數：</span>
-            <span className="font-medium text-gray-800">{data.guestCapacity}</span>
+            <span className="text-morandi-secondary">入住人數：</span>
+            <span className="font-medium text-foreground">{data.guestCapacity}</span>
           </div>
         </div>
       </div>
@@ -569,17 +569,17 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
       {/* 餐點資訊 */}
       {data.meals && data.meals.length > 0 && (
         <div className="avoid-break">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">餐點資訊</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">餐點資訊</h3>
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-gray-100 border-y border-gray-300">
-                <th className="py-2 px-3 text-left font-medium text-gray-700">日期</th>
-                <th className="py-2 px-3 text-left font-medium text-gray-700">餐點內容</th>
+              <tr className="bg-muted border-y border-border">
+                <th className="py-2 px-3 text-left font-medium text-morandi-primary">日期</th>
+                <th className="py-2 px-3 text-left font-medium text-morandi-primary">餐點內容</th>
               </tr>
             </thead>
             <tbody>
               {data.meals.map((meal, idx) => (
-                <tr key={idx} className="border-b border-gray-200">
+                <tr key={idx} className="border-b border-border">
                   <td className="py-2 px-3">{meal.date}</td>
                   <td className="py-2 px-3">{meal.description}</td>
                 </tr>
@@ -592,8 +592,8 @@ const AccommodationConfirmationContent: React.FC<{ data: AccommodationData }> = 
       {/* 重要資訊 */}
       {data.importantNotes && (
         <div className="avoid-break">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">重要資訊</h3>
-          <div className="text-sm text-gray-700 whitespace-pre-wrap bg-yellow-50 p-4 rounded border border-yellow-200">
+          <h3 className="text-sm font-semibold text-foreground mb-3">重要資訊</h3>
+          <div className="text-sm text-morandi-primary whitespace-pre-wrap bg-status-warning-bg p-4 rounded border border-status-warning/30">
             {data.importantNotes}
           </div>
         </div>

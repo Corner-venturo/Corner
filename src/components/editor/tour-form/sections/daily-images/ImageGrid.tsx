@@ -102,7 +102,7 @@ function SortableImageItem({
       <button
         type="button"
         onClick={onRemove}
-        className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded text-white opacity-0 group-hover:opacity-100 transition-all"
+        className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-status-danger rounded text-white opacity-0 group-hover:opacity-100 transition-all"
       >
         <X size={14} />
       </button>

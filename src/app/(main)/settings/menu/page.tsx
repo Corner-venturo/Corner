@@ -10,6 +10,7 @@ import { useUserStore } from '@/stores/user-store'
 import { MENU_ITEMS, MENU_CATEGORIES, getMenuItemsByCategory } from '@/constants/menu-items'
 import type { MenuItem } from '@/constants/menu-items'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { Save, RotateCcw } from 'lucide-react'
 
 export default function MenuSettingsPage() {
   const { user } = useAuthStore()
@@ -136,10 +137,12 @@ export default function MenuSettingsPage() {
 
       {/* 操作按鈕 */}
       <div className="flex gap-3 pt-4 border-t">
-        <Button onClick={handleSave} disabled={isSaving} className="flex-1">
+        <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+          <Save size={16} />
           {isSaving ? '儲存中...' : '儲存設定'}
         </Button>
-        <Button variant="outline" onClick={handleReset}>
+        <Button variant="outline" onClick={handleReset} className="gap-2">
+          <RotateCcw size={16} />
           重設為預設
         </Button>
       </div>

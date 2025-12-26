@@ -66,7 +66,7 @@ export function EditableText({
       className={`cursor-pointer hover:bg-[#2C5F4D]/10 rounded px-1 py-0.5 transition-all border border-transparent hover:border-[#2C5F4D]/30 ${className}`}
       title="點擊編輯"
     >
-      {value || <span className="text-gray-400 italic">{placeholder}</span>}
+      {value || <span className="text-morandi-muted italic">{placeholder}</span>}
     </div>
   )
 }

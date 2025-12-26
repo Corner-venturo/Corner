@@ -98,7 +98,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       </div>
 
       {/* 旅客資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">旅客資訊</h3>
         {(data.passengers || []).map((passenger, index) => (
           <div key={index} className="space-y-2 p-3 bg-white rounded border">
@@ -174,7 +174,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       </div>
 
       {/* 航班資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">航班資訊</h3>
         {(data.segments || []).map((segment, index) => (
           <div key={index} className="space-y-2 p-3 bg-white rounded border">
@@ -276,7 +276,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       </div>
 
       {/* 行李額度 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">行李額度</h3>
         {(data.baggage || []).map((bag, index) => (
           <div key={index} className="space-y-2 p-3 bg-white rounded border">
@@ -338,7 +338,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       </div>
 
       {/* 重要資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">重要資訊</h3>
         {(data.importantNotes || []).map((note, index) => (
           <div key={index} className="space-y-2">
@@ -360,7 +360,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       </div>
 
       {/* 行李詳細資訊 */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+      <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">行李詳細資訊</h3>
         {(data.baggageDetails || []).map((detail, index) => (
           <div key={index} className="space-y-2 p-3 bg-white rounded border">

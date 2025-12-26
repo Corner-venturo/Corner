@@ -149,12 +149,12 @@ const demoVisas: DemoVisa[] = [
 
 // 狀態顯示設定
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: '待處理', color: 'bg-gray-100 text-gray-600', icon: <Clock size={12} /> },
-  submitted: { label: '已送件', color: 'bg-blue-100 text-blue-600', icon: <FileText size={12} /> },
-  processing: { label: '審核中', color: 'bg-amber-100 text-amber-600', icon: <Clock size={12} /> },
-  approved: { label: '已核發', color: 'bg-green-100 text-green-600', icon: <CheckCircle size={12} /> },
-  rejected: { label: '已拒絕', color: 'bg-red-100 text-red-600', icon: <XCircle size={12} /> },
-  returned: { label: '已退件', color: 'bg-orange-100 text-orange-600', icon: <RotateCcw size={12} /> },
+  pending: { label: '待處理', color: 'bg-muted text-morandi-secondary', icon: <Clock size={12} /> },
+  submitted: { label: '已送件', color: 'bg-status-info-bg text-status-info', icon: <FileText size={12} /> },
+  processing: { label: '審核中', color: 'bg-status-warning-bg text-status-warning', icon: <Clock size={12} /> },
+  approved: { label: '已核發', color: 'bg-status-success-bg text-status-success', icon: <CheckCircle size={12} /> },
+  rejected: { label: '已拒絕', color: 'bg-status-danger-bg text-status-danger', icon: <XCircle size={12} /> },
+  returned: { label: '已退件', color: 'bg-status-warning-bg text-status-warning', icon: <RotateCcw size={12} /> },
 }
 
 export default function DemoVisasPage() {
@@ -339,7 +339,7 @@ export default function DemoVisasPage() {
           <span>總申請：<strong className="text-morandi-primary">{stats.total}</strong> 件</span>
           <span>已核發：<strong className="text-green-600">{stats.approved}</strong> 件</span>
           <span>處理中：<strong className="text-amber-600">{stats.processing}</strong> 件</span>
-          <span>待處理：<strong className="text-gray-600">{stats.pending}</strong> 件</span>
+          <span>待處理：<strong className="text-morandi-secondary">{stats.pending}</strong> 件</span>
         </div>
       </div>
 

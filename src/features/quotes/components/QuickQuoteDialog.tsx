@@ -257,7 +257,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                         <button
                           type="button"
                           onClick={() => removeItem(item.id)}
-                          className="text-morandi-red hover:text-red-700 text-lg"
+                          className="text-morandi-red hover:text-status-danger text-lg"
                         >
                           ×
                         </button>

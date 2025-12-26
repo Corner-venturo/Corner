@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2 } from 'lucide-react'
+import { Trash2, X, Save, Share2, Plus } from 'lucide-react'
 import { ShareAdvanceDialog } from '../ShareAdvanceDialog'
 import { ShareOrdersDialog } from '../ShareOrdersDialog'
 import { ShareTodoDialog } from '../ShareTodoDialog'
@@ -23,7 +23,7 @@ import type { AdvanceItem } from '@/stores/workspace/types'
 interface User {
   id: string
   display_name: string
-  email: string
+  email?: string
   avatar?: string
 }
 
@@ -216,10 +216,14 @@ export function DialogsContainer({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSettingsDialog(false)}>
+            <Button variant="outline" onClick={() => setShowSettingsDialog(false)} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={onUpdateChannel}>儲存變更</Button>
+            <Button onClick={onUpdateChannel} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Save size={16} />
+              儲存變更
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -242,10 +246,14 @@ export function DialogsContainer({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowShareQuoteDialog(false)}>
+            <Button variant="outline" onClick={() => setShowShareQuoteDialog(false)} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => setShowShareQuoteDialog(false)}>分享到頻道</Button>
+            <Button onClick={() => setShowShareQuoteDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Share2 size={16} />
+              分享到頻道
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -268,10 +276,14 @@ export function DialogsContainer({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowShareTourDialog(false)}>
+            <Button variant="outline" onClick={() => setShowShareTourDialog(false)} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => setShowShareTourDialog(false)}>分享到頻道</Button>
+            <Button onClick={() => setShowShareTourDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Share2 size={16} />
+              分享到頻道
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -298,10 +310,14 @@ export function DialogsContainer({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewPaymentDialog(false)}>
+            <Button variant="outline" onClick={() => setShowNewPaymentDialog(false)} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => setShowNewPaymentDialog(false)}>建立並分享</Button>
+            <Button onClick={() => setShowNewPaymentDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Plus size={16} />
+              建立並分享
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -328,10 +344,14 @@ export function DialogsContainer({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewReceiptDialog(false)}>
+            <Button variant="outline" onClick={() => setShowNewReceiptDialog(false)} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => setShowNewReceiptDialog(false)}>建立並分享</Button>
+            <Button onClick={() => setShowNewReceiptDialog(false)} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Plus size={16} />
+              建立並分享
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

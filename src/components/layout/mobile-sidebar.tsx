@@ -156,7 +156,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             onClick={() => toggleExpand(item.href)}
             className={cn(
               'w-full flex items-center justify-between px-4 py-3 text-left transition-colors',
-              isActive ? 'bg-morandi-gold/10 text-morandi-gold' : 'text-gray-700 hover:bg-gray-50'
+              isActive ? 'bg-morandi-gold/10 text-morandi-gold' : 'text-morandi-primary hover:bg-muted'
             )}
           >
             <span className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             />
           </button>
           {isExpanded && (
-            <div className="bg-gray-50 py-1">
+            <div className="bg-muted py-1">
               {item.children!.filter(child => hasPermission(child.requiredPermission)).map(child =>
                 renderMenuItem(child, true)
               )}
@@ -188,7 +188,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           isChild && 'pl-12',
           isActive
             ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
-            : 'text-gray-700 hover:bg-gray-50'
+            : 'text-morandi-primary hover:bg-muted'
         )}
       >
         <Icon className="w-5 h-5" />
@@ -216,14 +216,14 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         )}
       >
         {/* 頂部標題 */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <span className="text-lg font-bold text-morandi-gold">Venturo</span>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100"
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted"
             aria-label="關閉選單"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-morandi-secondary" />
           </button>
         </div>
 
@@ -237,9 +237,9 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           {/* 分隔線 */}
           {visiblePersonalItems.length > 0 && (
             <>
-              <div className="mx-4 my-2 border-t border-gray-200" />
+              <div className="mx-4 my-2 border-t border-border" />
               <div className="px-4 py-2">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <span className="text-xs font-medium text-morandi-muted uppercase tracking-wider">
                   個人工具
                 </span>
               </div>
@@ -250,7 +250,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           )}
 
           {/* 設定 */}
-          <div className="mx-4 my-2 border-t border-gray-200" />
+          <div className="mx-4 my-2 border-t border-border" />
           <Link
             href="/settings"
             onClick={handleLinkClick}
@@ -258,7 +258,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               'flex items-center gap-3 px-4 py-3 transition-colors',
               pathname === '/settings'
                 ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
+                : 'text-morandi-primary hover:bg-muted'
             )}
           >
             <Settings className="w-5 h-5" />

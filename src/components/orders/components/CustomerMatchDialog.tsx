@@ -60,12 +60,12 @@ export function CustomerMatchDialog({
                         {customer.name}
                       </span>
                       {customer.verification_status === 'verified' && (
-                        <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-status-success-bg text-status-success rounded">
                           已驗證
                         </span>
                       )}
                       {customer.is_vip && (
-                        <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-morandi-gold/20 text-morandi-gold rounded">
                           VIP
                         </span>
                       )}

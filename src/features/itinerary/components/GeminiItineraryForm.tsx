@@ -206,12 +206,12 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
   return (
     <div className="space-y-6 p-6">
       {/* AI 功能提示 */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-blue-700 font-medium mb-2">
+      <div className="bg-gradient-to-r from-status-info-bg to-purple-50 border border-purple-600/30 rounded-lg p-4">
+        <div className="flex items-center gap-2 text-status-info font-medium mb-2">
           <Sparkles size={18} />
           <span>Gemini AI 智慧助手</span>
         </div>
-        <p className="text-sm text-blue-600">
+        <p className="text-sm text-status-info">
           點擊 <Sparkles size={14} className="inline" /> 按鈕，AI 會自動幫你生成景點描述和插圖。
           目前為測試模式，之後會接上 Gemini Pro API。
         </p>
@@ -226,7 +226,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
               <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇國家" />
@@ -244,7 +244,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">城市</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">城市</label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇城市" />
@@ -268,7 +268,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
           {/* 封面圖片 with AI 生成 */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">封面圖片</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">封面圖片</label>
             <div className="flex gap-2">
               <InputIME
                 value={data.coverImage}
@@ -280,7 +280,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                 onClick={() => handleGenerateImage('cover')}
                 disabled={generatingImage === 'cover' || !data.city}
                 size="sm"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-status-info to-purple-600 hover:from-status-info/90 hover:to-purple-600 text-white"
               >
                 {generatingImage === 'cover' ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -292,7 +292,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">標題</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">標題</label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
@@ -301,17 +301,17 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">副標題 (詩意文案，用換行分隔)</label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
               placeholder="第一行文案&#10;第二行文案"
-              className="w-full text-sm border border-gray-300 rounded-md p-2 min-h-[60px]"
+              className="w-full text-sm border border-border rounded-md p-2 min-h-[60px]"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">價格 (不含NT$和起)</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格 (不含NT$和起)</label>
               <InputIME
                 value={data.price}
                 onChange={value => updateField('price', value)}
@@ -320,7 +320,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">價格備註</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格備註</label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}
@@ -357,7 +357,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         </div>
         <div className="space-y-3">
           {data.dailySchedule.map((day, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-[#F89520]">{day.day}</span>
                 <Button
@@ -369,7 +369,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   }}
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="h-6 px-2 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
                 >
                   <Trash2 size={12} />
                 </Button>
@@ -440,8 +440,8 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         </h3>
         <div className="space-y-4 text-xs">
           {data.flightOptions.map((option, idx) => (
-            <div key={idx} className="bg-orange-50 p-3 rounded border border-orange-200">
-              <div className="font-semibold text-gray-700 mb-2">{option.airline}</div>
+            <div key={idx} className="bg-status-warning-bg p-3 rounded border border-status-warning/30">
+              <div className="font-semibold text-morandi-primary mb-2">{option.airline}</div>
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-1">
                   <InputIME
@@ -533,7 +533,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         </div>
         <div className="space-y-3">
           {data.highlightSpots.map((spot, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-start justify-between mb-2">
                 <InputIME
                   value={spot.name}
@@ -551,7 +551,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     disabled={generatingDescription === idx || !spot.name}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="h-6 px-2 text-status-info hover:text-status-info hover:bg-muted"
                     title="AI 生成描述"
                   >
                     {generatingDescription === idx ? (
@@ -565,7 +565,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     disabled={generatingImage === `spot-${idx}` || !spot.name}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                    className="h-6 px-2 text-purple-600 hover:text-purple-600 hover:bg-purple-50"
                     title="AI 生成圖片"
                   >
                     {generatingImage === `spot-${idx}` ? (
@@ -583,7 +583,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     }}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-red-600"
+                    className="h-6 px-2 text-status-danger"
                   >
                     <Trash2 size={12} />
                   </Button>
@@ -612,7 +612,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   updateField('highlightSpots', newSpots)
                 }}
                 placeholder="景點描述（可點擊 AI 按鈕自動生成）"
-                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[50px]"
+                className="w-full text-xs border border-border rounded-md p-2 min-h-[50px]"
               />
             </div>
           ))}
@@ -639,7 +639,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
         </div>
         <div className="space-y-3">
           {data.sights.map((sight, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-start justify-between mb-2">
                 <InputIME
                   value={sight.name}
@@ -657,7 +657,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     disabled={generatingSightDesc === idx || !sight.name}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="h-6 px-2 text-status-info hover:text-status-info hover:bg-muted"
                     title="AI 生成描述"
                   >
                     {generatingSightDesc === idx ? (
@@ -671,7 +671,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     disabled={generatingImage === `sight-${idx}` || !sight.name}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                    className="h-6 px-2 text-purple-600 hover:text-purple-600 hover:bg-purple-50"
                     title="AI 生成圖片"
                   >
                     {generatingImage === `sight-${idx}` ? (
@@ -689,7 +689,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                     }}
                     size="sm"
                     variant="ghost"
-                    className="h-6 px-2 text-red-600"
+                    className="h-6 px-2 text-status-danger"
                   >
                     <Trash2 size={12} />
                   </Button>
@@ -718,7 +718,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
                   updateField('sights', newSights)
                 }}
                 placeholder="詳細描述（可點擊 AI 按鈕自動生成）"
-                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[60px]"
+                className="w-full text-xs border border-border rounded-md p-2 min-h-[60px]"
               />
             </div>
           ))}

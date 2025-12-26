@@ -127,11 +127,11 @@ const demoContracts: DemoContract[] = [
 
 // 狀態顯示設定
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  none: { label: '未建立', color: 'bg-gray-100 text-gray-500', icon: <FileText size={12} /> },
-  draft: { label: '草稿', color: 'bg-amber-100 text-amber-600', icon: <FileText size={12} /> },
-  sent: { label: '待簽署', color: 'bg-blue-100 text-blue-600', icon: <Send size={12} /> },
-  signed: { label: '已簽署', color: 'bg-green-100 text-green-600', icon: <CheckCircle size={12} /> },
-  expired: { label: '已過期', color: 'bg-red-100 text-red-600', icon: <Clock size={12} /> },
+  none: { label: '未建立', color: 'bg-muted text-morandi-muted', icon: <FileText size={12} /> },
+  draft: { label: '草稿', color: 'bg-status-warning-bg text-status-warning', icon: <FileText size={12} /> },
+  sent: { label: '待簽署', color: 'bg-status-info-bg text-status-info', icon: <Send size={12} /> },
+  signed: { label: '已簽署', color: 'bg-status-success-bg text-status-success', icon: <CheckCircle size={12} /> },
+  expired: { label: '已過期', color: 'bg-status-danger-bg text-status-danger', icon: <Clock size={12} /> },
 }
 
 export default function DemoContractsPage() {
@@ -307,8 +307,8 @@ export default function DemoContractsPage() {
       <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
         <div className="flex items-center gap-6 text-xs text-morandi-secondary">
           <span>總合約：<strong className="text-morandi-primary">{stats.total}</strong> 份</span>
-          <span>已簽署：<strong className="text-green-600">{stats.signed}</strong> 份</span>
-          <span>待簽署：<strong className="text-blue-600">{stats.pending}</strong> 份</span>
+          <span>已簽署：<strong className="text-status-success">{stats.signed}</strong> 份</span>
+          <span>待簽署：<strong className="text-status-info">{stats.pending}</strong> 份</span>
           <span>總人數：<strong className="text-morandi-gold">{stats.totalPax}</strong> 人</span>
         </div>
       </div>

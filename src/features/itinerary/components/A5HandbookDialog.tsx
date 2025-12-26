@@ -175,7 +175,7 @@ export function A5HandbookDialog({ open, onOpenChange, itinerary }: A5HandbookDi
         </div>
 
         {/* Preview */}
-        <div className="flex-1 overflow-auto p-6 bg-gray-100">
+        <div className="flex-1 overflow-auto p-6 bg-muted">
           <div className="flex justify-center">
             <div ref={printRef} className="bg-white shadow-lg">
               <A5HandbookPrint data={handbookData} />

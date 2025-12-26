@@ -99,7 +99,7 @@ export function AttractionSearchBar({
       {/* 搜尋框 */}
       <div className="relative">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
           size={16}
         />
         <Input

@@ -28,8 +28,8 @@ export function PickupList({
           key={index}
           className={`p-4 border rounded-lg ${
             item.manualVisaId
-              ? 'border-green-300 bg-green-50/50'
-              : 'border-amber-300 bg-amber-50/50'
+              ? 'border-morandi-green/30 bg-status-success-bg/50'
+              : 'border-status-warning/30 bg-status-warning-bg'
           }`}
         >
           <div className="flex gap-4">
@@ -42,8 +42,8 @@ export function PickupList({
                   className="w-full h-24 object-cover rounded border"
                 />
               ) : (
-                <div className="w-full h-24 bg-gray-100 rounded border flex items-center justify-center">
-                  <FileImage size={24} className="text-gray-400" />
+                <div className="w-full h-24 bg-muted rounded border flex items-center justify-center">
+                  <FileImage size={24} className="text-morandi-muted" />
                 </div>
               )}
               <p className="text-xs text-morandi-secondary mt-1 truncate">
@@ -71,12 +71,12 @@ export function PickupList({
                   {/* 配對狀態 */}
                   <div className="flex items-center gap-2 mb-2">
                     {item.matchedVisa ? (
-                      <span className="flex items-center gap-1 text-xs text-green-600">
+                      <span className="flex items-center gap-1 text-xs text-status-success">
                         <Check size={14} />
                         自動配對成功
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-xs text-amber-600">
+                      <span className="flex items-center gap-1 text-xs text-status-warning">
                         <AlertTriangle size={14} />
                         請手動選擇
                       </span>
@@ -116,7 +116,7 @@ export function PickupList({
                         type="checkbox"
                         checked={item.updateCustomer}
                         onChange={() => onToggleUpdateCustomer(index)}
-                        className="rounded border-gray-300"
+                        className="rounded border-border"
                       />
                       <span className="text-xs text-morandi-secondary">
                         同時更新顧客護照資訊
@@ -125,7 +125,7 @@ export function PickupList({
                   )}
                 </>
               ) : (
-                <div className="text-sm text-red-600">
+                <div className="text-sm text-status-danger">
                   <AlertTriangle size={16} className="inline mr-1" />
                   辨識失敗：{item.ocrResult.error || '無法解析護照資訊'}
                 </div>

@@ -72,7 +72,7 @@ export function AttractionsList({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <AlertTriangle size={14} className="text-amber-500 mt-1 flex-shrink-0" />
+                    <AlertTriangle size={14} className="text-status-warning mt-1 flex-shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>缺少：{missing.join('、')}</p>

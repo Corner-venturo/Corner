@@ -233,7 +233,7 @@ export function WeatherWidgetWeekly() {
       <div
         className={cn(
           'h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80',
-          'bg-gradient-to-br from-sky-50 via-white to-blue-50'
+          'bg-gradient-to-br from-status-info-bg via-white to-morandi-gold/5'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -242,7 +242,7 @@ export function WeatherWidgetWeekly() {
             <div
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
-                'bg-gradient-to-br from-sky-200/60 to-blue-100/60',
+                'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg',
                 'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
               )}
             >
@@ -301,14 +301,14 @@ export function WeatherWidgetWeekly() {
           {loading ? (
             <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-sky-400 mx-auto mb-2" />
+                <Loader2 className="w-8 h-8 animate-spin text-status-info mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">載入中...</p>
               </div>
             </div>
           ) : error ? (
             <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
               <div className="text-center">
-                <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                <AlertCircle className="w-8 h-8 text-morandi-red mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">{error}</p>
               </div>
             </div>
@@ -326,7 +326,7 @@ export function WeatherWidgetWeekly() {
                       className={cn(
                         'rounded-xl p-3 shadow-md border transition-all',
                         isToday
-                          ? 'bg-gradient-to-br from-sky-100/90 to-blue-100/90 border-sky-300/50'
+                          ? 'bg-gradient-to-br from-status-info-bg to-morandi-gold/5 border-status-info/30'
                           : 'bg-white/70 border-white/40 hover:bg-white/90'
                       )}
                     >
@@ -336,7 +336,7 @@ export function WeatherWidgetWeekly() {
                           <p
                             className={cn(
                               'text-xs font-semibold',
-                              isToday ? 'text-sky-700' : 'text-morandi-primary'
+                              isToday ? 'text-status-info' : 'text-morandi-primary'
                             )}
                           >
                             {formatDate(day.date)}

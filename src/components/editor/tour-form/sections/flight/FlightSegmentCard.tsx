@@ -42,7 +42,7 @@ export function FlightSegmentCard({
               type="checkbox"
               checked={flightData.hasMeal || false}
               onChange={e => onFieldChange('hasMeal', e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+              className="w-3.5 h-3.5 rounded border-border text-morandi-gold focus:ring-morandi-gold"
             />
             <span className="text-xs text-morandi-secondary">餐食</span>
           </label>

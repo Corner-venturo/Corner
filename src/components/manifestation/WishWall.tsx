@@ -21,20 +21,18 @@ export function WishWall() {
 
   const fetchWishes = async () => {
     try {
-       
-      const result = await (supabase as any)
-        .from('manifestation_entries')
+      // manifestation_entries 是自定義表，使用 type assertion
+      const { data, error } = await (supabase
+        .from('manifestation_entries' as 'employees') // Type workaround for custom table
         .select('id, shared_wish, created_at')
         .not('shared_wish', 'is', null)
         .neq('shared_wish', '')
         .order('created_at', { ascending: false })
-        .limit(50)
-
-      const { data, error } = result
+        .limit(50) as unknown as Promise<{ data: Wish[] | null; error: Error | null }>)
 
       if (error) throw error
 
-      setWishes((data || []) as Wish[])
+      setWishes(data || [])
     } catch (_error) {
       // Ignore error
     } finally {

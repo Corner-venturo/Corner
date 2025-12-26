@@ -34,7 +34,7 @@ export function checkPassportExpiry(
 
   // 檢查是否已過期
   if (expiry < today) {
-    return { status: 'expired', label: '已過期', color: 'text-red-600' }
+    return { status: 'expired', label: '已過期', color: 'text-status-danger' }
   }
 
   // 如果有出發日期，檢查是否距離出發日不足 6 個月
@@ -47,7 +47,7 @@ export function checkPassportExpiry(
     requiredExpiry.setMonth(requiredExpiry.getMonth() + 6)
 
     if (expiry < requiredExpiry) {
-      return { status: 'insufficient', label: '效期不足', color: 'text-amber-600' }
+      return { status: 'insufficient', label: '效期不足', color: 'text-status-warning' }
     }
   } else {
     // 沒有出發日期時，檢查是否距離今天不足 6 個月
@@ -55,7 +55,7 @@ export function checkPassportExpiry(
     sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
 
     if (expiry < sixMonthsFromNow) {
-      return { status: 'insufficient', label: '效期不足', color: 'text-amber-600' }
+      return { status: 'insufficient', label: '效期不足', color: 'text-status-warning' }
     }
   }
 

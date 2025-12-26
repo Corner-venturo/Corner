@@ -13,7 +13,7 @@ export function MessageView({ channel }: MessageViewProps) {
 
   if (!channel) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-500 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center text-morandi-secondary bg-muted">
         Select a channel to start chatting.
       </div>
     )
@@ -24,19 +24,19 @@ export function MessageView({ channel }: MessageViewProps) {
       {/* Channel Header */}
       <div className="p-4 border-b bg-white shadow-sm z-10">
         <h3 className="font-bold text-xl">#{channel.name}</h3>
-        {channel.description && <p className="text-gray-500 text-sm">{channel.description}</p>}
+        {channel.description && <p className="text-morandi-secondary text-sm">{channel.description}</p>}
       </div>
 
       {/* Message List */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+      <div className="flex-1 p-4 overflow-y-auto bg-muted">
         {loading && (
           <div className="flex justify-center items-center h-full">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-morandi-muted" />
           </div>
         )}
 
         {error && (
-          <div className="flex justify-center items-center h-full text-red-500">
+          <div className="flex justify-center items-center h-full text-status-danger">
             <AlertCircle className="w-6 h-6 mr-2" />
             <p>{error}</p>
           </div>
@@ -46,13 +46,13 @@ export function MessageView({ channel }: MessageViewProps) {
           <div className="space-y-4">
             {messages.map(message => (
               <div key={message.id} className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 bg-border rounded-full flex-shrink-0 flex items-center justify-center font-bold">
                   {message.author?.display_name?.[0] || '?'}
                 </div>
                 <div>
                   <p className="font-bold">
                     {message.author?.display_name || 'Unknown User'}
-                    <span className="text-xs text-gray-500 font-normal ml-2">
+                    <span className="text-xs text-morandi-secondary font-normal ml-2">
                       {new Date(message.created_at).toLocaleTimeString()}
                     </span>
                   </p>
@@ -61,7 +61,7 @@ export function MessageView({ channel }: MessageViewProps) {
               </div>
             ))}
              {messages.length === 0 && (
-              <div className="text-center text-gray-500 pt-8">
+              <div className="text-center text-morandi-secondary pt-8">
                 Be the first to say something in #{channel.name}!
               </div>
              )}

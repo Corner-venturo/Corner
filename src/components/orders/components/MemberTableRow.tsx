@@ -56,7 +56,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
 
   const cellClass = (bg?: string) => cn(
     "border border-morandi-gold/20 px-2 py-1",
-    bg || (isAllEditMode ? "bg-white" : "bg-gray-50")
+    bg || (isAllEditMode ? "bg-white" : "bg-muted")
   )
 
   const inputClass = "w-full bg-transparent text-xs border-none outline-none shadow-none"
@@ -64,8 +64,8 @@ export function MemberTableRow(props: MemberTableRowProps) {
   return (
     <tr className="group relative hover:bg-morandi-container/20 transition-colors">
       {showOrderColumn && (
-        <td className={cn(cellClass(), "bg-blue-50/50 text-center")}>
-          <span className="text-xs text-blue-600 font-medium">{member.order_code || '-'}</span>
+        <td className={cn(cellClass(), "bg-status-info-bg text-center")}>
+          <span className="text-xs text-status-info font-medium">{member.order_code || '-'}</span>
         </td>
       )}
 
@@ -87,7 +87,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         </td>
       )}
 
-      <td className={cellClass(isAllEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-red-50' : 'bg-gray-50'))}>
+      <td className={cellClass(isAllEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted'))}>
         {isAllEditMode ? (
           <input
             type="text"
@@ -105,7 +105,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         ) : (
           <div className="flex items-center gap-1">
             <span
-              className={cn("flex-1 text-xs", member.customer_verification_status === 'unverified' ? 'text-red-600 font-medium' : 'text-morandi-primary')}
+              className={cn("flex-1 text-xs", member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary')}
               title={member.customer_verification_status === 'unverified' ? '⚠️ 待驗證 - 請點擊編輯按鈕' : ''}
             >
               {member.chinese_name || '-'}
@@ -179,7 +179,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         )}
       </td>
 
-      <td className={cn(cellClass(), "bg-amber-50/50")}>
+      <td className={cn(cellClass(), "bg-status-warning-bg")}>
         <input type="text" value={member.special_meal || ''} onChange={e => onFieldChange(member.id, 'special_meal', e.target.value)} onCompositionStart={onCompositionStart} onCompositionEnd={e => handleCompositionEnd(e, v => onFieldChange(member.id, 'special_meal', v))} onKeyDown={e => onKeyDown(e, index, 'special_meal')} data-member={member.id} data-field="special_meal" className={inputClass} />
       </td>
 
@@ -191,7 +191,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         <input type="text" inputMode="numeric" value={member.deposit_amount || ''} onChange={e => onNumberInput(member.id, 'deposit_amount', e.target.value)} className={inputClass} />
       </td>
 
-      <td className={cn(cellClass(), "bg-gray-50 text-xs text-center text-morandi-secondary")}>
+      <td className={cn(cellClass(), "bg-muted text-xs text-center text-morandi-secondary")}>
         {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
       </td>
 
@@ -200,8 +200,8 @@ export function MemberTableRow(props: MemberTableRowProps) {
       </td>
 
       {showRoomColumn && (
-        <td className={cn(cellClass(), "bg-amber-50/50")}>
-          <span className="text-xs text-amber-700">{roomAssignment || '未分房'}</span>
+        <td className={cn(cellClass(), "bg-status-warning-bg")}>
+          <span className="text-xs text-morandi-gold">{roomAssignment || '未分房'}</span>
         </td>
       )}
 
@@ -220,14 +220,14 @@ export function MemberTableRow(props: MemberTableRowProps) {
       <td className={cn(cellClass(), "bg-white text-center")}>
         <div className="flex items-center justify-center gap-1">
           {member.customer_verification_status === 'unverified' && (
-            <button onClick={() => onOpenEdit(member, 'verify')} className="text-amber-500 hover:text-amber-600 transition-colors p-1" title="待驗證 - 點擊驗證">
+            <button onClick={() => onOpenEdit(member, 'verify')} className="text-status-warning hover:text-morandi-gold transition-colors p-1" title="待驗證 - 點擊驗證">
               <AlertTriangle size={14} />
             </button>
           )}
           <button onClick={() => onOpenEdit(member, 'edit')} className="text-morandi-blue hover:text-morandi-blue/80 transition-colors p-1" title="編輯成員">
             <Pencil size={14} />
           </button>
-          <button onClick={() => onDelete(member.id)} className="text-morandi-secondary/50 hover:text-red-500 transition-colors p-1" title="刪除成員">
+          <button onClick={() => onDelete(member.id)} className="text-morandi-secondary/50 hover:text-status-danger transition-colors p-1" title="刪除成員">
             <Trash2 size={14} />
           </button>
         </div>

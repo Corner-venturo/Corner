@@ -28,8 +28,8 @@ export const TYPE_FILTERS = [
  */
 export const STATUS_COLORS: Record<string, string> = {
   proposed: 'text-morandi-gold',
-  '進行中': 'text-blue-600',
-  approved: 'text-green-600',
+  '進行中': 'text-status-info',
+  approved: 'text-status-success',
 }
 
 /**

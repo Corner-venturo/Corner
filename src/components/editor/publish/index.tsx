@@ -192,7 +192,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{stripHtml(record.note) || `版本 ${record.version}`}</span>
                         {isMainVersion && (
-                          <span className="text-[10px] text-morandi-secondary bg-slate-100 px-1.5 py-0.5 rounded">主版本</span>
+                          <span className="text-[10px] text-morandi-secondary bg-morandi-container px-1.5 py-0.5 rounded">主版本</span>
                         )}
                       </div>
                       <span className="text-xs text-morandi-secondary">
@@ -209,10 +209,10 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
                             e.stopPropagation()
                             handleDeleteVersion(index)
                           }}
-                          className="p-1 hover:bg-red-100 rounded transition-colors"
+                          className="p-1 hover:bg-status-danger-bg rounded transition-colors"
                           title="刪除版本"
                         >
-                          <Trash2 size={14} className="text-red-500" />
+                          <Trash2 size={14} className="text-status-danger" />
                         </button>
                       )}
                     </div>

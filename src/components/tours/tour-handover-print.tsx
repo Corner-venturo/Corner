@@ -167,7 +167,7 @@ export function TourHandoverPrint({
               {/* 未分配的團員 */}
               {groups['未分配'] && groups['未分配'].length > 0 && (
                 <div>
-                  <h3 className="text-md font-semibold text-orange-600 mb-2 bg-orange-50 px-3 py-2 rounded">
+                  <h3 className="text-md font-semibold text-status-warning mb-2 bg-status-warning-bg px-3 py-2 rounded">
                     未分配 ({groups['未分配'].length} 人)
                   </h3>
                   <table className="w-full text-xs border-collapse">

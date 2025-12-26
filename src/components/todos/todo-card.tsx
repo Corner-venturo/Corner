@@ -39,9 +39,9 @@ export function TodoCard({
 
   // 優先級顏色
   const getPriorityColor = (priority: number) => {
-    if (priority >= 4) return 'text-red-500'
-    if (priority === 3) return 'text-orange-500'
-    return 'text-gray-400'
+    if (priority >= 4) return 'text-status-danger'
+    if (priority === 3) return 'text-status-warning'
+    return 'text-morandi-muted'
   }
 
   // 狀態標籤 - 使用 Morandi 配色
@@ -62,7 +62,7 @@ export function TodoCard({
         'hover:shadow-md hover:-translate-y-0.5',
         // 共享待辦使用淺藍色背景
         isShared
-          ? 'bg-blue-50/50 border-blue-200/50 hover:bg-blue-50 hover:border-blue-300'
+          ? 'bg-status-info-bg border-status-info/30 hover:bg-status-info-bg hover:border-status-info'
           : 'bg-white border-morandi-gold/20 hover:border-morandi-gold/40',
         // 已完成的待辦透明度降低
         isCompleted && 'opacity-60'
@@ -75,7 +75,7 @@ export function TodoCard({
           onClick={onToggleComplete}
           className={cn(
             'mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all',
-            isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'
+            isCompleted ? 'bg-status-success border-status-success' : 'border-border hover:border-status-success'
           )}
         >
           {isCompleted && <CheckCircle className="w-full h-full text-white" strokeWidth={3} />}
@@ -85,7 +85,7 @@ export function TodoCard({
         <h3
           className={cn(
             'flex-1 font-medium text-morandi-primary',
-            isCompleted && 'line-through text-gray-400'
+            isCompleted && 'line-through text-morandi-muted'
           )}
         >
           {todo.title}
@@ -100,7 +100,7 @@ export function TodoCard({
               className={cn(
                 star <= (todo.priority || 3)
                   ? `fill-current ${getPriorityColor(todo.priority || 3)}`
-                  : 'text-gray-300'
+                  : 'text-morandi-muted/60'
               )}
             />
           ))}
@@ -116,7 +116,7 @@ export function TodoCard({
 
         {/* 共享標籤 */}
         {isShared && (
-          <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-600 flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded text-xs font-medium bg-status-info-bg text-status-info flex items-center gap-1">
             <Users size={12} />
             共享
           </span>
@@ -125,7 +125,7 @@ export function TodoCard({
 
       {/* 底部：截止日期 */}
       {todo.deadline && (
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+        <div className="flex items-center gap-1.5 text-xs text-morandi-secondary">
           <Calendar size={14} />
           <span>{format(new Date(todo.deadline), 'yyyy/MM/dd', { locale: zhTW })}</span>
         </div>

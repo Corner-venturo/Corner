@@ -51,14 +51,14 @@ export function NotesWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-amber-50 via-white to-yellow-50 flex flex-col">
+      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-morandi-gold/10 via-white to-status-warning-bg flex flex-col">
         <div className="p-5 pb-3 flex-shrink-0">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3">
               <div
                 className={cn(
                   'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
-                  'bg-gradient-to-br from-amber-200/60 to-yellow-100/60',
+                  'bg-gradient-to-br from-morandi-gold/60 to-status-warning-bg/60',
                   'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
                 )}
               >
@@ -120,7 +120,7 @@ export function NotesWidget() {
                       e.stopPropagation()
                       deleteTab(tab.id)
                     }}
-                    className="opacity-0 group-hover:opacity-100 ml-0.5 text-morandi-muted hover:text-red-500 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 ml-0.5 text-morandi-muted hover:text-status-danger transition-opacity"
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -163,7 +163,7 @@ export function NotesWidget() {
             placeholder="在這裡寫下你的筆記..."
           />
           <p className="text-xs text-morandi-secondary/90 mt-2.5 font-medium flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
             自動儲存 • 雙擊分頁名稱可重新命名
           </p>
         </div>

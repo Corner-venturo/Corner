@@ -37,7 +37,7 @@ export function PublishPreview({ shareUrl, copied, onCopy }: PublishPreviewProps
             <Input
               value={shareUrl}
               readOnly
-              className="text-xs h-8 bg-gray-50"
+              className="text-xs h-8 bg-muted"
             />
             <Button
               size="sm"

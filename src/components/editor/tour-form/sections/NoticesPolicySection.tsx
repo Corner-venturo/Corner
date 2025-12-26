@@ -79,9 +79,9 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
         </h2>
 
         {/* 顯示開關 */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <AlertCircle className="h-5 w-5 text-status-warning" />
             <div>
               <h3 className="font-medium text-morandi-primary">顯示提醒事項</h3>
               <p className="text-sm text-morandi-secondary">
@@ -107,7 +107,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
             {notices.map((notice, index) => (
               <div key={index} className="flex gap-2">
                 <div className="flex items-start pt-2">
-                  <GripVertical className="h-4 w-4 text-gray-300" />
+                  <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
                   <Label className="text-xs text-morandi-secondary">第 {index + 1} 項</Label>
@@ -123,7 +123,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   variant="ghost"
                   size="sm"
                   onClick={() => removeNotice(index)}
-                  className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 mt-6"
+                  className="h-8 w-8 p-0 text-morandi-muted hover:text-status-danger mt-6"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -150,9 +150,9 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
         </h2>
 
         {/* 顯示開關 */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
           <div className="flex items-center gap-3">
-            <FileX className="h-5 w-5 text-red-400" />
+            <FileX className="h-5 w-5 text-morandi-red" />
             <div>
               <h3 className="font-medium text-morandi-primary">顯示取消政策</h3>
               <p className="text-sm text-morandi-secondary">
@@ -178,7 +178,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
             {cancellationPolicy.map((policy, index) => (
               <div key={index} className="flex gap-2">
                 <div className="flex items-start pt-2">
-                  <GripVertical className="h-4 w-4 text-gray-300" />
+                  <GripVertical className="h-4 w-4 text-morandi-muted/60" />
                 </div>
                 <div className="flex-1">
                   <Label className="text-xs text-morandi-secondary">第 {index + 1} 項</Label>
@@ -194,7 +194,7 @@ export function NoticesPolicySection({ data, onChange }: NoticesPolicySectionPro
                   variant="ghost"
                   size="sm"
                   onClick={() => removeCancellationPolicy(index)}
-                  className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 mt-6"
+                  className="h-8 w-8 p-0 text-morandi-muted hover:text-status-danger mt-6"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

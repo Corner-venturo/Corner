@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { alertError } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 import type { Itinerary } from '@/stores/types'
 
 interface FlightInfo {
@@ -245,7 +246,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
         return false
       }
     } catch (error) {
-      console.error('建立行程失敗:', error)
+      logger.error('建立行程失敗:', error)
       await alertError('建立失敗，請稍後再試')
       return false
     } finally {

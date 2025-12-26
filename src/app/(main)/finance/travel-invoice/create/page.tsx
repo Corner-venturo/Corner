@@ -135,8 +135,8 @@ export default function CreateInvoicePage() {
         <form onSubmit={handleSubmit} className="space-y-6 pb-6 max-w-4xl mx-auto">
           {/* 錯誤訊息 */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-600 text-sm">{error}</p>
+            <div className="p-3 bg-status-danger-bg border border-status-danger/30 rounded-md">
+              <p className="text-status-danger text-sm">{error}</p>
             </div>
           )}
 

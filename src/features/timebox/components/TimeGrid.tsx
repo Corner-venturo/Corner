@@ -31,7 +31,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   const error = boxesError || weeksError || scheduledError
   if (error) {
     return (
-      <div className="flex items-center justify-center p-8 text-red-500">
+      <div className="flex items-center justify-center p-8 text-status-danger">
         <div className="text-center">
           <p className="font-medium">載入資料時發生錯誤</p>
           <p className="text-sm mt-1">{error.message}</p>

@@ -194,9 +194,9 @@ export default function DemoCustomersPage() {
       <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
         <div className="flex items-center gap-6 text-xs text-morandi-secondary">
           <span>總顧客：<strong className="text-morandi-primary">{demoCustomers.length}</strong> 位</span>
-          <span>VIP：<strong className="text-amber-600">{demoCustomers.filter(c => c.vip_level !== 'normal').length}</strong> 位</span>
-          <span>總消費：<strong className="text-green-600">{formatCurrency(totalSpent)}</strong></span>
-          <span>總訂單：<strong className="text-blue-600">{totalOrders}</strong> 筆</span>
+          <span>VIP：<strong className="text-status-warning">{demoCustomers.filter(c => c.vip_level !== 'normal').length}</strong> 位</span>
+          <span>總消費：<strong className="text-status-success">{formatCurrency(totalSpent)}</strong></span>
+          <span>總訂單：<strong className="text-status-info">{totalOrders}</strong> 筆</span>
         </div>
       </div>
 

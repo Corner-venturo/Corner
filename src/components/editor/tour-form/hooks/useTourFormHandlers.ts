@@ -2,6 +2,7 @@ import { TourFormData, Activity } from '../types'
 import { cityImages, timezoneOffset } from '../constants'
 import { calculateFlightDuration } from '../utils'
 import { useRegionsStore } from '@/stores'
+import { logger } from '@/lib/utils/logger'
 
 export function useTourFormHandlers(
   data: TourFormData,
@@ -167,10 +168,10 @@ export function useTourFormHandlers(
   }
 
   const updateDailyItinerary = (index: number, field: string, value: unknown) => {
-    console.log('[useTourFormHandlers] updateDailyItinerary 被呼叫:', { index, field, value })
+    logger.log('[useTourFormHandlers] updateDailyItinerary 被呼叫:', { index, field, value })
     const newItinerary = [...data.dailyItinerary]
     newItinerary[index] = { ...newItinerary[index], [field]: value }
-    console.log('[useTourFormHandlers] 更新後的 day:', newItinerary[index])
+    logger.log('[useTourFormHandlers] 更新後的 day:', newItinerary[index])
     onChange({ ...data, dailyItinerary: newItinerary })
   }
 

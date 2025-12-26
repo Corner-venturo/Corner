@@ -197,7 +197,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                 className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center z-20 cursor-pointer"
                 onClick={() => setSelectedIndex(null)}
               >
-                <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                <div className="w-10 h-1 bg-border rounded-full" />
               </div>
 
               {/* 圖片 - 有圖片才顯示 */}

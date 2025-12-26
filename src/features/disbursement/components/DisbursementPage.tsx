@@ -29,7 +29,7 @@ import { logger } from '@/lib/utils/logger'
 // 出納單狀態
 const DISBURSEMENT_STATUS = {
   pending: { label: '待出帳', color: 'bg-morandi-gold' },
-  confirmed: { label: '已確認', color: 'bg-blue-500' },
+  confirmed: { label: '已確認', color: 'bg-status-info' },
   paid: { label: '已出帳', color: 'bg-morandi-green' },
 }
 
@@ -178,7 +178,7 @@ export function DisbursementPage() {
               }}
               className="h-8 w-8 p-0"
             >
-              <Trash2 size={16} className="text-red-500" />
+              <Trash2 size={16} className="text-status-danger" />
             </Button>
           )}
         </div>

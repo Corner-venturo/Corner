@@ -136,7 +136,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 text-red-500 hover:text-red-600 hover:bg-red-50"
+                  className="h-6 w-6 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
                   onClick={(e) => {
                     e.stopPropagation()
                     removeDay(index)

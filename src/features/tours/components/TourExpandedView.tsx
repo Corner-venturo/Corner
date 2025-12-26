@@ -169,7 +169,7 @@ export function TourExpandedView({
             <>
               <button
                 onClick={handleCreateChannel}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
               >
                 <MessageSquare size={14} className="mr-1" />
                 建立頻道

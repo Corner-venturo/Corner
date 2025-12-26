@@ -137,8 +137,8 @@ export function RestaurantSearchInput({
           onClick={onMichelinToggle}
           className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
             showMichelinOnly
-              ? 'bg-red-500 text-white'
-              : 'bg-white border border-morandi-container text-morandi-secondary hover:bg-red-50'
+              ? 'bg-status-danger text-white'
+              : 'bg-white border border-morandi-container text-morandi-secondary hover:bg-status-danger-bg'
           }`}
         >
           <Star size={14} className="inline mr-1" />
@@ -149,7 +149,7 @@ export function RestaurantSearchInput({
       {/* 搜尋框 */}
       <div className="flex-1 relative min-w-[160px]">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted"
           size={18}
         />
         <Input

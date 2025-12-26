@@ -42,7 +42,7 @@ export function QuickAddPreview({
 
         <div className="space-y-4">
           {/* 辨識結果 */}
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="p-4 bg-status-info-bg border border-status-info/30 rounded-lg">
             <p className="text-sm font-medium mb-2">辨識結果：</p>
             <div className="text-sm space-y-1">
               <p>姓名：{pendingMember.name}</p>
@@ -67,13 +67,13 @@ export function QuickAddPreview({
                     <p>
                       身分證：{customer.national_id || '無'}
                       {customer.national_id === pendingMember.id_number && (
-                        <span className="ml-2 text-green-600">✓ 相符</span>
+                        <span className="ml-2 text-status-success">✓ 相符</span>
                       )}
                     </p>
                     <p>
                       護照：{customer.passport_number || '無'}
                       {customer.passport_number === pendingMember.passport_number && (
-                        <span className="ml-2 text-green-600">✓ 相符</span>
+                        <span className="ml-2 text-status-success">✓ 相符</span>
                       )}
                     </p>
                     <p>電話：{customer.phone || '無'}</p>

@@ -50,18 +50,18 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
   }
 
   return (
-    <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 z-40 flex items-center px-4">
+    <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-border z-40 flex items-center px-4">
       {/* 漢堡按鈕 */}
       <button
         onClick={onMenuClick}
-        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors -ml-2"
+        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:bg-morandi-container transition-colors -ml-2"
         aria-label="開啟選單"
       >
-        <Menu className="w-6 h-6 text-gray-700" />
+        <Menu className="w-6 h-6 text-morandi-primary" />
       </button>
 
       {/* 頁面標題 */}
-      <h1 className="ml-2 text-lg font-semibold text-gray-900 truncate">
+      <h1 className="ml-2 text-lg font-semibold text-foreground truncate">
         {getPageTitle()}
       </h1>
     </header>

@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
 import PublicViewClient from './client'
 
 interface PageProps {
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       }
     }
   } catch (error) {
-    console.error('generateMetadata error:', error)
+    logger.error('generateMetadata error:', error)
   }
 
   return {

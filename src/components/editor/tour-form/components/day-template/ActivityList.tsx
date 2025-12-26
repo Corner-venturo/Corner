@@ -39,7 +39,7 @@ export function ActivityList({
             {/* 時間點 */}
             <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4a6fa5] border-4 border-white shadow" />
 
-            <div className="flex gap-4 bg-gray-50 rounded-xl p-4">
+            <div className="flex gap-4 bg-muted rounded-xl p-4">
               <UploadableImage
                 src={act.image}
                 alt={act.title}
@@ -56,7 +56,7 @@ export function ActivityList({
                   editingField={editingField}
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
-                  className="font-bold text-gray-900"
+                  className="font-bold text-foreground"
                   placeholder="景點名稱"
                 />
                 <EditableText
@@ -65,7 +65,7 @@ export function ActivityList({
                   editingField={editingField}
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'description', v)}
-                  className="text-sm text-gray-600 mt-1"
+                  className="text-sm text-morandi-secondary mt-1"
                   placeholder="景點描述..."
                   multiline
                 />
@@ -76,11 +76,11 @@ export function ActivityList({
 
         {/* 新增按鈕 */}
         <div className="relative">
-          <div className="absolute -left-5 w-4 h-4 rounded-full bg-gray-300 border-4 border-white" />
+          <div className="absolute -left-5 w-4 h-4 rounded-full bg-border border-4 border-white" />
           <button
             type="button"
             onClick={addActivity}
-            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-400 hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 border-2 border-dashed border-border rounded-xl text-morandi-muted hover:border-[#4a6fa5] hover:text-[#4a6fa5] transition-colors flex items-center justify-center gap-2"
           >
             <Plus size={18} />
             <span>新增行程點</span>
@@ -94,13 +94,13 @@ export function ActivityList({
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-500">景點活動</span>
+          <span className="text-sm font-medium text-morandi-secondary">景點活動</span>
           <button type="button" onClick={addActivity} className="text-xs text-[#c76d54] hover:underline flex items-center gap-1">
             <Plus size={12} /> 新增
           </button>
         </div>
         {activities.map((act, i) => (
-          <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+          <div key={i} className="flex items-center gap-3 p-2 bg-muted rounded-lg">
             <UploadableImage
               src={act.image}
               alt={act.title}
@@ -117,7 +117,7 @@ export function ActivityList({
                 editingField={editingField}
                 setEditingField={setEditingField}
                 onChange={v => updateActivity(i, 'title', v)}
-                className="font-medium text-gray-900 text-sm"
+                className="font-medium text-foreground text-sm"
                 placeholder="景點名稱"
               />
             </div>
@@ -131,7 +131,7 @@ export function ActivityList({
   return (
     <div className="grid grid-cols-2 gap-4">
       {activities.map((act, i) => (
-        <div key={i} className="group relative bg-gray-50 rounded-xl overflow-hidden">
+        <div key={i} className="group relative bg-muted rounded-xl overflow-hidden">
           <UploadableImage
             src={act.image}
             alt={act.title}
@@ -148,7 +148,7 @@ export function ActivityList({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateActivity(i, 'title', v)}
-              className="font-medium text-gray-900 text-sm"
+              className="font-medium text-foreground text-sm"
               placeholder="景點名稱"
             />
             <EditableText
@@ -157,7 +157,7 @@ export function ActivityList({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateActivity(i, 'description', v)}
-              className="text-xs text-gray-500 mt-1"
+              className="text-xs text-morandi-secondary mt-1"
               placeholder="景點描述"
             />
           </div>
@@ -167,7 +167,7 @@ export function ActivityList({
       <button
         type="button"
         onClick={addActivity}
-        className="h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
+        className="h-32 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-morandi-muted hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
       >
         <Plus size={28} />
         <span className="text-sm mt-1">新增景點</span>

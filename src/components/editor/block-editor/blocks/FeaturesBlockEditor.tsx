@@ -94,7 +94,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+              className="h-8 w-8 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
               onClick={() => removeFeature(index)}
             >
               <Trash2 size={14} />

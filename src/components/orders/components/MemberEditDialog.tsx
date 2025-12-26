@@ -76,7 +76,7 @@ export function MemberEditDialog({
           <DialogTitle className="flex items-center gap-2">
             {editMode === 'verify' ? (
               <>
-                <AlertTriangle className="text-amber-500" size={20} />
+                <AlertTriangle className="text-status-warning" size={20} />
                 驗證成員資料
               </>
             ) : (
@@ -118,7 +118,7 @@ export function MemberEditDialog({
             disabled={isSaving}
             size="lg"
             className={editMode === 'verify'
-              ? 'bg-green-600 hover:bg-green-700 text-white px-8 font-medium'
+              ? 'bg-status-success hover:bg-morandi-green text-white px-8 font-medium'
               : 'bg-morandi-gold hover:bg-morandi-gold-hover text-white px-8 font-medium'
             }
           >

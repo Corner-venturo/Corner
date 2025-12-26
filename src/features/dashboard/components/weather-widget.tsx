@@ -123,12 +123,12 @@ export function WeatherWidget() {
       <div
         className={cn(
           'h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80',
-          'bg-gradient-to-br from-sky-50 via-white to-blue-50'
+          'bg-gradient-to-br from-status-info-bg via-white to-morandi-gold/5'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
           <div className="flex items-start gap-3">
-            <div className={cn('rounded-full p-2.5 text-white shadow-lg shadow-black/10', 'bg-gradient-to-br from-sky-200/60 to-blue-100/60', 'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20')}>
+            <div className={cn('rounded-full p-2.5 text-white shadow-lg shadow-black/10', 'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg', 'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20')}>
               <Cloud className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
@@ -171,14 +171,14 @@ export function WeatherWidget() {
           {isPending ? (
             <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-sky-400 mx-auto mb-2" />
+                <Loader2 className="w-8 h-8 animate-spin text-status-info mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">載入中...</p>
               </div>
             </div>
           ) : error ? (
             <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
               <div className="text-center">
-                <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                <AlertCircle className="w-8 h-8 text-morandi-red mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">{error}</p>
               </div>
             </div>

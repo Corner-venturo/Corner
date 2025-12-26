@@ -17,7 +17,7 @@ function getMichelinDisplay(restaurant: CombinedRestaurant) {
 
   if (michelin.michelin_stars && michelin.michelin_stars > 0) {
     return (
-      <span className="flex items-center gap-0.5 text-red-500">
+      <span className="flex items-center gap-0.5 text-status-danger">
         {Array(michelin.michelin_stars).fill(0).map((_, i) => (
           <Star key={i} size={10} fill="currentColor" />
         ))}
@@ -25,12 +25,12 @@ function getMichelinDisplay(restaurant: CombinedRestaurant) {
     )
   }
   if (michelin.bib_gourmand) {
-    return <span className="text-xs text-orange-500 font-medium">必比登</span>
+    return <span className="text-xs text-status-warning font-medium">必比登</span>
   }
   if (michelin.green_star) {
-    return <span className="text-xs text-green-600 font-medium">綠星</span>
+    return <span className="text-xs text-status-success font-medium">綠星</span>
   }
-  return <span className="text-xs text-red-400">米其林推薦</span>
+  return <span className="text-xs text-morandi-red">米其林推薦</span>
 }
 
 function getRestaurantImage(restaurant: CombinedRestaurant) {
@@ -47,9 +47,9 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
         relative flex gap-3 p-3 rounded-xl cursor-pointer transition-all
         border-2 hover:shadow-md
         ${isSelected
-          ? 'border-rose-500 bg-rose-50/50 shadow-sm'
+          ? 'border-rose-500 bg-status-danger-bg shadow-sm'
           : isMichelin
-            ? 'border-red-200 bg-red-50/30 hover:bg-red-50/50'
+            ? 'border-morandi-red/30 bg-status-danger-bg hover:bg-status-danger-bg'
             : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
         }
       `}
@@ -83,14 +83,14 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
           {restaurant.name}
         </div>
         {restaurant.name_en && (
-          <div className="text-xs text-gray-400 truncate mt-0.5">
+          <div className="text-xs text-morandi-muted truncate mt-0.5">
             {restaurant.name_en}
           </div>
         )}
         <div className="text-xs text-morandi-secondary mt-1 flex items-center gap-1.5 flex-wrap">
           {/* 顯示區域與城市 */}
           {restaurant.region_name && (
-            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+            <span className="px-1.5 py-0.5 bg-status-info-bg text-status-info rounded">
               {restaurant.region_name}
             </span>
           )}
@@ -98,25 +98,25 @@ export function RestaurantCard({ restaurant, isSelected, onToggle }: RestaurantC
             {restaurant.city_name}
           </span>
           {restaurant.cuisine_type && restaurant.cuisine_type.length > 0 && (
-            <span className="text-rose-600">
+            <span className="text-morandi-red">
               {restaurant.cuisine_type[0]}
             </span>
           )}
         </div>
         <div className="text-xs mt-1 flex items-center gap-2">
           {restaurant.group_friendly && (
-            <span className="flex items-center gap-0.5 text-blue-500">
+            <span className="flex items-center gap-0.5 text-status-info">
               <Users size={10} />
               團體
             </span>
           )}
           {'private_room' in restaurant && restaurant.private_room && (
-            <span className="text-purple-500">
+            <span className="text-purple-600">
               包廂
             </span>
           )}
           {restaurant.price_range && (
-            <span className="text-green-600 font-medium">
+            <span className="text-status-success font-medium">
               {'$'.repeat(parseInt(restaurant.price_range) || 2)}
             </span>
           )}

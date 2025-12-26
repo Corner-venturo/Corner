@@ -99,7 +99,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
         <div className="space-y-4">
           {/* 提示內容 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               提示內容
             </label>
             <Textarea
@@ -113,7 +113,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
 
           {/* 最後更新時間 */}
           {getLastUpdated() && (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-morandi-secondary">
               最後更新：{getLastUpdated()}
             </div>
           )}
@@ -123,7 +123,7 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
             <Button
               variant="outline"
               onClick={handleDelete}
-              className="text-red-500 border-red-300 hover:bg-red-50"
+              className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg"
             >
               <Trash2 size={16} className="mr-1" />
               移除排程

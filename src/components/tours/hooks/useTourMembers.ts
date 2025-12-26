@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { OrderMember, CustomerDietaryMap, OrderCodeMap } from '../types'
 import { toast } from 'sonner'
-
-const supabase = supabaseClient as any
 
 /**
  * Hook for managing tour members data

@@ -72,16 +72,20 @@ export function CreateLinkPayDialog({
       const { data } = await response.json()
 
       // 儲存 LinkPay 記錄到資料庫
-       
       await createLinkPayLog({
         receipt_id: receipt.id,
+        receipt_number: receipt.receipt_number,
+        workspace_id: receipt.workspace_id,
+        price: parseFloat(formData.amount),
+        amount: parseFloat(formData.amount), // Same as price for compatibility
         linkpay_order_number: data.linkpay_order_number,
-        amount: parseFloat(formData.amount),
         status: data.status,
         link: data.link,
         end_date: data.end_date,
-      } as any)
-       
+        payment_name: formData.description || `收款單 ${receipt.receipt_number}`,
+        created_by: receipt.created_by || null,
+        updated_by: receipt.updated_by || null,
+      })
 
       void alert('LinkPay 付款連結已建立！', 'success')
       onClose()

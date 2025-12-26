@@ -30,7 +30,7 @@ interface TourHeroSectionProps {
 
 export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
   return (
-    <section id="top" className="relative h-screen overflow-hidden bg-slate-900">
+    <section id="top" className="relative h-screen overflow-hidden bg-morandi-primary">
       {/* 動態背景 */}
       <div className="absolute inset-0">
         <img
@@ -87,8 +87,8 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
             <span
               className={
                 viewMode === 'mobile'
-                  ? 'text-base text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500'
-                  : 'text-2xl md:text-4xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500'
+                  ? 'text-base text-transparent bg-clip-text bg-gradient-to-r from-morandi-gold to-status-warning'
+                  : 'text-2xl md:text-4xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-morandi-gold to-status-warning'
               }
             >
               <RichText html={data.subtitle} />
@@ -170,8 +170,8 @@ export function TourHeroSection({ data, viewMode }: TourHeroSectionProps) {
               <div
                 className={
                   viewMode === 'mobile'
-                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 rounded-full text-center'
-                    : 'bg-gradient-to-r from-amber-400 to-orange-500 px-6 sm:px-8 py-4 rounded-full text-center'
+                    ? 'bg-gradient-to-r from-morandi-gold to-status-warning px-4 py-2 rounded-full text-center'
+                    : 'bg-gradient-to-r from-morandi-gold to-status-warning px-6 sm:px-8 py-4 rounded-full text-center'
                 }
               >
                 <div

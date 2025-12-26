@@ -141,10 +141,10 @@ export function BatchPickupDialog({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveFile(index)}
-                          className="h-7 w-7 p-0 hover:bg-red-100"
+                          className="h-7 w-7 p-0 hover:bg-status-danger-bg"
                           disabled={isProcessing}
                         >
-                          <X size={14} className="text-red-500" />
+                          <X size={14} className="text-status-danger" />
                         </Button>
                       </div>
                     ))}
@@ -153,8 +153,8 @@ export function BatchPickupDialog({
               )}
 
               {/* 待取件簽證提示 */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
+              <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
+                <p className="text-sm text-morandi-primary">
                   目前有 <span className="font-semibold">{pendingVisas.length}</span> 筆待取件簽證
                 </p>
               </div>

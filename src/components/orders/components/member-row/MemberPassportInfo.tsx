@@ -50,7 +50,7 @@ export function MemberPassportInfo({
   return (
     <>
       {/* 護照拼音 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <input
             type="text"
@@ -72,7 +72,7 @@ export function MemberPassportInfo({
       </td>
 
       {/* 護照號碼 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <input
             type="text"
@@ -89,7 +89,7 @@ export function MemberPassportInfo({
       </td>
 
       {/* 護照效期 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <input
             type="text"

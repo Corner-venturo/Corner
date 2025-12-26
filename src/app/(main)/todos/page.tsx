@@ -34,6 +34,7 @@ import {
   AlertCircle,
   Trash2,
   Edit2,
+  Plus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
@@ -172,13 +173,13 @@ export default function TodosPage() {
               <span className="text-sm font-medium text-morandi-primary">{String(value)}</span>
               {/* 未讀留言紅點 */}
               {unreadCount > 0 && (
-                <span className="flex items-center justify-center min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full px-1 animate-pulse">
+                <span className="flex items-center justify-center min-w-[18px] h-[18px] bg-status-danger text-white text-[10px] font-bold rounded-full px-1 animate-pulse">
                   {unreadCount}
                 </span>
               )}
               {/* 公開標記 */}
               {todo.is_public && (
-                <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] bg-status-info-bg text-status-info px-1.5 py-0.5 rounded">
                   公開
                 </span>
               )}
@@ -260,27 +261,27 @@ export default function TodosPage() {
     switch (todo.priority) {
       case 5:
         return cn(
-          'bg-gradient-to-r from-red-50/80 via-rose-50/60 to-red-50/80',
-          'hover:from-red-100/90 hover:via-rose-100/70 hover:to-red-100/90',
-          'shadow-sm shadow-red-100/50',
+          'bg-gradient-to-r from-status-danger-bg via-rose-50/60 to-status-danger-bg',
+          'hover:from-status-danger-bg hover:via-rose-100/70 hover:to-status-danger-bg',
+          'shadow-sm shadow-status-danger-bg',
           opacity
         )
       case 4:
         return cn(
-          'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70',
-          'hover:from-orange-100/80 hover:via-amber-100/60 hover:to-orange-100/80',
+          'bg-gradient-to-r from-status-warning-bg via-status-warning-bg/50 to-status-warning-bg',
+          'hover:from-status-warning-bg hover:via-status-warning-bg/60 hover:to-status-warning-bg',
           opacity
         )
       case 3:
         return cn(
-          'bg-gradient-to-r from-yellow-50/60 via-amber-50/40 to-yellow-50/60',
-          'hover:from-yellow-100/70 hover:via-amber-100/50 hover:to-yellow-100/70',
+          'bg-gradient-to-r from-status-warning-bg/60 via-status-warning-bg/40 to-status-warning-bg/60',
+          'hover:from-status-warning-bg/70 hover:via-status-warning-bg/50 hover:to-status-warning-bg/70',
           opacity
         )
       case 2:
         return cn(
-          'bg-gradient-to-r from-blue-50/50 via-sky-50/30 to-blue-50/50',
-          'hover:from-blue-100/60 hover:via-sky-100/40 hover:to-blue-100/60',
+          'bg-gradient-to-r from-status-info-bg via-sky-50/30 to-status-info-bg',
+          'hover:from-status-info-bg hover:via-sky-100/40 hover:to-status-info-bg',
           opacity
         )
       case 1:
@@ -478,8 +479,8 @@ export default function TodosPage() {
                   className={cn(
                     'p-1 rounded transition-colors',
                     todo.status === 'completed'
-                      ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
-                      : 'text-morandi-secondary hover:text-green-600 hover:bg-green-50'
+                      ? 'text-status-success hover:text-status-success hover:bg-status-success-bg'
+                      : 'text-morandi-secondary hover:text-status-success hover:bg-status-success-bg'
                   )}
                   title={todo.status === 'completed' ? '取消完成' : '標記完成'}
                 >
@@ -663,10 +664,12 @@ function AddTodoForm({
       </div>
 
       <div className="flex gap-2 pt-4">
-        <Button type="submit" className="flex-1">
+        <Button type="submit" className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+          <Plus size={16} />
           建立任務
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} className="gap-2">
+          <X size={16} />
           取消
         </Button>
       </div>

@@ -3,11 +3,17 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { EditingMember } from '../hooks/useTourMemberEditor'
-import { Order } from '@/stores/types'
+
+// 使用簡化的 Order 類型，僅包含此組件需要的欄位
+interface TourOrder {
+  id: string
+  order_number?: string | null
+  contact_person?: string
+}
 
 interface MemberStatsProps {
   members: EditingMember[]
-  tourOrders: Order[]
+  tourOrders: TourOrder[]
   totalMembers: number
   completedMembers: number
   orderFilter?: string

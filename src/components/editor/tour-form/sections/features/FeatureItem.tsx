@@ -198,7 +198,7 @@ export function FeatureItem({
                         e.stopPropagation()
                         onRemoveImage(index, imgIndex)
                       }}
-                      className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 hover:bg-red-500 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 hover:bg-status-danger rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
                       title="移除圖片"
                     >
                       <X size={10} />

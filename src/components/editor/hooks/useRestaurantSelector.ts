@@ -218,7 +218,7 @@ export function useRestaurantSelector({
           const { data: restaurantData } = await restaurantQuery
 
           if (restaurantData) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             restaurantData.forEach((item: any) => {
               results.push({
                 id: item.id,
@@ -277,7 +277,7 @@ export function useRestaurantSelector({
           const { data: michelinData } = await michelinQuery
 
           if (michelinData) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             michelinData.forEach((item: any) => {
               results.push({
                 id: item.id,

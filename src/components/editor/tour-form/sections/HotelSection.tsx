@@ -256,7 +256,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         {hotels.length === 0 && (
           <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-morandi-container">
             <p className="text-sm text-morandi-secondary mb-2">尚未新增飯店資訊</p>
-            <p className="text-xs text-gray-400">點擊「新增飯店」按鈕開始</p>
+            <p className="text-xs text-morandi-muted">點擊「新增飯店」按鈕開始</p>
           </div>
         )}
 
@@ -343,7 +343,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(hotelIndex, imageIndex)}
-                            className="absolute top-1 right-1 p-1 bg-red-500 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            className="absolute top-1 right-1 p-1 bg-status-danger rounded text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-status-danger"
                           >
                             <X size={12} />
                           </button>

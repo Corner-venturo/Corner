@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
 
 interface UseCustomerVerifyProps {
@@ -86,7 +87,7 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
         onSuccess()
       }
     } catch (error) {
-      console.error('儲存失敗:', error)
+      logger.error('儲存失敗:', error)
       toast.error('儲存失敗')
     } finally {
       setIsSaving(false)

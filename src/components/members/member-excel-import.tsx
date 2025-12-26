@@ -350,14 +350,14 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
                       </SelectContent>
                     </Select>
                     {mapping.systemField && (
-                      <Check size={16} className="text-green-500" />
+                      <Check size={16} className="text-status-success" />
                     )}
                   </div>
                 ))}
               </div>
 
               {!requiredFieldsMapped && (
-                <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-status-warning bg-status-warning-bg p-3 rounded-lg">
                   <AlertCircle size={16} />
                   <span className="text-sm">請至少對應「姓名」欄位</span>
                 </div>

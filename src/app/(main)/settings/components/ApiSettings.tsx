@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Key, Eye, EyeOff, Copy, Check, ExternalLink, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { logger } from '@/lib/utils/logger'
 
 interface ApiConfig {
   name: string
@@ -31,7 +32,7 @@ export function ApiSettings() {
           setApiConfigs(data.configs)
         }
       } catch (error) {
-        console.error('Failed to fetch API configs:', error)
+        logger.error('Failed to fetch API configs:', error)
       } finally {
         setLoading(false)
       }
@@ -101,7 +102,7 @@ export function ApiSettings() {
           <Key className="h-5 w-5 text-morandi-gold" />
           <h2 className="text-lg font-semibold text-morandi-primary">API 設定</h2>
         </div>
-        <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">
+        <div className="flex items-center gap-2 text-xs text-status-warning bg-status-warning-bg px-3 py-1.5 rounded-lg">
           <AlertTriangle size={14} />
           <span>請勿將 API Key 分享給非授權人員</span>
         </div>
@@ -128,7 +129,7 @@ export function ApiSettings() {
                           {config.name}
                         </span>
                         {!config.value && (
-                          <span className="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                          <span className="text-xs text-status-danger bg-status-danger-bg px-2 py-0.5 rounded">
                             未設定
                           </span>
                         )}
@@ -139,7 +140,7 @@ export function ApiSettings() {
 
                       {/* 環境變數名稱 */}
                       <div className="flex items-center gap-2 mb-2">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono text-gray-600">
+                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono text-morandi-secondary">
                           {config.envKey}
                         </code>
                       </div>
@@ -173,7 +174,7 @@ export function ApiSettings() {
                               title="複製"
                             >
                               {copiedKey === config.envKey ? (
-                                <Check size={14} className="text-green-500" />
+                                <Check size={14} className="text-status-success" />
                               ) : (
                                 <Copy size={14} />
                               )}
@@ -184,7 +185,7 @@ export function ApiSettings() {
 
                       {/* 使用量資訊 */}
                       {config.usageInfo && (
-                        <p className="text-xs text-blue-600 mt-2">
+                        <p className="text-xs text-status-info mt-2">
                           {config.usageInfo}
                         </p>
                       )}
@@ -222,12 +223,12 @@ export function ApiSettings() {
       </div>
 
       {/* .env.local 說明 */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">設定方式</h4>
-        <p className="text-xs text-blue-800 mb-2">
-          在專案根目錄建立或編輯 <code className="bg-blue-100 px-1 rounded">.env.local</code> 檔案：
+      <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">設定方式</h4>
+        <p className="text-xs text-morandi-secondary mb-2">
+          在專案根目錄建立或編輯 <code className="bg-morandi-container px-1 rounded">.env.local</code> 檔案：
         </p>
-        <pre className="text-xs bg-blue-100 p-3 rounded overflow-x-auto">
+        <pre className="text-xs bg-morandi-container p-3 rounded overflow-x-auto">
 {`# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...

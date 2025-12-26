@@ -22,8 +22,8 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
 export const QUOTE_STATUS_COLORS: Record<QuoteStatus, string> = {
   draft: 'bg-morandi-secondary text-white',
   proposed: 'bg-morandi-gold text-white',
-  revised: 'bg-blue-500 text-white',
-  '進行中': 'bg-blue-600 text-white',
+  revised: 'bg-status-info text-white',
+  '進行中': 'bg-status-info text-white',
   approved: 'bg-morandi-green text-white',
   converted: 'bg-morandi-primary text-white',
   rejected: 'bg-morandi-red text-white',

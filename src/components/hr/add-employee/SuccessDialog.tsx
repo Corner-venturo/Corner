@@ -47,7 +47,7 @@ export function SuccessDialog({
 
             <div className="space-y-3">
               {/* 員工編號 */}
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="bg-white rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-xs text-morandi-muted mb-1.5">員工編號</p>
@@ -57,20 +57,20 @@ export function SuccessDialog({
                   </div>
                   <button
                     onClick={() => onCopy(createdEmployee?.employee_number || '', 'number')}
-                    className="ml-3 p-2 hover:bg-gray-100 rounded-md transition-colors"
+                    className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
                     title="複製員工編號"
                   >
                     {copiedField === 'number' ? (
                       <Check size={20} className="text-morandi-gold" />
                     ) : (
-                      <Copy size={20} className="text-gray-600" />
+                      <Copy size={20} className="text-morandi-secondary" />
                     )}
                   </button>
                 </div>
               </div>
 
               {/* 預設密碼 */}
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="bg-white rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-xs text-morandi-muted mb-1.5">預設密碼</p>
@@ -80,13 +80,13 @@ export function SuccessDialog({
                   </div>
                   <button
                     onClick={() => onCopy(createdEmployee?.password || '', 'password')}
-                    className="ml-3 p-2 hover:bg-gray-100 rounded-md transition-colors"
+                    className="ml-3 p-2 hover:bg-muted rounded-md transition-colors"
                     title="複製密碼"
                   >
                     {copiedField === 'password' ? (
                       <Check size={20} className="text-morandi-gold" />
                     ) : (
-                      <Copy size={20} className="text-gray-600" />
+                      <Copy size={20} className="text-morandi-secondary" />
                     )}
                   </button>
                 </div>

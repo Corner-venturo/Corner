@@ -1,21 +1,21 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { MutableRefObject, useState } from 'react'
-import { MapPin, Star, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, Star, ArrowRight } from 'lucide-react'
 import { TourFormData } from '@/components/editor/tour-form/types'
-
-// Luxury 配色
-const LUXURY = {
-  primary: '#2C5F4D',
-  secondary: '#C69C6D',
-  accent: '#8F4F4F',
-  background: '#FDFBF7',
-  surface: '#FFFFFF',
-  text: '#2D3436',
-  muted: '#636E72',
-  tableHeader: '#F0F4F3',
-}
+import {
+  LUXURY,
+  DAY_COLORS,
+  calculateDayLabels,
+  formatDateShort,
+  calculateDayDate,
+  isLastMainDay,
+  ImageGalleryState,
+  ActivityInfo,
+} from './utils/itineraryLuxuryUtils'
+import { ImageGalleryModal } from './modals/ImageGalleryModal'
+import { ActivityDetailModal } from './modals/ActivityDetailModal'
 
 interface TourItinerarySectionLuxuryProps {
   data: TourFormData
@@ -23,110 +23,6 @@ interface TourItinerarySectionLuxuryProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
-}
-
-// Day 卡片背景色循環
-const DAY_COLORS = [
-  LUXURY.primary,    // 深綠
-  LUXURY.text,       // 深灰
-  LUXURY.secondary,  // 金銅
-  LUXURY.accent,     // 酒紅
-]
-
-// 計算 dayLabel
-function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[] {
-  const labels: string[] = []
-  let currentDayNumber = 0
-  let alternativeCount = 0
-
-  for (let i = 0; i < itinerary.length; i++) {
-    const day = itinerary[i]
-    if (day.isAlternative) {
-      alternativeCount++
-      const suffix = String.fromCharCode(65 + alternativeCount)
-      labels.push(`Day ${currentDayNumber}-${suffix}`)
-    } else {
-      currentDayNumber++
-      alternativeCount = 0
-      labels.push(`Day ${currentDayNumber}`)
-    }
-  }
-  return labels
-}
-
-// 格式化日期為 DEC 24 格式（大寫月份）
-function formatDateShort(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return ''
-    const month = date.getMonth()
-    const day = date.getDate()
-    if (isNaN(month) || isNaN(day)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[month]} ${day}`
-  } catch {
-    return ''
-  }
-}
-
-// 根據出發日期和實際天數（非 index）計算該天的日期
-// actualDayNumber 是從 1 開始的實際天數，建議行程不增加天數
-function calculateDayDate(departureDate: string | undefined, actualDayNumber: number): string {
-  if (!departureDate || isNaN(actualDayNumber) || actualDayNumber < 1) return ''
-  try {
-    const date = new Date(departureDate)
-    if (isNaN(date.getTime())) return ''
-    // actualDayNumber 從 1 開始，所以 Day 1 = 出發日，Day 2 = 出發日 +1
-    date.setDate(date.getDate() + (actualDayNumber - 1))
-    const month = date.getMonth()
-    const day = date.getDate()
-    if (isNaN(month) || isNaN(day)) return ''
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-    return `${months[month]} ${day}`
-  } catch {
-    return ''
-  }
-}
-
-// 獲取星期幾縮寫
-function getDayOfWeek(dateStr: string | undefined): string {
-  if (!dateStr) return ''
-  try {
-    const date = new Date(dateStr)
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return days[date.getDay()]
-  } catch {
-    return ''
-  }
-}
-
-// 判斷是否為實際的最後一天（考慮替代行程）
-function isLastMainDay(itinerary: TourFormData['dailyItinerary'], currentIndex: number): boolean {
-  // 找出最後一個「非替代行程」的索引
-  let lastMainDayIndex = -1
-  for (let i = itinerary.length - 1; i >= 0; i--) {
-    if (!itinerary[i].isAlternative) {
-      lastMainDayIndex = i
-      break
-    }
-  }
-
-  // 如果當前是最後一個主行程，則為最後一天
-  if (currentIndex === lastMainDayIndex) return true
-
-  // 如果當前是替代行程，檢查其對應的主行程是否為最後一天
-  // 替代行程（如 Day 3-B）跟隨在主行程（Day 3）之後，也視為最後一天
-  if (itinerary[currentIndex].isAlternative) {
-    // 向前找到對應的主行程
-    for (let i = currentIndex - 1; i >= 0; i--) {
-      if (!itinerary[i].isAlternative) {
-        return i === lastMainDayIndex
-      }
-    }
-  }
-
-  return false
 }
 
 export function TourItinerarySectionLuxury({
@@ -140,17 +36,10 @@ export function TourItinerarySectionLuxury({
   const dayLabels = calculateDayLabels(dailyItinerary)
   const isMobile = viewMode === 'mobile'
 
-  const [selectedActivity, setSelectedActivity] = useState<{
-    title: string
-    description?: string
-    image?: string
-  } | null>(null)
+  const [selectedActivity, setSelectedActivity] = useState<ActivityInfo | null>(null)
 
   // 圖片瀏覽器狀態 - 每張圖片可以有自己的標題和描述
-  const [imageGallery, setImageGallery] = useState<{
-    images: { url: string; title?: string; description?: string }[]
-    currentIndex: number
-  } | null>(null)
+  const [imageGallery, setImageGallery] = useState<ImageGalleryState | null>(null)
 
   // 開啟圖片瀏覽器
   const openImageGallery = (images: { url: string; title?: string; description?: string }[], startIndex: number) => {
@@ -636,183 +525,19 @@ export function TourItinerarySectionLuxury({
       </div>
 
       {/* Image Gallery Modal - 全螢幕圖片瀏覽器 */}
-      <AnimatePresence>
-        {imageGallery && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-            onClick={() => setImageGallery(null)}
-          >
-            {/* X 關閉按鈕 */}
-            <button
-              onClick={() => setImageGallery(null)}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
-
-            {/* 圖片計數 */}
-            <div className="absolute top-4 left-4 z-10 text-white/80 text-sm">
-              {imageGallery.currentIndex + 1} / {imageGallery.images.length}
-            </div>
-
-            {/* 左箭頭 */}
-            {imageGallery.images.length > 1 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  prevImage()
-                }}
-                className="absolute left-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              >
-                <ChevronLeft className="w-8 h-8 text-white" />
-              </button>
-            )}
-
-            {/* 圖片 */}
-            <motion.div
-              key={imageGallery.currentIndex}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="max-w-4xl max-h-[80vh] mx-4"
-              onClick={e => e.stopPropagation()}
-            >
-              <img
-                src={imageGallery.images[imageGallery.currentIndex].url}
-                alt={imageGallery.images[imageGallery.currentIndex].title || '行程圖片'}
-                className="max-w-full max-h-[60vh] object-contain rounded-lg"
-              />
-              {/* 景點標題和描述 */}
-              <div className="text-center mt-4 max-w-2xl mx-auto">
-                {imageGallery.images[imageGallery.currentIndex].title && (
-                  <h3
-                    className="text-white text-xl font-bold mb-2"
-                    style={{ fontFamily: "'Noto Serif TC', serif" }}
-                  >
-                    {imageGallery.images[imageGallery.currentIndex].title}
-                  </h3>
-                )}
-                {imageGallery.images[imageGallery.currentIndex].description && (
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    {imageGallery.images[imageGallery.currentIndex].description}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-
-            {/* 右箭頭 */}
-            {imageGallery.images.length > 1 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  nextImage()
-                }}
-                className="absolute right-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              >
-                <ChevronRight className="w-8 h-8 text-white" />
-              </button>
-            )}
-
-            {/* 縮圖列表 */}
-            {imageGallery.images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {imageGallery.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setImageGallery({ ...imageGallery, currentIndex: idx })
-                    }}
-                    className={`w-16 h-12 rounded overflow-hidden border-2 transition-all ${
-                      idx === imageGallery.currentIndex
-                        ? 'border-white opacity-100'
-                        : 'border-transparent opacity-50 hover:opacity-75'
-                    }`}
-                  >
-                    <img
-                      src={img.url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ImageGalleryModal
+        imageGallery={imageGallery}
+        onClose={() => setImageGallery(null)}
+        onPrev={prevImage}
+        onNext={nextImage}
+        onSelectIndex={(idx) => imageGallery && setImageGallery({ ...imageGallery, currentIndex: idx })}
+      />
 
       {/* Activity Detail Modal - 景點詳情彈窗（保留給無圖片的景點列表點擊） */}
-      <AnimatePresence>
-        {selectedActivity && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSelectedActivity(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative"
-              onClick={e => e.stopPropagation()}
-            >
-              {/* X 關閉按鈕 */}
-              <button
-                onClick={() => setSelectedActivity(null)}
-                className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
-
-              {selectedActivity.image && (
-                <div className="relative h-48">
-                  <img
-                    src={selectedActivity.image}
-                    alt={selectedActivity.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3
-                      className="text-xl font-bold"
-                      style={{ fontFamily: "'Noto Serif TC', serif" }}
-                    >
-                      {selectedActivity.title}
-                    </h3>
-                  </div>
-                </div>
-              )}
-              <div className="p-6">
-                {!selectedActivity.image && (
-                  <h3
-                    className="text-xl font-bold mb-4 pr-8"
-                    style={{
-                      color: LUXURY.text,
-                      fontFamily: "'Noto Serif TC', serif"
-                    }}
-                  >
-                    {selectedActivity.title}
-                  </h3>
-                )}
-                {selectedActivity.description && (
-                  <p
-                    className="leading-relaxed"
-                    style={{ color: LUXURY.muted }}
-                  >
-                    {selectedActivity.description}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ActivityDetailModal
+        activity={selectedActivity}
+        onClose={() => setSelectedActivity(null)}
+      />
     </section>
   )
 }

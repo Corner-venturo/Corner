@@ -6,6 +6,7 @@
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
+import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 import type { Database } from '@/lib/supabase/types'
 
@@ -135,7 +136,7 @@ export function createCloudHook<T extends BaseEntity>(
       const errorMessage = typeof error === 'object' && error !== null
         ? (error as { message?: string }).message || JSON.stringify(error)
         : String(error)
-      console.error(`[${tableName}] Supabase error:`, error)
+      logger.error(`[${tableName}] Supabase error:`, error)
       throw new Error(errorMessage)
     }
 
@@ -205,8 +206,7 @@ export function createCloudHook<T extends BaseEntity>(
       mutate(SWR_KEY, [...items, newItem], false)
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await supabase.from(tableName).insert(newItem as any)
+        const { error } = await supabase.from(tableName).insert(newItem)
         if (error) throw error
 
         mutate(SWR_KEY)

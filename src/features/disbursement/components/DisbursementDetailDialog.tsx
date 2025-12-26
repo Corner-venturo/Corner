@@ -32,7 +32,7 @@ interface DisbursementDetailDialogProps {
 // 出納單狀態
 const DISBURSEMENT_STATUS = {
   pending: { label: '待出帳', color: 'bg-morandi-gold' },
-  confirmed: { label: '已確認', color: 'bg-blue-500' },
+  confirmed: { label: '已確認', color: 'bg-status-info' },
   paid: { label: '已出帳', color: 'bg-morandi-green' },
 }
 

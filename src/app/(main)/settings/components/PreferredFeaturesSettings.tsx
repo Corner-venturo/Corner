@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user-store'
 import { Check, Star, Info, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { logger } from '@/lib/utils/logger'
 import type { User } from '@/stores/types'
 
 // 定義所有可選功能
@@ -105,7 +106,7 @@ export function PreferredFeaturesSettings() {
       setHasUnsavedChanges(false)
       setTimeout(() => setShowSavedMessage(false), 2000)
     } catch (error) {
-      console.error('儲存失敗:', error)
+      logger.error('儲存失敗:', error)
     } finally {
       setIsSaving(false)
     }
@@ -229,19 +230,19 @@ export function PreferredFeaturesSettings() {
           </div>
           <div className="flex items-center gap-2">
             {isSaving && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-status-info-bg border border-status-info/30 rounded-lg text-status-info">
                 <Loader2 size={14} className="animate-spin" />
                 <span className="text-sm font-medium">儲存中...</span>
               </div>
             )}
             {showSavedMessage && !isSaving && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-green-700">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-status-success-bg border border-status-success/30 rounded-lg text-status-success">
                 <Check size={14} />
                 <span className="text-sm font-medium">已儲存</span>
               </div>
             )}
             {hasUnsavedChanges && !isSaving && !showSavedMessage && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-700">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-status-warning-bg border border-status-warning/30 rounded-lg text-status-warning">
                 <span className="text-sm font-medium">變更待儲存...</span>
               </div>
             )}
@@ -251,11 +252,11 @@ export function PreferredFeaturesSettings() {
 
       <div className="p-6 space-y-6">
         {/* 提示資訊 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-          <Info size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-900">
+        <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-4 flex items-start gap-3">
+          <Info size={18} className="text-status-info mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-morandi-primary">
             <p className="font-medium mb-1">說明</p>
-            <ul className="list-disc list-inside space-y-1 text-blue-700">
+            <ul className="list-disc list-inside space-y-1 text-morandi-secondary">
               <li>選擇的功能會顯示在側邊欄，未選擇的會被隱藏</li>
               <li>此設定不影響你的實際權限，只是個人化介面顯示</li>
               <li>你只能選擇有權限的功能</li>

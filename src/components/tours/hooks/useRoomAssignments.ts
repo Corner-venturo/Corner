@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { getRoomTypeLabel } from '../utils/room-utils'
-
-const supabase = supabaseClient as any
 
 /**
  * Hook for managing room assignments
@@ -38,19 +36,19 @@ export function useRoomAssignments(tourId: string) {
 
       // Build room_id -> room info mapping
       const roomMap: Record<string, { room_type: string; hotel_name: string | null; room_number: string | null; display_order: number }> = {}
-      rooms.forEach((room: { id: string; room_type: string; hotel_name: string | null; room_number: string | null; display_order: number }) => {
+      rooms.forEach((room) => {
         roomMap[room.id] = {
           room_type: room.room_type,
           hotel_name: room.hotel_name,
           room_number: room.room_number,
-          display_order: room.display_order,
+          display_order: room.display_order ?? 0,
         }
       })
 
       // Calculate room numbers for each room type (sorted by display_order)
       const roomCounters: Record<string, number> = {}
       const roomNumbers: Record<string, number> = {}
-      rooms.forEach((room: { id: string; room_type: string; hotel_name: string | null; display_order: number }) => {
+      rooms.forEach((room) => {
         const roomKey = `${room.hotel_name || ''}_${room.room_type}`
         if (!roomCounters[roomKey]) {
           roomCounters[roomKey] = 1

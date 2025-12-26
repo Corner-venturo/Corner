@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useItineraryStore, useAuthStore } from '@/stores'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 import type {
   FlightInfo,
   Feature,
@@ -156,7 +157,7 @@ export function useItineraryEditor() {
       setAutoSaveStatus('saved')
       setTimeout(() => setAutoSaveStatus('idle'), 3000)
     } catch (error) {
-      console.error('自動存檔失敗:', error)
+      logger.error('自動存檔失敗:', error)
       setAutoSaveStatus('error')
       toast.error('自動存檔失敗，請手動儲存')
     }

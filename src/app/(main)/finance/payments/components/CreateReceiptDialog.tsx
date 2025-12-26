@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus } from 'lucide-react'
+import { Plus, Save, X } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
 import { Combobox } from '@/components/ui/combobox'
 import { useTourStore } from '@/stores'
@@ -231,14 +231,16 @@ export function CreateReceiptDialog({
 
           {/* 操作按鈕 */}
           <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
+            <Button variant="outline" onClick={handleClose} disabled={isSubmitting} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!selectedOrderId || totalAmount <= 0 || isSubmitting}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Save size={16} />
               {isSubmitting ? '處理中...' : '儲存收款單'}
             </Button>
           </div>

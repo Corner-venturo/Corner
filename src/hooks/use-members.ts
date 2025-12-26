@@ -13,6 +13,7 @@ import { useMemo, useCallback } from 'react'
 import { useMembers as useMembersCloud } from './cloud-hooks' // Renamed to avoid conflict
 import { useMemberActions } from './useMemberActions' // 使用有同步邏輯的 actions
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Member } from '@/stores/types'
 
 /**
@@ -171,7 +172,7 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
           .upload(filePath, file, { upsert: true })
 
         if (uploadError) {
-          console.error('上傳護照照片失敗:', uploadError)
+          logger.error('上傳護照照片失敗:', uploadError)
           return { data: null, error: uploadError }
         }
 
@@ -186,7 +187,7 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
         }
       } catch (err) {
         const error = err instanceof Error ? err : new Error('上傳失敗')
-        console.error('上傳護照照片失敗:', error)
+        logger.error('上傳護照照片失敗:', error)
         return { data: null, error }
       }
     },

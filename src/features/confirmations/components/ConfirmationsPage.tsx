@@ -63,7 +63,12 @@ export const ConfirmationsPage: React.FC = () => {
         workspace_id: auth.workspaceId,
         type: 'flight', // 預設航班，可在編輯頁修改
         booking_number: '',
-        data: {} as any,
+        data: {
+          passengers: [],
+          segments: [],
+          baggage: [],
+          importantNotes: [],
+        }, // Minimal flight data structure
         status: 'draft',
         created_by: auth.user!.id,
         updated_by: auth.user!.id,

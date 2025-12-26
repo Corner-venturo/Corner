@@ -87,7 +87,7 @@ export function SortableChannelItem({
                   e.stopPropagation()
                   onLeaveChannel(channel.id)
                 }}
-                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-orange-100 text-orange-600 hover:text-orange-700 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning hover:text-status-warning transition-opacity"
                 title="離開頻道"
               >
                 <LogOut size={12} />
@@ -148,7 +148,7 @@ export function SortableChannelItem({
 
                   onDelete(channel.id)
                 }}
-                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-100 text-red-600 hover:text-red-700 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-danger-bg text-status-danger hover:text-status-danger transition-opacity"
                 title={isTourChannel ? '刪除頻道（需要密碼）' : '刪除頻道'}
               >
                 <Trash2 size={12} />

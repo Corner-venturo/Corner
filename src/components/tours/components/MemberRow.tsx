@@ -12,7 +12,7 @@ interface MemberRowProps {
   bgColor: string
   isDragging: boolean
   editingCell: EditingCell | null
-  inputRef: React.RefObject<HTMLInputElement>
+  inputRef: React.RefObject<HTMLInputElement | null>
   isNavigating: boolean
   roomAssignments: Record<string, string>
   editableFields: (keyof EditingMember)[]
@@ -96,12 +96,12 @@ export const MemberRow: React.FC<MemberRowProps> = ({
       <div
         className={cn(
           'h-8 px-2 py-1 flex items-center w-full',
-          isAutoField ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer hover:bg-morandi-gold/5',
+          isAutoField ? 'cursor-not-allowed text-morandi-muted' : 'cursor-pointer hover:bg-morandi-gold/5',
           member[field] && !isAutoField && 'font-medium'
         )}
         onClick={() => !isAutoField && onCellClick(index, field)}
       >
-        {value || <span className="text-gray-300">點擊輸入</span>}
+        {value || <span className="text-morandi-muted/60">點擊輸入</span>}
       </div>
     )
   }
@@ -120,34 +120,34 @@ export const MemberRow: React.FC<MemberRowProps> = ({
       onDrop={e => onDrop(e, index)}
       onDragEnd={onDragEnd}
     >
-      <td className="border border-gray-300 text-center py-1">
+      <td className="border border-border text-center py-1">
         <GripVertical
           size={14}
-          className="text-gray-400 cursor-grab active:cursor-grabbing mx-auto"
+          className="text-morandi-muted cursor-grab active:cursor-grabbing mx-auto"
         />
       </td>
-      <td className="border border-gray-300 text-center py-1">
+      <td className="border border-border text-center py-1">
         <span className="text-morandi-secondary font-medium">{index + 1}</span>
       </td>
-      <td className="border border-gray-300 p-0">{renderCell('name')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('nameEn')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('birthday')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('age')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('gender')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('idNumber')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('passportNumber')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('passportExpiry')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('order_number')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('contact_person')}</td>
-      <td className="border border-gray-300 p-0">{renderCell('assignedRoom')}</td>
-      <td className="border border-gray-300 text-center py-1">
+      <td className="border border-border p-0">{renderCell('name')}</td>
+      <td className="border border-border p-0">{renderCell('nameEn')}</td>
+      <td className="border border-border p-0">{renderCell('birthday')}</td>
+      <td className="border border-border p-0">{renderCell('age')}</td>
+      <td className="border border-border p-0">{renderCell('gender')}</td>
+      <td className="border border-border p-0">{renderCell('idNumber')}</td>
+      <td className="border border-border p-0">{renderCell('passportNumber')}</td>
+      <td className="border border-border p-0">{renderCell('passportExpiry')}</td>
+      <td className="border border-border p-0">{renderCell('order_number')}</td>
+      <td className="border border-border p-0">{renderCell('contact_person')}</td>
+      <td className="border border-border p-0">{renderCell('assignedRoom')}</td>
+      <td className="border border-border text-center py-1">
         <Button
           onClick={() => onDelete(index)}
           size="sm"
           variant="ghost"
-          className="h-6 w-6 p-0 hover:bg-red-100"
+          className="h-6 w-6 p-0 hover:bg-status-danger-bg"
         >
-          <Trash2 size={12} className="text-red-500" />
+          <Trash2 size={12} className="text-status-danger" />
         </Button>
       </td>
     </tr>

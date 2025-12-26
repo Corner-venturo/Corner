@@ -28,24 +28,24 @@ export function FlightStyleSelector({
 }: FlightStyleSelectorProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-lg border border-slate-200">
+      <div className="bg-gradient-to-r from-muted to-morandi-container/50 p-4 rounded-lg border border-border">
         <div className="flex items-center gap-2 mb-3">
-          <Plane className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-medium text-slate-700">航班卡片風格</span>
+          <Plane className="w-4 h-4 text-morandi-secondary" />
+          <span className="text-sm font-medium text-morandi-primary">航班卡片風格</span>
         </div>
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-5 h-5 animate-spin text-morandi-gold" />
-          <span className="ml-2 text-sm text-slate-500">載入中...</span>
+          <span className="ml-2 text-sm text-morandi-secondary">載入中...</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-lg border border-slate-200">
+    <div className="bg-gradient-to-r from-muted to-morandi-container/50 p-4 rounded-lg border border-border">
       <div className="flex items-center gap-2 mb-3">
-        <Plane className="w-4 h-4 text-slate-500" />
-        <span className="text-sm font-medium text-slate-700">航班卡片風格</span>
+        <Plane className="w-4 h-4 text-morandi-secondary" />
+        <span className="text-sm font-medium text-morandi-primary">航班卡片風格</span>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {options.map((option) => {
@@ -59,12 +59,12 @@ export function FlightStyleSelector({
                 'relative flex flex-col items-start p-2.5 rounded-lg border-2 transition-all text-left',
                 isSelected
                   ? 'border-morandi-gold bg-morandi-gold/10'
-                  : 'border-transparent bg-white hover:border-slate-300'
+                  : 'border-transparent bg-white hover:border-border'
               )}
             >
               {/* 預覽圖（如果有） */}
               {option.previewImage && (
-                <div className="w-full h-12 mb-2 rounded overflow-hidden bg-slate-100">
+                <div className="w-full h-12 mb-2 rounded overflow-hidden bg-morandi-container">
                   <img
                     src={option.previewImage}
                     alt={option.label}
@@ -79,11 +79,11 @@ export function FlightStyleSelector({
               )}
               <span className={cn(
                 'text-xs font-bold',
-                isSelected ? 'text-morandi-gold' : 'text-slate-700'
+                isSelected ? 'text-morandi-gold' : 'text-morandi-primary'
               )}>
                 {option.label}
               </span>
-              <span className="text-[10px] text-slate-500 mt-0.5">{option.description}</span>
+              <span className="text-[10px] text-morandi-secondary mt-0.5">{option.description}</span>
             </button>
           )
         })}

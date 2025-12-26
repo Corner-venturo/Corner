@@ -368,7 +368,7 @@ export function MessageInput({
               }
             }}
             placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `在 #${channelName} 中輸入訊息...`}
-            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
             rows={1}
             style={{
               height: 'auto',

@@ -14,11 +14,11 @@ import { toast } from 'sonner'
 import type { Account, AccountType } from '@/types/accounting.types'
 
 const typeConfig: Record<AccountType, { label: string; color: string }> = {
-  asset: { label: '資產', color: 'bg-blue-100 text-blue-800' },
-  liability: { label: '負債', color: 'bg-red-100 text-red-800' },
-  revenue: { label: '收入', color: 'bg-green-100 text-green-800' },
-  expense: { label: '費用', color: 'bg-orange-100 text-orange-800' },
-  cost: { label: '成本', color: 'bg-purple-100 text-purple-800' },
+  asset: { label: '資產', color: 'bg-status-info-bg text-status-info' },
+  liability: { label: '負債', color: 'bg-status-danger-bg text-status-danger' },
+  revenue: { label: '收入', color: 'bg-status-success-bg text-status-success' },
+  expense: { label: '費用', color: 'bg-status-warning-bg text-status-warning' },
+  cost: { label: '成本', color: 'bg-purple-50 text-purple-600' },
 }
 
 export function AccountsPage() {

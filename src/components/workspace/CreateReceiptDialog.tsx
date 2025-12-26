@@ -101,7 +101,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-morandi-gold/20">
                 <span className="text-morandi-secondary">待收金額：</span>
-                <span className="text-lg font-semibold text-red-600">
+                <span className="text-lg font-semibold text-status-danger">
                   ${order.gap.toLocaleString()}
                 </span>
               </div>

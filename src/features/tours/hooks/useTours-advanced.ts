@@ -8,6 +8,7 @@ import { BaseEntity } from '@/core/types/common'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
+import type { Database } from '@/lib/supabase/types'
 
 const TOURS_KEY = 'tours'
 
@@ -86,8 +87,8 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     mutate(TOURS_KEY, [newTour, ...allTours], false)
 
     try {
-       
-      const { error } = await (supabase as any).from('tours').insert(newTour)
+      // Type assertion needed due to Tour type vs Database Insert type mismatch
+      const { error } = await supabase.from('tours').insert(newTour as unknown as Database['public']['Tables']['tours']['Insert'])
       if (error) throw error
 
       mutate(TOURS_KEY)

@@ -68,9 +68,9 @@ export function ImportMealsDialog({
   const getMealIcon = (type: string) => {
     switch (type) {
       case '早餐':
-        return <Sun className="w-3.5 h-3.5 text-amber-500" />
+        return <Sun className="w-3.5 h-3.5 text-morandi-gold" />
       case '午餐':
-        return <Cloud className="w-3.5 h-3.5 text-blue-500" />
+        return <Cloud className="w-3.5 h-3.5 text-status-info" />
       case '晚餐':
         return <Moon className="w-3.5 h-3.5 text-indigo-500" />
       default:
@@ -179,7 +179,7 @@ export function ImportMealsDialog({
                         className={`w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-colors ${
                           isSelected
                             ? 'bg-[var(--morandi-gold)]/10 border-[var(--morandi-gold)]'
-                            : 'bg-white border-gray-200 hover:border-gray-300'
+                            : 'bg-white border-border hover:border-border/80'
                         }`}
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />

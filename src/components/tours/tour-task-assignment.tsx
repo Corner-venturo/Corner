@@ -160,8 +160,8 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
   const getStatusColor = (status: Todo['status']) => {
     const colorMap = {
       pending: 'text-morandi-muted',
-      in_progress: 'text-blue-600',
-      completed: 'text-green-600',
+      in_progress: 'text-status-info',
+      completed: 'text-status-success',
       cancelled: 'text-morandi-red',
     }
     return colorMap[status]

@@ -36,7 +36,7 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
       const nextThursday = getNextThursday()
       onChange(nextThursday, false)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])  
 
   const handleDateChange = (selectedDate: string) => {
     const isThursday = selectedDate ? new Date(selectedDate + 'T00:00:00').getDay() === 4 : false

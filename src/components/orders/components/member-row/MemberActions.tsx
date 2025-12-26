@@ -27,7 +27,7 @@ export function MemberActions({
         {member.customer_verification_status === 'unverified' && (
           <button
             onClick={() => onEdit(member, 'verify')}
-            className="text-amber-500 hover:text-amber-600 transition-colors p-1"
+            className="text-status-warning hover:text-morandi-gold transition-colors p-1"
             title="待驗證 - 點擊驗證"
           >
             <AlertTriangle size={14} />
@@ -44,7 +44,7 @@ export function MemberActions({
         {/* 刪除按鈕 */}
         <button
           onClick={() => onDelete(member.id)}
-          className="text-morandi-secondary/50 hover:text-red-500 transition-colors p-1"
+          className="text-morandi-secondary/50 hover:text-status-danger transition-colors p-1"
           title="刪除成員"
         >
           <Trash2 size={14} />

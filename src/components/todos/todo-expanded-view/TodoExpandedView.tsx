@@ -51,7 +51,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
         {/* 唯讀提示 */}
         {!canEdit && (
-          <div className="absolute top-1 left-1 z-10 flex items-center gap-1 bg-amber-100 text-amber-700 px-2 py-1 rounded-lg text-xs">
+          <div className="absolute top-1 left-1 z-10 flex items-center gap-1 bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded-lg text-xs">
             <Eye size={12} />
             <span>唯讀模式</span>
           </div>
@@ -120,7 +120,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                       onUpdate({ status: 'completed', completed: true })
                       onClose()
                     }}
-                    className="flex-1 bg-gradient-to-r from-morandi-gold to-yellow-400 hover:from-morandi-gold/90 hover:to-yellow-400/90 text-white shadow-md hover:shadow-lg transition-all"
+                    className="flex-1 bg-gradient-to-r from-morandi-gold to-status-warning hover:from-morandi-gold/90 hover:to-status-warning/90 text-white shadow-md hover:shadow-lg transition-all"
                   >
                     <Check size={16} className="mr-1" />
                     標記完成

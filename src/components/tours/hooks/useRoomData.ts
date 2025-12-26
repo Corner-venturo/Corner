@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import type { TourRoomStatus, TourRoomAssignment } from '@/types/room-vehicle.types'
 import { logger } from '@/lib/utils/logger'
-
-const supabase = supabaseClient as any
 
 interface UseRoomDataProps {
   tourId: string

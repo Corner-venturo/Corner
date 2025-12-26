@@ -9,7 +9,7 @@ import { PreviewContainer } from '../components/PreviewContainer'
 import { PrintableConfirmation } from '../components/PrintableConfirmation'
 import { ImportPNRDialog } from '../components/ImportPNRDialog'
 import { Button } from '@/components/ui/button'
-import { Printer, Upload } from 'lucide-react'
+import { Printer, Upload, X, Save } from 'lucide-react'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type {
@@ -174,7 +174,7 @@ export default function EditConfirmationPage() {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-gray-500">載入中...</div>
+        <div className="text-morandi-secondary">載入中...</div>
       </div>
     )
   }
@@ -210,10 +210,12 @@ export default function EditConfirmationPage() {
               <Printer className="h-4 w-4" />
               列印
             </Button>
-            <Button variant="outline" onClick={() => router.push('/confirmations')}>
+            <Button variant="outline" onClick={() => router.push('/confirmations')} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Save size={16} />
               {isSaving ? '儲存中...' : '更新確認單'}
             </Button>
           </div>

@@ -82,7 +82,7 @@ export function ItemRow({
       style={isFirstInGroup && categoryDragStyle ? categoryDragStyle : style}
       className={cn(
         'border-b border-border/50 hover:bg-morandi-container/20 transition-colors',
-        isBackup && 'bg-amber-50/20'
+        isBackup && 'bg-status-warning-bg'
       )}
     >
       {/* 拖曳手把 */}
@@ -190,25 +190,25 @@ export function ItemRow({
       </td>
 
       {/* 台幣 */}
-      <td className="px-4 py-2.5 text-right border-r border-amber-200/60">
+      <td className="px-4 py-2.5 text-right border-r border-morandi-gold/30">
         {renderEditableCell(rate, 'price_twd', rate.price_twd?.toLocaleString() || '0', 'number')}
       </td>
 
       {!hideKKDAYColumns && (
         <>
           {/* KKDAY售價 */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-amber-200/60">
+          <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-morandi-gold/30">
             {renderEditableCell(rate, 'kkday_selling_price', rate.kkday_selling_price?.toLocaleString() || '0', 'number')}
           </td>
 
           {/* KKDAY成本 */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-amber-200/60">
+          <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-morandi-gold/30">
             {renderEditableCell(rate, 'kkday_cost', rate.kkday_cost?.toLocaleString() || '0', 'number')}
           </td>
 
           {/* 利潤（自動計算，不可編輯） */}
-          <td className="px-4 py-2.5 text-right bg-amber-50/30 border-r border-border/40">
-            <span className="font-mono text-sm text-amber-800 font-medium" title="自動計算（售價 - 成本）">
+          <td className="px-4 py-2.5 text-right bg-status-warning-bg border-r border-border/40">
+            <span className="font-mono text-sm text-morandi-gold font-medium" title="自動計算（售價 - 成本）">
               {rate.kkday_profit?.toLocaleString() || '0'}
             </span>
           </td>

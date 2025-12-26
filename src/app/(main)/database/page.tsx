@@ -14,7 +14,7 @@ const databaseModules = [
     description: '國家、區域、城市、景點統一管理',
     icon: MapPin,
     href: '/database/attractions',
-    color: 'bg-blue-500',
+    color: 'bg-status-info',
     count: 0,
   },
   {
@@ -23,7 +23,7 @@ const databaseModules = [
     description: '管理各國車資參考報價',
     icon: Bus,
     href: '/database/transportation-rates',
-    color: 'bg-green-500',
+    color: 'bg-status-success',
     count: 0,
   },
   {
@@ -41,7 +41,7 @@ const databaseModules = [
     description: '管理公司 Logo、大小章、插圖等資源',
     icon: ImageIcon,
     href: '/database/company-assets',
-    color: 'bg-amber-500',
+    color: 'bg-morandi-gold',
     count: 0,
   },
 ]

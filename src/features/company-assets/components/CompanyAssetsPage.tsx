@@ -233,8 +233,7 @@ export const CompanyAssetsPage: React.FC = () => {
         const userName =
           user?.display_name || user?.chinese_name || user?.personal_info?.email || 'Unknown'
 
-         
-        const { error: dbError } = await (supabase as any).from('company_assets').insert({
+        const { error: dbError } = await supabase.from('company_assets').insert({
           name: formData.name,
           asset_type: formData.asset_type,
           file_path: filePath,

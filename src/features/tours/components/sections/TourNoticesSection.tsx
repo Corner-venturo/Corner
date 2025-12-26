@@ -31,7 +31,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
   const isMobile = viewMode === 'mobile'
 
   return (
-    <section className={cn('py-12 bg-slate-50', isMobile && 'py-8')}>
+    <section className={cn('py-12 bg-muted', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={cn(
           'grid gap-8',
@@ -39,7 +39,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
         )}>
           {/* 提醒事項 */}
           {hasNotices && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
                 title="提醒事項"
                 subtitle="NOTICES"
@@ -56,7 +56,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
                       isMobile ? 'text-xs' : 'text-sm'
                     )}
                   >
-                    <span className="text-amber-500 font-bold flex-shrink-0">
+                    <span className="text-status-warning font-bold flex-shrink-0">
                       {index + 1}.
                     </span>
                     <span>{notice}</span>
@@ -68,7 +68,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
 
           {/* 取消政策 */}
           {hasCancellation && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
                 title="取消政策"
                 subtitle="CANCELLATION"
@@ -85,8 +85,8 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
                       isMobile ? 'text-xs' : 'text-sm'
                     )}
                   >
-                    <span className="text-red-400 flex-shrink-0 mt-0.5">
-                      <span className="inline-block w-5 h-5 rounded-full bg-red-50 text-center text-xs font-bold leading-5">
+                    <span className="text-morandi-red flex-shrink-0 mt-0.5">
+                      <span className="inline-block w-5 h-5 rounded-full bg-status-danger-bg text-center text-xs font-bold leading-5">
                         {index + 1}
                       </span>
                     </span>

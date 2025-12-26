@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -11,8 +11,6 @@ import { logger } from '@/lib/utils/logger'
 import { generateUUID } from '../hooks/room-utils'
 import { format, addDays, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-
-const supabase = supabaseClient as any
 
 interface NewRoomRow {
   id: string

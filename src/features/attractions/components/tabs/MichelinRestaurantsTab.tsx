@@ -177,7 +177,7 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
     return (
       <div className="flex gap-0.5">
         {Array.from({ length: stars }).map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+          <Star key={i} className="w-4 h-4 fill-status-warning text-status-warning" />
         ))}
       </div>
     )

@@ -244,9 +244,9 @@ export default function InvoiceDetailPage() {
 
           {/* 作廢資訊 */}
           {currentInvoice.status === 'voided' && (
-            <Card className="border-red-300">
+            <Card className="border-status-danger/30">
               <CardHeader>
-                <CardTitle className="text-base text-red-600">作廢資訊</CardTitle>
+                <CardTitle className="text-base text-status-danger">作廢資訊</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div>

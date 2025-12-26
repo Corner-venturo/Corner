@@ -35,7 +35,7 @@ export function ChatLayout({ initialData }: ChatLayoutProps) {
   }
 
   return (
-    <div className="h-screen w-full flex bg-gray-100">
+    <div className="h-screen w-full flex bg-muted">
       <div className="w-64 flex-shrink-0">
         <ChannelSidebar 
           workspaces={workspaces}

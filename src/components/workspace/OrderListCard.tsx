@@ -4,28 +4,8 @@ import { useState } from 'react'
 import { Receipt, ChevronDown, ChevronUp, DollarSign, Check } from 'lucide-react'
 import type { Order } from '@/stores/types'
 
-interface SharedOrderList {
-  id: string
-  channel_id: string
-  orders: Array<{
-    id: string
-    order_number: string
-    contact_person: string
-    total_amount: number
-    paid_amount: number
-    gap: number
-    collection_rate: number
-    invoice_status?: 'not_invoiced' | 'invoiced'
-    receipt_status?: 'not_received' | 'received'
-  }>
-  created_by: string
-  created_at: string
-  author?: {
-    id: string
-    display_name: string
-    avatar?: string
-  }
-}
+// 使用統一的型別定義
+import type { SharedOrderList } from '@/stores/workspace/types'
 
 interface OrderListCardProps {
   orderList: SharedOrderList
@@ -53,20 +33,20 @@ export function OrderListCard({
     if (isFullyUnpaid) {
       return {
         text: '❌❌ 未請款/未收款',
-        color: 'text-red-600',
-        bgColor: 'bg-red-50',
+        color: 'text-status-danger',
+        bgColor: 'bg-status-danger-bg',
       }
     } else if (isLowRate) {
       return {
         text: '✅❌ 已請款/未收款',
-        color: 'text-orange-600',
-        bgColor: 'bg-orange-50',
+        color: 'text-status-warning',
+        bgColor: 'bg-status-warning-bg',
       }
     } else {
       return {
         text: '部分收款',
-        color: 'text-yellow-600',
-        bgColor: 'bg-yellow-50',
+        color: 'text-status-warning',
+        bgColor: 'bg-status-warning-bg',
       }
     }
   }
@@ -106,7 +86,7 @@ export function OrderListCard({
             <div className="flex items-center gap-3">
               <div className="text-right">
                 <div className="text-xs text-morandi-secondary">總缺口</div>
-                <div className="text-lg font-semibold text-red-600">
+                <div className="text-lg font-semibold text-status-danger">
                   ${totalGap.toLocaleString()}
                 </div>
               </div>
@@ -173,7 +153,7 @@ export function OrderListCard({
                         <td className="py-2 px-3 text-sm text-right text-morandi-primary">
                           ${order.paid_amount.toLocaleString()}
                         </td>
-                        <td className="py-2 px-3 text-sm text-right font-semibold text-red-600">
+                        <td className="py-2 px-3 text-sm text-right font-semibold text-status-danger">
                           ${order.gap.toLocaleString()}
                         </td>
                         <td className="py-2 px-3 text-center">
@@ -186,7 +166,7 @@ export function OrderListCard({
                         <td className="py-2 px-3 text-center">
                           {isProcessed ? (
                             <div className="flex items-center justify-center gap-1 text-xs text-morandi-secondary">
-                              <Check size={14} className="text-green-600" />
+                              <Check size={14} className="text-status-success" />
                               <span>已處理</span>
                             </div>
                           ) : canProcess ? (

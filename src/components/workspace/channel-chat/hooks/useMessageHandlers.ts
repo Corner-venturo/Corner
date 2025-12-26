@@ -1,4 +1,5 @@
 import type { Message } from '@/stores/workspace/types'
+import type { MessageAttachment } from '@/stores/workspace-store'
 import { ALERT_MESSAGES } from '../constants'
 
 /**
@@ -13,9 +14,9 @@ export function useMessageHandlers(
   user: { id: string } | null,
   attachedFiles: File[],
   currentMessages: Message[],
-  uploadFiles: (channelId: string) => Promise<unknown>,
+  uploadFiles: (channelId: string) => Promise<MessageAttachment[] | undefined>,
   clearFiles: () => void,
-  handleSendMessage: (channelId: string, text: string, attachments?: unknown, parentMessageId?: string) => Promise<void>,
+  handleSendMessage: (channelId: string, text: string, attachments?: MessageAttachment[], parentMessageId?: string) => Promise<void>,
   handleReaction: (messageId: string, emoji: string, messages: Message[]) => void,
   handleDeleteMessage: (messageId: string) => Promise<void>,
   parentMessageId?: string | null

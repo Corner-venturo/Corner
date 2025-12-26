@@ -1,5 +1,5 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
-import { Quote } from '@/stores/types'
+import { Quote, QuoteVersion } from '@/stores/types/quote.types'
 import { useQuoteStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateId } from '@/lib/data/create-data-store'
@@ -73,9 +73,10 @@ class QuoteService extends BaseService<Quote> {
     const current = store.items.find(q => q.id === id)
     if (!current) return undefined
 
-    const newVersion = {
+    const newVersion: QuoteVersion = {
       id: generateId(),
       version: (current.version || 1) + 1,
+      mode: 'detailed', // Default to detailed mode
       categories: current.categories,
       total_cost: current.total_cost,
       group_size: current.group_size,
@@ -99,7 +100,7 @@ class QuoteService extends BaseService<Quote> {
 
     return await store.update(id, {
       version: (current.version || 1) + 1,
-      versions: [...(current.versions || []), newVersion] as any,
+      versions: [...(current.versions || []), newVersion],
       ...updates,
     })
   }

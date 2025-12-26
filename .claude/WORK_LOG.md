@@ -1,7 +1,7 @@
 # Claude 工作日誌
 
 > **用途**: 記錄 Claude 工作進度，防止會話崩潰後遺失上下文
-> **最後更新**: 2025-12-24
+> **最後更新**: 2025-12-25
 
 ---
 
@@ -81,11 +81,120 @@
 
 ---
 
+## 2025-12-25 技術債清理與檔案拆分
+
+### 任務背景
+清理技術債、驗證 A5 手冊功能、拆分超大檔案。
+
+### 已完成項目
+
+| # | 項目 | 狀態 |
+|---|------|------|
+| 1 | Timebox 功能確認已停用 | ✅ 完成 |
+| 2 | 刪除 Corner 備份資料夾 (245MB) | ✅ 完成 |
+| 3 | 修復 as any 類型繞過 (48→43) | ✅ 完成 |
+| 4 | 驗證 A5 手冊功能 | ✅ 完成 |
+| 5 | 拆分 itinerary/page.tsx (1184→686) | ✅ 完成 |
+| 6 | 拆分 quotes/[id]/page.tsx (933→622) | ✅ 完成 |
+| 7 | 拆分 TourItinerarySectionLuxury.tsx (818→543) | ✅ 完成 |
+| 8 | 拆分 TourFlightSection.tsx (777→228) | ✅ 完成 |
+
+### [2025-12-25] A5 手冊功能驗證
+- ✅ A5HandbookDialog 已正確連接到 itinerary/new/page.tsx
+- ✅ A5 列印按鈕位於 ItineraryHeader
+- ✅ 列印預覽正常運作
+- **相關檔案**:
+  - `src/features/itinerary/components/A5HandbookDialog.tsx`
+  - `src/features/itinerary/components/A5HandbookPrint.tsx`
+  - `src/features/itinerary/components/A5HandbookPrint.module.css`
+
+### [2025-12-25] 檔案拆分：itinerary/page.tsx
+**原始**: 1184 行 → **拆分後**: 686 行（主組件約 250 行）
+
+**新增 hooks**:
+- `useItineraryActions.ts` (335 行) - 動作處理器
+- `useItineraryTableColumns.tsx` (346 行) - 表格欄位配置
+- `useItineraryFilters.ts` (93 行) - 過濾邏輯
+
+**子組件提取**:
+- CreateItineraryDialog
+- FlightInputSection
+- DailyItineraryPreview
+- PasswordDialog
+- DuplicateDialog
+
+### [2025-12-25] 檔案拆分：quotes/[id]/page.tsx
+**原始**: 933 行 → **拆分後**: 622 行
+
+**新增 hooks**:
+- `useSyncOperations.ts` (353 行) - 同步操作處理
+  - handleCreateItinerary
+  - calculateSyncDiffs
+  - handleConfirmSync
+  - handleSyncAccommodationFromItinerary
+  - itineraryMealsData
+  - itineraryActivitiesData
+
+### [2025-12-25] 檔案拆分：TourItinerarySectionLuxury.tsx
+**原始**: 818 行 → **拆分後**: 543 行
+
+**新增檔案**:
+- `utils/itineraryLuxuryUtils.ts` (139 行) - 輔助函數和類型
+- `modals/ImageGalleryModal.tsx` (134 行) - 圖片瀏覽器模態框
+- `modals/ActivityDetailModal.tsx` (85 行) - 活動詳情模態框
+
+### [2025-12-25] 檔案拆分：TourFlightSection.tsx
+**原始**: 777 行 → **拆分後**: 228 行
+
+**新增檔案**:
+- `flight-cards/types.ts` (33 行) - 航班類型定義
+- `flight-cards/OriginalFlightCard.tsx` (76 行) - 原版航班卡片
+- `flight-cards/ChineseFlightCard.tsx` (214 行) - 中國風航班卡片
+- `flight-cards/JapaneseFlightCard.tsx` (236 行) - 日式和紙航班卡片
+- `flight-cards/index.ts` (5 行) - Barrel 導出
+
+---
+
+## ✅ 2025-12-25 技術債清理完成
+
+### 拆分成果總結
+
+| 檔案 | 原始行數 | 拆分後 | 減少比例 |
+|------|----------|--------|----------|
+| itinerary/page.tsx | 1184 | 686 | -42% |
+| quotes/[id]/page.tsx | 933 | 622 | -33% |
+| TourItinerarySectionLuxury.tsx | 818 | 543 | -34% |
+| TourFlightSection.tsx | 777 | 228 | -71% |
+| **總計** | **3712** | **2079** | **-44%** |
+
+### 檔案拆分標準（最終決議）
+
+**不以行數為唯一標準，改用邏輯完整性判斷：**
+
+1. **職責單一性** - 一個檔案應該只做一件事
+2. **邏輯完整性** - 相關的邏輯應該放在一起
+3. **可維護性** - 拆分後是否更容易理解和修改
+
+**實務指引：**
+- 包含多個獨立子組件（如多種風格卡片）→ 應拆分
+- 單一完整流程（如 OCR API）→ 保持原狀
+- 行數只是警示指標，不是決策標準
+
+### 保留不拆分的檔案
+
+| 檔案 | 行數 | 原因 |
+|------|------|------|
+| passport/route.ts | 911 | OCR 處理是完整流程 |
+| posting-service.ts | 813 | 記帳服務是完整邏輯 |
+| TourItinerarySection.tsx | 762 | 可接受範圍 |
+
+---
+
 ## 如何繼續工作
 
 如果會話崩潰，請告訴 Claude：
 ```
-請查看 .claude/WORK_LOG.md 繼續之前的效能優化修復工作
+請查看 .claude/WORK_LOG.md 了解之前的工作紀錄
 ```
 
 Claude 會根據日誌中的狀態繼續未完成的任務。

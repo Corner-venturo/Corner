@@ -515,7 +515,7 @@ export default function DemoWorkspacePage() {
                           'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card',
                           member.status === 'online' && 'bg-green-500',
                           member.status === 'away' && 'bg-amber-500',
-                          member.status === 'offline' && 'bg-gray-400'
+                          member.status === 'offline' && 'bg-morandi-muted'
                         )}
                       />
                     </div>

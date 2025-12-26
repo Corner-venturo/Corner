@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { User, Lock, AlertCircle, Eye, EyeOff, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { logger } from '@/lib/utils/logger'
 import {
   Select,
   SelectContent,
@@ -60,7 +61,7 @@ export default function LoginPage() {
           setSelectedWorkspace(data[0].id)
         }
       } catch (err) {
-        console.error('Failed to load workspaces:', err)
+        logger.error('Failed to load workspaces:', err)
       } finally {
         setIsLoadingWorkspaces(false)
       }
@@ -137,9 +138,9 @@ export default function LoginPage() {
 
         {/* 錯誤訊息 */}
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-            <AlertCircle size={18} className="text-red-500 mt-0.5" />
-            <span className="text-sm text-red-700">{error}</span>
+          <div className="mb-4 p-3 bg-status-danger-bg border border-status-danger/30 rounded-lg flex items-start gap-2">
+            <AlertCircle size={18} className="text-status-danger mt-0.5" />
+            <span className="text-sm text-status-danger">{error}</span>
           </div>
         )}
 
@@ -228,7 +229,7 @@ export default function LoginPage() {
               id="rememberMe"
               checked={rememberMe}
               onChange={e => setRememberMe(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold cursor-pointer"
+              className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
             />
             <label htmlFor="rememberMe" className="text-sm text-morandi-secondary cursor-pointer select-none">
               記住我（30 天內免重新登入）

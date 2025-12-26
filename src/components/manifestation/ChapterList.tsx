@@ -62,13 +62,13 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
-                    completed && 'bg-green-100 text-green-700',
+                    completed && 'bg-status-success-bg text-status-success',
                     !completed && started && 'bg-morandi-gold/20 text-morandi-gold',
                     !completed &&
                       !started &&
                       unlocked &&
                       'bg-morandi-container text-morandi-secondary',
-                    !unlocked && 'bg-gray-100 text-gray-400'
+                    !unlocked && 'bg-muted text-morandi-muted'
                   )}
                 >
                   {completed ? <Check size={16} /> : !unlocked ? <Lock size={16} /> : chapter.id}
@@ -92,7 +92,7 @@ export function ChapterList({ currentChapter, onChapterSelect }: ChapterListProp
                 {/* 狀態指示器 */}
                 {completed && (
                   <div className="flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <div className="w-2 h-2 rounded-full bg-status-success" />
                   </div>
                 )}
               </div>

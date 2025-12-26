@@ -251,7 +251,7 @@ export function AttractionsMap({
 
   if (!selectedAttraction) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-400">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-morandi-secondary">
         <MapPin size={40} className="mb-3 opacity-40" />
         <p className="text-sm">選擇景點查看位置</p>
       </div>
@@ -260,7 +260,7 @@ export function AttractionsMap({
 
   if (!selectedAttraction.latitude || !selectedAttraction.longitude) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-400">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-morandi-secondary">
         <Navigation size={40} className="mb-3 opacity-40" />
         <p className="text-sm">此景點尚無座標</p>
       </div>
@@ -271,12 +271,12 @@ export function AttractionsMap({
     <div className="absolute inset-0">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-[2000]">
-          <Loader2 size={24} className="animate-spin text-slate-400" />
+          <Loader2 size={24} className="animate-spin text-morandi-secondary" />
         </div>
       )}
       <div ref={containerRef} className="w-full h-full" style={{ minHeight: '400px' }} />
       {nearbyAttractions.length > 0 && (
-        <div className="absolute bottom-3 left-3 text-xs bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-slate-600">
+        <div className="absolute bottom-3 left-3 text-xs bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-morandi-primary">
           {radiusKm}km 內 {nearbyAttractions.length} 個景點
         </div>
       )}

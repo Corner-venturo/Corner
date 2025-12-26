@@ -37,7 +37,7 @@ const getTierColorClass = (label: string, index: number): string => {
 
   // 單人房差、加價類用灰色
   if (labelLower.includes('單人房') || labelLower.includes('加價') || labelLower.includes('加購')) {
-    return 'bg-gray-500'
+    return 'bg-morandi-muted'
   }
 
   // 主方案（第一個或包含「包團」）用金色

@@ -322,13 +322,12 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     const user = useAuthStore.getState().user
     if (!user) return null
 
-     
-    const { error } = await (supabase as any).rpc('create_atomic_transaction', {
+    const { error } = await supabase.rpc('create_atomic_transaction', {
       p_account_id: transactionData.account_id,
       p_amount: transactionData.amount,
       p_transaction_type: transactionData.type,
-      p_description: transactionData.description,
-      p_category_id: transactionData.category_id,
+      p_description: transactionData.description ?? '',
+      p_category_id: transactionData.category_id ?? '',
       p_transaction_date: transactionData.date,
     })
 

@@ -39,7 +39,7 @@ export function MealSection({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, breakfast: v })}
-              className="inline text-gray-700"
+              className="inline text-morandi-primary"
               placeholder="飯店內"
             />
           </span>
@@ -50,7 +50,7 @@ export function MealSection({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, lunch: v })}
-              className="inline text-gray-700"
+              className="inline text-morandi-primary"
               placeholder="午餐"
             />
           </span>
@@ -61,7 +61,7 @@ export function MealSection({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => onUpdateMeals({ ...meals, dinner: v })}
-              className="inline text-gray-700"
+              className="inline text-morandi-primary"
               placeholder="晚餐"
             />
           </span>
@@ -81,7 +81,7 @@ export function MealSection({
             editingField={editingField}
             setEditingField={setEditingField}
             onChange={v => onUpdateMeals({ ...meals, lunch: v })}
-            className="text-gray-700"
+            className="text-morandi-primary"
             placeholder="午餐"
           />
         </div>
@@ -93,14 +93,14 @@ export function MealSection({
   return (
     <div className="flex gap-4 text-sm">
       <div className="flex-1">
-        <span className="text-gray-400">午餐：</span>
+        <span className="text-morandi-muted">午餐：</span>
         <EditableText
           value={meals.lunch || ''}
           fieldKey="meals-lunch"
           editingField={editingField}
           setEditingField={setEditingField}
           onChange={v => onUpdateMeals({ ...meals, lunch: v })}
-          className="inline text-gray-700"
+          className="inline text-morandi-primary"
           placeholder="午餐"
         />
       </div>

@@ -108,7 +108,7 @@ export function TourForm({
 
         {/* Error message */}
         {formError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+          <div className="bg-status-danger-bg border border-status-danger text-status-danger px-4 py-3 rounded-md mb-4">
             <div className="flex items-start gap-2">
               <AlertCircle size={18} className="mt-0.5 shrink-0" />
               <div className="text-sm">{formError}</div>

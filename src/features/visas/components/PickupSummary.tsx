@@ -30,8 +30,8 @@ export function PickupSummary({
       </div>
 
       {/* 待取件簽證提示 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-sm text-blue-800">
+      <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
+        <p className="text-sm text-morandi-primary">
           目前有 <span className="font-semibold">{pendingVisasCount}</span> 筆待取件簽證
         </p>
       </div>

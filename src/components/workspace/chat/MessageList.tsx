@@ -155,7 +155,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
                 return (
                   <OrderListCard
                     key={item.data.id}
-                    orderList={item.data as any}
+                    orderList={item.data}
                     userName={item.data.author?.display_name || getEmployeeName(item.data.created_by)}
                     currentUserId={currentUserId || ''}
                     userRole="admin"

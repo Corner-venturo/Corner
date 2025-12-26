@@ -218,8 +218,8 @@ export default function DatabaseManagementPage() {
         onDrop={handleTestDrop}
         className={`m-4 p-8 border-4 border-dashed rounded-xl text-center transition-all ${
           testDragOver
-            ? 'border-green-500 bg-green-50 text-green-700'
-            : 'border-gray-300 bg-gray-50 text-gray-500'
+            ? 'border-status-success bg-status-success-bg text-status-success'
+            : 'border-border bg-muted text-morandi-muted'
         }`}
       >
         <div className="text-xl font-bold mb-2">🧪 測試拖放區</div>

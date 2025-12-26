@@ -112,10 +112,10 @@ export function TourUnlockDialog({
 
         <div className="space-y-4 py-4">
           {/* 警告訊息 */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div className="bg-status-warning-bg border border-status-warning/30 rounded-lg p-3">
             <div className="flex gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-700">
+              <AlertTriangle className="h-4 w-4 text-status-warning flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-morandi-primary">
                 <p className="font-medium">{tour.name}</p>
                 <p className="mt-1">解鎖後可修改報價單和行程，完成後請記得重新鎖定。</p>
               </div>
@@ -166,7 +166,7 @@ export function TourUnlockDialog({
 
           {/* 錯誤訊息 */}
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+            <div className="text-sm text-status-danger bg-status-danger-bg border border-status-danger rounded-lg p-3">
               {error}
             </div>
           )}

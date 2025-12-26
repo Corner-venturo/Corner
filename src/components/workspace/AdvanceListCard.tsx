@@ -73,7 +73,7 @@ export function AdvanceListCard({
           {onDelete && (
             <button
               onClick={handleDelete}
-              className="p-1 hover:bg-red-50 hover:text-red-600 rounded transition-colors opacity-0 group-hover:opacity-100"
+              className="p-1 hover:bg-status-danger-bg hover:text-status-danger rounded transition-colors opacity-0 group-hover:opacity-100"
               title="刪除代墊清單"
             >
               <Trash2 size={14} />
@@ -141,7 +141,7 @@ export function AdvanceListCard({
               <div className="shrink-0 w-24">
                 {item.status === 'completed' ? (
                   <div className="flex items-center gap-1 text-xs text-morandi-secondary">
-                    <Check size={14} className="text-green-600" />
+                    <Check size={14} className="text-status-success" />
                     <span>已請款</span>
                   </div>
                 ) : canProcess ? (

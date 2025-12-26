@@ -36,10 +36,10 @@ const TYPE_CONFIG = {
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: 'text-amber-500',
-    titleColor: 'text-amber-600',
-    buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white',
-    detailsBg: 'bg-amber-50 border-amber-200',
+    iconColor: 'text-status-warning',
+    titleColor: 'text-morandi-gold',
+    buttonClass: 'bg-status-warning hover:bg-status-warning text-white',
+    detailsBg: 'bg-status-warning-bg border-morandi-gold/30',
   },
   info: {
     icon: Info,

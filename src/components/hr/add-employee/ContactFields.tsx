@@ -63,7 +63,7 @@ export function ContactFields({ formData, setFormData }: ContactFieldsProps) {
                       personal_info: { ...formData.personal_info, phone: phones },
                     })
                   }}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-status-danger hover:text-status-danger"
                 >
                   <Trash2 size={16} />
                 </Button>

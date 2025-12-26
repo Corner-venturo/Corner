@@ -133,7 +133,7 @@ export function AddMemberDialog({
                     variant="ghost"
                     size="sm"
                     onClick={() => processedFiles.forEach((_, i) => onRemoveFile(i))}
-                    className="text-morandi-muted hover:text-red-500"
+                    className="text-morandi-muted hover:text-status-danger"
                   >
                     清空全部
                   </Button>
@@ -149,7 +149,7 @@ export function AddMemberDialog({
                       />
                       <button
                         onClick={() => onRemoveFile(index)}
-                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-status-danger text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X size={10} />
                       </button>

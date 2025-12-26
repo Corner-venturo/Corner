@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // 記錄錯誤到錯誤追蹤服務（例如 Sentry）
-    console.error('Application Error:', error)
+    logger.error('Application Error:', error)
   }, [error])
 
   return (
@@ -23,8 +24,8 @@ export default function Error({
       <div className="max-w-md w-full space-y-6 text-center">
         {/* 錯誤圖示 */}
         <div className="flex justify-center">
-          <div className="rounded-full bg-red-100 dark:bg-red-900/20 p-6">
-            <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
+          <div className="rounded-full bg-status-danger-bg p-6">
+            <AlertCircle className="h-12 w-12 text-status-danger" />
           </div>
         </div>
 

@@ -34,7 +34,7 @@ export function CardGridTemplate({
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
       {/* 標題 */}
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-6 border-b border-border/50">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-xl bg-[#B8A99A] flex flex-col items-center justify-center text-white">
             <span className="text-2xl font-bold">{dayIndex + 1}</span>
@@ -47,7 +47,7 @@ export function CardGridTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('title', v)}
-              className="text-xl font-bold text-gray-900"
+              className="text-xl font-bold text-foreground"
               placeholder="行程標題"
             />
             <EditableText
@@ -56,7 +56,7 @@ export function CardGridTemplate({
               editingField={editingField}
               setEditingField={setEditingField}
               onChange={v => updateField('description', v)}
-              className="text-sm text-gray-500 mt-1"
+              className="text-sm text-morandi-secondary mt-1"
               placeholder="簡短描述..."
             />
           </div>
@@ -67,7 +67,7 @@ export function CardGridTemplate({
       <div className="p-6">
         <div className="grid grid-cols-2 gap-4">
           {editingDay.activities.map((act, i) => (
-            <div key={i} className="group relative bg-gray-50 rounded-xl overflow-hidden">
+            <div key={i} className="group relative bg-muted rounded-xl overflow-hidden">
               <UploadableImage
                 src={act.image}
                 alt={act.title}
@@ -84,7 +84,7 @@ export function CardGridTemplate({
                   editingField={editingField}
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'title', v)}
-                  className="font-medium text-gray-900 text-sm"
+                  className="font-medium text-foreground text-sm"
                   placeholder="景點名稱"
                 />
                 <EditableText
@@ -93,7 +93,7 @@ export function CardGridTemplate({
                   editingField={editingField}
                   setEditingField={setEditingField}
                   onChange={v => updateActivity(i, 'description', v)}
-                  className="text-xs text-gray-500 mt-1"
+                  className="text-xs text-morandi-secondary mt-1"
                   placeholder="景點描述"
                 />
               </div>
@@ -103,7 +103,7 @@ export function CardGridTemplate({
           <button
             type="button"
             onClick={addActivity}
-            className="h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
+            className="h-32 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-morandi-muted hover:border-[#B8A99A] hover:text-[#B8A99A] transition-colors"
           >
             <Plus size={28} />
             <span className="text-sm mt-1">新增景點</span>
@@ -123,7 +123,7 @@ export function CardGridTemplate({
                 editingField={editingField}
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, breakfast: v })}
-                className="inline text-gray-700"
+                className="inline text-morandi-primary"
                 placeholder="飯店內"
               />
             </span>
@@ -134,7 +134,7 @@ export function CardGridTemplate({
                 editingField={editingField}
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, lunch: v })}
-                className="inline text-gray-700"
+                className="inline text-morandi-primary"
                 placeholder="午餐"
               />
             </span>
@@ -145,7 +145,7 @@ export function CardGridTemplate({
                 editingField={editingField}
                 setEditingField={setEditingField}
                 onChange={v => updateField('meals', { ...editingDay.meals, dinner: v })}
-                className="inline text-gray-700"
+                className="inline text-morandi-primary"
                 placeholder="晚餐"
               />
             </span>
@@ -159,7 +159,7 @@ export function CardGridTemplate({
             editingField={editingField}
             setEditingField={setEditingField}
             onChange={v => updateField('accommodation', v)}
-            className="text-sm text-gray-700"
+            className="text-sm text-morandi-primary"
             placeholder="住宿飯店"
           />
         </div>

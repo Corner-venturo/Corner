@@ -167,15 +167,15 @@ export function FlightWidget() {
   // 狀態顏色
   const getStatusColor = (status: string) => {
     if (status.includes('延誤') || status.includes('取消')) {
-      return 'bg-red-100 text-red-700'
+      return 'bg-status-danger-bg text-status-danger'
     }
     if (status.includes('飛行中') || status.includes('登機')) {
-      return 'bg-blue-100 text-blue-700'
+      return 'bg-status-info-bg text-status-info'
     }
     if (status.includes('抵達') || status.includes('起飛')) {
-      return 'bg-green-100 text-green-700'
+      return 'bg-status-success-bg text-status-success'
     }
-    return 'bg-gray-100 text-gray-700'
+    return 'bg-muted text-morandi-primary'
   }
 
   return (
@@ -183,7 +183,7 @@ export function FlightWidget() {
       <div
         className={cn(
           'h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80',
-          'bg-gradient-to-br from-sky-50 via-white to-indigo-50'
+          'bg-gradient-to-br from-status-info-bg via-white to-indigo-50'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -192,7 +192,7 @@ export function FlightWidget() {
             <div
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
-                'bg-gradient-to-br from-sky-200/60 to-indigo-100/60',
+                'bg-gradient-to-br from-morandi-gold/10 to-indigo-100/60',
                 'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
               )}
             >
@@ -311,7 +311,7 @@ export function FlightWidget() {
               disabled={isPending}
               className={cn(
                 'w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md',
-                'bg-gradient-to-br from-sky-200/60 to-indigo-100/60 hover:from-sky-300/60 hover:to-indigo-200/60',
+                'bg-gradient-to-br from-morandi-gold/10 to-indigo-100/60 hover:from-morandi-gold/15 hover:to-indigo-200/60',
                 'text-morandi-primary disabled:opacity-50 disabled:cursor-not-allowed',
                 'flex items-center justify-center gap-2'
               )}
@@ -332,10 +332,10 @@ export function FlightWidget() {
 
           {/* 錯誤訊息 */}
           {error && (
-            <div className="rounded-xl bg-red-50/80 border border-red-200/50 p-3.5 backdrop-blur-sm">
+            <div className="rounded-xl bg-status-danger-bg/80 border border-status-danger/50 p-3.5 backdrop-blur-sm">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-red-600 font-medium">{error}</p>
+                <AlertCircle className="w-4 h-4 text-status-danger flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-status-danger font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -346,7 +346,7 @@ export function FlightWidget() {
               {/* 航班號與狀態 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-200/60 to-indigo-100/60 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-morandi-gold/10 to-indigo-100/60 flex items-center justify-center">
                     <Plane className="w-4 h-4 text-morandi-primary" />
                   </div>
                   <div>

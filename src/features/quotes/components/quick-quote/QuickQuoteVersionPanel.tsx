@@ -142,10 +142,10 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
                               e.stopPropagation()
                               handleDeleteVersion(originalIndex)
                             }}
-                            className="p-1 hover:bg-red-100 rounded transition-colors"
+                            className="p-1 hover:bg-status-danger-bg rounded transition-colors"
                             title="刪除版本"
                           >
-                            <Trash2 className="h-4 w-4 text-red-500" />
+                            <Trash2 className="h-4 w-4 text-status-danger" />
                           </button>
                         )}
                       </div>

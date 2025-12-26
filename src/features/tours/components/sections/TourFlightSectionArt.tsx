@@ -150,7 +150,7 @@ function FlightCard({
               {flight.departureAirport || 'TPE'}
             </div>
             <div
-              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-400"
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-morandi-muted"
               style={{
                 fontFamily: 'monospace',
                 color: '#6B7280',
@@ -164,7 +164,7 @@ function FlightCard({
           <div className="flex-1 mx-8 flex items-center justify-center">
             <div className="flex items-center w-full max-w-[200px]">
               <div
-                className="flex-1 border-t-2 border-dashed transition-colors duration-300 group-hover:border-gray-600"
+                className="flex-1 border-t-2 border-dashed transition-colors duration-300 group-hover:border-morandi-muted"
                 style={{ borderColor: `${ART.ink}30` }}
               />
               <Plane
@@ -172,7 +172,7 @@ function FlightCard({
                 style={{ color: ART.ink }}
               />
               <div
-                className="flex-1 border-t-2 border-dashed transition-colors duration-300 group-hover:border-gray-600"
+                className="flex-1 border-t-2 border-dashed transition-colors duration-300 group-hover:border-morandi-muted"
                 style={{ borderColor: `${ART.ink}30` }}
               />
             </div>
@@ -192,7 +192,7 @@ function FlightCard({
               {flight.arrivalAirport || 'FUK'}
             </div>
             <div
-              className="text-sm mt-2 transition-colors duration-300 group-hover:text-gray-400"
+              className="text-sm mt-2 transition-colors duration-300 group-hover:text-morandi-muted"
               style={{
                 fontFamily: 'monospace',
                 color: '#6B7280',
@@ -205,14 +205,14 @@ function FlightCard({
 
         {/* 航班詳情 */}
         <div
-          className={`flex justify-between items-end border-t mt-6 pt-4 transition-colors duration-300 group-hover:border-gray-700 ${
+          className={`flex justify-between items-end border-t mt-6 pt-4 transition-colors duration-300 group-hover:border-morandi-muted ${
             isMobile ? 'flex-col gap-4' : ''
           }`}
           style={{ borderColor: `${ART.ink}20` }}
         >
           <div>
             <span
-              className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-gray-500"
+              className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-morandi-muted"
               style={{ color: '#9CA3AF' }}
             >
               Flight
@@ -230,7 +230,7 @@ function FlightCard({
           {dateDisplay && (
             <div className={isMobile ? '' : 'text-right'}>
               <span
-                className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-gray-500"
+                className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-morandi-muted"
                 style={{ color: '#9CA3AF' }}
               >
                 Date
@@ -249,7 +249,7 @@ function FlightCard({
           {flight.duration && (
             <div className={isMobile ? '' : 'text-right'}>
               <span
-                className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-gray-500"
+                className="block text-[10px] uppercase tracking-widest mb-1 transition-colors duration-300 group-hover:text-morandi-muted"
                 style={{ color: '#9CA3AF' }}
               >
                 Duration

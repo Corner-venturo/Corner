@@ -54,7 +54,7 @@ export function SortableRow({
       ref={setNodeRef}
       style={style}
       className={`border-b border-morandi-gold/10 hover:bg-morandi-container/10 ${
-        index % 2 === 0 ? 'bg-blue-50/30' : 'bg-green-50/30'
+        index % 2 === 0 ? 'bg-status-info-bg' : 'bg-status-success-bg'
       } ${isDragging ? 'z-50' : ''}`}
     >
       {/* Drag handle */}
@@ -84,12 +84,12 @@ export function SortableRow({
       )}
       {/* Dietary restrictions - fixed field, synced to customers */}
       {visibleColumns.dietary && (
-        <td className="px-2 py-2 bg-amber-50/50">
+        <td className="px-2 py-2 bg-status-warning-bg">
           <input
             type="text"
             value={dietaryRestrictions}
             onChange={e => onDietaryChange(member.customer_id, e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none focus:bg-amber-100/50 px-1 py-0.5 rounded"
+            className="w-full bg-transparent text-xs border-none outline-none focus:bg-status-warning-bg px-1 py-0.5 rounded"
             placeholder="-"
             disabled={isDragMode}
           />
@@ -97,16 +97,16 @@ export function SortableRow({
       )}
       {/* Room assignment */}
       {visibleColumns.room && (
-        <td className="px-2 py-2 text-xs bg-green-50/50">
-          <span className={roomAssignment ? 'text-green-700' : 'text-morandi-text-light'}>
+        <td className="px-2 py-2 text-xs bg-status-success-bg">
+          <span className={roomAssignment ? 'text-status-success' : 'text-morandi-text-light'}>
             {roomAssignment || '未分房'}
           </span>
         </td>
       )}
       {/* Vehicle assignment */}
       {visibleColumns.vehicle && (
-        <td className="px-2 py-2 text-xs bg-blue-50/50">
-          <span className={vehicleAssignment ? 'text-blue-700' : 'text-morandi-text-light'}>
+        <td className="px-2 py-2 text-xs bg-status-info-bg">
+          <span className={vehicleAssignment ? 'text-status-info' : 'text-morandi-text-light'}>
             {vehicleAssignment || '未分車'}
           </span>
         </td>

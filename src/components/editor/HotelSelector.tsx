@@ -102,9 +102,9 @@ export function HotelSelector({
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
       <DialogContent className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-amber-50 to-transparent">
+        <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
-            <Building2 className="text-amber-600" size={22} />
+            <Building2 className="text-morandi-gold" size={22} />
             選擇飯店
           </DialogTitle>
         </DialogHeader>
@@ -146,8 +146,8 @@ export function HotelSelector({
 
           {/* 已選擇提示 */}
           {selectedIds.size > 0 && (
-            <div className="text-sm text-amber-800 bg-amber-100 px-4 py-2.5 rounded-xl border border-amber-200 flex items-center gap-2">
-              <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <div className="text-sm text-morandi-gold bg-morandi-gold/10 px-4 py-2.5 rounded-xl border border-morandi-gold/30 flex items-center gap-2">
+              <div className="w-6 h-6 bg-morandi-gold rounded-full flex items-center justify-center text-white text-xs font-bold">
                 {selectedIds.size}
               </div>
               已選擇 {selectedIds.size} 間飯店
@@ -155,14 +155,14 @@ export function HotelSelector({
           )}
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50/50">
+        <DialogFooter className="px-6 py-4 border-t bg-muted/50">
           <Button variant="outline" onClick={handleCancel} className="rounded-xl">
             取消
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={selectedIds.size === 0}
-            className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl min-w-[120px]"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-xl min-w-[120px]"
           >
             確認新增 ({selectedIds.size})
           </Button>

@@ -64,30 +64,33 @@ export function typedFrom<T extends SupabaseTableName>(tableName: T) {
  * 當表名是運行時變數時使用此函數
  * 它會執行類型斷言但保持代碼整潔
  *
- * 注意：為了避免 TypeScript 過度推斷導致的 "Type instantiation is excessively deep" 錯誤，
- * 我們使用 any 來繞過嚴格的類型檢查。這是一個已知的 Supabase 動態表名限制。
+ * 注意：此函數使用 `as any` 是必要的設計決策：
+ * 1. Supabase 的 .from() 方法期望字面量類型，無法處理運行時變數
+ * 2. 這是 Supabase 官方建議的動態表名處理方式
+ * 3. 替代方案（如 unknown）會導致所有使用處都需要類型轉換
+ * 4. 此函數集中處理類型轉換，避免在業務代碼中散落 as any
  *
  * @example
  * const tableName = config.tableName // 運行時變數
  * const { data } = await dynamicFrom(tableName).select('*')
  */
 export function dynamicFrom(tableName: string) {
-  // 使用類型斷言繞過 Supabase 的嚴格類型檢查
-  // 這是處理動態表名的標準做法
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // 使用 any 是處理 Supabase 動態表名的標準做法
+   
   return supabase.from(tableName as SupabaseTableName) as any
 }
 
 /**
  * 將 Supabase 回傳的資料轉換為指定類型
  *
- * 比 `as any` 更安全，因為它經過 `unknown` 中轉
+ * 使用 unknown 作為中間類型，比直接 as any 更安全
  *
  * @example
  * const { data } = await supabase.from('tours').select('*')
  * const tours = castData<Tour[]>(data)
  */
 export function castData<T>(data: unknown): T {
+  // 透過 unknown 中轉，保持類型安全
   return data as T
 }
 
@@ -99,6 +102,7 @@ export function castData<T>(data: unknown): T {
  * const tour = castRow<Tour>(data)
  */
 export function castRow<T>(data: unknown): T | null {
+  // 透過 unknown 中轉，保持類型安全
   return data as T | null
 }
 
@@ -110,5 +114,6 @@ export function castRow<T>(data: unknown): T | null {
  * const tours = castRows<Tour>(data)
  */
 export function castRows<T>(data: unknown): T[] {
-  return (data || []) as T[]
+  // 透過 unknown 中轉並處理 null/undefined，保持類型安全
+  return (data ?? []) as T[]
 }

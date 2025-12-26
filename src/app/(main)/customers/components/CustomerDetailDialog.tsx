@@ -38,25 +38,25 @@ export function CustomerDetailDialog({
         <div className="grid grid-cols-2 gap-4 py-4">
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-gray-500">電話</label>
+              <label className="text-xs text-morandi-secondary">電話</label>
               <div className="flex items-center gap-2">
-                <Phone size={14} className="text-gray-400" />
+                <Phone size={14} className="text-morandi-muted" />
                 <span>{customer.phone || '-'}</span>
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">Email</label>
+              <label className="text-xs text-morandi-secondary">Email</label>
               <div className="flex items-center gap-2">
-                <Mail size={14} className="text-gray-400" />
+                <Mail size={14} className="text-morandi-muted" />
                 <span>{customer.email || '-'}</span>
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">身分證號</label>
+              <label className="text-xs text-morandi-secondary">身分證號</label>
               <div className="font-mono">{customer.national_id || '-'}</div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">生日</label>
+              <label className="text-xs text-morandi-secondary">生日</label>
               <div>
                 {customer.date_of_birth
                   ? new Date(customer.date_of_birth).toLocaleDateString('zh-TW')
@@ -66,15 +66,15 @@ export function CustomerDetailDialog({
           </div>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-gray-500">護照號碼</label>
+              <label className="text-xs text-morandi-secondary">護照號碼</label>
               <div className="font-mono">{customer.passport_number || '-'}</div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">護照拼音</label>
+              <label className="text-xs text-morandi-secondary">護照拼音</label>
               <div className="font-mono">{customer.passport_romanization || '-'}</div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">護照效期</label>
+              <label className="text-xs text-morandi-secondary">護照效期</label>
               <div>
                 {customer.passport_expiry_date
                   ? new Date(customer.passport_expiry_date).toLocaleDateString('zh-TW')
@@ -82,17 +82,17 @@ export function CustomerDetailDialog({
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">驗證狀態</label>
+              <label className="text-xs text-morandi-secondary">驗證狀態</label>
               <div className="flex items-center gap-1">
                 {customer.verification_status === 'verified' ? (
                   <>
-                    <Check size={14} className="text-green-500" />
-                    <span className="text-green-600">已驗證</span>
+                    <Check size={14} className="text-status-success" />
+                    <span className="text-status-success">已驗證</span>
                   </>
                 ) : (
                   <>
-                    <AlertTriangle size={14} className="text-amber-500" />
-                    <span className="text-amber-600">待驗證</span>
+                    <AlertTriangle size={14} className="text-status-warning" />
+                    <span className="text-status-warning">待驗證</span>
                   </>
                 )}
               </div>
@@ -101,8 +101,8 @@ export function CustomerDetailDialog({
         </div>
         {/* 飲食禁忌 - 獨立一行 */}
         <div className="py-2">
-          <label className="text-xs text-gray-500">飲食禁忌</label>
-          <div className={customer.dietary_restrictions ? 'text-amber-700 bg-amber-50 px-2 py-1 rounded' : ''}>
+          <label className="text-xs text-morandi-secondary">飲食禁忌</label>
+          <div className={customer.dietary_restrictions ? 'text-morandi-gold bg-status-warning-bg px-2 py-1 rounded' : ''}>
             {customer.dietary_restrictions || '-'}
           </div>
         </div>

@@ -276,7 +276,7 @@ function FeatureCard({
     >
       {/* 圖片區 */}
       <div
-        className="relative h-64 rounded-sm overflow-hidden mb-6 shadow-md border border-gray-100 cursor-pointer"
+        className="relative h-64 rounded-sm overflow-hidden mb-6 shadow-md border border-border cursor-pointer"
         onClick={() => hasImages && onImageClick(validImages, currentImageIndex)}
       >
         {hasImages ? (
@@ -290,7 +290,7 @@ function FeatureCard({
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: '#f5f5f5' }}
           >
-            <span className="text-gray-400 text-sm">暫無圖片</span>
+            <span className="text-morandi-muted text-sm">暫無圖片</span>
           </div>
         )}
 

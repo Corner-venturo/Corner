@@ -61,15 +61,15 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
 
         <div className="space-y-4">
           {/* 基本資訊 */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">持續時間：</span>
+                <span className="text-sm text-morandi-secondary">持續時間：</span>
                 <span className="font-medium">{formatDuration(scheduledBox.duration)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">狀態：</span>
-                <span className={`font-medium ${scheduledBox.completed ? 'text-green-600' : 'text-gray-600'}`}>
+                <span className="text-sm text-morandi-secondary">狀態：</span>
+                <span className={`font-medium ${scheduledBox.completed ? 'text-status-success' : 'text-morandi-secondary'}`}>
                   {scheduledBox.completed ? '已完成' : '未完成'}
                 </span>
               </div>
@@ -81,7 +81,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
             <Button
               variant="outline"
               onClick={handleDelete}
-              className="text-red-500 border-red-300 hover:bg-red-50"
+              className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg"
             >
               <Trash2 size={16} className="mr-1" />
               移除排程

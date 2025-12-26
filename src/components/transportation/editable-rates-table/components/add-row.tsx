@@ -29,7 +29,7 @@ export function AddRow({
   const isAddingToCategory = addingAfterCategory !== null
 
   return (
-    <tr className="bg-blue-50/30">
+    <tr className="bg-status-info-bg">
       {/* 排序欄位（編輯模式才顯示） */}
       {isEditMode && (
         <td className="px-2 py-2.5 text-center border-r border-border/40">
@@ -94,7 +94,7 @@ export function AddRow({
           className="h-8 text-sm"
         />
       </td>
-      <td className="px-3 py-2 border-r border-amber-200/60">
+      <td className="px-3 py-2 border-r border-morandi-gold/30">
         <Input
           type="number"
           placeholder="0"
@@ -105,7 +105,7 @@ export function AddRow({
       </td>
       {!hideKKDAYColumns && (
         <>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-amber-200/60">
+          <td className="px-3 py-2 bg-status-warning-bg border-r border-morandi-gold/30">
             <Input
               type="number"
               placeholder="0"
@@ -114,7 +114,7 @@ export function AddRow({
               className="h-8 text-sm"
             />
           </td>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-amber-200/60">
+          <td className="px-3 py-2 bg-status-warning-bg border-r border-morandi-gold/30">
             <Input
               type="number"
               placeholder="0"
@@ -123,7 +123,7 @@ export function AddRow({
               className="h-8 text-sm"
             />
           </td>
-          <td className="px-3 py-2 bg-amber-50/30 border-r border-border/40">
+          <td className="px-3 py-2 bg-status-warning-bg border-r border-border/40">
             <Input
               type="number"
               placeholder="0"

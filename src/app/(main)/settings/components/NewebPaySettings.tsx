@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Json } from '@/lib/supabase/types'
 
 interface NewebPayConfig {
@@ -55,7 +56,7 @@ export function NewebPaySettings() {
         setConfig(data.settings as unknown as NewebPayConfig)
       }
     } catch (error) {
-      console.error('載入設定失敗:', error)
+      logger.error('載入設定失敗:', error)
       setMessage({ type: 'error', text: '載入設定失敗' })
     } finally {
       setLoading(false)
@@ -83,7 +84,7 @@ export function NewebPaySettings() {
       setMessage({ type: 'success', text: '設定已儲存' })
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
-      console.error('儲存設定失敗:', error)
+      logger.error('儲存設定失敗:', error)
       setMessage({ type: 'error', text: '儲存設定失敗' })
     } finally {
       setSaving(false)
@@ -205,7 +206,7 @@ export function NewebPaySettings() {
           {message && (
             <div
               className={`flex items-center gap-2 text-sm ${
-                message.type === 'success' ? 'text-green-600' : 'text-red-600'
+                message.type === 'success' ? 'text-status-success' : 'text-status-danger'
               }`}
             >
               {message.type === 'success' ? (
@@ -225,9 +226,9 @@ export function NewebPaySettings() {
       </div>
 
       {/* 說明 */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">設定說明</h4>
-        <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+      <div className="mt-6 p-4 bg-status-info-bg rounded-lg border border-status-info/30">
+        <h4 className="text-sm font-medium text-morandi-primary mb-2">設定說明</h4>
+        <ul className="text-xs text-morandi-secondary space-y-1 list-disc list-inside">
           <li>請先在藍新金流申請「旅行業代收轉付電子收據」服務</li>
           <li>HashKey 和 HashIV 是加密用金鑰，請妥善保管</li>
           <li>測試環境可使用測試商店代號進行開發測試</li>

@@ -107,7 +107,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
               <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇國家" />
@@ -125,7 +125,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">城市</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">城市</label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇城市" />
@@ -147,7 +147,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">標題</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">標題</label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
@@ -156,17 +156,17 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <label className="block text-xs font-medium text-morandi-secondary mb-1">副標題 (詩意文案，用換行分隔)</label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
               placeholder="第一行文案&#10;第二行文案"
-              className="w-full text-sm border border-gray-300 rounded-md p-2 min-h-[60px]"
+              className="w-full text-sm border border-border rounded-md p-2 min-h-[60px]"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">價格 (不含NT$和起)</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格 (不含NT$和起)</label>
               <InputIME
                 value={data.price}
                 onChange={value => updateField('price', value)}
@@ -175,7 +175,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">價格備註</label>
+              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格備註</label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}
@@ -212,7 +212,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
         </div>
         <div className="space-y-3">
           {data.dailySchedule.map((day, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-[#F89520]">{day.day}</span>
                 <Button
@@ -224,7 +224,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   }}
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="h-6 px-2 text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
                 >
                   <Trash2 size={12} />
                 </Button>
@@ -295,8 +295,8 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
         </h3>
         <div className="space-y-4 text-xs">
           {data.flightOptions.map((option, idx) => (
-            <div key={idx} className="bg-orange-50 p-3 rounded border border-orange-200">
-              <div className="font-semibold text-gray-700 mb-2">{option.airline}</div>
+            <div key={idx} className="bg-status-warning-bg p-3 rounded border border-status-warning/30">
+              <div className="font-semibold text-morandi-primary mb-2">{option.airline}</div>
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-1">
                   <InputIME
@@ -388,7 +388,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
         </div>
         <div className="space-y-3">
           {data.highlightSpots.map((spot, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-start justify-between mb-2">
                 <InputIME
                   value={spot.name}
@@ -409,7 +409,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   }}
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-red-600"
+                  className="h-6 px-2 text-status-danger"
                 >
                   <Trash2 size={12} />
                 </Button>
@@ -432,7 +432,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   updateField('highlightSpots', newSpots)
                 }}
                 placeholder="景點描述"
-                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[50px]"
+                className="w-full text-xs border border-border rounded-md p-2 min-h-[50px]"
               />
             </div>
           ))}
@@ -459,7 +459,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
         </div>
         <div className="space-y-3">
           {data.sights.map((sight, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+            <div key={idx} className="bg-muted p-3 rounded border border-border">
               <div className="flex items-start justify-between mb-2">
                 <InputIME
                   value={sight.name}
@@ -480,7 +480,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   }}
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-2 text-red-600"
+                  className="h-6 px-2 text-status-danger"
                 >
                   <Trash2 size={12} />
                 </Button>
@@ -503,7 +503,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
                   updateField('sights', newSights)
                 }}
                 placeholder="詳細描述"
-                className="w-full text-xs border border-gray-300 rounded-md p-2 min-h-[60px]"
+                className="w-full text-xs border border-border rounded-md p-2 min-h-[60px]"
               />
             </div>
           ))}

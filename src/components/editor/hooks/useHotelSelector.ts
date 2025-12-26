@@ -218,7 +218,7 @@ export function useHotelSelector({ isOpen, tourCountryName }: UseHotelSelectorPr
 
         if (error) throw error
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const formatted = (data || []).map((item: any): LuxuryHotel => ({
           id: item.id,
           name: item.name,

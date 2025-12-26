@@ -102,7 +102,7 @@ export function DevToolsSettings() {
               className="ml-4"
             >
               {copiedEnv ? (
-                <span className="flex items-center gap-1 text-green-600">
+                <span className="flex items-center gap-1 text-status-success">
                   <Check className="h-4 w-4" />
                   已複製！
                 </span>
@@ -132,7 +132,7 @@ export function DevToolsSettings() {
               className="ml-4"
             >
               {copiedVercel ? (
-                <span className="flex items-center gap-1 text-green-600">
+                <span className="flex items-center gap-1 text-status-success">
                   <Check className="h-4 w-4" />
                   已複製！
                 </span>
@@ -149,25 +149,25 @@ export function DevToolsSettings() {
         {/* 展開顯示完整內容 */}
         {expanded && (
           <div className="space-y-4 mt-4">
-            <div className="p-4 bg-gray-900 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-300 mb-2">
+            <div className="p-4 bg-foreground rounded-lg">
+              <h4 className="text-sm font-medium text-morandi-muted mb-2">
                 .env.local 完整內容預覽：
               </h4>
-              <pre className="text-xs text-green-400 overflow-x-auto whitespace-pre-wrap">
+              <pre className="text-xs text-status-success overflow-x-auto whitespace-pre-wrap">
                 {ENV_SETUP_PROMPT}
               </pre>
             </div>
 
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+            <div className="p-4 bg-status-info-bg dark:bg-status-info/10 rounded-lg">
+              <h4 className="text-sm font-medium text-morandi-primary dark:text-morandi-muted mb-2">
                 使用方式：
               </h4>
-              <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside">
+              <ol className="text-sm text-morandi-secondary dark:text-morandi-muted space-y-1 list-decimal list-inside">
                 <li>點擊「複製指令」按鈕</li>
                 <li>開啟 Claude Code 終端機</li>
                 <li>貼上複製的內容</li>
                 <li>Claude Code 會自動建立 .env.local 檔案</li>
-                <li>重啟開發伺服器：<code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">npm run dev</code></li>
+                <li>重啟開發伺服器：<code className="bg-morandi-container dark:bg-morandi-container/30 px-1 rounded">npm run dev</code></li>
               </ol>
             </div>
           </div>

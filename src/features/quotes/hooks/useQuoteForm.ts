@@ -128,7 +128,7 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
         ...formData,
         quote_type: 'standard', // 團體報價單類型
         group_size: groupSize,
-        ...(selectedTourId && { tour_id: selectedTourId }),
+        tour_id: selectedTourId || undefined, // Use undefined instead of null
         ...(quoteCode && { code: quoteCode }),
         accommodation_days: accommodationDays,
         categories: categories,
@@ -144,7 +144,7 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
           single_room: 0,
           infant: 0,
         },
-      } as any)
+      })
 
       // 重置表單
       resetForm()

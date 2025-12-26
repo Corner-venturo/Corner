@@ -166,7 +166,7 @@ export function PricingDetailsSection({
       </h2>
 
       {/* 顯示開關 */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
         <div className="flex items-center gap-3">
           <DollarSign className="h-5 w-5 text-morandi-primary" />
           <div>
@@ -262,7 +262,7 @@ export function PricingDetailsSection({
                       'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors',
                       item.included
                         ? 'bg-emerald-100 text-emerald-600'
-                        : 'bg-gray-100 text-gray-400'
+                        : 'bg-muted text-morandi-muted'
                     )}
                   >
                     {item.included ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
@@ -278,7 +278,7 @@ export function PricingDetailsSection({
                     variant="ghost"
                     size="sm"
                     onClick={() => removeIncludedItem(index)}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                    className="h-8 w-8 p-0 text-morandi-muted hover:text-status-danger"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -291,7 +291,7 @@ export function PricingDetailsSection({
           <div className="p-4 border border-morandi-container rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <X className="h-4 w-4 text-red-500" />
+                <X className="h-4 w-4 text-status-danger" />
                 <Label className="font-medium">費用不含</Label>
               </div>
               <Button
@@ -315,7 +315,7 @@ export function PricingDetailsSection({
                       'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors',
                       item.included
                         ? 'bg-emerald-100 text-emerald-600'
-                        : 'bg-red-50 text-red-400'
+                        : 'bg-status-danger-bg text-morandi-red'
                     )}
                   >
                     {item.included ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
@@ -331,7 +331,7 @@ export function PricingDetailsSection({
                     variant="ghost"
                     size="sm"
                     onClick={() => removeExcludedItem(index)}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                    className="h-8 w-8 p-0 text-morandi-muted hover:text-status-danger"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -344,7 +344,7 @@ export function PricingDetailsSection({
           <div className="p-4 border border-morandi-container rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                <AlertTriangle className="h-4 w-4 text-status-warning" />
                 <Label className="font-medium">注意事項</Label>
               </div>
               <Button
@@ -376,7 +376,7 @@ export function PricingDetailsSection({
                     variant="ghost"
                     size="sm"
                     onClick={() => removeNote(index)}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 mt-1"
+                    className="h-8 w-8 p-0 text-morandi-muted hover:text-status-danger mt-1"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

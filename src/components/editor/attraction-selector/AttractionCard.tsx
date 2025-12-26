@@ -38,11 +38,11 @@ export function AttractionCard({
         relative flex gap-3 p-2.5 rounded-xl transition-all
         border hover:shadow-sm
         ${isExisting
-          ? 'border-slate-200 bg-slate-50 opacity-60'
+          ? 'border-border bg-muted opacity-60'
           : isSelected
             ? 'border-morandi-gold bg-morandi-gold/5'
             : isSuggested
-              ? 'border-amber-300 bg-amber-50/50'
+              ? 'border-morandi-gold/30 bg-morandi-gold/10'
               : 'border-transparent bg-morandi-container/20 hover:bg-morandi-container/30'
         }
       `}
@@ -54,7 +54,7 @@ export function AttractionCard({
           checked={isSelected || isExisting}
           onChange={() => !isExisting && onToggleSelection(attraction.id)}
           disabled={isExisting}
-          className={`w-4 h-4 rounded border-gray-300 focus:ring-morandi-gold ${isExisting ? 'text-slate-400' : 'text-morandi-gold'}`}
+          className={`w-4 h-4 rounded border-border focus:ring-morandi-gold ${isExisting ? 'text-morandi-secondary' : 'text-morandi-gold'}`}
         />
       </label>
 
@@ -77,11 +77,11 @@ export function AttractionCard({
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <div className="font-medium text-morandi-primary text-sm leading-tight line-clamp-1 flex items-center gap-1">
           {isSuggested && (
-            <Sparkles size={12} className="text-amber-500 flex-shrink-0" />
+            <Sparkles size={12} className="text-morandi-gold flex-shrink-0" />
           )}
           {attraction.name}
           {isExisting && (
-            <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-slate-200 text-slate-500 rounded">
+            <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-morandi-container text-morandi-secondary rounded">
               已選
             </span>
           )}
@@ -105,7 +105,7 @@ export function AttractionCard({
           variant="ghost"
           size="sm"
           onClick={() => onViewOnMap(attraction)}
-          className={`h-8 px-2 rounded-lg ${selectedMapAttractionId === attraction.id ? 'bg-blue-100 text-blue-600' : ''}`}
+          className={`h-8 px-2 rounded-lg ${selectedMapAttractionId === attraction.id ? 'bg-status-info-bg text-status-info' : ''}`}
           title="查看附近景點"
         >
           <Map size={16} />

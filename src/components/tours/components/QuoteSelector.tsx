@@ -29,7 +29,7 @@ const formatQuoteStatus = (status: string | null) => {
     pending: { label: '待審核', color: 'text-morandi-gold' },
     approved: { label: '已核准', color: 'text-morandi-green' },
     rejected: { label: '已拒絕', color: 'text-morandi-red' },
-    sent: { label: '已發送', color: 'text-blue-500' },
+    sent: { label: '已發送', color: 'text-status-info' },
     confirmed: { label: '已確認', color: 'text-morandi-green' },
   }
   return statusMap[status || 'draft'] || { label: status || '未知', color: 'text-morandi-secondary' }

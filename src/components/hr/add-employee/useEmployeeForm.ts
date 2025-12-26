@@ -73,7 +73,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         chinese_name: formData.chinese_name,
         password_hash: hashedPassword,
         workspace_id: targetWorkspaceId,
-        roles: formData.roles,
+        roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],
         personal_info: {
           national_id: formData.personal_info.national_id,
           birthday: formData.personal_info.birthday,
@@ -100,11 +100,16 @@ export function useEmployeeForm(onSubmit: () => void) {
             },
           ],
         },
+        attendance: {
+          leave_records: [],
+          overtime_records: [],
+        },
+        contracts: [],
         permissions: ['settings'],
-        status: 'active',
+        status: 'active' as const,
       }
 
-      const newEmployee = await addUser(dbEmployeeData as any)
+      const newEmployee = await addUser(dbEmployeeData)
 
       // 建立 Supabase Auth 帳號（用於 RLS）
       try {

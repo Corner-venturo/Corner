@@ -8,7 +8,7 @@ interface PreviewContainerProps {
 
 export function PreviewContainer({ formData }: PreviewContainerProps) {
   return (
-    <div className="w-1/2 bg-gray-100 flex flex-col">
+    <div className="w-1/2 bg-muted flex flex-col">
       {/* 標題列 */}
       <div className="h-14 bg-white border-b px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">

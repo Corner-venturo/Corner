@@ -73,7 +73,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
   // 載入顧客資料 (僅執行一次)
   useEffect(() => {
     fetchCustomers()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [])
 
   // 初始化表格成員

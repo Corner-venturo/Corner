@@ -112,7 +112,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       type: transactionType,
       color: transactionType === 'expense' ? '#C89B9B' : '#7B9B7E',
       is_system: false,
-    } as any)
+    })
 
     if (newCategory) {
       setSelectedCategory(newCategory.id)

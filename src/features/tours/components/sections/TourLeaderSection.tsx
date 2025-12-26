@@ -103,7 +103,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             <div className={viewMode === 'mobile' ? 'space-y-3' : 'space-y-4'}>
               <div>
                 <p className="text-xs text-morandi-secondary mb-1">集合時間</p>
-                <p className={viewMode === 'mobile' ? 'text-lg font-semibold text-blue-600' : 'text-xl font-semibold text-blue-600'}>
+                <p className={viewMode === 'mobile' ? 'text-lg font-semibold text-status-info' : 'text-xl font-semibold text-status-info'}>
                   {data.meetingInfo?.time || '待定'}
                 </p>
               </div>

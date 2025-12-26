@@ -104,16 +104,16 @@ export function LinkTourDialog({
               {/* 關聯現有旅遊團 */}
               <button
                 onClick={() => setStep('tour-list')}
-                className="w-full flex items-center gap-4 p-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-white hover:bg-muted hover:border-border transition-colors text-left"
               >
-                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                  <Link className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-status-info-bg flex items-center justify-center shrink-0">
+                  <Link className="w-5 h-5 text-status-info" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-[var(--morandi-text)] flex items-center gap-2">
                     關聯現有旅遊團
                     {availableTours.length > 0 && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                      <span className="text-xs bg-status-info-bg text-status-info px-1.5 py-0.5 rounded">
                         {availableTours.length}
                       </span>
                     )}
@@ -129,7 +129,7 @@ export function LinkTourDialog({
               <DialogTitle className="flex items-center gap-2">
                 <button
                   onClick={() => setStep('select')}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  className="p-1 hover:bg-muted rounded transition-colors"
                 >
                   <Plane className="w-4 h-4" />
                 </button>
@@ -152,7 +152,7 @@ export function LinkTourDialog({
                     <button
                       key={tour.id}
                       onClick={() => handleLinkExisting(tour as Tour)}
-                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors text-left"
+                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-white hover:bg-muted hover:border-morandi-gold transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded bg-[var(--morandi-gold)]/20 flex items-center justify-center shrink-0">
                         <Plane className="w-4 h-4 text-[var(--morandi-gold)]" />
@@ -178,7 +178,7 @@ export function LinkTourDialog({
                             </span>
                           )}
                           {tour.status && (
-                            <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
+                            <span className="px-1.5 py-0.5 rounded bg-muted text-morandi-secondary">
                               {tour.status}
                             </span>
                           )}

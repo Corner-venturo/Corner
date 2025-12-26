@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { BedDouble, UserMinus, Pencil, Trash2, X, Check, Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -10,8 +10,6 @@ import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { calculateRoomNumbers, getRoomDisplayName, getRoomTypeKey } from '../hooks/room-utils'
-
-const supabase = supabaseClient as any
 
 interface OrderMember {
   id: string

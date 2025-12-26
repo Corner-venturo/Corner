@@ -6,6 +6,7 @@ import { FitnessLayout } from '../components/FitnessLayout'
 import { useAuthStore } from '@/stores/auth-store'
 import { localDB } from '@/lib/db'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 export default function FitnessSettingsPage() {
   const router = useRouter()
@@ -45,7 +46,7 @@ export default function FitnessSettingsPage() {
         await alert('本地資料已清除', 'success')
         router.push('/fitness')
       } catch (error) {
-        console.error('清除資料失敗:', error)
+        logger.error('清除資料失敗:', error)
         await alert('清除資料失敗，請稍後再試', 'error')
       }
     }

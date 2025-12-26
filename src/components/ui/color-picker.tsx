@@ -38,8 +38,8 @@ export default function ColorPicker({ value, onChange, className = '' }: ColorPi
             onClick={() => onChange(color.value)}
             className={`w-12 h-12 rounded-lg transition-transform hover:scale-105 ${
               color.value === value
-                ? 'ring-2 ring-gray-600 ring-offset-2'
-                : 'border border-gray-200'
+                ? 'ring-2 ring-morandi-primary ring-offset-2'
+                : 'border border-border'
             }`}
             style={{ backgroundColor: color.value }}
             title={color.name}

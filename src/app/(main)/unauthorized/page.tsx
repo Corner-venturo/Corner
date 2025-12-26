@@ -11,8 +11,8 @@ export default function UnauthorizedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-morandi-background p-4">
       <Card className="w-full max-w-md p-8 text-center space-y-6">
-        <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-          <ShieldX size={40} className="text-red-600" />
+        <div className="mx-auto w-20 h-20 bg-status-danger-bg rounded-full flex items-center justify-center">
+          <ShieldX size={40} className="text-status-danger" />
         </div>
 
         <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
 import type { Tour as TourType } from '@/types/tour.types'
@@ -8,6 +8,7 @@ import { useQuoteState } from '@/features/quotes/hooks/useQuoteState'
 import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperations'
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
+import { useSyncOperations } from './hooks/useSyncOperations'
 import { useItineraryStore } from '@/stores'
 import { toast } from 'sonner'
 import {
@@ -77,6 +78,18 @@ export default function QuoteDetailPage() {
   // Itinerary store for sync
   const { items: itineraries, update: updateItinerary } = useItineraryStore()
 
+  // Sync operations hook
+  const syncOps = useSyncOperations({
+    quote: quote ?? null,
+    categories,
+    accommodationDays,
+    setCategories,
+    setAccommodationDays,
+    itineraries,
+    updateItinerary: updateItinerary as unknown as (id: string, data: Partial<Itinerary>) => Promise<void>,
+    router,
+  })
+
   // Category operations hook
   const categoryOps = useCategoryOperations({
     categories,
@@ -132,168 +145,10 @@ export default function QuoteDetailPage() {
     quote?.quote_type === 'quick' ? 'quick' : 'standard'
   )
 
-  // 建立行程表
-  const handleCreateItinerary = useCallback(() => {
-    if (!quote) return
-
-    // 從報價單分類中提取資料
-    const extractMeals = () => {
-      const mealsCategory = categories.find(cat => cat.id === 'meals')
-      if (!mealsCategory || mealsCategory.items.length === 0) return []
-
-      return mealsCategory.items.map(item => {
-        // 解析名稱格式：「Day 1 午餐 - 餐廳名稱」
-        const nameMatch = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*-?\s*(.*)/)
-        if (nameMatch) {
-          return {
-            day: parseInt(nameMatch[1]),
-            type: nameMatch[2],
-            name: nameMatch[3].trim() || item.description || '',
-            note: item.notes || '',
-          }
-        }
-        return {
-          day: 1,
-          type: '午餐',
-          name: item.name || item.description || '',
-          note: item.notes || '',
-        }
-      })
-    }
-
-    const extractHotels = () => {
-      const accommodationCategory = categories.find(cat => cat.id === 'accommodation')
-      if (!accommodationCategory || accommodationCategory.items.length === 0) return []
-
-      return accommodationCategory.items.map(item => {
-        const nameMatch = item.name.match(/Day\s*(\d+)(?:-\d+)?\s*住宿/)
-        return {
-          day: nameMatch ? parseInt(nameMatch[1]) : 1,
-          name: item.description || item.name.replace(/Day\s*\d+(?:-\d+)?\s*住宿\s*-?\s*/, '').trim(),
-          note: item.notes || '',
-        }
-      })
-    }
-
-    const extractActivities = () => {
-      const activitiesCategory = categories.find(cat => cat.id === 'activities')
-      if (!activitiesCategory || activitiesCategory.items.length === 0) return []
-
-      return activitiesCategory.items.map(item => {
-        const nameMatch = item.name.match(/Day\s*(\d+)\s*-?\s*(.*)/)
-        if (nameMatch) {
-          return {
-            day: parseInt(nameMatch[1]),
-            title: nameMatch[2].trim(),
-            description: item.description || item.notes || '',
-          }
-        }
-        return {
-          day: 1,
-          title: item.name,
-          description: item.description || item.notes || '',
-        }
-      })
-    }
-
-    const meals = extractMeals()
-    const hotels = extractHotels()
-    const activities = extractActivities()
-    const days = accommodationDays > 0 ? accommodationDays + 1 : 5
-
-    // 建立 URL 參數
-    const params = new URLSearchParams()
-    params.set('from_quote', 'true')
-    params.set('quote_id', quote.id)
-    params.set('quote_name', quote.name || '')
-    params.set('days', days.toString())
-
-    if (meals.length > 0) {
-      params.set('meals', JSON.stringify(meals))
-    }
-    if (hotels.length > 0) {
-      params.set('hotels', JSON.stringify(hotels))
-    }
-    if (activities.length > 0) {
-      params.set('activities', JSON.stringify(activities))
-    }
-
-    router.push(`/itinerary/new?${params.toString()}`)
-  }, [quote, categories, accommodationDays, router])
-
   // 同步到行程表 - 狀態
   const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false)
   const [syncDiffs, setSyncDiffs] = React.useState<MealDiff[]>([])
   const [syncItineraryTitle, setSyncItineraryTitle] = React.useState<string>('')
-
-  // 計算同步差異
-  const calculateSyncDiffs = useCallback(() => {
-    if (!quote?.itinerary_id) return null
-
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary) return null
-
-    const mealsCategory = categories.find(cat => cat.id === 'meals')
-    if (!mealsCategory || mealsCategory.items.length === 0) return null
-
-    // 解析報價單餐飲
-    type MealType = 'lunch' | 'dinner'
-    const mealUpdates: Record<number, Record<MealType, { name: string; isSelfArranged: boolean }>> = {}
-
-    mealsCategory.items.forEach(item => {
-      const match = item.name.match(/Day\s*(\d+)\s*(午餐|晚餐)\s*-?\s*(.*)/)
-      if (match) {
-        const day = parseInt(match[1])
-        const type = match[2] === '午餐' ? 'lunch' : 'dinner'
-        const name = match[3].trim()
-        const isSelfArranged = item.is_self_arranged || false
-
-        if (!mealUpdates[day]) {
-          mealUpdates[day] = {} as Record<MealType, { name: string; isSelfArranged: boolean }>
-        }
-        mealUpdates[day][type] = { name, isSelfArranged }
-      }
-    })
-
-    // 比對差異
-    const diffs: MealDiff[] = []
-
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      const updates = mealUpdates[dayNumber]
-      if (!updates) return
-
-      if (updates.lunch) {
-        const newValue = updates.lunch.isSelfArranged ? '自理' : (updates.lunch.name || '')
-        const oldValue = day.meals.lunch || ''
-        if (newValue && newValue !== oldValue) {
-          diffs.push({
-            day: dayNumber,
-            type: 'lunch',
-            typeLabel: '午餐',
-            oldValue,
-            newValue,
-          })
-        }
-      }
-
-      if (updates.dinner) {
-        const newValue = updates.dinner.isSelfArranged ? '自理' : (updates.dinner.name || '')
-        const oldValue = day.meals.dinner || ''
-        if (newValue && newValue !== oldValue) {
-          diffs.push({
-            day: dayNumber,
-            type: 'dinner',
-            typeLabel: '晚餐',
-            oldValue,
-            newValue,
-          })
-        }
-      }
-    })
-
-    return { itinerary, diffs }
-  }, [quote, categories, itineraries])
 
   // 開啟同步對話框
   const handleSyncToItinerary = useCallback(() => {
@@ -302,7 +157,7 @@ export default function QuoteDetailPage() {
       return
     }
 
-    const result = calculateSyncDiffs()
+    const result = syncOps.calculateSyncDiffs()
     if (!result) {
       toast.error('找不到連結的行程表')
       return
@@ -316,135 +171,12 @@ export default function QuoteDetailPage() {
     setSyncDiffs(result.diffs)
     setSyncItineraryTitle(result.itinerary.title || result.itinerary.tagline || '')
     setIsSyncDialogOpen(true)
-  }, [quote, calculateSyncDiffs])
+  }, [quote, syncOps])
 
   // 確認同步
   const handleConfirmSync = useCallback(() => {
-    if (!quote?.itinerary_id) return
-
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary) return
-
-    // 套用差異
-    const updatedDailyItinerary = itinerary.daily_itinerary.map((day, index) => {
-      const dayNumber = index + 1
-      const dayDiffs = syncDiffs.filter(d => d.day === dayNumber)
-      if (dayDiffs.length === 0) return day
-
-      const newMeals = { ...day.meals }
-      dayDiffs.forEach(diff => {
-        if (diff.type === 'lunch') {
-          newMeals.lunch = diff.newValue
-        } else if (diff.type === 'dinner') {
-          newMeals.dinner = diff.newValue
-        }
-      })
-
-      return { ...day, meals: newMeals }
-    })
-
-    // 儲存更新
-    updateItinerary(itinerary.id, {
-      daily_itinerary: updatedDailyItinerary,
-    })
-
-    toast.success('已同步餐飲資料到行程表')
-  }, [quote, itineraries, syncDiffs, updateItinerary])
-
-  // 從行程表同步住宿名稱（行程表 → 報價單）
-  const handleSyncAccommodationFromItinerary = useCallback(() => {
-    if (!quote?.itinerary_id) {
-      toast.error('此報價單沒有連結行程表')
-      return
-    }
-
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) {
-      toast.error('找不到連結的行程表')
-      return
-    }
-
-    // 從行程表取得住宿資料
-    const itineraryHotels: Array<{ day: number; name: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      // 住宿在 accommodation 欄位
-      const hotelName = day.accommodation || ''
-      if (hotelName) {
-        itineraryHotels.push({ day: dayNumber, name: hotelName })
-      }
-    })
-
-    if (itineraryHotels.length === 0) {
-      toast.info('行程表沒有住宿資料')
-      return
-    }
-
-    // 更新報價單的住宿項目
-    setCategories(prev => {
-      const newCategories = [...prev]
-      const accommodationCategory = newCategories.find(cat => cat.id === 'accommodation')
-      if (!accommodationCategory) return prev
-
-      // 找出需要的最大天數
-      const maxDay = Math.max(...itineraryHotels.map(h => h.day), accommodationDays)
-
-      // 建立天數對應的住宿 map
-      const existingByDay: Record<number, typeof accommodationCategory.items[0]> = {}
-      accommodationCategory.items.forEach(item => {
-        if (item.day) {
-          existingByDay[item.day] = item
-        }
-      })
-
-      // 更新或新增住宿項目
-      const updatedItems: typeof accommodationCategory.items = []
-      let hasChanges = false
-
-      for (let day = 1; day <= maxDay; day++) {
-        const itineraryHotel = itineraryHotels.find(h => h.day === day)
-        const existingItem = existingByDay[day]
-
-        if (existingItem) {
-          // 已有此天的住宿項目
-          if (itineraryHotel && existingItem.name !== itineraryHotel.name) {
-            // 行程有飯店名稱且與現有不同 → 更新
-            updatedItems.push({ ...existingItem, name: itineraryHotel.name })
-            hasChanges = true
-          } else {
-            // 保持不變
-            updatedItems.push(existingItem)
-          }
-        } else if (itineraryHotel) {
-          // 沒有此天的住宿項目，但行程有飯店 → 新增
-          updatedItems.push({
-            id: `accommodation-day${day}-${Date.now()}`,
-            name: itineraryHotel.name,
-            quantity: 0,
-            unit_price: 0,
-            total: 0,
-            note: '',
-            day: day,
-            room_type: '',
-          })
-          hasChanges = true
-        }
-      }
-
-      if (!hasChanges) {
-        toast.info('住宿名稱已是最新')
-        return prev
-      }
-
-      accommodationCategory.items = updatedItems
-      // 更新天數
-      if (maxDay > accommodationDays) {
-        setAccommodationDays(maxDay)
-      }
-      toast.success(`已從行程表同步 ${itineraryHotels.length} 天住宿`)
-      return newCategories
-    })
-  }, [quote, itineraries, categories, accommodationDays, setCategories, setAccommodationDays])
+    syncOps.handleConfirmSync(syncDiffs)
+  }, [syncOps, syncDiffs])
 
   // 載入特定版本
   const handleLoadVersion = useCallback(
@@ -534,49 +266,6 @@ export default function QuoteDetailPage() {
     useTourStore.getState().update(tour.id, { quote_id: quote.id })
     toast.success(`已關聯旅遊團：${tour.code}`)
   }, [quote, updateQuote])
-
-  // 取得行程表的餐飲和景點資料
-  const itineraryMealsData = useMemo(() => {
-    if (!quote?.itinerary_id) return []
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) return []
-
-    const meals: Array<{ day: number; type: '早餐' | '午餐' | '晚餐'; name: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      if (day.meals?.breakfast && !day.meals.breakfast.includes('自理')) {
-        meals.push({ day: dayNumber, type: '早餐', name: day.meals.breakfast })
-      }
-      if (day.meals?.lunch && !day.meals.lunch.includes('自理')) {
-        meals.push({ day: dayNumber, type: '午餐', name: day.meals.lunch })
-      }
-      if (day.meals?.dinner && !day.meals.dinner.includes('自理')) {
-        meals.push({ day: dayNumber, type: '晚餐', name: day.meals.dinner })
-      }
-    })
-    return meals
-  }, [quote, itineraries])
-
-  const itineraryActivitiesData = useMemo(() => {
-    if (!quote?.itinerary_id) return []
-    const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
-    if (!itinerary?.daily_itinerary) return []
-
-    const activities: Array<{ day: number; title: string; description?: string }> = []
-    itinerary.daily_itinerary.forEach((day, index) => {
-      const dayNumber = index + 1
-      if (day.activities) {
-        day.activities.forEach((activity: { title: string; description?: string }) => {
-          activities.push({
-            day: dayNumber,
-            title: activity.title,
-            description: activity.description,
-          })
-        })
-      }
-    })
-    return activities
-  }, [quote, itineraries])
 
   // 處理匯入餐飲
   const handleImportMeals = React.useCallback((items: CostItem[]) => {
@@ -769,7 +458,7 @@ export default function QuoteDetailPage() {
         handleGenerateQuotation={handleGenerateQuotation}
         handleDeleteVersion={handleDeleteVersion}
         handleSyncToItinerary={handleSyncToItinerary}
-        handleSyncAccommodationFromItinerary={handleSyncAccommodationFromItinerary}
+        handleSyncAccommodationFromItinerary={syncOps.handleSyncAccommodationFromItinerary}
         onSwitchToQuickQuote={() => setViewMode('quick')}
         onStatusChange={handleStatusChange}
         currentEditingVersion={currentEditingVersion}
@@ -917,7 +606,7 @@ export default function QuoteDetailPage() {
       <ImportMealsDialog
         isOpen={showImportMealsDialog}
         onClose={() => setShowImportMealsDialog(false)}
-        meals={itineraryMealsData}
+        meals={syncOps.itineraryMealsData}
         onImport={handleImportMeals}
       />
 
@@ -925,7 +614,7 @@ export default function QuoteDetailPage() {
       <ImportActivitiesDialog
         isOpen={showImportActivitiesDialog}
         onClose={() => setShowImportActivitiesDialog(false)}
-        activities={itineraryActivitiesData}
+        activities={syncOps.itineraryActivitiesData}
         onImport={handleImportActivities}
       />
     </div>

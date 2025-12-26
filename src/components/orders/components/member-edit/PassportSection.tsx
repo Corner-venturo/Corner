@@ -75,29 +75,29 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.zoomOut()}
-              className="p-1.5 hover:bg-gray-100 rounded-md"
+              className="p-1.5 hover:bg-muted rounded-md"
               title="縮小"
             >
-              <ZoomOut size={16} className="text-gray-600" />
+              <ZoomOut size={16} className="text-morandi-secondary" />
             </button>
-            <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+            <span className="text-xs text-morandi-secondary min-w-[3rem] text-center">
               {Math.round(imageEditor.zoom * 100)}%
             </span>
             <button
               type="button"
               onClick={() => imageEditor.zoomIn()}
-              className="p-1.5 hover:bg-gray-100 rounded-md"
+              className="p-1.5 hover:bg-muted rounded-md"
               title="放大"
             >
-              <ZoomIn size={16} className="text-gray-600" />
+              <ZoomIn size={16} className="text-morandi-secondary" />
             </button>
             <button
               type="button"
               onClick={() => imageEditor.reset()}
-              className="p-1.5 hover:bg-gray-100 rounded-md ml-1"
+              className="p-1.5 hover:bg-muted rounded-md ml-1"
               title="重置檢視"
             >
-              <X size={16} className="text-gray-600" />
+              <X size={16} className="text-morandi-secondary" />
             </button>
           </div>
         )}
@@ -105,42 +105,42 @@ export function PassportSection({
 
       {/* 工具列 */}
       {editingMember?.passport_image_url && !imageEditor.isCropMode && (
-        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+        <div className="flex items-center justify-between bg-muted rounded-lg p-2">
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => imageEditor.rotateLeft()}
               className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
             >
-              <RotateCcw size={16} className="text-blue-600" />
-              <span className="text-gray-600 hidden sm:inline">左轉</span>
+              <RotateCcw size={16} className="text-morandi-gold" />
+              <span className="text-morandi-secondary hidden sm:inline">左轉</span>
             </button>
             <button
               type="button"
               onClick={() => imageEditor.rotateRight()}
               className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
             >
-              <RotateCw size={16} className="text-blue-600" />
-              <span className="text-gray-600 hidden sm:inline">右轉</span>
+              <RotateCw size={16} className="text-morandi-gold" />
+              <span className="text-morandi-secondary hidden sm:inline">右轉</span>
             </button>
             <button
               type="button"
               onClick={() => imageEditor.toggleFlipH()}
               className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${
-                imageEditor.flipH ? 'bg-blue-100' : ''
+                imageEditor.flipH ? 'bg-status-info-bg' : ''
               }`}
             >
-              <FlipHorizontal size={16} className="text-blue-600" />
-              <span className="text-gray-600 hidden sm:inline">翻轉</span>
+              <FlipHorizontal size={16} className="text-morandi-gold" />
+              <span className="text-morandi-secondary hidden sm:inline">翻轉</span>
             </button>
-            <div className="w-px h-6 bg-gray-300 mx-1" />
+            <div className="w-px h-6 bg-border mx-1" />
             <button
               type="button"
               onClick={() => imageEditor.startCrop()}
               className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
             >
               <Crop size={16} className="text-purple-600" />
-              <span className="text-gray-600 hidden sm:inline">裁剪</span>
+              <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
             </button>
           </div>
           <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export function PassportSection({
                 type="button"
                 onClick={onSaveTransform}
                 disabled={imageEditor.isSaving}
-                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
+                className="p-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md flex items-center gap-1 text-xs disabled:opacity-50"
               >
                 <Save size={16} />
                 <span>{imageEditor.isSaving ? '儲存中...' : '儲存圖片'}</span>
@@ -171,12 +171,12 @@ export function PassportSection({
       {/* 裁剪模式工具列 */}
       {editingMember?.passport_image_url && imageEditor.isCropMode && (
         <div className="flex items-center justify-between bg-purple-50 rounded-lg p-2">
-          <span className="text-xs text-purple-700">拖曳框選要保留的區域</span>
+          <span className="text-xs text-purple-600">拖曳框選要保留的區域</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => imageEditor.cancelCrop()}
-              className="px-3 py-1 text-xs text-gray-600 hover:bg-white rounded-md"
+              className="px-3 py-1 text-xs text-morandi-secondary hover:bg-white rounded-md"
             >
               取消
             </button>
@@ -184,7 +184,7 @@ export function PassportSection({
               type="button"
               onClick={onConfirmCrop}
               disabled={imageEditor.cropRect.width < 20 || imageEditor.isSaving}
-              className="px-3 py-1 text-xs bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+              className="px-3 py-1 text-xs bg-purple-600 text-white rounded-md hover:bg-purple-600 disabled:opacity-50"
             >
               {imageEditor.isSaving ? '處理中...' : '確認裁剪'}
             </button>
@@ -196,9 +196,9 @@ export function PassportSection({
       {editingMember?.passport_image_url ? (
         <div
           ref={imageEditor.containerRef}
-          className={`relative overflow-hidden rounded-lg border bg-gray-50 ${
+          className={`relative overflow-hidden rounded-lg border bg-muted ${
             imageEditor.isCropMode
-              ? 'border-purple-400 cursor-crosshair'
+              ? 'border-purple-600 cursor-crosshair'
               : 'cursor-grab active:cursor-grabbing'
           }`}
           style={{ height: '320px' }}
@@ -221,7 +221,7 @@ export function PassportSection({
           {/* 裁剪框 */}
           {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
             <div
-              className="absolute border-2 border-purple-500 bg-purple-500/10"
+              className="absolute border-2 border-purple-600 bg-purple-600/10"
               style={{
                 left: imageEditor.cropRect.x,
                 top: imageEditor.cropRect.y,
@@ -251,8 +251,8 @@ export function PassportSection({
 
       {/* 驗證模式提示 */}
       {editMode === 'verify' && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-          <p className="text-xs text-amber-700">
+        <div className="bg-status-warning-bg border border-morandi-gold/30 rounded-lg p-3">
+          <p className="text-xs text-morandi-gold">
             請仔細核對護照照片與右邊的資料是否一致。驗證完成後，此成員的資料將被標記為「已驗證」。
           </p>
         </div>

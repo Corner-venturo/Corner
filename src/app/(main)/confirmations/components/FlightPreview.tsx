@@ -21,7 +21,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
       </div>
 
       {/* 免責聲明 */}
-      <div className="text-center text-xs italic py-2 bg-amber-50 rounded" style={{ color: '#92400E' }}>
+      <div className="text-center text-xs italic py-2 bg-status-warning-bg rounded" style={{ color: '#92400E' }}>
         **** 此文件資訊僅供參考, 實際資訊以航空公司及相關旅遊供應商為準 ****
       </div>
 
@@ -124,7 +124,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
 
       {/* 重要資訊 */}
       {data.importantNotes && data.importantNotes.length > 0 && (
-        <div className="mt-4 p-3 bg-amber-50 rounded border border-amber-200">
+        <div className="mt-4 p-3 bg-status-warning-bg rounded border border-status-warning/30">
           <div className="font-semibold mb-2" style={{ color: '#92400E' }}>
             ⚠️ 重要資訊
           </div>

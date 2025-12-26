@@ -165,7 +165,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     <button
                       type="button"
                       onClick={() => onRemoveItem(item.id)}
-                      className="text-morandi-red hover:text-red-700"
+                      className="text-morandi-red hover:text-status-danger"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

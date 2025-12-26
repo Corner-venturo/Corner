@@ -9,6 +9,7 @@
 
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * OCR 辨識結果的通用資料結構
@@ -110,7 +111,7 @@ export function useOcrRecognition() {
         toast.error('無法辨識護照資訊，請手動輸入')
       }
     } catch (error) {
-      console.error('OCR 辨識失敗:', error)
+      logger.error('OCR 辨識失敗:', error)
       toast.error('辨識失敗，請重試')
     } finally {
       setIsRecognizing(false)

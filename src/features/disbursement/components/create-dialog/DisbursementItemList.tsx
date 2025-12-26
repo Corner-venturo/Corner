@@ -46,12 +46,12 @@ export function DisbursementItemList({
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
       pending: 'bg-morandi-gold',
-      approved: 'bg-blue-500',
+      approved: 'bg-status-info',
       confirmed: 'bg-morandi-green',
-      processing: 'bg-orange-500',
+      processing: 'bg-status-warning',
     }
     return (
-      <Badge className={cn('text-white text-xs', colors[status] || 'bg-gray-500')}>
+      <Badge className={cn('text-white text-xs', colors[status] || 'bg-morandi-muted')}>
         {(statusLabels as Record<string, string>)[status] || status}
       </Badge>
     )
@@ -153,7 +153,7 @@ export function DisbursementItemList({
                     />
                   </td>
                   <td className="py-3 px-4">
-                    <span className="font-medium text-blue-600 hover:underline">
+                    <span className="font-medium text-morandi-gold hover:underline">
                       {request.code}
                     </span>
                   </td>

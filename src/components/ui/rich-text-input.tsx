@@ -153,7 +153,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
       {/* 浮動工具列 */}
       {showToolbar && (
         <div
-          className="absolute z-50 flex items-center gap-0.5 bg-white rounded-lg shadow-lg border border-gray-200 p-1"
+          className="absolute z-50 flex items-center gap-0.5 bg-white rounded-lg shadow-lg border border-border p-1"
           style={{
             top: Math.max(toolbarPos.top, -45),
             left: Math.max(toolbarPos.left, 0),
@@ -164,8 +164,8 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={cn(
-              'p-1.5 rounded hover:bg-gray-100 transition-colors',
-              editor.isActive('bold') && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-muted transition-colors',
+              editor.isActive('bold') && 'bg-muted'
             )}
             title="粗體"
           >
@@ -176,8 +176,8 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             className={cn(
-              'p-1.5 rounded hover:bg-gray-100 transition-colors',
-              editor.isActive('italic') && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-muted transition-colors',
+              editor.isActive('italic') && 'bg-muted'
             )}
             title="斜體"
           >
@@ -188,8 +188,8 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
             type="button"
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             className={cn(
-              'p-1.5 rounded hover:bg-gray-100 transition-colors',
-              editor.isActive('underline') && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-muted transition-colors',
+              editor.isActive('underline') && 'bg-muted'
             )}
             title="底線"
           >
@@ -200,15 +200,15 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
             type="button"
             onClick={() => editor.chain().focus().toggleStrike().run()}
             className={cn(
-              'p-1.5 rounded hover:bg-gray-100 transition-colors',
-              editor.isActive('strike') && 'bg-gray-200'
+              'p-1.5 rounded hover:bg-muted transition-colors',
+              editor.isActive('strike') && 'bg-muted'
             )}
             title="刪除線"
           >
             <Strikethrough size={16} />
           </button>
 
-          <div className="w-px h-5 bg-gray-200 mx-1" />
+          <div className="w-px h-5 bg-muted mx-1" />
 
           {/* 文字顏色 */}
           <div className="relative">
@@ -218,19 +218,19 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                 setShowColorPicker(!showColorPicker)
                 setShowHighlightPicker(false)
               }}
-              className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded hover:bg-muted transition-colors"
               title="文字顏色"
             >
               <Palette size={16} />
             </button>
             {showColorPicker && (
-              <div className="absolute left-0 top-full mt-1 grid grid-cols-4 gap-1 p-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 min-w-[140px]">
+              <div className="absolute left-0 top-full mt-1 grid grid-cols-4 gap-1 p-2 bg-white rounded-lg shadow-lg border border-border z-50 min-w-[140px]">
                 {COLORS.map(color => (
                   <button
                     key={color.value}
                     type="button"
                     onClick={() => setColor(color.value)}
-                    className="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+                    className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                     style={{ backgroundColor: color.value }}
                     title={color.label}
                   />
@@ -248,22 +248,22 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                 setShowColorPicker(false)
               }}
               className={cn(
-                'p-1.5 rounded hover:bg-gray-100 transition-colors',
-                editor.isActive('highlight') && 'bg-gray-200'
+                'p-1.5 rounded hover:bg-muted transition-colors',
+                editor.isActive('highlight') && 'bg-muted'
               )}
               title="螢光標記"
             >
               <Highlighter size={16} />
             </button>
             {showHighlightPicker && (
-              <div className="absolute left-0 top-full mt-1 flex flex-col gap-1 p-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+              <div className="absolute left-0 top-full mt-1 flex flex-col gap-1 p-2 bg-white rounded-lg shadow-lg border border-border z-50">
                 <div className="grid grid-cols-5 gap-1">
                   {HIGHLIGHTS.map(color => (
                     <button
                       key={color.value}
                       type="button"
                       onClick={() => setHighlight(color.value)}
-                      className="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+                      className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                       style={{ backgroundColor: color.value }}
                       title={color.label}
                     />
@@ -272,7 +272,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
                 <button
                   type="button"
                   onClick={removeHighlight}
-                  className="text-xs text-gray-500 hover:text-gray-700 mt-1"
+                  className="text-xs text-morandi-secondary hover:text-morandi-primary mt-1"
                 >
                   移除標記
                 </button>
@@ -287,7 +287,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
 
       {/* Placeholder */}
       {editor.isEmpty && placeholder && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-muted pointer-events-none">
           {placeholder}
         </div>
       )}

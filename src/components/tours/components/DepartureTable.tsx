@@ -86,7 +86,7 @@ export function DepartureTable({ title, items, nameField, nameLabel, isEditing }
                   <td className="px-3 py-2 text-morandi-muted text-xs">{item.notes || '-'}</td>
                   {isEditing && (
                     <td className="px-3 py-2 text-center">
-                      <button className="text-morandi-red hover:text-red-700">
+                      <button className="text-morandi-red hover:text-status-danger">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>

@@ -167,12 +167,12 @@ const demoEsims: DemoEsim[] = [
 
 // 狀態顯示設定
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: '待處理', color: 'bg-gray-100 text-gray-600', icon: <Clock size={12} /> },
-  ordered: { label: '已訂購', color: 'bg-blue-100 text-blue-600', icon: <Wifi size={12} /> },
-  sent: { label: '已發送', color: 'bg-purple-100 text-purple-600', icon: <Send size={12} /> },
-  activated: { label: '已啟用', color: 'bg-green-100 text-green-600', icon: <CheckCircle size={12} /> },
-  expired: { label: '已過期', color: 'bg-amber-100 text-amber-600', icon: <Clock size={12} /> },
-  cancelled: { label: '已取消', color: 'bg-red-100 text-red-600', icon: <XCircle size={12} /> },
+  pending: { label: '待處理', color: 'bg-muted text-morandi-secondary', icon: <Clock size={12} /> },
+  ordered: { label: '已訂購', color: 'bg-status-info-bg text-status-info', icon: <Wifi size={12} /> },
+  sent: { label: '已發送', color: 'bg-morandi-gold/10 text-morandi-gold', icon: <Send size={12} /> },
+  activated: { label: '已啟用', color: 'bg-status-success-bg text-status-success', icon: <CheckCircle size={12} /> },
+  expired: { label: '已過期', color: 'bg-status-warning-bg text-status-warning', icon: <Clock size={12} /> },
+  cancelled: { label: '已取消', color: 'bg-status-danger-bg text-status-danger', icon: <XCircle size={12} /> },
 }
 
 export default function DemoEsimsPage() {
@@ -369,7 +369,7 @@ export default function DemoEsimsPage() {
         <div className="flex items-center gap-6 text-xs text-morandi-secondary">
           <span>總訂單：<strong className="text-morandi-primary">{stats.total}</strong> 筆</span>
           <span>已啟用：<strong className="text-green-600">{stats.activated}</strong> 筆</span>
-          <span>待處理：<strong className="text-gray-600">{stats.pending}</strong> 筆</span>
+          <span>待處理：<strong className="text-morandi-secondary">{stats.pending}</strong> 筆</span>
           <span>總營收：<strong className="text-morandi-gold">{formatCurrency(stats.totalRevenue)}</strong></span>
         </div>
       </div>

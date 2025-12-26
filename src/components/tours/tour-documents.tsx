@@ -85,13 +85,13 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
 
   const getTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      合約: 'text-red-600',
-      行程: 'text-blue-600',
-      保險: 'text-green-600',
+      合約: 'text-morandi-red',
+      行程: 'text-status-info',
+      保險: 'text-status-success',
       票務: 'text-purple-600',
-      住宿: 'text-orange-600',
+      住宿: 'text-status-warning',
     }
-    return colors[type] || 'text-gray-600'
+    return colors[type] || 'text-morandi-secondary'
   }
 
   const documentsByType = mockDocuments.reduce(

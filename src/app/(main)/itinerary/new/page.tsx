@@ -216,10 +216,10 @@ function NewItineraryPageContent() {
               </div>
             </div>
 
-            <div className="w-1/2 bg-gray-100 flex flex-col print:w-full">
+            <div className="w-1/2 bg-muted flex flex-col print:w-full">
               <div className="h-14 bg-white border-b px-6 flex items-center justify-between print:hidden">
                 <h2 className="text-lg font-semibold text-morandi-primary">列印預覽</h2>
-                <div className="text-sm text-gray-600">A4 尺寸 (210mm × 297mm)</div>
+                <div className="text-sm text-morandi-secondary">A4 尺寸 (210mm × 297mm)</div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-8 print:p-0">

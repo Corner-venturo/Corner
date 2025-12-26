@@ -331,7 +331,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                     type="text"
                     value={senderCompany}
                     readOnly
-                    className="bg-gray-50 text-morandi-secondary cursor-not-allowed"
+                    className="bg-muted text-morandi-secondary cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -352,7 +352,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   type="text"
                   value={senderAddress}
                   readOnly
-                  className="bg-gray-50 text-morandi-secondary cursor-not-allowed"
+                  className="bg-muted text-morandi-secondary cursor-not-allowed"
                 />
               </div>
               <div>

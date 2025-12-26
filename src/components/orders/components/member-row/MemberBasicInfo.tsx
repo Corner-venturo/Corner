@@ -59,14 +59,14 @@ export function MemberBasicInfo({
     <>
       {/* 團體模式：訂單序號 */}
       {showOrderCode && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-blue-50/50 text-center">
-          <span className="text-xs text-blue-600 font-medium">{member.order_code || '-'}</span>
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-status-info-bg text-center">
+          <span className="text-xs text-status-info font-medium">{member.order_code || '-'}</span>
         </td>
       )}
 
       {/* 身份（領隊勾選） */}
       {showIdentityColumn && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-white" : "bg-gray-50")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-white" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="checkbox"
@@ -86,7 +86,7 @@ export function MemberBasicInfo({
       {/* 中文姓名 */}
       <td className={cn(
         "border border-morandi-gold/20 px-2 py-1",
-        isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-red-50' : 'bg-gray-50')
+        isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted')
       )}>
         {isEditMode ? (
           <input
@@ -116,7 +116,7 @@ export function MemberBasicInfo({
             <span
               className={cn(
                 "flex-1 text-xs",
-                member.customer_verification_status === 'unverified' ? 'text-red-600 font-medium' : 'text-morandi-primary'
+                member.customer_verification_status === 'unverified' ? 'text-status-danger font-medium' : 'text-morandi-primary'
               )}
               title={member.customer_verification_status === 'unverified' ? '⚠️ 待驗證 - 請點擊編輯按鈕' : ''}
             >
@@ -137,7 +137,7 @@ export function MemberBasicInfo({
       </td>
 
       {/* 出生年月日 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <input
             type="text"
@@ -155,7 +155,7 @@ export function MemberBasicInfo({
       </td>
 
       {/* 性別 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <select
             value={member.gender || ''}
@@ -176,7 +176,7 @@ export function MemberBasicInfo({
       </td>
 
       {/* 身分證號 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-gray-50")}>
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (
           <input
             type="text"

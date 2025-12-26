@@ -98,7 +98,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         setContractHtml(sanitizedHtml)
       } catch (error) {
         logger.error('載入合約失敗:', error)
-        setContractHtml('<p class="text-red-500">載入合約範本失敗，請稍後再試</p>')
+        setContractHtml('<p class="text-status-danger">載入合約範本失敗，請稍後再試</p>')
       } finally {
         setLoading(false)
       }
@@ -172,7 +172,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
             </div>
           ) : (
             <div
-              className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg"
+              className="bg-white p-8 shadow-sm border border-border rounded-lg"
               dangerouslySetInnerHTML={{ __html: contractHtml }}
             />
           )}

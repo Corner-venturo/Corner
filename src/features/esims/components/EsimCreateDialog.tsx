@@ -534,7 +534,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
               className={
                 index === esimItems.length - 1
                   ? 'h-8 w-8 p-0 flex-shrink-0 bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                  : 'h-8 w-8 p-0 flex-shrink-0 text-morandi-red hover:bg-red-50'
+                  : 'h-8 w-8 p-0 flex-shrink-0 text-morandi-red hover:bg-status-danger-bg'
               }
               variant={index === esimItems.length - 1 ? 'default' : 'ghost'}
             >

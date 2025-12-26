@@ -150,10 +150,10 @@ export function FlightRouteSearchDialog({
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* 搜尋條件 */}
-          <div className="bg-slate-50 p-4 rounded-lg border space-y-3">
+          <div className="bg-muted p-4 rounded-lg border space-y-3">
             <div className="grid grid-cols-4 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-morandi-primary mb-1">
                   出發機場
                 </label>
                 <Input
@@ -166,7 +166,7 @@ export function FlightRouteSearchDialog({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-morandi-primary mb-1">
                   目的地
                 </label>
                 <Input
@@ -179,7 +179,7 @@ export function FlightRouteSearchDialog({
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-morandi-primary mb-1">
                   日期
                 </label>
                 <DatePicker
@@ -206,14 +206,14 @@ export function FlightRouteSearchDialog({
               </div>
             </div>
 
-            <div className="text-xs text-slate-500 space-y-1">
+            <div className="text-xs text-morandi-secondary space-y-1">
               {destination && (
                 <div className="flex items-center gap-1">
                   <MapPin size={12} />
                   查詢 {origin} → {destination} 的直飛航班
                 </div>
               )}
-              <div className="text-amber-600">
+              <div className="text-status-warning">
                 ⚠️ 航班 API 只能查詢 14 天內的航班
               </div>
             </div>
@@ -221,7 +221,7 @@ export function FlightRouteSearchDialog({
 
           {/* 搜尋日期顯示 */}
           {searched && (
-            <div className="text-sm text-slate-600 flex items-center gap-2">
+            <div className="text-sm text-morandi-primary flex items-center gap-2">
               <Clock size={14} />
               {formatDateDisplay(searchDate)} 的航班
               {flights.length > 0 && (
@@ -237,10 +237,10 @@ export function FlightRouteSearchDialog({
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
-                <span className="ml-2 text-slate-500">查詢中...</span>
+                <span className="ml-2 text-morandi-secondary">查詢中...</span>
               </div>
             ) : searched && flights.length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-morandi-secondary">
                 <Plane className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>找不到符合條件的航班</p>
                 <p className="text-xs mt-1">請確認機場代碼是否正確</p>
@@ -261,13 +261,13 @@ export function FlightRouteSearchDialog({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {/* 航班號碼 */}
-                        <div className="bg-slate-100 px-2 py-1 rounded">
-                          <span className="text-sm font-bold text-slate-700">
+                        <div className="bg-morandi-container px-2 py-1 rounded">
+                          <span className="text-sm font-bold text-morandi-primary">
                             {flight.flightNumber}
                           </span>
                         </div>
                         {/* 航空公司 */}
-                        <span className="text-sm text-slate-600">
+                        <span className="text-sm text-morandi-primary">
                           {flight.airline}
                         </span>
                       </div>
@@ -277,17 +277,17 @@ export function FlightRouteSearchDialog({
                           {flight.scheduledTime}
                         </span>
                         {flight.estimatedTime && flight.estimatedTime !== flight.scheduledTime && (
-                          <span className="text-xs text-orange-500 ml-2">
+                          <span className="text-xs text-status-warning ml-2">
                             → {flight.estimatedTime}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
+                    <div className="flex items-center justify-between mt-2 text-xs text-morandi-secondary">
                       <div className="flex items-center gap-1">
                         <MapPin size={10} />
                         {origin} → {flight.destinationIata}
-                        <span className="ml-1 text-slate-400">
+                        <span className="ml-1 text-morandi-secondary">
                           ({flight.destination})
                         </span>
                       </div>
@@ -301,12 +301,12 @@ export function FlightRouteSearchDialog({
                         <span className={cn(
                           'px-1.5 py-0.5 rounded text-[10px]',
                           flight.status === '預計' || flight.status === '準時'
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-status-success-bg text-status-success'
                             : flight.status === '延誤'
-                            ? 'bg-orange-100 text-orange-700'
+                            ? 'bg-status-warning-bg text-status-warning'
                             : flight.status === '已取消'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-slate-100 text-slate-600'
+                            ? 'bg-status-danger-bg text-status-danger'
+                            : 'bg-morandi-container text-morandi-primary'
                         )}>
                           {flight.status}
                         </span>

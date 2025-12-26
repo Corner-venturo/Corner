@@ -52,13 +52,13 @@ export function MessageInput({ channel }: MessageInputProps) {
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder={`Message #${channel.name}`}
-          className="w-full p-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold"
           disabled={isPending}
         />
         <button
           onClick={handleSendMessage}
           disabled={isPending || !content.trim()}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-morandi-gold text-white hover:bg-morandi-gold-hover disabled:bg-border"
         >
           <Send size={18} />
         </button>

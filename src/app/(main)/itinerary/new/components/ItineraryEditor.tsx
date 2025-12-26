@@ -13,8 +13,8 @@ interface ItineraryEditorProps {
 
 export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, onChange }: ItineraryEditorProps) {
   return (
-    <div className="w-1/2 bg-white border-r border-gray-200 flex flex-col">
-      <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-gray-200">
+    <div className="w-1/2 bg-white border-r border-border flex flex-col">
+      <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
         <h2 className="text-lg font-semibold">編輯表單</h2>
         {/* 自動存檔狀態指示 */}
         <div className="flex items-center gap-2 text-sm">
@@ -31,7 +31,7 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, onChange }:
             </span>
           )}
           {autoSaveStatus === 'error' && (
-            <span className="flex items-center gap-1.5 text-red-200">
+            <span className="flex items-center gap-1.5 text-morandi-red/80">
               <CloudOff size={14} />
               存檔失敗
             </span>

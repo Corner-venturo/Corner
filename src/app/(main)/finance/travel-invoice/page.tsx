@@ -170,7 +170,7 @@ export default function TravelInvoicePage() {
         />
         <ContentContainer>
           <div className="text-center py-12">
-            <p className="text-red-500">{error}</p>
+            <p className="text-status-danger">{error}</p>
           </div>
         </ContentContainer>
       </div>

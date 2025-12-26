@@ -95,7 +95,7 @@ export function MemberRow({
       />
 
       {/* 飲食禁忌 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50">
+      <td className="border border-morandi-gold/20 px-2 py-1 bg-status-warning-bg">
         <input
           type="text"
           value={member.special_meal || ''}
@@ -153,7 +153,7 @@ export function MemberRow({
       </td>
 
       {/* 尾款 (自動計算) */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-gray-50 text-xs text-center text-morandi-secondary">
+      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-xs text-center text-morandi-secondary">
         {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
       </td>
 

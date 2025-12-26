@@ -29,6 +29,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ReactNode } from 'react'
+import { Save, X } from 'lucide-react'
 
 export interface FormDialogProps {
   /** 對話框開啟狀態 */
@@ -146,14 +147,17 @@ export function FormDialog({
                       type="button"
                       variant="outline"
                       onClick={handleCancel}
+                      className="gap-2"
                     >
+                      <X size={16} />
                       {cancelLabel}
                     </Button>
                     <Button
                       type="submit"
                       disabled={loading || submitDisabled}
-                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
                     >
+                      <Save size={16} />
                       {loading ? '處理中...' : submitLabel}
                     </Button>
                   </>

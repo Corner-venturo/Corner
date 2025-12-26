@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { differenceInDays, parseISO } from 'date-fns'
-
-const supabase = supabaseClient as any
 
 interface NightRoomConfig {
   hotel_name: string

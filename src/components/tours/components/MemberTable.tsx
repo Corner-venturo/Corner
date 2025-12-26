@@ -5,15 +5,22 @@ import { Users } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
 import { MemberRow } from './MemberRow'
 import { EditingMember, EditingCell } from '../hooks/useTourMemberEditor'
-import { Order } from '@/stores/types'
+
+// 使用簡化的 Order 類型，僅包含此組件需要的欄位
+interface TourOrder {
+  id: string
+  order_number?: string | null
+  code?: string
+  contact_person?: string
+}
 
 interface MemberTableProps {
   members: EditingMember[]
-  tourOrders: Order[]
+  tourOrders: TourOrder[]
   editingCell: EditingCell | null
   draggedRow: number | null
   isNavigating: boolean
-  inputRef: React.RefObject<HTMLInputElement>
+  inputRef: React.RefObject<HTMLInputElement | null>
   roomAssignments: Record<string, string>
   editableFields: (keyof EditingMember)[]
   onCellClick: (rowIndex: number, field: keyof EditingMember) => void
@@ -170,7 +177,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
           <tbody>
             {members.map((member, index) => {
               const orderIndex = tourOrders.findIndex(order => order.id === member.order_id)
-              const bgColor = orderIndex % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'
+              const bgColor = orderIndex % 2 === 0 ? 'bg-white' : 'bg-status-info-bg'
 
               return (
                 <MemberRow

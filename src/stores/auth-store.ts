@@ -365,5 +365,9 @@ export const useAuthStore = create<AuthState>()(
 )
 
 if (typeof window !== 'undefined') {
-  (useAuthStore as any).persist.rehydrate()
+  // Zustand persist 的 rehydrate 方法類型定義缺失，使用 type assertion
+  type StoreWithPersist = typeof useAuthStore & {
+    persist: { rehydrate: () => void }
+  }
+  ;(useAuthStore as StoreWithPersist).persist.rehydrate()
 }

@@ -89,7 +89,7 @@ export function useChannelChat() {
 
   // Message operations
   const messageOps = useMessageOperations()
-  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = messageOps as any
+  const { handleSendMessage, handleReaction, handleDeleteMessage, user } = messageOps
   const {
     attachedFiles,
     setAttachedFiles,

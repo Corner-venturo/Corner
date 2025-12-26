@@ -84,7 +84,6 @@ export function usePaymentData() {
       const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
 
       // 建立收款單
-       
       const receipt = await createReceipt({
         receipt_number: receiptNumber,
         workspace_id: user.workspace_id || '',
@@ -95,7 +94,7 @@ export function usePaymentData() {
         receipt_type: item.receipt_type,
         receipt_amount: item.amount,
         actual_amount: 0, // 待會計確認
-        status: 0, // 待確認
+        status: 0, // 待確認 (ReceiptStatus.PENDING)
         receipt_account: item.receipt_account || null,
         email: item.email || null,
         payment_name: item.payment_name || null,
@@ -107,11 +106,12 @@ export function usePaymentData() {
         auth_code: item.auth_code || null,
         check_number: item.check_number || null,
         check_bank: item.check_bank || null,
+        check_date: null, // 支票兌現日期
         note: item.note || null,
+        deleted_at: null,
         created_by: user.id,
         updated_by: user.id,
-      } as any)
-       
+      })
 
       // ✅ 自動產生會計傳票（如果啟用會計模組）
       if (hasAccounting && !isExpired && user.workspace_id) {

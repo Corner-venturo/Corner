@@ -31,7 +31,7 @@ export function AccommodationSection({
           editingField={editingField}
           setEditingField={setEditingField}
           onChange={onUpdateAccommodation}
-          className="text-sm text-gray-700"
+          className="text-sm text-morandi-primary"
           placeholder="住宿飯店"
         />
       </div>
@@ -48,7 +48,7 @@ export function AccommodationSection({
           editingField={editingField}
           setEditingField={setEditingField}
           onChange={onUpdateAccommodation}
-          className="text-gray-700"
+          className="text-morandi-primary"
           placeholder="住宿"
         />
       </div>
@@ -58,14 +58,14 @@ export function AccommodationSection({
   // Default inline variant
   return (
     <div className="flex-1">
-      <span className="text-gray-400">住宿：</span>
+      <span className="text-morandi-muted">住宿：</span>
       <EditableText
         value={accommodation}
         fieldKey="accommodation"
         editingField={editingField}
         setEditingField={setEditingField}
         onChange={onUpdateAccommodation}
-        className="inline text-gray-700"
+        className="inline text-morandi-primary"
         placeholder="住宿"
       />
     </div>

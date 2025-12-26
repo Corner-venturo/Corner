@@ -142,8 +142,8 @@ export default function DemoToursPage() {
               <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${
-                    percentage >= 80 ? 'bg-green-500' :
-                    percentage >= 50 ? 'bg-amber-500' : 'bg-blue-500'
+                    percentage >= 80 ? 'bg-status-success' :
+                    percentage >= 50 ? 'bg-status-warning' : 'bg-status-info'
                   }`}
                   style={{ width: `${percentage}%` }}
                 />
@@ -213,9 +213,9 @@ export default function DemoToursPage() {
       <div className="px-4 py-2 bg-morandi-container/20 border-b border-border">
         <div className="flex items-center gap-6 text-xs text-morandi-secondary">
           <span>總行程：<strong className="text-morandi-primary">{stats.total}</strong> 個</span>
-          <span>已成團：<strong className="text-green-600">{stats.confirmed}</strong> 個</span>
-          <span>招募中：<strong className="text-blue-600">{stats.published}</strong> 個</span>
-          <span>總報名：<strong className="text-amber-600">{stats.totalEnrolled}</strong> 人</span>
+          <span>已成團：<strong className="text-status-success">{stats.confirmed}</strong> 個</span>
+          <span>招募中：<strong className="text-status-info">{stats.published}</strong> 個</span>
+          <span>總報名：<strong className="text-status-warning">{stats.totalEnrolled}</strong> 人</span>
         </div>
       </div>
 

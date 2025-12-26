@@ -131,7 +131,7 @@ export function DisbursementDialog({
         ) : (
           <>
             {/* 統計和搜尋 */}
-            <div className="flex items-center justify-between py-3 px-4 border-b bg-gray-50">
+            <div className="flex items-center justify-between py-3 px-4 border-b bg-muted">
               <div className="flex items-center space-x-4">
                 <span className="font-medium">共 {pendingRequests.length} 筆請款單</span>
                 {selectedRequests.length > 0 && (

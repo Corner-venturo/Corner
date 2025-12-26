@@ -49,11 +49,11 @@ export function useCompanyColumns({ onView }: UseCompanyColumnsProps) {
           const level = value as number
           const colors: Record<number, string> = {
             0: 'bg-morandi-container/20 text-morandi-muted',
-            1: 'bg-blue-100 text-blue-700',
-            2: 'bg-green-100 text-green-700',
-            3: 'bg-yellow-100 text-yellow-700',
-            4: 'bg-orange-100 text-orange-700',
-            5: 'bg-red-100 text-red-700',
+            1: 'bg-status-info-bg text-status-info',
+            2: 'bg-status-success-bg text-status-success',
+            3: 'bg-status-warning-bg text-status-warning',
+            4: 'bg-status-warning-bg text-status-warning',
+            5: 'bg-status-danger-bg text-status-danger',
           }
           return (
             <Badge variant="outline" className={colors[level] || colors[0]}>

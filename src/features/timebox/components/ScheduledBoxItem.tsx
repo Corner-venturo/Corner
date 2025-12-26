@@ -69,7 +69,7 @@ function ScheduledBoxItem({ scheduledBox, height, topOffset = 0, boxes }: Schedu
             )}
           </div>
           {scheduledBox.completed && (
-            <Check className="h-3 w-3 flex-shrink-0 text-green-200" />
+            <Check className="h-3 w-3 flex-shrink-0 text-morandi-green/60" />
           )}
         </div>
       </div>

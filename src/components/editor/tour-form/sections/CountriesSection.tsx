@@ -214,7 +214,7 @@ export function CountriesSection({
             c => c.country_id === country.country_id && !c.is_primary
           )
           return (
-            <div key={actualIndex} className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div key={actualIndex} className="p-4 bg-muted border border-border rounded-lg">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-semibold text-morandi-primary">
                   其他國家 #{index + 1}

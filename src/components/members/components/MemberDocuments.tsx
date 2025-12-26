@@ -137,7 +137,7 @@ export function MemberDocuments({
                       variant="ghost"
                       size="sm"
                       onClick={() => onRemoveFile(index)}
-                      className="h-6 w-6 p-0 hover:bg-red-100 flex-shrink-0"
+                      className="h-6 w-6 p-0 hover:bg-status-danger-bg flex-shrink-0"
                       disabled={isUploading}
                     >
                       <Trash2 size={12} className="text-morandi-red" />

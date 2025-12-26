@@ -193,12 +193,12 @@ function AccordionItem({
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+      className="bg-white rounded-lg shadow-sm border border-border overflow-hidden"
     >
       {/* Header */}
       <button
         onClick={onToggle}
-        className="w-full flex justify-between items-center p-6 cursor-pointer select-none transition-colors hover:bg-gray-50"
+        className="w-full flex justify-between items-center p-6 cursor-pointer select-none transition-colors hover:bg-muted"
         style={{ backgroundColor: isOpen ? '#fafafa' : 'transparent' }}
       >
         <div className="flex items-center gap-3">
@@ -232,7 +232,7 @@ function AccordionItem({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="overflow-hidden"
       >
-        <div className="p-6 pt-0 border-t border-gray-100 bg-white">
+        <div className="p-6 pt-0 border-t border-border bg-white">
           {children}
         </div>
       </motion.div>

@@ -159,8 +159,8 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
     <>
       {/* 特殊團鎖定警告 */}
       {isSpecialTour && (
-        <div className="fixed top-18 right-0 left-16 bg-orange-50 border-b border-orange-200 z-30 px-6 py-2">
-          <div className="flex items-center space-x-2 text-orange-800">
+        <div className="fixed top-18 right-0 left-16 bg-status-warning-bg border-b border-status-warning/30 z-30 px-6 py-2">
+          <div className="flex items-center space-x-2 text-status-warning">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -413,10 +413,10 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                                   e.stopPropagation()
                                   handleDeleteVersion(originalIndex)
                                 }}
-                                className="p-1 hover:bg-red-100 rounded transition-colors"
+                                className="p-1 hover:bg-status-danger-bg rounded transition-colors"
                                 title="刪除版本"
                               >
-                                <Trash2 size={14} className="text-red-500" />
+                                <Trash2 size={14} className="text-status-danger" />
                               </button>
                             )}
                           </div>

@@ -74,7 +74,7 @@ export function TourHeroSerene({ data, viewMode }: TourHeroSereneProps) {
               <span className="inline-block px-2.5 py-1 rounded-full bg-[#30c9e8]/10 text-xs font-bold text-[#30c9e8]">
                 {dayNumber} Days
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-morandi-secondary">
                 {data.city || data.country}
               </span>
             </div>
@@ -96,14 +96,14 @@ export function TourHeroSerene({ data, viewMode }: TourHeroSereneProps) {
 
             {/* 描述 */}
             {data.description && (
-              <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">
+              <p className="text-sm text-morandi-secondary leading-relaxed mb-4 line-clamp-3">
                 {data.description}
               </p>
             )}
 
             {/* 底部資訊列 */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <div className="flex items-center gap-4 text-xs text-morandi-secondary">
                 <span className="flex items-center gap-1">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

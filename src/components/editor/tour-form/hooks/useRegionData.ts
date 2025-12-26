@@ -1,5 +1,6 @@
 import React from 'react'
 import { useRegionsStore } from '@/stores'
+import { logger } from '@/lib/utils/logger'
 import { CityOption } from '../types'
 
 /**
@@ -32,7 +33,7 @@ export function useRegionData(data: { country?: string }) {
   React.useEffect(() => {
     if (countries.length === 0 && !hasFetchedRef.current) {
       hasFetchedRef.current = true
-      console.log('[useRegionData] 開始載入國家和城市資料')
+      logger.log('[useRegionData] 開始載入國家和城市資料')
       fetchAll()
     }
   }, [countries.length, fetchAll])
@@ -54,26 +55,26 @@ export function useRegionData(data: { country?: string }) {
     const matchedCountry = countries.find(c => c.name === data.country)
 
     if (!matchedCountry) {
-      console.warn(`[useRegionData] 找不到國家: ${data.country}`)
+      logger.warn(`[useRegionData] 找不到國家: ${data.country}`)
       if (selectedCountryCode !== '') setSelectedCountryCode('')
       return
     }
 
     if (!matchedCountry.code) {
-      console.warn(`[useRegionData] 國家 ${data.country} 缺少 code`)
+      logger.warn(`[useRegionData] 國家 ${data.country} 缺少 code`)
       if (selectedCountryCode !== '') setSelectedCountryCode('')
       return
     }
 
     // 同步 selectedCountry
     if (selectedCountry !== data.country) {
-      console.log(`[useRegionData] 同步 selectedCountry: ${data.country}`)
+      logger.log(`[useRegionData] 同步 selectedCountry: ${data.country}`)
       setSelectedCountry(data.country)
     }
 
     // 同步 selectedCountryCode
     if (selectedCountryCode !== matchedCountry.code) {
-      console.log(`[useRegionData] 設定 countryCode: ${matchedCountry.code} for ${data.country}`)
+      logger.log(`[useRegionData] 設定 countryCode: ${matchedCountry.code} for ${data.country}`)
       setSelectedCountryCode(matchedCountry.code)
     }
 
@@ -91,7 +92,7 @@ export function useRegionData(data: { country?: string }) {
         code: c.code || '',
         name: c.name
       }))
-    console.log(`[useRegionData] allDestinations 計算完成: ${result.length} 個國家`)
+    logger.log(`[useRegionData] allDestinations 計算完成: ${result.length} 個國家`)
     return result
   }, [countries])
 
@@ -109,7 +110,7 @@ export function useRegionData(data: { country?: string }) {
   // 根據選中的國家代碼取得城市列表
   const availableCities = React.useMemo<CityOption[]>(() => {
     if (!selectedCountryCode) {
-      console.log('[useRegionData] selectedCountryCode 為空，返回空城市列表')
+      logger.log('[useRegionData] selectedCountryCode 為空，返回空城市列表')
       return []
     }
 
@@ -117,7 +118,7 @@ export function useRegionData(data: { country?: string }) {
     const country = countries.find(c => c.code === selectedCountryCode)
 
     if (!country) {
-      console.warn(`[useRegionData] 找不到 code=${selectedCountryCode} 的國家`)
+      logger.warn(`[useRegionData] 找不到 code=${selectedCountryCode} 的國家`)
       return []
     }
 
@@ -130,14 +131,14 @@ export function useRegionData(data: { country?: string }) {
         name: c.name
       }))
 
-    console.log(`[useRegionData] availableCities 計算完成: ${result.length} 個城市 for ${country.name}`)
+    logger.log(`[useRegionData] availableCities 計算完成: ${result.length} 個城市 for ${country.name}`)
     return result
   }, [selectedCountryCode, countries, cities])
 
   // 📊 Debug 資訊（開發環境）
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[useRegionData] 狀態更新:', {
+      logger.log('[useRegionData] 狀態更新:', {
         'data.country': data.country,
         selectedCountry,
         selectedCountryCode,

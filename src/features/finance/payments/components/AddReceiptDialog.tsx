@@ -7,7 +7,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Save, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -318,14 +318,16 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
 
         {/* 操作按鈕 */}
         <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!formData.tour_id || !formData.order_id || paymentItems.length === 0}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Save size={16} />
             新增收款單 (共 {paymentItems.length} 項，NT$ {totalAmount.toLocaleString()})
           </Button>
         </div>

@@ -1,26 +1,265 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2025-12-24 (升級 Next.js 16 + RSC 規範)
+> **最後更新**: 2025-12-25 (UI 規範整合 + 技術債清理)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
 
-## 📍 必讀：專案網站地圖
+## 📍 必讀清單（開發前必看）
 
-**在探索專案結構前，請先查閱：**
-
+### 1. 專案網站地圖
 ```
 /Users/williamchien/Projects/SITEMAP.md
 ```
+包含：頁面路由、API 列表、Store 結構、關鍵檔案位置
 
-此檔案包含：
-- 兩個專案的完整頁面路由
-- API 路由列表
-- Store 結構
-- 關鍵檔案位置
-- 資料庫連接關係
+### 2. UI/UX 規範文件
+| 文件 | 內容 | 最後更新 |
+|------|------|----------|
+| `docs/VENTURO_UI_DESIGN_STYLE.md` | 莫蘭迪色系、組件樣式、陰影設計 | 2025-10 |
+| `docs/DESIGN_SYSTEM.md` | 圓角、邊框、間距規範 | 2025-10 |
+| `docs/STANDARD_PAGE_LAYOUT.md` | 頁面佈局使用指南 | 2025-10 |
 
-**避免重複探索整個 codebase，先查 SITEMAP！**
+### 3. 架構規範
+| 文件 | 內容 |
+|------|------|
+| `docs/ARCHITECTURE_STANDARDS.md` | 五層架構、資料隔離、權限控制 |
+| `docs/CODE_REVIEW_CHECKLIST.md` | 程式碼審查清單 |
+
+**⚠️ 避免 AI 斷裂感：開發新頁面前，務必先閱讀 UI 規範！**
+
+---
+
+## 🎨 UI/UX 速查規範（最重要！）
+
+> **設計理念**: 優雅、精緻、有質感的莫蘭迪風格
+> **參考頁面**: `/login`（設計標準）
+
+### 莫蘭迪色系 (CSS 變數)
+
+```css
+/* 主色系 */
+--morandi-primary: #3a3633;     /* 主文字、深色 */
+--morandi-secondary: #8b8680;   /* 次要文字 */
+--morandi-gold: #c9aa7c;        /* 強調色、按鈕、連結 ⭐ */
+--morandi-gold-hover: #b8996b;  /* 金色懸停 */
+--morandi-green: #9fa68f;       /* 成功 */
+--morandi-red: #c08374;         /* 錯誤 */
+--morandi-container: #e8e5e0;   /* 背景淡色 */
+--morandi-muted: #b8b2aa;       /* 禁用 */
+
+/* 背景 */
+--background: #f6f4f1;          /* 頁面背景 */
+--card: #ffffff;                /* 卡片背景 */
+--border: #d4c4b0;              /* 邊框 */
+```
+
+### 標準組件使用規則
+
+| 場景 | 必須使用的組件 | 位置 |
+|------|---------------|------|
+| **列表頁面** | `ListPageLayout` | `@/components/layout/list-page-layout` |
+| **頁面標題** | `ResponsiveHeader` | `@/components/layout/responsive-header` |
+| **表格** | `EnhancedTable` | `@/components/ui/enhanced-table` |
+| **表格單元格** | `DateCell`, `StatusCell`, `CurrencyCell` 等 | `@/components/table-cells` |
+
+### 列表頁面標準模板
+
+```tsx
+// ✅ 正確：使用 ListPageLayout
+import { ListPageLayout } from '@/components/layout/list-page-layout'
+import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
+
+export default function MyListPage() {
+  return (
+    <ListPageLayout
+      title="XXX 管理"
+      icon={SomeIcon}
+      breadcrumb={[
+        { label: '首頁', href: '/' },
+        { label: 'XXX 管理', href: '/xxx' },
+      ]}
+      data={items}
+      columns={columns}
+      searchable
+      searchFields={['name', 'code']}
+      statusTabs={[
+        { value: 'all', label: '全部' },
+        { value: 'active', label: '進行中' },
+      ]}
+      statusField="status"
+      onAdd={() => setShowDialog(true)}
+      addLabel="新增 XXX"
+    />
+  )
+}
+```
+
+### 表格 Column 定義範例
+
+```tsx
+const columns = [
+  {
+    key: 'date',
+    label: '日期',
+    width: 120,
+    render: (_, row) => <DateCell date={row.date} showIcon />,
+  },
+  {
+    key: 'status',
+    label: '狀態',
+    width: 100,
+    render: (_, row) => <StatusCell type="tour" status={row.status} />,
+  },
+  {
+    key: 'amount',
+    label: '金額',
+    width: 120,
+    render: (_, row) => <CurrencyCell amount={row.amount} />,
+  },
+  {
+    key: 'actions',
+    label: '',
+    width: 80,
+    render: (_, row) => (
+      <ActionCell
+        actions={[
+          { icon: Edit2, label: '編輯', onClick: () => handleEdit(row) },
+          { icon: Trash2, label: '刪除', onClick: () => handleDelete(row), variant: 'danger' },
+        ]}
+      />
+    ),
+  },
+]
+```
+
+### 設計 Token 快速參考
+
+| 元素 | Class | 說明 |
+|------|-------|------|
+| **主要卡片** | `rounded-xl shadow-lg border border-border p-8` | 登入頁標準 |
+| **次要卡片** | `rounded-lg shadow-sm border border-border p-6` | 列表項目 |
+| **主要按鈕** | `bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-lg` | CTA |
+| **輸入框** | `rounded-lg border border-border focus:ring-2 focus:ring-morandi-gold` | 表單 |
+| **表格頭** | `bg-morandi-container/40 border-b border-border/60` | 表格 |
+
+### ❌ 禁止的設計做法
+
+```tsx
+// ❌ 不要使用固定顏色（不支援深色主題）
+<div className="border-gray-200 bg-gray-100">
+
+// ✅ 使用 CSS 變數
+<div className="border-border bg-morandi-container">
+
+// ❌ 不要自己寫列表頁面結構
+<div className="h-full flex flex-col">
+  <div className="p-4">標題</div>
+  <table>...</table>
+</div>
+
+// ✅ 使用 ListPageLayout
+<ListPageLayout title="..." data={...} columns={...} />
+
+// ❌ 不要自己格式化日期/金額/狀態
+<span>{new Date(row.date).toLocaleDateString()}</span>
+<span>NT$ {row.amount}</span>
+<span className="text-green-500">{row.status}</span>
+
+// ✅ 使用 Table Cells
+<DateCell date={row.date} />
+<CurrencyCell amount={row.amount} />
+<StatusCell type="tour" status={row.status} />
+```
+
+### 可用的 Table Cell 組件
+
+| 組件 | 用途 | 範例 |
+|------|------|------|
+| `DateCell` | 日期顯示 | `<DateCell date={date} format="short" showIcon />` |
+| `StatusCell` | 狀態徽章 | `<StatusCell type="tour" status="confirmed" />` |
+| `CurrencyCell` | 金額顯示 | `<CurrencyCell amount={1000} variant="income" />` |
+| `DateRangeCell` | 日期區間 | `<DateRangeCell start={start} end={end} showDuration />` |
+| `ActionCell` | 操作按鈕 | `<ActionCell actions={[...]} />` |
+| `AvatarCell` | 頭像+名稱 | `<AvatarCell name="張三" subtitle="業務部" />` |
+| `TextCell` | 截斷文字 | `<TextCell text={desc} maxLength={50} />` |
+| `NumberCell` | 數字 | `<NumberCell value={10} suffix="人" />` |
+| `BadgeCell` | 簡單徽章 | `<BadgeCell text="熱門" variant="warning" />` |
+
+### 狀態類型對應
+
+`StatusCell` 的 `type` 參數對應不同的狀態配置：
+
+| type | 用途 | 可用狀態 |
+|------|------|----------|
+| `tour` | 旅遊團 | planning, confirmed, in_progress, completed, cancelled |
+| `order` | 訂單 | draft, pending, confirmed, processing, completed, cancelled |
+| `payment` | 付款 | pending, confirmed, completed, cancelled |
+| `invoice` | 發票 | draft, pending, approved, paid, rejected |
+| `visa` | 簽證 | pending, submitted, issued, collected, rejected |
+| `todo` | 待辦 | pending, in_progress, completed, cancelled |
+| `voucher` | 傳票 | draft, pending, approved, posted |
+
+### 🔘 按鈕規範（重要！）
+
+**所有主要操作按鈕必須有圖標 + 文字**
+
+#### 標準按鈕樣式
+
+```tsx
+import { Plus, Save, Check, X, Trash2, Edit2, Printer } from 'lucide-react'
+
+// ✅ 主要操作按鈕（新增/儲存/確認）
+<Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+  <Plus size={16} />
+  新增項目
+</Button>
+
+<Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+  <Save size={16} />
+  儲存
+</Button>
+
+<Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+  <Check size={16} />
+  確認
+</Button>
+
+// ✅ 次要操作按鈕（取消/關閉）
+<Button variant="outline" className="gap-2">
+  <X size={16} />
+  取消
+</Button>
+
+// ✅ 危險操作按鈕（刪除）
+<Button variant="outline" className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white">
+  <Trash2 size={16} />
+  刪除
+</Button>
+
+// ❌ 禁止：純文字按鈕（缺少圖標）
+<Button>儲存</Button>
+<Button>確認</Button>
+<Button variant="outline">取消</Button>
+```
+
+#### 常用按鈕圖標對應
+
+| 操作 | 圖標 | import |
+|------|------|--------|
+| 新增 | `Plus` | `lucide-react` |
+| 儲存 | `Save` | `lucide-react` |
+| 確認 | `Check` | `lucide-react` |
+| 更新 | `RefreshCw` | `lucide-react` |
+| 取消 | `X` | `lucide-react` |
+| 關閉 | `X` | `lucide-react` |
+| 刪除 | `Trash2` | `lucide-react` |
+| 編輯 | `Edit2` | `lucide-react` |
+| 列印 | `Printer` | `lucide-react` |
+| 下載 | `Download` | `lucide-react` |
+| 上傳 | `Upload` | `lucide-react` |
+| 搜尋 | `Search` | `lucide-react` |
+| 重設 | `RotateCcw` | `lucide-react` |
 
 ---
 
@@ -213,6 +452,93 @@ const { data } = await supabase
 
 ---
 
+## 🚨🚨🚨 快取架構規範 (2025-12-26 新增，極重要！) 🚨🚨🚨
+
+> **核心原則**：登入速度 = 用戶體驗，任何功能都不能讓登入變慢！
+
+### ❌ 絕對禁止的架構
+
+```typescript
+// ❌ 登入時才去 JOIN 多個表格
+const onLogin = async () => {
+  // 這樣會讓登入變慢！
+  const tours = await supabase
+    .from('tours')
+    .select('*, orders(*), order_members(*), itineraries(*)')
+    .eq('...', '...')
+}
+
+// ❌ 每次讀取都 JOIN 多個表格
+const MyComponent = () => {
+  // View 每次查詢都 JOIN 4 個表格 = 浪費資源
+  const { data } = useSWR('my_erp_tours', fetcher)
+}
+```
+
+### ✅ 正確的快取架構
+
+```
+寫入時計算（ERP 端觸發）：
+  ERP 建立訂單 → 自動更新快取表 → 會員登入直接讀（快！）
+
+而不是：
+  會員登入 → 即時 JOIN 計算 → 慢！
+```
+
+### 快取表設計模式
+
+```sql
+-- 1. 建立快取表（預先計算好的資料）
+CREATE TABLE xxx_cache (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL,
+
+  -- 快取的資料（從多個表 JOIN 計算出來的）
+  cached_field_1 text,
+  cached_field_2 jsonb,
+
+  -- 快取元資料
+  cached_at timestamptz DEFAULT now(),
+  source_updated_at timestamptz
+);
+
+-- 2. 來源資料變更時，自動更新快取
+CREATE TRIGGER trigger_refresh_cache
+AFTER INSERT OR UPDATE ON source_table
+FOR EACH ROW
+EXECUTE FUNCTION auto_refresh_cache();
+
+-- 3. 使用者讀取時，直接查快取表（單表查詢）
+SELECT * FROM xxx_cache WHERE user_id = auth.uid();
+```
+
+### 已實作的快取表
+
+| 快取表 | 來源 | 觸發時機 |
+|--------|------|---------|
+| `traveler_tour_cache` | tours + orders + order_members + itineraries | order_members 新增/修改、tours 修改、旅客綁定身分證 |
+
+### 新功能開發檢查清單
+
+開發任何需要「跨表查詢」的功能前，問自己：
+
+- [ ] **登入時會觸發嗎？** 如果是，必須用快取表！
+- [ ] **頻繁讀取嗎？** 如果 >10次/天/用戶，考慮快取
+- [ ] **JOIN 幾個表？** 如果 >2 個表，考慮快取
+- [ ] **資料變動頻率？** 如果來源資料很少變，適合快取
+- [ ] **觸發時機？** 寫入時更新快取，而不是讀取時計算
+
+### 其他應該使用快取的功能
+
+| 功能 | 建議快取 | 觸發時機 |
+|------|---------|---------|
+| 未讀訊息數 | `user_unread_counts` | 訊息新增時 |
+| 用戶統計 | `user_stats_cache` | 相關資料變更時 |
+| 權限快取 | `user_permissions_cache` | 角色變更時 |
+| 通知數量 | `notification_counts` | 通知新增時 |
+
+---
+
 ## 🚨 前端效能優化規範 (2025-12-24 新增)
 
 ### 1. Dynamic Import - 大型組件延遲載入
@@ -347,33 +673,77 @@ import { useMyHook } from './hooks'
 
 ---
 
-## 🚨 Console.log 規範 (2025-12-24 更新)
+## 🚨🚨🚨 Console 與 as any 嚴禁規範 (2025-12-25 強制) 🚨🚨🚨
 
-> **原則**: 使用統一的 logger 工具，禁止直接使用 console
+### ❌ 絕對禁止：console.log/error/warn
 
-### ❌ 禁止
+**從今以後，所有新代碼禁止使用 console，必須使用 logger。**
 
 ```typescript
-// ❌ 直接使用 console
+// ❌ 絕對禁止
 console.log('debug:', data)
 console.error('錯誤:', error)
-```
+console.warn('警告:', message)
 
-### ✅ 正確做法
-
-```typescript
-// ✅ 使用 logger 工具
+// ✅ 唯一正確做法
 import { logger } from '@/lib/utils/logger'
 
-logger.log('重要資訊:', data)
+logger.log('資訊:', data)
 logger.error('錯誤:', error)
+logger.warn('警告:', message)
 ```
 
-### Logger 優勢
-- 統一格式
-- 可控制輸出級別
-- 生產環境可關閉
-- 便於追蹤問題
+**Logger 優勢**：
+- 統一格式、可控制輸出級別、生產環境可關閉、便於追蹤問題
+
+**例外情況**（僅以下兩種允許 console）：
+1. `src/lib/utils/logger.ts` - Logger 本身的實現
+2. `scripts/reset-db.ts` - 開發工具腳本
+
+---
+
+### ❌ 絕對禁止：新增 as any
+
+**從今以後，所有新代碼禁止使用 `as any`。沒有例外。**
+
+```typescript
+// ❌ 絕對禁止
+const data = response as any
+const items = result as any[]
+function process(input: any): any { }
+
+// ✅ 正確做法：使用明確類型
+interface ApiResponse { items: Customer[] }
+const data: ApiResponse = response
+const items: Customer[] = result.items
+
+// ✅ 如果真的無法確定類型，使用 unknown + type guard
+const data: unknown = response
+if (isValidResponse(data)) {
+  // data 現在有正確類型
+}
+```
+
+### 📋 現存 as any 遺留清單 (43 處，已凍結)
+
+以下是 2025-12-25 技術債清理時記錄的現存 `as any` 使用。這些是歷史遺留問題，大多與 Supabase 類型系統深度整合相關，風險較高不適合現階段修改。
+
+| 檔案 | 數量 | 原因 |
+|------|------|------|
+| `src/stores/cloud-store-factory.ts` | 8 | Supabase 泛型 store 類型推導 |
+| `src/stores/order-store.ts` | 5 | Supabase 關聯查詢類型 |
+| `src/stores/passport-ocr-store.ts` | 4 | OCR API 回應類型 |
+| `src/stores/quote-store.ts` | 4 | 報價單複雜嵌套類型 |
+| `src/stores/tour-store.ts` | 3 | 團號關聯查詢 |
+| `src/lib/supabase/admin.ts` | 2 | Supabase Admin 類型 |
+| `src/app/api/` 各 route | 7 | API 請求/回應類型轉換 |
+| 其他散落 | 10 | 各種 edge case |
+
+**規則**：
+1. 現存的 43 處 `as any` 已凍結，不再增加
+2. 新代碼絕對禁止使用 `as any`
+3. 如果修改現有檔案，鼓勵順便修復該檔案的 `as any`
+4. 未來若有時間，逐步修復這些遺留問題
 
 ---
 

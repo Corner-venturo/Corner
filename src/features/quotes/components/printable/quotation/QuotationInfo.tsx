@@ -41,21 +41,21 @@ export const QuotationInfo: React.FC<QuotationInfoProps> = ({
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="flex">
           <span className="font-semibold w-32">行程名稱：</span>
-          <span className="flex-1 border-b border-gray-300">
+          <span className="flex-1 border-b border-border">
             {quoteName || '精選旅遊行程'}
           </span>
         </div>
         <div className="flex">
           <span className="font-semibold w-32">報價單編號：</span>
-          <span className="flex-1 border-b border-gray-300">{quoteCode || ''}</span>
+          <span className="flex-1 border-b border-border">{quoteCode || ''}</span>
         </div>
         <div className="flex">
           <span className="font-semibold w-32">總人數：</span>
-          <span className="flex-1 border-b border-gray-300">{totalParticipants} 人</span>
+          <span className="flex-1 border-b border-border">{totalParticipants} 人</span>
         </div>
         <div className="flex">
           <span className="font-semibold w-32">有效期限：</span>
-          <span className="flex-1 border-b border-gray-300">{formatValidUntil()}</span>
+          <span className="flex-1 border-b border-border">{formatValidUntil()}</span>
         </div>
       </div>
     </div>

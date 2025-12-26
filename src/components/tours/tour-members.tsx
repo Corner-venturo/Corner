@@ -60,11 +60,11 @@ export const TourMembers = React.memo(function TourMembers({
     <div>
       <MemberTable
         members={tableMembers}
-        tourOrders={tourOrders as any}
+        tourOrders={tourOrders}
         editingCell={editingCell}
         draggedRow={draggedRow}
         isNavigating={isNavigating}
-        inputRef={inputRef as any}
+        inputRef={inputRef}
         roomAssignments={roomAssignments}
         editableFields={editableFields}
         onCellClick={startCellEdit}
@@ -81,7 +81,7 @@ export const TourMembers = React.memo(function TourMembers({
 
       <MemberStats
         members={tableMembers}
-        tourOrders={tourOrders as any}
+        tourOrders={tourOrders}
         totalMembers={totalMembers}
         completedMembers={completedMembers}
         orderFilter={orderFilter}

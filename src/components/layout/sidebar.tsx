@@ -32,6 +32,7 @@ import {
   Bus,
   CheckSquare,
   FolderTree,
+  ClipboardList,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -52,6 +53,7 @@ const menuItems: MenuItem[] = [
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
   { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
+  { href: '/tour-requests', label: '需求管理', icon: ClipboardList, requiredPermission: 'tours' },
   { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
   { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {

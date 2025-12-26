@@ -104,7 +104,7 @@ export function PreviewPanel({
 
                     {/* 底部指示條 */}
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
-                      <div className="w-32 h-1 bg-gray-300 rounded-full"></div>
+                      <div className="w-32 h-1 bg-border rounded-full"></div>
                     </div>
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export function PreviewPanel({
             ) : (
               // 電腦版
               <div
-                className="bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-200"
+                className="bg-white shadow-2xl rounded-lg overflow-hidden border border-border"
                 style={{
                   width: '1200px',
                   height: '800px',

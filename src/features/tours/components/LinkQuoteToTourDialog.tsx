@@ -80,7 +80,7 @@ export function LinkQuoteToTourDialog({
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
         customer_name: '', // 必填欄位，預設空字串
-      } as any)
+      })
 
 
       if (newQuote?.id) {
@@ -155,7 +155,7 @@ export function LinkQuoteToTourDialog({
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
                       {quote.quote_type === 'quick' && (
-                        <span className="flex items-center gap-0.5 text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded">
+                        <span className="flex items-center gap-0.5 text-xs bg-status-warning-bg text-status-warning px-1.5 py-0.5 rounded">
                           <Zap className="w-3 h-3" />
                           快速
                         </span>

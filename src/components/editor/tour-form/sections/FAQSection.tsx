@@ -71,7 +71,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
       </h2>
 
       {/* 顯示開關 */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
         <div className="flex items-center gap-3">
           <MessageCircleQuestion className="h-5 w-5 text-morandi-primary" />
           <div>
@@ -106,7 +106,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
                 {/* 標題列 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-gray-300" />
+                    <GripVertical className="h-4 w-4 text-morandi-muted" />
                     <HelpCircle className="h-4 w-4 text-morandi-gold" />
                     <span className="text-sm font-medium text-morandi-secondary">
                       問題 {index + 1}
@@ -118,7 +118,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
                     size="sm"
                     onClick={() => removeFAQ(index)}
                     disabled={faqs.length <= 1}
-                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                    className="h-7 w-7 p-0 text-morandi-muted hover:text-status-danger"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -162,8 +162,8 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
           </Button>
 
           {/* 預覽提示 */}
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-700">
+          <div className="p-3 bg-status-info-bg border border-morandi-gold rounded-lg">
+            <p className="text-sm text-status-info">
               💡 常見問題會以 Q&A 格式顯示在行程頁面底部，建議設定 3-5 個常見問題。
             </p>
           </div>

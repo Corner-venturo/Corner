@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useMessageStore } from './message-store'
 import type { Message } from './types'
 import { ensureMessageAttachments, normalizeMessage } from './utils'
+import type { Json } from '@/lib/supabase/types'
 
 /**
  * Chat UI 狀態 (不需要同步到 Supabase 的狀態)
@@ -180,12 +181,12 @@ export const useChatStore = () => {
             channel_id: newMessage.channel_id,
             author_id: newMessage.author_id,
             content: newMessage.content,
-            author: newMessage.author,
-            attachments: newMessage.attachments,
-            reactions: newMessage.reactions,
+            author: newMessage.author as unknown as Json,
+            attachments: newMessage.attachments as unknown as Json,
+            reactions: newMessage.reactions as unknown as Json,
             parent_message_id: newMessage.parent_message_id,
             created_at: newMessage.created_at,
-          } as any)
+          })
 
         if (error) {
           // 回滾樂觀更新

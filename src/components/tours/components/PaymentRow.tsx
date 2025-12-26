@@ -33,12 +33,12 @@ const getStatusBadge = (status: string) => {
 
 const getMethodBadge = (method: string) => {
   const badges: Record<string, string> = {
-    bank_transfer: 'bg-blue-100 text-blue-800',
-    credit_card: 'bg-purple-100 text-purple-800',
-    cash: 'bg-green-100 text-green-800',
-    check: 'bg-yellow-100 text-yellow-800',
+    bank_transfer: 'bg-status-info-bg text-status-info',
+    credit_card: 'bg-purple-50 text-purple-600',
+    cash: 'bg-status-success-bg text-status-success',
+    check: 'bg-status-warning-bg text-status-warning',
   }
-  return badges[method] || 'bg-gray-100 text-gray-800'
+  return badges[method] || 'bg-muted text-foreground'
 }
 
 const getMethodDisplayName = (method: string) => {

@@ -157,8 +157,8 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
 
       {/* 重要資訊 */}
       {data.importantNotes && (
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-300 border-l-4 rounded-md p-5">
-          <div className="text-sm font-semibold text-orange-600 mb-3 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-status-warning-bg to-status-warning-bg border border-status-warning/30 border-l-4 rounded-md p-5">
+          <div className="text-sm font-semibold text-status-warning mb-3 flex items-center gap-2">
             ⚠️ 重要城市資訊
           </div>
           <div className="text-sm text-morandi-secondary leading-relaxed whitespace-pre-wrap">

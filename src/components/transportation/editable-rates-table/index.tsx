@@ -317,18 +317,18 @@ export function EditableRatesTable({
                 <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-border/40" style={{ width: '120px' }}>
                   越南盾
                 </th>
-                <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-amber-200/60" style={{ width: '100px' }}>
+                <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-secondary border-r border-morandi-gold/30" style={{ width: '100px' }}>
                   台幣
                 </th>
                 {!hideKKDAYColumns && (
                   <>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-amber-700/70 bg-amber-50/40 border-r border-amber-200/60" style={{ width: '100px' }}>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30" style={{ width: '100px' }}>
                       KKDAY售價
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-amber-700/70 bg-amber-50/40 border-r border-amber-200/60" style={{ width: '100px' }}>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-morandi-gold/30" style={{ width: '100px' }}>
                       KKDAY成本
                     </th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-amber-700/70 bg-amber-50/40 border-r border-border/40" style={{ width: '100px' }}>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-morandi-gold bg-status-warning-bg border-r border-border/40" style={{ width: '100px' }}>
                       利潤
                     </th>
                   </>
