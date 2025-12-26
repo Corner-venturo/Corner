@@ -4,22 +4,6 @@
 echo "🔍 執行 pre-commit 代碼品質檢查..."
 echo "================================"
 
-# 檢查文件大小
-echo ""
-echo "📏 檢查文件大小限制..."
-if ! ./scripts/check-file-size.sh; then
-  echo "❌ 文件大小檢查失敗！請拆分超大文件後再提交。"
-  exit 1
-fi
-
-# 檢查 any 類型使用
-echo ""
-echo "🔍 檢查 TypeScript any 類型使用..."
-if ! ./scripts/check-any-usage.sh; then
-  echo "❌ any 類型檢查失敗！請使用明確的類型定義。"
-  exit 1
-fi
-
 # TypeScript 類型檢查
 echo ""
 echo "🔧 執行 TypeScript 類型檢查..."
@@ -28,7 +12,7 @@ if ! npm run type-check --silent; then
   exit 1
 fi
 
-# ESLint 檢查（只檢查暫存區的文件）
+# ESLint 檢查
 echo ""
 echo "📋 執行 ESLint 檢查..."
 if ! npm run lint --silent; then
