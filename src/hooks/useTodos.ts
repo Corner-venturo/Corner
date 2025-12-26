@@ -109,7 +109,7 @@ export function useTodos() {
 
     try {
        
-      const { error } = await (supabase as any).from('todos').insert(newTodo)
+      const { error } = await supabase.from('todos').insert(newTodo as any)
       if (error) throw error
 
       // 成功後重新驗證

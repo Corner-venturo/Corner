@@ -173,6 +173,129 @@ export type Database = {
         }
         Relationships: []
       }
+      accounting_events: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          event_date: string
+          event_type: Database["public"]["Enums"]["accounting_event_type"]
+          group_id: string | null
+          id: string
+          memo: string | null
+          meta: Json | null
+          reversal_event_id: string | null
+          source_id: string | null
+          source_type: string | null
+          status: Database["public"]["Enums"]["accounting_event_status"] | null
+          tour_id: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          event_date: string
+          event_type: Database["public"]["Enums"]["accounting_event_type"]
+          group_id?: string | null
+          id?: string
+          memo?: string | null
+          meta?: Json | null
+          reversal_event_id?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: Database["public"]["Enums"]["accounting_event_status"] | null
+          tour_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          event_date?: string
+          event_type?: Database["public"]["Enums"]["accounting_event_type"]
+          group_id?: string | null
+          id?: string
+          memo?: string | null
+          meta?: Json | null
+          reversal_event_id?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: Database["public"]["Enums"]["accounting_event_status"] | null
+          tour_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_events_reversal_event_id_fkey"
+            columns: ["reversal_event_id"]
+            isOneToOne: false
+            referencedRelation: "accounting_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_events_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounting_periods: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string | null
+          end_date: string
+          id: string
+          is_closed: boolean | null
+          period_name: string
+          start_date: string
+          workspace_id: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          end_date: string
+          id?: string
+          is_closed?: boolean | null
+          period_name: string
+          start_date: string
+          workspace_id?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          is_closed?: boolean | null
+          period_name?: string
+          start_date?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_periods_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       accounting_subjects: {
         Row: {
           code: string
@@ -232,235 +355,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      // === 手動添加的 ERP 會計表格 (2025-12-20) ===
-      accounting_events: {
-        Row: {
-          id: string
-          workspace_id: string
-          event_type: string
-          source_type: string | null
-          source_id: string | null
-          group_id: string | null
-          tour_id: string | null
-          event_date: string
-          currency: string
-          meta: Json
-          status: string
-          reversal_event_id: string | null
-          memo: string | null
-          created_by: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          workspace_id: string
-          event_type: string
-          source_type?: string | null
-          source_id?: string | null
-          group_id?: string | null
-          tour_id?: string | null
-          event_date: string
-          currency?: string
-          meta?: Json
-          status?: string
-          reversal_event_id?: string | null
-          memo?: string | null
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          workspace_id?: string
-          event_type?: string
-          source_type?: string | null
-          source_id?: string | null
-          group_id?: string | null
-          tour_id?: string | null
-          event_date?: string
-          currency?: string
-          meta?: Json
-          status?: string
-          reversal_event_id?: string | null
-          memo?: string | null
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      chart_of_accounts: {
-        Row: {
-          id: string
-          workspace_id: string
-          code: string
-          name: string
-          account_type: string
-          type: string | null
-          parent_id: string | null
-          is_system_locked: boolean
-          is_active: boolean
-          description: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          workspace_id: string
-          code: string
-          name: string
-          account_type: string
-          type?: string | null
-          parent_id?: string | null
-          is_system_locked?: boolean
-          is_active?: boolean
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          workspace_id?: string
-          code?: string
-          name?: string
-          account_type?: string
-          type?: string | null
-          parent_id?: string | null
-          is_system_locked?: boolean
-          is_active?: boolean
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      erp_bank_accounts: {
-        Row: {
-          id: string
-          workspace_id: string
-          name: string
-          bank_name: string | null
-          account_number: string | null
-          account_id: string | null
-          is_active: boolean
-          description: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          workspace_id: string
-          name: string
-          bank_name?: string | null
-          account_number?: string | null
-          account_id?: string | null
-          is_active?: boolean
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          workspace_id?: string
-          name?: string
-          bank_name?: string | null
-          account_number?: string | null
-          account_id?: string | null
-          is_active?: boolean
-          description?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      journal_lines: {
-        Row: {
-          id: string
-          voucher_id: string
-          line_no: number
-          account_id: string
-          subledger_type: string | null
-          subledger_id: string | null
-          description: string | null
-          debit_amount: number
-          credit_amount: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          voucher_id: string
-          line_no: number
-          account_id: string
-          subledger_type?: string | null
-          subledger_id?: string | null
-          description?: string | null
-          debit_amount?: number
-          credit_amount?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          voucher_id?: string
-          line_no?: number
-          account_id?: string
-          subledger_type?: string | null
-          subledger_id?: string | null
-          description?: string | null
-          debit_amount?: number
-          credit_amount?: number
-          created_at?: string
-        }
-        Relationships: []
-      }
-      journal_vouchers: {
-        Row: {
-          id: string
-          workspace_id: string
-          voucher_no: string
-          voucher_date: string
-          memo: string | null
-          company_unit: string
-          event_id: string | null
-          status: string
-          total_debit: number
-          total_credit: number
-          created_by: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          workspace_id: string
-          voucher_no: string
-          voucher_date: string
-          memo?: string | null
-          company_unit?: string
-          event_id?: string | null
-          status?: string
-          total_debit?: number
-          total_credit?: number
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          workspace_id?: string
-          voucher_no?: string
-          voucher_date?: string
-          memo?: string | null
-          company_unit?: string
-          event_id?: string | null
-          status?: string
-          total_debit?: number
-          total_credit?: number
-          created_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       accounting_transactions: {
         Row: {
@@ -841,6 +735,7 @@ export type Database = {
           city_id: string | null
           country_id: string
           created_at: string | null
+          data_verified: boolean | null
           description: string | null
           display_order: number | null
           duration_minutes: number | null
@@ -858,6 +753,7 @@ export type Database = {
           region_id: string | null
           tags: string[] | null
           thumbnail: string | null
+          ticket_price: string | null
           type: string | null
           updated_at: string | null
           website: string | null
@@ -869,6 +765,7 @@ export type Database = {
           city_id?: string | null
           country_id: string
           created_at?: string | null
+          data_verified?: boolean | null
           description?: string | null
           display_order?: number | null
           duration_minutes?: number | null
@@ -886,6 +783,7 @@ export type Database = {
           region_id?: string | null
           tags?: string[] | null
           thumbnail?: string | null
+          ticket_price?: string | null
           type?: string | null
           updated_at?: string | null
           website?: string | null
@@ -894,9 +792,10 @@ export type Database = {
         Update: {
           address?: string | null
           category?: string | null
-          city_id?: string
+          city_id?: string | null
           country_id?: string
           created_at?: string | null
+          data_verified?: boolean | null
           description?: string | null
           display_order?: number | null
           duration_minutes?: number | null
@@ -914,6 +813,7 @@ export type Database = {
           region_id?: string | null
           tags?: string[] | null
           thumbnail?: string | null
+          ticket_price?: string | null
           type?: string | null
           updated_at?: string | null
           website?: string | null
@@ -1572,12 +1472,13 @@ export type Database = {
           _needs_sync: boolean | null
           _synced_at: string | null
           archived_at: string | null
+          channel_type: string
           created_at: string | null
           created_by: string | null
           description: string | null
           group_id: string | null
           id: string
-          is_announcement: boolean | null
+          is_announcement: boolean
           is_archived: boolean | null
           is_company_wide: boolean | null
           is_favorite: boolean | null
@@ -1597,12 +1498,13 @@ export type Database = {
           _needs_sync?: boolean | null
           _synced_at?: string | null
           archived_at?: string | null
+          channel_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           group_id?: string | null
           id?: string
-          is_announcement?: boolean | null
+          is_announcement?: boolean
           is_archived?: boolean | null
           is_company_wide?: boolean | null
           is_favorite?: boolean | null
@@ -1622,12 +1524,13 @@ export type Database = {
           _needs_sync?: boolean | null
           _synced_at?: string | null
           archived_at?: string | null
+          channel_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           group_id?: string | null
           id?: string
-          is_announcement?: boolean | null
+          is_announcement?: boolean
           is_archived?: boolean | null
           is_company_wide?: boolean | null
           is_favorite?: boolean | null
@@ -1662,6 +1565,63 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chart_of_accounts: {
+        Row: {
+          account_type: string
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_system_locked: boolean | null
+          name: string
+          parent_id: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          account_type: string
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_system_locked?: boolean | null
+          name: string
+          parent_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          account_type?: string
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_system_locked?: boolean | null
+          name?: string
+          parent_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_of_accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chart_of_accounts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -2817,6 +2777,7 @@ export type Database = {
           roles: string[] | null
           salary_info: Json | null
           status: string | null
+          supabase_user_id: string | null
           updated_at: string | null
           user_id: string | null
           workspace_id: string | null
@@ -2845,6 +2806,7 @@ export type Database = {
           roles?: string[] | null
           salary_info?: Json | null
           status?: string | null
+          supabase_user_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           workspace_id?: string | null
@@ -2873,6 +2835,7 @@ export type Database = {
           roles?: string[] | null
           salary_info?: Json | null
           status?: string | null
+          supabase_user_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           workspace_id?: string | null
@@ -2880,6 +2843,57 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "employees_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      erp_bank_accounts: {
+        Row: {
+          account_id: string | null
+          account_number: string | null
+          bank_name: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          account_number?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erp_bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "erp_bank_accounts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -3022,6 +3036,39 @@ export type Database = {
           },
         ]
       }
+      features_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       fitness_goals: {
         Row: {
           completed_at: string | null
@@ -3125,139 +3172,6 @@ export type Database = {
           name?: string
           preview_image_url?: string | null
           sort_order?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      // === 手動添加的模板表 (2025-12-17) ===
-      leader_templates: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          preview_image_url: string | null
-          is_active: boolean | null
-          sort_order: number | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id: string
-          name: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      hotel_templates: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          preview_image_url: string | null
-          is_active: boolean | null
-          sort_order: number | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id: string
-          name: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      pricing_templates: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          preview_image_url: string | null
-          is_active: boolean | null
-          sort_order: number | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id: string
-          name: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      features_templates: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          preview_image_url: string | null
-          is_active: boolean | null
-          sort_order: number | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id: string
-          name: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          preview_image_url?: string | null
-          is_active?: boolean | null
-          sort_order?: number | null
-          created_at?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -3477,6 +3391,39 @@ export type Database = {
           },
         ]
       }
+      hotel_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       image_library: {
         Row: {
           attraction_id: string | null
@@ -3565,6 +3512,7 @@ export type Database = {
           cover_template_id: string | null
           created_at: string
           created_by: string | null
+          creator_user_id: string | null
           daily_itinerary: Json | null
           daily_template_id: string | null
           departure_date: string | null
@@ -3573,9 +3521,11 @@ export type Database = {
           erp_itinerary_id: string | null
           faqs: Json | null
           features: Json | null
+          features_style: string | null
           flight_style: string | null
           flight_template_id: string | null
           focus_cards: Json | null
+          hotel_style: string | null
           hotels: Json | null
           id: string
           is_latest: boolean | null
@@ -3583,6 +3533,7 @@ export type Database = {
           itinerary_style: string | null
           itinerary_subtitle: string | null
           leader: Json | null
+          leader_style: string | null
           meeting_info: Json | null
           notices: string[] | null
           outbound_flight: Json | null
@@ -3591,6 +3542,7 @@ export type Database = {
           price_note: string | null
           price_tiers: Json | null
           pricing_details: Json | null
+          pricing_style: string | null
           return_flight: Json | null
           show_cancellation_policy: boolean | null
           show_faqs: boolean | null
@@ -3612,11 +3564,6 @@ export type Database = {
           version: number | null
           version_records: Json | null
           workspace_id: string
-          // 新增區塊風格欄位 (2025-12-17)
-          leader_style: string | null
-          hotel_style: string | null
-          pricing_style: string | null
-          features_style: string | null
         }
         Insert: {
           _deleted?: boolean | null
@@ -3634,6 +3581,7 @@ export type Database = {
           cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
+          creator_user_id?: string | null
           daily_itinerary?: Json | null
           daily_template_id?: string | null
           departure_date?: string | null
@@ -3642,9 +3590,11 @@ export type Database = {
           erp_itinerary_id?: string | null
           faqs?: Json | null
           features?: Json | null
+          features_style?: string | null
           flight_style?: string | null
           flight_template_id?: string | null
           focus_cards?: Json | null
+          hotel_style?: string | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
@@ -3652,6 +3602,7 @@ export type Database = {
           itinerary_style?: string | null
           itinerary_subtitle?: string | null
           leader?: Json | null
+          leader_style?: string | null
           meeting_info?: Json | null
           notices?: string[] | null
           outbound_flight?: Json | null
@@ -3660,6 +3611,7 @@ export type Database = {
           price_note?: string | null
           price_tiers?: Json | null
           pricing_details?: Json | null
+          pricing_style?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -3681,11 +3633,6 @@ export type Database = {
           version?: number | null
           version_records?: Json | null
           workspace_id: string
-          // 新增區塊風格欄位 (2025-12-17)
-          leader_style?: string | null
-          hotel_style?: string | null
-          pricing_style?: string | null
-          features_style?: string | null
         }
         Update: {
           _deleted?: boolean | null
@@ -3703,6 +3650,7 @@ export type Database = {
           cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
+          creator_user_id?: string | null
           daily_itinerary?: Json | null
           daily_template_id?: string | null
           departure_date?: string | null
@@ -3711,9 +3659,11 @@ export type Database = {
           erp_itinerary_id?: string | null
           faqs?: Json | null
           features?: Json | null
+          features_style?: string | null
           flight_style?: string | null
           flight_template_id?: string | null
           focus_cards?: Json | null
+          hotel_style?: string | null
           hotels?: Json | null
           id?: string
           is_latest?: boolean | null
@@ -3721,6 +3671,7 @@ export type Database = {
           itinerary_style?: string | null
           itinerary_subtitle?: string | null
           leader?: Json | null
+          leader_style?: string | null
           meeting_info?: Json | null
           notices?: string[] | null
           outbound_flight?: Json | null
@@ -3729,6 +3680,7 @@ export type Database = {
           price_note?: string | null
           price_tiers?: Json | null
           pricing_details?: Json | null
+          pricing_style?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -3750,11 +3702,6 @@ export type Database = {
           version?: number | null
           version_records?: Json | null
           workspace_id?: string
-          // 新增區塊風格欄位 (2025-12-17)
-          leader_style?: string | null
-          hotel_style?: string | null
-          pricing_style?: string | null
-          features_style?: string | null
         }
         Relationships: [
           {
@@ -3941,6 +3888,188 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      Itinerary_Permissions: {
+        Row: {
+          created_at: string | null
+          id: number
+          itinerary_id: string
+          permission_level: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          itinerary_id: string
+          permission_level: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          itinerary_id?: string
+          permission_level?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Itinerary_Permissions_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_lines: {
+        Row: {
+          account_id: string | null
+          created_at: string | null
+          credit_amount: number | null
+          debit_amount: number | null
+          description: string | null
+          id: string
+          line_no: number
+          subledger_id: string | null
+          subledger_type: Database["public"]["Enums"]["subledger_type"] | null
+          voucher_id: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string | null
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          id?: string
+          line_no: number
+          subledger_id?: string | null
+          subledger_type?: Database["public"]["Enums"]["subledger_type"] | null
+          voucher_id?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string | null
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          id?: string
+          line_no?: number
+          subledger_id?: string | null
+          subledger_type?: Database["public"]["Enums"]["subledger_type"] | null
+          voucher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "journal_vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_vouchers: {
+        Row: {
+          company_unit: string | null
+          created_at: string | null
+          created_by: string | null
+          event_id: string | null
+          id: string
+          memo: string | null
+          status: Database["public"]["Enums"]["voucher_status"] | null
+          total_credit: number | null
+          total_debit: number | null
+          updated_at: string | null
+          voucher_date: string
+          voucher_no: string
+          workspace_id: string | null
+        }
+        Insert: {
+          company_unit?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          memo?: string | null
+          status?: Database["public"]["Enums"]["voucher_status"] | null
+          total_credit?: number | null
+          total_debit?: number | null
+          updated_at?: string | null
+          voucher_date: string
+          voucher_no: string
+          workspace_id?: string | null
+        }
+        Update: {
+          company_unit?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          memo?: string | null
+          status?: Database["public"]["Enums"]["voucher_status"] | null
+          total_credit?: number | null
+          total_debit?: number | null
+          updated_at?: string | null
+          voucher_date?: string
+          voucher_no?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_vouchers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "accounting_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_vouchers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leader_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       linkpay_logs: {
         Row: {
@@ -4400,9 +4529,10 @@ export type Database = {
           edited_at: string | null
           id: string
           is_pinned: boolean | null
+          last_reply_at: string | null
           parent_message_id: string | null
           reactions: Json | null
-          thread_id: string | null
+          reply_count: number | null
           updated_at: string | null
           updated_by: string | null
           workspace_id: string | null
@@ -4421,9 +4551,10 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          last_reply_at?: string | null
           parent_message_id?: string | null
           reactions?: Json | null
-          thread_id?: string | null
+          reply_count?: number | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -4442,9 +4573,10 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
+          last_reply_at?: string | null
           parent_message_id?: string | null
           reactions?: Json | null
-          thread_id?: string | null
+          reply_count?: number | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
@@ -4476,13 +4608,6 @@ export type Database = {
             columns: ["parent_message_id"]
             isOneToOne: false
             referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "channel_threads"
             referencedColumns: ["id"]
           },
           {
@@ -5030,6 +5155,7 @@ export type Database = {
           subtotal: number | null
           supplier_id: string | null
           supplier_name: string | null
+          tour_id: string | null
           unitprice: number | null
           updated_at: string | null
           updated_by: string | null
@@ -5051,6 +5177,7 @@ export type Database = {
           subtotal?: number | null
           supplier_id?: string | null
           supplier_name?: string | null
+          tour_id?: string | null
           unitprice?: number | null
           updated_at?: string | null
           updated_by?: string | null
@@ -5072,12 +5199,21 @@ export type Database = {
           subtotal?: number | null
           supplier_id?: string | null
           supplier_name?: string | null
+          tour_id?: string | null
           unitprice?: number | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payment_request_items_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_requests: {
         Row: {
@@ -5458,6 +5594,47 @@ export type Database = {
           },
         ]
       }
+      posting_rules: {
+        Row: {
+          created_at: string | null
+          event_type: Database["public"]["Enums"]["accounting_event_type"]
+          id: string
+          is_active: boolean | null
+          rule_config: Json
+          rule_name: string
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: Database["public"]["Enums"]["accounting_event_type"]
+          id?: string
+          is_active?: boolean | null
+          rule_config: Json
+          rule_name: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: Database["public"]["Enums"]["accounting_event_type"]
+          id?: string
+          is_active?: boolean | null
+          rule_config?: Json
+          rule_name?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posting_rules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       premium_experiences: {
         Row: {
           advance_booking_days: number | null
@@ -5762,6 +5939,39 @@ export type Database = {
           updatedat?: string | null
           validfrom?: string | null
           validuntil?: string | null
+        }
+        Relationships: []
+      }
+      pricing_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          preview_image_url: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -6873,6 +7083,160 @@ export type Database = {
           },
         ]
       }
+      social_group_members: {
+        Row: {
+          applied_at: string | null
+          approved_at: string | null
+          group_id: string
+          id: string
+          role: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          approved_at?: string | null
+          group_id: string
+          id?: string
+          role?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          approved_at?: string | null
+          group_id?: string
+          id?: string
+          role?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "social_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_group_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_group_tags: {
+        Row: {
+          group_id: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_group_tags_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "social_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_groups: {
+        Row: {
+          category: string | null
+          cover_image: string | null
+          created_at: string | null
+          created_by: string
+          current_members: number | null
+          description: string | null
+          end_time: string | null
+          estimated_cost: number | null
+          event_date: string | null
+          gender_limit: string | null
+          id: string
+          is_private: boolean | null
+          latitude: number | null
+          location_address: string | null
+          location_name: string | null
+          longitude: number | null
+          max_members: number | null
+          require_approval: boolean | null
+          start_time: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          created_by: string
+          current_members?: number | null
+          description?: string | null
+          end_time?: string | null
+          estimated_cost?: number | null
+          event_date?: string | null
+          gender_limit?: string | null
+          id?: string
+          is_private?: boolean | null
+          latitude?: number | null
+          location_address?: string | null
+          location_name?: string | null
+          longitude?: number | null
+          max_members?: number | null
+          require_approval?: boolean | null
+          start_time?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string
+          current_members?: number | null
+          description?: string | null
+          end_time?: string | null
+          estimated_cost?: number | null
+          event_date?: string | null
+          gender_limit?: string | null
+          id?: string
+          is_private?: boolean | null
+          latitude?: number | null
+          location_address?: string | null
+          location_name?: string | null
+          longitude?: number | null
+          max_members?: number | null
+          require_approval?: boolean | null
+          start_time?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       split_bill_expenses: {
         Row: {
           amount: number
@@ -7775,6 +8139,7 @@ export type Database = {
           deadline: string | null
           enabled_quick_actions: string[] | null
           id: string
+          is_public: boolean | null
           needs_creator_notification: boolean | null
           notes: Json | null
           priority: number
@@ -7796,6 +8161,7 @@ export type Database = {
           deadline?: string | null
           enabled_quick_actions?: string[] | null
           id?: string
+          is_public?: boolean | null
           needs_creator_notification?: boolean | null
           notes?: Json | null
           priority?: number
@@ -7817,6 +8183,7 @@ export type Database = {
           deadline?: string | null
           enabled_quick_actions?: string[] | null
           id?: string
+          is_public?: boolean | null
           needs_creator_notification?: boolean | null
           notes?: Json | null
           priority?: number
@@ -7894,6 +8261,83 @@ export type Database = {
           },
         ]
       }
+      tour_custom_cost_fields: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          field_name: string
+          id: string
+          tour_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          field_name: string
+          id?: string
+          tour_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          field_name?: string
+          id?: string
+          tour_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_custom_cost_fields_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_custom_cost_values: {
+        Row: {
+          created_at: string | null
+          field_id: string
+          id: string
+          member_id: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          field_id: string
+          id?: string
+          member_id: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          field_id?: string
+          id?: string
+          member_id?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_custom_cost_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "tour_custom_cost_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_custom_cost_values_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "order_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_departure_data: {
         Row: {
           bus_info: Json | null
@@ -7946,6 +8390,131 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tour_destinations: {
+        Row: {
+          airport_code: string
+          city: string
+          country: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          airport_code: string
+          city: string
+          country: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          airport_code?: string
+          city?: string
+          country?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      Tour_Expenses: {
+        Row: {
+          actual_amount: number
+          created_at: string | null
+          expense_id: number
+          itinerary_id: string
+          leader_id: string
+          notes: string | null
+        }
+        Insert: {
+          actual_amount: number
+          created_at?: string | null
+          expense_id?: number
+          itinerary_id: string
+          leader_id: string
+          notes?: string | null
+        }
+        Update: {
+          actual_amount?: number
+          created_at?: string | null
+          expense_id?: number
+          itinerary_id?: string
+          leader_id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Tour_Expenses_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_leaders: {
+        Row: {
+          address: string | null
+          code: string | null
+          created_at: string | null
+          display_order: number | null
+          email: string | null
+          id: string
+          languages: string[] | null
+          license_number: string | null
+          name: string
+          name_en: string | null
+          national_id: string | null
+          notes: string | null
+          passport_expiry: string | null
+          passport_number: string | null
+          phone: string | null
+          specialties: string[] | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          code?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          email?: string | null
+          id?: string
+          languages?: string[] | null
+          license_number?: string | null
+          name: string
+          name_en?: string | null
+          national_id?: string | null
+          notes?: string | null
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          specialties?: string[] | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          code?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          email?: string | null
+          id?: string
+          languages?: string[] | null
+          license_number?: string | null
+          name?: string
+          name_en?: string | null
+          national_id?: string | null
+          notes?: string | null
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          specialties?: string[] | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       tour_member_fields: {
         Row: {
@@ -8096,83 +8665,6 @@ export type Database = {
           updatedat?: string | null
         }
         Relationships: []
-      }
-      tour_custom_cost_fields: {
-        Row: {
-          id: string
-          tour_id: string
-          field_name: string
-          display_order: number | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          tour_id: string
-          field_name: string
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          tour_id?: string
-          field_name?: string
-          display_order?: number | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_custom_cost_fields_tour_id_fkey"
-            columns: ["tour_id"]
-            isOneToOne: false
-            referencedRelation: "tours"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tour_custom_cost_values: {
-        Row: {
-          id: string
-          field_id: string
-          member_id: string
-          value: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          field_id: string
-          member_id: string
-          value?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          field_id?: string
-          member_id?: string
-          value?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_custom_cost_values_field_id_fkey"
-            columns: ["field_id"]
-            isOneToOne: false
-            referencedRelation: "tour_custom_cost_fields"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tour_custom_cost_values_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "order_members"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       tour_room_assignments: {
         Row: {
@@ -8381,86 +8873,12 @@ export type Database = {
           },
         ]
       }
-      tour_leaders: {
-        Row: {
-          id: string
-          code: string | null
-          name: string
-          name_en: string | null
-          phone: string | null
-          email: string | null
-          address: string | null
-          national_id: string | null
-          passport_number: string | null
-          passport_expiry: string | null
-          languages: string[] | null
-          specialties: string[] | null
-          license_number: string | null
-          notes: string | null
-          status: string | null
-          display_order: number | null
-          workspace_id: string | null
-          created_at: string | null
-          updated_at: string | null
-          _deleted: boolean | null
-          _needs_sync: boolean | null
-          _synced_at: string | null
-        }
-        Insert: {
-          id?: string
-          code?: string | null
-          name: string
-          name_en?: string | null
-          phone?: string | null
-          email?: string | null
-          address?: string | null
-          national_id?: string | null
-          passport_number?: string | null
-          passport_expiry?: string | null
-          languages?: string[] | null
-          specialties?: string[] | null
-          license_number?: string | null
-          notes?: string | null
-          status?: string | null
-          display_order?: number | null
-          workspace_id?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          _deleted?: boolean | null
-          _needs_sync?: boolean | null
-          _synced_at?: string | null
-        }
-        Update: {
-          id?: string
-          code?: string | null
-          name?: string
-          name_en?: string | null
-          phone?: string | null
-          email?: string | null
-          address?: string | null
-          national_id?: string | null
-          passport_number?: string | null
-          passport_expiry?: string | null
-          languages?: string[] | null
-          specialties?: string[] | null
-          license_number?: string | null
-          notes?: string | null
-          status?: string | null
-          display_order?: number | null
-          workspace_id?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-          _deleted?: boolean | null
-          _needs_sync?: boolean | null
-          _synced_at?: string | null
-        }
-        Relationships: []
-      }
       tours: {
         Row: {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
+          archive_reason: string | null
           archived: boolean | null
           checkin_qrcode: string | null
           closed_by: string | null
@@ -8485,9 +8903,18 @@ export type Database = {
           features: Json | null
           id: string
           is_active: boolean | null
+          last_unlocked_at: string | null
+          last_unlocked_by: string | null
           location: string | null
+          locked_at: string | null
+          locked_by: string | null
+          locked_itinerary_id: string | null
+          locked_itinerary_version: number | null
+          locked_quote_id: string | null
+          locked_quote_version: number | null
           main_city_id: string | null
           max_participants: number | null
+          modification_reason: string | null
           name: string
           outbound_flight: Json | null
           price: number | null
@@ -8507,6 +8934,7 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archive_reason?: string | null
           archived?: boolean | null
           checkin_qrcode?: string | null
           closed_by?: string | null
@@ -8531,9 +8959,18 @@ export type Database = {
           features?: Json | null
           id: string
           is_active?: boolean | null
+          last_unlocked_at?: string | null
+          last_unlocked_by?: string | null
           location?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          locked_itinerary_id?: string | null
+          locked_itinerary_version?: number | null
+          locked_quote_id?: string | null
+          locked_quote_version?: number | null
           main_city_id?: string | null
           max_participants?: number | null
+          modification_reason?: string | null
           name: string
           outbound_flight?: Json | null
           price?: number | null
@@ -8553,6 +8990,7 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
+          archive_reason?: string | null
           archived?: boolean | null
           checkin_qrcode?: string | null
           closed_by?: string | null
@@ -8577,9 +9015,18 @@ export type Database = {
           features?: Json | null
           id?: string
           is_active?: boolean | null
+          last_unlocked_at?: string | null
+          last_unlocked_by?: string | null
           location?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          locked_itinerary_id?: string | null
+          locked_itinerary_version?: number | null
+          locked_quote_id?: string | null
+          locked_quote_version?: number | null
           main_city_id?: string | null
           max_participants?: number | null
+          modification_reason?: string | null
           name?: string
           outbound_flight?: Json | null
           price?: number | null
@@ -8939,6 +9386,728 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_badges: {
+        Row: {
+          badge_type: string
+          earned_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_expense_splits: {
+        Row: {
+          amount: number
+          expense_id: string
+          id: string
+          is_settled: boolean | null
+          settled_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          expense_id: string
+          id?: string
+          is_settled?: boolean | null
+          settled_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          expense_id?: string
+          id?: string
+          is_settled?: boolean | null
+          settled_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_expense_splits_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_expense_splits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_expenses: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          expense_date: string | null
+          id: string
+          paid_by: string
+          receipt_url: string | null
+          split_group_id: string | null
+          title: string
+          trip_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          expense_date?: string | null
+          id?: string
+          paid_by: string
+          receipt_url?: string | null
+          split_group_id?: string | null
+          title: string
+          trip_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          expense_date?: string | null
+          id?: string
+          paid_by?: string
+          receipt_url?: string | null
+          split_group_id?: string | null
+          title?: string
+          trip_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_traveler_expenses_split_group"
+            columns: ["split_group_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_split_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_expenses_paid_by_fkey"
+            columns: ["paid_by"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_expenses_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_friends: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          expires_at: string | null
+          friend_id: string
+          id: string
+          invite_code: string | null
+          invite_message: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          friend_id: string
+          id?: string
+          invite_code?: string | null
+          invite_message?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          friend_id?: string
+          id?: string
+          invite_code?: string | null
+          invite_message?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_friends_friend_id_fkey"
+            columns: ["friend_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_friends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_profiles: {
+        Row: {
+          active_group_count: number | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          customer_id: string | null
+          display_name: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          id_number: string | null
+          id_verified_at: string | null
+          is_founding_member: boolean | null
+          is_profile_complete: boolean | null
+          location: string | null
+          member_level: string | null
+          member_number: number | null
+          phone: string | null
+          updated_at: string | null
+          user_type: string | null
+          username: string | null
+        }
+        Insert: {
+          active_group_count?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          id_number?: string | null
+          id_verified_at?: string | null
+          is_founding_member?: boolean | null
+          is_profile_complete?: boolean | null
+          location?: string | null
+          member_level?: string | null
+          member_number?: number | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type?: string | null
+          username?: string | null
+        }
+        Update: {
+          active_group_count?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          id_number?: string | null
+          id_verified_at?: string | null
+          is_founding_member?: boolean | null
+          is_profile_complete?: boolean | null
+          location?: string | null
+          member_level?: string | null
+          member_number?: number | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      traveler_settlements: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string | null
+          currency: string | null
+          from_user: string
+          id: string
+          note: string | null
+          split_group_id: string | null
+          status: string | null
+          to_user: string
+          trip_id: string | null
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          from_user: string
+          id?: string
+          note?: string | null
+          split_group_id?: string | null
+          status?: string | null
+          to_user: string
+          trip_id?: string | null
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string | null
+          currency?: string | null
+          from_user?: string
+          id?: string
+          note?: string | null
+          split_group_id?: string | null
+          status?: string | null
+          to_user?: string
+          trip_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_traveler_settlements_split_group"
+            columns: ["split_group_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_split_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_settlements_from_user_fkey"
+            columns: ["from_user"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_settlements_to_user_fkey"
+            columns: ["to_user"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_settlements_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_split_group_members: {
+        Row: {
+          display_name: string | null
+          group_id: string
+          id: string
+          is_virtual: boolean | null
+          joined_at: string | null
+          nickname: string | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          group_id: string
+          id?: string
+          is_virtual?: boolean | null
+          joined_at?: string | null
+          nickname?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          group_id?: string
+          id?: string
+          is_virtual?: boolean | null
+          joined_at?: string | null
+          nickname?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_split_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_split_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_split_groups: {
+        Row: {
+          cover_image: string | null
+          created_at: string | null
+          created_by: string
+          default_currency: string | null
+          description: string | null
+          id: string
+          name: string
+          trip_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by: string
+          default_currency?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          trip_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string
+          default_currency?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          trip_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_split_groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_split_groups_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trip_accommodations: {
+        Row: {
+          address: string | null
+          booking_platform: string | null
+          check_in_date: string | null
+          check_out_date: string | null
+          confirmation_number: string | null
+          created_at: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          room_count: number | null
+          room_type: string | null
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          booking_platform?: string | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          confirmation_number?: string | null
+          created_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          room_count?: number | null
+          room_type?: string | null
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          booking_platform?: string | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          confirmation_number?: string | null
+          created_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          room_count?: number | null
+          room_type?: string | null
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_accommodations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trip_flights: {
+        Row: {
+          airline: string | null
+          arrival_airport: string | null
+          arrival_airport_code: string | null
+          arrival_date: string | null
+          arrival_time: string | null
+          cabin_class: string | null
+          created_at: string | null
+          departure_airport: string | null
+          departure_airport_code: string | null
+          departure_date: string | null
+          departure_time: string | null
+          flight_no: string | null
+          flight_type: string | null
+          id: string
+          meeting_location: string | null
+          meeting_time: string | null
+          pnr: string | null
+          ticket_number: string | null
+          trip_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          airline?: string | null
+          arrival_airport?: string | null
+          arrival_airport_code?: string | null
+          arrival_date?: string | null
+          arrival_time?: string | null
+          cabin_class?: string | null
+          created_at?: string | null
+          departure_airport?: string | null
+          departure_airport_code?: string | null
+          departure_date?: string | null
+          departure_time?: string | null
+          flight_no?: string | null
+          flight_type?: string | null
+          id?: string
+          meeting_location?: string | null
+          meeting_time?: string | null
+          pnr?: string | null
+          ticket_number?: string | null
+          trip_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          airline?: string | null
+          arrival_airport?: string | null
+          arrival_airport_code?: string | null
+          arrival_date?: string | null
+          arrival_time?: string | null
+          cabin_class?: string | null
+          created_at?: string | null
+          departure_airport?: string | null
+          departure_airport_code?: string | null
+          departure_date?: string | null
+          departure_time?: string | null
+          flight_no?: string | null
+          flight_type?: string | null
+          id?: string
+          meeting_location?: string | null
+          meeting_time?: string | null
+          pnr?: string | null
+          ticket_number?: string | null
+          trip_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_flights_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trip_invitations: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invite_code: string
+          invitee_id: string | null
+          inviter_id: string
+          role: string | null
+          status: string | null
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_code: string
+          invitee_id?: string | null
+          inviter_id: string
+          role?: string | null
+          status?: string | null
+          trip_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_code?: string
+          invitee_id?: string | null
+          inviter_id?: string
+          role?: string | null
+          status?: string | null
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_invitations_invitee_id_fkey"
+            columns: ["invitee_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_trip_invitations_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_trip_invitations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trip_members: {
+        Row: {
+          id: string
+          joined_at: string | null
+          nickname: string | null
+          role: string | null
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          nickname?: string | null
+          role?: string | null
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          nickname?: string | null
+          role?: string | null
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trip_members_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_trip_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traveler_trips: {
+        Row: {
+          cover_image: string | null
+          created_at: string | null
+          created_by: string
+          default_currency: string | null
+          description: string | null
+          end_date: string | null
+          erp_tour_id: string | null
+          id: string
+          start_date: string | null
+          status: string | null
+          title: string
+          tour_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by: string
+          default_currency?: string | null
+          description?: string | null
+          end_date?: string | null
+          erp_tour_id?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string | null
+          title: string
+          tour_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string
+          default_currency?: string | null
+          description?: string | null
+          end_date?: string | null
+          erp_tour_id?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          tour_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traveler_trips_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "traveler_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -10141,31 +11310,6 @@ export type Database = {
           },
         ]
       }
-      // === 手動添加的表格類型 (2025-12-22) ===
-      tour_destinations: {
-        Row: {
-          id: string
-          country: string
-          city: string
-          airport_code: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          country: string
-          city: string
-          airport_code: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          country?: string
-          city?: string
-          airport_code?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       tour_rooms_status: {
@@ -10236,8 +11380,60 @@ export type Database = {
         }
         Returns: undefined
       }
+      ensure_traveler_profile: {
+        Args: {
+          p_avatar_url?: string
+          p_email?: string
+          p_full_name?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       get_current_employee_id: { Args: never; Returns: string }
       get_current_user_workspace: { Args: never; Returns: string }
+      get_or_create_dm_channel: {
+        Args: {
+          p_user_1_id: string
+          p_user_2_id: string
+          p_workspace_id: string
+        }
+        Returns: {
+          _deleted: boolean | null
+          _needs_sync: boolean | null
+          _synced_at: string | null
+          archived_at: string | null
+          channel_type: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          group_id: string | null
+          id: string
+          is_announcement: boolean
+          is_archived: boolean | null
+          is_company_wide: boolean | null
+          is_favorite: boolean | null
+          is_pinned: boolean | null
+          name: string
+          order: number | null
+          scope: string | null
+          tour_id: string | null
+          type: string | null
+          updated_at: string | null
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["channel_visibility"] | null
+          workspace_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "channels"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_user_permission: {
+        Args: { p_itinerary_id: string; p_user_id: string }
+        Returns: string
+      }
       get_user_project_ids: { Args: { uid: string }; Returns: string[] }
       get_user_workspace_id: { Args: never; Returns: string }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
@@ -10245,7 +11441,9 @@ export type Database = {
         Args: { customer_id_param: string; points_param: number }
         Returns: undefined
       }
-      is_admin: { Args: never; Returns: boolean }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { p_user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       refresh_all_region_stats: { Args: never; Returns: undefined }
       set_current_workspace: {
@@ -10255,10 +11453,20 @@ export type Database = {
       update_city_stats: { Args: { p_city_id: string }; Returns: undefined }
     }
     Enums: {
+      accounting_event_status: "posted" | "reversed"
+      accounting_event_type:
+        | "customer_receipt_posted"
+        | "supplier_payment_posted"
+        | "group_settlement_posted"
+        | "bonus_paid"
+        | "tax_paid"
+        | "manual_voucher"
       calendar_visibility: "private" | "workspace" | "company_wide"
       channel_visibility: "private" | "public"
       confirmation_type: "accommodation" | "flight"
+      subledger_type: "customer" | "supplier" | "bank" | "group" | "employee"
       verification_status: "verified" | "unverified" | "rejected"
+      voucher_status: "draft" | "posted" | "reversed" | "locked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -10386,10 +11594,21 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      accounting_event_status: ["posted", "reversed"],
+      accounting_event_type: [
+        "customer_receipt_posted",
+        "supplier_payment_posted",
+        "group_settlement_posted",
+        "bonus_paid",
+        "tax_paid",
+        "manual_voucher",
+      ],
       calendar_visibility: ["private", "workspace", "company_wide"],
       channel_visibility: ["private", "public"],
       confirmation_type: ["accommodation", "flight"],
+      subledger_type: ["customer", "supplier", "bank", "group", "employee"],
       verification_status: ["verified", "unverified", "rejected"],
+      voucher_status: ["draft", "posted", "reversed", "locked"],
     },
   },
 } as const

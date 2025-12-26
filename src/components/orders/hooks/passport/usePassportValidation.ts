@@ -169,8 +169,9 @@ export function usePassportValidation(): UsePassportValidationReturn {
 
           matchedCustomer = true
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const createdCustomer = await useCustomerStore.getState().create({
+          // 護照辨識自動建立客戶，使用 type assertion 避免完整欄位驗證
+          const customerStore = useCustomerStore.getState()
+          const customerInput = {
             name: customerData.name || '',
             english_name: customerData.english_name || '',
             passport_number: passportNumber,
@@ -181,13 +182,15 @@ export function usePassportValidation(): UsePassportValidationReturn {
             date_of_birth: birthDate,
             gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
             phone: '',
+            member_type: 'potential', // 護照建立的客戶預設為潛在客戶
             is_vip: false,
-            is_active: true,
             total_spent: 0,
             total_orders: 0,
             verification_status: 'unverified',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
+            // 其他欄位由資料庫預設值或 store 自動填入
+          }
+           
+          const createdCustomer = await customerStore.create(customerInput as any)
 
           if (createdCustomer) {
             await supabase

@@ -22,8 +22,8 @@ export interface Order extends BaseEntity {
   contact_phone?: string | null // 聯絡電話（可選）
   sales_person: string | null // 業務人員
   assistant: string | null // 助理
-  member_count: number // 團員人數
-  payment_status: PaymentStatus // 付款狀態
+  member_count: number | null // 團員人數
+  payment_status: PaymentStatus | null // 付款狀態
   status?: OrderStatus | null // 訂單狀態
   total_amount: number // 總金額
   paid_amount: number // 已付金額

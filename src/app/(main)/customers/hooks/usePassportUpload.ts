@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Customer } from '@/types/customer.types'
 
 interface UploadResult {
@@ -27,10 +28,10 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
 
   // 📁 文件變更處理
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('📁 handlePassportFileChange triggered', e.target.files)
+    logger.log('📁 handlePassportFileChange triggered', e.target.files)
     const newFiles = e.target.files
     if (newFiles && newFiles.length > 0) {
-      console.log('📁 Adding files:', Array.from(newFiles).map(f => f.name))
+      logger.log('📁 Adding files:', Array.from(newFiles).map(f => f.name))
       setFiles(prev => [...prev, ...Array.from(newFiles)])
     }
   }, [])
@@ -54,7 +55,7 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
     setIsDragging(false)
 
     const droppedFiles = Array.from(e.dataTransfer.files)
-    console.log('📥 Files dropped:', droppedFiles.map(f => f.name))
+    logger.log('📥 Files dropped:', droppedFiles.map(f => f.name))
 
     if (droppedFiles.length > 0) {
       setFiles(prev => [...prev, ...droppedFiles])
@@ -172,7 +173,7 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
       const allFiles: File[] = []
       for (const file of files) {
         if (file.type === 'application/pdf') {
-          console.log(`📄 Converting PDF: ${file.name}`)
+          logger.log(`📄 Converting PDF: ${file.name}`)
           const images = await convertPdfToImages(file)
           allFiles.push(...images)
         } else {
@@ -180,17 +181,17 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
         }
       }
 
-      console.log(`📤 開始上傳 ${allFiles.length} 個檔案`)
+      logger.log(`📤 開始上傳 ${allFiles.length} 個檔案`)
 
       // 逐一處理每個文件
       for (let i = 0; i < allFiles.length; i++) {
         const file = allFiles[i]
-        console.log(`處理 ${i + 1}/${allFiles.length}: ${file.name}`)
+        logger.log(`處理 ${i + 1}/${allFiles.length}: ${file.name}`)
 
         try {
           // 1. 壓縮圖片
           const compressedFile = await compressImage(file)
-          console.log(`✅ 壓縮完成: ${file.name} (${(compressedFile.size / 1024).toFixed(0)} KB)`)
+          logger.log(`✅ 壓縮完成: ${file.name} (${(compressedFile.size / 1024).toFixed(0)} KB)`)
 
           // 2. 呼叫 OCR API
           const formData = new FormData()
@@ -226,7 +227,7 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
 
               if (existingCustomers && existingCustomers.length > 0) {
                 matchedCustomer = existingCustomers[0]
-                console.log(`✅ 找到匹配客戶: ${matchedCustomer.name}`)
+                logger.log(`✅ 找到匹配客戶: ${matchedCustomer?.name ?? ''}`)
               }
             }
 
@@ -288,7 +289,7 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
             })
           }
         } catch (error) {
-          console.error(`❌ 處理失敗: ${file.name}`, error)
+          logger.error(`❌ 處理失敗: ${file.name}`, error)
           results.push({
             success: false,
             fileName: file.name,
@@ -319,7 +320,7 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
         await onSuccess(successfulCustomers)
       }
     } catch (error) {
-      console.error('批次上傳失敗:', error)
+      logger.error('批次上傳失敗:', error)
       toast.error('批次上傳失敗')
     } finally {
       setIsUploading(false)

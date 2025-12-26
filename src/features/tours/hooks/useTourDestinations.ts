@@ -12,7 +12,7 @@ export interface TourDestination {
   country: string
   city: string
   airport_code: string
-  created_at: string
+  created_at: string | null
 }
 
 export function useTourDestinations() {

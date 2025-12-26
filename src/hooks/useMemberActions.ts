@@ -5,6 +5,7 @@
 import { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
+import { logger } from '@/lib/utils/logger'
 import type { Member } from '@/stores/types'
 
 // SWR key 與 cloud-hooks 的 useMembers 一致，確保 mutate 時能同步
@@ -42,7 +43,7 @@ async function syncOrderMemberCount(orderId: string): Promise<void> {
     .eq('order_id', orderId)
 
   if (countError) {
-    console.error('Failed to count members:', countError)
+    logger.error('Failed to count members:', countError)
     return
   }
 
@@ -53,7 +54,7 @@ async function syncOrderMemberCount(orderId: string): Promise<void> {
     .eq('id', orderId)
 
   if (updateError) {
-    console.error('Failed to update order member_count:', updateError)
+    logger.error('Failed to update order member_count:', updateError)
     return
   }
 
@@ -83,10 +84,12 @@ export function useMemberActions(): MemberActionsReturn {
       id: generateUUID(),
       created_at: now,
       updated_at: now,
+      name: data.name || '', // 確保 name 不為 undefined
       ...(workspace_id ? { workspace_id } : {}),
     } as Member
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // 使用 type assertion 避免 Supabase 嚴格類型檢查
+     
     const { error } = await supabase.from('members').insert(newMember as any)
     if (error) throw error
 

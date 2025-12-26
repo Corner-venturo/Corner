@@ -22,13 +22,13 @@ class TourService extends BaseService<Tour & BaseEntity> {
       getAll: () => store.items as unknown as (Tour & BaseEntity)[],
       getById: (id: string) => store.items.find(t => t.id === id) as unknown as (Tour & BaseEntity) | undefined,
       add: async (tour: Tour & BaseEntity) => {
-         
-        const result = await store.create(tour as any)
-        return (result || tour) as unknown as Tour & BaseEntity
+        // Type assertion needed due to Store CreateInput type requirements
+        const result = await store.create(tour as unknown as Parameters<typeof store.create>[0])
+        return (result || tour) as Tour & BaseEntity
       },
       update: async (id: string, data: Partial<Tour>) => {
-         
-        await store.update(id, data as any)
+        // Type assertion needed due to Store type compatibility
+        await store.update(id, data as Parameters<typeof store.update>[1])
       },
       delete: async (id: string) => {
         await store.delete(id)

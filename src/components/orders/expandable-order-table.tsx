@@ -52,7 +52,8 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
     setActiveTabs(prev => ({ ...prev, [order_id]: tabId }))
   }
 
-  const getPaymentBadge = (status: string) => {
+  const getPaymentBadge = (status: string | null) => {
+    if (!status) return 'bg-morandi-muted text-white'
     const badges: Record<string, string> = {
       paid: 'bg-morandi-green text-white',
       partial: 'bg-morandi-gold text-white',
