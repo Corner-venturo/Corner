@@ -5,7 +5,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
@@ -29,6 +29,8 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
 import { TourClosingDialog } from './TourClosingDialog'
+import { TourRequestDialog } from '@/app/(main)/tour-requests/components/TourRequestDialog'
+import { useTourRequests } from '@/stores/tour-request-store'
 
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
@@ -44,14 +46,17 @@ const TourDetailDialog = dynamic(
 
 export const ToursPage: React.FC = () => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { user } = useAuthStore()
 
   const [selectedItineraryId, setSelectedItineraryId] = useState<string | null>(null)
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
+  const [tourRequestDialogTour, setTourRequestDialogTour] = useState<Tour | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
+  const { items: tourRequests } = useTourRequests()
   const { dialog, closeDialog } = useDialog()
 
   const {
@@ -180,6 +185,17 @@ export const ToursPage: React.FC = () => {
     onUnlockLockedTour: openUnlockDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
+    onOpenTourRequestDialog: (tour: Tour) => {
+      // 檢查該團是否有需求單
+      const hasRequests = tourRequests.some(r => r.tour_id === tour.id)
+      if (hasRequests) {
+        // 有需求單：跳轉到需求單列表頁
+        router.push(`/tour-requests?tour_id=${tour.id}`)
+      } else {
+        // 沒有需求單：打開新增對話框
+        setTourRequestDialogTour(tour)
+      }
+    },
   })
 
   // 點擊整列打開詳情浮動視窗
@@ -337,6 +353,13 @@ export const ToursPage: React.FC = () => {
           onSuccess={closeClosingDialog}
         />
       )}
+
+      {/* 需求單對話框 */}
+      <TourRequestDialog
+        isOpen={!!tourRequestDialogTour}
+        onClose={() => setTourRequestDialogTour(null)}
+        defaultTourId={tourRequestDialogTour?.id}
+      />
     </div>
   )
 }

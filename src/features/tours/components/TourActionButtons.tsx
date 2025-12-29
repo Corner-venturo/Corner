@@ -20,6 +20,7 @@ import {
   FileText,
   CheckCircle2,
   FileCheck,
+  ClipboardList,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -49,6 +50,8 @@ interface UseTourActionButtonsParams {
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
   onOpenArchiveDialog?: (tour: Tour) => void
+  // 需求單對話框
+  onOpenTourRequestDialog?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -71,6 +74,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onUnlockLockedTour,
     onCloseTour,
     onOpenArchiveDialog,
+    onOpenTourRequestDialog,
   } = params
 
   const renderActions = useCallback(
@@ -221,6 +225,22 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <FileSignature size={14} />
           </button>
 
+          {/* 需求單 */}
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              if (onOpenTourRequestDialog) {
+                onOpenTourRequestDialog(tour)
+              } else {
+                router.push(`/tour-requests?tour_id=${tour.id}`)
+              }
+            }}
+            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
+            title="需求單"
+          >
+            <ClipboardList size={14} />
+          </button>
+
           {/* 封存/解除封存 */}
           <button
             onClick={e => {
@@ -295,6 +315,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onUnlockLockedTour,
       onCloseTour,
       onOpenArchiveDialog,
+      onOpenTourRequestDialog,
     ]
   )
 

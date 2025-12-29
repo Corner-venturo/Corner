@@ -4,7 +4,7 @@
  */
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   Check,
   AlertTriangle,
@@ -71,6 +71,13 @@ export function CustomerVerifyDialog({
       })
     }
   }, [customer])
+
+  // 當對話框打開或 customer 改變時，初始化表單
+  useEffect(() => {
+    if (open && customer) {
+      initFormData()
+    }
+  }, [open, customer, initFormData])
 
   // 儲存驗證結果
   const handleSave = async () => {
