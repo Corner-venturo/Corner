@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Users, Plus, Printer, Hotel, Bus, Hash, Plane, Coins } from 'lucide-react'
+import { Users, Plus, Printer, Hotel, Bus, Plane, Coins } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -46,6 +46,7 @@ export function OrderMembersExpandable({
   workspaceId,
   onClose,
   mode: propMode,
+  embedded = false,
 }: OrderMembersExpandableProps) {
   const mode = propMode || (orderId ? 'order' : 'tour')
 
@@ -115,9 +116,9 @@ export function OrderMembersExpandable({
   }, [membersData.members, roomVehicle.showRoomColumn, roomVehicle.roomSortKeys])
 
   return (
-    <div className="flex flex-col h-full border border-border rounded-lg overflow-hidden bg-card">
-      {/* 區塊標題行 - 與收款紀錄/成本支出風格一致 */}
-      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border/60">
+    <div className={`flex flex-col h-full overflow-hidden ${embedded ? '' : 'border border-border rounded-xl bg-card'}`}>
+      {/* 區塊標題行 */}
+      <div className={`flex-shrink-0 flex items-center justify-between px-4 py-2 ${embedded ? '' : 'bg-morandi-container/50 border-b border-border/60'}`}>
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-morandi-primary">團員名單</span>
           <span className="text-sm text-morandi-secondary">({sortedMembers.length} 人)</span>
@@ -136,8 +137,8 @@ export function OrderMembersExpandable({
               </Button>
             </>
           )}
-          <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
-            <Hash size={14} className={showIdentityColumn ? 'text-morandi-gold' : ''} />
+          <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
+            身份
           </Button>
           {mode === 'tour' && (
             <Button

@@ -115,24 +115,6 @@ export function MemberRow({
         />
       </td>
 
-      {/* 訂房代號 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-        <input
-          type="text"
-          value={member.hotel_confirmation || ''}
-          onChange={e => onUpdateField(member.id, 'hotel_confirmation', e.target.value)}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={e => {
-            setIsComposing(false)
-            setTimeout(() => onUpdateField(member.id, 'hotel_confirmation', e.currentTarget.value), 0)
-          }}
-          data-member={member.id}
-          data-field="hotel_confirmation"
-          className="w-full bg-transparent text-xs font-mono border-none outline-none shadow-none"
-          placeholder="輸入訂房代號"
-        />
-      </td>
-
       {/* 應付金額 */}
       <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
         <input

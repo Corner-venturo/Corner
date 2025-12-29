@@ -54,12 +54,12 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   return (
     <div
       className={cn(
-        'flex flex-col w-full h-full overflow-hidden bg-card rounded-xl border border-border shadow-sm',
+        'flex flex-col w-full h-full overflow-hidden border border-border rounded-xl bg-card',
         className
       )}
     >
       {/* 表頭 */}
-      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 rounded-t-xl">
+      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b border-border/60 rounded-t-xl">
         <div className="grid" style={{ gridTemplateColumns: gridCols }}>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
@@ -217,14 +217,13 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
 
               {/* 展開成員列表 */}
               {expandedOrderId === order.id && (
-                <div className="bg-morandi-container/10 border-t border-border">
-                  <OrderMembersExpandable
-                    orderId={order.id}
-                    tourId={order.tour_id || ''}
-                    workspaceId={workspaceId}
-                    onClose={() => setExpandedOrderId(null)}
-                  />
-                </div>
+                <OrderMembersExpandable
+                  orderId={order.id}
+                  tourId={order.tour_id || ''}
+                  workspaceId={workspaceId}
+                  onClose={() => setExpandedOrderId(null)}
+                  embedded
+                />
               )}
             </React.Fragment>
           ))

@@ -119,6 +119,8 @@ export interface OrderMembersExpandableProps {
   workspaceId: string
   onClose?: () => void
   mode?: 'order' | 'tour'
+  /** 是否嵌入在其他組件中（如訂單展開），嵌入時不顯示外框 */
+  embedded?: boolean
 }
 
 export interface MemberRowProps {
