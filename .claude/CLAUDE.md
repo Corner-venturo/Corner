@@ -1,17 +1,40 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2025-12-25 (UI 規範整合 + 技術債清理)
+> **最後更新**: 2025-12-29 (SITEMAP 規範強化 + 工具模組)
 > **專案狀態**: 核心功能完成，代碼品質強化中
+
+---
+
+## 🚨🚨🚨 對話開始必做 (P0) 🚨🚨🚨
+
+### 第一步：閱讀 SITEMAP
+
+**每次對話開始時，必須先執行：**
+```
+Read /Users/williamchien/Projects/SITEMAP.md
+```
+
+**為什麼？**
+- SITEMAP 包含完整的頁面路由、API、Store、關鍵檔案位置
+- 直接查 SITEMAP 比 grep/glob 搜尋快 10 倍
+- 減少 token 消耗，提高回應速度
+- 避免找錯檔案或重複搜尋
+
+**SITEMAP 包含：**
+- 頁面路由對照表
+- API 端點列表
+- Store 結構
+- 工具模組位置
+- 狀態生命週期
 
 ---
 
 ## 📍 必讀清單（開發前必看）
 
-### 1. 專案網站地圖
+### 1. 專案網站地圖（已在上方強調）
 ```
 /Users/williamchien/Projects/SITEMAP.md
 ```
-包含：頁面路由、API 列表、Store 結構、關鍵檔案位置
 
 ### 2. UI/UX 規範文件
 | 文件 | 內容 | 最後更新 |
