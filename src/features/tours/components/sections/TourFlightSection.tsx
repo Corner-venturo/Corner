@@ -33,7 +33,7 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
   let effectiveFlightStyle: FlightStyleType = data.flightStyle || 'original'
   if (!data.flightStyle) {
     // 向後相容：如果沒有設定 flightStyle，根據 coverStyle 推斷
-    if (coverStyle === 'nature' || coverStyle === 'serene') {
+    if (coverStyle === 'nature') {
       effectiveFlightStyle = 'chinese'
     } else if (coverStyle === 'luxury') {
       effectiveFlightStyle = 'luxury'

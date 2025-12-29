@@ -27,7 +27,7 @@ export function extractCityName(airport: string | null | undefined): string {
 }
 
 /**
- * 中國風航班卡片組件 - 用於 nature/serene 風格
+ * 中國風航班卡片組件 - 用於 nature 風格
  */
 export function ChineseFlightCard({
   flight,

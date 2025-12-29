@@ -13,6 +13,7 @@ export interface TimeboxBox extends BaseEntity {
   user_id: string
   default_content: Record<string, unknown> | null
   equipment?: string | null
+  default_duration?: number | null // 預設時長（分鐘）
 }
 
 export interface TimeboxWeek extends BaseEntity {
@@ -20,6 +21,8 @@ export interface TimeboxWeek extends BaseEntity {
   week_start: string // date string YYYY-MM-DD
   name: string | null
   archived: boolean | null
+  review_notes?: string | null // 週回顧筆記
+  next_week_goals?: string | null // 下週目標
 }
 
 export interface TimeboxScheduledBox extends BaseEntity {
@@ -56,6 +59,13 @@ export interface ReminderData {
   lastUpdated: string
 }
 
+// 訓練模板
+export interface WorkoutTemplate extends BaseEntity {
+  user_id: string
+  name: string
+  exercises: WorkoutExercise[]
+}
+
 // ============================================
 // Hooks
 // ============================================
@@ -70,6 +80,10 @@ export const useTimeboxWeeks = createCloudHook<TimeboxWeek>('timebox_weeks', {
 
 export const useTimeboxScheduledBoxes = createCloudHook<TimeboxScheduledBox>('timebox_scheduled_boxes', {
   orderBy: { column: 'start_time', ascending: true },
+})
+
+export const useWorkoutTemplates = createCloudHook<WorkoutTemplate>('timebox_workout_templates', {
+  orderBy: { column: 'name', ascending: true },
 })
 
 // ============================================

@@ -65,6 +65,14 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
     }
   }, [open])
 
+  // 如果只有一個訂單，自動帶入
+  useEffect(() => {
+    if (formData.tour_id && filteredOrders.length === 1 && !formData.order_id) {
+      const order = filteredOrders[0]
+      setFormData(prev => ({ ...prev, order_id: order.id }))
+    }
+  }, [formData.tour_id, filteredOrders, formData.order_id, setFormData])
+
   const handleSubmit = async () => {
     // 驗證表單
     const errors = validateForm()
@@ -81,7 +89,6 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
       // 實作儲存邏輯
       const { useReceiptStore, useAuthStore } = await import('@/stores')
       const { generateReceiptNumber } = await import('@/lib/utils/receipt-number-generator')
-      const { getCurrentWorkspaceCode } = await import('@/lib/workspace-helpers')
 
       const receiptStore = useReceiptStore.getState()
       const authStore = useAuthStore.getState()
@@ -91,18 +98,19 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
         throw new Error('無法取得 workspace ID')
       }
 
-      const workspaceCode = getCurrentWorkspaceCode()
-      if (!workspaceCode) {
-        throw new Error('無法取得 workspace code，請重新登入')
+      // 取得團號（從訂單關聯的旅遊團）
+      const tour = tours.find(t => t.id === selectedOrder?.tour_id)
+      const tourCode = tour?.code || ''
+      if (!tourCode) {
+        throw new Error('無法取得團號，請確認訂單已關聯旅遊團')
       }
 
       // 為每個收款項目建立收款單
       for (const item of paymentItems) {
-        // 生成收款單號
+        // 生成收款單號（新格式：{團號}-R{2位數}）
         const receiptNumber = generateReceiptNumber(
-          workspaceCode,
-          item.transaction_date,
-          receiptStore.items
+          tourCode,
+          receiptStore.items.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`))
         )
 
         // 建立收款單
@@ -191,7 +199,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
         </DialogHeader>
 
         {/* 基本資訊 - 單行 */}
-        <div className="bg-white border border-border rounded-md p-4 shadow-sm">
+        <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {/* 選擇團體 */}
             <div>
@@ -257,40 +265,31 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
           </div>
         </div>
 
-        {/* 收款項目 - 表格式 */}
-        <div className="bg-white border border-border rounded-md p-4 shadow-sm flex-1 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-foreground">收款項目</h3>
-            <Button onClick={addPaymentItem} size="sm" variant="outline">
+        {/* 收款項目 - 文青風表格 */}
+        <div className="flex-1 flex flex-col overflow-hidden pt-4 border-t border-morandi-container/30">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-morandi-primary">收款項目</h3>
+            <Button onClick={addPaymentItem} size="sm" variant="ghost" className="text-morandi-gold hover:bg-morandi-gold/10">
               <Plus size={14} className="mr-2" />
               新增項目
             </Button>
           </div>
 
-          <div className="overflow-x-auto flex-1">
+          <div className="flex-1 overflow-visible">
+            {/* 表頭 */}
+            <div className="border-b border-morandi-container/60">
+              <div className="grid grid-cols-[110px_120px_150px_180px_1fr_60px] px-2 py-2.5">
+                <span className="text-xs font-medium text-morandi-secondary">收款方式</span>
+                <span className="text-xs font-medium text-morandi-secondary text-right pr-2">金額</span>
+                <span className="text-xs font-medium text-morandi-secondary">交易日期</span>
+                <span className="text-xs font-medium text-morandi-secondary">付款人姓名</span>
+                <span className="text-xs font-medium text-morandi-secondary">備註</span>
+                <span></span>
+              </div>
+            </div>
+
+            {/* 項目列表 */}
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-3 text-sm font-medium text-muted-foreground w-28">
-                    收款方式
-                  </th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-muted-foreground w-28">
-                    金額
-                  </th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-muted-foreground w-36">
-                    交易日期
-                  </th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-muted-foreground w-40">
-                    付款人姓名
-                  </th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-muted-foreground">
-                    備註
-                  </th>
-                  <th className="text-center py-2 px-3 text-sm font-medium text-muted-foreground w-20">
-                    操作
-                  </th>
-                </tr>
-              </thead>
               <tbody>
                 {paymentItems.map((item, index) => (
                   <PaymentItemRow
@@ -300,15 +299,16 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
                     onUpdate={updatePaymentItem}
                     onRemove={removePaymentItem}
                     canRemove={paymentItems.length > 1}
+                    isNewRow={index === paymentItems.length - 1}
                   />
                 ))}
               </tbody>
             </table>
 
             {paymentItems.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-border flex justify-end items-center">
-                <span className="text-base font-semibold text-foreground mr-4">總金額:</span>
-                <span className="text-xl font-bold text-morandi-gold">
+              <div className="flex justify-end items-center gap-6 pt-4 mt-2">
+                <span className="text-sm text-morandi-secondary">總金額</span>
+                <span className="text-lg font-semibold text-morandi-gold">
                   NT$ {totalAmount.toLocaleString()}
                 </span>
               </div>

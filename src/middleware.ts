@@ -58,12 +58,13 @@ export async function middleware(request: NextRequest) {
   // 公開路由：不需要登入即可訪問
   const publicPaths = [
     '/login',
-    '/demo', // DEMO 展示頁面（公開）
+    '/confirm', // 報價確認頁面（客戶公開連結）
     '/api/auth',
     '/api/health',
     '/api/linkpay', // Webhook 回調
     '/api/gemini', // AI 圖片生成 API
     '/api/itineraries', // 公開行程 API（給 /view 頁面使用）
+    '/api/quotes/confirmation/customer', // 客戶報價確認 API（使用 token 驗證）
     '/api/my', // App API（使用 Bearer token 驗證）
     '/api/trips', // App API（使用 Bearer token 驗證）
     '/api/eyeline', // 旅人眼線 API（使用 Bearer token 驗證）

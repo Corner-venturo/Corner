@@ -28,6 +28,7 @@ import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
+import { TourClosingDialog } from './TourClosingDialog'
 
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
@@ -66,7 +67,6 @@ export const ToursPage: React.FC = () => {
     state,
     actions,
     handleSortChange,
-    handleRowClick,
   } = useToursPage()
 
   const {
@@ -92,6 +92,9 @@ export const ToursPage: React.FC = () => {
     unlockDialogTour,
     openUnlockDialog,
     closeUnlockDialog,
+    closingDialogTour,
+    openClosingDialog,
+    closeClosingDialog,
     deleteConfirm,
     openDeleteDialog,
     closeDeleteDialog,
@@ -175,8 +178,16 @@ export const ToursPage: React.FC = () => {
     },
     onConfirmTour: openConfirmWizard,
     onUnlockLockedTour: openUnlockDialog,
+    onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
   })
+
+  // 點擊整列打開詳情浮動視窗
+  const handleRowClick = useCallback((row: unknown) => {
+    const tour = row as Tour
+    setSelectedTour(tour)
+    openDetailDialog(tour.id)
+  }, [setSelectedTour, openDetailDialog])
 
   useEffect(() => {
     handleNavigationEffect()
@@ -315,6 +326,15 @@ export const ToursPage: React.FC = () => {
           open={!!unlockDialogTour}
           onOpenChange={(open) => !open && closeUnlockDialog()}
           onUnlocked={closeUnlockDialog}
+        />
+      )}
+
+      {closingDialogTour && (
+        <TourClosingDialog
+          tour={closingDialogTour}
+          open={!!closingDialogTour}
+          onOpenChange={(open) => !open && closeClosingDialog()}
+          onSuccess={closeClosingDialog}
         />
       )}
     </div>

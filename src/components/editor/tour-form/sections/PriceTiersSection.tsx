@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, Users, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Users, GripVertical, Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { TierPricing } from '@/stores/types/quote.types'
 
 interface PriceTiersSectionProps {
   data: TourFormData
   onChange: (data: TourFormData) => void
+  quoteTierPricings?: TierPricing[] // 從報價單帶入的砍次表
 }
 
 // 格式化價格（加千分位逗號）
@@ -26,6 +28,17 @@ const formatPrice = (value: string): string => {
 // 解析價格（移除逗號）
 const parsePrice = (value: string): string => {
   return value.replace(/,/g, '')
+}
+
+// 從報價單的 TierPricing 轉換為行程表的 PriceTier
+const convertFromQuoteTierPricings = (tierPricings: TierPricing[]): PriceTier[] => {
+  return tierPricings.map((tier) => ({
+    label: `${tier.participant_count}人成團`,
+    sublabel: '每人',
+    price: formatPrice(String(tier.selling_prices?.adult || 0)),
+    priceNote: '起',
+    addon: '',
+  }))
 }
 
 // 預設價格方案
@@ -53,8 +66,15 @@ const getDefaultPriceTiers = (): PriceTier[] => [
   },
 ]
 
-export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
+export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTiersSectionProps) {
   const priceTiers = data.priceTiers || getDefaultPriceTiers()
+
+  // 從報價單帶入砍次表
+  const importFromQuote = () => {
+    if (!quoteTierPricings || quoteTierPricings.length === 0) return
+    const converted = convertFromQuoteTierPricings(quoteTierPricings)
+    onChange({ ...data, priceTiers: converted, showPriceTiers: true })
+  }
 
   // 更新價格方案
   const updatePriceTier = (index: number, updates: Partial<PriceTier>) => {
@@ -103,16 +123,31 @@ export function PriceTiersSection({ data, onChange }: PriceTiersSectionProps) {
             </p>
           </div>
         </div>
-        <Switch
-          checked={data.showPriceTiers || false}
-          onCheckedChange={(checked) => {
-            onChange({
-              ...data,
-              showPriceTiers: checked,
-              priceTiers: checked && !data.priceTiers ? getDefaultPriceTiers() : data.priceTiers,
-            })
-          }}
-        />
+        <div className="flex items-center gap-2">
+          {/* 從報價單帶入按鈕 */}
+          {quoteTierPricings && quoteTierPricings.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={importFromQuote}
+              className="gap-1.5 text-morandi-gold border-morandi-gold hover:bg-morandi-gold hover:text-white"
+            >
+              <Download className="h-4 w-4" />
+              從報價單帶入 ({quoteTierPricings.length})
+            </Button>
+          )}
+          <Switch
+            checked={data.showPriceTiers || false}
+            onCheckedChange={(checked) => {
+              onChange({
+                ...data,
+                showPriceTiers: checked,
+                priceTiers: checked && !data.priceTiers ? getDefaultPriceTiers() : data.priceTiers,
+              })
+            }}
+          />
+        </div>
       </div>
 
       {/* 主內容區域 */}

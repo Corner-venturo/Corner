@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -35,9 +34,10 @@ interface MockDocument {
 interface TourDocumentsProps {
   tour: Tour
   orderFilter?: string
+  showSummary?: boolean
 }
 
-export function TourDocuments({ orderFilter }: TourDocumentsProps) {
+export function TourDocuments({ orderFilter, showSummary = true }: TourDocumentsProps) {
    
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [newDocument, setNewDocument] = useState({
@@ -104,131 +104,84 @@ export function TourDocuments({ orderFilter }: TourDocumentsProps) {
   )
 
   return (
-    <div className="space-y-6">
-      {/* 文件統計 */}
-      <ContentContainer>
-        <h3 className="text-lg font-semibold text-morandi-primary mb-4">文件狀態概覽</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-primary">{mockDocuments.length}</div>
-            <div className="text-sm text-morandi-secondary">總文件數</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-green">
-              {mockDocuments.filter(doc => doc.status.includes('已')).length}
+    <div className="space-y-4">
+      {/* 統計 + 按鈕 */}
+      {showSummary && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6 text-sm">
+            <div>
+              <span className="text-morandi-secondary">總文件</span>
+              <span className="ml-2 font-semibold text-morandi-primary">{mockDocuments.length}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">已確認</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-gold">
-              {mockDocuments.filter(doc => doc.status.includes('待')).length}
+            <div>
+              <span className="text-morandi-secondary">已確認</span>
+              <span className="ml-2 font-semibold text-morandi-green">{mockDocuments.filter(doc => doc.status.includes('已')).length}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">待處理</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-primary">
-              {mockDocuments.filter(doc => doc.signedBy).length}
+            <div>
+              <span className="text-morandi-secondary">待處理</span>
+              <span className="ml-2 font-semibold text-morandi-gold">{mockDocuments.filter(doc => doc.status.includes('待')).length}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">已簽署</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Download size={14} className="mr-1" />
+              批量下載
+            </Button>
+            <Button
+              onClick={() => setIsUploadDialogOpen(true)}
+              size="sm"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Plus size={14} className="mr-1" />
+              上傳文件
+            </Button>
           </div>
         </div>
-      </ContentContainer>
+      )}
 
-      {/* 文件操作按鈕 - 右上角 */}
-      <div className="flex justify-end gap-2 mb-6">
-        <Button variant="outline">
-          <Download size={16} className="mr-2" />
-          批量下載
-        </Button>
-        <Button
-          onClick={() => setIsUploadDialogOpen(true)}
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-        >
-          <Plus size={16} className="mr-2" />
-          上傳文件
-        </Button>
-      </div>
-
-      {/* 文件分類展示 */}
-      <div className="space-y-6">
-        {Object.entries(documentsByType).map(([type, documents]) => (
-          <ContentContainer key={type}>
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-medium text-morandi-primary flex items-center">
-                <FileText size={20} className={`mr-2 ${getTypeColor(type)}`} />
-                {type}文件
-                <span className="ml-2 text-sm text-morandi-secondary">
-                  ({documents.length} 個文件)
-                </span>
-              </h4>
-            </div>
-
-            <div className="space-y-2">
-              {documents.map((doc) => {
-                const StatusIcon = getStatusIcon(doc.status)
-                return (
-                  <div
-                    key={doc.id}
-                    className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg hover:shadow-md transition-shadow"
-                  >
-                    <div className="col-span-3">
-                      <div className="flex items-center">
-                        <StatusIcon
-                          size={16}
-                          className={
-                            doc.status.includes('已')
-                              ? 'text-morandi-green'
-                              : doc.status.includes('待')
-                                ? 'text-morandi-gold'
-                                : 'text-morandi-red'
-                          }
-                        />
-                        <div className="ml-2">
-                          <div className="font-medium text-morandi-primary">{doc.name}</div>
-                          <div className="text-xs text-morandi-secondary">
-                            {doc.format} • {doc.size}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-span-3">
-                      <div className="text-sm text-morandi-primary">{doc.description}</div>
-                      {doc.signedBy && (
-                        <div className="text-xs text-morandi-secondary">簽署人：{doc.signedBy}</div>
-                      )}
-                    </div>
-
-                    <div className="col-span-2">
-                      <div className="text-sm text-morandi-primary">{doc.uploadDate}</div>
-                    </div>
-
-                    <div className="col-span-2">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(doc.status)}`}
-                      >
-                        {doc.status}
-                      </span>
-                    </div>
-
-                    <div className="col-span-2">
-                      <div className="flex gap-1">
-                        <Button variant="outline" size="sm">
-                          <Eye size={12} className="mr-1" />
-                          預覽
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Download size={12} className="mr-1" />
-                          下載
-                        </Button>
-                      </div>
-                    </div>
+      {/* 文件列表 */}
+      <div className="border border-border rounded-lg overflow-hidden">
+        {mockDocuments.length === 0 ? (
+          <div className="py-12 text-center text-morandi-secondary">
+            <FileText size={24} className="mx-auto mb-4 opacity-50" />
+            <p>尚無文件</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {mockDocuments.map((doc) => {
+              const StatusIcon = getStatusIcon(doc.status)
+              return (
+                <div
+                  key={doc.id}
+                  className="flex items-center gap-4 px-4 py-3 hover:bg-morandi-container/20"
+                >
+                  <StatusIcon
+                    size={16}
+                    className={
+                      doc.status.includes('已') ? 'text-morandi-green' :
+                      doc.status.includes('待') ? 'text-morandi-gold' : 'text-morandi-red'
+                    }
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-morandi-primary">{doc.name}</div>
+                    <div className="text-xs text-morandi-secondary">{doc.format} • {doc.size} • {doc.uploadDate}</div>
                   </div>
-                )
-              })}
-            </div>
-          </ContentContainer>
-        ))}
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadge(doc.status)}`}>
+                    {doc.status}
+                  </span>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Eye size={14} />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 px-2">
+                      <Download size={14} />
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* 上傳文件對話框 */}

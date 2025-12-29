@@ -11,7 +11,7 @@
  * - 訂單選擇對話框狀態（團體模式）
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
@@ -58,7 +58,7 @@ export function useOrderMembersData({
   /**
    * 載入旅遊團出發/回程日期
    */
-  const loadTourDepartureDate = async () => {
+  const loadTourDepartureDate = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('tours')
@@ -72,14 +72,14 @@ export function useOrderMembersData({
     } catch (error) {
       logger.error('載入出發日期失敗:', error)
     }
-  }
+  }, [tourId])
 
   /**
    * 載入成員資料
    * - 單一訂單模式：載入該訂單的成員
    * - 團體模式：載入該旅遊團所有訂單的成員
    */
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     setLoading(true)
     try {
       let membersData: OrderMember[] = []
@@ -167,7 +167,7 @@ export function useOrderMembersData({
     } finally {
       setLoading(false)
     }
-  }
+  }, [mode, tourId, orderId])
 
   /**
    * 處理新增成員按鈕點擊

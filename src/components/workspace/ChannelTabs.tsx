@@ -90,15 +90,15 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* 分頁標籤 */}
-      <div className="h-[52px] border-b border-border bg-white px-6 flex items-center shrink-0">
+      {/* 分頁標籤 - 高度對齊 logo 分割線 (72px - 16px padding = 56px) */}
+      <div className="h-[56px] border-b border-border bg-white px-6 flex items-center shrink-0">
         <div className="flex items-center justify-between w-full">
           <div className="flex gap-1 items-center">
             {/* 對話 Tab */}
             <button
               onClick={() => setActiveTab('chat')}
               className={cn(
-                'flex items-center gap-2 px-4 h-[52px] text-sm font-medium transition-colors relative',
+                'flex items-center gap-2 px-4 h-[56px] text-sm font-medium transition-colors relative',
                 activeTab === 'chat'
                   ? 'text-morandi-primary'
                   : 'text-morandi-secondary hover:text-morandi-primary'
@@ -117,7 +117,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
                 key={canvas.id}
                 onClick={() => setActiveTab(canvas.id)}
                 className={cn(
-                  'group flex items-center gap-2 px-4 h-[52px] text-sm font-medium transition-colors relative',
+                  'group flex items-center gap-2 px-4 h-[56px] text-sm font-medium transition-colors relative',
                   activeTab === canvas.id
                     ? 'text-morandi-primary'
                     : 'text-morandi-secondary hover:text-morandi-primary'

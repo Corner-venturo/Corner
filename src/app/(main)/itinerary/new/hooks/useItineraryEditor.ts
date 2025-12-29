@@ -15,6 +15,7 @@ import type {
   HotelInfo,
 } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord, PricingDetails, PriceTier, FAQ } from '@/stores/types'
+import type { TierPricing } from '@/stores/types/quote.types'
 
 // Local tour data interface
 export interface LocalTourData {
@@ -25,7 +26,7 @@ export interface LocalTourData {
   departureDate: string
   tourCode: string
   coverImage?: string
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
   flightStyle?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
   itineraryStyle?: 'original' | 'luxury' | 'art' | 'dreamscape'
   price?: string | null
@@ -70,6 +71,7 @@ export function useItineraryEditor() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<AutoSaveStatus>('idle')
   const [currentItineraryId, setCurrentItineraryId] = useState<string | null>(itineraryId)
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
+  const [quoteTierPricings, setQuoteTierPricings] = useState<TierPricing[]>([])
 
   const { create: createItinerary, update: updateItinerary } = useItineraryStore()
   const { user } = useAuthStore()
@@ -220,6 +222,8 @@ export function useItineraryEditor() {
     setCurrentVersionIndex,
     handleVersionChange,
     performAutoSave,
+    quoteTierPricings,
+    setQuoteTierPricings,
   }
 }
 

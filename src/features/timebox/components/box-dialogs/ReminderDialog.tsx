@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Check } from 'lucide-react'
 import {
   useTimeboxScheduledBoxes,
+  useTimeboxBoxes,
   type TimeboxScheduledBox,
   type TimeboxBox,
   type ReminderData,
@@ -22,6 +23,7 @@ interface ReminderDialogProps {
 
 export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderDialogProps) {
   const { update: updateScheduledBox, delete: deleteScheduledBox } = useTimeboxScheduledBoxes()
+  const { update: updateBox } = useTimeboxBoxes()
   const [text, setText] = useState('')
 
   // 載入現有資料
@@ -32,13 +34,21 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
     }
   }, [scheduledBox.data])
 
+  // 同時更新排程和箱子預設內容
+  const saveContent = async (reminderData: ReminderData) => {
+    // 更新排程
+    await updateScheduledBox(scheduledBox.id, { data: reminderData as unknown as Record<string, unknown> })
+    // 更新箱子預設內容（下次新增排程會自動帶入）
+    await updateBox(box.id, { default_content: reminderData as unknown as Record<string, unknown> })
+  }
+
   const handleUpdate = async () => {
     const reminderData: ReminderData = {
       text,
       lastUpdated: new Date().toISOString(),
     }
 
-    await updateScheduledBox(scheduledBox.id, { data: reminderData as unknown as Record<string, unknown> })
+    await saveContent(reminderData)
     onClose()
   }
 
@@ -48,10 +58,8 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
         text,
         lastUpdated: new Date().toISOString(),
       }
-      await updateScheduledBox(scheduledBox.id, {
-        data: reminderData as unknown as Record<string, unknown>,
-        completed: true,
-      })
+      await saveContent(reminderData)
+      await updateScheduledBox(scheduledBox.id, { completed: true })
     } else if (!scheduledBox.completed) {
       await updateScheduledBox(scheduledBox.id, { completed: true })
     }
@@ -123,19 +131,25 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
             <Button
               variant="outline"
               onClick={handleDelete}
-              className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg"
+              className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg gap-1"
             >
-              <Trash2 size={16} className="mr-1" />
+              <Trash2 size={16} />
               移除排程
             </Button>
             <div className="flex space-x-2">
               <Button variant="outline" onClick={onClose}>
                 取消
               </Button>
-              <Button variant="outline" onClick={handleUpdate}>
+              <Button variant="outline" onClick={handleUpdate} className="gap-1">
+                <Check size={16} />
                 更新內容
               </Button>
-              <Button onClick={handleComplete} disabled={scheduledBox.completed}>
+              <Button
+                onClick={handleComplete}
+                disabled={scheduledBox.completed}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+              >
+                <Check size={16} />
                 {scheduledBox.completed ? '已完成' : '標記完成'}
               </Button>
             </div>

@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Users, Plus, Printer, Hotel, Bus, Hash, Plane } from 'lucide-react'
+import { Users, Plus, Printer, Hotel, Bus, Hash, Plane, Coins } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -115,51 +115,53 @@ export function OrderMembersExpandable({
   }, [membersData.members, roomVehicle.showRoomColumn, roomVehicle.roomSortKeys])
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between p-4 border-b bg-morandi-bg">
+    <div className="flex flex-col h-full border border-border rounded-lg overflow-hidden bg-card">
+      {/* 區塊標題行 - 與收款紀錄/成本支出風格一致 */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border/60">
         <div className="flex items-center gap-2">
-          <Users className="text-morandi-gold" size={20} />
-          <h3 className="font-medium text-morandi-primary">
-            {mode === 'tour' ? '團體成員名單' : '訂單成員名單'} ({sortedMembers.length}人)
-          </h3>
+          <span className="text-sm font-medium text-morandi-primary">團員名單</span>
+          <span className="text-sm text-morandi-secondary">({sortedMembers.length} 人)</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {mode === 'tour' && (
             <>
-              <Button variant="outline" size="sm" onClick={() => roomVehicle.setShowRoomManager(true)}>
-                <Hotel size={14} className="mr-1" />分房管理
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
+                <Hotel size={14} className="mr-1" />分房
               </Button>
-              <Button variant="outline" size="sm" onClick={() => roomVehicle.setShowVehicleManager(true)}>
-                <Bus size={14} className="mr-1" />分車管理
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowVehicleManager(true)}>
+                <Bus size={14} className="mr-1" />分車
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setShowPnrColumn(!showPnrColumn)}>
-                <Plane size={14} className="mr-1" />PNR {showPnrColumn ? '✓' : ''}
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrColumn(!showPnrColumn)}>
+                <Plane size={14} className={showPnrColumn ? 'text-morandi-gold' : ''} />
               </Button>
             </>
           )}
-          <Button variant="outline" size="sm" onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
-            <Hash size={14} className="mr-1" />身份 {showIdentityColumn ? '✓' : ''}
+          <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
+            <Hash size={14} className={showIdentityColumn ? 'text-morandi-gold' : ''} />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => memberExport.setIsExportDialogOpen(true)}>
-            <Printer size={14} className="mr-1" />列印
+          {mode === 'tour' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2"
+              onClick={() => {
+                const name = prompt('輸入費用欄位名稱（例如：簽證費、小費）')
+                if (name?.trim()) {
+                  setCustomCostFields([...customCostFields, { id: `cost_${Date.now()}`, name: name.trim(), values: {} }])
+                }
+              }}
+            >
+              <Coins size={14} className={customCostFields.length > 0 ? 'text-morandi-gold' : ''} />
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => memberExport.setIsExportDialogOpen(true)}>
+            <Printer size={14} />
           </Button>
-          <Button variant="default" size="sm" onClick={membersData.handleAddMember}>
-            <Plus size={14} className="mr-1" />新增成員
+          <Button variant="default" size="sm" className="h-8 px-3" onClick={membersData.handleAddMember}>
+            <Plus size={14} className="mr-1" />新增
           </Button>
         </div>
       </div>
-
-      {/* Custom Cost Fields Control */}
-      {mode === 'tour' && (
-        <div className="flex-shrink-0 px-4 py-2 border-b bg-morandi-container/10">
-          <CustomCostFieldsSection
-            fields={customCostFields}
-            onAddField={(name) => setCustomCostFields([...customCostFields, { id: `cost_${Date.now()}`, name, values: {} }])}
-            onRemoveField={(id) => setCustomCostFields(customCostFields.filter(f => f.id !== id))}
-          />
-        </div>
-      )}
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
@@ -181,6 +183,7 @@ export function OrderMembersExpandable({
                 isEditMode={isAllEditMode}
                 showIdentityColumn={showIdentityColumn}
                 showPnrColumn={showPnrColumn}
+                showRoomColumn={roomVehicle.showRoomColumn}
                 showOrderCode={mode === 'tour' && membersData.orderCount > 1}
                 departureDate={membersData.departureDate}
                 roomAssignment={roomVehicle.roomAssignments[member.id]}

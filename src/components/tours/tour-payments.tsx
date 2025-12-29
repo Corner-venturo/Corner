@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { Tour } from '@/stores/types'
-import { DollarSign } from 'lucide-react'
+import { DollarSign, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useTourPayments } from './hooks/useTourPayments'
 import { PaymentSummary } from './components/PaymentSummary'
 import { PaymentRow } from './components/PaymentRow'
@@ -14,6 +15,7 @@ interface TourPaymentsProps {
   orderFilter?: string
   triggerAdd?: boolean
   onTriggerAddComplete?: () => void
+  showSummary?: boolean
 }
 
 export const TourPayments = React.memo(function TourPayments({
@@ -21,6 +23,7 @@ export const TourPayments = React.memo(function TourPayments({
   orderFilter,
   triggerAdd,
   onTriggerAddComplete,
+  showSummary = true,
 }: TourPaymentsProps) {
   const {
     // 資料
@@ -69,21 +72,40 @@ export const TourPayments = React.memo(function TourPayments({
   } = useTourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete })
 
   return (
-    <div className="space-y-6">
-      {/* 收款統計 */}
-      <PaymentSummary
-        totalConfirmed={totalConfirmed}
-        totalPending={totalPending}
-        totalPayments={totalPayments}
-        remaining_amount={remaining_amount}
-      />
+    <div className="space-y-4">
+      {/* 統計 + 新增按鈕 */}
+      {showSummary && (
+        <div className="flex items-center justify-between">
+          <PaymentSummary
+            totalConfirmed={totalConfirmed}
+            totalPending={totalPending}
+            totalPayments={totalPayments}
+            remaining_amount={remaining_amount}
+          />
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            size="sm"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            <Plus size={14} className="mr-1" />
+            新增收款
+          </Button>
+        </div>
+      )}
 
       {/* 收款紀錄表格 */}
       <div className="border border-border rounded-lg overflow-hidden bg-card">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-morandi-container/30">
-              <tr>
+            <thead>
+              {/* 區塊標題行 */}
+              <tr className="bg-morandi-container/50 border-b border-border/60">
+                <th colSpan={8} className="text-left py-2 px-4 text-sm font-medium text-morandi-primary">
+                  收款紀錄
+                </th>
+              </tr>
+              {/* 欄位標題行 */}
+              <tr className="bg-morandi-container/30">
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-morandi-secondary">
                   日期
                 </th>

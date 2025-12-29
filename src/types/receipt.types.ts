@@ -11,6 +11,7 @@ export interface Receipt {
   receipt_number: string // R2501280001
   workspace_id: string
   order_id: string | null
+  tour_id: string | null // 直接關聯團號，方便查詢
   order_number: string | null
   tour_name: string | null
 
@@ -178,6 +179,7 @@ export function getReceiptStatusColor(status: ReceiptStatus): string {
 export interface CreateReceiptData {
   workspace_id: string
   order_id: string
+  tour_id?: string // 直接關聯團號
   order_number: string
   tour_name?: string
   receipt_date: string

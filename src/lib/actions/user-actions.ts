@@ -9,17 +9,11 @@ interface WorkspaceMember {
   avatar_url: string | null
 }
 
-interface ProfileData {
-  name: string | null
-  avatar_url: string | null
-}
-
 /**
  * Fetches all members of the current user's workspace, excluding the user themselves.
  *
  * This action retrieves the current user's session and workspace ID,
- * then queries for all employees in that workspace, joining with
- * the profiles table to get their public information.
+ * then queries for all employees in that workspace.
  */
 export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
   // 使用統一的認證服務
@@ -33,17 +27,18 @@ export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
   const { user, workspaceId } = auth.data
   const supabase = await getAuthenticatedSupabase()
 
-  // Query for all employees in the workspace and join with their profiles
+  // Query for all employees in the workspace
   const { data: members, error: queryError } = await supabase
     .from('employees')
     .select(`
       id,
-      profiles (
-        name,
-        avatar_url
-      )
+      display_name,
+      chinese_name,
+      english_name,
+      avatar_url
     `)
     .eq('workspace_id', workspaceId)
+    .eq('is_active', true)
     .neq('id', user.id) // Exclude the current user
 
   if (queryError) {
@@ -51,18 +46,12 @@ export async function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
     throw new Error('Could not fetch workspace members.')
   }
 
-  // The data structure from the query will be nested, e.g., { id, profiles: [{ name, ... }] }
-  // We'll flatten it for easier use in the UI.
-  const formattedMembers: WorkspaceMember[] = (members || []).map(member => {
-    // profiles is an array from the join, get first item
-    const profilesArray = member.profiles as ProfileData[] | null
-    const profile = profilesArray?.[0]
-    return {
-      id: member.id,
-      full_name: profile?.name || 'Unnamed User',
-      avatar_url: profile?.avatar_url || null,
-    }
-  })
+  // Format the members for the UI
+  const formattedMembers: WorkspaceMember[] = (members || []).map(member => ({
+    id: member.id,
+    full_name: member.display_name || member.chinese_name || member.english_name || 'Unnamed User',
+    avatar_url: member.avatar_url || null,
+  }))
 
   return formattedMembers
 }

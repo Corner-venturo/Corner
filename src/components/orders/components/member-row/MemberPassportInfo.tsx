@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { cn } from '@/lib/utils'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import type { OrderMember } from '../../order-member.types'
@@ -27,7 +27,6 @@ export function MemberPassportInfo({
   onUpdateField,
   onKeyDown,
 }: MemberPassportInfoProps) {
-  const [isComposing, setIsComposing] = useState(false)
 
   // 處理護照效期日期輸入
   const handlePassportExpiryInput = (value: string) => {
@@ -49,28 +48,6 @@ export function MemberPassportInfo({
 
   return (
     <>
-      {/* 護照拼音 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.passport_name || ''}
-            onChange={e => onUpdateField(member.id, 'passport_name', e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={e => {
-              setIsComposing(false)
-              setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
-            }}
-            onKeyDown={e => onKeyDown(e, index, 'passport_name')}
-            data-member={member.id}
-            data-field="passport_name"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
-        ) : (
-          <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
-        )}
-      </td>
-
       {/* 護照號碼 */}
       <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
         {isEditMode ? (

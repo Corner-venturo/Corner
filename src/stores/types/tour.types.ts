@@ -231,8 +231,8 @@ export interface Itinerary {
   cover_image: string
   country: string
   city: string
-  status: '提案' | '進行中'
-  cover_style?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
+  status: '提案' | '進行中' | '結案' | '取消'
+  cover_style?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   flight_style?: 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage' // 航班卡片風格
   itinerary_style?: 'original' | 'luxury' | 'art' | 'dreamscape' // 每日行程風格
   price?: string | null // 價格（如：39,800）

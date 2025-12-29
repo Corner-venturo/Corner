@@ -284,7 +284,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
           <textarea
             value={formData.note || ''}
             onChange={e => updateField('note', e.target.value)}
-            className="w-full mt-1 p-2 border border-border rounded-md bg-background text-sm min-h-[80px]"
+            className="w-full mt-1 p-2 border border-border rounded-md bg-white text-sm min-h-[80px]"
             placeholder="輸入備註..."
           />
         </div>

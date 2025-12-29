@@ -1,6 +1,6 @@
 'use client'
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface SectionTitleProps {
   title: string
@@ -12,12 +12,12 @@ interface SectionTitleProps {
 /**
  * 區塊標題組件 - 根據 coverStyle 切換風格
  * - original/gemini: 原版金色標題
- * - nature/serene: 中國風書法標題
+ * - nature: 中國風書法標題
  */
 export function SectionTitle({ title, subtitle, coverStyle = 'original', className = '' }: SectionTitleProps) {
-  const isChineseStyle = coverStyle === 'nature' || coverStyle === 'serene'
+  const isChineseStyle = coverStyle === 'nature'
 
-  // 中國風版本（nature/serene）
+  // 中國風版本（nature）
   if (isChineseStyle) {
     return (
       <div className={`flex flex-col items-center justify-center gap-2 mb-8 text-center ${className}`}>

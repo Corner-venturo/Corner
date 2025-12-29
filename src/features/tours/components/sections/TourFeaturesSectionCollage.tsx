@@ -36,7 +36,7 @@ interface CollageFeature {
   tags?: string[] // recipe 風格用的標籤
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourData {
   features?: CollageFeature[]

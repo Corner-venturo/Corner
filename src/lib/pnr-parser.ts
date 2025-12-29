@@ -26,6 +26,29 @@ export interface ParsedPNR {
   otherInfo: EnhancedOSI[];
   contactInfo: string[];
   validation: ValidationResult;
+  // 2025-12-29: PNR Enhancement - Fare Monitoring
+  fareData: ParsedFareData | null;
+}
+
+/**
+ * 票價解析結果
+ */
+export interface ParsedFareData {
+  currency: string;          // TWD, USD, etc.
+  baseFare: number | null;   // 票價（不含稅）
+  taxes: number | null;      // 稅金
+  totalFare: number;         // 總價
+  fareBasis: string | null;  // Fare Basis Code
+  validatingCarrier: string | null; // 開票航空公司
+  taxBreakdown: TaxItem[];   // 稅金明細
+  perPassenger: boolean;     // 是否為每人價格
+  raw: string;               // 原始票價資訊
+}
+
+export interface TaxItem {
+  code: string;   // YQ, OI, G3, etc.
+  amount: number;
+  currency?: string;
 }
 
 export interface EnhancedSSR {
@@ -255,7 +278,8 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     specialRequests: [],
     otherInfo: [],
     contactInfo: [],
-    validation
+    validation,
+    fareData: null
   };
 
   for (const line of lines) {
@@ -373,7 +397,212 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     }
   }
 
+  // 7. 解析票價資訊（在循環結束後處理）
+  result.fareData = parseFareFromTelegram(rawPNR);
+
   return result;
+}
+
+/**
+ * 從 Amadeus 電報解析票價資訊
+ *
+ * 常見票價格式：
+ * - FV BR                    (Validating Carrier)
+ * - K FARE USD320.00         (Base Fare)
+ * - K TAX 45.00XT            (Taxes)
+ * - K TOTAL USD365.00        (Total)
+ *
+ * 或 TST 格式：
+ * - FXP/R,U                  (Fare Quote command)
+ * - 01 WU/MINGTUNG
+ * - FARE  TWD10000
+ * - TAX   1500YQ 150OI 50G3
+ * - TOTAL TWD11700
+ *
+ * 或 HTML 確認單格式：
+ * - 票價：TWD 10,000
+ * - 稅金：TWD 1,500
+ * - 合計：TWD 11,500
+ */
+export function parseFareFromTelegram(rawPNR: string): ParsedFareData | null {
+  const lines = rawPNR.split('\n').map(line => line.trim());
+  const fullText = rawPNR.toUpperCase();
+
+  let currency = 'TWD';
+  let baseFare: number | null = null;
+  let taxes: number | null = null;
+  let totalFare: number | null = null;
+  let fareBasis: string | null = null;
+  let validatingCarrier: string | null = null;
+  const taxBreakdown: TaxItem[] = [];
+  let perPassenger = true;
+  const rawFareLines: string[] = [];
+
+  // 1. 解析 Validating Carrier (FV XX)
+  const fvMatch = fullText.match(/FV\s+([A-Z]{2})/);
+  if (fvMatch) {
+    validatingCarrier = fvMatch[1];
+  }
+
+  // 2. 解析 Fare Basis (K FB- 或 FBA-)
+  const fbMatch = fullText.match(/(?:K\s+FB-?|FBA-?)\s*([A-Z0-9]+)/i);
+  if (fbMatch) {
+    fareBasis = fbMatch[1];
+  }
+
+  for (const line of lines) {
+    const upperLine = line.toUpperCase();
+
+    // 3. 解析標準 K FARE 格式
+    // K FARE USD320.00 或 K FARE TWD10000
+    const kFareMatch = upperLine.match(/K\s+FARE\s+([A-Z]{3})[\s]*([\d,]+(?:\.\d{2})?)/);
+    if (kFareMatch) {
+      currency = kFareMatch[1];
+      baseFare = parseFloat(kFareMatch[2].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 4. 解析 K TAX 格式
+    // K TAX 45.00XT 或 K TAX USD45.00
+    const kTaxMatch = upperLine.match(/K\s+TAX\s+(?:([A-Z]{3})[\s]*)?([\d,]+(?:\.\d{2})?)/);
+    if (kTaxMatch) {
+      if (kTaxMatch[1]) currency = kTaxMatch[1];
+      taxes = parseFloat(kTaxMatch[2].replace(/,/g, ''));
+      rawFareLines.push(line);
+
+      // 嘗試解析稅金代碼
+      const taxCodeMatch = upperLine.match(/([\d.]+)([A-Z]{2})/g);
+      if (taxCodeMatch) {
+        for (const match of taxCodeMatch) {
+          const [, amount, code] = match.match(/([\d.]+)([A-Z]{2})/) || [];
+          if (amount && code) {
+            taxBreakdown.push({ code, amount: parseFloat(amount) });
+          }
+        }
+      }
+      continue;
+    }
+
+    // 5. 解析 K TOTAL 格式
+    // K TOTAL USD365.00 或 K TOTAL TWD11700
+    const kTotalMatch = upperLine.match(/K\s+TOTAL\s+([A-Z]{3})[\s]*([\d,]+(?:\.\d{2})?)/);
+    if (kTotalMatch) {
+      currency = kTotalMatch[1];
+      totalFare = parseFloat(kTotalMatch[2].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 6. 解析 TST/FXP 格式 (直接的 FARE/TAX/TOTAL)
+    // FARE  TWD10000 或 FARE TWD 10,000
+    const fareMatch = upperLine.match(/^FARE\s+([A-Z]{3})[\s]*([\d,]+(?:\.\d{2})?)/);
+    if (fareMatch) {
+      currency = fareMatch[1];
+      baseFare = parseFloat(fareMatch[2].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // TAX   1500YQ 150OI 50G3 或 TAX TWD 1,500
+    const taxMatch = upperLine.match(/^TAX\s+(?:([A-Z]{3})[\s]*)?([\d,]+(?:\.\d{2})?)/);
+    if (taxMatch) {
+      const taxAmount = parseFloat(taxMatch[2].replace(/,/g, ''));
+      if (taxMatch[1]) {
+        currency = taxMatch[1];
+        taxes = taxAmount;
+      } else {
+        // 嘗試加總多個稅金 (1500YQ 150OI 50G3)
+        const allTaxes = upperLine.match(/([\d]+)([A-Z]{2})/g);
+        if (allTaxes) {
+          taxes = 0;
+          for (const t of allTaxes) {
+            const [, amount, code] = t.match(/([\d]+)([A-Z]{2})/) || [];
+            if (amount && code) {
+              const taxAmt = parseFloat(amount);
+              taxes += taxAmt;
+              taxBreakdown.push({ code, amount: taxAmt });
+            }
+          }
+        } else {
+          taxes = taxAmount;
+        }
+      }
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // TOTAL TWD11700 或 TOTAL TWD 11,700
+    const totalMatch = upperLine.match(/^TOTAL\s+([A-Z]{3})[\s]*([\d,]+(?:\.\d{2})?)/);
+    if (totalMatch) {
+      currency = totalMatch[1];
+      totalFare = parseFloat(totalMatch[2].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 7. 解析中文 HTML 確認單格式
+    // 票價：TWD 10,000 或 票價: NT$ 10,000
+    const cnFareMatch = line.match(/票價[:：]\s*(?:NT\$|TWD|USD)?\s*([\d,]+)/);
+    if (cnFareMatch) {
+      baseFare = parseFloat(cnFareMatch[1].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 稅金：TWD 1,500
+    const cnTaxMatch = line.match(/稅金[:：]\s*(?:NT\$|TWD|USD)?\s*([\d,]+)/);
+    if (cnTaxMatch) {
+      taxes = parseFloat(cnTaxMatch[1].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 合計：TWD 11,500 或 總計：TWD 11,500
+    const cnTotalMatch = line.match(/[合總]計[:：]\s*(?:NT\$|TWD|USD)?\s*([\d,]+)/);
+    if (cnTotalMatch) {
+      totalFare = parseFloat(cnTotalMatch[1].replace(/,/g, ''));
+      rawFareLines.push(line);
+      continue;
+    }
+
+    // 8. 解析 GRAND TOTAL 格式 (通常是全部旅客總價)
+    const grandTotalMatch = upperLine.match(/GRAND\s+TOTAL\s+([A-Z]{3})[\s]*([\d,]+(?:\.\d{2})?)/);
+    if (grandTotalMatch) {
+      currency = grandTotalMatch[1];
+      totalFare = parseFloat(grandTotalMatch[2].replace(/,/g, ''));
+      perPassenger = false;
+      rawFareLines.push(line);
+      continue;
+    }
+  }
+
+  // 如果沒有找到任何票價資訊，返回 null
+  if (totalFare === null && baseFare === null) {
+    return null;
+  }
+
+  // 如果只有 base fare 和 taxes，計算 total
+  if (totalFare === null && baseFare !== null) {
+    totalFare = baseFare + (taxes || 0);
+  }
+
+  // 如果只有 total 和 taxes，計算 base fare
+  if (baseFare === null && totalFare !== null && taxes !== null) {
+    baseFare = totalFare - taxes;
+  }
+
+  return {
+    currency,
+    baseFare,
+    taxes,
+    totalFare: totalFare || 0,
+    fareBasis,
+    validatingCarrier,
+    taxBreakdown,
+    perPassenger,
+    raw: rawFareLines.join('\n')
+  };
 }
 
 /**

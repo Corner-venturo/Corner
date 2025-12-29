@@ -9,8 +9,9 @@ import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperat
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
 import { useSyncOperations } from './hooks/useSyncOperations'
-import { useItineraryStore } from '@/stores'
+import { useItineraryStore, useAuthStore } from '@/stores'
 import { toast } from 'sonner'
+import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import {
   QuoteHeader,
   CategorySection,
@@ -77,6 +78,15 @@ export default function QuoteDetailPage() {
 
   // Itinerary store for sync
   const { items: itineraries, update: updateItinerary } = useItineraryStore()
+
+  // Auth store for staff info
+  const { user } = useAuthStore()
+
+  // 處理確認狀態變更
+  const handleConfirmationStatusChange = React.useCallback(async (status: QuoteConfirmationStatus) => {
+    if (!quote) return
+    await updateQuote(quote.id, { confirmation_status: status })
+  }, [quote, updateQuote])
 
   // Sync operations hook
   const syncOps = useSyncOperations({
@@ -476,6 +486,9 @@ export default function QuoteDetailPage() {
             contact_address: info.contact_address,
           })
         }}
+        staffId={user?.id}
+        staffName={user?.name || user?.email}
+        onConfirmationStatusChange={handleConfirmationStatusChange}
       />
 
       <div className="w-full pb-6">

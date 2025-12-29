@@ -167,11 +167,11 @@ export function TourConfirmationWizard({
       const selectedQuote = quotes.find(q => q.id === selectedQuoteId)
       const selectedItinerary = itineraries.find(it => it.id === selectedItineraryId)
 
-      // 更新 tour 狀態為已確認，並記錄鎖定的版本
+      // 更新 tour 狀態為進行中，並記錄鎖定的版本
       const { error } = await supabase
         .from('tours')
         .update({
-          status: '已確認',
+          status: '進行中',
           locked_quote_id: selectedQuoteId,
           locked_quote_version: selectedQuote?.version || null,
           locked_itinerary_id: selectedItineraryId,

@@ -4,10 +4,9 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
-import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore } from '@/stores'
+import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore, useTourStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
-import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
-import { generateVoucherFromPayment } from '@/services/voucher-auto-generator'
+import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
 import { useAccountingModule } from '@/hooks/use-accounting-module'
 import type { ReceiptItem } from '@/stores'
 
@@ -23,6 +22,7 @@ export function usePaymentData() {
   const { items: orders } = useOrderStore()
   const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: linkpayLogs } = useLinkPayLogStore()
+  const { items: tours } = useTourStore()
   const { user } = useAuthStore()
   const { hasAccounting, isExpired } = useAccountingModule()
 
@@ -74,20 +74,27 @@ export function usePaymentData() {
 
     const selectedOrder = orders.find(order => order.id === selectedOrderId)
 
+    // 取得團號（從訂單關聯的旅遊團）
+    const tour = tours.find(t => t.id === selectedOrder?.tour_id)
+    const tourCode = tour?.code || ''
+    if (!tourCode) {
+      throw new Error('無法取得團號，請確認訂單已關聯旅遊團')
+    }
+
     // 為每個收款項目建立收款單
     for (const item of paymentItems) {
-      // 生成收款單號
-      const workspaceCode = getCurrentWorkspaceCode()
-      if (!workspaceCode) {
-        throw new Error('無法取得 workspace code，請重新登入')
-      }
-      const receiptNumber = generateReceiptNumber(workspaceCode, item.transaction_date, receipts)
+      // 生成收款單號（新格式：{團號}-R{2位數}）
+      const receiptNumber = generateReceiptNumber(
+        tourCode,
+        receipts.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`))
+      )
 
       // 建立收款單
       const receipt = await createReceipt({
         receipt_number: receiptNumber,
         workspace_id: user.workspace_id || '',
         order_id: selectedOrderId,
+        tour_id: selectedOrder?.tour_id || null, // 直接關聯團號
         order_number: selectedOrder?.order_number || '',
         tour_name: selectedOrder?.tour_name || '',
         receipt_date: item.transaction_date,
@@ -117,19 +124,40 @@ export function usePaymentData() {
       if (hasAccounting && !isExpired && user.workspace_id) {
         try {
           // 判斷收款方式
-          const paymentMethod = item.receipt_type === RECEIPT_TYPES.CASH ? 'cash' : 'bank'
+          if (item.receipt_type === RECEIPT_TYPES.CREDIT_CARD) {
+            // V2: 刷卡收款使用 4 筆分錄
+            // 預設費率：銀行實扣 1.68%，團成本固定 2%
+            const feeRateDeducted = item.fees ? item.fees / item.amount : 0.0168
 
-          // 產生傳票
-          await generateVoucherFromPayment({
-            workspace_id: user.workspace_id,
-            order_id: selectedOrderId,
-            payment_amount: item.amount,
-            payment_date: item.transaction_date,
-            payment_method: paymentMethod,
-            description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 收款`,
-          })
+            await generateVoucherFromCardPayment({
+              workspace_id: user.workspace_id,
+              order_id: selectedOrderId,
+              payment_date: item.transaction_date,
+              gross_amount: item.amount,
+              fee_rate_deducted: feeRateDeducted,
+              description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 刷卡收款`,
+            })
 
-          logger.info('✅ 收款傳票已自動產生', { receiptNumber, amount: item.amount })
+            logger.info('✅ 刷卡收款傳票已自動產生 (V2)', {
+              receiptNumber,
+              grossAmount: item.amount,
+              feeRateDeducted,
+            })
+          } else {
+            // 現金/匯款收款使用傳統 2 筆分錄
+            const paymentMethod = item.receipt_type === RECEIPT_TYPES.CASH ? 'cash' : 'bank'
+
+            await generateVoucherFromPayment({
+              workspace_id: user.workspace_id,
+              order_id: selectedOrderId,
+              payment_amount: item.amount,
+              payment_date: item.transaction_date,
+              payment_method: paymentMethod,
+              description: `${selectedOrder?.order_number || ''} - ${receiptNumber} 收款`,
+            })
+
+            logger.info('✅ 收款傳票已自動產生', { receiptNumber, amount: item.amount })
+          }
         } catch (error) {
           logger.error('❌ 傳票產生失敗（不影響收款單建立）:', error)
           // 不阻斷收款流程

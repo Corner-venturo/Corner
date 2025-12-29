@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { isHtmlString, htmlToPlainText, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import { ART } from './utils/art-theme'
 
 // 渲染可能包含 HTML 的文字（保留內聯樣式）
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -13,15 +14,8 @@ function RichText({ html, className }: { html: string | null | undefined; classN
   return <span className={className}>{html}</span>
 }
 
-// Art/Magazine 配色 - 根據 HTML 模板
-const ART = {
-  black: '#0a0a0a',
-  paper: '#f4f1ea',
-  accent: '#B8A99A',
-  ink: '#1a1a1a',
-  clay: '#c76d54',
-  sage: '#8da399',
-}
+// Brutalist 陰影
+const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
 
 // 預設封面圖片
 const DEFAULT_COVER = 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=80&auto=format&fit=crop'
@@ -251,11 +245,11 @@ export function TourHeroArt({ data, viewMode }: TourHeroArtProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="absolute -bottom-4 -left-8 p-5 max-w-[280px] z-20 border"
+                    className="absolute -bottom-4 -left-8 p-5 max-w-[280px] z-20 border-2"
                     style={{
                       backgroundColor: ART.paper,
                       borderColor: ART.ink,
-                      boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+                      boxShadow: brutalistShadow,
                     }}
                   >
                     <p

@@ -3,6 +3,8 @@
 import { Check, X, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SectionTitle } from './SectionTitle'
+import { TourPricingSectionArt } from './TourPricingSectionArt'
+import { TourPricingSectionCollage } from './TourPricingSectionCollage'
 
 interface PricingItem {
   text: string
@@ -17,7 +19,7 @@ interface PricingDetails {
   notes: string[]
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourPricingSectionProps {
   data: {
@@ -33,6 +35,16 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
 
   if (!data.showPricingDetails || !pricingDetails) {
     return null
+  }
+
+  // Art 風格使用專用組件
+  if (coverStyle === 'art') {
+    return <TourPricingSectionArt data={data} viewMode={viewMode} />
+  }
+
+  // Collage 風格使用專用組件
+  if (coverStyle === 'collage') {
+    return <TourPricingSectionCollage data={data} viewMode={viewMode} />
   }
 
   const isMobile = viewMode === 'mobile'

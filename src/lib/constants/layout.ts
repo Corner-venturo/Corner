@@ -23,5 +23,5 @@ export const NO_SIDEBAR_PAGES = [
   '/view', // 分享的行程預覽頁面（無需登入、無側邊欄）
 ]
 
-// Pages with custom layout
-export const CUSTOM_LAYOUT_PAGES = ['/editor']
+// Pages with custom layout (no padding, full height)
+export const CUSTOM_LAYOUT_PAGES = ['/editor', '/workspace']

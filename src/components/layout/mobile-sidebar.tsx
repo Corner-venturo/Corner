@@ -23,7 +23,6 @@ import {
   TrendingDown,
   FileCheck,
   Flag,
-  Sparkles,
   FileSignature,
   FileText,
   CircleDot,
@@ -31,6 +30,8 @@ import {
   ImageIcon,
   Bus,
   CheckSquare,
+  MessageCircle,
+  ClipboardList,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -48,9 +49,13 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { href: '/', label: '首頁', icon: Home },
   { href: '/calendar', label: '行事曆', icon: Calendar, requiredPermission: 'calendar' },
+  { href: '/workspace', label: '工作空間', icon: Building2, requiredPermission: 'workspace' },
+  // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
+  // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
   { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
+  { href: '/tour-requests', label: '需求管理', icon: ClipboardList, requiredPermission: 'tours' },
   { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
   { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {
@@ -61,7 +66,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/payments', label: '收款管理', icon: CreditCard, requiredPermission: 'payments' },
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
-      { href: '/finance/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
+      { href: '/erp-accounting/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
       { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ],
@@ -91,7 +96,6 @@ const menuItems: MenuItem[] = [
 const personalToolItems: MenuItem[] = [
   { href: '/accounting', label: '記帳管理', icon: Wallet, requiredPermission: 'accounting' },
   { href: '/timebox', label: '箱型時間', icon: Clock, requiredPermission: 'timebox' },
-  { href: '/manifestation', label: '顯化魔法', icon: Sparkles, requiredPermission: 'manifestation' },
 ]
 
 interface MobileSidebarProps {
@@ -104,8 +108,17 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const { user } = useAuthStore()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
-  // 取得使用者隱藏的選單項目
+  // 權限相關
+  const userPermissions = user?.permissions || []
+  const userRoles = user?.roles || []
   const hiddenMenuItems = user?.hidden_menu_items || []
+  const preferredFeatures = user?.preferred_features || []
+
+  const isSuperAdmin =
+    userPermissions.includes('super_admin') ||
+    userPermissions.includes('admin') ||
+    userPermissions.includes('*') ||
+    userRoles.includes('super_admin')
 
   // 關閉側邊欄時重置展開狀態
   useEffect(() => {
@@ -126,21 +139,32 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     )
   }
 
-  // 檢查是否有權限
-  const hasPermission = (permission?: string) => {
-    if (!permission) return true
-    // 暫時都返回 true，實際權限邏輯可以之後加
-    return true
+  // 過濾選單（與桌面版一致的權限邏輯）
+  const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
+    if (!user) return items.filter(item => !item.requiredPermission)
+
+    return items
+      .map(item => {
+        if (isMenuItemHidden(item.href, hiddenMenuItems)) return null
+        if (!isSuperAdmin && preferredFeatures.length > 0 && item.requiredPermission) {
+          if (!preferredFeatures.includes(item.requiredPermission)) return null
+        }
+        if (item.children) {
+          const visibleChildren = filterMenuByPermissions(item.children)
+          if (visibleChildren.length > 0 || isSuperAdmin) {
+            return { ...item, children: visibleChildren }
+          }
+          return null
+        }
+        if (!item.requiredPermission) return item
+        if (isSuperAdmin) return item
+        return userPermissions.includes(item.requiredPermission) ? item : null
+      })
+      .filter((item): item is MenuItem => item !== null)
   }
 
-  // 過濾可見項目
-  const visibleMenuItems = menuItems.filter(
-    item => !isMenuItemHidden(item.href, hiddenMenuItems) && hasPermission(item.requiredPermission)
-  )
-
-  const visiblePersonalItems = personalToolItems.filter(
-    item => !isMenuItemHidden(item.href, hiddenMenuItems) && hasPermission(item.requiredPermission)
-  )
+  const visibleMenuItems = filterMenuByPermissions(menuItems)
+  const visiblePersonalItems = filterMenuByPermissions(personalToolItems)
 
   // 渲染選單項目
   const renderMenuItem = (item: MenuItem, isChild = false) => {
@@ -169,9 +193,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </button>
           {isExpanded && (
             <div className="bg-muted py-1">
-              {item.children!.filter(child => hasPermission(child.requiredPermission)).map(child =>
-                renderMenuItem(child, true)
-              )}
+              {item.children!.map(child => renderMenuItem(child, true))}
             </div>
           )}
         </div>
@@ -232,38 +254,23 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           {/* 主選單 */}
           <nav className="py-2">
             {visibleMenuItems.map(item => renderMenuItem(item))}
+            {visiblePersonalItems.map(item => renderMenuItem(item))}
+
+            {/* 設定 */}
+            <Link
+              href="/settings"
+              onClick={handleLinkClick}
+              className={cn(
+                'flex items-center gap-3 px-4 py-3 transition-colors',
+                pathname === '/settings'
+                  ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
+                  : 'text-morandi-primary hover:bg-muted'
+              )}
+            >
+              <Settings className="w-5 h-5" />
+              <span>設定</span>
+            </Link>
           </nav>
-
-          {/* 分隔線 */}
-          {visiblePersonalItems.length > 0 && (
-            <>
-              <div className="mx-4 my-2 border-t border-border" />
-              <div className="px-4 py-2">
-                <span className="text-xs font-medium text-morandi-muted uppercase tracking-wider">
-                  個人工具
-                </span>
-              </div>
-              <nav className="pb-4">
-                {visiblePersonalItems.map(item => renderMenuItem(item))}
-              </nav>
-            </>
-          )}
-
-          {/* 設定 */}
-          <div className="mx-4 my-2 border-t border-border" />
-          <Link
-            href="/settings"
-            onClick={handleLinkClick}
-            className={cn(
-              'flex items-center gap-3 px-4 py-3 transition-colors',
-              pathname === '/settings'
-                ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
-                : 'text-morandi-primary hover:bg-muted'
-            )}
-          >
-            <Settings className="w-5 h-5" />
-            <span>設定</span>
-          </Link>
         </div>
       </aside>
     </>

@@ -45,7 +45,6 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
         { value: 'all', label: '全部', icon: BarChart3 },
         { value: '提案', label: '提案', icon: FileText },
         { value: '進行中', label: '進行中', icon: Calendar },
-        { value: '待結案', label: '待結案', icon: AlertCircle },
         { value: '結案', label: '結案', icon: FileCheck },
         { value: 'archived', label: '封存', icon: Archive },
       ]}

@@ -57,7 +57,7 @@ export function BasicInfoFields({ formData, setFormData }: BasicInfoFieldsProps)
             className="bg-morandi-container/20"
           />
           <p className="text-xs text-morandi-muted mt-1">
-            格式：TP-E001, TC-E001...
+            格式：E001, E002...
           </p>
         </div>
       </div>

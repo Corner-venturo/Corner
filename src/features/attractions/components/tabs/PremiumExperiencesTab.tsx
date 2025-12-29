@@ -477,7 +477,7 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
                   onChange={e =>
                     setEditingExperience({ ...editingExperience, description: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm min-h-[100px]"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-white text-sm min-h-[100px]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">

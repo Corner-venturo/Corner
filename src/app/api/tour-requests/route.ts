@@ -26,71 +26,48 @@ const VALID_PRIORITIES = ['urgent', 'high', 'normal', 'low']
 
 /**
  * Generate tour request code
- * Format: TR{YYMMDD}{A-Z}-{3digits}
- * Example: TR251226A-001
+ * Format: {團號}-RQ{2位數}
+ * Example: CNX250128A-RQ01
+ *
+ * 注意：-R 已被收款單使用，需求單使用 -RQ (Request)
  */
 async function generateTourRequestCode(
   supabase: ReturnType<typeof getSupabaseAdminClient>,
-  workspaceId: string
+  tourId: string,
+  tourCode: string | null
 ): Promise<string> {
-  const now = new Date()
-  const yy = String(now.getFullYear()).slice(-2)
-  const mm = String(now.getMonth() + 1).padStart(2, '0')
-  const dd = String(now.getDate()).padStart(2, '0')
-  const datePrefix = `TR${yy}${mm}${dd}`
+  // 如果沒有團號，使用備用格式
+  if (!tourCode) {
+    const now = new Date()
+    const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
+    return `RQ-${timestamp}`
+  }
 
-  // Find existing codes with the same date prefix
+  // 查詢該團已有的需求單數量
   const { data: existingRequests } = await supabase
     .from('tour_requests')
     .select('code')
-    .eq('workspace_id', workspaceId)
-    .like('code', `${datePrefix}%`)
+    .eq('tour_id', tourId)
+    .like('code', `${tourCode}-RQ%`)
     .order('code', { ascending: false })
-    .limit(100)
+    .limit(1)
 
   if (!existingRequests || existingRequests.length === 0) {
-    return `${datePrefix}A-001`
+    return `${tourCode}-RQ01`
   }
 
-  // Parse existing codes to find the highest number for each letter
-  const codePattern = /^TR\d{6}([A-Z])-(\d{3})$/
-  const letterNumbers: Record<string, number> = {}
+  // 解析最大編號
+  const lastCode = existingRequests[0].code
+  const match = lastCode.match(/-RQ(\d+)$/)
 
-  for (const req of existingRequests) {
-    const match = req.code.match(codePattern)
-    if (match) {
-      const letter = match[1]
-      const num = parseInt(match[2], 10)
-      if (!letterNumbers[letter] || num > letterNumbers[letter]) {
-        letterNumbers[letter] = num
-      }
-    }
+  if (match) {
+    const lastNum = parseInt(match[1], 10)
+    const newNum = String(lastNum + 1).padStart(2, '0')
+    return `${tourCode}-RQ${newNum}`
   }
 
-  // Find the current letter with the highest number
-  const letters = Object.keys(letterNumbers).sort()
-  if (letters.length === 0) {
-    return `${datePrefix}A-001`
-  }
-
-  const lastLetter = letters[letters.length - 1]
-  const lastNumber = letterNumbers[lastLetter]
-
-  // If we haven't reached 999, increment the number
-  if (lastNumber < 999) {
-    const newNumber = String(lastNumber + 1).padStart(3, '0')
-    return `${datePrefix}${lastLetter}-${newNumber}`
-  }
-
-  // Otherwise, move to the next letter
-  const nextLetter = String.fromCharCode(lastLetter.charCodeAt(0) + 1)
-  if (nextLetter > 'Z') {
-    // Fallback: use timestamp if we run out of letters (unlikely)
-    const timestamp = Date.now().toString().slice(-6)
-    return `${datePrefix}X-${timestamp}`
-  }
-
-  return `${datePrefix}${nextLetter}-001`
+  // 備用：從 01 開始
+  return `${tourCode}-RQ01`
 }
 
 /**
@@ -282,8 +259,8 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdminClient()
 
-    // Generate code
-    const code = await generateTourRequestCode(supabaseAdmin, body.workspace_id)
+    // Generate code (基於團號)
+    const code = await generateTourRequestCode(supabaseAdmin, body.tour_id, body.tour_code ?? null)
 
     // Prepare insert data
     const insertData: TourRequestInsert = {

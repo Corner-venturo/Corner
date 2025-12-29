@@ -99,6 +99,21 @@ export interface Quote {
   expense_description?: string // 費用說明（快速報價單用）
   created_at: string
   updated_at: string
+
+  // 確認相關欄位（雙軌確認機制）
+  confirmation_status?: 'draft' | 'pending' | 'customer_confirmed' | 'staff_confirmed' | 'closed'
+  confirmation_token?: string // 客戶確認連結 token
+  confirmation_token_expires_at?: string // token 過期時間
+  confirmed_at?: string // 確認時間
+  confirmed_by_type?: 'customer' | 'staff' // 確認者類型
+  confirmed_by_name?: string // 確認者姓名
+  confirmed_by_email?: string // 確認者 Email
+  confirmed_by_phone?: string // 確認者電話
+  confirmed_by_staff_id?: string // 業務確認者 ID
+  confirmed_version?: number // 確認時鎖定的版本
+  confirmation_ip?: string // 確認時 IP（稽核用）
+  confirmation_user_agent?: string // 確認時瀏覽器資訊（稽核用）
+  confirmation_notes?: string // 確認備註
 }
 
 /**

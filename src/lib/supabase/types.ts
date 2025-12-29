@@ -2305,6 +2305,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_execution_logs: {
+        Row: {
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          job_name: string
+          result: Json | null
+          success: boolean | null
+        }
+        Insert: {
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          job_name: string
+          result?: Json | null
+          success?: boolean | null
+        }
+        Update: {
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          job_name?: string
+          result?: Json | null
+          success?: boolean | null
+        }
+        Relationships: []
+      }
       customer_assigned_itineraries: {
         Row: {
           assigned_date: string
@@ -2417,6 +2444,60 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_travel_cards: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label_zh: string | null
+          sort_order: number | null
+          template_id: string | null
+          translations: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label_zh?: string | null
+          sort_order?: number | null
+          template_id?: string | null
+          translations?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label_zh?: string | null
+          sort_order?: number | null
+          template_id?: string | null
+          translations?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_travel_cards_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_travel_cards_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "travel_card_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -3147,6 +3228,92 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fitness_goals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flight_status_subscriptions: {
+        Row: {
+          airline_code: string
+          created_at: string | null
+          external_provider: string | null
+          external_subscription_id: string | null
+          flight_date: string
+          flight_number: string
+          id: string
+          is_active: boolean | null
+          last_checked_at: string | null
+          notify_channel_id: string | null
+          notify_employee_ids: string[] | null
+          notify_on: string[] | null
+          pnr_id: string | null
+          segment_id: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          airline_code: string
+          created_at?: string | null
+          external_provider?: string | null
+          external_subscription_id?: string | null
+          flight_date: string
+          flight_number: string
+          id?: string
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          notify_channel_id?: string | null
+          notify_employee_ids?: string[] | null
+          notify_on?: string[] | null
+          pnr_id?: string | null
+          segment_id?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          airline_code?: string
+          created_at?: string | null
+          external_provider?: string | null
+          external_subscription_id?: string | null
+          flight_date?: string
+          flight_number?: string
+          id?: string
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          notify_channel_id?: string | null
+          notify_employee_ids?: string[] | null
+          notify_on?: string[] | null
+          pnr_id?: string | null
+          segment_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flight_status_subscriptions_notify_channel_id_fkey"
+            columns: ["notify_channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_status_subscriptions_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_status_subscriptions_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flight_status_subscriptions_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -5547,6 +5714,784 @@ export type Database = {
           },
         ]
       }
+      pnr_ai_queries: {
+        Row: {
+          created_at: string | null
+          id: string
+          pnr_id: string | null
+          queried_by: string | null
+          query_context: Json | null
+          query_text: string
+          response_metadata: Json | null
+          response_text: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          pnr_id?: string | null
+          queried_by?: string | null
+          query_context?: Json | null
+          query_text: string
+          response_metadata?: Json | null
+          response_text?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          pnr_id?: string | null
+          queried_by?: string | null
+          query_context?: Json | null
+          query_text?: string
+          response_metadata?: Json | null
+          response_text?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_ai_queries_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_ai_queries_queried_by_fkey"
+            columns: ["queried_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_ai_queries_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_fare_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_checked_at: string | null
+          last_fare: number | null
+          notify_channel_id: string | null
+          notify_employee_ids: string[] | null
+          pnr_id: string
+          threshold_amount: number | null
+          threshold_percent: number | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          last_fare?: number | null
+          notify_channel_id?: string | null
+          notify_employee_ids?: string[] | null
+          pnr_id: string
+          threshold_amount?: number | null
+          threshold_percent?: number | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_checked_at?: string | null
+          last_fare?: number | null
+          notify_channel_id?: string | null
+          notify_employee_ids?: string[] | null
+          pnr_id?: string
+          threshold_amount?: number | null
+          threshold_percent?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_fare_alerts_notify_channel_id_fkey"
+            columns: ["notify_channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_fare_alerts_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_fare_alerts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_fare_history: {
+        Row: {
+          base_fare: number | null
+          created_at: string | null
+          currency: string | null
+          fare_basis: string | null
+          id: string
+          pnr_id: string
+          raw_fare_data: Json | null
+          recorded_at: string | null
+          recorded_by: string | null
+          source: string | null
+          taxes: number | null
+          total_fare: number
+          workspace_id: string
+        }
+        Insert: {
+          base_fare?: number | null
+          created_at?: string | null
+          currency?: string | null
+          fare_basis?: string | null
+          id?: string
+          pnr_id: string
+          raw_fare_data?: Json | null
+          recorded_at?: string | null
+          recorded_by?: string | null
+          source?: string | null
+          taxes?: number | null
+          total_fare: number
+          workspace_id: string
+        }
+        Update: {
+          base_fare?: number | null
+          created_at?: string | null
+          currency?: string | null
+          fare_basis?: string | null
+          id?: string
+          pnr_id?: string
+          raw_fare_data?: Json | null
+          recorded_at?: string | null
+          recorded_by?: string | null
+          source?: string | null
+          taxes?: number | null
+          total_fare?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_fare_history_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_fare_history_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_fare_history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_flight_status_history: {
+        Row: {
+          airline_code: string
+          booking_status: string | null
+          delay_minutes: number | null
+          external_data: Json | null
+          flight_date: string
+          flight_number: string
+          gate_info: string | null
+          id: string
+          new_arrival_time: string | null
+          new_departure_time: string | null
+          operational_status: string | null
+          pnr_id: string
+          recorded_at: string | null
+          remarks: string | null
+          segment_id: string | null
+          source: string | null
+          workspace_id: string
+        }
+        Insert: {
+          airline_code: string
+          booking_status?: string | null
+          delay_minutes?: number | null
+          external_data?: Json | null
+          flight_date: string
+          flight_number: string
+          gate_info?: string | null
+          id?: string
+          new_arrival_time?: string | null
+          new_departure_time?: string | null
+          operational_status?: string | null
+          pnr_id: string
+          recorded_at?: string | null
+          remarks?: string | null
+          segment_id?: string | null
+          source?: string | null
+          workspace_id: string
+        }
+        Update: {
+          airline_code?: string
+          booking_status?: string | null
+          delay_minutes?: number | null
+          external_data?: Json | null
+          flight_date?: string
+          flight_number?: string
+          gate_info?: string | null
+          id?: string
+          new_arrival_time?: string | null
+          new_departure_time?: string | null
+          operational_status?: string | null
+          pnr_id?: string
+          recorded_at?: string | null
+          remarks?: string | null
+          segment_id?: string | null
+          source?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_flight_status_history_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_flight_status_history_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_flight_status_history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_passengers: {
+        Row: {
+          created_at: string | null
+          customer_id: string | null
+          date_of_birth: string | null
+          given_name: string | null
+          id: string
+          order_member_id: string | null
+          passenger_type: string | null
+          pnr_id: string
+          sequence_number: number | null
+          surname: string
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id?: string | null
+          date_of_birth?: string | null
+          given_name?: string | null
+          id?: string
+          order_member_id?: string | null
+          passenger_type?: string | null
+          pnr_id: string
+          sequence_number?: number | null
+          surname: string
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string | null
+          date_of_birth?: string | null
+          given_name?: string | null
+          id?: string
+          order_member_id?: string | null
+          passenger_type?: string | null
+          pnr_id?: string
+          sequence_number?: number | null
+          surname?: string
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_passengers_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_queue_items: {
+        Row: {
+          assigned_to: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          metadata: Json | null
+          pnr_id: string
+          priority: number | null
+          queue_type: string
+          reminder_at: string | null
+          resolution_notes: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          metadata?: Json | null
+          pnr_id: string
+          priority?: number | null
+          queue_type: string
+          reminder_at?: string | null
+          resolution_notes?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          metadata?: Json | null
+          pnr_id?: string
+          priority?: number | null
+          queue_type?: string
+          reminder_at?: string | null
+          resolution_notes?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_queue_items_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_queue_items_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_queue_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_queue_items_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_queue_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_records: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          created_date: string | null
+          current_fare: number | null
+          fare_currency: string | null
+          has_schedule_change: boolean | null
+          id: string
+          is_ticketed: boolean | null
+          notes: string | null
+          office_id: string | null
+          queue_count: number | null
+          raw_content: string | null
+          record_locator: string
+          ticket_issued_at: string | null
+          ticket_numbers: string[] | null
+          ticketing_deadline: string | null
+          ticketing_status: string | null
+          tour_id: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          created_date?: string | null
+          current_fare?: number | null
+          fare_currency?: string | null
+          has_schedule_change?: boolean | null
+          id?: string
+          is_ticketed?: boolean | null
+          notes?: string | null
+          office_id?: string | null
+          queue_count?: number | null
+          raw_content?: string | null
+          record_locator: string
+          ticket_issued_at?: string | null
+          ticket_numbers?: string[] | null
+          ticketing_deadline?: string | null
+          ticketing_status?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          created_date?: string | null
+          current_fare?: number | null
+          fare_currency?: string | null
+          has_schedule_change?: boolean | null
+          id?: string
+          is_ticketed?: boolean | null
+          notes?: string | null
+          office_id?: string | null
+          queue_count?: number | null
+          raw_content?: string | null
+          record_locator?: string
+          ticket_issued_at?: string | null
+          ticket_numbers?: string[] | null
+          ticketing_deadline?: string | null
+          ticketing_status?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_records_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_records_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_remarks: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          pnr_id: string
+          remark_type: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          pnr_id: string
+          remark_type?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          pnr_id?: string
+          remark_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_remarks_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_schedule_changes: {
+        Row: {
+          change_type: string
+          created_at: string | null
+          detected_at: string | null
+          id: string
+          new_arrival_time: string | null
+          new_departure_date: string | null
+          new_departure_time: string | null
+          new_flight_number: string | null
+          notes: string | null
+          original_arrival_time: string | null
+          original_departure_date: string | null
+          original_departure_time: string | null
+          original_flight_number: string | null
+          pnr_id: string
+          processed_at: string | null
+          processed_by: string | null
+          requires_refund: boolean | null
+          requires_reissue: boolean | null
+          requires_revalidation: boolean | null
+          segment_id: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          change_type: string
+          created_at?: string | null
+          detected_at?: string | null
+          id?: string
+          new_arrival_time?: string | null
+          new_departure_date?: string | null
+          new_departure_time?: string | null
+          new_flight_number?: string | null
+          notes?: string | null
+          original_arrival_time?: string | null
+          original_departure_date?: string | null
+          original_departure_time?: string | null
+          original_flight_number?: string | null
+          pnr_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requires_refund?: boolean | null
+          requires_reissue?: boolean | null
+          requires_revalidation?: boolean | null
+          segment_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          change_type?: string
+          created_at?: string | null
+          detected_at?: string | null
+          id?: string
+          new_arrival_time?: string | null
+          new_departure_date?: string | null
+          new_departure_time?: string | null
+          new_flight_number?: string | null
+          notes?: string | null
+          original_arrival_time?: string | null
+          original_departure_date?: string | null
+          original_departure_time?: string | null
+          original_flight_number?: string | null
+          pnr_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requires_refund?: boolean | null
+          requires_reissue?: boolean | null
+          requires_revalidation?: boolean | null
+          segment_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_schedule_changes_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_schedule_changes_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_schedule_changes_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_schedule_changes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_segments: {
+        Row: {
+          airline_code: string
+          arrival_day_offset: number | null
+          arrival_time: string | null
+          booking_class: string | null
+          created_at: string | null
+          day_of_week: number | null
+          departure_date: string
+          departure_time: string | null
+          destination: string
+          equipment: string | null
+          flight_number: string
+          id: string
+          origin: string
+          pnr_id: string
+          quantity: number | null
+          segment_number: number | null
+          status_code: string | null
+        }
+        Insert: {
+          airline_code: string
+          arrival_day_offset?: number | null
+          arrival_time?: string | null
+          booking_class?: string | null
+          created_at?: string | null
+          day_of_week?: number | null
+          departure_date: string
+          departure_time?: string | null
+          destination: string
+          equipment?: string | null
+          flight_number: string
+          id?: string
+          origin: string
+          pnr_id: string
+          quantity?: number | null
+          segment_number?: number | null
+          status_code?: string | null
+        }
+        Update: {
+          airline_code?: string
+          arrival_day_offset?: number | null
+          arrival_time?: string | null
+          booking_class?: string | null
+          created_at?: string | null
+          day_of_week?: number | null
+          departure_date?: string
+          departure_time?: string | null
+          destination?: string
+          equipment?: string | null
+          flight_number?: string
+          id?: string
+          origin?: string
+          pnr_id?: string
+          quantity?: number | null
+          segment_number?: number | null
+          status_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_segments_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pnr_ssr_elements: {
+        Row: {
+          airline_code: string | null
+          created_at: string | null
+          free_text: string | null
+          id: string
+          passenger_id: string | null
+          pnr_id: string
+          segment_id: string | null
+          ssr_code: string
+          status: string | null
+        }
+        Insert: {
+          airline_code?: string | null
+          created_at?: string | null
+          free_text?: string | null
+          id?: string
+          passenger_id?: string | null
+          pnr_id: string
+          segment_id?: string | null
+          ssr_code: string
+          status?: string | null
+        }
+        Update: {
+          airline_code?: string | null
+          created_at?: string | null
+          free_text?: string | null
+          id?: string
+          passenger_id?: string | null
+          pnr_id?: string
+          segment_id?: string | null
+          ssr_code?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pnr_ssr_elements_passenger_id_fkey"
+            columns: ["passenger_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_passengers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_ssr_elements_pnr_id_fkey"
+            columns: ["pnr_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnr_ssr_elements_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "pnr_segments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pnrs: {
         Row: {
           cancellation_deadline: string | null
@@ -6161,6 +7106,79 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_confirmation_logs: {
+        Row: {
+          action: string
+          confirmed_by_email: string | null
+          confirmed_by_name: string | null
+          confirmed_by_phone: string | null
+          confirmed_by_staff_id: string | null
+          confirmed_by_type: string | null
+          confirmed_version: number | null
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          notes: string | null
+          quote_id: string
+          user_agent: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          action: string
+          confirmed_by_email?: string | null
+          confirmed_by_name?: string | null
+          confirmed_by_phone?: string | null
+          confirmed_by_staff_id?: string | null
+          confirmed_by_type?: string | null
+          confirmed_version?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          quote_id: string
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          action?: string
+          confirmed_by_email?: string | null
+          confirmed_by_name?: string | null
+          confirmed_by_phone?: string | null
+          confirmed_by_staff_id?: string | null
+          confirmed_by_type?: string | null
+          confirmed_version?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          quote_id?: string
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_confirmation_logs_confirmed_by_staff_id_fkey"
+            columns: ["confirmed_by_staff_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_confirmation_logs_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_confirmation_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_items: {
         Row: {
           category: string
@@ -6314,6 +7332,19 @@ export type Database = {
           categories: Json | null
           child_count: number | null
           code: string | null
+          confirmation_ip: string | null
+          confirmation_notes: string | null
+          confirmation_status: string | null
+          confirmation_token: string | null
+          confirmation_token_expires_at: string | null
+          confirmation_user_agent: string | null
+          confirmed_at: string | null
+          confirmed_by_email: string | null
+          confirmed_by_name: string | null
+          confirmed_by_phone: string | null
+          confirmed_by_staff_id: string | null
+          confirmed_by_type: string | null
+          confirmed_version: number | null
           contact_address: string | null
           contact_phone: string | null
           converted_to_tour: boolean | null
@@ -6371,6 +7402,19 @@ export type Database = {
           categories?: Json | null
           child_count?: number | null
           code?: string | null
+          confirmation_ip?: string | null
+          confirmation_notes?: string | null
+          confirmation_status?: string | null
+          confirmation_token?: string | null
+          confirmation_token_expires_at?: string | null
+          confirmation_user_agent?: string | null
+          confirmed_at?: string | null
+          confirmed_by_email?: string | null
+          confirmed_by_name?: string | null
+          confirmed_by_phone?: string | null
+          confirmed_by_staff_id?: string | null
+          confirmed_by_type?: string | null
+          confirmed_version?: number | null
           contact_address?: string | null
           contact_phone?: string | null
           converted_to_tour?: boolean | null
@@ -6428,6 +7472,19 @@ export type Database = {
           categories?: Json | null
           child_count?: number | null
           code?: string | null
+          confirmation_ip?: string | null
+          confirmation_notes?: string | null
+          confirmation_status?: string | null
+          confirmation_token?: string | null
+          confirmation_token_expires_at?: string | null
+          confirmation_user_agent?: string | null
+          confirmed_at?: string | null
+          confirmed_by_email?: string | null
+          confirmed_by_name?: string | null
+          confirmed_by_phone?: string | null
+          confirmed_by_staff_id?: string | null
+          confirmed_by_type?: string | null
+          confirmed_version?: number | null
           contact_address?: string | null
           contact_phone?: string | null
           converted_to_tour?: boolean | null
@@ -6636,6 +7693,7 @@ export type Database = {
           receipt_type: number
           status: string
           sync_status: string | null
+          tour_id: string | null
           tour_name: string | null
           transaction_id: string | null
           updated_at: string | null
@@ -6678,6 +7736,7 @@ export type Database = {
           receipt_type?: number
           status?: string
           sync_status?: string | null
+          tour_id?: string | null
           tour_name?: string | null
           transaction_id?: string | null
           updated_at?: string | null
@@ -6720,6 +7779,7 @@ export type Database = {
           receipt_type?: number
           status?: string
           sync_status?: string | null
+          tour_id?: string | null
           tour_name?: string | null
           transaction_id?: string | null
           updated_at?: string | null
@@ -6728,6 +7788,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "receipts_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "receipts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
@@ -6735,6 +7809,156 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ref_airlines: {
+        Row: {
+          alliance: string | null
+          country: string | null
+          created_at: string | null
+          iata_code: string
+          icao_code: string | null
+          is_active: boolean | null
+          name_en: string | null
+          name_zh: string | null
+        }
+        Insert: {
+          alliance?: string | null
+          country?: string | null
+          created_at?: string | null
+          iata_code: string
+          icao_code?: string | null
+          is_active?: boolean | null
+          name_en?: string | null
+          name_zh?: string | null
+        }
+        Update: {
+          alliance?: string | null
+          country?: string | null
+          created_at?: string | null
+          iata_code?: string
+          icao_code?: string | null
+          is_active?: boolean | null
+          name_en?: string | null
+          name_zh?: string | null
+        }
+        Relationships: []
+      }
+      ref_airports: {
+        Row: {
+          city_code: string | null
+          city_name_en: string | null
+          city_name_zh: string | null
+          country_code: string | null
+          created_at: string | null
+          iata_code: string
+          icao_code: string | null
+          latitude: number | null
+          longitude: number | null
+          name_en: string | null
+          name_zh: string | null
+          timezone: string | null
+        }
+        Insert: {
+          city_code?: string | null
+          city_name_en?: string | null
+          city_name_zh?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          iata_code: string
+          icao_code?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name_en?: string | null
+          name_zh?: string | null
+          timezone?: string | null
+        }
+        Update: {
+          city_code?: string | null
+          city_name_en?: string | null
+          city_name_zh?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          iata_code?: string
+          icao_code?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name_en?: string | null
+          name_zh?: string | null
+          timezone?: string | null
+        }
+        Relationships: []
+      }
+      ref_booking_classes: {
+        Row: {
+          cabin_type: string | null
+          code: string
+          created_at: string | null
+          description: string | null
+          priority: number | null
+        }
+        Insert: {
+          cabin_type?: string | null
+          code: string
+          created_at?: string | null
+          description?: string | null
+          priority?: number | null
+        }
+        Update: {
+          cabin_type?: string | null
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          priority?: number | null
+        }
+        Relationships: []
+      }
+      ref_ssr_codes: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string | null
+          description_en: string | null
+          description_zh: string | null
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string | null
+          description_en?: string | null
+          description_zh?: string | null
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string | null
+          description_en?: string | null
+          description_zh?: string | null
+        }
+        Relationships: []
+      }
+      ref_status_codes: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string | null
+          description_en: string | null
+          description_zh: string | null
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string | null
+          description_en?: string | null
+          description_zh?: string | null
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string | null
+          description_en?: string | null
+          description_zh?: string | null
+        }
+        Relationships: []
       }
       region_stats: {
         Row: {
@@ -7957,6 +9181,7 @@ export type Database = {
           color: string
           created_at: string | null
           default_content: Json | null
+          default_duration: number | null
           equipment: string | null
           id: string
           name: string
@@ -7971,6 +9196,7 @@ export type Database = {
           color: string
           created_at?: string | null
           default_content?: Json | null
+          default_duration?: number | null
           equipment?: string | null
           id?: string
           name: string
@@ -7985,6 +9211,7 @@ export type Database = {
           color?: string
           created_at?: string | null
           default_content?: Json | null
+          default_duration?: number | null
           equipment?: string | null
           id?: string
           name?: string
@@ -8125,6 +9352,7 @@ export type Database = {
           created_at: string | null
           id: string
           name: string | null
+          next_week_goals: string | null
           review_created_at: string | null
           review_notes: string | null
           total_count: number | null
@@ -8142,6 +9370,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string | null
+          next_week_goals?: string | null
           review_created_at?: string | null
           review_notes?: string | null
           total_count?: number | null
@@ -8159,6 +9388,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string | null
+          next_week_goals?: string | null
           review_created_at?: string | null
           review_notes?: string | null
           total_count?: number | null
@@ -8168,6 +9398,33 @@ export type Database = {
           user_id?: string
           week_end?: string
           week_start?: string
+        }
+        Relationships: []
+      }
+      timebox_workout_templates: {
+        Row: {
+          created_at: string | null
+          exercises: Json
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          exercises?: Json
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          exercises?: Json
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -9670,6 +10927,42 @@ export type Database = {
           },
         ]
       }
+      travel_card_templates: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          icon: string
+          id: string
+          label_zh: string
+          sort_order: number | null
+          translations: Json
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          icon: string
+          id?: string
+          label_zh: string
+          sort_order?: number | null
+          translations?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          label_zh?: string
+          sort_order?: number | null
+          translations?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       travel_invoices: {
         Row: {
           allowance_amount: number | null
@@ -9850,34 +11143,40 @@ export type Database = {
       traveler_conversation_members: {
         Row: {
           conversation_id: string
+          employee_id: string | null
           id: string
           is_muted: boolean | null
           joined_at: string | null
           last_read_at: string | null
           last_read_message_id: string | null
           left_at: string | null
+          member_type: string | null
           role: string
           user_id: string
         }
         Insert: {
           conversation_id: string
+          employee_id?: string | null
           id?: string
           is_muted?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
           last_read_message_id?: string | null
           left_at?: string | null
+          member_type?: string | null
           role?: string
           user_id: string
         }
         Update: {
           conversation_id?: string
+          employee_id?: string | null
           id?: string
           is_muted?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
           last_read_message_id?: string | null
           left_at?: string | null
+          member_type?: string | null
           role?: string
           user_id?: string
         }
@@ -9889,50 +11188,75 @@ export type Database = {
             referencedRelation: "traveler_conversations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "traveler_conversation_members_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
         ]
       }
       traveler_conversations: {
         Row: {
+          auto_open_before_days: number | null
           avatar_url: string | null
+          close_at: string | null
           created_at: string | null
           created_by: string | null
           id: string
+          is_open: boolean | null
           last_message_at: string | null
           last_message_id: string | null
           last_message_preview: string | null
           name: string | null
+          open_at: string | null
           split_group_id: string | null
+          tour_id: string | null
           trip_id: string | null
           type: string
           updated_at: string | null
+          workspace_id: string | null
         }
         Insert: {
+          auto_open_before_days?: number | null
           avatar_url?: string | null
+          close_at?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_open?: boolean | null
           last_message_at?: string | null
           last_message_id?: string | null
           last_message_preview?: string | null
           name?: string | null
+          open_at?: string | null
           split_group_id?: string | null
+          tour_id?: string | null
           trip_id?: string | null
           type?: string
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Update: {
+          auto_open_before_days?: number | null
           avatar_url?: string | null
+          close_at?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_open?: boolean | null
           last_message_at?: string | null
           last_message_id?: string | null
           last_message_preview?: string | null
           name?: string | null
+          open_at?: string | null
           split_group_id?: string | null
+          tour_id?: string | null
           trip_id?: string | null
           type?: string
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -9950,10 +11274,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "traveler_conversations_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_conversations_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "traveler_conversations_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "traveler_trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traveler_conversations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -12313,12 +13658,42 @@ export type Database = {
       }
     }
     Functions: {
+      add_employee_to_tour_conversation: {
+        Args: { p_employee_id: string; p_role?: string; p_tour_id: string }
+        Returns: undefined
+      }
+      auto_open_tour_conversations: { Args: never; Returns: number }
+      auto_open_tour_conversations_with_logging: {
+        Args: never
+        Returns: undefined
+      }
       can_manage_workspace: {
         Args: { target_workspace_id: string }
         Returns: boolean
       }
       check_my_tours_updates: {
         Args: { p_last_synced_at?: string }
+        Returns: Json
+      }
+      confirm_quote_by_customer: {
+        Args: {
+          p_email?: string
+          p_ip_address?: string
+          p_name: string
+          p_notes?: string
+          p_phone?: string
+          p_token: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
+      confirm_quote_by_staff: {
+        Args: {
+          p_notes?: string
+          p_quote_id: string
+          p_staff_id: string
+          p_staff_name: string
+        }
         Returns: Json
       }
       create_atomic_transaction: {
@@ -12340,6 +13715,17 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      generate_confirmation_token: { Args: never; Returns: string }
+      get_cron_job_status: {
+        Args: never
+        Returns: {
+          job_name: string
+          last_run: string
+          next_run: string
+          schedule: string
+          status: string
+        }[]
       }
       get_current_employee_id: { Args: never; Returns: string }
       get_current_traveler_id: { Args: never; Returns: string }
@@ -12388,7 +13774,32 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_tour_conversations: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          conversation_id: string
+          conversation_type: string
+          departure_date: string
+          is_open: boolean
+          last_message_at: string
+          last_message_preview: string
+          member_count: number
+          open_at: string
+          tour_code: string
+          tour_id: string
+          tour_name: string
+          traveler_count: number
+          unread_count: number
+        }[]
+      }
       get_unread_count: { Args: { p_conversation_id: string }; Returns: number }
+      get_unread_counts_batch: {
+        Args: { p_conversation_ids: string[] }
+        Returns: {
+          conversation_id: string
+          unread_count: number
+        }[]
+      }
       get_user_permission: {
         Args: { p_itinerary_id: string; p_user_id: string }
         Returns: string
@@ -12415,11 +13826,52 @@ export type Database = {
         Args: { p_traveler_id?: string }
         Returns: number
       }
+      revoke_quote_confirmation: {
+        Args: {
+          p_quote_id: string
+          p_reason: string
+          p_staff_id: string
+          p_staff_name: string
+        }
+        Returns: Json
+      }
+      run_auto_open_now: {
+        Args: never
+        Returns: {
+          executed_at: string
+          opened_count: number
+        }[]
+      }
+      send_quote_confirmation: {
+        Args: {
+          p_expires_in_days?: number
+          p_quote_id: string
+          p_staff_id?: string
+        }
+        Returns: Json
+      }
+      send_tour_message: {
+        Args: {
+          p_attachments?: Json
+          p_content: string
+          p_conversation_id: string
+          p_type?: string
+        }
+        Returns: string
+      }
       set_current_workspace: {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
       sync_my_tours: { Args: never; Returns: Json }
+      toggle_tour_conversation: {
+        Args: {
+          p_is_open: boolean
+          p_send_welcome?: boolean
+          p_tour_id: string
+        }
+        Returns: undefined
+      }
       update_city_stats: { Args: { p_city_id: string }; Returns: undefined }
     }
     Enums: {

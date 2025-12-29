@@ -66,7 +66,7 @@ export type VoucherStatus = 'draft' | 'posted' | 'void'
 /**
  * 傳票來源類型
  */
-export type VoucherSourceType = 'payment_request' | 'order_payment' | 'tour_closing' | 'manual'
+export type VoucherSourceType = 'payment_request' | 'order_payment' | 'card_payment' | 'tour_closing' | 'manual'
 
 /**
  * 傳票主檔
@@ -149,7 +149,7 @@ export type UpdateGeneralLedgerData = Partial<CreateGeneralLedgerData>
 // ============================================
 
 /**
- * 自動產生傳票 - 從收款
+ * 自動產生傳票 - 從收款（現金/匯款）
  */
 export interface AutoVoucherFromPayment {
   workspace_id: string
@@ -159,6 +159,41 @@ export interface AutoVoucherFromPayment {
   payment_method: 'cash' | 'bank' // 收款方式
   bank_account_code?: string // 銀行科目代碼，如：1102-01
   description?: string
+}
+
+/**
+ * 刷卡收款 meta 資料（V2）
+ */
+export interface CardPaymentMeta {
+  gross_amount: number       // 刷卡金額（原始金額）
+  fee_rate_total: number     // 團成本固定費率 (0.02 = 2%)
+  fee_rate_deducted: number  // 實扣費率 (0.0168 = 1.68%)
+  fee_rate_retained: number  // 回饋費率 (0.0032 = 0.32%)
+  fee_total: number          // 團成本總額 (gross * 2%)
+  fee_deducted: number       // 銀行實扣金額 (gross * 1.68%)
+  fee_retained: number       // 公司回饋金額 (gross * 0.32%)
+  bank_net: number           // 銀行實收金額 (gross - fee_deducted)
+}
+
+/**
+ * 自動產生傳票 - 從刷卡收款（V2）
+ *
+ * 分錄：
+ * Dr 銀行存款              bank_net
+ * Dr 預付團務成本－刷卡成本  fee_total (2%)
+ *   Cr 預收團款            gross_amount
+ *   Cr 其他收入－刷卡回饋    fee_retained (0.32%)
+ */
+export interface AutoVoucherFromCardPayment {
+  workspace_id: string
+  order_id: string // 訂單 ID
+  payment_date: string // 收款日期
+  bank_account_code?: string // 銀行科目代碼
+  description?: string
+  // 刷卡相關
+  gross_amount: number       // 刷卡金額（原始金額）
+  fee_rate_deducted: number  // 實扣費率 (預設 0.0168)
+  fee_rate_total?: number    // 團成本固定費率 (預設 0.02)
 }
 
 /**
@@ -174,21 +209,40 @@ export interface AutoVoucherFromPaymentRequest {
 }
 
 /**
- * 自動產生傳票 - 從結團
+ * 自動產生傳票 - 從結團（V2：一張傳票）
+ *
+ * 分錄：
+ * 1. 預收團款 → 團費收入
+ * 2. 預付團務成本 → 團務成本（含刷卡成本）
+ * 3. 行政費：成本 → 其他收入
+ * 4. 12% 代收稅金：成本 → 代收稅金負債
+ * 5. 獎金：成本 → 銀行/應付獎金
  */
 export interface AutoVoucherFromTourClosing {
   workspace_id: string
   tour_id: string // 團號 ID
   tour_code: string // 團號代碼
   closing_date: string // 結團日期
-  total_revenue: number // 總收入
+  // 收入
+  total_revenue: number // 預收團款彙總
+  // 成本
   costs: {
     transportation: number // 交通費
     accommodation: number // 住宿費
     meal: number // 餐食費
     ticket: number // 門票費
     insurance: number // 保險費
+    card_fee: number // 刷卡成本（2%，從預付團務成本－刷卡成本轉列）
     other: number // 其他費用
+  }
+  // V2 新增欄位
+  participants: number // 參加人數
+  admin_fee?: number // 行政費（預設 = participants * 10）
+  tax_rate?: number // 代收稅金費率（預設 0.12 = 12%）
+  bonuses?: {
+    sales: number // 業務獎金
+    op: number // OP 獎金
+    team_performance: number // 團績獎金（進應付）
   }
 }
 

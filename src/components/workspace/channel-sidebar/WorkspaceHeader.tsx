@@ -2,7 +2,8 @@
  * 工作空間標題列
  */
 
-import { Filter, Settings, Plus, RefreshCw } from 'lucide-react'
+import { Filter, Settings, Plus, RefreshCw, Search, X } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,8 @@ interface WorkspaceHeaderProps {
   onCreateGroup: () => void
   onRefresh?: () => void
   isRefreshing?: boolean
+  searchQuery: string
+  onSearchChange: (query: string) => void
 }
 
 export function WorkspaceHeader({
@@ -30,14 +33,83 @@ export function WorkspaceHeader({
   onCreateGroup,
   onRefresh,
   isRefreshing = false,
+  searchQuery,
+  onSearchChange,
 }: WorkspaceHeaderProps) {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // 當搜尋框展開時自動聚焦
+  useEffect(() => {
+    if (isSearchExpanded && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [isSearchExpanded])
+
+  // 當有搜尋內容時保持展開
+  useEffect(() => {
+    if (searchQuery && !isSearchExpanded) {
+      setIsSearchExpanded(true)
+    }
+  }, [searchQuery])
+
+  const handleSearchToggle = () => {
+    if (isSearchExpanded && !searchQuery) {
+      setIsSearchExpanded(false)
+    } else {
+      setIsSearchExpanded(true)
+    }
+  }
+
+  const handleClearSearch = () => {
+    onSearchChange('')
+    setIsSearchExpanded(false)
+  }
+
   return (
-    <div className="h-[52px] px-6 border-b border-morandi-gold/20 bg-gradient-to-r from-morandi-gold/5 to-transparent flex items-center">
+    <div className="h-[56px] px-6 border-b border-border bg-gradient-to-r from-morandi-gold/5 to-transparent flex items-center">
       <div className="flex items-center justify-between w-full">
-        <h2 className="font-semibold text-morandi-primary truncate flex-1">
+        <h2 className="font-semibold text-morandi-primary truncate flex-1 min-w-0">
           {workspaceIcon} {workspaceName || '工作空間'}
         </h2>
         <div className="flex items-center gap-1">
+          {/* 搜尋按鈕/輸入框 */}
+          <div className="relative flex items-center">
+            {isSearchExpanded ? (
+              <div className="flex items-center bg-white border border-border rounded-md overflow-hidden">
+                <Search size={14} className="ml-2 text-morandi-secondary" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="搜尋..."
+                  value={searchQuery}
+                  onChange={e => onSearchChange(e.target.value)}
+                  className="w-24 h-7 px-2 text-xs border-none focus:outline-none focus:ring-0"
+                  onBlur={() => {
+                    if (!searchQuery) {
+                      setIsSearchExpanded(false)
+                    }
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={handleClearSearch}
+                    className="mr-1 p-0.5 hover:bg-morandi-container rounded"
+                  >
+                    <X size={12} className="text-morandi-secondary" />
+                  </button>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={handleSearchToggle}
+                className="btn-icon-morandi !w-7 !h-7"
+                title="搜尋頻道"
+              >
+                <Search size={14} />
+              </button>
+            )}
+          </div>
           {onRefresh && (
             <button
               onClick={onRefresh}

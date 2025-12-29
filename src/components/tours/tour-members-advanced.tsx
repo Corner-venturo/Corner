@@ -173,7 +173,6 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
             variant="outline"
             size="sm"
             onClick={() => setShowEntryCardDialog(true)}
-            className="bg-rose-50 hover:bg-rose-100 border-rose-200"
           >
             <FileText size={16} className="mr-1" />
             列印入境卡

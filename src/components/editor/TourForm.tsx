@@ -18,10 +18,12 @@ import { FAQSection } from './tour-form/sections/FAQSection'
 import { NoticesPolicySection } from './tour-form/sections/NoticesPolicySection'
 import { Image, Plane, Star, MapPin, Users, Building2, DollarSign, HelpCircle, AlertCircle, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { TierPricing } from '@/stores/types/quote.types'
 
 interface TourFormProps {
   data: TourFormData
   onChange: (data: TourFormData) => void
+  quoteTierPricings?: TierPricing[]
 }
 
 // 導覽項目配置
@@ -59,7 +61,7 @@ function calculateDayLabels(itinerary: TourFormData['dailyItinerary']): string[]
   return labels
 }
 
-export function TourForm({ data, onChange }: TourFormProps) {
+export function TourForm({ data, onChange, quoteTierPricings }: TourFormProps) {
   const { user } = useAuthStore()
   const [activeSection, setActiveSection] = useState('section-cover')
   const [showDayNav, setShowDayNav] = useState(false)
@@ -381,7 +383,7 @@ export function TourForm({ data, onChange }: TourFormProps) {
         {/* 團費說明 */}
         <div id="section-pricing" className="space-y-8">
           {/* 價格方案（4人、6人、8人包團） */}
-          <PriceTiersSection data={data} onChange={onChange} />
+          <PriceTiersSection data={data} onChange={onChange} quoteTierPricings={quoteTierPricings} />
 
           {/* 詳細團費（費用包含/不含） */}
           <PricingDetailsSection

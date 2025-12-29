@@ -46,10 +46,20 @@ export function TourOrders({ tour }: TourOrdersProps) {
   }
 
   return (
-    <SimpleOrderTable
-      orders={orders as OrderType[]}
-      showTourInfo={false}
-      className="flex-1"
-    />
+    <div className="flex flex-col h-full border border-border rounded-lg overflow-hidden bg-card">
+      {/* 區塊標題行 */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border/60">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-morandi-primary">訂單管理</span>
+          <span className="text-sm text-morandi-secondary">({orders.length} 筆)</span>
+        </div>
+      </div>
+      {/* 表格 */}
+      <SimpleOrderTable
+        orders={orders as OrderType[]}
+        showTourInfo={false}
+        className="flex-1"
+      />
+    </div>
   )
 }

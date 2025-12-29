@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -51,11 +51,13 @@ export default function ItineraryPage() {
     if (isSuperAdmin && workspaces.length === 0) {
       loadWorkspaces()
     }
-  }, [isSuperAdmin, workspaces.length, loadWorkspaces])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuperAdmin, workspaces.length])
 
   useEffect(() => {
     regionsStore.fetchAll()
-  }, [regionsStore])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Custom hooks
   const pageState = useItineraryPageState()
@@ -120,6 +122,14 @@ export default function ItineraryPage() {
     }
   }, [formState, pageState])
 
+  // Memoize filtered employees for author select to prevent infinite re-renders
+  const filteredEmployeesForSelect = useMemo(() => {
+    return employees.filter(emp =>
+      emp.id !== user?.id &&
+      itineraries.some(it => it.created_by === emp.id)
+    )
+  }, [employees, user?.id, itineraries])
+
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
@@ -155,16 +165,11 @@ export default function ItineraryPage() {
               <SelectContent>
                 <SelectItem value="__mine__">我的行程</SelectItem>
                 <SelectItem value="all">全部作者</SelectItem>
-                {employees
-                  .filter(emp =>
-                    emp.id !== user?.id &&
-                    itineraries.some(it => it.created_by === emp.id)
-                  )
-                  .map(emp => (
-                    <SelectItem key={emp.id} value={emp.id}>
-                      {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
-                    </SelectItem>
-                  ))}
+                {filteredEmployeesForSelect.map(emp => (
+                  <SelectItem key={emp.id} value={emp.id}>
+                    {emp.display_name || emp.chinese_name || emp.english_name || emp.email}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

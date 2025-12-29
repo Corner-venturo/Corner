@@ -86,10 +86,16 @@ export function useCalendarEvents() {
     if (!initializedRef.current) {
       initializedRef.current = true
       logger.log('[Calendar] 載入行事曆事件和員工資料...')
+      logger.log('[Calendar] 當前用戶:', {
+        id: user?.id,
+        workspace_id: user?.workspace_id,
+        roles: user?.roles,
+        isSuperAdmin,
+      })
       fetchCalendarEvents()
       fetchEmployees()
     }
-  }, [fetchCalendarEvents, fetchEmployees])
+  }, [fetchCalendarEvents, fetchEmployees, user, isSuperAdmin])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -202,6 +208,10 @@ export function useCalendarEvents() {
 
   // 轉換公司事項為日曆事件
   const companyCalendarEvents: FullCalendarEvent[] = useMemo(() => {
+    // 🔍 診斷日誌：查看載入的行事曆事件
+    logger.log('[Calendar] calendarEvents 總數:', calendarEvents?.length || 0)
+    logger.log('[Calendar] 公司事件數量:', calendarEvents?.filter(e => e.visibility === 'company').length || 0)
+
     return (calendarEvents || [])
       .filter(event => {
         if (event.visibility !== 'company') return false

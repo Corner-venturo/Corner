@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   useTimeboxBoxes,
@@ -13,6 +13,52 @@ import {
 import ScheduledBoxItem from './ScheduledBoxItem'
 import BoxSelector from './BoxSelector'
 import { alert } from '@/lib/ui/alert-dialog'
+
+// 固定格子高度（像素）- 不依賴 DOM 測量，確保一致性
+const SLOT_HEIGHTS = {
+  30: 40,   // 30分鐘間隔：40px
+  60: 56,   // 60分鐘間隔：56px
+}
+
+// 當前時間指示器
+function CurrentTimeIndicator({
+  slotHeight,
+  slotMinutes,
+  startHour
+}: {
+  slotHeight: number
+  slotMinutes: number
+  startHour: number
+}) {
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000) // 每分鐘更新
+    return () => clearInterval(timer)
+  }, [])
+
+  const currentHour = now.getHours()
+  const currentMinute = now.getMinutes()
+
+  // 如果當前時間不在顯示範圍內，不顯示
+  if (currentHour < startHour || currentHour >= 24) return null
+
+  const minutesSinceStart = (currentHour - startHour) * 60 + currentMinute
+  // 使用 slotMinutes 而不是 hardcode 60
+  const topPosition = (minutesSinceStart / slotMinutes) * slotHeight
+
+  return (
+    <div
+      className="absolute left-0 right-0 z-20 pointer-events-none"
+      style={{ top: `${topPosition}px` }}
+    >
+      <div className="flex items-center">
+        <div className="w-2 h-2 rounded-full bg-morandi-red" />
+        <div className="flex-1 h-0.5 bg-morandi-red/60" />
+      </div>
+    </div>
+  )
+}
 
 interface TimeGridProps {
   weekDays: Date[]
@@ -56,8 +102,9 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
   }, [timeInterval])
 
   const [selectorTarget, setSelectorTarget] = useState<{ dayOfWeek: number; start_time: string } | null>(null)
-  const [slotHeight, setSlotHeight] = useState<number>(timeInterval === 30 ? 40 : 56)
-  const measureRef = useRef<HTMLDivElement | null>(null)
+
+  // 使用固定像素高度，確保切換間隔時計算一致
+  const slotHeight = SLOT_HEIGHTS[timeInterval]
 
   // 取得當前週記錄
   const currentWeekRecord = useMemo(() => {
@@ -78,27 +125,12 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       createWeek({
         user_id: userId,
         week_start: weekStartStr,
+        week_end: weekEndStr,
         name: null,
         archived: false,
       } as Omit<TimeboxWeek, 'id' | 'created_at' | 'updated_at'>)
     }
   }, [userId, weekDays, weeks, createWeek])
-
-  // 測量格子高度
-  useEffect(() => {
-    if (!measureRef.current) return
-
-    const observer = new ResizeObserver((entries) => {
-      if (!entries[0]) return
-      const { height } = entries[0].contentRect
-      if (height > 0) {
-        setSlotHeight(height)
-      }
-    })
-
-    observer.observe(measureRef.current)
-    return () => observer.disconnect()
-  }, [timeInterval])
 
   // 當前週的排程
   const currentScheduledBoxes = useMemo(() => {
@@ -154,6 +186,10 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       return
     }
 
+    // 找到箱子的預設內容
+    const box = userBoxes.find(b => b.id === boxId)
+    const defaultData = box?.default_content || null
+
     await createScheduledBox({
       user_id: userId,
       box_id: boxId,
@@ -162,13 +198,14 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       start_time: start_time + ':00',
       duration,
       completed: false,
-      data: null,
+      data: defaultData,
     })
 
     setSelectorTarget(null)
   }
 
-  const slotClass = timeInterval === 30 ? 'min-h-[2.5rem]' : 'min-h-[3.5rem]'
+  // 使用固定高度樣式，確保與 slotHeight 計算一致
+  const slotClass = timeInterval === 30 ? 'h-[40px]' : 'h-[56px]'
   const dayStartMinutes = startHour * 60
   const totalMinutes = (endHour - startHour) * 60
 
@@ -177,11 +214,10 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
       <div className="grid grid-cols-8 min-h-[600px]">
         {/* 時間軸 */}
         <div className="border-r border-border bg-morandi-container/10">
-          {timeSlots.map((timeSlot, index) => (
+          {timeSlots.map((timeSlot) => (
             <div
               key={timeSlot}
               className={`${slotClass} flex items-center justify-center text-xs sm:text-sm text-morandi-secondary border-b border-border/50`}
-              ref={index === 0 ? measureRef : undefined}
             >
               {timeSlot}
             </div>
@@ -191,6 +227,7 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
         {/* 每天的欄位 */}
         {weekDays.map((day, dayIndex) => {
           const dayOfWeek = day.getDay()
+          const isToday = day.toDateString() === new Date().toDateString()
           const boxesInDay = currentScheduledBoxes
             .filter((box) => box.day_of_week === dayOfWeek)
             .sort((a, b) => timeToMinutes(a.start_time) - timeToMinutes(b.start_time))
@@ -198,9 +235,12 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
           return (
             <div
               key={dayIndex}
-              className="relative border-r border-border last:border-r-0 bg-card"
+              className={`relative border-r border-border last:border-r-0 ${isToday ? 'bg-morandi-gold/5' : 'bg-card'}`}
               style={{ minHeight: `${(totalMinutes / slotMinutes) * slotHeight}px` }}
             >
+              {/* 今天的當前時間指示器 */}
+              {isToday && <CurrentTimeIndicator slotHeight={slotHeight} slotMinutes={slotMinutes} startHour={startHour} />}
+
               <div className="relative">
                 {timeSlots.map((timeSlot, slotIndex) => (
                   <div
@@ -227,6 +267,10 @@ export default function TimeGrid({ weekDays, timeInterval }: TimeGridProps) {
                     height={height}
                     topOffset={top}
                     boxes={userBoxes}
+                    slotHeight={slotHeight}
+                    slotMinutes={slotMinutes}
+                    startHour={startHour}
+                    allScheduledBoxes={currentScheduledBoxes}
                   />
                 )
               })}

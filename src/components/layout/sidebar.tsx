@@ -23,7 +23,6 @@ import {
   TrendingDown,
   FileCheck,
   Flag,
-  Sparkles,
   FileSignature,
   FileText,
   CircleDot,
@@ -33,6 +32,7 @@ import {
   CheckSquare,
   FolderTree,
   ClipboardList,
+  MessageCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -50,6 +50,8 @@ const menuItems: MenuItem[] = [
   { href: '/', label: '首頁', icon: Home },
   { href: '/calendar', label: '行事曆', icon: Calendar, requiredPermission: 'calendar' },
   { href: '/workspace', label: '工作空間', icon: Building2, requiredPermission: 'workspace' },
+  // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
+  // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
   { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
@@ -93,7 +95,6 @@ const menuItems: MenuItem[] = [
 const personalToolItems: MenuItem[] = [
   { href: '/accounting', label: '記帳管理', icon: Wallet, requiredPermission: 'accounting' },
   { href: '/timebox', label: '箱型時間', icon: Clock, requiredPermission: 'timebox' },
-  { href: '/manifestation', label: '顯化魔法', icon: Sparkles, requiredPermission: 'manifestation' },
 ]
 
 export function Sidebar() {
@@ -316,57 +317,13 @@ export function Sidebar() {
             </div>
           )}
         </div>
-        <div
-          style={{
-            marginLeft: '12px',
-            marginRight: '12px',
-            borderTop: '1px solid var(--border)',
-            height: '1px',
-          }}
-        />
       </div>
 
-      {/* 導航選單 */}
+      {/* 統一導航選單 */}
       <nav className="flex-1 py-4 overflow-y-auto min-h-0">
         <ul className="space-y-px">
           {visibleMenuItems.map(item => renderMenuItem(item))}
-        </ul>
-      </nav>
-
-      {/* 底部功能區 */}
-      <div className="py-4 shrink-0">
-        <div
-          className="mb-4"
-          style={{
-            marginLeft: '12px',
-            marginRight: '12px',
-            borderTop: '1px solid var(--border)',
-            height: '1px',
-          }}
-        />
-
-        {isExpanded && user && (
-          <div className="mb-4 mx-4 p-3 bg-morandi-container rounded-lg">
-            <div className="text-sm font-medium text-morandi-primary">{user.display_name}</div>
-            <div className="text-xs text-morandi-secondary">{user.employee_number}</div>
-          </div>
-        )}
-
-        <ul className="space-y-px">
           {visiblePersonalToolItems.map(item => renderMenuItem(item))}
-
-          {visiblePersonalToolItems.length > 0 && (
-            <li className="my-2">
-              <div
-                style={{
-                  marginLeft: '12px',
-                  marginRight: '12px',
-                  borderTop: '1px solid var(--border)',
-                  height: '1px',
-                }}
-              />
-            </li>
-          )}
 
           {/* 開發者地圖 */}
           <li>
@@ -406,7 +363,7 @@ export function Sidebar() {
             </Link>
           </li>
         </ul>
-      </div>
+      </nav>
     </div>
   )
 }

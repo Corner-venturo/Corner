@@ -19,6 +19,7 @@ import {
   Calculator,
   FileText,
   CheckCircle2,
+  FileCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -44,6 +45,8 @@ interface UseTourActionButtonsParams {
   // V2.0：確認出團 & 解鎖
   onConfirmTour?: (tour: Tour) => void
   onUnlockLockedTour?: (tour: Tour) => void
+  // 結案
+  onCloseTour?: (tour: Tour) => void
   // 封存對話框
   onOpenArchiveDialog?: (tour: Tour) => void
 }
@@ -66,6 +69,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onViewDetails,
     onConfirmTour,
     onUnlockLockedTour,
+    onCloseTour,
     onOpenArchiveDialog,
   } = params
 
@@ -93,8 +97,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <Eye size={14} />
           </button>
 
-          {/* V2.0：確認出團（僅提案/修改中狀態可見） */}
-          {(tour.status === '提案' || tour.status === '修改中') && onConfirmTour && (
+          {/* 確認出團（僅提案狀態可見） */}
+          {tour.status === '提案' && onConfirmTour && (
             <button
               onClick={e => {
                 e.stopPropagation()
@@ -107,25 +111,38 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             </button>
           )}
 
-          {/* V2.0：解鎖版本（僅已確認狀態可見） */}
-          {tour.status === '已確認' && onUnlockLockedTour && (
+          {/* 進行中狀態的解鎖 */}
+          {tour.status === '進行中' && (
+            onUnlockLockedTour ? (
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  onUnlockLockedTour(tour)
+                }}
+                className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
+                title="解鎖回提案"
+              >
+                <LockOpen size={14} />
+              </button>
+            ) : (
+              <span className="p-1 text-morandi-gold" title="行程已鎖定">
+                <Lock size={14} />
+              </span>
+            )
+          )}
+
+          {/* 結案（僅進行中狀態可見） */}
+          {tour.status === '進行中' && onCloseTour && (
             <button
               onClick={e => {
                 e.stopPropagation()
-                onUnlockLockedTour(tour)
+                onCloseTour(tour)
               }}
-              className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
-              title="解鎖修改"
+              className="p-1 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors"
+              title="結案"
             >
-              <LockOpen size={14} />
+              <FileCheck size={14} />
             </button>
-          )}
-
-          {/* 已鎖定標示 */}
-          {tour.status === '已確認' && (
-            <span className="p-1 text-morandi-gold" title="版本已鎖定">
-              <Lock size={14} />
-            </span>
           )}
 
           {/* 編輯 */}
@@ -276,6 +293,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onViewDetails,
       onConfirmTour,
       onUnlockLockedTour,
+      onCloseTour,
       onOpenArchiveDialog,
     ]
   )

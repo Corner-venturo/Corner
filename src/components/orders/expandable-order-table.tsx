@@ -219,7 +219,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                               `/finance/payments?order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`
                             )
                           }}
-                          className="h-10 w-10 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
+                          className="h-10 w-10 p-0 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                           title="快速收款"
                         >
                           $
@@ -233,7 +233,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                             e.stopPropagation()
                             router.push(`/finance/requests`)
                           }}
-                          className="h-10 w-10 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10"
+                          className="h-10 w-10 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
                           title="快速請款"
                         >
                           <CreditCard size={14} />
@@ -244,7 +244,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                           size="sm"
                           variant="ghost"
                           onClick={e => handleDeleteOrder(order, e)}
-                          className="h-10 w-10 p-0 text-morandi-red hover:text-morandi-red hover:bg-morandi-red/10"
+                          className="h-10 w-10 p-0 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
                           title="刪除訂單"
                         >
                           <Trash2 size={14} />

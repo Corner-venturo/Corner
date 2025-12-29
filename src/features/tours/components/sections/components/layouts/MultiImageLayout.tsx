@@ -44,7 +44,7 @@ export function MultiImageLayout({
             <span key={i}>
               {i > 0 && <br />}
               {i === arr.length - 1 ? (
-                <span style={{ color: ART.sage }} className="italic">{part.trim()}</span>
+                <span style={{ color: ART.accent }} className="italic">{part.trim()}</span>
               ) : (
                 part.trim()
               )}
@@ -67,7 +67,7 @@ export function MultiImageLayout({
             <div key={actIdx} className="text-right">
               <h4
                 className="text-xs tracking-widest mb-2"
-                style={{ fontFamily: "'Cinzel', serif", color: ART.sage }}
+                style={{ fontFamily: "'Cinzel', serif", color: ART.accent }}
               >
                 HIGHLIGHT
               </h4>
@@ -139,7 +139,7 @@ export function MultiImageLayout({
           className="text-xs uppercase tracking-widest pt-12"
           style={{
             writingMode: 'vertical-rl',
-            color: ART.sage,
+            color: ART.accent,
           }}
         >
           Adventure

@@ -8,7 +8,6 @@ import { useTourItineraryNav } from '@/features/tours/hooks/useTourItineraryNav'
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
 import { TourHeroGemini } from '@/features/tours/components/sections/TourHeroGemini'
 import { TourHeroNature } from '@/features/tours/components/sections/TourHeroNature'
-import { TourHeroSerene } from '@/features/tours/components/sections/TourHeroSerene'
 import { TourHeroLuxury } from '@/features/tours/components/sections/TourHeroLuxury'
 import { TourHeroArt } from '@/features/tours/components/sections/TourHeroArt'
 import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHeroDreamscape'
@@ -99,8 +98,6 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
           <TourHeroGemini data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'nature' ? (
           <TourHeroNature data={data} viewMode={viewMode} />
-        ) : data.coverStyle === 'serene' ? (
-          <TourHeroSerene data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'dreamscape' ? (
           <TourHeroDreamscape data={data} viewMode={viewMode} />
         ) : data.coverStyle === 'collage' ? (

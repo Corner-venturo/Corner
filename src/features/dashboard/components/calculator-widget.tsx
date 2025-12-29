@@ -172,7 +172,7 @@ export function CalculatorWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-morandi-container/30 via-white to-morandi-gold/5">
         <div className="p-5 space-y-4 h-full flex flex-col">
           {/* Header with Icon */}
           <div className="flex items-start justify-between">
@@ -180,7 +180,7 @@ export function CalculatorWidget() {
               <div
                 className={cn(
                   'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
-                  'bg-gradient-to-br from-teal-200/60 to-cyan-100/60',
+                  'bg-gradient-to-br from-morandi-gold/40 to-morandi-container/60',
                   'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
                 )}
               >

@@ -166,42 +166,45 @@ export function useEventOperations() {
     const originalEvent = calendarEvents.find(e => e.id === event.id)
     if (!originalEvent) return
 
-    // 解析日期（直接取 YYYY-MM-DD 部分，不做時區轉換）
-    const startDate = originalEvent.start.substring(0, 10)
+    // 🔧 修正：使用 Date 物件正確轉換時區，而不是直接 substring
+    // 這樣可以避免 UTC 轉換造成的日期跳動問題
+    const parseToTaipeiDateTime = (isoString: string) => {
+      const date = new Date(isoString)
+      // 使用台灣時區格式化
+      const taipeiDate = date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }) // sv-SE 格式為 YYYY-MM-DD
+      const taipeiTime = date.toLocaleTimeString('zh-TW', {
+        timeZone: 'Asia/Taipei',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      return { date: taipeiDate, time: taipeiTime }
+    }
+
+    const startParsed = parseToTaipeiDateTime(originalEvent.start)
+    const startDate = startParsed.date
 
     // 結束日期：如果有 end 就解析，否則用開始日期
     let endDate = startDate
+    let endParsed = { date: startDate, time: '23:59' }
     if (originalEvent.end) {
-      endDate = originalEvent.end.substring(0, 10)
+      endParsed = parseToTaipeiDateTime(originalEvent.end)
+      endDate = endParsed.date
     }
 
-    // 解析時間部分（直接從字串中擷取 HH:MM）
+    // 解析時間部分
     let startTime = ''
     let endTime = ''
 
     if (!originalEvent.all_day) {
-      // 解析開始時間
-      const startTimeMatch = originalEvent.start.match(/T(\d{2}):(\d{2})/)
-      if (startTimeMatch) {
-        const hour = startTimeMatch[1]
-        const minute = startTimeMatch[2]
-        // 只有非 00:00 才設定時間
-        if (hour !== '00' || minute !== '00') {
-          startTime = `${hour}:${minute}`
-        }
+      // 只有非 00:00 才設定時間
+      if (startParsed.time !== '00:00') {
+        startTime = startParsed.time
       }
 
-      // 解析結束時間
-      if (originalEvent.end) {
-        const endTimeMatch = originalEvent.end.match(/T(\d{2}):(\d{2})/)
-        if (endTimeMatch) {
-          const hour = endTimeMatch[1]
-          const minute = endTimeMatch[2]
-          // 只有非 23:59 才設定時間（23:59 是全天事件的預設結束時間）
-          if (!(hour === '23' && minute === '59')) {
-            endTime = `${hour}:${minute}`
-          }
-        }
+      // 只有非 23:59 才設定時間（23:59 是全天事件的預設結束時間）
+      if (endParsed.time !== '23:59') {
+        endTime = endParsed.time
       }
     }
 

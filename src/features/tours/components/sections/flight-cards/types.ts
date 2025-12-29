@@ -24,7 +24,7 @@ export interface TourDisplayData {
   flightStyle?: FlightStyleType // 航班卡片風格
 }
 
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 export interface FlightCardProps {
   flight: FlightInfo | null | undefined

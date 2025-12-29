@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
+import { QuoteConfirmationSection } from './QuoteConfirmationSection'
+import type { QuoteConfirmationStatus } from '@/types/quote.types'
 
 // 移除 HTML 標籤
 const stripHtml = (html: string | undefined): string => {
@@ -58,6 +60,13 @@ type QuoteWithVersions = Omit<StoreQuote, 'versions' | 'categories'> & {
   versions?: VersionRecord[]
   current_version_index?: number
   categories?: CostCategory[]
+  // 確認相關欄位
+  confirmation_status?: QuoteConfirmationStatus
+  confirmation_token?: string
+  confirmation_token_expires_at?: string
+  confirmed_at?: string
+  confirmed_by_type?: 'customer' | 'staff'
+  confirmed_by_name?: string
 }
 
 interface ContactInfo {
@@ -96,6 +105,10 @@ interface QuoteHeaderProps {
   // 聯絡資訊
   contactInfo?: ContactInfo
   onContactInfoChange?: (info: ContactInfo) => void
+  // 確認相關
+  staffId?: string
+  staffName?: string
+  onConfirmationStatusChange?: (status: QuoteConfirmationStatus) => void
 }
 
 export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
@@ -127,6 +140,9 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   accommodationDays,
   contactInfo,
   onContactInfoChange,
+  staffId,
+  staffName,
+  onConfirmationStatusChange,
 }) => {
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
@@ -327,6 +343,26 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               </span>
             )}
           </div>
+
+          <div className="h-4 w-px bg-morandi-container" />
+
+          {/* 報價確認 */}
+          {quote && staffId && staffName && (
+            <QuoteConfirmationSection
+              quoteId={quote.id}
+              quoteCode={quote.code || ''}
+              confirmationStatus={quote.confirmation_status}
+              confirmationToken={quote.confirmation_token}
+              confirmationTokenExpiresAt={quote.confirmation_token_expires_at}
+              confirmedAt={quote.confirmed_at}
+              confirmedByType={quote.confirmed_by_type}
+              confirmedByName={quote.confirmed_by_name}
+              staffId={staffId}
+              staffName={staffName}
+              onConfirmationStatusChange={onConfirmationStatusChange}
+              isReadOnly={isReadOnly}
+            />
+          )}
 
           <div className="h-4 w-px bg-morandi-container" />
 

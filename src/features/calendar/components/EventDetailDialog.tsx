@@ -61,7 +61,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
             {/* 日期時間 */}
             <div className="space-y-2">
               {(() => {
-                // 🔥 使用 ISO 格式解析（避免時區問題）
+                // 🔧 修正：明確使用台灣時區，避免時區轉換問題
                 const startDate = event.start.includes('T') ? event.start : `${event.start}T00:00:00`
                 const endDate = event.end
                   ? event.end.includes('T')
@@ -71,6 +71,9 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
 
                 const isAllDay = event.allDay ?? true // 預設為全天事件
 
+                // 統一的時區設定
+                const taipeiTZ = 'Asia/Taipei'
+
                 if (isAllDay) {
                   // 全天事件：只顯示日期
                   const start = new Date(startDate)
@@ -79,9 +82,10 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                   // FullCalendar 的全天事件 end 是隔天 00:00，所以要減一天
                   const actualEnd = end ? new Date(end.getTime() - 24 * 60 * 60 * 1000) : null
 
-                  const isSameDay =
-                    !actualEnd ||
-                    start.toDateString() === actualEnd.toDateString()
+                  // 使用台灣時區比較日期
+                  const startDateStr = start.toLocaleDateString('sv-SE', { timeZone: taipeiTZ })
+                  const endDateStr = actualEnd?.toLocaleDateString('sv-SE', { timeZone: taipeiTZ })
+                  const isSameDay = !endDateStr || startDateStr === endDateStr
 
                   return (
                     <>
@@ -89,6 +93,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                         <CalendarIcon size={16} className="text-morandi-secondary" />
                         <span className="text-morandi-primary">
                           {start.toLocaleDateString('zh-TW', {
+                            timeZone: taipeiTZ,
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -101,6 +106,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                           <span className="text-morandi-secondary ml-6">至</span>
                           <span className="text-morandi-primary">
                             {actualEnd.toLocaleDateString('zh-TW', {
+                              timeZone: taipeiTZ,
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -122,6 +128,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                         <CalendarIcon size={16} className="text-morandi-secondary" />
                         <span className="text-morandi-primary">
                           {start.toLocaleDateString('zh-TW', {
+                            timeZone: taipeiTZ,
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -134,12 +141,14 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                           <Clock size={16} className="text-morandi-secondary" />
                           <span className="text-morandi-primary">
                             {start.toLocaleTimeString('zh-TW', {
+                              timeZone: taipeiTZ,
                               hour: '2-digit',
                               minute: '2-digit',
                               hour12: false,
                             })}
                             {' - '}
                             {end.toLocaleTimeString('zh-TW', {
+                              timeZone: taipeiTZ,
                               hour: '2-digit',
                               minute: '2-digit',
                               hour12: false,

@@ -11,12 +11,17 @@ export interface AuthPayload {
 
 // 生成 token（瀏覽器相容版本，使用 base64 編碼）
 // 注意：jsonwebtoken 只能在 Node.js 環境使用，這裡改用簡單的 base64 編碼
-export function generateToken(payload: AuthPayload): string {
+export function generateToken(payload: AuthPayload, rememberMe: boolean = false): string {
+  // rememberMe: true = 30 天，false = 8 小時
+  const expirationMs = rememberMe
+    ? 30 * 24 * 60 * 60 * 1000  // 30 天
+    : 8 * 60 * 60 * 1000        // 8 小時
+
   // 在瀏覽器環境使用 base64 編碼
   return btoa(
     JSON.stringify({
       ...payload,
-      exp: Date.now() + 8 * 60 * 60 * 1000, // 8小時
+      exp: Date.now() + expirationMs,
       iss: 'venturo-app',
     })
   )

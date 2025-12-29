@@ -57,6 +57,11 @@ export function MemberBasicInfo({
 
   return (
     <>
+      {/* 序號 */}
+      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-center">
+        <span className="text-xs text-morandi-secondary">{index + 1}</span>
+      </td>
+
       {/* 團體模式：訂單序號 */}
       {showOrderCode && (
         <td className="border border-morandi-gold/20 px-2 py-1 bg-status-info-bg text-center">
@@ -133,6 +138,28 @@ export function MemberBasicInfo({
               </button>
             )}
           </div>
+        )}
+      </td>
+
+      {/* 護照拼音 */}
+      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        {isEditMode ? (
+          <input
+            type="text"
+            value={member.passport_name || ''}
+            onChange={e => onUpdateField(member.id, 'passport_name', e.target.value)}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={e => {
+              setIsComposing(false)
+              setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
+            }}
+            onKeyDown={e => onKeyDown(e, index, 'passport_name')}
+            data-member={member.id}
+            data-field="passport_name"
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+          />
+        ) : (
+          <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
         )}
       </td>
 

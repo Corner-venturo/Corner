@@ -29,6 +29,15 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
   const [selectedBox, setSelectedBox] = useState<string | null>(null)
   const [duration, setDuration] = useState<number>(timeInterval)
 
+  // 當選擇箱子時，使用該箱子的預設時長
+  const handleSelectBox = (boxId: string) => {
+    setSelectedBox(boxId)
+    const box = boxes.find(b => b.id === boxId)
+    if (box?.default_duration) {
+      setDuration(box.default_duration)
+    }
+  }
+
   // 生成持續時間選項
   const durationOptions = []
   for (let i = timeInterval; i <= 480; i += timeInterval) {
@@ -77,7 +86,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
                     <button
                       key={box.id}
                       type="button"
-                      onClick={() => setSelectedBox(box.id)}
+                      onClick={() => handleSelectBox(box.id)}
                       className={`w-full rounded-lg border text-left transition-colors px-3 py-2 ${
                         selectedBox === box.id
                           ? 'border-morandi-gold/60 bg-morandi-gold/10'

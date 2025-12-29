@@ -8,6 +8,7 @@ import {
   Cloud,
   Plane,
   CloudSun,
+  FileText,
 } from 'lucide-react'
 import type { WidgetConfig } from '../types'
 import { CalculatorWidget } from './calculator-widget'
@@ -18,6 +19,7 @@ import { ManifestationWidget } from './manifestation-widget'
 import { WeatherWidget } from './weather-widget'
 import { WeatherWidgetWeekly } from './weather-widget-weekly'
 import { FlightWidget } from './flight-widget'
+import { PNRWidget } from './pnr-widget'
 
 // 小工具配置
 export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }> = [
@@ -33,6 +35,13 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
     name: '航班查詢',
     icon: Plane as unknown,
     component: FlightWidget,
+    span: 1
+  },
+  {
+    id: 'pnr',
+    name: 'PNR 解析',
+    icon: FileText as unknown,
+    component: PNRWidget,
     span: 1
   },
   {

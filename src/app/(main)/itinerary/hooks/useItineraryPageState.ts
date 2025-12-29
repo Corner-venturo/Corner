@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { Itinerary } from '@/stores/types'
 
 /**
@@ -28,7 +28,8 @@ export function useItineraryPageState() {
   const [duplicateTitle, setDuplicateTitle] = useState('')
   const [isDuplicating, setIsDuplicating] = useState(false)
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     // Filter states
     statusFilter,
     setStatusFilter,
@@ -60,5 +61,18 @@ export function useItineraryPageState() {
     setDuplicateTitle,
     isDuplicating,
     setIsDuplicating,
-  }
+  }), [
+    statusFilter,
+    authorFilter,
+    searchTerm,
+    isTypeSelectOpen,
+    isPasswordDialogOpen,
+    isDuplicateDialogOpen,
+    passwordInput,
+    pendingEditId,
+    duplicateSource,
+    duplicateTourCode,
+    duplicateTitle,
+    isDuplicating,
+  ])
 }

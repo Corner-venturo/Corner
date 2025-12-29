@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { logger } from '@/lib/utils/logger'
-import { ContentContainer } from '@/components/layout/content-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -10,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tour, Payment } from '@/stores/types'
 import { useOrderStore, usePaymentRequestStore, useSupplierStore } from '@/stores'
 import type { PaymentRequestItem } from '@/stores/types'
+import { supabase } from '@/lib/supabase/client'
+import { mutate } from 'swr'
 
 // 擴展 PaymentRequest 型別以包含 items
 interface PaymentRequestWithItems {
@@ -28,6 +29,7 @@ import { generateUUID } from '@/lib/utils/uuid'
 interface TourCostsProps {
   tour: Tour
   orderFilter?: string // 選填：只顯示特定訂單相關的成本
+  showSummary?: boolean
 }
 
 // 擴展 Payment 型別以包含成本專用欄位
@@ -37,7 +39,7 @@ interface CostPayment extends Payment {
   receipt?: string
 }
 
-export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: TourCostsProps) {
+export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true }: TourCostsProps) {
   const { items: orders } = useOrderStore()
   const {
     items: paymentRequests,
@@ -46,6 +48,78 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
   } = usePaymentRequestStore()
   const { items: suppliers } = useSupplierStore()
   const { toast } = useToast()
+
+  // 更新 tour 的成本財務欄位
+  const updateTourCostFinancials = useCallback(async () => {
+    try {
+      // 取得該團所有請款單的項目
+      const { data: requestsData } = await supabase
+        .from('payment_requests')
+        .select('id, status')
+        .eq('tour_id', tour.id)
+
+      if (!requestsData || requestsData.length === 0) {
+        // 如果沒有請款單，設成本為 0
+        const { data: currentTour } = await supabase
+          .from('tours')
+          .select('total_revenue')
+          .eq('id', tour.id)
+          .single()
+
+        await supabase
+          .from('tours')
+          .update({
+            total_cost: 0,
+            profit: currentTour?.total_revenue || 0,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', tour.id)
+
+        // 刷新 SWR 快取
+        await mutate(`tour-${tour.id}`)
+        await mutate('tours')
+        return
+      }
+
+      const requestIds = requestsData.map(r => r.id)
+
+      // 取得所有請款項目
+      const { data: itemsData } = await supabase
+        .from('payment_request_items')
+        .select('subtotal')
+        .in('request_id', requestIds)
+
+      const totalCost = (itemsData || []).reduce((sum, item) => sum + (item.subtotal || 0), 0)
+
+      // 取得當前收入
+      const { data: currentTour } = await supabase
+        .from('tours')
+        .select('total_revenue')
+        .eq('id', tour.id)
+        .single()
+
+      const totalRevenue = currentTour?.total_revenue || 0
+      const profit = totalRevenue - totalCost
+
+      // 更新 tour
+      await supabase
+        .from('tours')
+        .update({
+          total_cost: totalCost,
+          profit: profit,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', tour.id)
+
+      // 刷新 SWR 快取讓 UI 更新
+      await mutate(`tour-${tour.id}`)
+      await mutate('tours')
+
+      logger.log('Tour 成本數據已更新:', { total_cost: totalCost, profit })
+    } catch (error) {
+      logger.error('更新 Tour 成本數據失敗:', error)
+    }
+  }, [tour.id])
 
   const addPayment = async (data: {
     tour_id: string
@@ -105,6 +179,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
 
       await createPaymentRequest(paymentRequestData as unknown as Parameters<typeof createPaymentRequest>[0])
       await fetchPaymentRequests()
+
+      // 同步更新 tour 的成本數據
+      await updateTourCostFinancials()
 
       toast({
         title: '成功',
@@ -208,11 +285,25 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     return names[category] || category
   }
 
+  // 狀態標籤映射（英文 -> 中文）
+  const STATUS_LABELS: Record<string, string> = {
+    confirmed: '已確認',
+    pending: '待確認',
+    paid: '已付款',
+  }
+
+  const getStatusLabel = (status: string) => STATUS_LABELS[status] || status
+
   const getStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
-      已確認: 'bg-morandi-green text-white',
-      待確認: 'bg-morandi-gold text-white',
+      // 中文狀態
+      已確認: 'bg-morandi-green/20 text-morandi-green',
+      待確認: 'bg-morandi-gold/20 text-morandi-gold',
       已付款: 'bg-morandi-container text-morandi-secondary',
+      // 英文狀態（相容）
+      confirmed: 'bg-morandi-green/20 text-morandi-green',
+      pending: 'bg-morandi-gold/20 text-morandi-gold',
+      paid: 'bg-morandi-container text-morandi-secondary',
     }
     return badges[status] || 'bg-morandi-container text-morandi-secondary'
   }
@@ -230,160 +321,115 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter }: To
     .reduce((sum, cost) => sum + cost.amount, 0)
 
   return (
-    <div className="space-y-6">
-      {/* 成本統計 */}
-      <ContentContainer>
-        <h3 className="text-lg font-semibold text-morandi-primary mb-4">成本概況</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-primary">
-              NT$ {totalCosts.toLocaleString()}
+    <div className="space-y-4">
+      {/* 統計摘要 + 新增按鈕 */}
+      {showSummary && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6 text-sm">
+            <div>
+              <span className="text-morandi-secondary">總成本</span>
+              <span className="ml-2 font-semibold text-morandi-primary">NT$ {totalCosts.toLocaleString()}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">總成本</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-green">
-              NT$ {confirmedCosts.toLocaleString()}
+            <div>
+              <span className="text-morandi-secondary">已確認</span>
+              <span className="ml-2 font-semibold text-morandi-green">NT$ {confirmedCosts.toLocaleString()}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">已確認</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-gold">
-              NT$ {pendingCosts.toLocaleString()}
+            <div>
+              <span className="text-morandi-secondary">待確認</span>
+              <span className="ml-2 font-semibold text-morandi-gold">NT$ {pendingCosts.toLocaleString()}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">待確認</div>
-          </div>
-          <div className="bg-morandi-container p-4 rounded-lg">
-            <div className="text-2xl font-bold text-morandi-red">
-              NT$ {Math.max(0, tour.total_revenue - totalCosts).toLocaleString()}
+            <div>
+              <span className="text-morandi-secondary">預估利潤</span>
+              <span className="ml-2 font-semibold text-morandi-red">NT$ {Math.max(0, tour.total_revenue - totalCosts).toLocaleString()}</span>
             </div>
-            <div className="text-sm text-morandi-secondary">預估利潤</div>
           </div>
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            size="sm"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            <Plus size={14} className="mr-1" />
+            新增支出
+          </Button>
         </div>
-      </ContentContainer>
+      )}
 
-      {/* 分類統計 */}
-      <ContentContainer>
-        <h3 className="text-lg font-semibold text-morandi-primary mb-4">成本分類</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          {['transport', 'accommodation', 'food', 'attraction', 'other'].map(category => {
-            const categoryTotal = costPayments
-              .filter(cost => cost.category === category)
-              .reduce((sum, cost) => sum + cost.amount, 0)
-            const Icon = getCategoryIcon(category)
-            const displayName = getCategoryDisplayName(category)
+      {/* 成本列表 - 直接表格 */}
+      <div className="border border-border rounded-lg overflow-hidden">
+        {/* 區塊標題行 */}
+        <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
+          <span className="text-sm font-medium text-morandi-primary">成本支出</span>
+        </div>
+        {/* 欄位標題行 */}
+        <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-morandi-container/30 text-xs font-medium text-morandi-secondary">
+          <div className="col-span-2">日期</div>
+          <div className="col-span-2">金額</div>
+          <div className="col-span-2">類別</div>
+          <div className="col-span-2">說明</div>
+          <div className="col-span-2">供應商</div>
+          <div className="col-span-1">收據</div>
+          <div className="col-span-1">狀態</div>
+        </div>
+
+        {/* 成本項目 */}
+        <div className="divide-y divide-border">
+          {costPayments.map(cost => {
+            const Icon = getCategoryIcon(cost.category || '')
+            const displayCategory = getCategoryDisplayName(cost.category || '')
+            const relatedOrder = tourOrders.find(order => order.id === cost.order_id)
 
             return (
-              <div key={category} className="bg-card border border-border p-4 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <Icon size={20} className="text-morandi-gold" />
-                  <div className="text-lg font-bold text-morandi-primary">
-                    NT$ {categoryTotal.toLocaleString()}
+              <div
+                key={cost.id}
+                className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-morandi-container/20"
+              >
+                <div className="col-span-2">
+                  <div className="flex items-center text-sm text-morandi-primary">
+                    <Calendar size={14} className="mr-1 text-morandi-secondary" />
+                    {new Date(cost.created_at).toLocaleDateString()}
                   </div>
                 </div>
-                <div className="text-sm text-morandi-secondary">{displayName}</div>
+                <div className="col-span-2">
+                  <div className="font-medium text-morandi-red">
+                    NT$ {cost.amount.toLocaleString()}
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <div className="flex items-center text-sm text-morandi-primary">
+                    <Icon size={14} className="mr-1 text-morandi-gold" />
+                    {displayCategory}
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-sm text-morandi-primary">{cost.description}</div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-sm text-morandi-primary">
+                    {cost.vendor || relatedOrder?.order_number || '-'}
+                  </div>
+                </div>
+                <div className="col-span-1">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getReceiptBadge('待上傳')}`}>
+                    待上傳
+                  </span>
+                </div>
+                <div className="col-span-1">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusBadge(cost.status)}`}>
+                    {getStatusLabel(cost.status)}
+                  </span>
+                </div>
               </div>
             )
           })}
-        </div>
-      </ContentContainer>
 
-      {/* 新增支出按鈕 - 右上角 */}
-      <div className="flex justify-end mb-6">
-        <Button
-          onClick={() => setIsAddDialogOpen(true)}
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-        >
-          <Plus size={16} className="mr-2" />
-          新增支出
-        </Button>
+          {costPayments.length === 0 && (
+            <div className="text-center py-12 text-morandi-secondary">
+              <Receipt size={24} className="mx-auto mb-4 opacity-50" />
+              <p>尚無成本支出記錄</p>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* 成本列表 */}
-      <ContentContainer>
-        <div className="space-y-4">
-          {/* 表格標頭 */}
-          <div className="grid grid-cols-12 gap-4 p-4 bg-morandi-container rounded-lg text-sm font-medium text-morandi-secondary">
-            <div className="col-span-2">日期</div>
-            <div className="col-span-2">金額</div>
-            <div className="col-span-2">類別</div>
-            <div className="col-span-2">說明</div>
-            <div className="col-span-2">供應商</div>
-            <div className="col-span-1">收據</div>
-            <div className="col-span-1">狀態</div>
-          </div>
-
-          {/* 成本項目 */}
-          <div className="space-y-2">
-            {costPayments.map(cost => {
-              const Icon = getCategoryIcon(cost.category || '')
-              const displayCategory = getCategoryDisplayName(cost.category || '')
-              const relatedOrder = tourOrders.find(order => order.id === cost.order_id)
-
-              return (
-                <div
-                  key={cost.id}
-                  className="grid grid-cols-12 gap-4 p-4 bg-card border border-border rounded-lg"
-                >
-                  <div className="col-span-2">
-                    <div className="flex items-center text-sm text-morandi-primary">
-                      <Calendar size={14} className="mr-1" />
-                      {new Date(cost.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  <div className="col-span-2">
-                    <div className="font-medium text-morandi-red">
-                      NT$ {cost.amount.toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div className="col-span-2">
-                    <div className="flex items-center text-sm text-morandi-primary">
-                      <Icon size={14} className="mr-1" />
-                      {displayCategory}
-                    </div>
-                  </div>
-
-                  <div className="col-span-2">
-                    <div className="text-sm text-morandi-primary">{cost.description}</div>
-                  </div>
-
-                  <div className="col-span-2">
-                    <div className="text-sm text-morandi-primary">
-                      {cost.vendor || relatedOrder?.order_number || '-'}
-                    </div>
-                  </div>
-
-                  <div className="col-span-1">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getReceiptBadge('待上傳')}`}
-                    >
-                      待上傳
-                    </span>
-                  </div>
-
-                  <div className="col-span-1">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(cost.status)}`}
-                    >
-                      {cost.status}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-
-            {costPayments.length === 0 && (
-              <div className="text-center py-12 text-morandi-secondary">
-                <Receipt size={24} className="mx-auto mb-4 opacity-50" />
-                <p>尚無成本支出記錄</p>
-                <p className="text-sm mt-1">點擊上方「新增支出」按鈕開始記錄成本</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </ContentContainer>
 
       {/* 新增成本對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

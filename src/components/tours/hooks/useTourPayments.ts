@@ -1,13 +1,15 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Tour, Payment } from '@/stores/types'
 import { useOrderStore, useReceiptStore } from '@/stores'
 import type { Receipt, ReceiptType } from '@/types/receipt.types'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
+import { mutate } from 'swr'
 
 interface ReceiptPayment extends Payment {
   method?: string
@@ -115,6 +117,59 @@ export function useTourPayments({
   const totalOrderAmount = useMemo(() => tourOrders.reduce((sum, order) => sum + (order.total_amount ?? 0), 0), [tourOrders])
   const remaining_amount = useMemo(() => Math.max(0, totalOrderAmount - totalConfirmed), [totalOrderAmount, totalConfirmed])
 
+  // 更新 tour 的財務欄位
+  const updateTourFinancials = useCallback(async () => {
+    try {
+      // 取得該團所有訂單 ID
+      const { data: tourOrdersData } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tour_id', tour.id)
+
+      if (!tourOrdersData || tourOrdersData.length === 0) return
+
+      const orderIds = tourOrdersData.map(o => o.id)
+
+      // 計算總收款（已確認的收據）
+      const { data: receiptsData } = await supabase
+        .from('receipts')
+        .select('actual_amount, status')
+        .in('order_id', orderIds)
+
+      const totalRevenue = (receiptsData || [])
+        .filter(r => Number(r.status) === 1) // 已確認
+        .reduce((sum, r) => sum + (r.actual_amount || 0), 0)
+
+      // 取得當前成本
+      const { data: currentTour } = await supabase
+        .from('tours')
+        .select('total_cost')
+        .eq('id', tour.id)
+        .single()
+
+      const totalCost = currentTour?.total_cost || 0
+      const profit = totalRevenue - totalCost
+
+      // 更新 tour
+      await supabase
+        .from('tours')
+        .update({
+          total_revenue: totalRevenue,
+          profit: profit,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', tour.id)
+
+      // 刷新 SWR 快取讓 UI 更新
+      await mutate(`tour-${tour.id}`)
+      await mutate('tours')
+
+      logger.log('Tour 財務數據已更新:', { total_revenue: totalRevenue, profit })
+    } catch (error) {
+      logger.error('更新 Tour 財務數據失敗:', error)
+    }
+  }, [tour.id])
+
   // 新增收款
   const addPayment = async (data: {
     type?: string
@@ -150,6 +205,9 @@ export function useTourPayments({
 
       await createReceipt(receiptData as Receipt)
       await fetchReceipts()
+
+      // 同步更新 tour 的財務數據
+      await updateTourFinancials()
 
       toast({
         title: '成功',

@@ -53,7 +53,7 @@ export function RequestDateInput({ value, onChange, label = '請款日期' }: Re
         onChange={(date) => handleDateChange(date)}
         className={cn(
           'mt-1',
-          isSpecialBilling ? 'bg-morandi-gold/10 border-morandi-gold/20' : 'bg-background'
+          isSpecialBilling && 'bg-morandi-gold/10 border-morandi-gold/20'
         )}
         placeholder="選擇日期"
       />

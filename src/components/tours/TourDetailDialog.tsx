@@ -18,8 +18,9 @@ import { TourRequests } from '@/components/tours/tour-requests'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
-import { MessageSquare, FileText, X, Printer, Loader2 } from 'lucide-react'
+import { MessageSquare, FileText, X, Printer, Loader2, Plane } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
+import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
 import { Input } from '@/components/ui/input'
 import { Dialog as EntryCardDialog, DialogContent as EntryCardDialogContent, DialogHeader as EntryCardDialogHeader, DialogTitle as EntryCardDialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
@@ -44,10 +45,7 @@ const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
-  { value: 'payments', label: '收款紀錄' },
-  { value: 'costs', label: '成本支出' },
   { value: 'requests', label: '需求管理' },
-  { value: 'documents', label: '文件確認' },
 ]
 
 interface TourDetailDialogProps {
@@ -69,6 +67,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [showDepartureDialog, setShowDepartureDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showPnrToolDialog, setShowPnrToolDialog] = useState(false)
 
   // 入境卡列印
   const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
@@ -81,9 +80,14 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   })
   const [tourMembers, setTourMembers] = useState<Array<{
     id: string
+    order_id: string
     passport_name?: string | null
+    chinese_name?: string | null
     birth_date?: string | null
     passport_number?: string | null
+    special_meal?: string | null
+    flight_cost?: number | null
+    pnr?: string | null
   }>>([])
 
   // 載入團員資料（用於入境卡列印）
@@ -103,7 +107,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
       const { data: members } = await supabase
         .from('order_members')
-        .select('id, passport_name, birth_date, passport_number')
+        .select('id, order_id, passport_name, chinese_name, birth_date, passport_number, special_meal, flight_cost, pnr')
         .in('order_id', orderIds)
 
       if (members) {
@@ -111,10 +115,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
       }
     }
 
-    if (showEntryCardDialog) {
+    if (showEntryCardDialog || showPnrToolDialog) {
       loadMembers()
     }
-  }, [tour?.id, showEntryCardDialog])
+  }, [tour?.id, showEntryCardDialog, showPnrToolDialog])
 
   // 建立頻道對話框狀態
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
@@ -207,25 +211,35 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
     switch (activeTab) {
       case 'overview':
-        return <TourOverview tour={tour} onEdit={() => setShowEditDialog(true)} />
+        return (
+          <div className="space-y-6">
+            {/* 基本資訊 */}
+            <TourOverview tour={tour} onEdit={() => setShowEditDialog(true)} />
+
+            {/* 收款紀錄 */}
+            <TourPayments
+              tour={tour}
+              triggerAdd={triggerPaymentAdd}
+              onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
+              showSummary={false}
+            />
+
+            {/* 成本支出 */}
+            <TourCosts tour={tour} showSummary={false} />
+
+            {/* 文件確認 */}
+            <div>
+              <h3 className="text-sm font-medium text-morandi-secondary mb-3">文件確認</h3>
+              <TourDocuments tour={tour} showSummary={false} />
+            </div>
+          </div>
+        )
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
         return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" />
-      case 'payments':
-        return (
-          <TourPayments
-            tour={tour}
-            triggerAdd={triggerPaymentAdd}
-            onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
-          />
-        )
-      case 'costs':
-        return <TourCosts tour={tour} />
       case 'requests':
         return <TourRequests tourId={tour.id} />
-      case 'documents':
-        return <TourDocuments tour={tour} />
       default:
         return <TourOverview tour={tour} />
     }
@@ -241,111 +255,99 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
           </DialogTitle>
         </VisuallyHidden>
 
-        {/* Header */}
-        <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <h2 className="text-lg font-semibold">
-              {loading ? '載入中...' : tour ? `${tour.name} (${tour.code})` : '找不到旅遊團'}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {tour && (
-              <>
-                {/* 出團資料表 */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/20"
-                  onClick={() => setShowDepartureDialog(true)}
-                >
-                  <FileText size={16} className="mr-1" />
-                  出團資料表
-                </Button>
+        {/* Header: 團名 + Tabs + 功能按鈕 (同一排) */}
+        <div className="flex-shrink-0 h-12 bg-morandi-gold text-white px-4 flex items-center gap-4">
+          {/* 團名 */}
+          <h2 className="text-base font-semibold whitespace-nowrap">
+            {loading ? '載入中...' : tour?.name || '找不到旅遊團'}
+          </h2>
 
-                {/* 結團 */}
-                {!tour.archived && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20"
-                    onClick={() => setShowCloseDialog(true)}
-                  >
-                    結團
-                  </Button>
-                )}
-
-                {/* 工作頻道 */}
-                {existingChannel ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20"
-                    onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
-                  >
-                    <MessageSquare size={16} className="mr-1" />
-                    前往工作頻道
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20"
-                    disabled={isCreatingChannel}
-                    onClick={() => setShowCreateChannelDialog(true)}
-                  >
-                    <MessageSquare size={16} className="mr-1" />
-                    {isCreatingChannel ? '建立中...' : '建立工作頻道'}
-                  </Button>
-                )}
-              </>
-            )}
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-              onClick={onClose}
-            >
-              <X size={20} />
-            </Button>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        {tour && (
-          <div className="h-12 bg-white border-b px-6 flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-1">
+          {/* Tabs */}
+          {tour && (
+            <div className="flex items-center flex-1 min-w-0">
               {tabs.map((tab) => (
                 <button
                   key={tab.value}
                   onClick={() => setActiveTab(tab.value)}
                   className={cn(
-                    'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+                    'px-3 py-1.5 text-sm font-medium transition-colors rounded',
                     activeTab === tab.value
-                      ? 'bg-morandi-gold text-white'
-                      : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
                   )}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-            {/* 入境卡按鈕 - 只在團員名單頁籤顯示 */}
-            {activeTab === 'members' && (
-              <Button
-                size="sm"
-                className="bg-rose-500 hover:bg-rose-600 text-white"
-                onClick={() => setShowEntryCardDialog(true)}
-              >
-                <Printer size={16} className="mr-1" />
-                列印入境卡
-              </Button>
+          )}
+
+          {/* 功能按鈕 */}
+          <div className="flex items-center gap-1">
+            {tour && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                  onClick={() => setShowDepartureDialog(true)}
+                >
+                  <FileText size={15} className="mr-1" />
+                  出團資料表
+                </Button>
+                {!tour.archived && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                    onClick={() => setShowCloseDialog(true)}
+                  >
+                    結團
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                  onClick={() => setShowPnrToolDialog(true)}
+                >
+                  <Plane size={15} className="mr-1" />
+                  PNR
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                  onClick={() => setShowEntryCardDialog(true)}
+                >
+                  <Printer size={15} className="mr-1" />
+                  入境卡
+                </Button>
+                {existingChannel && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                    onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+                  >
+                    <MessageSquare size={15} />
+                  </Button>
+                )}
+              </>
             )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20 h-8 w-8"
+              onClick={onClose}
+            >
+              <X size={18} />
+            </Button>
           </div>
-        )}
+        </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto flex flex-col">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-morandi-secondary">載入中...</p>
@@ -355,7 +357,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               <p className="text-morandi-secondary">找不到指定的旅遊團</p>
             </div>
           ) : (
-            <div className="p-6">
+            <div className="flex-1 flex flex-col min-h-0 px-4 pb-4 overflow-auto">
               {renderTabContent()}
             </div>
           )}
@@ -395,6 +397,25 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               isOpen={showEditDialog}
               onClose={() => setShowEditDialog(false)}
               tour={tour}
+              onSuccess={handleSuccess}
+            />
+
+            {/* PNR 電報工具 */}
+            <TourPnrToolDialog
+              isOpen={showPnrToolDialog}
+              onClose={() => setShowPnrToolDialog(false)}
+              tourId={tour.id}
+              tourCode={tour.code || ''}
+              tourName={tour.name}
+              members={tourMembers.map(m => ({
+                id: m.id,
+                order_id: m.order_id,
+                passport_name: m.passport_name,
+                chinese_name: m.chinese_name,
+                special_meal: m.special_meal,
+                flight_cost: m.flight_cost,
+                pnr: m.pnr,
+              }))}
               onSuccess={handleSuccess}
             />
 

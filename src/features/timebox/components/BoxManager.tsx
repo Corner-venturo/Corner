@@ -35,6 +35,7 @@ export default function BoxManager() {
     name: '',
     type: 'basic' as 'workout' | 'reminder' | 'basic',
     color: morandiColors[0].value,
+    default_duration: 60, // 預設 1 小時
   })
 
   // 使用者的箱子
@@ -48,6 +49,7 @@ export default function BoxManager() {
         name: formData.name,
         type: formData.type,
         color: formData.color,
+        default_duration: formData.default_duration,
       })
       setEditingBox(null)
     } else {
@@ -55,6 +57,7 @@ export default function BoxManager() {
         name: formData.name,
         type: formData.type,
         color: formData.color,
+        default_duration: formData.default_duration,
         user_id: userId,
         default_content: null,
       })
@@ -68,6 +71,7 @@ export default function BoxManager() {
       name: box.name,
       type: (box.type || 'basic') as 'workout' | 'reminder' | 'basic',
       color: box.color || morandiColors[0].value,
+      default_duration: box.default_duration || 60,
     })
     setEditingBox(box.id)
     setShowForm(true)
@@ -90,6 +94,7 @@ export default function BoxManager() {
       name: '',
       type: 'basic',
       color: morandiColors[0].value,
+      default_duration: 60,
     })
   }
 
@@ -168,6 +173,28 @@ export default function BoxManager() {
                     style={{ backgroundColor: c.value }}
                     title={c.name}
                   />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+                預設時長
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[30, 60, 90, 120, 180].map((duration) => (
+                  <button
+                    key={duration}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, default_duration: duration })}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                      formData.default_duration === duration
+                        ? 'bg-morandi-gold text-white'
+                        : 'bg-morandi-container/50 text-morandi-secondary hover:bg-morandi-container'
+                    }`}
+                  >
+                    {duration >= 60 ? `${duration / 60}小時` : `${duration}分鐘`}
+                  </button>
                 ))}
               </div>
             </div>

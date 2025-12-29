@@ -25,7 +25,7 @@ interface TourItinerarySectionProps {
   activeDayIndex: number
   dayRefs: MutableRefObject<(HTMLDivElement | null)[]>
   handleDayNavigate: (index: number) => void
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 }
 
 // 將標題中的文字符號轉換成 SVG 圖標
@@ -271,10 +271,10 @@ export function TourItinerarySection({
                       viewMode === 'mobile' ? 'mb-4' : 'mb-6'
                     )}>
                       {/* 日式風格不需要分隔線 */}
-                      {coverStyle !== 'nature' && coverStyle !== 'serene' && (
+                      {coverStyle !== 'nature' && (
                         <DecorativeDivider variant="simple" />
                       )}
-                      {(coverStyle === 'nature' || coverStyle === 'serene') ? (
+                      {coverStyle === 'nature' ? (
                         // 日式和風風格：根據景點數量調整排版
                         day.activities.length === 1 ? (
                           // 只有一個景點：滿版顯示
@@ -564,7 +564,7 @@ export function TourItinerarySection({
                   )}
 
                   {/* 餐食區塊 */}
-                  {(coverStyle === 'nature' || coverStyle === 'serene') ? (
+                  {coverStyle === 'nature' ? (
                     // 日式和風風格餐食卡片（桌面版+手機版都用）
                     <JapaneseMealsCard
                       meals={{
@@ -636,7 +636,7 @@ export function TourItinerarySection({
                   )}
 
                   {day.accommodation && (
-                    (coverStyle === 'nature' || coverStyle === 'serene') ? (
+                    coverStyle === 'nature' ? (
                       // 日式和風風格住宿卡片（桌面版+手機版都用）
                       <JapaneseAccommodationCard
                         name={day.accommodation}

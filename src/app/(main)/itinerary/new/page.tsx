@@ -36,6 +36,8 @@ function NewItineraryPageContent() {
     currentVersionIndex,
     setCurrentVersionIndex,
     handleVersionChange: baseHandleVersionChange,
+    quoteTierPricings,
+    setQuoteTierPricings,
   } = useItineraryEditor()
 
   const { items: itineraries } = useItineraries()
@@ -51,6 +53,7 @@ function NewItineraryPageContent() {
     setTourData,
     setLoading,
     setCurrentVersionIndex,
+    setQuoteTierPricings,
   })
 
   // 版本切換處理
@@ -257,6 +260,7 @@ function NewItineraryPageContent() {
             tourData={tourData}
             autoSaveStatus={autoSaveStatus}
             isDirty={isDirty}
+            quoteTierPricings={quoteTierPricings}
             onChange={(newData) => {
               setTourData(newData)
               setIsDirty(true)

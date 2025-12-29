@@ -54,12 +54,12 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   return (
     <div
       className={cn(
-        'flex flex-col w-full h-full border border-border rounded-2xl overflow-hidden bg-card shadow-sm',
+        'flex flex-col w-full h-full overflow-hidden bg-card rounded-xl border border-border shadow-sm',
         className
       )}
     >
       {/* 表頭 */}
-      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20">
+      <div className="bg-gradient-to-r from-morandi-container/40 via-morandi-gold/10 to-morandi-container/40 border-b-2 border-morandi-gold/20 rounded-t-xl">
         <div className="grid" style={{ gridTemplateColumns: gridCols }}>
           <div className="text-left py-2.5 px-4 text-xs relative">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
@@ -163,8 +163,8 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                         setExpandedOrderId(expandedOrderId === order.id ? null : order.id)
                       }}
                       className={cn(
-                        'h-8 w-8 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10',
-                        expandedOrderId === order.id && 'bg-morandi-blue/10'
+                        'h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-blue hover:bg-morandi-blue/10',
+                        expandedOrderId === order.id && 'text-morandi-blue bg-morandi-blue/10'
                       )}
                       title="查看成員"
                     >
@@ -181,7 +181,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                           `/finance/payments?order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`
                         )
                       }}
-                      className="h-8 w-8 p-0 text-morandi-green hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
+                      className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                       title="快速收款"
                     >
                       $
@@ -195,7 +195,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                         e.stopPropagation()
                         router.push(`/finance/requests`)
                       }}
-                      className="h-8 w-8 p-0 text-morandi-blue hover:text-morandi-blue hover:bg-morandi-blue/10"
+                      className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
                       title="快速請款"
                     >
                       ¥
@@ -206,7 +206,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                       size="sm"
                       variant="ghost"
                       onClick={e => handleDeleteOrder(order, e)}
-                      className="h-8 w-8 p-0 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10"
+                      className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
                       title="刪除訂單"
                     >
                       <Trash2 size={14} />

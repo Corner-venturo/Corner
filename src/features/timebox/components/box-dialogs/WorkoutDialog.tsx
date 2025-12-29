@@ -1,20 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Dumbbell, Plus, X, Edit2, Trash2 } from 'lucide-react'
+import { Check, Dumbbell, Plus, X, Edit2, Trash2, Save, FolderOpen, ChevronDown } from 'lucide-react'
 import { generateUUID } from '@/lib/utils/uuid'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   useTimeboxScheduledBoxes,
+  useWorkoutTemplates,
   type TimeboxScheduledBox,
   type TimeboxBox,
   type WorkoutData,
   type WorkoutExercise,
+  type WorkoutTemplate,
   weekDayNames,
 } from '../../hooks/useTimeboxData'
-import { confirm } from '@/lib/ui/alert-dialog'
+import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { useAuthStore } from '@/stores/auth-store'
 
 interface WorkoutDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -24,8 +34,13 @@ interface WorkoutDialogProps {
 
 export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDialogProps) {
   const { update: updateScheduledBox, delete: deleteScheduledBox, items: scheduledBoxes } = useTimeboxScheduledBoxes()
+  const { items: templates, create: createTemplate, delete: deleteTemplate } = useWorkoutTemplates()
+  const user = useAuthStore(state => state.user)
+  const userId = user?.id
 
   const [showAddExercise, setShowAddExercise] = useState(false)
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false)
+  const [templateName, setTemplateName] = useState('')
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null)
   const [isAdding, setIsAdding] = useState(false)
   const [exerciseForm, setExerciseForm] = useState({
@@ -167,6 +182,63 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
     onClose()
   }
 
+  // 儲存為模板
+  const handleSaveAsTemplate = async () => {
+    if (!userId || !templateName.trim() || !workoutData.exercises?.length) return
+
+    // 只保存動作定義，不保存完成狀態
+    const cleanExercises = workoutData.exercises.map(ex => ({
+      id: generateUUID(),
+      equipment: ex.equipment,
+      weight: ex.weight,
+      reps: ex.reps,
+      sets: ex.sets,
+      setsCompleted: Array(ex.sets).fill(false),
+      completedSetsTime: Array(ex.sets).fill(null),
+    }))
+
+    await createTemplate({
+      user_id: userId,
+      name: templateName.trim(),
+      exercises: cleanExercises,
+    } as Omit<WorkoutTemplate, 'id' | 'created_at' | 'updated_at'>)
+
+    void alert(`已儲存模板「${templateName}」`, 'success')
+    setTemplateName('')
+    setShowSaveTemplate(false)
+  }
+
+  // 載入模板
+  const handleLoadTemplate = async (template: WorkoutTemplate) => {
+    // 重設所有動作的完成狀態
+    const freshExercises = template.exercises.map(ex => ({
+      ...ex,
+      id: generateUUID(), // 產生新 ID
+      setsCompleted: Array(ex.sets).fill(false),
+      completedSetsTime: Array(ex.sets).fill(null),
+    }))
+
+    await updateScheduledBox(scheduledBox.id, {
+      data: { exercises: freshExercises },
+    })
+
+    void alert(`已載入模板「${template.name}」`, 'success')
+  }
+
+  // 刪除模板
+  const handleDeleteTemplate = async (template: WorkoutTemplate) => {
+    const confirmed = await confirm(`確定要刪除模板「${template.name}」嗎？`, {
+      title: '刪除模板',
+      type: 'warning',
+    })
+    if (!confirmed) return
+    await deleteTemplate(template.id)
+    void alert('模板已刪除', 'success')
+  }
+
+  // 使用者的模板
+  const userTemplates = templates.filter(t => t.user_id === userId)
+
   const getTotalVolume = () => {
     if (!workoutData.exercises) return 0
     return workoutData.exercises.reduce((total, exercise) => {
@@ -215,18 +287,119 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium">訓練動作</h3>
-              {!showAddExercise && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAddExercise(true)}
-                  className="text-morandi-gold border-morandi-gold/20 hover:bg-morandi-gold/10"
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  新增動作
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {/* 模板下拉選單 */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-morandi-secondary border-border hover:bg-morandi-container/20"
+                    >
+                      <FolderOpen className="h-4 w-4 mr-1" />
+                      模板
+                      <ChevronDown className="h-3 w-3 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {userTemplates.length > 0 ? (
+                      <>
+                        <div className="px-2 py-1.5 text-xs text-morandi-secondary font-medium">
+                          載入模板
+                        </div>
+                        {userTemplates.map(template => (
+                          <DropdownMenuItem
+                            key={template.id}
+                            className="flex items-center justify-between"
+                          >
+                            <span
+                              onClick={() => handleLoadTemplate(template)}
+                              className="flex-1 cursor-pointer"
+                            >
+                              {template.name}
+                              <span className="text-xs text-morandi-secondary ml-1">
+                                ({template.exercises.length} 個動作)
+                              </span>
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteTemplate(template)
+                              }}
+                              className="text-morandi-red hover:text-red-600 ml-2"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : (
+                      <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
+                        尚無模板
+                      </div>
+                    )}
+                    {workoutData.exercises?.length > 0 && (
+                      <DropdownMenuItem onClick={() => setShowSaveTemplate(true)}>
+                        <Save className="h-4 w-4 mr-2" />
+                        儲存目前動作為模板
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {!showAddExercise && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddExercise(true)}
+                    className="text-morandi-gold border-morandi-gold/20 hover:bg-morandi-gold/10"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    新增動作
+                  </Button>
+                )}
+              </div>
             </div>
+
+            {/* 儲存模板表單 */}
+            {showSaveTemplate && (
+              <div className="bg-morandi-gold/10 border border-morandi-gold/30 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium text-morandi-gold flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    儲存為模板
+                  </h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowSaveTemplate(false)
+                      setTemplateName('')
+                    }}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="輸入模板名稱，例如：胸推日"
+                    className="flex-1"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleSaveAsTemplate}
+                    disabled={!templateName.trim()}
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover"
+                  >
+                    儲存
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* 新增/編輯表單 */}
             {showAddExercise && (

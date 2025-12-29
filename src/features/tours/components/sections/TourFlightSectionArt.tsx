@@ -2,16 +2,10 @@
 
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
+import { ART } from './utils/art-theme'
 
-// Art/Magazine 配色 - 根據 HTML 模板
-const ART = {
-  black: '#0a0a0a',
-  paper: '#f4f1ea',
-  accent: '#B8A99A',
-  ink: '#1a1a1a',
-  clay: '#c76d54',
-  sage: '#8da399',
-}
+// Brutalist 陰影
+const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
 
 interface FlightInfo {
   airline?: string | null
@@ -100,15 +94,16 @@ function FlightCard({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`relative border group cursor-pointer transition-all duration-300 ${
+      className={`relative border-2 group cursor-pointer transition-all duration-300 ${
         isMobile ? 'p-6' : 'p-8'
       }`}
       style={{
         borderColor: ART.ink,
         backgroundColor: ART.paper,
+        boxShadow: brutalistShadow,
       }}
       whileHover={{
-        backgroundColor: ART.black,
+        backgroundColor: ART.ink,
       }}
     >
       {/* 類型標籤 - 角落 */}

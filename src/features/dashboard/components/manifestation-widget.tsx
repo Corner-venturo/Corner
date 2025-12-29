@@ -42,8 +42,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     return {
       title: '開啟你的顯化旅程',
       message: '今天就與願望對話，為內在點亮第一束光。',
-      accent: 'from-rose-200/70 to-morandi-gold/20',
-      gradient: 'bg-gradient-to-br from-rose-100/80 via-white to-morandi-gold/10',
+      accent: 'from-morandi-red/30 to-morandi-gold/20',
+      gradient: 'bg-gradient-to-br from-morandi-red/10 via-white to-morandi-gold/10',
       icon: icons.empty,
       showAction: true,
     }
@@ -53,8 +53,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     return {
       title: '🌸 今日已完成顯化練習',
       message: '讓願望在靜心中成長。',
-      accent: 'from-pink-200/60 to-morandi-gold/20',
-      gradient: 'bg-gradient-to-br from-pink-50 via-white to-morandi-gold/10',
+      accent: 'from-morandi-gold/40 to-morandi-gold/20',
+      gradient: 'bg-gradient-to-br from-morandi-gold/10 via-white to-morandi-container/20',
       icon: icons.complete,
       showAction: false,
     }
@@ -64,8 +64,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     return {
       title: '🍃 今天還沒與願望對話呢',
       message: '要不要花 3 分鐘？把心再次帶回自己。',
-      accent: 'from-emerald-200/60 to-sky-100/60',
-      gradient: 'bg-gradient-to-br from-emerald-50 via-white to-sky-50',
+      accent: 'from-morandi-green/40 to-morandi-container/40',
+      gradient: 'bg-gradient-to-br from-morandi-green/10 via-white to-morandi-container/20',
       icon: icons.day1,
       showAction: true,
     }
@@ -75,8 +75,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     return {
       title: '🌙 願望還在等你',
       message: '它還記得你昨天的心，也相信你會回來。',
-      accent: 'from-indigo-200/60 to-purple-600/30',
-      gradient: 'bg-gradient-to-br from-indigo-50 via-white to-purple-50',
+      accent: 'from-morandi-secondary/40 to-morandi-muted/40',
+      gradient: 'bg-gradient-to-br from-morandi-secondary/10 via-white to-morandi-muted/10',
       icon: icons.day2,
       showAction: true,
     }
@@ -85,8 +85,8 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
   return {
     title: '🔔 能量回呼',
     message: '距離上次顯化已過 3 日，請回到呼吸與心願。',
-    accent: 'from-purple-600/30 to-status-info-bg/60',
-    gradient: 'bg-gradient-to-br from-purple-50 via-white to-status-info-bg',
+    accent: 'from-morandi-primary/30 to-morandi-secondary/30',
+    gradient: 'bg-gradient-to-br from-morandi-primary/5 via-white to-morandi-secondary/10',
     icon: icons.recall,
     showAction: true,
   }

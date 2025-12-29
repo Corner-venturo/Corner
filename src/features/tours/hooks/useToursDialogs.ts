@@ -52,6 +52,11 @@ export interface UseToursDialogsReturn {
   openUnlockDialog: (tour: Tour) => void
   closeUnlockDialog: () => void
 
+  // Closing Dialog
+  closingDialogTour: Tour | null
+  openClosingDialog: (tour: Tour) => void
+  closeClosingDialog: () => void
+
   // Delete Confirm Dialog
   deleteConfirm: DialogState
   openDeleteDialog: (tour: Tour) => void
@@ -83,6 +88,9 @@ export function useToursDialogs(): UseToursDialogsReturn {
 
   // Unlock Dialog
   const [unlockDialogTour, setUnlockDialogTour] = useState<Tour | null>(null)
+
+  // Closing Dialog
+  const [closingDialogTour, setClosingDialogTour] = useState<Tour | null>(null)
 
   // Delete Confirm Dialog
   const [deleteConfirm, setDeleteConfirm] = useState<DialogState>({
@@ -127,6 +135,9 @@ export function useToursDialogs(): UseToursDialogsReturn {
   const openUnlockDialog = useCallback((tour: Tour) => setUnlockDialogTour(tour), [])
   const closeUnlockDialog = useCallback(() => setUnlockDialogTour(null), [])
 
+  const openClosingDialog = useCallback((tour: Tour) => setClosingDialogTour(tour), [])
+  const closeClosingDialog = useCallback(() => setClosingDialogTour(null), [])
+
   const openDeleteDialog = useCallback((tour: Tour) => {
     setDeleteConfirm({ isOpen: true, tour })
   }, [])
@@ -157,6 +168,9 @@ export function useToursDialogs(): UseToursDialogsReturn {
     unlockDialogTour,
     openUnlockDialog,
     closeUnlockDialog,
+    closingDialogTour,
+    openClosingDialog,
+    closeClosingDialog,
     deleteConfirm,
     openDeleteDialog,
     closeDeleteDialog,

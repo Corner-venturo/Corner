@@ -58,9 +58,15 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
     if (authData) {
       const parsed = JSON.parse(authData)
       const user = parsed?.state?.user
+      // 🔧 修正：User 類型存的是 roles（陣列），不是 role
+      // 優先檢查 roles 陣列中是否有 super_admin
+      const roles = user?.roles as UserRole[] | undefined
+      const userRole = roles?.includes('super_admin')
+        ? 'super_admin'
+        : (roles?.[0] as UserRole) || null
       return {
         workspaceId: user?.workspace_id || null,
-        userRole: (user?.role as UserRole) || null,
+        userRole,
       }
     }
   } catch {
@@ -129,53 +135,69 @@ export function createStore<T extends BaseEntity>(
     // 設定錯誤
     setError: (error: string | null) => set({ error }),
 
-    // 取得所有資料（直接從 Supabase）
+    // 取得所有資料（直接從 Supabase，含重試機制）
     fetchAll: async () => {
-      try {
-        // 取消前一個請求
-        abortManager.abort()
+      const MAX_RETRIES = 3
+      const RETRY_DELAY = 1000 // 1 秒
 
-        set({ loading: true, error: null })
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          // 取消前一個請求
+          abortManager.abort()
 
-        // 建立基礎查詢（使用 dynamicFrom 處理動態表名）
-        let query = dynamicFrom(tableName)
-          .select('*')
-          .order('created_at', { ascending: false })
+          set({ loading: true, error: null })
 
-        // 🔒 Workspace 隔離：若啟用 workspaceScoped，自動過濾 workspace_id
-        if (config.workspaceScoped) {
-          const { workspaceId, userRole } = getCurrentUserContext()
+          // 建立基礎查詢（使用 dynamicFrom 處理動態表名）
+          let query = dynamicFrom(tableName)
+            .select('*')
+            .order('created_at', { ascending: false })
 
-          // Super Admin 可以跨 workspace 查詢，不加過濾
-          if (!canCrossWorkspace(userRole) && workspaceId) {
-            // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
-            query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
-            logger.log(`🔒 [${tableName}] Workspace 隔離：查詢 workspace_id=${workspaceId} 或 NULL（舊資料）`)
-          } else if (canCrossWorkspace(userRole)) {
-            logger.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
+          // 🔒 Workspace 隔離：若啟用 workspaceScoped，自動過濾 workspace_id
+          if (config.workspaceScoped) {
+            const { workspaceId, userRole } = getCurrentUserContext()
+
+            // Super Admin 可以跨 workspace 查詢，不加過濾
+            if (!canCrossWorkspace(userRole) && workspaceId) {
+              // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
+              query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
+              logger.log(`🔒 [${tableName}] Workspace 隔離：查詢 workspace_id=${workspaceId} 或 NULL（舊資料）`)
+            } else if (canCrossWorkspace(userRole)) {
+              logger.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
+            }
           }
+
+          const { data, error } = await query
+
+          if (error) throw error
+
+          const items = castRows<T>(data)
+          set({ items, loading: false })
+          return items
+        } catch (error) {
+          const isNetworkError = error instanceof TypeError && error.message === 'Failed to fetch'
+          const isLastAttempt = attempt === MAX_RETRIES
+
+          // 如果是網路錯誤且還有重試機會，等待後重試
+          if (isNetworkError && !isLastAttempt) {
+            logger.warn(`[${tableName}] 網路錯誤，${RETRY_DELAY}ms 後重試 (${attempt}/${MAX_RETRIES})`)
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt))
+            continue
+          }
+
+          // 處理各種錯誤格式
+          let errorMessage = '無法載入資料'
+          if (error instanceof Error) {
+            errorMessage = error.message
+          } else if (error && typeof error === 'object') {
+            const err = error as Record<string, unknown>
+            errorMessage = (err.message as string) || (err.error as string) || JSON.stringify(error)
+          }
+          logger.error(`[${tableName}] fetchAll 失敗:`, errorMessage)
+          set({ error: errorMessage, loading: false })
+          return []
         }
-
-        const { data, error } = await query
-
-        if (error) throw error
-
-        const items = castRows<T>(data)
-        set({ items, loading: false })
-        return items
-      } catch (error) {
-        // 處理各種錯誤格式
-        let errorMessage = '無法載入資料'
-        if (error instanceof Error) {
-          errorMessage = error.message
-        } else if (error && typeof error === 'object') {
-          const err = error as Record<string, unknown>
-          errorMessage = (err.message as string) || (err.error as string) || JSON.stringify(error)
-        }
-        logger.error(`[${tableName}] fetchAll 失敗:`, errorMessage)
-        set({ error: errorMessage, loading: false })
-        return []
       }
+      return []
     },
 
     // 根據 ID 取得單筆

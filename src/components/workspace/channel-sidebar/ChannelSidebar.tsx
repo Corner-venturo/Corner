@@ -126,7 +126,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
 
   return (
     <div className="w-[280px] bg-white border-r border-morandi-gold/20 flex flex-col shrink-0">
-      {/* Workspace header */}
+      {/* Workspace header with integrated search */}
       <WorkspaceHeader
         workspaceName={sidebarState.currentWorkspace?.name || ''}
         workspaceIcon={sidebarState.currentWorkspace?.icon || ''}
@@ -139,18 +139,9 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
           sidebarState.loadChannels(sidebarState.currentWorkspace.id)
         }
         isRefreshing={sidebarState.loading || sidebarState.isCreatingDm}
+        searchQuery={sidebarState.searchQuery}
+        onSearchChange={sidebarState.setSearchQuery}
       />
-
-      {/* Search input */}
-      <div className="px-4 py-2">
-        <input
-          type="text"
-          placeholder="搜尋頻道..."
-          value={sidebarState.searchQuery}
-          onChange={e => sidebarState.setSearchQuery(e.target.value)}
-          className="h-8 text-sm"
-        />
-      </div>
 
       {/* Channel list */}
       <ChannelList

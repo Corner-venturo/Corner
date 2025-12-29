@@ -73,19 +73,19 @@ export async function POST(
       )
     }
 
-    // 檢查團是否已鎖定
-    if (tour.status !== '已確認') {
+    // 檢查團是否已鎖定（進行中）
+    if (tour.status !== '進行中') {
       return NextResponse.json(
         { error: '此團未處於鎖定狀態' },
         { status: 400 }
       )
     }
 
-    // 解鎖：更新狀態為「修改中」
+    // 解鎖：更新狀態為「提案」
     const { error: updateError } = await supabaseAdmin
       .from('tours')
       .update({
-        status: '修改中',
+        status: '提案',
         last_unlocked_at: new Date().toISOString(),
         last_unlocked_by: user.id,
         modification_reason: reason || null,

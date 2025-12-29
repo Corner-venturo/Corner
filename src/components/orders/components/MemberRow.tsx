@@ -21,6 +21,7 @@ interface MemberRowProps {
   isEditMode: boolean
   showIdentityColumn: boolean
   showPnrColumn: boolean
+  showRoomColumn: boolean
   showOrderCode: boolean
   departureDate: string | null
   roomAssignment?: string
@@ -45,8 +46,10 @@ export function MemberRow({
   isEditMode,
   showIdentityColumn,
   showPnrColumn,
+  showRoomColumn,
   showOrderCode,
   departureDate,
+  roomAssignment,
   pnrValue,
   customCostFields,
   mode,
@@ -171,6 +174,13 @@ export function MemberRow({
           className="w-full bg-transparent text-xs border-none outline-none shadow-none"
         />
       </td>
+
+      {/* 團體模式：分房欄位 */}
+      {mode === 'tour' && showRoomColumn && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs">
+          {roomAssignment || '-'}
+        </td>
+      )}
 
       {/* 團體模式：PNR 欄位 */}
       {mode === 'tour' && showPnrColumn && (

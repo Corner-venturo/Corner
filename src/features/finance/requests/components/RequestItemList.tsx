@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -28,6 +27,11 @@ interface EditableRequestItemListProps {
   addNewEmptyItem: () => void
 }
 
+// 每列高度約 48px，固定顯示 4 列
+const ROW_HEIGHT = 48
+const VISIBLE_ROWS = 4
+const TABLE_HEIGHT = ROW_HEIGHT * VISIBLE_ROWS
+
 export function EditableRequestItemList({
   items,
   suppliers,
@@ -37,40 +41,52 @@ export function EditableRequestItemList({
 }: EditableRequestItemListProps) {
   const total_amount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
 
-  // 將供應商轉換成 Combobox 的選項格式
   const supplierOptions = suppliers.map(s => ({
     value: s.id,
     label: s.name || '未命名',
   }))
 
-  return (
-    <div className="border border-border rounded-md p-4">
-      <h3 className="text-sm font-medium text-morandi-primary mb-4">請款項目</h3>
+  // 無 focus 樣式的 input class（使用 globals.css 的 input-no-focus）
+  const inputClass = 'input-no-focus w-full h-9 px-1 bg-transparent text-sm'
 
-      {/* Header - 固定不動 */}
-      <div className="grid grid-cols-12 gap-4 px-3 text-xs font-medium text-morandi-secondary mb-3">
-        <div className="col-span-1">類別</div>
-        <div className="col-span-3">供應商</div>
-        <div className="col-span-3">項目描述</div>
-        <div className="col-span-1 text-right">單價</div>
-        <div className="col-span-1 text-center">數量</div>
-        <div className="col-span-2 text-right">小計</div>
-        <div className="col-span-1"></div>
+  return (
+    <div>
+      <h3 className="text-sm font-medium text-morandi-primary mb-3">請款項目</h3>
+
+      {/* 表頭 */}
+      <div className="border-b border-morandi-container/60">
+        <div className="grid grid-cols-[80px_1fr_1fr_96px_64px_112px_48px] px-2 py-2.5">
+          <span className="text-xs font-medium text-morandi-secondary">類別</span>
+          <span className="text-xs font-medium text-morandi-secondary">供應商</span>
+          <span className="text-xs font-medium text-morandi-secondary">項目描述</span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">單價</span>
+          <span className="text-xs font-medium text-morandi-secondary text-center">數量</span>
+          <span className="text-xs font-medium text-morandi-secondary text-right">小計</span>
+          <span></span>
+        </div>
       </div>
 
-      {/* Items - 固定高度可捲動 */}
-      <div className="space-y-3 h-[200px] overflow-y-auto">
+      {/* 項目區域 - 最小 4 列高度，超過則可滾動 */}
+      <div
+        className="overflow-visible"
+        style={{ minHeight: `${TABLE_HEIGHT}px`, maxHeight: `${TABLE_HEIGHT * 1.5}px`, overflowY: items.length > VISIBLE_ROWS ? 'auto' : 'visible' }}
+      >
         {items.map((item, index) => (
-          <div key={item.id} className="grid grid-cols-12 gap-2 items-start">
+          <div
+            key={item.id}
+            className={`grid grid-cols-[80px_1fr_1fr_96px_64px_112px_48px] px-2 py-1.5 border-b border-morandi-container/30 items-center ${index === 0 ? 'bg-white' : 'hover:bg-morandi-container/5'}`}
+          >
             {/* Category */}
-            <div className="col-span-1">
+            <div>
               <Select
                 value={item.category}
                 onValueChange={value =>
                   updateItem(item.id, { category: value as RequestItem['category'] })
                 }
               >
-                <SelectTrigger className="h-10">
+                <SelectTrigger
+                  className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -84,7 +100,7 @@ export function EditableRequestItemList({
             </div>
 
             {/* Supplier */}
-            <div className="col-span-3">
+            <div>
               <Combobox
                 options={supplierOptions}
                 value={item.supplier_id}
@@ -96,61 +112,62 @@ export function EditableRequestItemList({
                   })
                 }}
                 placeholder="選擇供應商..."
+                className="input-no-focus [&_input]:h-9 [&_input]:px-1 [&_input]:bg-transparent"
               />
             </div>
 
             {/* Description */}
-            <div className="col-span-3">
-              <Input
+            <div>
+              <input
+                type="text"
                 value={item.description}
                 onChange={e => updateItem(item.id, { description: e.target.value })}
                 placeholder="輸入項目描述"
-                className="h-10"
+                className={`${inputClass} placeholder:text-morandi-muted`}
               />
             </div>
 
             {/* Unit Price */}
-            <div className="col-span-1">
-              <Input
+            <div>
+              <input
                 type="number"
-                value={item.unit_price}
+                value={item.unit_price || ''}
                 onChange={e =>
                   updateItem(item.id, { unit_price: parseFloat(e.target.value) || 0 })
                 }
                 placeholder="0"
-                className="h-10 text-right"
+                className={`${inputClass} text-right placeholder:text-morandi-muted`}
               />
             </div>
 
             {/* Quantity */}
-            <div className="col-span-1">
-              <Input
+            <div>
+              <input
                 type="number"
-                value={item.quantity}
+                value={item.quantity || ''}
                 onChange={e =>
                   updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })
                 }
                 placeholder="1"
-                className="h-10 text-center"
+                className={`${inputClass} text-center placeholder:text-morandi-muted`}
               />
             </div>
 
             {/* Subtotal */}
-            <div className="col-span-2 flex items-center h-10 justify-end">
-              <span className="text-sm font-semibold text-morandi-gold whitespace-nowrap">
+            <div className="text-right pr-2">
+              <span className="text-sm font-medium text-morandi-gold">
                 NT$ {(item.unit_price * item.quantity).toLocaleString()}
               </span>
             </div>
-            
+
             {/* Actions */}
-            <div className="col-span-1 flex items-center h-10 justify-center gap-1">
-              {/* 第一項不能刪除，顯示新增按鈕；其他項顯示刪除按鈕 */}
+            <div className="text-center">
               {index === 0 ? (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={addNewEmptyItem}
-                  className="text-morandi-gold hover:bg-morandi-gold/10"
+                  className="h-8 w-8 text-morandi-gold hover:bg-morandi-gold/10"
                   title="新增項目"
                 >
                   <Plus size={16} />
@@ -160,7 +177,7 @@ export function EditableRequestItemList({
                   variant="ghost"
                   size="icon"
                   onClick={() => removeItem(item.id)}
-                  className="text-morandi-red hover:bg-morandi-red/10"
+                  className="h-8 w-8 text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10"
                   title="刪除項目"
                 >
                   <Trash2 size={16} />
@@ -169,21 +186,33 @@ export function EditableRequestItemList({
             </div>
           </div>
         ))}
+
+        {/* 空白佔位列，確保始終顯示 4 列高度 */}
+        {items.length < VISIBLE_ROWS &&
+          Array.from({ length: VISIBLE_ROWS - items.length }).map((_, i) => (
+            <div
+              key={`empty-${i}`}
+              className="grid grid-cols-[80px_1fr_1fr_96px_64px_112px_48px] px-2 py-1.5 border-b border-morandi-container/30 items-center"
+              style={{ height: `${ROW_HEIGHT}px` }}
+            >
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          ))
+        }
       </div>
 
       {/* Total */}
-      <div className="mt-4 pt-4 border-t border-border">
-        <div className="grid grid-cols-12 gap-4 px-3">
-          <div className="col-span-9 flex justify-end items-center">
-            <span className="text-lg font-semibold text-morandi-primary">總金額:</span>
-          </div>
-          <div className="col-span-2 flex justify-end items-center">
-            <span className="text-xl font-bold text-morandi-gold whitespace-nowrap">
-              NT$ {total_amount.toLocaleString()}
-            </span>
-          </div>
-          <div className="col-span-1"></div>
-        </div>
+      <div className="flex justify-end items-center gap-6 pt-4 mt-2">
+        <span className="text-sm text-morandi-secondary">總金額</span>
+        <span className="text-lg font-semibold text-morandi-gold">
+          NT$ {total_amount.toLocaleString()}
+        </span>
       </div>
     </div>
   )

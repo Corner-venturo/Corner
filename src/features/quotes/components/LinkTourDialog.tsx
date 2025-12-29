@@ -60,7 +60,7 @@ export function LinkTourDialog({
   // 過濾可用的旅遊團（尚未關聯報價單的）
   const availableTours = useMemo(() => {
     return tours
-      .filter(t => !t.quote_id && t.status !== 'cancelled')
+      .filter(t => !t.quote_id && t.status !== '取消')
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
   }, [tours])
 

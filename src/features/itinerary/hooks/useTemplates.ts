@@ -168,7 +168,6 @@ export const templateColors: Record<string, string> = {
   original: '#f59e0b',   // amber
   gemini: '#c9aa7c',     // morandi gold
   nature: '#30abe8',     // japan blue
-  serene: '#4a6fa5',     // serene blue
   luxury: '#2C5F4D',     // luxury green
   art: '#E63946',        // art red
   dreamscape: '#9370db', // dreamscape purple

@@ -82,14 +82,14 @@ class TourService extends BaseService<Tour & BaseEntity> {
    * @param cityCode - 3碼城市代號 (如: CNX, BKK, OSA)
    * @param date - 出發日期
    * @param isSpecial - 是否為特殊團（目前未使用）
-   * @returns 團號 (格式: TP-CNX25012801)
+   * @returns 團號 (格式: CNX250128A)
    */
   async generateTourCode(
     cityCode: string,
     date: Date,
     isSpecial: boolean = false
   ): Promise<string> {
-    // 取得當前 workspace code
+    // 取得當前 workspace code (用於向後相容，新格式不需要)
     const workspaceCode = getCurrentWorkspaceCode()
     if (!workspaceCode) {
       throw new Error('無法取得 workspace code，請重新登入')
@@ -109,10 +109,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
     // 雙重檢查：確保生成的團號不存在
     const exists = await this.isTourCodeExists(code)
     if (exists) {
-      // 如果仍然重複，使用時間戳確保唯一性
-      const timestamp = Date.now().toString().slice(-2)
+      // 如果仍然重複，嘗試下一個字母
       const dateStr = date.toISOString().split('T')[0].replace(/-/g, '').slice(2) // YYMMDD
-      return `${workspaceCode}-${cityCode}${dateStr}${timestamp}`
+      const lastChar = code.slice(-1)
+      const nextChar = String.fromCharCode(lastChar.charCodeAt(0) + 1)
+      return `${cityCode.toUpperCase()}${dateStr}${nextChar}`
     }
 
     return code
@@ -189,22 +190,20 @@ class TourService extends BaseService<Tour & BaseEntity> {
         return tour
       }
 
-      // V2.0 State Machine Validation Logic
-      const ALLOWED_STATUS_TRANSITIONS: Record<string, (Tour['status'])[]> = {
-        '提案': ['確認中', '已取消'],
-        '確認中': ['提案', '已確認', '已取消'], // '已確認' is allowed from the confirmation wizard
-        '已確認': ['待結案', '已取消'], // To enter '修改中', the unlockTour method must be used.
-        '修改中': ['確認中', '已取消'], // To re-confirm, it must go through the '確認中' process again.
-        '待結案': ['結案', '已取消'],
-        '結案': [], // Terminal state
-        '已取消': [], // Terminal state
-        '進行中': ['待結案', '已取消', '已確認'], // Legacy status transitions
-        '特殊團': ['已取消'],
+      // 簡化版狀態轉換邏輯
+      // 提案 → 進行中 → 結案
+      //          ↓
+      //    (解鎖回提案)
+      const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
+        '提案': ['進行中', '取消'],
+        '進行中': ['結案', '取消', '提案'], // 可解鎖回提案
+        '結案': [], // 終態
+        '取消': [], // 終態
       };
 
 
       const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentStatus || ''] || [];
-      if (!allowedTransitions.includes(newStatus)) {
+      if (!newStatus || !allowedTransitions.includes(newStatus)) {
         throw new ValidationError(
           'status',
           `不允許的狀態轉換：無法從 "${currentStatus}" 更新為 "${newStatus}"`
@@ -406,7 +405,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     }
   ) {
     const updates = {
-      status: '已確認',
+      status: '進行中', // 確認出團後鎖定
       locked_quote_id: options.quoteId || null,
       locked_quote_version: options.quoteVersion || null,
       locked_itinerary_id: options.itineraryId || null,
@@ -421,7 +420,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
   }
 
   /**
-   * 解鎖團（需先驗證密碼）
+   * 解鎖團（回到提案狀態）
    * 注意：密碼驗證應在 API 層進行，這裡只處理狀態更新
    */
   async unlockTour(
@@ -436,12 +435,12 @@ class TourService extends BaseService<Tour & BaseEntity> {
       return { success: false, error: '找不到此團' }
     }
 
-    if (tour.status !== '已確認') {
+    if (tour.status !== '進行中') {
       return { success: false, error: '此團未處於鎖定狀態' }
     }
 
     const updates = {
-      status: '修改中',
+      status: '提案', // 解鎖回到提案
       last_unlocked_at: this.now(),
       last_unlocked_by: options.unlockedBy,
       modification_reason: options.reason || null,
@@ -453,7 +452,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
   }
 
   /**
-   * 重新鎖定團（修改完成後）
+   * 重新鎖定團（修改完成後確認出團）
    */
   async relockTour(
     tourId: string,
@@ -470,7 +469,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       return { success: false, error: '找不到此團' }
     }
 
-    if (tour.status !== '修改中' && tour.status !== '提案') {
+    if (tour.status !== '提案') {
       return { success: false, error: '此團無法進行鎖定' }
     }
 
@@ -478,17 +477,17 @@ class TourService extends BaseService<Tour & BaseEntity> {
   }
 
   /**
-   * 判斷團是否已鎖定
+   * 判斷團是否已鎖定（進行中或結案）
    */
   isTourLocked(tour: Tour): boolean {
-    return tour.status === '已確認' || tour.status === '待結案' || tour.status === '結案'
+    return tour.status === '進行中' || tour.status === '結案'
   }
 
   /**
-   * 判斷團是否可進入確認流程
+   * 判斷團是否可進入確認流程（只有提案可以）
    */
   canConfirmTour(tour: Tour): boolean {
-    return tour.status === '提案' || tour.status === '修改中'
+    return tour.status === '提案'
   }
 }
 

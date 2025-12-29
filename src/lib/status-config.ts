@@ -190,33 +190,27 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
 
   // 團體狀態
   tour: {
-    planning: {
+    '提案': {
       color: 'text-morandi-secondary',
-      label: '規劃中',
+      label: '提案',
       icon: FileText,
       bgColor: 'bg-morandi-secondary/10',
     },
-    confirmed: {
-      color: 'text-morandi-primary',
-      label: '已確認',
-      icon: CheckCircle,
-      bgColor: 'bg-morandi-primary/10',
-    },
-    in_progress: {
+    '進行中': {
       color: 'text-morandi-gold',
       label: '進行中',
       icon: Truck,
       bgColor: 'bg-morandi-gold/10',
     },
-    completed: {
+    '結案': {
       color: 'text-morandi-green',
-      label: '已完成',
+      label: '結案',
       icon: FileCheck,
       bgColor: 'bg-morandi-green/10',
     },
-    cancelled: {
+    '取消': {
       color: 'text-morandi-red',
-      label: '已取消',
+      label: '取消',
       icon: XCircle,
       bgColor: 'bg-morandi-red/10',
     },

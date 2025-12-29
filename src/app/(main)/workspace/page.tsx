@@ -2,11 +2,16 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useEffect, useState } from 'react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ChannelChat } from '@/components/workspace/ChannelChat'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
+import { useAuthStore } from '@/stores/auth-store'
+import { cn } from '@/lib/utils'
+import { MobileHeader } from '@/components/layout/mobile-header'
+import { MobileSidebar } from '@/components/layout/mobile-sidebar'
 
 export default function WorkspacePage() {
+  const { sidebarCollapsed } = useAuthStore()
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   const { loadWorkspaces, loadChannelGroups, loadChannels, currentWorkspace } =
     useWorkspaceChannels()
@@ -22,7 +27,7 @@ export default function WorkspacePage() {
     }
 
     init()
-     
+
   }, [])
 
   // 🔥 Step 2: 當 workspace 載入後，載入 channels 和 groups（只執行一次）
@@ -37,22 +42,34 @@ export default function WorkspacePage() {
     }
 
     loadData()
-     
+
   }, [currentWorkspace?.id])
 
+  // 工作空間頁面使用自訂 layout，最大化聊天區域
   return (
-    <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title="工作空間"
-        breadcrumb={[
-          { label: '首頁', href: '/' },
-          { label: '工作空間', href: '/workspace' },
-        ]}
+    <>
+      {/* 手機版頂部標題列 */}
+      <MobileHeader onMenuClick={() => setMobileSidebarOpen(true)} />
+      <MobileSidebar
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
       />
 
-      <div className="flex-1 overflow-hidden">
-        <ChannelChat />
-      </div>
-    </div>
+      {/* 主內容區域 - 頂部對齊，分割線對齊 logo 下方 */}
+      <main
+        className={cn(
+          'fixed right-0 bottom-0 overflow-hidden',
+          // 手機模式：全寬，頂部扣除標題列
+          'top-14 left-0 p-2',
+          // 桌面模式：扣除 sidebar 寬度，從頂部開始，保留適當間距
+          'lg:top-0 lg:p-4',
+          sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]'
+        )}
+      >
+        <div className="h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+          <ChannelChat />
+        </div>
+      </main>
+    </>
   )
 }

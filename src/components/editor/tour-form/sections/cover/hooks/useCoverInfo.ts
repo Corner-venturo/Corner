@@ -59,10 +59,9 @@ export function useCoverInfo({ data, onChange }: UseCoverInfoProps) {
     }
   }
 
-  // 從資料庫載入的封面風格選項（排除 serene）
+  // 從資料庫載入的封面風格選項
   const coverStyleOptions = useMemo(() => {
     return coverTemplates
-      .filter(template => template.id !== 'serene')
       .map(template => ({
         value: template.id as CoverStyleType,
         label: template.name,

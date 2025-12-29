@@ -8,20 +8,17 @@
 // ============================================
 
 /**
- * Tour Lifecycle V2.0 狀態列表
+ * Tour Lifecycle 狀態列表（簡化版）
  *
- * 生命週期: 提案 → 確認中 → 已確認 → 修改中 → 待結案 → 結案
+ * 生命週期: 提案 → 進行中 → 結案
+ *              ↓
+ *        (解鎖回提案)
  */
 export const TOUR_STATUS_LIST = [
-  '提案',      // 草稿階段
-  '確認中',    // 確認精靈進行中
-  '已確認',    // 版本已鎖定
-  '修改中',    // 解鎖修改中
-  '進行中',    // 舊狀態，保留相容
-  '待結案',    // 出團結束
-  '結案',      // 已完成
-  '已取消',    // 已取消
-  '特殊團',    // 特殊用途團
+  '提案',      // 可編輯行程
+  '進行中',    // 已確認出團，行程鎖定
+  '結案',      // 團結束，結算獎金
+  '取消',      // 已取消
 ] as const
 
 export type TourStatusValue = (typeof TOUR_STATUS_LIST)[number]
@@ -30,14 +27,14 @@ export type TourStatusValue = (typeof TOUR_STATUS_LIST)[number]
  * 判斷團是否已鎖定（不可自由編輯）
  */
 export function isTourLocked(status: string | null): boolean {
-  return status === '已確認' || status === '待結案' || status === '結案'
+  return status === '進行中' || status === '結案'
 }
 
 /**
- * 判斷團是否可進入確認流程
+ * 判斷團是否可進入確認流程（確認出團）
  */
 export function canConfirmTour(status: string | null): boolean {
-  return status === '提案' || status === '修改中'
+  return status === '提案'
 }
 
 // ============================================

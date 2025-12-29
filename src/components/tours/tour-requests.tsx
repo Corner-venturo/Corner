@@ -139,14 +139,15 @@ export function TourRequests({ tourId }: TourRequestsProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full border border-border rounded-lg overflow-hidden bg-card">
+      {/* 區塊標題行 */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-morandi-container/50 border-b border-border/60">
         <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold text-morandi-primary">需求管理</h3>
-          <div className="flex items-center gap-2 text-sm text-morandi-secondary">
-            <span>{stats.completed}/{stats.total}</span>
-            <div className="w-24 h-2 bg-morandi-container rounded-full overflow-hidden">
+          <span className="text-sm font-medium text-morandi-primary">需求管理</span>
+          <span className="text-sm text-morandi-secondary">({tourRequests.length} 筆)</span>
+          <div className="flex items-center gap-2 text-xs text-morandi-secondary">
+            <span>進度 {stats.completed}/{stats.total}</span>
+            <div className="w-16 h-1.5 bg-morandi-container rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all ${getProgressColor(stats.percent)}`}
                 style={{ width: `${stats.percent}%` }}
@@ -157,26 +158,28 @@ export function TourRequests({ tourId }: TourRequestsProps) {
         </div>
         <Button
           onClick={handleAdd}
-          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+          size="sm"
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white h-7 text-xs"
         >
-          <Plus size={16} />
+          <Plus size={12} className="mr-1" />
           新增需求
         </Button>
       </div>
 
       {/* 需求列表 */}
-      {loading ? (
-        <div className="flex items-center justify-center h-32 text-morandi-secondary">
-          載入中...
-        </div>
-      ) : tourRequests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
-          <ClipboardList size={32} className="mb-2 opacity-50" />
-          <p>尚無需求單</p>
-        </div>
-      ) : (
-        <div className="border border-border rounded-lg divide-y divide-border">
-          {tourRequests.map((request) => {
+      <div className="flex-1 overflow-auto">
+        {loading ? (
+          <div className="flex items-center justify-center h-32 text-morandi-secondary">
+            載入中...
+          </div>
+        ) : tourRequests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-32 text-morandi-secondary">
+            <ClipboardList size={32} className="mb-2 opacity-50" />
+            <p>尚無需求單</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {tourRequests.map((request) => {
             const CategoryIcon = CATEGORY_ICONS[request.category] || MoreHorizontal
 
             return (
@@ -249,8 +252,9 @@ export function TourRequests({ tourId }: TourRequestsProps) {
               </div>
             )
           })}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* 新增/編輯 Dialog */}
       <TourRequestDialog

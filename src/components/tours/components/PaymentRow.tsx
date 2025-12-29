@@ -17,18 +17,27 @@ interface PaymentRowProps {
   onOpenInvoice: (orderId?: string) => void
 }
 
+// 狀態標籤映射（英文 -> 中文）
+const STATUS_LABELS: Record<string, string> = {
+  confirmed: '已確認',
+  pending: '待確認',
+  completed: '已完成',
+}
+
+const getStatusLabel = (status: string) => STATUS_LABELS[status] || status
+
 const getStatusBadge = (status: string) => {
-  const statusMap: Record<string, string> = {
-    confirmed: '已確認',
-    pending: '待確認',
-    completed: '已完成',
-  }
   const badges: Record<string, string> = {
-    已確認: 'bg-morandi-green text-white',
-    待確認: 'bg-morandi-gold text-white',
+    // 中文狀態
+    已確認: 'bg-morandi-green/20 text-morandi-green',
+    待確認: 'bg-morandi-gold/20 text-morandi-gold',
     已完成: 'bg-morandi-container text-morandi-primary',
+    // 英文狀態（相容）
+    confirmed: 'bg-morandi-green/20 text-morandi-green',
+    pending: 'bg-morandi-gold/20 text-morandi-gold',
+    completed: 'bg-morandi-container text-morandi-primary',
   }
-  return badges[statusMap[status] || status] || 'bg-morandi-container text-morandi-secondary'
+  return badges[status] || 'bg-morandi-container text-morandi-secondary'
 }
 
 const getMethodBadge = (method: string) => {
@@ -106,7 +115,7 @@ export const PaymentRow = React.memo(function PaymentRow({
             getStatusBadge(payment.status)
           )}
         >
-          {payment.status}
+          {getStatusLabel(payment.status)}
         </span>
       </td>
       <td className="py-3 px-4 text-center">

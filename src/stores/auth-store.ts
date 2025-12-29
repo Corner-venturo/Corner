@@ -174,6 +174,20 @@ export const useAuthStore = create<AuthState>()(
 
           logger.log('✅ Supabase Auth session created:', authData.user?.id)
 
+          // 🔧 關鍵修正：確保 employees.supabase_user_id 與 auth.uid() 匹配
+          // 這樣 RLS 函數才能正確找到員工的 workspace
+          if (authData.user?.id) {
+            try {
+              await supabase
+                .from('employees')
+                .update({ supabase_user_id: authData.user.id })
+                .eq('id', employeeData.id)
+              logger.log('✅ Updated employees.supabase_user_id:', authData.user.id)
+            } catch (updateError) {
+              logger.warn('⚠️ Failed to update supabase_user_id:', updateError)
+            }
+          }
+
           // 同步 workspace_id 和 employee_id 到 user_metadata
           // 這樣 Server Actions 可以直接從 user_metadata 讀取，不用每次查 DB
           if (employeeData.workspace_id) {
@@ -185,6 +199,12 @@ export const useAuthStore = create<AuthState>()(
                 }
               })
               logger.log('✅ Synced workspace_id to user_metadata')
+
+              // 呼叫 set_current_workspace 設定 RLS session（作為備用方案）
+              await supabase.rpc('set_current_workspace', {
+                p_workspace_id: employeeData.workspace_id
+              })
+              logger.log('✅ Set current workspace for RLS:', employeeData.workspace_id)
             } catch (metadataError) {
               // 非關鍵錯誤，只記錄警告
               logger.warn('⚠️ Failed to sync user_metadata:', metadataError)
@@ -244,7 +264,7 @@ export const useAuthStore = create<AuthState>()(
             role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
           }
 
-          const token = generateToken(authPayload)
+          const token = generateToken(authPayload, rememberMe)
           setSecureCookie(token, rememberMe)
 
           get().setUser(user);

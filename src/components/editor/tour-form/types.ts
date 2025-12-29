@@ -146,12 +146,11 @@ export interface TourCountry {
 // - original: 經典全螢幕置中（金色漸層）
 // - gemini: 緊湊底部對齊（莫蘭迪金色）
 // - nature: 綠色慢旅風格（垂直文字 + 重疊圖片卡）
-// - serene: 藍色靜謐風格（日期浮水印效果）
 // - luxury: 奢華質感風格（左右分欄 + 襯線字體 + 深色酒店區塊）
 // - art: 藝術雜誌風格（全螢幕大圖 + 高對比 + 不規則佈局）
 // - dreamscape: 夢幻漫遊風格（blob 遮罩 + 玻璃擬態 + 浮動動畫）
 // - collage: 互動拼貼風格（Pop Art + 拍立得 + 登機證）
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 // 航班卡片風格類型：
 // - original: 經典莫蘭迪金色風格

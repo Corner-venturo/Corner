@@ -86,11 +86,10 @@ export function useTourPageState() {
   // Get status color
   const getStatusColor = useCallback((status: string) => {
     const colors: Record<string, string> = {
-      提案: 'text-[#6B7280]',
-      進行中: 'text-[#6B8E7F]',
-      待結案: 'text-[#9B7E4A]',
-      結案: 'text-[#8A8A8A]',
-      特殊團: 'text-[#A17676]',
+      提案: 'text-morandi-secondary',
+      進行中: 'text-morandi-gold',
+      結案: 'text-morandi-green',
+      取消: 'text-morandi-red',
     }
     return colors[status] || 'text-morandi-secondary'
   }, [])

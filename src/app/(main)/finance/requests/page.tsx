@@ -5,17 +5,13 @@ import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
-import { Plus, FileText, Split, Loader2 } from 'lucide-react'
+import { Plus, Layers, Loader2 } from 'lucide-react'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
 
 // Dynamic imports for dialogs (reduce initial bundle)
 const AddRequestDialog = dynamic(
   () => import('@/features/finance/requests/components/AddRequestDialog').then(m => m.AddRequestDialog),
-  { loading: () => null }
-)
-const BatchRequestDialog = dynamic(
-  () => import('@/features/finance/requests/components/BatchRequestDialog').then(m => m.BatchRequestDialog),
   { loading: () => null }
 )
 const BatchAllocateRequestDialog = dynamic(
@@ -31,7 +27,6 @@ export default function RequestsPage() {
   const { payment_requests, loadPaymentRequests } = usePayments()
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
-  const [isAllocateDialogOpen, setIsAllocateDialogOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null)
 
   // 載入資料（只執行一次）
@@ -63,17 +58,10 @@ export default function RequestsPage() {
             </button>
             <button
               onClick={() => setIsBatchDialogOpen(true)}
-              className="bg-morandi-primary hover:bg-morandi-primary/90 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
+              className="border border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
             >
-              <FileText size={16} className="mr-2" />
+              <Layers size={16} className="mr-2" />
               批次請款
-            </button>
-            <button
-              onClick={() => setIsAllocateDialogOpen(true)}
-              className="bg-morandi-accent hover:bg-morandi-accent/90 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center transition-colors"
-            >
-              <Split size={16} className="mr-2" />
-              分配請款
             </button>
           </>
         }
@@ -92,9 +80,7 @@ export default function RequestsPage() {
 
       <AddRequestDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
-      <BatchRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
-
-      <BatchAllocateRequestDialog open={isAllocateDialogOpen} onOpenChange={setIsAllocateDialogOpen} />
+      <BatchAllocateRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
 
       <RequestDetailDialog
         request={selectedRequest}

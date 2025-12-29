@@ -28,31 +28,28 @@ export const userStoreHelpers = {
 
   /**
    * 員工編號生成
-   * 格式: {辦公室}-E001-E999, {辦公室}-EA01-EA99...
-   * 例如: TP-E001, TC-E001, TP-EA01
+   * 新格式: E001-E999 (無辦公室前綴)
+   * 例如: E001, E002...E999
    * E000 為超級管理員保留
+   *
+   * 向後相容舊格式: TP-E001, TC-E001
    */
   generateUserNumber: (_english_name?: string): string => {
     const state = useUserStore.getState()
     const users = state.items
 
-    // 取得當前 workspace code（TP 或 TC）
-    const currentUser = useAuthStore.getState().user
-    const workspaceCode = currentUser?.workspace_code || 'TP'
-
-    // 所有現有的員工編號（同 workspace）
+    // 取得所有現有的員工編號
     const allEmployeeNumbers = users
-      .filter(user => user.employee_number?.startsWith(`${workspaceCode}-`))
       .map(user => user.employee_number)
+      .filter(Boolean) as string[]
 
     /**
      * 解析員工編號為序列號
-     * TP-E001-TP-E999 → 1-999
-     * TP-EA01-TP-EA99 → 1000-1098
-     * ...
+     * 新格式: E001-E999 → 1-999
+     * 舊格式: TP-E001, TC-E001 → 1-999 (向後相容)
      */
     const parseEmployeeNumber = (num: string): number => {
-      // 移除前綴 "TP-" 或 "TC-"
+      // 移除前綴 "TP-" 或 "TC-"（向後相容舊格式）
       const withoutPrefix = num.replace(/^[A-Z]{2}-/, '')
 
       // E000-E999 格式
@@ -61,12 +58,11 @@ export const userStoreHelpers = {
         return parseInt(basicMatch[1], 10)
       }
 
-      // EA01-EZ99 格式
+      // EA01-EZ99 格式（擴展）
       const extendedMatch = withoutPrefix.match(/^E([A-Z])(\d{2})$/)
       if (extendedMatch) {
         const letterIndex = extendedMatch[1].charCodeAt(0) - 'A'.charCodeAt(0)
         const number = parseInt(extendedMatch[2], 10)
-        // EA01 = 1000, EA99 = 1098, EB01 = 1099, ...
         return 1000 + letterIndex * 99 + (number - 1)
       }
 
@@ -74,23 +70,19 @@ export const userStoreHelpers = {
     }
 
     /**
-     * 將序列號轉換為員工編號（含前綴）
-     * 1-999 → TP-E001-TP-E999
-     * 1000-1098 → TP-EA01-TP-EA99
-     * ...
+     * 將序列號轉換為員工編號（新格式，無前綴）
+     * 1-999 → E001-E999
      */
     const toEmployeeNumber = (seq: number): string => {
-      let base: string
       if (seq < 1000) {
-        base = `E${seq.toString().padStart(3, '0')}`
+        return `E${seq.toString().padStart(3, '0')}`
       } else {
         const extended = seq - 1000
         const letterIndex = Math.floor(extended / 99)
         const number = (extended % 99) + 1
         const letter = String.fromCharCode('A'.charCodeAt(0) + letterIndex)
-        base = `E${letter}${number.toString().padStart(2, '0')}`
+        return `E${letter}${number.toString().padStart(2, '0')}`
       }
-      return `${workspaceCode}-${base}`
     }
 
     // 找出現有最大序號

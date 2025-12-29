@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { SectionTitle } from './SectionTitle'
+import { TourHotelsSectionArt } from './TourHotelsSectionArt'
+import { TourHotelsSectionCollage } from './TourHotelsSectionCollage'
 
 interface HotelData {
   image?: string // 舊版單張圖片（向後相容）
@@ -15,7 +17,7 @@ interface TourData {
   hotels?: HotelData[]
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourHotelsSectionProps {
   data: TourData
@@ -101,6 +103,16 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
 
   if (!data.showHotels && hotels.length === 0) {
     return null
+  }
+
+  // Art 風格使用專用組件
+  if (coverStyle === 'art') {
+    return <TourHotelsSectionArt data={data} viewMode={viewMode} />
+  }
+
+  // Collage 風格使用專用組件
+  if (coverStyle === 'collage') {
+    return <TourHotelsSectionCollage data={data} viewMode={viewMode} />
   }
 
   // 根據飯店數量決定 grid 樣式

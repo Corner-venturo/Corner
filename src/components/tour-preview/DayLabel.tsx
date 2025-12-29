@@ -6,7 +6,7 @@ export interface DayLabelProps {
   dayLabel?: string // 自定義標籤（如 "Day 3-B"），優先於 dayNumber
   isAlternative?: boolean // 是否為建議方案
   variant?: 'default' | 'large' | 'small'
-  coverStyle?: 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
+  coverStyle?: 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage' // 封面風格
   title?: string // 當天標題（nature 風格使用）
   className?: string
 }

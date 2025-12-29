@@ -21,13 +21,13 @@ export function MemberActions({
   onDelete,
 }: MemberActionsProps) {
   return (
-    <td className="border border-morandi-gold/20 px-2 py-1 bg-white text-center">
+    <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-center sticky right-0">
       <div className="flex items-center justify-center gap-1">
         {/* 警告按鈕（待驗證時顯示） */}
         {member.customer_verification_status === 'unverified' && (
           <button
-            onClick={() => onEdit(member, 'verify')}
-            className="text-status-warning hover:text-morandi-gold transition-colors p-1"
+            onClick={(e) => { e.stopPropagation(); onEdit(member, 'verify') }}
+            className="text-status-warning hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors p-1 rounded"
             title="待驗證 - 點擊驗證"
           >
             <AlertTriangle size={14} />
@@ -35,16 +35,16 @@ export function MemberActions({
         )}
         {/* 編輯按鈕 */}
         <button
-          onClick={() => onEdit(member, 'edit')}
-          className="text-morandi-blue hover:text-morandi-blue/80 transition-colors p-1"
+          onClick={(e) => { e.stopPropagation(); onEdit(member, 'edit') }}
+          className="text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 transition-colors p-1 rounded"
           title="編輯成員"
         >
           <Pencil size={14} />
         </button>
         {/* 刪除按鈕 */}
         <button
-          onClick={() => onDelete(member.id)}
-          className="text-morandi-secondary/50 hover:text-status-danger transition-colors p-1"
+          onClick={(e) => { e.stopPropagation(); onDelete(member.id) }}
+          className="text-morandi-secondary hover:text-morandi-red hover:bg-morandi-red/10 transition-colors p-1 rounded"
           title="刪除成員"
         >
           <Trash2 size={14} />

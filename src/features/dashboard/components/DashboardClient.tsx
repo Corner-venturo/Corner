@@ -14,6 +14,7 @@ import {
   DndContext,
   closestCenter,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -59,6 +60,12 @@ export function DashboardClient() {
   // 設定拖拽感應器（長按 500ms 才觸發，避免影響正常互動）
   const sensors = useSensors(
     useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
       activationConstraint: {
         delay: 500,
         tolerance: 8,

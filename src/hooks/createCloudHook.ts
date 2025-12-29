@@ -75,6 +75,15 @@ const WORKSPACE_SCOPED_TABLES = [
   'visas',
   'calendar_events',
   'tour_addons',
+  // ✅ 2025-12-29: PNR Enhancement 新增
+  'pnr_records',
+  'pnr_fare_history',
+  'pnr_fare_alerts',
+  'pnr_flight_status_history',
+  'flight_status_subscriptions',
+  'pnr_queue_items',
+  'pnr_schedule_changes',
+  'pnr_ai_queries',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）

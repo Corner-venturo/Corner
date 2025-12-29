@@ -2,21 +2,24 @@
 
 import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useTourStore, useRegionsStore } from '@/stores'
+import { useTourStore, useRegionsStore, useQuoteStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
+import type { TierPricing } from '@/stores/types/quote.types'
 
 interface UseItineraryDataLoaderProps {
   setTourData: (data: LocalTourData) => void
   setLoading: (loading: boolean) => void
   setCurrentVersionIndex: (index: number) => void
+  setQuoteTierPricings?: (tierPricings: TierPricing[]) => void
 }
 
 export function useItineraryDataLoader({
   setTourData,
   setLoading,
   setCurrentVersionIndex,
+  setQuoteTierPricings,
 }: UseItineraryDataLoaderProps) {
   const searchParams = useSearchParams()
   const tourId = searchParams.get('tour_id')
@@ -35,6 +38,7 @@ export function useItineraryDataLoader({
 
   const { items: tours } = useTourStore()
   const { items: itineraries } = useItineraries()
+  const { items: quotes } = useQuoteStore()
   const { countries, cities } = useRegionsStore()
 
   const hasInitializedRef = useRef(false)
@@ -148,6 +152,15 @@ export function useItineraryDataLoader({
             version_records: itinerary.version_records || [],
           })
           setCurrentVersionIndex(-1)
+
+          // 載入關聯報價單的砍次表
+          if (setQuoteTierPricings && itinerary.quote_id) {
+            const quote = quotes.find(q => q.id === itinerary.quote_id)
+            if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
+              setQuoteTierPricings(quote.tier_pricings as TierPricing[])
+            }
+          }
+
           setLoading(false)
           hasInitializedRef.current = true
           lastIdRef.current = currentId
@@ -313,6 +326,7 @@ export function useItineraryDataLoader({
     itineraryId,
     tours,
     itineraries,
+    quotes,
     countries,
     cities,
     isFromQuote,
@@ -320,6 +334,7 @@ export function useItineraryDataLoader({
     setTourData,
     setLoading,
     setCurrentVersionIndex,
+    setQuoteTierPricings,
   ])
 }
 

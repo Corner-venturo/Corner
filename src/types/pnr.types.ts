@@ -81,3 +81,308 @@ export interface UpdatePNRInput {
   status?: PNR['status'];
   notes?: string;
 }
+
+// =====================================================
+// PNR Enhancement Types (2025-12-29)
+// =====================================================
+
+/**
+ * 票價資料
+ */
+export interface FareData {
+  fareBasis?: string
+  currency: string
+  baseFare: number
+  taxes: number
+  totalFare: number
+  source: 'telegram' | 'manual' | 'api'
+}
+
+/**
+ * 票價歷史記錄
+ */
+export interface PnrFareHistory {
+  id: string
+  workspace_id: string
+  pnr_id: string
+  fare_basis: string | null
+  currency: string
+  base_fare: number | null
+  taxes: number | null
+  total_fare: number
+  source: 'telegram' | 'manual' | 'api'
+  raw_fare_data: Record<string, unknown> | null
+  recorded_at: string
+  recorded_by: string | null
+  created_at: string
+}
+
+/**
+ * 票價警報類型
+ */
+export type FareAlertType = 'price_increase' | 'price_decrease' | 'threshold'
+
+/**
+ * 票價警報設定
+ */
+export interface PnrFareAlert {
+  id: string
+  workspace_id: string
+  pnr_id: string
+  alert_type: FareAlertType
+  threshold_amount: number | null
+  threshold_percent: number | null
+  is_active: boolean
+  last_fare: number | null
+  last_checked_at: string | null
+  notify_channel_id: string | null
+  notify_employee_ids: string[] | null
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * 訂位狀態
+ */
+export type BookingStatus = 'HK' | 'TK' | 'UC' | 'XX' | 'HL' | 'HN' | 'LL' | 'WL' | string
+
+/**
+ * 營運狀態
+ */
+export type OperationalStatus =
+  | 'ON_TIME'
+  | 'DELAYED'
+  | 'CANCELLED'
+  | 'GATE_CHANGE'
+  | 'DEPARTED'
+  | 'ARRIVED'
+  | 'DIVERTED'
+  | string
+
+/**
+ * 航班狀態歷史
+ */
+export interface PnrFlightStatusHistory {
+  id: string
+  workspace_id: string
+  pnr_id: string
+  segment_id: string | null
+  airline_code: string
+  flight_number: string
+  flight_date: string
+  booking_status: BookingStatus | null
+  operational_status: OperationalStatus | null
+  delay_minutes: number | null
+  new_departure_time: string | null
+  new_arrival_time: string | null
+  gate_info: string | null
+  remarks: string | null
+  source: 'telegram' | 'api' | 'manual'
+  external_data: Record<string, unknown> | null
+  recorded_at: string
+}
+
+/**
+ * 通知類型
+ */
+export type FlightNotifyEvent = 'delay' | 'cancel' | 'gate_change' | 'departed' | 'arrived'
+
+/**
+ * 航班訂閱
+ */
+export interface FlightStatusSubscription {
+  id: string
+  workspace_id: string
+  pnr_id: string | null
+  segment_id: string | null
+  airline_code: string
+  flight_number: string
+  flight_date: string
+  notify_on: FlightNotifyEvent[]
+  notify_channel_id: string | null
+  notify_employee_ids: string[] | null
+  external_provider: string | null
+  external_subscription_id: string | null
+  is_active: boolean
+  last_checked_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Queue 任務類型
+ */
+export type QueueType =
+  | 'pending_ticket'
+  | 'pending_confirm'
+  | 'schedule_change'
+  | 'name_correction'
+  | 'seat_request'
+  | 'ssr_pending'
+  | 'revalidation'
+  | 'reissue'
+  | 'refund'
+  | 'custom'
+
+/**
+ * Queue 狀態
+ */
+export type QueueStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled'
+
+/**
+ * PNR Queue 項目
+ */
+export interface PnrQueueItem {
+  id: string
+  workspace_id: string
+  pnr_id: string
+  queue_type: QueueType
+  priority: number
+  due_date: string | null
+  reminder_at: string | null
+  status: QueueStatus
+  assigned_to: string | null
+  title: string
+  description: string | null
+  metadata: Record<string, unknown> | null
+  completed_at: string | null
+  completed_by: string | null
+  resolution_notes: string | null
+  created_at: string
+  updated_at: string
+  created_by: string | null
+}
+
+/**
+ * Queue 統計
+ */
+export interface QueueStats {
+  pendingTicket: number
+  pendingConfirm: number
+  scheduleChange: number
+  ssrPending: number
+  revalidation: number
+  reissue: number
+  overdue: number
+  total: number
+}
+
+/**
+ * 航變類型
+ */
+export type ScheduleChangeType =
+  | 'time_change'
+  | 'flight_change'
+  | 'route_change'
+  | 'equipment_change'
+  | 'cancellation'
+
+/**
+ * 航變處理狀態
+ */
+export type ScheduleChangeStatus =
+  | 'pending'
+  | 'contacted'
+  | 'accepted'
+  | 'revalidated'
+  | 'reissued'
+  | 'refunded'
+  | 'cancelled'
+
+/**
+ * 航變追蹤
+ */
+export interface PnrScheduleChange {
+  id: string
+  workspace_id: string
+  pnr_id: string
+  segment_id: string | null
+  change_type: ScheduleChangeType
+  original_flight_number: string | null
+  original_departure_time: string | null
+  original_arrival_time: string | null
+  original_departure_date: string | null
+  new_flight_number: string | null
+  new_departure_time: string | null
+  new_arrival_time: string | null
+  new_departure_date: string | null
+  requires_revalidation: boolean
+  requires_reissue: boolean
+  requires_refund: boolean
+  status: ScheduleChangeStatus
+  processed_by: string | null
+  processed_at: string | null
+  notes: string | null
+  detected_at: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * AI 查詢記錄
+ */
+export interface PnrAiQuery {
+  id: string
+  workspace_id: string
+  pnr_id: string | null
+  query_text: string
+  query_context: Record<string, unknown> | null
+  response_text: string | null
+  response_metadata: Record<string, unknown> | null
+  queried_by: string | null
+  created_at: string
+}
+
+/**
+ * AI 查詢意圖
+ */
+export type QueryIntent =
+  | 'meal'
+  | 'deadline'
+  | 'times'
+  | 'passengers'
+  | 'wheelchair'
+  | 'baggage'
+  | 'status'
+  | 'segments'
+  | 'unknown'
+
+/**
+ * Queue 類型標籤對應
+ */
+export const QUEUE_TYPE_LABELS: Record<QueueType, string> = {
+  pending_ticket: '待開票',
+  pending_confirm: '待確認',
+  schedule_change: '航變處理',
+  name_correction: '姓名更正',
+  seat_request: '座位請求',
+  ssr_pending: 'SSR 未確認',
+  revalidation: '需 Revalidation',
+  reissue: '需 Reissue',
+  refund: '退票處理',
+  custom: '自訂任務',
+}
+
+/**
+ * 航變類型標籤對應
+ */
+export const SCHEDULE_CHANGE_TYPE_LABELS: Record<ScheduleChangeType, string> = {
+  time_change: '時間變更',
+  flight_change: '航班號變更',
+  route_change: '航線變更',
+  equipment_change: '機型變更',
+  cancellation: '航班取消',
+}
+
+/**
+ * 航變狀態標籤對應
+ */
+export const SCHEDULE_CHANGE_STATUS_LABELS: Record<ScheduleChangeStatus, string> = {
+  pending: '待處理',
+  contacted: '已聯繫',
+  accepted: '已接受',
+  revalidated: '已 Revalidate',
+  reissued: '已 Reissue',
+  refunded: '已退票',
+  cancelled: '無需處理',
+}

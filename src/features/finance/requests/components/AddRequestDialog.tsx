@@ -2,14 +2,12 @@ import { useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { TourSearchSelect } from './TourSearchSelect'
-import { OrderSearchSelect } from './OrderSearchSelect'
+import { Combobox } from '@/components/ui/combobox'
 import { RequestDateInput } from './RequestDateInput'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 import { logger } from '@/lib/utils/logger'
-import type { Order } from '@/stores/types'
 
 interface AddRequestDialogProps {
   open: boolean
@@ -21,15 +19,6 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     formData,
     setFormData,
     requestItems,
-    tourSearchValue,
-    setTourSearchValue,
-    orderSearchValue,
-    setOrderSearchValue,
-    showTourDropdown,
-    setShowTourDropdown,
-    showOrderDropdown,
-    setShowOrderDropdown,
-    filteredTours,
     filteredOrders,
     total_amount,
     addNewEmptyItem,
@@ -37,9 +26,9 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     removeItem,
     resetForm,
     suppliers,
-    tours,  // 完整的旅遊團列表（用於查找選中的團）
-    orders, // 完整的訂單列表（用於查找選中的訂單）
-    currentUser, // 當前登入用戶
+    tours,
+    orders,
+    currentUser,
   } = useRequestForm()
 
   const { generateRequestCode, createRequest } = useRequestOperations()
@@ -49,13 +38,23 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
     if (formData.tour_id && filteredOrders.length === 1 && !formData.order_id) {
       const order = filteredOrders[0]
       setFormData(prev => ({ ...prev, order_id: order.id }))
-      setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
     }
-  }, [formData.tour_id, filteredOrders, formData.order_id, setFormData, setOrderSearchValue])
+  }, [formData.tour_id, filteredOrders, formData.order_id, setFormData])
 
   // 取得選中的旅遊團以預覽編號
-  const selectedTour = filteredTours.find(t => t.id === formData.tour_id)
+  const selectedTour = tours.find(t => t.id === formData.tour_id)
   const previewCode = selectedTour ? generateRequestCode(selectedTour.code) : '請先選擇旅遊團'
+
+  // 轉換為 Combobox 選項格式
+  const tourOptions = tours.map(tour => ({
+    value: tour.id,
+    label: `${tour.code || ''} - ${tour.name || ''}`,
+  }))
+
+  const orderOptions = filteredOrders.map(order => ({
+    value: order.id,
+    label: `${order.order_number} - ${order.contact_person || '無聯絡人'}`,
+  }))
 
   const handleCancel = () => {
     resetForm()
@@ -102,39 +101,34 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
         <div className="space-y-6">
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TourSearchSelect
-                value={tourSearchValue}
-                onChange={setTourSearchValue}
-                onSelect={tour => {
-                  setFormData(prev => ({
-                    ...prev,
-                    tour_id: tour.id,
-                    order_id: '',
-                  }))
-                  setTourSearchValue(`${tour.code} - ${tour.name}`)
-                  setOrderSearchValue('')
-                }}
-                tours={filteredTours}
-                showDropdown={showTourDropdown}
-                onShowDropdown={setShowTourDropdown}
-                label="選擇旅遊團 *"
-              />
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">選擇旅遊團 *</label>
+                <Combobox
+                  options={tourOptions}
+                  value={formData.tour_id}
+                  onChange={value => {
+                    setFormData(prev => ({
+                      ...prev,
+                      tour_id: value,
+                      order_id: '',
+                    }))
+                  }}
+                  placeholder="搜尋團號或團名..."
+                  className="mt-1"
+                />
+              </div>
 
-              <OrderSearchSelect
-                value={orderSearchValue}
-                onChange={setOrderSearchValue}
-                onSelect={order => {
-                  setFormData(prev => ({
-                    ...prev,
-                    order_id: order.id,
-                  }))
-                  setOrderSearchValue(`${order.order_number} - ${order.contact_person}`)
-                }}
-                orders={filteredOrders as Order[]}
-                showDropdown={showOrderDropdown}
-                onShowDropdown={setShowOrderDropdown}
-                disabled={!formData.tour_id}
-              />
+              <div>
+                <label className="text-sm font-medium text-morandi-primary">選擇訂單（可選）</label>
+                <Combobox
+                  options={orderOptions}
+                  value={formData.order_id}
+                  onChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
+                  placeholder={!formData.tour_id ? '請先選擇旅遊團' : '搜尋訂單...'}
+                  disabled={!formData.tour_id}
+                  className="mt-1"
+                />
+              </div>
 
               <RequestDateInput
                 value={formData.request_date}

@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { SectionTitle } from './SectionTitle'
+import { TourLeaderSectionArt } from './TourLeaderSectionArt'
+import { TourLeaderSectionCollage } from './TourLeaderSectionCollage'
 
 interface TourDisplayData {
   leader?: {
@@ -13,7 +15,7 @@ interface TourDisplayData {
   } | null
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 interface TourLeaderSectionProps {
   data: TourDisplayData
@@ -22,6 +24,16 @@ interface TourLeaderSectionProps {
 }
 
 export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: TourLeaderSectionProps) {
+  // Art 風格使用專用組件
+  if (coverStyle === 'art') {
+    return <TourLeaderSectionArt data={data} viewMode={viewMode} />
+  }
+
+  // Collage 風格使用專用組件
+  if (coverStyle === 'collage') {
+    return <TourLeaderSectionCollage data={data} viewMode={viewMode} />
+  }
+
   return (
     <section id="contact" className={viewMode === 'mobile' ? 'bg-white pt-6 pb-8' : 'bg-white pt-8 pb-16'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>

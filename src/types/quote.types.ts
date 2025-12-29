@@ -61,6 +61,21 @@ export interface Quote extends BaseEntity {
   current_version_index?: number // 當前編輯的版本索引（對應 versions 陣列）
   participant_counts?: Record<string, number> // 參與人數統計
   selling_prices?: Record<string, number> // 銷售價格
+
+  // 確認相關欄位（雙軌確認機制）
+  confirmation_status?: QuoteConfirmationStatus // 確認狀態
+  confirmation_token?: string // 客戶確認連結 token
+  confirmation_token_expires_at?: string // token 過期時間
+  confirmed_at?: string // 確認時間
+  confirmed_by_type?: QuoteConfirmedByType // 確認者類型
+  confirmed_by_name?: string // 確認者姓名
+  confirmed_by_email?: string // 確認者 Email
+  confirmed_by_phone?: string // 確認者電話
+  confirmed_by_staff_id?: string // 業務確認者 ID
+  confirmed_version?: number // 確認時鎖定的版本
+  confirmation_ip?: string // 確認時 IP（稽核用）
+  confirmation_user_agent?: string // 確認時瀏覽器資訊（稽核用）
+  confirmation_notes?: string // 確認備註
 }
 
 /**
@@ -146,6 +161,21 @@ export type QuoteStatus =
   | 'revised' // 修改中
   | 'approved' // 已核准
   | 'billed' // 已請款
+
+/**
+ * QuoteConfirmationStatus - 報價確認狀態（雙軌制）
+ */
+export type QuoteConfirmationStatus =
+  | 'draft' // 草稿（尚未發送確認）
+  | 'pending' // 待客戶確認（已發送確認連結）
+  | 'customer_confirmed' // 客戶已確認
+  | 'staff_confirmed' // 業務已確認（手動確認）
+  | 'closed' // 已成交（轉訂單）
+
+/**
+ * QuoteConfirmedByType - 確認者類型
+ */
+export type QuoteConfirmedByType = 'customer' | 'staff'
 
 /**
  * QuoteItemType - 報價項目類型
@@ -310,4 +340,83 @@ export interface QuoteStats {
   conversion_rate: number // 轉換率（百分比）
   total_quoted_amount: number
   average_quote_amount: number
+}
+
+// ============================================
+// 報價確認相關
+// ============================================
+
+/**
+ * QuoteConfirmationLogAction - 確認日誌動作類型
+ */
+export type QuoteConfirmationLogAction =
+  | 'send_link' // 發送確認連結
+  | 'resend_link' // 重新發送連結
+  | 'customer_confirmed' // 客戶確認
+  | 'staff_confirmed' // 業務確認
+  | 'revoked' // 撤銷確認
+  | 'expired' // 連結過期
+
+/**
+ * QuoteConfirmationLog - 確認歷史記錄
+ */
+export interface QuoteConfirmationLog {
+  id: string
+  quote_id: string
+  workspace_id?: string
+  action: QuoteConfirmationLogAction
+  confirmed_by_type?: QuoteConfirmedByType
+  confirmed_by_name?: string
+  confirmed_by_email?: string
+  confirmed_by_phone?: string
+  confirmed_by_staff_id?: string
+  confirmed_version?: number
+  ip_address?: string
+  user_agent?: string
+  notes?: string
+  created_at: string
+}
+
+/**
+ * SendConfirmationLinkParams - 發送確認連結參數
+ */
+export interface SendConfirmationLinkParams {
+  quote_id: string
+  expires_in_days?: number // 預設 7 天
+  staff_id?: string
+}
+
+/**
+ * CustomerConfirmParams - 客戶確認參數
+ */
+export interface CustomerConfirmParams {
+  token: string
+  name: string
+  email?: string
+  phone?: string
+  notes?: string
+}
+
+/**
+ * StaffConfirmParams - 業務確認參數
+ */
+export interface StaffConfirmParams {
+  quote_id: string
+  staff_id: string
+  staff_name: string
+  notes?: string
+}
+
+/**
+ * ConfirmationResult - 確認結果
+ */
+export interface ConfirmationResult {
+  success: boolean
+  error?: string
+  already_confirmed?: boolean
+  token?: string
+  expires_at?: string
+  quote_code?: string
+  quote_name?: string
+  confirmed_at?: string
 }

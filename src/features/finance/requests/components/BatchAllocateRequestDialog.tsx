@@ -243,8 +243,11 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-morandi-gold" />
-            批次分配請款（一筆款分多團）
+            批次請款
           </DialogTitle>
+          <p className="text-sm text-morandi-secondary">
+            輸入總金額後分配到多個旅遊團，適用於月結或統一請款的場景
+          </p>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -266,7 +269,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
           </div>
 
           {/* 請款項目資訊 */}
-          <div className="border border-border rounded-md p-4 space-y-4">
+          <div className="space-y-4 pt-4 border-t border-morandi-container/30">
             <h3 className="text-sm font-medium text-morandi-primary">請款項目資訊</h3>
 
             <div className="grid grid-cols-2 gap-4">
@@ -314,7 +317,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
           </div>
 
           {/* 旅遊團分配 */}
-          <div className="space-y-3">
+          <div className="space-y-3 pt-4 border-t border-morandi-container/30">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">旅遊團分配</Label>
               <div className="flex gap-2">
@@ -345,15 +348,15 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
             </div>
 
             {tourAllocations.length === 0 ? (
-              <div className="text-center py-8 text-morandi-secondary border rounded-lg border-dashed">
+              <div className="text-center py-6 text-morandi-secondary text-sm">
                 請新增旅遊團分配
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="border-t border-morandi-container/30">
                 {tourAllocations.map((allocation, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-3 border rounded-lg bg-morandi-container/20"
+                    className="flex items-center gap-3 px-2 py-2 border-b border-morandi-container/30 last:border-b-0 hover:bg-morandi-container/10"
                   >
                     <Select
                       value={allocation.tour_id}
@@ -395,10 +398,10 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
               </div>
             )}
 
-            <div className="flex items-center justify-between p-3 border rounded-lg bg-morandi-container/10">
+            <div className="flex items-center justify-between pt-3 mt-3 border-t border-morandi-container/50">
               <div className="text-sm">
-                <span className="text-morandi-secondary">已分配：</span>
-                <span className="font-semibold ml-2">
+                <span className="text-morandi-secondary">已分配</span>
+                <span className="font-medium ml-2">
                   NT$ {totalAllocatedAmount.toLocaleString()}
                 </span>
               </div>
@@ -409,14 +412,14 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
                   unallocatedAmount < 0 && 'text-morandi-red'
                 )}
               >
-                <span>未分配：</span>
-                <span className="font-semibold ml-2">NT$ {unallocatedAmount.toLocaleString()}</span>
+                <span>未分配</span>
+                <span className="font-medium ml-2">NT$ {unallocatedAmount.toLocaleString()}</span>
               </div>
             </div>
 
             {unallocatedAmount !== 0 && (
-              <div className="flex items-center gap-2 p-3 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
-                <AlertCircle className="h-4 w-4 text-morandi-gold" />
+              <div className="flex items-center gap-2 py-2 text-sm">
+                <AlertCircle className="h-4 w-4 text-morandi-gold shrink-0" />
                 <span className="text-morandi-gold">
                   {unallocatedAmount > 0 ? '還有金額未分配' : '分配金額超過總金額'}
                   ，請調整分配金額

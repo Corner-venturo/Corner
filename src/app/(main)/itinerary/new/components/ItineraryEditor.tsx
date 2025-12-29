@@ -3,15 +3,17 @@
 import { TourForm } from '@/components/editor/TourForm'
 import { Cloud, CloudOff } from 'lucide-react'
 import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
+import type { TierPricing } from '@/stores/types/quote.types'
 
 interface ItineraryEditorProps {
   tourData: LocalTourData
   autoSaveStatus: AutoSaveStatus
   isDirty: boolean
+  quoteTierPricings?: TierPricing[]
   onChange: (newData: LocalTourData) => void
 }
 
-export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, onChange }: ItineraryEditorProps) {
+export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPricings, onChange }: ItineraryEditorProps) {
   return (
     <div className="w-1/2 bg-white border-r border-border flex flex-col">
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
@@ -65,6 +67,7 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, onChange }:
             cancellationPolicy: tourData.cancellationPolicy,
             showCancellationPolicy: tourData.showCancellationPolicy || false,
           }}
+          quoteTierPricings={quoteTierPricings}
           onChange={(newData) => {
             const { meetingPoints, countries, ...restData } = newData
             onChange({

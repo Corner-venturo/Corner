@@ -192,7 +192,7 @@ export default function DatabaseManagementPage() {
                 <select
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
-                  className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-background text-morandi-primary min-w-[120px]"
+                  className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-white text-morandi-primary min-w-[120px]"
                 >
                   <option value="all">全部分類</option>
                   {categoryOptions.map(option => (

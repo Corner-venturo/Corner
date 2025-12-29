@@ -4,6 +4,7 @@ import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 import { SectionTitle } from './SectionTitle'
 import { TourFeaturesSectionCollage, type FeatureCardStyle } from './TourFeaturesSectionCollage'
+import { TourFeaturesSectionArt } from './TourFeaturesSectionArt'
 
 interface TourFeature {
   icon: string
@@ -15,8 +16,8 @@ interface TourFeature {
   tags?: string[] // Collage recipe 風格用的標籤
 }
 
-type CoverStyleType = 'original' | 'gemini' | 'nature' | 'serene' | 'luxury' | 'art' | 'dreamscape' | 'collage'
-type FeaturesStyleType = 'original' | 'luxury' | 'collage'
+type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
+type FeaturesStyleType = 'original' | 'luxury' | 'collage' | 'art'
 
 interface TourData {
   features?: TourFeature[]
@@ -33,7 +34,7 @@ interface TourFeaturesSectionProps {
 
 export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', featuresStyle, collageDisplayMode = 'large' }: TourFeaturesSectionProps) {
   // 決定實際使用的風格：優先使用 featuresStyle，否則根據 coverStyle 推斷
-  const effectiveStyle = featuresStyle || (coverStyle === 'collage' ? 'collage' : 'original')
+  const effectiveStyle = featuresStyle || (coverStyle === 'collage' ? 'collage' : coverStyle === 'art' ? 'art' : 'original')
 
   // Collage 風格使用專用組件
   if (effectiveStyle === 'collage') {
@@ -43,6 +44,16 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
         viewMode={viewMode}
         coverStyle={coverStyle}
         displayMode={collageDisplayMode}
+      />
+    )
+  }
+
+  // Art 風格使用專用組件
+  if (effectiveStyle === 'art') {
+    return (
+      <TourFeaturesSectionArt
+        data={data}
+        viewMode={viewMode}
       />
     )
   }

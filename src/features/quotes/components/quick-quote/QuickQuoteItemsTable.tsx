@@ -38,9 +38,14 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
     return val
   }
 
+  // 儲存格樣式
+  const cellClass = "px-2 py-1.5 border border-morandi-gold/20"
+  const headerCellClass = "px-2 py-2 text-left font-medium text-morandi-secondary text-xs border border-morandi-gold/20 bg-morandi-container/30"
+  const inputClass = "w-full h-7 bg-transparent border-0 outline-none focus:ring-0 text-sm"
+
   return (
-    <div className="bg-card border border-border rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-morandi-primary">收費明細表</h2>
         {isEditing && (
           <Button onClick={onAddItem} size="sm" variant="outline" className="gap-2">
@@ -49,35 +54,35 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
           </Button>
         )}
       </div>
-      <div className="border border-border rounded-md overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-morandi-container/20">
+      <div className="bg-white rounded-lg border border-morandi-gold/20 overflow-hidden">
+        <table className="w-full text-sm border-collapse">
+          <thead>
             <tr>
-              <th className="px-3 py-2 text-left">摘要</th>
-              <th className="px-3 py-2 text-center w-20">數量</th>
-              {isEditing && <th className="px-3 py-2 text-center w-24">成本</th>}
-              <th className="px-3 py-2 text-center w-28">單價</th>
-              <th className="px-3 py-2 text-center w-28">金額</th>
-              {isEditing && <th className="px-3 py-2 text-center w-24">利潤</th>}
-              <th className="px-3 py-2 text-left w-32">備註</th>
-              {isEditing && <th className="px-3 py-2 text-center w-16"></th>}
+              <th className={headerCellClass}>摘要</th>
+              <th className={`${headerCellClass} text-center w-20`}>數量</th>
+              {isEditing && <th className={`${headerCellClass} text-center w-24`}>成本</th>}
+              <th className={`${headerCellClass} text-center w-28`}>單價</th>
+              <th className={`${headerCellClass} text-center w-28`}>金額</th>
+              {isEditing && <th className={`${headerCellClass} text-center w-24`}>利潤</th>}
+              <th className={`${headerCellClass} w-32`}>備註</th>
+              {isEditing && <th className={`${headerCellClass} text-center w-12`}></th>}
             </tr>
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.id} className="border-t border-border">
-                <td className="px-3 py-2">
-                  <Input
+              <tr key={item.id} className="hover:bg-morandi-container/10">
+                <td className={cellClass}>
+                  <input
                     value={item.description}
                     onChange={e => onUpdateItem(item.id, 'description', e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="項目說明"
                     disabled={!isEditing}
-                    className="h-8"
+                    className={inputClass}
                   />
                 </td>
-                <td className="px-3 py-2">
-                  <Input
+                <td className={cellClass}>
+                  <input
                     type="text"
                     value={item.quantity === 0 ? '' : item.quantity}
                     onChange={e => {
@@ -93,13 +98,12 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     }}
                     onKeyDown={handleKeyDown}
                     disabled={!isEditing}
-                    className="h-8 text-center"
-                    placeholder=""
+                    className={`${inputClass} text-center`}
                   />
                 </td>
                 {isEditing && (
-                  <td className="px-3 py-2">
-                    <Input
+                  <td className={cellClass}>
+                    <input
                       type="text"
                       value={item.cost === 0 || item.cost === undefined ? '' : item.cost}
                       onChange={e => {
@@ -114,13 +118,12 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                         }
                       }}
                       onKeyDown={handleKeyDown}
-                      className="h-8 text-right"
-                      placeholder=""
+                      className={`${inputClass} text-right`}
                     />
                   </td>
                 )}
-                <td className="px-3 py-2">
-                  <Input
+                <td className={cellClass}>
+                  <input
                     type="text"
                     value={item.unit_price === 0 ? '' : item.unit_price}
                     onChange={e => {
@@ -136,32 +139,31 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     }}
                     onKeyDown={handleKeyDown}
                     disabled={!isEditing}
-                    className="h-8 text-right"
-                    placeholder=""
+                    className={`${inputClass} text-right`}
                   />
                 </td>
-                <td className="px-3 py-2 text-right font-medium">
+                <td className={`${cellClass} text-right font-medium`}>
                   {item.amount.toLocaleString()}
                 </td>
                 {isEditing && (
-                  <td className="px-3 py-2 text-right font-medium">
+                  <td className={`${cellClass} text-right font-medium`}>
                     <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
                       {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
                     </span>
                   </td>
                 )}
-                <td className="px-3 py-2">
-                  <Input
+                <td className={cellClass}>
+                  <input
                     value={item.notes}
                     onChange={e => onUpdateItem(item.id, 'notes', e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="備註"
                     disabled={!isEditing}
-                    className="h-8"
+                    className={inputClass}
                   />
                 </td>
                 {isEditing && (
-                  <td className="px-3 py-2 text-center">
+                  <td className={`${cellClass} text-center`}>
                     <button
                       type="button"
                       onClick={() => onRemoveItem(item.id)}
@@ -177,7 +179,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
               <tr>
                 <td
                   colSpan={isEditing ? 8 : 5}
-                  className="px-3 py-8 text-center text-morandi-secondary"
+                  className="px-3 py-8 text-center text-morandi-secondary border border-morandi-gold/20"
                 >
                   尚無項目
                   {isEditing && '，點擊「新增項目」開始'}

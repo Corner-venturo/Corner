@@ -40,21 +40,20 @@ export function PaymentItemRow({
 
   return (
     <>
-      {/* 主要資料行 */}
+      {/* 主要資料行 - 文青風格 */}
       <tr
         className={cn(
-          'border-b border-border/40 hover:bg-morandi-container/10 transition-colors',
-          isNewRow && 'bg-morandi-gold/5 border-b-2 border-morandi-gold/30',
-          !isNewRow && index % 2 === 1 && 'bg-morandi-container/5'
+          'border-b border-morandi-container/30 transition-colors',
+          isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
         )}
       >
         {/* 收款方式 */}
-        <td className="py-2 px-3 w-28">
+        <td className="py-1.5 px-2" style={{ width: '110px' }}>
           <Select
             value={item.receipt_type.toString()}
             onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) as ReceiptType })}
           >
-            <SelectTrigger className="h-9 border-morandi-container/30">
+            <SelectTrigger className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -68,43 +67,45 @@ export function PaymentItemRow({
         </td>
 
         {/* 金額 */}
-        <td className="py-2 px-3 w-28">
-          <Input
+        <td className="py-1.5 px-2" style={{ width: '120px' }}>
+          <input
             type="number"
             value={item.amount || ''}
             onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
             placeholder="0"
-            className="h-9 border-morandi-container/30"
+            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm text-right placeholder:text-morandi-muted"
           />
         </td>
 
         {/* 交易日期 */}
-        <td className="py-2 px-3 w-36">
+        <td className="py-1.5 px-2" style={{ width: '150px' }}>
           <DatePicker
             value={item.transaction_date}
             onChange={(date) => onUpdate(item.id, { transaction_date: date })}
-            className="h-9 border-morandi-container/30"
+            className="input-no-focus h-9 border-0 shadow-none bg-transparent"
             placeholder="選擇日期"
           />
         </td>
 
         {/* 付款人姓名 */}
-        <td className="py-2 px-3 w-40">
-          <Input
+        <td className="py-1.5 px-2" style={{ width: '180px' }}>
+          <input
+            type="text"
             value={item.receipt_account || ''}
             onChange={e => onUpdate(item.id, { receipt_account: e.target.value })}
             placeholder="輸入付款人"
-            className="h-9 border-morandi-container/30"
+            className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
           />
         </td>
 
         {/* 備註 */}
-        <td className="py-2 px-3">
-          <Input
+        <td className="py-1.5 px-2">
+          <input
+            type="text"
             value={item.note || ''}
             onChange={e => onUpdate(item.id, { note: e.target.value })}
             placeholder="備註（選填）"
-            className="h-9 border-morandi-container/30"
+            className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
           />
         </td>
 
@@ -127,9 +128,8 @@ export function PaymentItemRow({
       {item.receipt_type !== RECEIPT_TYPES.CASH && (
         <tr
           className={cn(
-            'border-b border-border/40',
-            isNewRow && 'bg-morandi-gold/5',
-            !isNewRow && index % 2 === 1 && 'bg-morandi-container/5'
+            'border-b border-morandi-container/30',
+            isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
           )}
         >
           <td colSpan={6} className="py-2 px-3">

@@ -233,7 +233,7 @@ export function TourExpandedView({
                 const event = new CustomEvent('openEntryCardDialog', { detail: { tourId: tour.id } })
                 window.dispatchEvent(event)
               }}
-              className="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white px-3 py-1.5 rounded text-sm font-medium flex items-center transition-colors"
             >
               <Printer size={14} className="mr-1" />
               列印入境卡

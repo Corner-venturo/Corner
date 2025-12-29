@@ -47,9 +47,9 @@ export function usePublish({
   const versionRecords = data.version_records || []
   const isEditMode = !!data.id
 
-  // 分享連結（使用 ID，永久有效）
+  // 分享連結（優先使用團號，沒有則用 ID）
   const shareUrl = data.id
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${data.id}`
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${data.tourCode || data.id}`
     : null
 
   // 轉換資料格式（camelCase → snake_case）
