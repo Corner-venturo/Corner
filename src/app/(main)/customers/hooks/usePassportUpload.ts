@@ -239,15 +239,15 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
               else if (secondChar === '2') gender = '女'
             }
 
-            // 5. 上傳圖片到 storage
-            const fileName = `passports/${Date.now()}_${compressedFile.name}`
+            // 5. 上傳圖片到 storage (統一使用 passport-images bucket)
+            const fileName = `customers/${Date.now()}_${compressedFile.name}`
             const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('customer-files')
+              .from('passport-images')
               .upload(fileName, compressedFile)
 
             if (uploadError) throw uploadError
 
-            const { data: urlData } = supabase.storage.from('customer-files').getPublicUrl(fileName)
+            const { data: urlData } = supabase.storage.from('passport-images').getPublicUrl(fileName)
             const imageUrl = urlData.publicUrl
 
             // 6. 更新或創建客戶資料
