@@ -40,6 +40,21 @@ interface CreateMemberResult {
   error?: string
 }
 
+interface UpdateMemberParams {
+  memberId: string
+  workspaceId: string
+  orderId: string
+  customerData: CustomerData
+  file: File
+  fileIndex: number
+}
+
+interface UpdateMemberResult {
+  success: boolean
+  memberId?: string
+  error?: string
+}
+
 interface UsePassportValidationReturn {
   uploadPassportImage: (
     file: File,
@@ -48,6 +63,7 @@ interface UsePassportValidationReturn {
     index: number
   ) => Promise<string | null>
   createOrderMember: (params: CreateMemberParams) => Promise<CreateMemberResult>
+  updateOrderMember: (params: UpdateMemberParams) => Promise<UpdateMemberResult>
 }
 
 export function usePassportValidation(): UsePassportValidationReturn {
@@ -217,8 +233,73 @@ export function usePassportValidation(): UsePassportValidationReturn {
     }
   }, [uploadPassportImage])
 
+  // 更新現有成員（用於姓名比對到的情況）
+  const updateOrderMember = useCallback(async ({
+    memberId,
+    workspaceId,
+    orderId,
+    customerData,
+    file,
+    fileIndex,
+  }: UpdateMemberParams): Promise<UpdateMemberResult> => {
+    try {
+      // 上傳護照照片
+      const passportImageUrl = await uploadPassportImage(file, workspaceId, orderId, fileIndex)
+
+      const passportNumber = customerData.passport_number || ''
+      const idNumber = customerData.national_id || ''
+      const birthDate = customerData.date_of_birth || null
+      const chineseName = customerData.name || ''
+      const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
+
+      // 更新成員資料（保留原有的 chinese_name，補上 OCR 辨識到的資料）
+      const updateData: Record<string, unknown> = {
+        passport_name: customerData.passport_romanization || customerData.english_name || '',
+        passport_number: passportNumber,
+        passport_expiry: customerData.passport_expiry_date || null,
+        birth_date: birthDate,
+        id_number: idNumber,
+        gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
+        passport_image_url: passportImageUrl,
+      }
+
+      // 如果 OCR 有辨識到中文名，且與現有名稱相同，就不更新（避免覆蓋）
+      // 只有在現有名稱為空時才補上
+      const { data: existingMember } = await supabase
+        .from('order_members')
+        .select('chinese_name')
+        .eq('id', memberId)
+        .single()
+
+      if (!existingMember?.chinese_name && cleanChineseName) {
+        updateData.chinese_name = cleanChineseName
+      }
+
+      const { error } = await supabase
+        .from('order_members')
+        .update(updateData)
+        .eq('id', memberId)
+
+      if (error) throw error
+
+      logger.log(`已更新成員 ${memberId} 的護照資料`)
+
+      return {
+        success: true,
+        memberId,
+      }
+    } catch (error) {
+      logger.error('更新成員失敗:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '未知錯誤',
+      }
+    }
+  }, [uploadPassportImage])
+
   return {
     uploadPassportImage,
     createOrderMember,
+    updateOrderMember,
   }
 }

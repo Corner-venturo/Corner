@@ -83,13 +83,15 @@ export function usePassportUpload({
       let duplicateCount = 0
       let matchedCustomerCount = 0
       let newCustomerCount = 0
+      let updatedCount = 0  // 新增：更新現有成員的計數
       const failedItems: string[] = []
       const duplicateItems: string[] = []
+      const updatedItems: string[] = []  // 新增：更新的成員列表
 
-      // 載入現有成員
+      // 載入現有成員（包含 id）
       const { data: existingMembers } = await supabase
         .from('order_members')
-        .select('passport_number, id_number, chinese_name, birth_date')
+        .select('id, passport_number, id_number, chinese_name, birth_date')
         .eq('order_id', orderId)
 
       // 處理每個 OCR 結果
@@ -103,6 +105,7 @@ export function usePassportUpload({
             existingMembers || []
           )
 
+          // 完全重複 → 跳過
           if (duplicateCheck.isDuplicate) {
             duplicateCount++
             const displayName = item.customer.name || item.fileName
@@ -110,7 +113,28 @@ export function usePassportUpload({
             continue
           }
 
-          // 建立成員
+          // 姓名比對到（無生日資料）→ 更新現有成員
+          if (duplicateCheck.matchType === 'name_only' && duplicateCheck.matchedMember) {
+            const updateResult = await validationModule.updateOrderMember({
+              memberId: duplicateCheck.matchedMember.id,
+              orderId,
+              workspaceId,
+              customerData: item.customer,
+              file: compressedFiles[i],
+              fileIndex: i,
+            })
+
+            if (updateResult.success) {
+              updatedCount++
+              const displayName = item.customer.name || duplicateCheck.matchedMember.chinese_name || item.fileName
+              updatedItems.push(displayName)
+            } else {
+              failedItems.push(`${item.fileName} (更新失敗)`)
+            }
+            continue
+          }
+
+          // 沒有重複 → 建立新成員
           const createResult = await validationModule.createOrderMember({
             orderId,
             workspaceId,
@@ -132,7 +156,13 @@ export function usePassportUpload({
       }
 
       // 顯示結果
-      let message = `成功辨識 ${result.successful}/${result.total} 張護照\n成功建立 ${successCount} 位成員`
+      let message = `成功辨識 ${result.successful}/${result.total} 張護照`
+      if (successCount > 0) {
+        message += `\n成功建立 ${successCount} 位成員`
+      }
+      if (updatedCount > 0) {
+        message += `\n已更新 ${updatedCount} 位現有成員：\n${updatedItems.join('、')}`
+      }
       if (matchedCustomerCount > 0) {
         message += `\n已比對 ${matchedCustomerCount} 位現有顧客`
       }

@@ -4,15 +4,20 @@
 
 export const PRINT_STYLES = `
   @media print {
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0 !important;
       padding: 0 !important;
       background: white !important;
+      width: 100% !important;
     }
 
     @page {
       size: A4;
-      margin: 1cm;
+      margin: 10mm;
     }
 
     /* 防止表格行被切斷 */
@@ -52,6 +57,17 @@ export const PRINT_STYLES = `
     body {
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
+    }
+
+    /* 確保表格不超出列印區域 */
+    table {
+      max-width: 100% !important;
+      table-layout: fixed;
+    }
+
+    td, th {
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
   }
 `

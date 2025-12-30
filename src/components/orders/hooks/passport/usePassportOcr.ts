@@ -36,6 +36,7 @@ interface OcrApiResponse {
 }
 
 interface ExistingMember {
+  id: string
   passport_number: string | null
   id_number: string | null
   chinese_name: string | null
@@ -45,6 +46,8 @@ interface ExistingMember {
 interface DuplicateCheckResult {
   isDuplicate: boolean
   reason: string
+  matchType?: 'exact' | 'name_only'  // exact = 完全重複, name_only = 只有姓名符合
+  matchedMember?: ExistingMember     // 符合的現有成員
 }
 
 interface UsePassportOcrReturn {
@@ -96,17 +99,62 @@ export function usePassportOcr(): UsePassportOcrReturn {
         .map(m => `${m.chinese_name}|${m.birth_date}`)
     )
 
-    // 檢查重複
+    // 檢查重複 - 先找符合的成員
+    const findMatchedMember = (
+      field: 'passport_number' | 'id_number',
+      value: string
+    ): ExistingMember | undefined => {
+      return existingMembers.find(m => m[field] === value)
+    }
+
+    // 1. 護照號碼完全符合 → 跳過
     if (passportNumber && existingPassports.has(passportNumber)) {
-      return { isDuplicate: true, reason: '護照號碼重複' }
+      const matched = findMatchedMember('passport_number', passportNumber)
+      return {
+        isDuplicate: true,
+        reason: '護照號碼重複',
+        matchType: 'exact',
+        matchedMember: matched
+      }
     }
 
+    // 2. 身分證號完全符合 → 跳過
     if (idNumber && existingIdNumbers.has(idNumber)) {
-      return { isDuplicate: true, reason: '身分證號重複' }
+      const matched = findMatchedMember('id_number', idNumber)
+      return {
+        isDuplicate: true,
+        reason: '身分證號重複',
+        matchType: 'exact',
+        matchedMember: matched
+      }
     }
 
+    // 3. 姓名+生日完全符合 → 跳過
     if (nameBirthKey && existingNameBirthKeys.has(nameBirthKey)) {
-      return { isDuplicate: true, reason: '姓名+生日重複' }
+      const matched = existingMembers.find(
+        m => m.chinese_name === cleanChineseName && m.birth_date === birthDate
+      )
+      return {
+        isDuplicate: true,
+        reason: '姓名+生日重複',
+        matchType: 'exact',
+        matchedMember: matched
+      }
+    }
+
+    // 4. 只有姓名符合（無生日比對） → 提示使用者選擇
+    if (cleanChineseName) {
+      const nameOnlyMatch = existingMembers.find(
+        m => m.chinese_name === cleanChineseName && !m.birth_date
+      )
+      if (nameOnlyMatch) {
+        return {
+          isDuplicate: false,  // 不算重複，但需要使用者確認
+          reason: '發現同名成員（無生日資料）',
+          matchType: 'name_only',
+          matchedMember: nameOnlyMatch
+        }
+      }
     }
 
     return { isDuplicate: false, reason: '' }

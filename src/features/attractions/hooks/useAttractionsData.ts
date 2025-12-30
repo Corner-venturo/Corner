@@ -61,14 +61,17 @@ export function useAttractionsData() {
         // 轉換表單資料為 Attraction 格式
         const attractionData: Partial<Attraction> = {
           ...formData,
-          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-          images: formData.images ? formData.images.split(',').map(url => url.trim()) : [],
+          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          images: formData.images ? formData.images.split(',').map(url => url.trim()).filter(Boolean) : [],
           region_id: formData.region_id || undefined,
+          city_id: formData.city_id || undefined,
         }
 
         logger.log('[Attractions] attractionData:', attractionData)
-        await store.update(id, attractionData as Attraction)
-        logger.log('[Attractions] 更新成功!')
+        const result = await store.update(id, attractionData as Attraction)
+        logger.log('[Attractions] 更新成功! 結果:', result)
+        // 觸發重新載入以確保 UI 同步
+        await store.fetchAll()
         return { success: true }
       } catch (error) {
         logger.error('[Attractions] 更新失敗:', error)

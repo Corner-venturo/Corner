@@ -7,88 +7,41 @@ import { User, Lock, AlertCircle, Eye, EyeOff, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { logger } from '@/lib/utils/logger'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
-// localStorage key for remembering workspace selection
-const LAST_WORKSPACE_KEY = 'venturo-last-workspace'
-
-interface Workspace {
-  id: string
-  name: string
-  code: string
-}
+// localStorage keys
+const LAST_CODE_KEY = 'venturo-last-code'
+const LAST_USERNAME_KEY = 'venturo-last-username'
 
 export default function LoginPage() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
-  const [selectedWorkspace, setSelectedWorkspace] = useState('')
+  const [code, setCode] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(true) // 預設勾選記住我
+  const [rememberMe, setRememberMe] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(true)
   const [error, setError] = useState('')
   const router = useRouter()
   const searchParams = useSearchParams()
   const { validateLogin } = useAuthStore()
 
-  // 載入 workspaces 列表
+  // 從 localStorage 讀取上次輸入的代號和帳號
   useEffect(() => {
-    const loadWorkspaces = async () => {
-      try {
-        const { supabase } = await import('@/lib/supabase/client')
-        const { data, error } = await supabase
-          .from('workspaces')
-          .select('id, name, code')
-          .order('name')
-
-        if (error) throw error
-
-        setWorkspaces(data || [])
-
-        // 讀取上次選擇的 workspace
-        const lastWorkspace = localStorage.getItem(LAST_WORKSPACE_KEY)
-        if (lastWorkspace && data?.some(w => w.id === lastWorkspace)) {
-          setSelectedWorkspace(lastWorkspace)
-        } else if (data && data.length > 0) {
-          // 預設選第一個
-          setSelectedWorkspace(data[0].id)
-        }
-      } catch (err) {
-        logger.error('Failed to load workspaces:', err)
-      } finally {
-        setIsLoadingWorkspaces(false)
-      }
-    }
-
-    loadWorkspaces()
+    const lastCode = localStorage.getItem(LAST_CODE_KEY)
+    const lastUsername = localStorage.getItem(LAST_USERNAME_KEY)
+    if (lastCode) setCode(lastCode)
+    if (lastUsername) setUsername(lastUsername)
   }, [])
-
-  // 當選擇改變時，儲存到 localStorage
-  const handleWorkspaceChange = (workspaceId: string) => {
-    setSelectedWorkspace(workspaceId)
-    localStorage.setItem(LAST_WORKSPACE_KEY, workspaceId)
-  }
 
   // 取得登入後要跳轉的頁面
   const getRedirectPath = (): string => {
-    // 1. 優先從 URL 參數讀取（middleware 設定的）
     const redirectParam = searchParams.get('redirect')
     if (redirectParam && redirectParam !== '/login') {
       return redirectParam
     }
-    // 2. 從 localStorage 讀取最後訪問的頁面
     const lastPath = localStorage.getItem('last-visited-path')
     if (lastPath && lastPath !== '/login') {
       return lastPath
     }
-    // 3. 預設跳到首頁
     return '/'
   }
 
@@ -96,33 +49,54 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    if (!selectedWorkspace) {
-      setError('請選擇辦公室')
+    const trimmedCode = code.trim().toUpperCase()
+    if (!trimmedCode) {
+      setError('請輸入辦公室或廠商代號')
+      return
+    }
+
+    if (!username.trim()) {
+      setError('請輸入帳號')
       return
     }
 
     setIsLoading(true)
 
     try {
-      const result = await validateLogin(username, password, selectedWorkspace, rememberMe)
+      // 記住輸入的代號和帳號
+      localStorage.setItem(LAST_CODE_KEY, trimmedCode)
+      localStorage.setItem(LAST_USERNAME_KEY, username.trim())
+
+      const result = await validateLogin(username.trim(), password, trimmedCode, rememberMe)
 
       if (result.success) {
-        // 登入成功，記住選擇的 workspace
-        localStorage.setItem(LAST_WORKSPACE_KEY, selectedWorkspace)
         const redirectPath = getRedirectPath()
         router.push(redirectPath)
       } else {
-        // 登入失敗
         setError(result.message || '帳號或密碼錯誤')
       }
     } catch (error) {
+      logger.error('Login error:', error)
       setError('系統錯誤，請稍後再試')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const selectedWorkspaceName = workspaces.find(w => w.id === selectedWorkspace)?.name || ''
+  // 判斷代號類型（用於顯示提示）
+  const getCodeHint = () => {
+    const trimmedCode = code.trim().toUpperCase()
+    if (!trimmedCode) return null
+    if (trimmedCode === 'TP' || trimmedCode === 'TC') {
+      return { type: 'workspace', label: trimmedCode === 'TP' ? '台北辦公室' : '台中辦公室' }
+    }
+    if (trimmedCode.length >= 3) {
+      return { type: 'supplier', label: '廠商登入' }
+    }
+    return null
+  }
+
+  const codeHint = getCodeHint()
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-morandi-light via-white to-morandi-container/20">
@@ -133,7 +107,7 @@ export default function LoginPage() {
             <User size={32} className="text-white" />
           </div>
           <h2 className="text-2xl font-bold text-morandi-primary">Venturo 系統登入</h2>
-          <p className="text-sm text-morandi-secondary mt-2">請選擇辦公室並輸入員工帳號</p>
+          <p className="text-sm text-morandi-secondary mt-2">請輸入代號和帳號密碼</p>
         </div>
 
         {/* 錯誤訊息 */}
@@ -146,36 +120,38 @@ export default function LoginPage() {
 
         {/* 登入表單 */}
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* 辦公室選擇 */}
+          {/* 代號輸入 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              辦公室
+              辦公室/廠商代號
             </label>
-            <Select
-              value={selectedWorkspace}
-              onValueChange={handleWorkspaceChange}
-              disabled={isLoadingWorkspaces}
-            >
-              <SelectTrigger className="w-full">
-                <div className="flex items-center gap-2">
-                  <Building2 size={18} className="text-morandi-secondary" />
-                  <SelectValue placeholder={isLoadingWorkspaces ? '載入中...' : '選擇辦公室'} />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {workspaces.map(workspace => (
-                  <SelectItem key={workspace.id} value={workspace.id}>
-                    {workspace.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="relative">
+              <Building2
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary"
+              />
+              <Input
+                type="text"
+                value={code}
+                onChange={e => setCode(e.target.value.toUpperCase())}
+                className="pl-10 uppercase"
+                placeholder="例：TP、TC、HTL01"
+                required
+                autoComplete="organization"
+                autoFocus
+              />
+            </div>
+            {codeHint && (
+              <p className="mt-1 text-xs text-morandi-secondary">
+                {codeHint.type === 'workspace' ? '🏢' : '🏭'} {codeHint.label}
+              </p>
+            )}
           </div>
 
-          {/* 員工編號 */}
+          {/* 帳號 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              員工編號
+              帳號
             </label>
             <div className="relative">
               <User
@@ -190,7 +166,6 @@ export default function LoginPage() {
                 placeholder="例：E001"
                 required
                 autoComplete="username"
-                autoFocus
               />
             </div>
           </div>
@@ -239,11 +214,19 @@ export default function LoginPage() {
           <Button
             type="submit"
             className="w-full bg-morandi-gold hover:bg-morandi-gold-hover"
-            disabled={isLoading || isLoadingWorkspaces || !selectedWorkspace}
+            disabled={isLoading || !code.trim()}
           >
             {isLoading ? '登入中...' : '登入'}
           </Button>
         </form>
+
+        {/* 提示 */}
+        <div className="mt-6 pt-4 border-t border-border/50">
+          <p className="text-xs text-morandi-secondary text-center">
+            員工請輸入辦公室代號（TP/TC）+ 員工編號<br />
+            廠商請輸入廠商代號 + 帳號
+          </p>
+        </div>
       </div>
     </div>
   )

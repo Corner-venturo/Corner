@@ -110,13 +110,48 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
-      validateLogin: async (username: string, password: string, workspaceId?: string, rememberMe: boolean = true) => {
+      validateLogin: async (username: string, password: string, code?: string, rememberMe: boolean = true) => {
         try {
-          logger.log('🌐 Authenticating via Supabase...', username, 'workspace:', workspaceId)
+          logger.log('🌐 Authenticating via Supabase...', username, 'code:', code)
 
           const { supabase } = await import('@/lib/supabase/client')
 
-          // 建立查詢，加上 workspace_id 條件（如果有提供）
+          // 如果提供了 code，先判斷是 workspace code 還是 supplier code
+          let workspaceId: string | undefined = undefined
+          let isSupplierLogin = false
+
+          if (code) {
+            // 先嘗試用 code 查詢 workspace
+            const { data: workspace } = await supabase
+              .from('workspaces')
+              .select('id')
+              .eq('code', code)
+              .single()
+
+            if (workspace) {
+              workspaceId = workspace.id
+              logger.log('✅ Found workspace by code:', code, workspaceId)
+            } else {
+              // 不是 workspace code，檢查是否是 supplier code
+              const { data: supplier } = await supabase
+                .from('suppliers')
+                .select('id, code, name, workspace_id')
+                .eq('code', code)
+                .eq('is_active', true)
+                .single()
+
+              if (supplier) {
+                isSupplierLogin = true
+                logger.log('✅ Found supplier by code:', code, supplier.name)
+                // TODO: 實作廠商登入邏輯
+                return { success: false, message: '廠商登入功能開發中' }
+              } else {
+                return { success: false, message: '找不到此代號，請確認輸入是否正確' }
+              }
+            }
+          }
+
+          // 員工登入流程
           let query = supabase
             .from('employees')
             .select('*')

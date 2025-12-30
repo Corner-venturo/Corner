@@ -21,13 +21,13 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
         </h3>
       </div>
 
-      <table className="w-full mb-6 text-sm" style={TABLE_STYLES}>
+      <table className="w-full mb-6 text-sm" style={{ ...TABLE_STYLES, tableLayout: 'fixed' }}>
         <thead>
           <tr style={{ backgroundColor: MORANDI_COLORS.lightBrown }}>
             <th
               className="px-3 py-2 text-left"
               style={{
-                width: '35%',
+                width: '32%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,
                 fontWeight: 600,
@@ -74,7 +74,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
             <th
               className="px-3 py-2 text-left"
               style={{
-                width: '25%',
+                width: '23%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,
@@ -93,6 +93,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                 style={{
                   borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
+                  wordBreak: 'break-word',
+                  overflow: 'hidden',
                 }}
               >
                 {item.description || '\u00A0'}
@@ -136,6 +138,8 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
                   borderBottom: index === items.length - 1 ? 'none' : `1px solid ${MORANDI_COLORS.border}`,
                   borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                   color: MORANDI_COLORS.gray,
+                  wordBreak: 'break-word',
+                  overflow: 'hidden',
                 }}
               >
                 {item.notes || '\u00A0'}

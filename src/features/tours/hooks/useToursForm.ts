@@ -1,11 +1,10 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Tour } from '@/stores/types'
 import { useRegionsStore } from '@/stores'
 import { useTourPageState } from './useTourPageState'
-import { useDialog } from '@/hooks/useDialog'
 import { useEmployees } from '@/hooks/cloud-hooks'
 import { useQuotesListSlim } from '@/hooks/useListSlim'
 
@@ -16,10 +15,15 @@ interface UseToursFormReturn {
   handleNavigationEffect: () => void
 }
 
-export function useToursForm(state: ReturnType<typeof useTourPageState>): UseToursFormReturn {
+interface UseToursFormParams {
+  state: ReturnType<typeof useTourPageState>
+  openDialog: (type: string, data?: unknown, meta?: unknown) => void
+  dialog: { type: string | null; data: unknown }
+}
+
+export function useToursForm({ state, openDialog, dialog }: UseToursFormParams): UseToursFormReturn {
   const searchParams = useSearchParams()
   const { countries, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
-  const { dialog, openDialog } = useDialog()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { items: quotes } = useQuotesListSlim()
 

@@ -10127,37 +10127,58 @@ export type Database = {
           attachments: Json | null
           content: string
           created_at: string | null
+          forwarded_at: string | null
+          forwarded_message_id: string | null
+          forwarded_to_channel: boolean | null
           id: string
+          is_important: boolean | null
           is_read: boolean | null
+          is_read_by_staff: boolean | null
+          is_read_by_supplier: boolean | null
           read_at: string | null
           request_id: string
           sender_id: string
           sender_name: string | null
           sender_type: string
+          updated_at: string | null
         }
         Insert: {
           attachments?: Json | null
           content: string
           created_at?: string | null
+          forwarded_at?: string | null
+          forwarded_message_id?: string | null
+          forwarded_to_channel?: boolean | null
           id?: string
+          is_important?: boolean | null
           is_read?: boolean | null
+          is_read_by_staff?: boolean | null
+          is_read_by_supplier?: boolean | null
           read_at?: string | null
           request_id: string
           sender_id: string
           sender_name?: string | null
           sender_type: string
+          updated_at?: string | null
         }
         Update: {
           attachments?: Json | null
           content?: string
           created_at?: string | null
+          forwarded_at?: string | null
+          forwarded_message_id?: string | null
+          forwarded_to_channel?: boolean | null
           id?: string
+          is_important?: boolean | null
           is_read?: boolean | null
+          is_read_by_staff?: boolean | null
+          is_read_by_supplier?: boolean | null
           read_at?: string | null
           request_id?: string
           sender_id?: string
           sender_name?: string | null
           sender_type?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -10198,12 +10219,14 @@ export type Database = {
           replied_by: string | null
           reply_content: Json | null
           reply_note: string | null
+          request_type: string | null
           service_date: string | null
           service_date_end: string | null
           specifications: Json | null
           status: string | null
           supplier_id: string | null
           supplier_name: string | null
+          supplier_response_at: string | null
           supplier_type: string | null
           sync_to_app: boolean | null
           synced_at: string | null
@@ -10245,12 +10268,14 @@ export type Database = {
           replied_by?: string | null
           reply_content?: Json | null
           reply_note?: string | null
+          request_type?: string | null
           service_date?: string | null
           service_date_end?: string | null
           specifications?: Json | null
           status?: string | null
           supplier_id?: string | null
           supplier_name?: string | null
+          supplier_response_at?: string | null
           supplier_type?: string | null
           sync_to_app?: boolean | null
           synced_at?: string | null
@@ -10292,12 +10317,14 @@ export type Database = {
           replied_by?: string | null
           reply_content?: Json | null
           reply_note?: string | null
+          request_type?: string | null
           service_date?: string | null
           service_date_end?: string | null
           specifications?: Json | null
           status?: string | null
           supplier_id?: string | null
           supplier_name?: string | null
+          supplier_response_at?: string | null
           supplier_type?: string | null
           sync_to_app?: boolean | null
           synced_at?: string | null

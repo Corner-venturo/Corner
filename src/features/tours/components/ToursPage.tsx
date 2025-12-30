@@ -57,7 +57,7 @@ export const ToursPage: React.FC = () => {
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
   const { items: tourRequests } = useTourRequests()
-  const { dialog, closeDialog } = useDialog()
+  const { dialog, closeDialog, openDialog } = useDialog()
 
   const {
     filteredTours,
@@ -122,6 +122,7 @@ export const ToursPage: React.FC = () => {
     newTour,
     setNewTour,
     newOrder,
+    setNewOrder,
     toggleRowExpand,
     setActiveTab,
     getStatusColor,
@@ -133,7 +134,7 @@ export const ToursPage: React.FC = () => {
     resetForm,
     handleEditDialogEffect,
     handleNavigationEffect,
-  } = useToursForm(state)
+  } = useToursForm({ state, openDialog, dialog })
 
   const operations = useTourOperations({
     actions,
@@ -271,7 +272,7 @@ export const ToursPage: React.FC = () => {
         newTour={newTour}
         setNewTour={setNewTour}
         newOrder={newOrder}
-        setNewOrder={() => {}}
+        setNewOrder={setNewOrder}
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}
