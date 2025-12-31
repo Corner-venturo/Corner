@@ -1,9 +1,11 @@
 import { useCallback } from 'react'
 import { usePayments } from '@/features/payments/hooks/usePayments'
+import { useWorkspaceId } from '@/lib/workspace-context'
 import { RequestFormData, BatchRequestFormData, RequestItem } from '../types'
 
 export function useRequestOperations() {
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
+  const workspaceId = useWorkspaceId()
 
   // 根據團號生成請款單編號：團號-I01, 團號-I02, ...
   // I = Invoice (請款單)
@@ -34,12 +36,14 @@ export function useRequestOperations() {
       createdByName?: string  // 請款人姓名
     ) => {
       if (!formData.tour_id || !items || items.length === 0) return null
+      if (!workspaceId) throw new Error('無法取得 workspace_id，請重新登入')
 
       // 生成請款單編號：團號-R01
       const requestCode = generateRequestCode(tourCode)
 
-      // Create payment request
+      // Create payment request (明確傳入 workspace_id)
       const request = await createPaymentRequest({
+        workspace_id: workspaceId,
         tour_id: formData.tour_id,
         code: requestCode,
         tour_code: tourCode, // 保存團號供查詢用
@@ -72,7 +76,7 @@ export function useRequestOperations() {
 
       return request
     },
-    [createPaymentRequest, addPaymentItem, generateRequestCode]
+    [createPaymentRequest, addPaymentItem, generateRequestCode, workspaceId]
   )
 
   // Create batch requests
@@ -84,6 +88,7 @@ export function useRequestOperations() {
       tours: Array<{ id: string; code: string; name: string }>
     ) => {
       if (tourIds.length === 0 || items.length === 0) return []
+      if (!workspaceId) throw new Error('無法取得 workspace_id，請重新登入')
 
       const createdRequests = []
 
@@ -94,8 +99,9 @@ export function useRequestOperations() {
         // 生成請款單編號：團號-R01
         const requestCode = generateRequestCode(selectedTour.code)
 
-        // Create payment request
+        // Create payment request (明確傳入 workspace_id)
         const request = await createPaymentRequest({
+          workspace_id: workspaceId,
           tour_id: tourId,
           code: requestCode,
           tour_code: selectedTour.code, // 保存團號供查詢用
@@ -127,7 +133,7 @@ export function useRequestOperations() {
 
       return createdRequests
     },
-    [createPaymentRequest, addPaymentItem, generateRequestCode]
+    [createPaymentRequest, addPaymentItem, generateRequestCode, workspaceId]
   )
 
   return {

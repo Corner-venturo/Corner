@@ -2,6 +2,7 @@ import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 
 class DisbursementOrderService extends BaseService<DisbursementOrder> {
   protected resourceName = 'disbursement_orders'
@@ -85,6 +86,9 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
    * 使用請款單創建出納單
    */
   async createWithRequests(paymentRequestIds: string[], note?: string): Promise<DisbursementOrder> {
+    // 取得 workspace_id（RLS 必須）
+    const workspaceId = getRequiredWorkspaceId()
+
     // 計算總金額
     const paymentRequestStore = usePaymentRequestStore.getState()
     const totalAmount = paymentRequestIds.reduce((sum, requestId) => {
@@ -92,8 +96,16 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       return sum + (request?.amount ?? 0)
     }, 0)
 
+    // 生成出納單編號
+    const disbursementDate = this.getNextThursday()
+    const store = useDisbursementOrderStore.getState()
+    const existingOrders = store.items.filter(o => o.disbursement_date === disbursementDate)
+    const orderNumber = `P${disbursementDate.replace(/-/g, '').slice(2)}${String.fromCharCode(65 + existingOrders.length)}`
+
     const orderData = {
-      disbursement_date: this.getNextThursday(),
+      workspace_id: workspaceId,
+      order_number: orderNumber,
+      disbursement_date: disbursementDate,
       payment_request_ids: [...paymentRequestIds],
       amount: totalAmount,
       status: 'pending' as const,

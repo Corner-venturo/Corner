@@ -77,8 +77,22 @@ function getCurrentUserContext(): { workspaceId: string | null; userRole: UserRo
 
 /**
  * 取得當前使用者的 workspace_id（向後相容）
+ * 優先從 auth store 讀取，fallback 到 localStorage
  */
 function getCurrentWorkspaceId(): string | null {
+  // 優先從 Zustand auth store 讀取（更可靠）
+  try {
+    // 動態 import 避免循環依賴
+    const authStorage = localStorage.getItem('auth-storage')
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage)
+      const workspaceId = parsed?.state?.user?.workspace_id
+      if (workspaceId) return workspaceId
+    }
+  } catch {
+    // 忽略
+  }
+  // Fallback 到原始方法
   return getCurrentUserContext().workspaceId
 }
 
@@ -242,6 +256,9 @@ export function createStore<T extends BaseEntity>(
           const workspace_id = (data as Record<string, unknown>).workspace_id || getCurrentWorkspaceId()
           if (workspace_id) {
             insertData.workspace_id = workspace_id
+          } else {
+            // RLS 需要 workspace_id，如果沒有則拋出明確錯誤
+            throw new Error(`[${tableName}] 無法取得 workspace_id，請確認已登入並重新整理頁面`)
           }
         }
 

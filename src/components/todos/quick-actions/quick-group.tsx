@@ -11,6 +11,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
 import { useTourStore, useOrderStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
+import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
 
 interface QuickGroupProps {
@@ -21,6 +22,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const tourStore = useTourStore()
   const orderStore = useOrderStore()
   const { items: employees } = useUserStore()
+  const workspaceId = useWorkspaceId()
   const [submitting, setSubmitting] = useState(false)
 
   const [newTour, setNewTour] = useState({
@@ -48,6 +50,11 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const assistants = employees.filter(emp => emp.status === 'active')
 
   const handleSubmit = async () => {
+    if (!workspaceId) {
+      void alert('無法取得 workspace_id，請重新登入', 'error')
+      return
+    }
+
     if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
       void alert('請填寫必填欄位（團名、出發日期、返回日期）', 'warning')
       return
@@ -71,6 +78,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
     setSubmitting(true)
     try {
       const tourData = {
+        workspace_id: workspaceId,
         name: newTour.name,
         country_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.countryCode,
         city_code: newTour.countryCode === '__custom__' ? '__custom__' : newTour.cityCode,
@@ -92,6 +100,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       // 如果有填寫聯絡人，同時建立訂單
       if (newOrder.contact_person.trim()) {
         const orderData = {
+          workspace_id: workspaceId,
           tour_id: createdTour.id,
           code: createdTour.code,
           tour_name: createdTour.name,

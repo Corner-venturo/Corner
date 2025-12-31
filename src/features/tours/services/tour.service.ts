@@ -4,6 +4,7 @@ import { useTourStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { BaseEntity } from '@/core/types/common'
 
 interface TourFinancialSummary {
@@ -283,7 +284,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const yearStart = new Date(targetYear, 0, 1)
     const departureDate = today > yearStart ? today : yearStart
 
+    // 取得 workspace_id（RLS 必須）
+    const workspaceId = getRequiredWorkspaceId()
+
     const visaTour: Partial<Tour> = {
+      workspace_id: workspaceId,
       code: visaCode,
       name: `${targetYear}年度簽證專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
@@ -361,7 +366,11 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const yearStart = new Date(targetYear, 0, 1)
     const departureDate = today > yearStart ? today : yearStart
 
+    // 取得 workspace_id（RLS 必須）
+    const workspaceId = getRequiredWorkspaceId()
+
     const esimTour: Partial<Tour> = {
+      workspace_id: workspaceId,
       code: esimCode,
       name: `${targetYear}年度網卡專用團`,
       departure_date: departureDate.toISOString().split('T')[0],
