@@ -98,6 +98,17 @@ export default function ArchiveManagementPage() {
 
       if (orphanedError) throw orphanedError
       setOrphanedQuotes(orphaned || [])
+
+      // 載入結案的旅遊團（未封存的）
+      const { data: closed, error: closedError } = await supabase
+        .from('tours')
+        .select('id, code, name, location, departure_date, return_date, closing_date, closing_status')
+        .eq('closing_status', 'closed')
+        .or('archived.is.null,archived.eq.false')
+        .order('closing_date', { ascending: false })
+
+      if (closedError) throw closedError
+      setClosedTours(closed || [])
     } catch (error) {
       logger.error('載入封存資料失敗:', error)
       toast.error('載入封存資料失敗')
@@ -247,6 +258,32 @@ export default function ArchiveManagementPage() {
     }
   }
 
+  // 封存結案的旅遊團
+  const handleArchiveClosedTour = async (tour: ClosedTour) => {
+    const confirmed = await confirm(
+      `確定要將結案旅遊團「${tour.code}」封存嗎？\n\n封存後可在「封存旅遊團」標籤頁還原。`,
+      {
+        title: '封存旅遊團',
+        type: 'warning',
+      }
+    )
+    if (!confirmed) return
+
+    try {
+      const { error } = await supabase
+        .from('tours')
+        .update({ archived: true, archive_reason: 'closed' })
+        .eq('id', tour.id)
+
+      if (error) throw error
+      toast.success(`已封存旅遊團 ${tour.code}`)
+      loadArchivedData()
+    } catch (error) {
+      logger.error('封存失敗:', error)
+      toast.error('封存失敗，請稍後再試')
+    }
+  }
+
   // 旅遊團表格欄位
   const tourColumns = [
     {
@@ -360,6 +397,57 @@ export default function ArchiveManagementPage() {
     },
   ]
 
+  // 結案旅遊團表格欄位
+  const closedToursColumns = [
+    {
+      key: 'code',
+      label: '團號',
+      width: '140px',
+      render: (_: unknown, row: ClosedTour) => (
+        <span className="font-medium text-morandi-primary">{row.code}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: '團名',
+      render: (_: unknown, row: ClosedTour) => (
+        <span className="text-morandi-secondary">{row.name || row.location || '-'}</span>
+      ),
+    },
+    {
+      key: 'departure_date',
+      label: '出發日期',
+      width: '120px',
+      render: (_: unknown, row: ClosedTour) => <DateCell date={row.departure_date} />,
+    },
+    {
+      key: 'closing_date',
+      label: '結案日期',
+      width: '120px',
+      render: (_: unknown, row: ClosedTour) => (
+        <span className="text-sm text-morandi-secondary">
+          {row.closing_date ? formatDate(row.closing_date) : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: '',
+      width: '80px',
+      render: (_: unknown, row: ClosedTour) => (
+        <ActionCell
+          actions={[
+            {
+              icon: Archive,
+              label: '封存',
+              onClick: () => handleArchiveClosedTour(row),
+            },
+          ]}
+        />
+      ),
+    },
+  ]
+
   // 行程表表格欄位
   const itineraryColumns = [
     {
@@ -424,6 +512,7 @@ export default function ArchiveManagementPage() {
   // 標籤頁定義
   const STATUS_TABS = [
     { value: 'orphaned-quotes', label: `未關聯報價單 (${orphanedQuotes.length})`, icon: FileQuestion },
+    { value: 'closed', label: `結案旅遊團 (${closedTours.length})`, icon: CheckCircle },
     { value: 'tours', label: `封存旅遊團 (${archivedTours.length})`, icon: Plane },
     { value: 'itineraries', label: `封存行程表 (${archivedItineraries.length})`, icon: FileText },
   ]
@@ -461,6 +550,21 @@ export default function ArchiveManagementPage() {
                 <EnhancedTable
                   columns={orphanedQuotesColumns}
                   data={orphanedQuotes}
+                />
+              )
+            )}
+
+            {/* 結案旅遊團 */}
+            {activeTab === 'closed' && (
+              closedTours.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                  <CheckCircle className="h-12 w-12 mb-4 opacity-30" />
+                  <p>沒有結案的旅遊團</p>
+                </div>
+              ) : (
+                <EnhancedTable
+                  columns={closedToursColumns}
+                  data={closedTours}
                 />
               )
             )}

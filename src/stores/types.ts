@@ -11,6 +11,8 @@ export type {
   Payment,
   Company,
   CompanyContact,
+  AirportImage,
+  AirportImageSeason,
 } from './types/base.types'
 
 // 使用者相關型別

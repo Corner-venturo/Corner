@@ -149,3 +149,21 @@ export interface CompanyContact {
   created_at: string
   updated_at: string
 }
+
+// 機場圖片季節類型
+export type AirportImageSeason = 'spring' | 'summer' | 'autumn' | 'winter' | 'all'
+
+// 機場圖片（封面圖片庫）
+export interface AirportImage {
+  id: string
+  airport_code: string // 機場代碼如 CNX, BKK, HND
+  image_url: string
+  label: string | null // 標籤名稱（如「春季櫻花」「夏季祭典」）
+  season: AirportImageSeason | null // 季節分類
+  is_default: boolean // 是否為預設圖片
+  display_order: number // 排序順序
+  uploaded_by: string | null // 上傳者
+  workspace_id: string | null
+  created_at: string
+  updated_at: string
+}

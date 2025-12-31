@@ -42,6 +42,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import type { OrderMember } from '@/components/orders/order-member.types'
 import type { PNR } from '@/types/pnr.types'
+import type { Json } from '@/lib/supabase/types'
 
 interface TourPnrToolDialogProps {
   isOpen: boolean
@@ -258,25 +259,55 @@ export function TourPnrToolDialog({
 
     setIsSaving(true)
     try {
-      // 1. 儲存 PNR 記錄（關聯 tour_id）
-      await createPNR({
-        record_locator: parsedPNR.recordLocator || 'UNKNWN',
-        workspace_id: user.workspace_id,
-        employee_id: user.id || null,
-        raw_pnr: rawPNR,
-        passenger_names: parsedPNR.passengerNames,
-        ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
-        segments: parsedPNR.segments,
-        special_requests: parsedPNR.specialRequests || null,
-        other_info: parsedPNR.otherInfo || null,
-        status: 'active',
-        tour_id: tourId,
-        created_by: user.id || null,
-      } as Omit<PNR, 'id' | 'created_at' | 'updated_at'>)
+      const { supabase } = await import('@/lib/supabase/client')
+      const recordLocator = parsedPNR.recordLocator || 'UNKNWN'
+
+      // 1. 檢查 PNR 是否已存在
+      const { data: existingPNR } = await supabase
+        .from('pnrs')
+        .select('id')
+        .eq('record_locator', recordLocator)
+        .single()
+
+      if (existingPNR) {
+        // PNR 已存在，更新它
+        // Note: special_requests and other_info are stored as JSONB but typed as string[] in Supabase
+        await supabase
+          .from('pnrs')
+          .update({
+            raw_pnr: rawPNR,
+            passenger_names: parsedPNR.passengerNames,
+            ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
+            segments: parsedPNR.segments as unknown as Json,
+            special_requests: parsedPNR.specialRequests as unknown as string[],
+            other_info: parsedPNR.otherInfo as unknown as string[],
+            tour_id: tourId,
+            updated_by: user.id || null,
+          })
+          .eq('id', existingPNR.id)
+        toast.info(`PNR ${recordLocator} 已存在，已更新資料`)
+      } else {
+        // PNR 不存在，新建
+        await createPNR({
+          record_locator: recordLocator,
+          workspace_id: user.workspace_id,
+          employee_id: user.id || null,
+          raw_pnr: rawPNR,
+          passenger_names: parsedPNR.passengerNames,
+          ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
+          cancellation_deadline: null,
+          segments: parsedPNR.segments,
+          special_requests: parsedPNR.specialRequests || null,
+          other_info: parsedPNR.otherInfo || null,
+          status: 'active',
+          tour_id: tourId,
+          notes: null,
+          created_by: user.id || null,
+          updated_by: null,
+        } as unknown as Omit<PNR, 'id' | 'created_at' | 'updated_at'>)
+      }
 
       // 2. 更新團員的 PNR 欄位
-      const { supabase } = await import('@/lib/supabase/client')
-      const recordLocator = parsedPNR.recordLocator || ''
       let updateCount = 0
       const errors: string[] = []
 

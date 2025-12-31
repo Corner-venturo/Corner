@@ -606,6 +606,63 @@ export type Database = {
           },
         ]
       }
+      airport_images: {
+        Row: {
+          id: string
+          airport_code: string
+          image_url: string
+          label: string | null
+          season: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
+          is_default: boolean
+          display_order: number
+          uploaded_by: string | null
+          workspace_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          airport_code: string
+          image_url: string
+          label?: string | null
+          season?: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
+          is_default?: boolean
+          display_order?: number
+          uploaded_by?: string | null
+          workspace_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          airport_code?: string
+          image_url?: string
+          label?: string | null
+          season?: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
+          is_default?: boolean
+          display_order?: number
+          uploaded_by?: string | null
+          workspace_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airport_images_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airport_images_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       advance_lists: {
         Row: {
           _deleted: boolean | null
@@ -6503,12 +6560,12 @@ export type Database = {
           employee_id: string | null
           id: string
           notes: string | null
-          other_info: string[] | null
+          other_info: Json | null
           passenger_names: string[]
           raw_pnr: string
           record_locator: string
           segments: Json | null
-          special_requests: string[] | null
+          special_requests: Json | null
           status: string | null
           ticketing_deadline: string | null
           tour_id: string | null
@@ -6523,12 +6580,12 @@ export type Database = {
           employee_id?: string | null
           id?: string
           notes?: string | null
-          other_info?: string[] | null
+          other_info?: Json | null
           passenger_names?: string[]
           raw_pnr: string
           record_locator: string
           segments?: Json | null
-          special_requests?: string[] | null
+          special_requests?: Json | null
           status?: string | null
           ticketing_deadline?: string | null
           tour_id?: string | null
@@ -6543,12 +6600,12 @@ export type Database = {
           employee_id?: string | null
           id?: string
           notes?: string | null
-          other_info?: string[] | null
+          other_info?: Json | null
           passenger_names?: string[]
           raw_pnr?: string
           record_locator?: string
           segments?: Json | null
-          special_requests?: string[] | null
+          special_requests?: Json | null
           status?: string | null
           ticketing_deadline?: string | null
           tour_id?: string | null

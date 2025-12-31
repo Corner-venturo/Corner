@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { TourFormData, CityOption } from '../types'
 import { Settings2 } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
-import { alert } from '@/lib/ui/alert-dialog'
 import { PreviewPanel } from '../components/PreviewPanel'
 // Hero 組件
 import { TourHeroSection } from '@/features/tours/components/sections/TourHeroSection'
@@ -17,7 +16,7 @@ import { TourHeroDreamscape } from '@/features/tours/components/sections/TourHer
 import { TourHeroCollage } from '@/features/tours/components/sections/TourHeroCollage'
 // 拆分的模組
 import { useCoverInfo } from './cover/hooks/useCoverInfo'
-import { CoverImageUpload } from './cover/CoverImageUpload'
+import { AirportImageLibrary } from './cover/AirportImageLibrary'
 import { CoverInfoForm } from './cover/CoverInfoForm'
 
 interface CoverInfoSectionProps {
@@ -53,35 +52,35 @@ export function CoverInfoSection({
   const [showCoverSettings, setShowCoverSettings] = useState(false)
 
   const {
-    cityImages,
     coverStyleOptions,
     currentStyleOption,
     currentStyleColor,
-    showUpdateDialog,
-    setShowUpdateDialog,
-    uploadedImageUrl,
-    setUploadedImageUrl,
     templatesLoading,
-    handleUpdateCityImage,
     handleCoverStyleChange,
   } = useCoverInfo({ data, onChange })
 
+  // 從城市名稱取得機場代碼
+  const airportCode = useMemo(() => {
+    if (!data.city) return ''
+    const city = availableCities.find(c => c.name === data.city)
+    return city?.code || ''
+  }, [data.city, availableCities])
+
+  // 處理圖片選擇
+  const handleImageSelect = (url: string) => {
+    logger.log('[CoverInfoSection] handleImageSelect:', { url })
+    updateField('coverImage', url)
+  }
+
   // 處理圖片上傳
   const handleImageUpload = (url: string) => {
-    logger.log('[CoverInfoSection] handleImageUpload 被呼叫:', { url, oldImage: data.coverImage })
-    const oldImage = data.coverImage
+    logger.log('[CoverInfoSection] handleImageUpload:', { url })
     // 同時更新 coverImage 和 coverImagePosition，避免 stale closure 問題
     onChange({
       ...data,
       coverImage: url,
       coverImagePosition: { x: 50, y: 50, scale: 1 },
     })
-    logger.log('[CoverInfoSection] onChange 已呼叫，同時設定 coverImage 和 position')
-    // 如果上傳了新圖片且有城市，詢問是否設為預設
-    if (url && data.city && oldImage !== url) {
-      setUploadedImageUrl(url)
-      setShowUpdateDialog(true)
-    }
   }
 
   // 生成預覽用資料
@@ -141,6 +140,7 @@ export function CoverInfoSection({
           <h2 className="text-base font-bold text-morandi-primary">封面設定</h2>
           <p className="text-xs text-morandi-secondary">
             風格：{currentStyleOption?.label || '經典全屏'}
+            {airportCode && ` · ${airportCode}`}
           </p>
         </div>
       </button>
@@ -181,11 +181,11 @@ export function CoverInfoSection({
                   templatesLoading={templatesLoading}
                 />
 
-                {/* 封面圖片 */}
-                <CoverImageUpload
-                  cityImages={cityImages}
+                {/* 封面圖片 - 使用新的機場圖片庫 */}
+                <AirportImageLibrary
+                  airportCode={airportCode}
                   selectedImage={data.coverImage}
-                  onImageSelect={(url) => updateField('coverImage', url)}
+                  onImageSelect={handleImageSelect}
                   onImageUpload={handleImageUpload}
                   position={data.coverImagePosition as ImagePositionSettings}
                   onPositionChange={(pos) => updateField('coverImagePosition', pos)}
@@ -209,59 +209,6 @@ export function CoverInfoSection({
             >
               {renderHeroPreview}
             </PreviewPanel>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* 更新城市預設圖片對話框 */}
-      <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>圖片上傳成功！</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-morandi-secondary">
-              要將此圖片設為「<span className="font-medium text-morandi-primary">{data.city}</span>」的預設圖片嗎？
-              <br />
-              （所有人建立 {data.city} 行程時都能使用）
-            </p>
-
-            {/* 預覽上傳的圖片 */}
-            {uploadedImageUrl && (
-              <div className="rounded-lg overflow-hidden border border-morandi-container">
-                <img
-                  src={uploadedImageUrl}
-                  alt="上傳的圖片"
-                  className="w-full h-32 object-cover"
-                />
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                onClick={() => handleUpdateCityImage(1)}
-                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                設為圖片 1
-              </Button>
-              <Button
-                onClick={() => handleUpdateCityImage(2)}
-                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                設為圖片 2
-              </Button>
-            </div>
-
-            <Button
-              onClick={() => {
-                setShowUpdateDialog(false)
-                void alert('圖片僅用於此行程！', 'success')
-              }}
-              variant="outline"
-              className="w-full"
-            >
-              只用於此行程
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -84,6 +84,8 @@ const WORKSPACE_SCOPED_TABLES = [
   'pnr_queue_items',
   'pnr_schedule_changes',
   'pnr_ai_queries',
+  // ✅ 2025-12-31: 機場圖片庫
+  'airport_images',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）

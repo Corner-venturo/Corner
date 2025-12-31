@@ -17,6 +17,7 @@ import type {
   Visa,
   Supplier,
   Itinerary,
+  AirportImage,
 } from '@/stores/types'
 import type { QuoteItem } from '@/types/quote.types'
 
@@ -98,3 +99,10 @@ export const useSuppliers = createCloudHook<Supplier>('suppliers', {
 
 // 報價項目
 export const useQuoteItems = createCloudHook<QuoteItem>('quote_items')
+
+// ===== 圖片庫 =====
+
+// 機場圖片（封面圖片庫）
+export const useAirportImages = createCloudHook<AirportImage>('airport_images', {
+  orderBy: { column: 'display_order', ascending: true },
+})
