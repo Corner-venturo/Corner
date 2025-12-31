@@ -93,6 +93,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       subtotal: itemData.unit_price * itemData.quantity,
       note: itemData.note,
       sort_order: itemData.sort_order,
+      workspace_id: request.workspace_id, // RLS 需要
     }
 
     // 使用 itemStore 新增項目
