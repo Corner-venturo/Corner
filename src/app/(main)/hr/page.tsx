@@ -81,7 +81,8 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      // 靜默失敗，UI 層面已透過 store 狀態處理
+      const { toast } = await import('sonner')
+      toast.error('離職處理失敗，請稍後再試')
     }
   }
 
@@ -115,7 +116,8 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      // 靜默失敗，UI 層面已透過 store 狀態處理
+      const { toast } = await import('sonner')
+      toast.error('刪除員工失敗，請稍後再試')
     }
   }
 

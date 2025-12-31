@@ -66,30 +66,39 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
   }
 
   const handleAddExercise = async () => {
-    if (!exerciseForm.equipment.trim()) return
+    if (!exerciseForm.equipment.trim()) {
+      alert('請填寫器材名稱')
+      return
+    }
 
     setIsAdding(true)
 
-    const newExercise: WorkoutExercise = {
-      id: generateUUID(),
-      equipment: exerciseForm.equipment,
-      weight: exerciseForm.weight,
-      reps: exerciseForm.reps,
-      sets: exerciseForm.sets,
-      setsCompleted: Array(exerciseForm.sets).fill(false),
-      completedSetsTime: Array(exerciseForm.sets).fill(null),
-    }
+    try {
+      const newExercise: WorkoutExercise = {
+        id: generateUUID(),
+        equipment: exerciseForm.equipment,
+        weight: exerciseForm.weight,
+        reps: exerciseForm.reps,
+        sets: exerciseForm.sets,
+        setsCompleted: Array(exerciseForm.sets).fill(false),
+        completedSetsTime: Array(exerciseForm.sets).fill(null),
+      }
 
-    const updatedData: WorkoutData = {
-      exercises: [...(workoutData.exercises || []), newExercise],
-    }
+      const updatedData: WorkoutData = {
+        exercises: [...(workoutData.exercises || []), newExercise],
+      }
 
-    await updateScheduledBox(scheduledBox.id, { data: updatedData as unknown as Record<string, unknown> })
+      await updateScheduledBox(scheduledBox.id, { data: updatedData as unknown as Record<string, unknown> })
 
-    setTimeout(() => {
-      resetForm()
+      setTimeout(() => {
+        resetForm()
+        setIsAdding(false)
+      }, 300)
+    } catch (error) {
+      console.error('[WorkoutDialog] 新增運動失敗:', error)
+      alert(error instanceof Error ? error.message : '新增失敗，請稍後再試')
       setIsAdding(false)
-    }, 300)
+    }
   }
 
   const handleEditExercise = (exercise: WorkoutExercise) => {
@@ -108,20 +117,26 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
     setIsAdding(true)
 
-    const updatedExercises = workoutData.exercises.map(ex =>
-      ex.id === editingExerciseId
-        ? { ...ex, ...exerciseForm }
-        : ex
-    )
+    try {
+      const updatedExercises = workoutData.exercises.map(ex =>
+        ex.id === editingExerciseId
+          ? { ...ex, ...exerciseForm }
+          : ex
+      )
 
-    await updateScheduledBox(scheduledBox.id, {
-      data: { exercises: updatedExercises },
-    })
+      await updateScheduledBox(scheduledBox.id, {
+        data: { exercises: updatedExercises },
+      })
 
-    setTimeout(() => {
-      resetForm()
+      setTimeout(() => {
+        resetForm()
+        setIsAdding(false)
+      }, 300)
+    } catch (error) {
+      console.error('[WorkoutDialog] 更新運動失敗:', error)
+      alert(error instanceof Error ? error.message : '更新失敗，請稍後再試')
       setIsAdding(false)
-    }, 300)
+    }
   }
 
   const handleDeleteExercise = async (exerciseId: string) => {
@@ -131,45 +146,54 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
     })
     if (!confirmed) return
 
-    const updatedExercises = workoutData.exercises.filter(ex => ex.id !== exerciseId)
-    await updateScheduledBox(scheduledBox.id, {
-      data: { exercises: updatedExercises },
-    })
+    try {
+      const updatedExercises = workoutData.exercises.filter(ex => ex.id !== exerciseId)
+      await updateScheduledBox(scheduledBox.id, {
+        data: { exercises: updatedExercises },
+      })
+    } catch (error) {
+      console.error('[WorkoutDialog] 刪除動作失敗:', error)
+      alert(error instanceof Error ? error.message : '刪除失敗，請稍後再試')
+    }
   }
 
   const handleSetClick = async (exerciseId: string, setIndex: number) => {
-    const updatedExercises = workoutData.exercises.map(ex => {
-      if (ex.id !== exerciseId) return ex
+    try {
+      const updatedExercises = workoutData.exercises.map(ex => {
+        if (ex.id !== exerciseId) return ex
 
-      const newSetsCompleted = [...ex.setsCompleted]
-      const newCompletedSetsTime = [...ex.completedSetsTime]
+        const newSetsCompleted = [...ex.setsCompleted]
+        const newCompletedSetsTime = [...ex.completedSetsTime]
 
-      newSetsCompleted[setIndex] = !newSetsCompleted[setIndex]
-      newCompletedSetsTime[setIndex] = newSetsCompleted[setIndex]
-        ? new Date().toISOString()
-        : null
+        newSetsCompleted[setIndex] = !newSetsCompleted[setIndex]
+        newCompletedSetsTime[setIndex] = newSetsCompleted[setIndex]
+          ? new Date().toISOString()
+          : null
 
-      return {
-        ...ex,
-        setsCompleted: newSetsCompleted,
-        completedSetsTime: newCompletedSetsTime,
-      }
-    })
+        return {
+          ...ex,
+          setsCompleted: newSetsCompleted,
+          completedSetsTime: newCompletedSetsTime,
+        }
+      })
 
-    await updateScheduledBox(scheduledBox.id, {
-      data: { exercises: updatedExercises },
-    })
+      await updateScheduledBox(scheduledBox.id, {
+        data: { exercises: updatedExercises },
+      })
 
-    // 檢查是否全部完成
-    setTimeout(async () => {
-      const allCompleted = updatedExercises.every(ex =>
-        ex.setsCompleted.every(completed => completed === true)
-      )
+      // 檢查是否全部完成
+      setTimeout(async () => {
+        const allCompleted = updatedExercises.every(ex =>
+          ex.setsCompleted.every(completed => completed === true)
+        )
 
-      if (allCompleted && !currentScheduledBox.completed) {
-        await updateScheduledBox(scheduledBox.id, { completed: true })
-      }
-    }, 100)
+        if (allCompleted && !currentScheduledBox.completed) {
+          await updateScheduledBox(scheduledBox.id, { completed: true })
+        }
+      }, 100)
+    } catch (error) {
+      console.error('[WorkoutDialog] 更新組數狀態失敗:', error)
+    }
   }
 
   const handleDelete = async () => {
@@ -178,34 +202,56 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
       type: 'warning',
     })
     if (!confirmed) return
-    await deleteScheduledBox(scheduledBox.id)
-    onClose()
+
+    try {
+      await deleteScheduledBox(scheduledBox.id)
+      onClose()
+    } catch (error) {
+      console.error('[WorkoutDialog] 刪除排程失敗:', error)
+      alert(error instanceof Error ? error.message : '刪除失敗，請稍後再試')
+    }
   }
 
   // 儲存為模板
   const handleSaveAsTemplate = async () => {
-    if (!userId || !templateName.trim() || !workoutData.exercises?.length) return
+    if (!userId) {
+      alert('請先登入')
+      return
+    }
+    if (!templateName.trim()) {
+      alert('請填寫模板名稱')
+      return
+    }
+    if (!workoutData.exercises?.length) {
+      alert('請先新增運動項目')
+      return
+    }
 
-    // 只保存動作定義，不保存完成狀態
-    const cleanExercises = workoutData.exercises.map(ex => ({
-      id: generateUUID(),
-      equipment: ex.equipment,
-      weight: ex.weight,
-      reps: ex.reps,
-      sets: ex.sets,
-      setsCompleted: Array(ex.sets).fill(false),
-      completedSetsTime: Array(ex.sets).fill(null),
-    }))
+    try {
+      // 只保存動作定義，不保存完成狀態
+      const cleanExercises = workoutData.exercises.map(ex => ({
+        id: generateUUID(),
+        equipment: ex.equipment,
+        weight: ex.weight,
+        reps: ex.reps,
+        sets: ex.sets,
+        setsCompleted: Array(ex.sets).fill(false),
+        completedSetsTime: Array(ex.sets).fill(null),
+      }))
 
-    await createTemplate({
-      user_id: userId,
-      name: templateName.trim(),
-      exercises: cleanExercises,
-    } as Omit<WorkoutTemplate, 'id' | 'created_at' | 'updated_at'>)
+      await createTemplate({
+        user_id: userId,
+        name: templateName.trim(),
+        exercises: cleanExercises,
+      } as Omit<WorkoutTemplate, 'id' | 'created_at' | 'updated_at'>)
 
-    void alert(`已儲存模板「${templateName}」`, 'success')
-    setTemplateName('')
-    setShowSaveTemplate(false)
+      void alert(`已儲存模板「${templateName}」`, 'success')
+      setTemplateName('')
+      setShowSaveTemplate(false)
+    } catch (error) {
+      console.error('[WorkoutDialog] 儲存模板失敗:', error)
+      alert(error instanceof Error ? error.message : '儲存模板失敗，請稍後再試')
+    }
   }
 
   // 載入模板

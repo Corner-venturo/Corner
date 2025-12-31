@@ -30,19 +30,31 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
   const userBoxes = boxes.filter(b => b.user_id === userId)
 
   const handleQuickAdd = async () => {
-    if (!userId || !newBoxName.trim()) return
+    if (!userId) {
+      alert('請先登入')
+      return
+    }
+    if (!newBoxName.trim()) {
+      alert('請填寫箱子名稱')
+      return
+    }
 
-    await createBox({
-      user_id: userId,
-      name: newBoxName.trim(),
-      color: newBoxColor,
-      type: 'basic',
-      default_content: null,
-    })
+    try {
+      await createBox({
+        user_id: userId,
+        name: newBoxName.trim(),
+        color: newBoxColor,
+        type: 'basic',
+        default_content: null,
+      })
 
-    setNewBoxName('')
-    setNewBoxColor(morandiColors[0].value)
-    setShowQuickAdd(false)
+      setNewBoxName('')
+      setNewBoxColor(morandiColors[0].value)
+      setShowQuickAdd(false)
+    } catch (error) {
+      console.error('[BoxSidebar] 新增箱子失敗:', error)
+      alert(error instanceof Error ? error.message : '新增失敗，請稍後再試')
+    }
   }
 
   return (

@@ -163,25 +163,39 @@ export const QuotesPage: React.FC = () => {
 
     // 如果是快速報價單，需要載入 items
     if (quoteWithType.quote_type === 'quick') {
-      const { supabase } = await import('@/lib/supabase/client')
-      const { data: items, error } = await supabase
-        .from('quote_items')
-        .select('*')
-        .eq('quote_id', quoteId)
-        .order('created_at', { ascending: true })
+      try {
+        const { supabase } = await import('@/lib/supabase/client')
+        const { data: items, error } = await supabase
+          .from('quote_items')
+          .select('*')
+          .eq('quote_id', quoteId)
+          .order('created_at', { ascending: true })
 
-      logger.log('📦 Quick quote items:', items, 'Error:', error)
-      // 轉換 quote_items 資料為 QuickQuoteItem 格式
-      setPreviewQuoteItems(
-        (items || []).map(item => ({
-          id: item.id,
-          description: item.description ?? '',
-          quantity: item.quantity ?? 0,
-          unit_price: item.unit_price ?? 0,
-          amount: item.total_price ?? 0,
-          notes: item.notes ?? '',
-        }))
-      )
+        if (error) {
+          logger.error('載入報價項目失敗:', error)
+          const { toast } = await import('sonner')
+          toast.error('載入報價項目失敗')
+          return
+        }
+
+        logger.log('📦 Quick quote items:', items)
+        // 轉換 quote_items 資料為 QuickQuoteItem 格式
+        setPreviewQuoteItems(
+          (items || []).map(item => ({
+            id: item.id,
+            description: item.description ?? '',
+            quantity: item.quantity ?? 0,
+            unit_price: item.unit_price ?? 0,
+            amount: item.total_price ?? 0,
+            notes: item.notes ?? '',
+          }))
+        )
+      } catch (error) {
+        logger.error('預覽報價單失敗:', error)
+        const { toast } = await import('sonner')
+        toast.error('預覽報價單失敗，請稍後再試')
+        return
+      }
     } else {
       setPreviewQuoteItems([])
     }

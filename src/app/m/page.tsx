@@ -7,6 +7,7 @@ import { TourCard } from '@/components/mobile/cards'
 import { TodoCard } from '@/components/mobile/cards'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { logger } from '@/lib/utils/logger'
 
 interface Tour {
   id: string
@@ -71,7 +72,7 @@ export default function MobileHomePage() {
         setTodayReturns(returnsRes.data || [])
         setUrgentTodos(todosRes.data || [])
       } catch (error) {
-        console.error('Failed to load home data:', error)
+        logger.error('Failed to load home data:', error)
       } finally {
         setIsLoading(false)
       }

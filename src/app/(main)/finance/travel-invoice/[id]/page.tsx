@@ -33,7 +33,11 @@ export default function InvoiceDetailPage() {
   }, [params.id, fetchInvoiceById])
 
   const handleVoid = async () => {
-    if (!currentInvoice || !voidReason.trim()) return
+    if (!currentInvoice) return
+    if (!voidReason.trim()) {
+      await alert('請填寫作廢原因', 'error')
+      return
+    }
 
     try {
       await voidInvoice(currentInvoice.id, voidReason, 'current_user')

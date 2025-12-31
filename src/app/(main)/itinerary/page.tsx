@@ -51,13 +51,11 @@ export default function ItineraryPage() {
     if (isSuperAdmin && workspaces.length === 0) {
       loadWorkspaces()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuperAdmin, workspaces.length])
+  }, [isSuperAdmin, workspaces.length, loadWorkspaces])
 
   useEffect(() => {
     regionsStore.fetchAll()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [regionsStore])
 
   // Custom hooks
   const pageState = useItineraryPageState()

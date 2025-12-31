@@ -6,6 +6,7 @@ import { ArrowLeft, Plus } from 'lucide-react'
 import { TodoCard } from '@/components/mobile/cards'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 interface DbTodo {
   id: string
@@ -109,7 +110,7 @@ export default function MobileTodosPage() {
       const { data, error } = await query.limit(50)
 
       if (error) {
-        console.error('Failed to load todos:', error)
+        logger.error('Failed to load todos:', error)
       } else {
         setTodos((data as DbTodo[] || []).map(formatTodo))
       }
@@ -127,7 +128,11 @@ export default function MobileTodosPage() {
       .update({ status: newStatus, updated_at: new Date().toISOString() })
       .eq('id', todoId)
 
-    if (!error) {
+    if (error) {
+      // 顯示錯誤訊息
+      const { toast } = await import('sonner')
+      toast.error('更新失敗，請稍後再試')
+    } else {
       setTodos((prev) =>
         prev.map((t) => (t.id === todoId ? { ...t, status: newStatus as DisplayTodo['status'] } : t))
       )

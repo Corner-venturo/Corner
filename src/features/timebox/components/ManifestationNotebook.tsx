@@ -171,27 +171,39 @@ export default function ManifestationNotebook() {
 
   // 保存章節練習
   const handleSaveChapter = async () => {
-    if (!user?.id || !selectedChapter) return
-
-    const existingEntry = entries.find(e => e.chapter_number === selectedChapter)
-
-    if (existingEntry) {
-      await updateEntry(existingEntry.id, {
-        ...chapterForm,
-        is_completed: true,
-        completed_at: new Date().toISOString(),
-      })
-    } else {
-      await createEntry({
-        chapter_number: selectedChapter,
-        ...chapterForm,
-        is_completed: true,
-        completed_at: new Date().toISOString(),
-      })
+    if (!user?.id) {
+      alert('請先登入')
+      return
+    }
+    if (!selectedChapter) {
+      alert('請選擇章節')
+      return
     }
 
-    setSelectedChapter(null)
-    setChapterForm({})
+    try {
+      const existingEntry = entries.find(e => e.chapter_number === selectedChapter)
+
+      if (existingEntry) {
+        await updateEntry(existingEntry.id, {
+          ...chapterForm,
+          is_completed: true,
+          completed_at: new Date().toISOString(),
+        })
+      } else {
+        await createEntry({
+          chapter_number: selectedChapter,
+          ...chapterForm,
+          is_completed: true,
+          completed_at: new Date().toISOString(),
+        })
+      }
+
+      setSelectedChapter(null)
+      setChapterForm({})
+    } catch (error) {
+      console.error('[ManifestationNotebook] 保存章節失敗:', error)
+      alert(error instanceof Error ? error.message : '保存失敗，請稍後再試')
+    }
   }
 
   // 分頁邏輯

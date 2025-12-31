@@ -592,7 +592,10 @@ function AddTodoForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.title.trim()) return
+    if (!formData.title.trim()) {
+      alert('請填寫任務標題')
+      return
+    }
     onSubmit(formData)
   }
 

@@ -44,7 +44,12 @@ export default function EsimsPage() {
       type: 'warning',
     })
     if (confirmed) {
-      await remove(id)
+      try {
+        await remove(id)
+      } catch (error) {
+        const { alert } = await import('@/lib/ui/alert-dialog')
+        await alert('刪除失敗，請稍後再試', 'error')
+      }
     }
   }
 

@@ -100,12 +100,16 @@ export function CustomerVerifyDialog({
   // OCR 再次辨識
   const handleReOcr = async () => {
     if (!customer?.passport_image_url) return
-    await recognizePassport(customer.passport_image_url, (result) => {
-      setFormData(prev => ({
-        ...prev,
-        ...result,
-      }))
-    })
+    try {
+      await recognizePassport(customer.passport_image_url, (result) => {
+        setFormData(prev => ({
+          ...prev,
+          ...result,
+        }))
+      })
+    } catch (error) {
+      toast.error('OCR 辨識失敗，請稍後再試')
+    }
   }
 
   // 儲存圖片變更

@@ -85,7 +85,12 @@ export default function QuoteDetailPage() {
   // 處理確認狀態變更
   const handleConfirmationStatusChange = React.useCallback(async (status: QuoteConfirmationStatus) => {
     if (!quote) return
-    await updateQuote(quote.id, { confirmation_status: status })
+    try {
+      await updateQuote(quote.id, { confirmation_status: status })
+    } catch (error) {
+      const { toast } = await import('sonner')
+      toast.error('更新狀態失敗，請稍後再試')
+    }
   }, [quote, updateQuote])
 
   // Sync operations hook

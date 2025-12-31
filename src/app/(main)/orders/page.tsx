@@ -13,6 +13,7 @@ import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
 import { cn } from '@/lib/utils'
 import type { Order, Member } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 export default function OrdersPage() {
   const router = useRouter()
@@ -147,33 +148,45 @@ export default function OrdersPage() {
     assistant: string
   }) => {
     const selectedTour = tours.find(t => t.id === orderData.tour_id)
-    if (!selectedTour || !currentWorkspace) return
+    if (!selectedTour) {
+      alert('請選擇旅遊團')
+      return
+    }
+    if (!currentWorkspace) {
+      alert('無法取得工作空間，請重新登入')
+      return
+    }
 
-    // 計算該團的訂單序號 (格式: {團號}-O{2位數})
-    const tourOrders = orders.filter(o => o.tour_id === orderData.tour_id)
-    const nextOrderNumber = tourOrders.length + 1
-    const orderNumber = `${selectedTour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
+    try {
+      // 計算該團的訂單序號 (格式: {團號}-O{2位數})
+      const tourOrders = orders.filter(o => o.tour_id === orderData.tour_id)
+      const nextOrderNumber = tourOrders.length + 1
+      const orderNumber = `${selectedTour.code}-O${nextOrderNumber.toString().padStart(2, '0')}`
 
-    await addOrder({
-      order_number: orderNumber,
-      tour_id: orderData.tour_id,
-      code: selectedTour.code,
-      tour_name: selectedTour.name,
-      contact_person: orderData.contact_person,
-      contact_phone: null,
-      sales_person: orderData.sales_person,
-      assistant: orderData.assistant,
-      member_count: 0,
-      total_amount: 0,
-      paid_amount: 0,
-      payment_status: 'unpaid',
-      remaining_amount: 0,
-      status: null,
-      notes: null,
-      customer_id: null,
-    } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
+      await addOrder({
+        order_number: orderNumber,
+        tour_id: orderData.tour_id,
+        code: selectedTour.code,
+        tour_name: selectedTour.name,
+        contact_person: orderData.contact_person,
+        contact_phone: null,
+        sales_person: orderData.sales_person,
+        assistant: orderData.assistant,
+        member_count: 0,
+        total_amount: 0,
+        paid_amount: 0,
+        payment_status: 'unpaid',
+        remaining_amount: 0,
+        status: null,
+        notes: null,
+        customer_id: null,
+      } as Omit<Order, 'id' | 'created_at' | 'updated_at'>)
 
-    setIsAddDialogOpen(false)
+      setIsAddDialogOpen(false)
+    } catch (error) {
+      logger.error('[Orders] 新增訂單失敗:', error)
+      alert(error instanceof Error ? error.message : '新增訂單失敗，請稍後再試')
+    }
   }
 
   return (

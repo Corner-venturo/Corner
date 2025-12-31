@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MapPin, Bus, Building2, ImageIcon } from 'lucide-react'
+import { MapPin, Bus, Building2, ImageIcon, Archive } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -42,6 +42,15 @@ const databaseModules = [
     icon: ImageIcon,
     href: '/database/company-assets',
     color: 'bg-morandi-gold',
+    count: 0,
+  },
+  {
+    id: 'archive-management',
+    title: '封存資料管理',
+    description: '管理已封存的旅遊團、行程表，可還原或永久刪除',
+    icon: Archive,
+    href: '/database/archive-management',
+    color: 'bg-morandi-red',
     count: 0,
   },
 ]

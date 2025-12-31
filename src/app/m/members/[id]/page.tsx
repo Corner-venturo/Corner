@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 interface MemberDetail {
   id: string
@@ -75,7 +76,7 @@ export default function MemberDetailPage() {
         .single()
 
       if (memberError || !memberData) {
-        console.error('Failed to load member:', memberError)
+        logger.error('Failed to load member:', memberError)
         setIsLoading(false)
         return
       }

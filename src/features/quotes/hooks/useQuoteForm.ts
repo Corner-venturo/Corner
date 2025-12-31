@@ -76,7 +76,10 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
   }
 
   const handleSubmit = async (): Promise<boolean> => {
-    if (!formData.name.trim()) return false
+    if (!formData.name.trim()) {
+      alert('請填寫報價單名稱')
+      return false
+    }
 
     // 確保人數有效
     const groupSize = typeof formData.group_size === 'number' ? formData.group_size : 1

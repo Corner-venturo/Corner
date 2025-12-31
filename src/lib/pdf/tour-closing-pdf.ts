@@ -103,7 +103,6 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (doc as any).lastAutoTable.finalY + 8
 
   // ========== 訂單收入明細 ==========
@@ -151,7 +150,6 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     },
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (doc as any).lastAutoTable.finalY + 8
 
   // ========== 支出/成本明細 ==========
@@ -201,7 +199,6 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (doc as any).lastAutoTable.finalY + 8
 
   // ========== 獎金明細 ==========
@@ -246,7 +243,6 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   yPos = (doc as any).lastAutoTable.finalY + 8
 
   // ========== 損益摘要 ==========

@@ -81,35 +81,53 @@ export default function AccountingPage() {
 
   // 快速記帳處理
   const handleQuickTransaction = useCallback(async () => {
-    if (!quickAmount || !quickCategory || !quickAccount) return
+    if (!quickAmount) {
+      toast.error('請輸入金額')
+      return
+    }
+    if (!quickCategory) {
+      toast.error('請選擇分類')
+      return
+    }
+    if (!quickAccount) {
+      toast.error('請選擇帳戶')
+      return
+    }
 
     const categoryData = categories.find(c => c.id === quickCategory)
     const accountData = accounts.find(a => a.id === quickAccount)
 
-    if (!categoryData || !accountData) return
-
-    const transactionData = {
-      account_id: quickAccount,
-      account_name: accountData.name,
-      category_id: quickCategory,
-      category_name: categoryData.name,
-      type: 'expense' as const,
-      amount: parseFloat(quickAmount),
-      currency: 'TWD',
-      description: '',
-      date: today,
+    if (!categoryData || !accountData) {
+      toast.error('找不到選擇的分類或帳戶')
+      return
     }
 
-    addTransaction(transactionData)
+    try {
+      const transactionData = {
+        account_id: quickAccount,
+        account_name: accountData.name,
+        category_id: quickCategory,
+        category_name: categoryData.name,
+        type: 'expense' as const,
+        amount: parseFloat(quickAmount),
+        currency: 'TWD',
+        description: '',
+        date: today,
+      }
 
-    // 清空表單並顯示成功提示
-    setQuickAmount('')
-    toast.success('記帳成功')
+      addTransaction(transactionData)
 
-    // 重新聚焦到金額輸入
-    setTimeout(() => {
-      amountInputRef.current?.focus()
-    }, 100)
+      // 清空表單並顯示成功提示
+      setQuickAmount('')
+      toast.success('記帳成功')
+
+      // 重新聚焦到金額輸入
+      setTimeout(() => {
+        amountInputRef.current?.focus()
+      }, 100)
+    } catch (error) {
+      toast.error('記帳失敗，請稍後再試')
+    }
   }, [quickAmount, quickCategory, quickAccount, categories, accounts, today, addTransaction])
 
   // 分類快速選擇

@@ -111,7 +111,10 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
   }
 
   const handleSubmit = async (): Promise<boolean> => {
-    if (!formData.customer_name.trim()) return false
+    if (!formData.customer_name.trim()) {
+      alert('請填寫客戶名稱')
+      return false
+    }
 
     // 確保有 workspace_id
     const finalWorkspaceId = user?.workspace_id || workspaceId

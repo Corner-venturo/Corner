@@ -42,28 +42,40 @@ export default function BoxManager() {
   const userBoxes = boxes.filter(b => b.user_id === userId)
 
   const handleSubmit = async () => {
-    if (!formData.name.trim() || !userId) return
-
-    if (editingBox) {
-      await updateBox(editingBox, {
-        name: formData.name,
-        type: formData.type,
-        color: formData.color,
-        default_duration: formData.default_duration,
-      })
-      setEditingBox(null)
-    } else {
-      await createBox({
-        name: formData.name,
-        type: formData.type,
-        color: formData.color,
-        default_duration: formData.default_duration,
-        user_id: userId,
-        default_content: null,
-      })
+    if (!formData.name.trim()) {
+      alert('請填寫名稱')
+      return
+    }
+    if (!userId) {
+      alert('請先登入')
+      return
     }
 
-    resetForm()
+    try {
+      if (editingBox) {
+        await updateBox(editingBox, {
+          name: formData.name,
+          type: formData.type,
+          color: formData.color,
+          default_duration: formData.default_duration,
+        })
+        setEditingBox(null)
+      } else {
+        await createBox({
+          name: formData.name,
+          type: formData.type,
+          color: formData.color,
+          default_duration: formData.default_duration,
+          user_id: userId,
+          default_content: null,
+        })
+      }
+
+      resetForm()
+    } catch (error) {
+      console.error('[BoxManager] 儲存失敗:', error)
+      alert(error instanceof Error ? error.message : '儲存失敗，請稍後再試')
+    }
   }
 
   const handleEdit = (box: TimeboxBox) => {
