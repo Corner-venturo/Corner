@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Archive, RotateCcw, Trash2, Plane, FileText, FileQuestion } from 'lucide-react'
+import { Archive, RotateCcw, Trash2, Plane, FileText, FileQuestion, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -45,11 +45,24 @@ interface OrphanedQuote {
   created_at: string | null
 }
 
+// 結案旅遊團
+interface ClosedTour {
+  id: string
+  code: string
+  name: string | null
+  location: string | null
+  departure_date: string | null
+  return_date: string | null
+  closing_date: string | null
+  closing_status: string | null
+}
+
 export default function ArchiveManagementPage() {
   const [activeTab, setActiveTab] = useState('orphaned-quotes')
   const [archivedTours, setArchivedTours] = useState<ArchivedTour[]>([])
   const [archivedItineraries, setArchivedItineraries] = useState<ArchivedItinerary[]>([])
   const [orphanedQuotes, setOrphanedQuotes] = useState<OrphanedQuote[]>([])
+  const [closedTours, setClosedTours] = useState<ClosedTour[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   // 載入封存資料
