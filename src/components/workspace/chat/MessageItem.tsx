@@ -56,7 +56,10 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
 
     try {
       await downloadFile(targetUrl, fileName)
-    } catch (error) {}
+    } catch (error) {
+      console.error('[MessageItem] 下載檔案失敗:', error)
+      void alert('下載失敗，請稍後再試', 'error')
+    }
   }
 
   return (

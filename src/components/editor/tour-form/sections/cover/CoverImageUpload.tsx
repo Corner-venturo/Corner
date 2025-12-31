@@ -1,7 +1,8 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { ImageUploader } from '@/components/ui/image-uploader'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
+import { logger } from '@/lib/utils/logger'
 
 interface CoverImageUploadProps {
   cityImages: Array<{ url: string; label: string }>
@@ -20,6 +21,33 @@ export function CoverImageUpload({
   position,
   onPositionChange,
 }: CoverImageUploadProps) {
+  // 用來追蹤是否剛上傳完成，避免 stale closure 問題
+  const justUploadedRef = useRef(false)
+
+  // 診斷：追蹤 selectedImage 變化
+  useEffect(() => {
+    logger.log('[CoverImageUpload] selectedImage 變化:', selectedImage)
+  }, [selectedImage])
+  // 每次渲染時記錄
+  logger.log('[CoverImageUpload] 渲染中，selectedImage =', selectedImage)
+
+  // 包裝 onPositionChange，在剛上傳完成時跳過（因為 handleImageUpload 已經處理了）
+  const handlePositionChange = useCallback((pos: ImagePositionSettings) => {
+    if (justUploadedRef.current) {
+      logger.log('[CoverImageUpload] 跳過位置重設（剛上傳完成）')
+      justUploadedRef.current = false
+      return
+    }
+    onPositionChange?.(pos)
+  }, [onPositionChange])
+
+  // 包裝 onImageUpload，設定標記
+  const handleImageUpload = useCallback((url: string) => {
+    logger.log('[CoverImageUpload] 設定 justUploadedRef = true')
+    justUploadedRef.current = true
+    onImageUpload(url)
+  }, [onImageUpload])
+
   return (
     <div className="space-y-3">
       <label className="block text-sm font-medium text-morandi-primary">封面圖片</label>
@@ -53,9 +81,12 @@ export function CoverImageUpload({
       {/* 上傳圖片（支援拖曳） */}
       <ImageUploader
         value={selectedImage}
-        onChange={onImageUpload}
+        onChange={(url) => {
+          logger.log('[CoverImageUpload] ImageUploader onChange 被呼叫:', url)
+          handleImageUpload(url)
+        }}
         position={position}
-        onPositionChange={onPositionChange}
+        onPositionChange={handlePositionChange}
         bucket="city-backgrounds"
         filePrefix="itinerary"
         previewHeight="112px"

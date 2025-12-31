@@ -83,8 +83,8 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       updated_at: now,
     } as Tour
 
-    // 樂觀更新
-    mutate(TOURS_KEY, [newTour, ...allTours], false)
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
+    mutate(TOURS_KEY, (currentTours: Tour[] | undefined) => [newTour, ...(currentTours || [])], false)
 
     try {
       // Type assertion needed due to Tour type vs Database Insert type mismatch
@@ -106,11 +106,11 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
       updated_at: new Date().toISOString(),
     }
 
-    // 樂觀更新
-    const optimisticTours = allTours.map(tour =>
-      tour.id === id ? { ...tour, ...updatedData } : tour
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
+    mutate(TOURS_KEY, (currentTours: Tour[] | undefined) =>
+      (currentTours || []).map(tour => tour.id === id ? { ...tour, ...updatedData } : tour),
+      false
     )
-    mutate(TOURS_KEY, optimisticTours, false)
 
     try {
       const { data, error } = await supabase
@@ -132,10 +132,10 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
 
   // 刪除
   const deleteTour = async (id: string): Promise<boolean> => {
-    // 樂觀更新
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
       TOURS_KEY,
-      allTours.filter(tour => tour.id !== id),
+      (currentTours: Tour[] | undefined) => (currentTours || []).filter(tour => tour.id !== id),
       false
     )
 

@@ -4,6 +4,7 @@ import { TourForm } from '@/components/editor/TourForm'
 import { Cloud, CloudOff } from 'lucide-react'
 import type { LocalTourData, AutoSaveStatus } from '../hooks/useItineraryEditor'
 import type { TierPricing } from '@/stores/types/quote.types'
+import { logger } from '@/lib/utils/logger'
 
 interface ItineraryEditorProps {
   tourData: LocalTourData
@@ -69,8 +70,9 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
           }}
           quoteTierPricings={quoteTierPricings}
           onChange={(newData) => {
+            logger.log('[ItineraryEditor] TourForm onChange 收到:', { coverImage: newData.coverImage })
             const { meetingPoints, countries, ...restData } = newData
-            onChange({
+            const updatedData = {
               ...restData,
               status: tourData.status,
               meetingInfo: meetingPoints?.[0] || { time: '', location: '' },
@@ -85,7 +87,9 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
               showNotices: newData.showNotices,
               cancellationPolicy: newData.cancellationPolicy ?? undefined,
               showCancellationPolicy: newData.showCancellationPolicy,
-            })
+            }
+            logger.log('[ItineraryEditor] 傳給 parent onChange:', { coverImage: updatedData.coverImage })
+            onChange(updatedData)
           }}
         />
       </div>

@@ -174,7 +174,15 @@ export function TourHotelsSectionArt({ data, viewMode }: TourHotelsSectionArtPro
         </motion.div>
 
         {/* 飯店卡片網格 */}
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'md:grid-cols-2 lg:grid-cols-3 gap-8'}`}>
+        <div className={`grid ${
+          isMobile
+            ? 'grid-cols-1 gap-8'
+            : hotels.length === 1
+              ? 'grid-cols-1 max-w-2xl mx-auto gap-8'
+              : hotels.length === 2
+                ? 'md:grid-cols-2 max-w-4xl mx-auto gap-8'
+                : 'md:grid-cols-2 lg:grid-cols-3 gap-8'
+        }`}>
           {hotels.map((hotel, index) => {
             const images = getHotelImages(hotel)
 

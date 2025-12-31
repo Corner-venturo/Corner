@@ -3,6 +3,7 @@
 import React, { useState, Suspense, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { logger } from '@/lib/utils/logger'
 import { PrintItineraryForm } from '@/features/itinerary/components/PrintItineraryForm'
 import { PrintItineraryPreview } from '@/features/itinerary/components/PrintItineraryPreview'
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
@@ -262,6 +263,7 @@ function NewItineraryPageContent() {
             isDirty={isDirty}
             quoteTierPricings={quoteTierPricings}
             onChange={(newData) => {
+              logger.log('[Page] ItineraryEditor onChange 收到:', { coverImage: newData.coverImage })
               setTourData(newData)
               setIsDirty(true)
             }}

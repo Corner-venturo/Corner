@@ -142,7 +142,7 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
           />
         </motion.div>
 
-        <div className={`grid ${getGridClass()} gap-8 mx-auto`}>
+        <div className={`grid ${getGridClass()} gap-8 mx-auto ${hotels.length === 1 ? 'justify-center' : ''}`}>
           {hotels.map((hotel, index) => {
             const images = getHotelImages(hotel)
 

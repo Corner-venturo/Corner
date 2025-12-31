@@ -104,8 +104,8 @@ export function useTodos() {
 
     logger.log('[useTodos] 新增待辦:', { title: newTodo.title, creator: newTodo.creator, workspace_id })
 
-    // 樂觀更新：先在 UI 顯示
-    mutate(TODOS_KEY, [...todos, newTodo], false)
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
+    mutate(TODOS_KEY, (currentTodos: Todo[] | undefined) => [...(currentTodos || []), newTodo], false)
 
     try {
        
@@ -130,10 +130,10 @@ export function useTodos() {
       updated_at: new Date().toISOString(),
     }
 
-    // 樂觀更新
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
       TODOS_KEY,
-      todos.map(t => (t.id === id ? { ...t, ...updatedTodo } : t)),
+      (currentTodos: Todo[] | undefined) => (currentTodos || []).map(t => (t.id === id ? { ...t, ...updatedTodo } : t)),
       false
     )
 
@@ -153,10 +153,10 @@ export function useTodos() {
 
   // 刪除待辦
   const remove = async (id: string) => {
-    // 樂觀更新
+    // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
       TODOS_KEY,
-      todos.filter(t => t.id !== id),
+      (currentTodos: Todo[] | undefined) => (currentTodos || []).filter(t => t.id !== id),
       false
     )
 

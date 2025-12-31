@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { TourFormData, CityOption } from '../types'
 import { Settings2 } from 'lucide-react'
+import { logger } from '@/lib/utils/logger'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { ImagePositionSettings } from '@/components/ui/image-position-editor'
@@ -67,8 +68,15 @@ export function CoverInfoSection({
 
   // 處理圖片上傳
   const handleImageUpload = (url: string) => {
+    logger.log('[CoverInfoSection] handleImageUpload 被呼叫:', { url, oldImage: data.coverImage })
     const oldImage = data.coverImage
-    updateField('coverImage', url)
+    // 同時更新 coverImage 和 coverImagePosition，避免 stale closure 問題
+    onChange({
+      ...data,
+      coverImage: url,
+      coverImagePosition: { x: 50, y: 50, scale: 1 },
+    })
+    logger.log('[CoverInfoSection] onChange 已呼叫，同時設定 coverImage 和 position')
     // 如果上傳了新圖片且有城市，詢問是否設為預設
     if (url && data.city && oldImage !== url) {
       setUploadedImageUrl(url)

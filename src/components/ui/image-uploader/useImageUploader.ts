@@ -52,8 +52,52 @@ export function useImageUploader({
     }
   }, [bucket, filePrefix, extractFileName])
 
+  // 將不支援的圖片格式轉換為 JPEG
+  const convertToJpeg = useCallback(async (file: File): Promise<File> => {
+    // 支援的格式直接返回
+    const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if (supportedTypes.includes(file.type)) {
+      return file
+    }
+
+    // 需要轉換的格式（如 AVIF, HEIC 等）
+    logger.log(`[ImageUploader] 轉換 ${file.type} 為 JPEG`)
+
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      img.onload = () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx?.drawImage(img, 0, 0)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const newFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                type: 'image/jpeg',
+              })
+              resolve(newFile)
+            } else {
+              reject(new Error('無法轉換圖片'))
+            }
+          },
+          'image/jpeg',
+          0.9
+        )
+      }
+
+      img.onerror = () => reject(new Error('無法讀取圖片'))
+      img.src = URL.createObjectURL(file)
+    })
+  }, [])
+
   // 上傳檔案
   const uploadFile = useCallback(async (file: File) => {
+    logger.log(`[ImageUploader] 開始處理檔案: ${file.name}, 類型: ${file.type}, 大小: ${file.size}`)
+
     // 檢查檔案大小
     if (file.size > maxSize) {
       void alert(`檔案太大！請選擇小於 ${Math.round(maxSize / 1024 / 1024)}MB 的圖片`, 'warning')
@@ -70,24 +114,36 @@ export function useImageUploader({
     const oldImageUrl = value
 
     try {
+      // 如果是不支援的格式，先轉換為 JPEG
+      logger.log(`[ImageUploader] 準備轉換圖片格式...`)
+      const fileToUpload = await convertToJpeg(file)
+      logger.log(`[ImageUploader] 轉換完成: ${fileToUpload.name}, 類型: ${fileToUpload.type}`)
+
       // 生成唯一檔名
       const timestamp = Date.now()
       const randomStr = Math.random().toString(36).substring(2, 8)
-      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileExt = fileToUpload.name.split('.').pop() || 'jpg'
       const fileName = `${filePrefix}_${timestamp}_${randomStr}.${fileExt}`
 
       // 上傳到 Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      logger.log(`[ImageUploader] 開始上傳到 bucket: ${bucket}, 檔名: ${fileName}`)
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(fileName, file, {
+        .upload(fileName, fileToUpload, {
           cacheControl: '3600',
           upsert: false,
         })
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        logger.error(`[ImageUploader] 上傳錯誤:`, uploadError)
+        void alert(`上傳失敗: ${uploadError.message}`, 'error')
+        throw uploadError
+      }
+      logger.log(`[ImageUploader] 上傳成功:`, uploadData)
 
       // 取得公開網址
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName)
+      logger.log(`[ImageUploader] 公開網址:`, urlData.publicUrl)
 
       // 刪除舊圖片
       if (oldImageUrl) {
@@ -95,19 +151,26 @@ export function useImageUploader({
       }
 
       // 更新
+      logger.log(`[ImageUploader] 呼叫 onChange 更新圖片...`)
       onChange(urlData.publicUrl)
 
       // 重置位置
       if (onPositionChange) {
         onPositionChange({ x: 50, y: 50, scale: 1 })
       }
+
+      logger.log(`[ImageUploader] 上傳流程完成！`)
     } catch (error) {
-      logger.error('上傳失敗:', error)
-      void alert('圖片上傳失敗，請稍後再試', 'error')
+      logger.error('[ImageUploader] 上傳失敗:', error)
+      if (error instanceof Error) {
+        void alert(`圖片上傳失敗: ${error.message}`, 'error')
+      } else {
+        void alert('圖片上傳失敗，請稍後再試', 'error')
+      }
     } finally {
       setUploading(false)
     }
-  }, [maxSize, bucket, filePrefix, value, onChange, onPositionChange, deleteStorageImage])
+  }, [maxSize, bucket, filePrefix, value, onChange, onPositionChange, deleteStorageImage, convertToJpeg])
 
   // 從 URL 下載並上傳圖片
   const fetchAndUploadImage = useCallback(async (imageUrl: string) => {

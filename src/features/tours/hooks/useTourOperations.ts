@@ -52,7 +52,17 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
   const handleAddTour = useCallback(
     async (newTour: NewTourData, newOrder: Partial<OrderFormData>, fromQuoteId?: string) => {
-      if (!newTour.name.trim() || !newTour.departure_date || !newTour.return_date) {
+      // 驗證必填欄位，並給用戶明確的錯誤提示
+      if (!newTour.name.trim()) {
+        setFormError('請填寫團名')
+        return
+      }
+      if (!newTour.departure_date) {
+        setFormError('請選擇出發日期')
+        return
+      }
+      if (!newTour.return_date) {
+        setFormError('請選擇回程日期')
         return
       }
 

@@ -6,7 +6,7 @@ import { TextStyle } from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
 import Underline from '@tiptap/extension-underline'
 import Highlight from '@tiptap/extension-highlight'
-import { useEffect, useCallback, useState, useRef } from 'react'
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, Palette, Highlighter } from 'lucide-react'
 
@@ -50,24 +50,31 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
   const [showHighlightPicker, setShowHighlightPicker] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Memoize extensions to prevent recreating on each render
+  const extensions = useMemo(() => [
+    StarterKit.configure({
+      // 保留 paragraph（必須），但禁用其他區塊類型
+      heading: false,
+      bulletList: false,
+      orderedList: false,
+      blockquote: false,
+      codeBlock: false,
+      horizontalRule: false,
+      hardBreak: singleLine ? false : undefined,
+    }),
+    TextStyle,
+    Color,
+    Underline.configure({
+      HTMLAttributes: {
+        class: 'underline',
+      },
+    }),
+    Highlight.configure({ multicolor: true }),
+  ], [singleLine])
+
   const editor = useEditor({
     immediatelyRender: false, // 避免 SSR hydration 問題
-    extensions: [
-      StarterKit.configure({
-        // 保留 paragraph（必須），但禁用其他區塊類型
-        heading: false,
-        bulletList: false,
-        orderedList: false,
-        blockquote: false,
-        codeBlock: false,
-        horizontalRule: false,
-        hardBreak: singleLine ? false : undefined,
-      }),
-      TextStyle,
-      Color,
-      Underline,
-      Highlight.configure({ multicolor: true }),
-    ],
+    extensions,
     content: value || '',
     editorProps: {
       attributes: {

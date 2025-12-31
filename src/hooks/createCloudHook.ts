@@ -211,8 +211,8 @@ export function createCloudHook<T extends BaseEntity>(
         ...(generatedCode ? { code: generatedCode } : {}),
       } as T
 
-      // 樂觀更新
-      mutate(SWR_KEY, [...items, newItem], false)
+      // 樂觀更新：使用 functional update 避免 stale closure 問題
+      mutate(SWR_KEY, (currentItems: T[] | undefined) => [...(currentItems || []), newItem], false)
 
       try {
         const { error } = await supabase.from(tableName).insert(newItem)
@@ -233,10 +233,10 @@ export function createCloudHook<T extends BaseEntity>(
         updated_at: new Date().toISOString(),
       }
 
-      // 樂觀更新
+      // 樂觀更新：使用 functional update 避免 stale closure 問題
       mutate(
         SWR_KEY,
-        items.map(item => (item.id === id ? { ...item, ...updatedData } : item)),
+        (currentItems: T[] | undefined) => (currentItems || []).map(item => (item.id === id ? { ...item, ...updatedData } : item)),
         false
       )
 
@@ -255,10 +255,10 @@ export function createCloudHook<T extends BaseEntity>(
 
     // 刪除
     const remove = async (id: string): Promise<void> => {
-      // 樂觀更新
+      // 樂觀更新：使用 functional update 避免 stale closure 問題
       mutate(
         SWR_KEY,
-        items.filter(item => item.id !== id),
+        (currentItems: T[] | undefined) => (currentItems || []).filter(item => item.id !== id),
         false
       )
 

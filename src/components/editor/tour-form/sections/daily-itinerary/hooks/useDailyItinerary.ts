@@ -97,7 +97,9 @@ export function useDailyItinerary({
 
     for (const attraction of attractions) {
       const day = data.dailyItinerary[currentDayIndex]
-      const newActivityIndex = day.activities.length
+      // 確保 activities 陣列存在（舊資料可能沒有這個欄位）
+      const activities = day?.activities || []
+      const newActivityIndex = activities.length
       addActivity(currentDayIndex)
       updateActivity(currentDayIndex, newActivityIndex, 'attraction_id', attraction.id)
       updateActivity(currentDayIndex, newActivityIndex, 'icon', '📍')

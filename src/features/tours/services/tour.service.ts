@@ -266,7 +266,10 @@ class TourService extends BaseService<Tour & BaseEntity> {
           }
         }
       }
-    } catch (_error) {}
+    } catch (error) {
+      // Supabase 查詢失敗，繼續嘗試本地 Store
+      console.warn('[TourService] getOrCreateVisaTour Supabase 查詢失敗，使用備用邏輯:', error)
+    }
 
     // 檢查本地 Store 是否有（未刪除的）
     const allTours = await this.list()
@@ -341,7 +344,10 @@ class TourService extends BaseService<Tour & BaseEntity> {
           }
         }
       }
-    } catch (_error) {}
+    } catch (error) {
+      // Supabase 查詢失敗，繼續嘗試本地 Store
+      console.warn('[TourService] getOrCreateEsimTour Supabase 查詢失敗，使用備用邏輯:', error)
+    }
 
     // 檢查本地 Store 是否有（未刪除的）
     const allTours = await this.list()

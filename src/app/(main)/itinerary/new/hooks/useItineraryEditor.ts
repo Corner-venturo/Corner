@@ -86,6 +86,7 @@ export function useItineraryEditor() {
   // 轉換資料格式（camelCase → snake_case）
   const convertDataForSave = useCallback(() => {
     const data = tourDataRef.current
+    logger.log('[ItineraryEditor] convertDataForSave - features:', data.features?.length || 0, data.features)
     return {
       tour_id: undefined,
       tagline: data.tagline,
@@ -136,9 +137,13 @@ export function useItineraryEditor() {
     setAutoSaveStatus('saving')
     try {
       const convertedData = convertDataForSave()
+      logger.log('[ItineraryEditor] 準備存檔 - features:', convertedData.features?.length || 0)
+      logger.log('[ItineraryEditor] 準備存檔 - daily_itinerary:', convertedData.daily_itinerary?.length || 0)
 
       if (currentItineraryId) {
+        logger.log('[ItineraryEditor] 更新行程:', currentItineraryId)
         await updateItinerary(currentItineraryId, convertedData)
+        logger.log('[ItineraryEditor] 更新完成')
       } else {
         if (!convertedData.title) {
           setAutoSaveStatus('idle')

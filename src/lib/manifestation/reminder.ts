@@ -32,7 +32,9 @@ const parseHistory = (raw: string | null): string[] => {
     if (Array.isArray(parsed)) {
       return parsed.filter(item => typeof item === 'string')
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error('[Manifestation] 解析歷史記錄失敗:', error)
+  }
   return []
 }
 
@@ -96,6 +98,7 @@ export const loadManifestationFromSupabase = async (
       history,
     }
   } catch (error) {
+    console.error('[Manifestation] 從 Supabase 載入失敗:', error)
     return null
   }
 }
@@ -125,6 +128,7 @@ export const saveManifestationToSupabase = async (
 
     return true
   } catch (error) {
+    console.error('[Manifestation] 保存到 Supabase 失敗:', error)
     return false
   }
 }

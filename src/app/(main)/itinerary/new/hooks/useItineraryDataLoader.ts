@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTourStore, useRegionsStore, useQuoteStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
+import { logger } from '@/lib/utils/logger'
 import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 import type { TierPricing } from '@/stores/types/quote.types'
@@ -56,7 +57,9 @@ export function useItineraryDataLoader({
       // 優先從 itineraries 載入（編輯現有行程）
       if (itineraryId && !tourId) {
         const itinerary = itineraries.find((i) => i.id === itineraryId)
+        logger.log('[ItineraryDataLoader] 尋找行程:', itineraryId, '找到:', !!itinerary)
         if (itinerary) {
+          logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
           setTourData({
             tagline: itinerary.tagline || 'Corner Travel 2025',
             title: itinerary.title || '',
@@ -96,7 +99,11 @@ export function useItineraryDataLoader({
               arrivalTime: '',
               duration: '',
             },
-            features: itinerary.features || [],
+            features: (() => {
+              const f = itinerary.features || []
+              logger.log('[ItineraryDataLoader] 載入 features:', Array.isArray(f) ? f.length : 'not array', f)
+              return f
+            })(),
             showFeatures: itinerary.show_features !== false,
             focusCards: itinerary.focus_cards || [],
             leader: itinerary.leader || {
@@ -112,7 +119,16 @@ export function useItineraryDataLoader({
             hotels: (itinerary.hotels as HotelInfo[]) || [],
             showHotels: itinerary.show_hotels || false,
             itinerarySubtitle: itinerary.itinerary_subtitle || '',
-            dailyItinerary: itinerary.daily_itinerary || [],
+            dailyItinerary: (itinerary.daily_itinerary || []).map((day) => {
+              const d = day as DailyItinerary
+              return {
+                ...d,
+                activities: Array.isArray(d.activities) ? d.activities : [],
+                recommendations: Array.isArray(d.recommendations) ? d.recommendations : [],
+                images: Array.isArray(d.images) ? d.images : [],
+                meals: d.meals || { breakfast: '', lunch: '', dinner: '' },
+              }
+            }),
             showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
             pricingDetails: itinerary.pricing_details || {
               show_pricing_details: false,

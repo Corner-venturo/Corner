@@ -12,7 +12,10 @@ export function useTourFormHandlers(
   const { cities } = useRegionsStore()
 
   const updateField = (field: string, value: unknown) => {
-    onChange({ ...data, [field]: value })
+    logger.log('[useTourFormHandlers] updateField:', { field, value, currentCoverImage: data.coverImage })
+    const newData = { ...data, [field]: value }
+    logger.log('[useTourFormHandlers] 呼叫 onChange 更新:', { field, newValue: newData[field as keyof typeof newData] })
+    onChange(newData)
   }
 
   // 更新城市時自動設定封面圖片（從 Supabase 取得）

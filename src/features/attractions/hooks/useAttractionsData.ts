@@ -55,16 +55,24 @@ export function useAttractionsData() {
     async (id: string, formData: AttractionFormData) => {
       try {
         logger.log('[Attractions] 更新景點:', id)
-        logger.log('[Attractions] formData:', formData)
-        logger.log('[Attractions] formData.images type:', typeof formData.images, formData.images)
 
-        // 轉換表單資料為 Attraction 格式
+        // 轉換表單資料為 Attraction 格式（只傳送資料庫需要的欄位）
         const attractionData: Partial<Attraction> = {
-          ...formData,
-          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-          images: formData.images ? formData.images.split(',').map(url => url.trim()).filter(Boolean) : [],
+          name: formData.name,
+          name_en: formData.name_en || undefined,
+          description: formData.description || undefined,
+          country_id: formData.country_id,
           region_id: formData.region_id || undefined,
           city_id: formData.city_id || undefined,
+          category: formData.category || '景點',
+          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          duration_minutes: formData.duration_minutes || 60,
+          address: formData.address || undefined,
+          phone: formData.phone || undefined,
+          website: formData.website || undefined,
+          images: formData.images ? formData.images.split(',').map(url => url.trim()).filter(Boolean) : [],
+          notes: formData.notes || undefined,
+          is_active: formData.is_active,
         }
 
         logger.log('[Attractions] attractionData:', attractionData)
@@ -72,9 +80,12 @@ export function useAttractionsData() {
         logger.log('[Attractions] 更新成功! 結果:', result)
         // 觸發重新載入以確保 UI 同步
         await store.fetchAll()
+        void alert('景點已更新', 'success')
         return { success: true }
       } catch (error) {
         logger.error('[Attractions] 更新失敗:', error)
+        const errorMessage = error instanceof Error ? error.message : '更新失敗，請稍後再試'
+        void alert(errorMessage, 'error')
         return { success: false, error }
       }
     },
