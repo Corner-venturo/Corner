@@ -18,6 +18,7 @@ import {
   RECEIPT_STATUS_LABELS,
   ReceiptType,
 } from '@/types/receipt.types'
+import { loadChineseFonts } from './pdf-fonts'
 
 interface ReceiptPDFData {
   receipt: Receipt
@@ -37,20 +38,20 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
     format: 'a4',
   })
 
-  // 設定字體
-  doc.setFont('helvetica')
+  // 載入中文字體
+  await loadChineseFonts(doc)
 
   let yPos = 20
 
   // ========== 標題 ==========
   doc.setFontSize(18)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Receipt / 收款單', 105, yPos, { align: 'center' })
   yPos += 15
 
   // ========== 基本資訊 ==========
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('ChironHeiHK', 'normal')
 
   const infoLeft = 20
   const infoRight = 110
@@ -68,12 +69,12 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   // 訂單資訊
   if (order) {
     doc.setFontSize(11)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('ChironHeiHK', 'bold')
     doc.text('Order Information / 訂單資訊', infoLeft, yPos)
     yPos += 6
 
     doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('ChironHeiHK', 'normal')
     doc.text(`Order No. / 訂單編號: ${order.order_number || '-'}`, infoLeft, yPos)
     yPos += 6
     doc.text(`Contact Person / 聯絡人: ${order.contact_person || '-'}`, infoLeft, yPos)
@@ -84,7 +85,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
 
   // ========== 收款明細 ==========
   doc.setFontSize(12)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Payment Details / 收款明細', infoLeft, yPos)
   yPos += 8
 
@@ -191,7 +192,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   // 繪製收款方式詳細資訊表格
   if (paymentDetailsData.length > 0) {
     doc.setFontSize(11)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('ChironHeiHK', 'bold')
     doc.text('Payment Method Details / 收款方式詳細資訊', infoLeft, yPos)
     yPos += 6
 
@@ -219,12 +220,12 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   // ========== 備註 ==========
   if (receipt.note) {
     doc.setFontSize(11)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('ChironHeiHK', 'bold')
     doc.text('Note / 備註', infoLeft, yPos)
     yPos += 6
 
     doc.setFontSize(9)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('ChironHeiHK', 'normal')
     const noteLines = doc.splitTextToSize(receipt.note, 170)
     doc.text(noteLines, infoLeft, yPos)
     yPos += noteLines.length * 5
@@ -235,7 +236,7 @@ export async function generateReceiptPDF(data: ReceiptPDFData): Promise<void> {
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setFontSize(8)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('ChironHeiHK', 'normal')
     doc.setTextColor(150)
     doc.text(
       `Generated on ${formatDate(new Date().toISOString())} - Page ${i} of ${pageCount}`,

@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Check, FileText } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Check, FileText, Plus, X, Trash2 } from 'lucide-react'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
 import { cn } from '@/lib/utils'
@@ -43,10 +44,13 @@ export function DisbursementDetailDialog({
 }: DisbursementDetailDialogProps) {
   // Stores
   const { items: payment_requests, update: updatePaymentRequest } = usePaymentRequestStore()
-  const { update: updateDisbursement } = useDisbursementOrderStore()
+  const { update: updateDisbursement, fetchAll: fetchDisbursementOrders } = useDisbursementOrderStore()
 
   // 列印對話框狀態
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  // 追加請款單模式
+  const [isAddingMode, setIsAddingMode] = useState(false)
+  const [selectedToAdd, setSelectedToAdd] = useState<string[]>([])
 
   // 取得此出納單包含的請款單
   const includedRequests = useMemo(() => {
@@ -56,9 +60,98 @@ export function DisbursementDetailDialog({
       .filter(Boolean) as PaymentRequest[]
   }, [order, payment_requests])
 
+  // 取得可追加的待處理請款單（pending 狀態且不在此出納單中）
+  const availableRequests = useMemo(() => {
+    if (!order?.payment_request_ids) return []
+    return payment_requests.filter(
+      r => r.status === 'pending' && !order.payment_request_ids.includes(r.id)
+    )
+  }, [order, payment_requests])
+
   if (!order) return null
 
   const status = DISBURSEMENT_STATUS[order.status as keyof typeof DISBURSEMENT_STATUS] || DISBURSEMENT_STATUS.pending
+
+  // 追加請款單
+  const handleAddRequests = async () => {
+    if (selectedToAdd.length === 0) {
+      await alert('請選擇要追加的請款單', 'warning')
+      return
+    }
+
+    try {
+      // 計算新的請款單 ID 陣列和金額
+      const newRequestIds = [...order.payment_request_ids, ...selectedToAdd]
+      const addedAmount = selectedToAdd.reduce((sum, id) => {
+        const req = payment_requests.find(r => r.id === id)
+        return sum + (req?.amount || 0)
+      }, 0)
+      const newAmount = (order.amount || 0) + addedAmount
+
+      // 更新出納單
+      await updateDisbursement(order.id, {
+        payment_request_ids: newRequestIds,
+        amount: newAmount,
+      })
+
+      // 更新追加的請款單狀態為 approved
+      for (const id of selectedToAdd) {
+        await updatePaymentRequest(id, { status: 'approved' })
+      }
+
+      // 重新載入
+      await fetchDisbursementOrders()
+
+      await alert(`已追加 ${selectedToAdd.length} 筆請款單`, 'success')
+      setIsAddingMode(false)
+      setSelectedToAdd([])
+    } catch (error) {
+      logger.error('追加請款單失敗:', error)
+      await alert('追加請款單失敗', 'error')
+    }
+  }
+
+  // 切換選擇追加的請款單
+  const toggleSelectToAdd = (id: string) => {
+    setSelectedToAdd(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  // 從出納單移除單筆請款單
+  const handleRemoveRequest = async (requestId: string) => {
+    const request = includedRequests.find(r => r.id === requestId)
+    if (!request) return
+
+    const confirmed = await confirm(`確定要從此出納單移除「${request.code}」嗎？`, {
+      title: '移除請款單',
+      type: 'warning',
+    })
+    if (!confirmed) return
+
+    try {
+      // 計算新的請款單 ID 陣列和金額
+      const newRequestIds = order.payment_request_ids.filter(id => id !== requestId)
+      const newAmount = (order.amount || 0) - (request.amount || 0)
+
+      // 更新出納單
+      await updateDisbursement(order.id, {
+        payment_request_ids: newRequestIds,
+        amount: newAmount,
+      })
+
+      // 將請款單狀態改回 pending
+      await updatePaymentRequest(requestId, { status: 'pending' })
+
+      // 重新載入
+      await fetchDisbursementOrders()
+
+      await alert('已移除請款單', 'success')
+    } catch (error) {
+      logger.error('移除請款單失敗:', error)
+      await alert('移除請款單失敗', 'error')
+    }
+  }
 
   // 確認出帳
   const handleConfirmPaid = async () => {
@@ -131,9 +224,22 @@ export function DisbursementDetailDialog({
 
           {/* 包含的請款單 */}
           <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">
-              包含請款單 ({includedRequests.length} 筆)
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-morandi-primary">
+                包含請款單 ({includedRequests.length} 筆)
+              </h3>
+              {order.status === 'pending' && !isAddingMode && availableRequests.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsAddingMode(true)}
+                  className="text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+                >
+                  <Plus size={14} className="mr-1" />
+                  追加請款單
+                </Button>
+              )}
+            </div>
 
             <div className="border border-morandi-container/20 rounded-lg overflow-hidden">
               <table className="w-full text-sm">
@@ -144,12 +250,15 @@ export function DisbursementDetailDialog({
                     <th className="text-left py-2 px-3 text-morandi-muted font-medium">團名</th>
                     <th className="text-left py-2 px-3 text-morandi-muted font-medium">請款人</th>
                     <th className="text-right py-2 px-3 text-morandi-muted font-medium">金額</th>
+                    {order.status === 'pending' && (
+                      <th className="text-center py-2 px-3 text-morandi-muted font-medium w-16">操作</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {includedRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-8 text-morandi-muted">
+                      <td colSpan={order.status === 'pending' ? 6 : 5} className="text-center py-8 text-morandi-muted">
                         無請款單資料
                       </td>
                     </tr>
@@ -165,13 +274,25 @@ export function DisbursementDetailDialog({
                         <td className="py-2 px-3 text-right font-medium text-morandi-gold">
                           NT$ {(request.amount || 0).toLocaleString()}
                         </td>
+                        {order.status === 'pending' && (
+                          <td className="py-2 px-3 text-center">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 text-morandi-red hover:bg-morandi-red/10"
+                              onClick={() => handleRemoveRequest(request.id)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
                 </tbody>
                 <tfoot>
                   <tr className="bg-morandi-background/50">
-                    <td colSpan={4} className="py-3 px-3 text-right font-semibold">
+                    <td colSpan={order.status === 'pending' ? 5 : 4} className="py-3 px-3 text-right font-semibold">
                       合計
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-morandi-gold">
@@ -182,6 +303,90 @@ export function DisbursementDetailDialog({
               </table>
             </div>
           </div>
+
+          {/* 追加請款單區塊 */}
+          {isAddingMode && (
+            <div className="border border-morandi-gold/30 rounded-lg p-4 bg-morandi-gold/5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-morandi-primary">
+                  選擇要追加的請款單 ({availableRequests.length} 筆可選)
+                </h3>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setIsAddingMode(false)
+                    setSelectedToAdd([])
+                  }}
+                >
+                  <X size={14} className="mr-1" />
+                  取消
+                </Button>
+              </div>
+
+              {availableRequests.length === 0 ? (
+                <p className="text-sm text-morandi-muted text-center py-4">
+                  目前沒有待處理的請款單可追加
+                </p>
+              ) : (
+                <>
+                  <div className="max-h-48 overflow-y-auto border border-morandi-container/20 rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead className="sticky top-0 bg-morandi-background">
+                        <tr className="border-b border-morandi-container/20">
+                          <th className="w-10 py-2 px-2"></th>
+                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">請款單號</th>
+                          <th className="text-left py-2 px-2 text-morandi-muted font-medium">團號</th>
+                          <th className="text-right py-2 px-2 text-morandi-muted font-medium">金額</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {availableRequests.map(request => (
+                          <tr
+                            key={request.id}
+                            className="border-b border-morandi-container/10 hover:bg-morandi-gold/10 cursor-pointer"
+                            onClick={() => toggleSelectToAdd(request.id)}
+                          >
+                            <td className="py-2 px-2 text-center">
+                              <Checkbox
+                                checked={selectedToAdd.includes(request.id)}
+                                onCheckedChange={() => toggleSelectToAdd(request.id)}
+                              />
+                            </td>
+                            <td className="py-2 px-2 font-medium text-morandi-primary">{request.code}</td>
+                            <td className="py-2 px-2 text-morandi-secondary">{request.tour_code || '-'}</td>
+                            <td className="py-2 px-2 text-right text-morandi-gold">
+                              NT$ {(request.amount || 0).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3">
+                    <p className="text-sm text-morandi-secondary">
+                      已選擇 {selectedToAdd.length} 筆，金額：
+                      <span className="font-semibold text-morandi-gold ml-1">
+                        NT$ {selectedToAdd.reduce((sum, id) => {
+                          const req = payment_requests.find(r => r.id === id)
+                          return sum + (req?.amount || 0)
+                        }, 0).toLocaleString()}
+                      </span>
+                    </p>
+                    <Button
+                      onClick={handleAddRequests}
+                      disabled={selectedToAdd.length === 0}
+                      className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                    >
+                      <Plus size={14} className="mr-1" />
+                      追加 {selectedToAdd.length} 筆
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* 操作按鈕 */}
           <div className="flex items-center justify-between pt-4 border-t border-morandi-container/20">
@@ -195,7 +400,7 @@ export function DisbursementDetailDialog({
             </Button>
 
             <div className="flex gap-2">
-              {order.status === 'pending' && (
+              {order.status === 'pending' && !isAddingMode && (
                 <Button
                   onClick={handleConfirmPaid}
                   className="bg-morandi-green hover:bg-morandi-green/90 text-white"

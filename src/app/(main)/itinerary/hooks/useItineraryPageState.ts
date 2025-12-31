@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import type { Itinerary } from '@/stores/types'
 
 /**
  * Hook for managing itinerary page state
  * Includes: filters, search, dialogs, and password state
+ *
+ * Note: Returns stable setter references to prevent infinite re-render loops.
+ * DO NOT wrap return in useMemo - it causes object recreation on every state change.
  */
 export function useItineraryPageState() {
   // Filter states
@@ -28,8 +31,27 @@ export function useItineraryPageState() {
   const [duplicateTitle, setDuplicateTitle] = useState('')
   const [isDuplicating, setIsDuplicating] = useState(false)
 
-  // Memoize the return object to prevent unnecessary re-renders
-  return useMemo(() => ({
+  // Use refs to store latest values for stable callbacks
+  const duplicateSourceRef = useRef(duplicateSource)
+  duplicateSourceRef.current = duplicateSource
+  const duplicateTourCodeRef = useRef(duplicateTourCode)
+  duplicateTourCodeRef.current = duplicateTourCode
+  const duplicateTitleRef = useRef(duplicateTitle)
+  duplicateTitleRef.current = duplicateTitle
+  const passwordInputRef = useRef(passwordInput)
+  passwordInputRef.current = passwordInput
+  const pendingEditIdRef = useRef(pendingEditId)
+  pendingEditIdRef.current = pendingEditId
+
+  // Stable getter functions for values that change frequently
+  const getDuplicateSource = useCallback(() => duplicateSourceRef.current, [])
+  const getDuplicateTourCode = useCallback(() => duplicateTourCodeRef.current, [])
+  const getDuplicateTitle = useCallback(() => duplicateTitleRef.current, [])
+  const getPasswordInput = useCallback(() => passwordInputRef.current, [])
+  const getPendingEditId = useCallback(() => pendingEditIdRef.current, [])
+
+  // Return object directly - useState setters are already stable
+  return {
     // Filter states
     statusFilter,
     setStatusFilter,
@@ -46,33 +68,25 @@ export function useItineraryPageState() {
     isDuplicateDialogOpen,
     setIsDuplicateDialogOpen,
 
-    // Password state
+    // Password state - use getters for callbacks, direct values for rendering
     passwordInput,
     setPasswordInput,
+    getPasswordInput,
     pendingEditId,
     setPendingEditId,
+    getPendingEditId,
 
-    // Duplicate state
+    // Duplicate state - use getters for callbacks, direct values for rendering
     duplicateSource,
     setDuplicateSource,
+    getDuplicateSource,
     duplicateTourCode,
     setDuplicateTourCode,
+    getDuplicateTourCode,
     duplicateTitle,
     setDuplicateTitle,
+    getDuplicateTitle,
     isDuplicating,
     setIsDuplicating,
-  }), [
-    statusFilter,
-    authorFilter,
-    searchTerm,
-    isTypeSelectOpen,
-    isPasswordDialogOpen,
-    isDuplicateDialogOpen,
-    passwordInput,
-    pendingEditId,
-    duplicateSource,
-    duplicateTourCode,
-    duplicateTitle,
-    isDuplicating,
-  ])
+  }
 }

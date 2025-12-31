@@ -33,6 +33,7 @@ import {
   FolderTree,
   ClipboardList,
   MessageCircle,
+  Archive,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -86,6 +87,7 @@ const menuItems: MenuItem[] = [
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
       { href: '/database/tour-leaders', label: '領隊資料', icon: Users, requiredPermission: 'database' },
       { href: '/database/company-assets', label: '公司資源管理', icon: ImageIcon, requiredPermission: 'database' },
+      { href: '/database/archive-management', label: '封存管理', icon: Archive, requiredPermission: 'database' },
     ],
   },
   { href: '/hr', label: '人資管理', icon: UserCog, requiredPermission: 'hr' },

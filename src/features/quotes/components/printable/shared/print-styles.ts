@@ -5,7 +5,7 @@
 export const PRINT_STYLES = `
   @media print {
     *, *::before, *::after {
-      box-sizing: border-box;
+      box-sizing: border-box !important;
     }
 
     html, body {
@@ -13,11 +13,13 @@ export const PRINT_STYLES = `
       padding: 0 !important;
       background: white !important;
       width: 100% !important;
+      overflow: hidden !important;
     }
 
+    /* A4 頁面設定 - 增加右側 margin 防止出血 */
     @page {
       size: A4;
-      margin: 10mm;
+      margin: 10mm 12mm 10mm 10mm; /* 上 右 下 左 - 右側多留 2mm */
     }
 
     /* 防止表格行被切斷 */
@@ -26,9 +28,15 @@ export const PRINT_STYLES = `
     }
 
     /* 使用 table 的 thead/tfoot 來實作固定頁首頁尾 */
-    table.print-wrapper {
-      width: 100%;
+    /* 強制覆蓋 hidden class，確保列印時表格顯示 */
+    table.print-wrapper,
+    table.print-wrapper.hidden {
+      display: table !important;
+      visibility: visible !important;
+      width: 100% !important;
+      max-width: 100% !important;
       border-collapse: collapse;
+      table-layout: fixed !important;
     }
 
     table.print-wrapper thead {
@@ -41,12 +49,6 @@ export const PRINT_STYLES = `
 
     table.print-wrapper tbody {
       display: table-row-group;
-    }
-
-    /* A4 頁面設定 */
-    @page {
-      size: A4;
-      margin: 8mm;
     }
 
     /* 防止表格內容被切斷 */
@@ -62,12 +64,52 @@ export const PRINT_STYLES = `
     /* 確保表格不超出列印區域 */
     table {
       max-width: 100% !important;
-      table-layout: fixed;
+      width: 100% !important;
+      table-layout: fixed !important;
     }
 
     td, th {
       word-break: break-word;
       overflow-wrap: break-word;
+      overflow: hidden !important;
+    }
+
+    /* 防止任何元素超出頁面 - 快速報價單 & 團體報價單 */
+    #printable-quote,
+    #printable-quotation {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+    }
+
+    /* 確保內容區塊不超出 */
+    #printable-quote > table.print-wrapper > tbody > tr > td,
+    #printable-quotation > table.print-wrapper > tbody > tr > td {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+    }
+
+    /* 內層表格確保不超出 */
+    #printable-quote table:not(.print-wrapper),
+    #printable-quotation table:not(.print-wrapper) {
+      width: 100% !important;
+      max-width: 100% !important;
+      table-layout: fixed !important;
+    }
+
+    /* 確保 print:hidden 的元素在列印時隱藏 */
+    .print\\:hidden {
+      display: none !important;
+    }
+
+    /* 確保所有列印內容可見 */
+    #printable-quote *,
+    #printable-quotation * {
+      visibility: visible !important;
+      color-adjust: exact !important;
+      -webkit-print-color-adjust: exact !important;
     }
   }
 `

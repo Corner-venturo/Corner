@@ -1,12 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Archive, RotateCcw, Trash2, Plane, FileText, AlertTriangle } from 'lucide-react'
+import { Archive, RotateCcw, Trash2, Plane, FileText, FileQuestion } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -36,10 +34,22 @@ interface ArchivedItinerary {
   status: string | null
 }
 
+// 未關聯旅遊團的報價單
+interface OrphanedQuote {
+  id: string
+  code: string | null
+  name: string | null
+  customer_name: string | null
+  total_amount: number | null
+  status: string | null
+  created_at: string | null
+}
+
 export default function ArchiveManagementPage() {
-  const [activeTab, setActiveTab] = useState('tours')
+  const [activeTab, setActiveTab] = useState('orphaned-quotes')
   const [archivedTours, setArchivedTours] = useState<ArchivedTour[]>([])
   const [archivedItineraries, setArchivedItineraries] = useState<ArchivedItinerary[]>([])
+  const [orphanedQuotes, setOrphanedQuotes] = useState<OrphanedQuote[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   // 載入封存資料
@@ -65,6 +75,16 @@ export default function ArchiveManagementPage() {
 
       if (itinerariesError) throw itinerariesError
       setArchivedItineraries(itineraries || [])
+
+      // 載入未關聯旅遊團的報價單
+      const { data: orphaned, error: orphanedError } = await supabase
+        .from('quotes')
+        .select('id, code, name, customer_name, total_amount, status, created_at')
+        .is('tour_id', null)
+        .order('created_at', { ascending: false })
+
+      if (orphanedError) throw orphanedError
+      setOrphanedQuotes(orphaned || [])
     } catch (error) {
       logger.error('載入封存資料失敗:', error)
       toast.error('載入封存資料失敗')
@@ -188,6 +208,32 @@ export default function ArchiveManagementPage() {
     }
   }
 
+  // 刪除未關聯的報價單
+  const handleDeleteOrphanedQuote = async (quote: OrphanedQuote) => {
+    const confirmed = await confirm(
+      `確定要刪除報價單「${quote.code}」嗎？\n\n此報價單未關聯任何旅遊團，刪除後無法復原。`,
+      {
+        title: '刪除報價單',
+        type: 'warning',
+      }
+    )
+    if (!confirmed) return
+
+    try {
+      const { error } = await supabase
+        .from('quotes')
+        .delete()
+        .eq('id', quote.id)
+
+      if (error) throw error
+      toast.success(`已刪除報價單 ${quote.code}`)
+      loadArchivedData()
+    } catch (error) {
+      logger.error('刪除失敗:', error)
+      toast.error('刪除失敗，請稍後再試')
+    }
+  }
+
   // 旅遊團表格欄位
   const tourColumns = [
     {
@@ -237,6 +283,62 @@ export default function ArchiveManagementPage() {
               icon: Trash2,
               label: '永久刪除',
               onClick: () => handleDeleteTour(row),
+              variant: 'danger',
+            },
+          ]}
+        />
+      ),
+    },
+  ]
+
+  // 未關聯報價單表格欄位
+  const orphanedQuotesColumns = [
+    {
+      key: 'code',
+      label: '報價單號',
+      width: '140px',
+      render: (_: unknown, row: OrphanedQuote) => (
+        <span className="font-medium text-morandi-primary">{row.code}</span>
+      ),
+    },
+    {
+      key: 'customer_name',
+      label: '客戶名稱',
+      render: (_: unknown, row: OrphanedQuote) => (
+        <span className="text-morandi-secondary">{row.customer_name || row.name || '-'}</span>
+      ),
+    },
+    {
+      key: 'total_amount',
+      label: '金額',
+      width: '120px',
+      render: (_: unknown, row: OrphanedQuote) => (
+        <span className="text-sm text-morandi-secondary">
+          {row.total_amount ? `NT$ ${row.total_amount.toLocaleString()}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      label: '建立時間',
+      width: '120px',
+      render: (_: unknown, row: OrphanedQuote) => (
+        <span className="text-sm text-morandi-secondary">
+          {row.created_at ? formatDate(row.created_at) : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: '',
+      width: '80px',
+      render: (_: unknown, row: OrphanedQuote) => (
+        <ActionCell
+          actions={[
+            {
+              icon: Trash2,
+              label: '刪除',
+              onClick: () => handleDeleteOrphanedQuote(row),
               variant: 'danger',
             },
           ]}
@@ -306,88 +408,81 @@ export default function ArchiveManagementPage() {
     },
   ]
 
+  // 標籤頁定義
+  const STATUS_TABS = [
+    { value: 'orphaned-quotes', label: `未關聯報價單 (${orphanedQuotes.length})`, icon: FileQuestion },
+    { value: 'tours', label: `封存旅遊團 (${archivedTours.length})`, icon: Plane },
+    { value: 'itineraries', label: `封存行程表 (${archivedItineraries.length})`, icon: FileText },
+  ]
+
   return (
     <div className="h-full flex flex-col">
       <ResponsiveHeader
-        title="封存資料管理"
+        title="封存管理"
         icon={Archive}
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '資料庫管理', href: '/database' },
-          { label: '封存資料管理', href: '/database/archive-management' },
+          { label: '封存管理', href: '/database/archive-management' },
         ]}
+        tabs={STATUS_TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
-      {/* 警告提示 */}
-      <div className="mx-4 mb-4 p-4 bg-morandi-red/10 border border-morandi-red/30 rounded-lg flex items-start gap-3">
-        <AlertTriangle className="h-5 w-5 text-morandi-red flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-medium text-morandi-red">注意事項</p>
-          <p className="text-sm text-morandi-secondary mt-1">
-            永久刪除的資料無法復原。刪除旅遊團時，相關的訂單、請款單等資料也會一併刪除。建議定期清理超過一年以上的封存資料。
-          </p>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden px-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="mb-4">
-            <TabsTrigger value="tours" className="gap-2">
-              <Plane className="h-4 w-4" />
-              旅遊團
-              {archivedTours.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs bg-morandi-red/20 text-morandi-red rounded-full">
-                  {archivedTours.length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="itineraries" className="gap-2">
-              <FileText className="h-4 w-4" />
-              行程表
-              {archivedItineraries.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs bg-morandi-red/20 text-morandi-red rounded-full">
-                  {archivedItineraries.length}
-                </span>
-              )}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="tours" className="flex-1 overflow-hidden mt-0">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
-              </div>
-            ) : archivedTours.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                <Archive className="h-12 w-12 mb-4 opacity-30" />
-                <p>沒有封存的旅遊團</p>
-              </div>
-            ) : (
-              <EnhancedTable
-                columns={tourColumns}
-                data={archivedTours}
-              />
+      <div className="flex-1 overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
+          </div>
+        ) : (
+          <>
+            {/* 未關聯報價單 */}
+            {activeTab === 'orphaned-quotes' && (
+              orphanedQuotes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                  <FileQuestion className="h-12 w-12 mb-4 opacity-30" />
+                  <p>沒有未關聯旅遊團的報價單</p>
+                </div>
+              ) : (
+                <EnhancedTable
+                  columns={orphanedQuotesColumns}
+                  data={orphanedQuotes}
+                />
+              )
             )}
-          </TabsContent>
 
-          <TabsContent value="itineraries" className="flex-1 overflow-hidden mt-0">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morandi-gold" />
-              </div>
-            ) : archivedItineraries.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
-                <Archive className="h-12 w-12 mb-4 opacity-30" />
-                <p>沒有封存的行程表</p>
-              </div>
-            ) : (
-              <EnhancedTable
-                columns={itineraryColumns}
-                data={archivedItineraries}
-              />
+            {/* 封存旅遊團 */}
+            {activeTab === 'tours' && (
+              archivedTours.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                  <Archive className="h-12 w-12 mb-4 opacity-30" />
+                  <p>沒有封存的旅遊團</p>
+                </div>
+              ) : (
+                <EnhancedTable
+                  columns={tourColumns}
+                  data={archivedTours}
+                />
+              )
             )}
-          </TabsContent>
-        </Tabs>
+
+            {/* 封存行程表 */}
+            {activeTab === 'itineraries' && (
+              archivedItineraries.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+                  <Archive className="h-12 w-12 mb-4 opacity-30" />
+                  <p>沒有封存的行程表</p>
+                </div>
+              ) : (
+                <EnhancedTable
+                  columns={itineraryColumns}
+                  data={archivedItineraries}
+                />
+              )
+            )}
+          </>
+        )}
       </div>
     </div>
   )

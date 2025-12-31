@@ -181,8 +181,21 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   // 判斷是否可以編輯（只有待處理狀態可以編輯）
   const canEdit = request.status === 'pending'
 
+  // 是否正在編輯中（新增或編輯項目）
+  const isEditing = isAddingItem || editingItemId !== null
+
+  // 處理關閉對話框（編輯中時阻止關閉）
+  const handleOpenChange = async (newOpen: boolean) => {
+    if (!newOpen && isEditing) {
+      // 正在編輯中，提示用戶
+      await alert('請先儲存或取消目前的編輯', 'warning')
+      return
+    }
+    onOpenChange(newOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">

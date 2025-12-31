@@ -14,6 +14,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { Tour, PaymentRequest } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
+import { loadChineseFonts } from './pdf-fonts'
 
 // 簡化的訂單介面（只需要報表需要的欄位）
 interface OrderForReport {
@@ -62,22 +63,25 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     format: 'a4',
   })
 
+  // 載入中文字體
+  await loadChineseFonts(doc)
+
   const pageWidth = doc.internal.pageSize.getWidth()
   let yPos = 15
 
   // ========== 標題區 ==========
   doc.setFontSize(18)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Tour Closing Report', pageWidth / 2, yPos, { align: 'center' })
   yPos += 6
   doc.setFontSize(12)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('ChironHeiHK', 'normal')
   doc.text(tour.code, pageWidth / 2, yPos, { align: 'center' })
   yPos += 10
 
   // ========== 團體資訊區 ==========
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Tour Information', 15, yPos)
   yPos += 2
 
@@ -90,7 +94,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     ],
     theme: 'plain',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 9,
       cellPadding: 2,
     },
@@ -107,7 +111,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
   // ========== 訂單收入明細 ==========
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Revenue Details', 15, yPos)
   yPos += 2
 
@@ -128,7 +132,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     body: orderRows,
     theme: 'striped',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 9,
       cellPadding: 2,
     },
@@ -154,7 +158,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
   // ========== 支出/成本明細 ==========
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Cost Details', 15, yPos)
   yPos += 2
 
@@ -183,7 +187,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     body: costRows,
     theme: 'striped',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 9,
       cellPadding: 2,
     },
@@ -203,7 +207,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
   // ========== 獎金明細 ==========
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Bonus Details', 15, yPos)
   yPos += 2
 
@@ -226,7 +230,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     body: bonusRows,
     theme: 'striped',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 9,
       cellPadding: 2,
     },
@@ -247,7 +251,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
 
   // ========== 損益摘要 ==========
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text('Profit Summary', 15, yPos)
   yPos += 2
 
@@ -262,7 +266,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     ],
     theme: 'plain',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 10,
       cellPadding: 3,
     },
@@ -287,7 +291,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setFontSize(8)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('ChironHeiHK', 'normal')
     doc.setTextColor(150)
 
     const pageHeight = doc.internal.pageSize.getHeight()

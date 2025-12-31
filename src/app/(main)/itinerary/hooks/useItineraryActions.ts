@@ -19,9 +19,7 @@ interface UseItineraryActionsProps {
   userId?: string
   userName?: string
   pageState: {
-    duplicateSource: Itinerary | null
-    duplicateTourCode: string
-    duplicateTitle: string
+    // Setters (stable references)
     setDuplicateSource: (source: Itinerary | null) => void
     setDuplicateTourCode: (code: string) => void
     setDuplicateTitle: (title: string) => void
@@ -30,8 +28,12 @@ interface UseItineraryActionsProps {
     setPendingEditId: (id: string | null) => void
     setPasswordInput: (input: string) => void
     setIsPasswordDialogOpen: (open: boolean) => void
-    passwordInput: string
-    pendingEditId: string | null
+    // Stable getter functions (for use in callbacks)
+    getDuplicateSource: () => Itinerary | null
+    getDuplicateTourCode: () => string
+    getDuplicateTitle: () => string
+    getPasswordInput: () => string
+    getPendingEditId: () => string | null
   }
 }
 
@@ -56,10 +58,14 @@ export function useItineraryActions({
     pageState.setIsDuplicateDialogOpen(true)
   }, [pageState])
 
-  // 執行複製行程
+  // 執行複製行程 - 使用 getter 函數避免 stale closure
   const handleDuplicateSubmit = useCallback(async () => {
-    if (!pageState.duplicateSource) return
-    if (!pageState.duplicateTourCode.trim() || !pageState.duplicateTitle.trim()) {
+    const duplicateSource = pageState.getDuplicateSource()
+    const duplicateTourCode = pageState.getDuplicateTourCode()
+    const duplicateTitle = pageState.getDuplicateTitle()
+
+    if (!duplicateSource) return
+    if (!duplicateTourCode.trim() || !duplicateTitle.trim()) {
       await alertError('請填寫行程編號和行程名稱')
       return
     }
@@ -78,12 +84,12 @@ export function useItineraryActions({
         closed_at: _closedAt,
         archived_at: _archivedAt,
         ...restData
-      } = pageState.duplicateSource
+      } = duplicateSource
 
       const newItinerary = {
         ...restData,
-        tour_code: pageState.duplicateTourCode.trim(),
-        title: pageState.duplicateTitle.trim(),
+        tour_code: duplicateTourCode.trim(),
+        title: duplicateTitle.trim(),
         status: '提案' as const,
         created_by: userId,
       }
@@ -112,7 +118,7 @@ export function useItineraryActions({
           total_cost: quote.total_cost,
           notes: quote.notes,
           is_active: quote.is_active,
-          tour_code: pageState.duplicateTourCode.trim(),
+          tour_code: duplicateTourCode.trim(),
           created_by: userId,
           created_by_name: userName || undefined,
           converted_to_tour: false,
@@ -294,12 +300,15 @@ export function useItineraryActions({
     [router, pageState]
   )
 
-  // 密碼驗證
+  // 密碼驗證 - 使用 getter 函數避免 stale closure
   const handlePasswordSubmit = useCallback(() => {
-    if (pageState.passwordInput === COMPANY_PASSWORD) {
+    const passwordInput = pageState.getPasswordInput()
+    const pendingEditId = pageState.getPendingEditId()
+
+    if (passwordInput === COMPANY_PASSWORD) {
       pageState.setIsPasswordDialogOpen(false)
-      if (pageState.pendingEditId) {
-        router.push(`/itinerary/new?itinerary_id=${pageState.pendingEditId}`)
+      if (pendingEditId) {
+        router.push(`/itinerary/new?itinerary_id=${pendingEditId}`)
       }
     } else {
       alertError('密碼錯誤！')

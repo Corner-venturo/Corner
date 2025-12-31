@@ -21,13 +21,13 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
         </h3>
       </div>
 
-      <table className="w-full mb-6 text-sm" style={{ ...TABLE_STYLES, tableLayout: 'fixed' }}>
+      <table className="w-full mb-6 text-sm" style={{ ...TABLE_STYLES, tableLayout: 'fixed', maxWidth: '100%' }}>
         <thead>
           <tr style={{ backgroundColor: MORANDI_COLORS.lightBrown }}>
             <th
-              className="px-3 py-2 text-left"
+              className="px-2 py-2 text-left"
               style={{
-                width: '32%',
+                width: '30%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,
                 fontWeight: 600,
@@ -36,7 +36,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               摘要
             </th>
             <th
-              className="px-3 py-2 text-center"
+              className="px-2 py-2 text-center"
               style={{
                 width: '10%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
@@ -48,9 +48,9 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               數量
             </th>
             <th
-              className="px-3 py-2 text-center"
+              className="px-2 py-2 text-center"
               style={{
-                width: '15%',
+                width: '14%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,
@@ -60,9 +60,9 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               單價
             </th>
             <th
-              className="px-3 py-2 text-center"
+              className="px-2 py-2 text-center"
               style={{
-                width: '15%',
+                width: '14%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,
@@ -72,9 +72,9 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({ item
               金額
             </th>
             <th
-              className="px-3 py-2 text-left"
+              className="px-2 py-2 text-left"
               style={{
-                width: '23%',
+                width: '22%',
                 borderBottom: `1px solid ${MORANDI_COLORS.border}`,
                 borderLeft: `1px solid ${MORANDI_COLORS.border}`,
                 color: MORANDI_COLORS.brown,

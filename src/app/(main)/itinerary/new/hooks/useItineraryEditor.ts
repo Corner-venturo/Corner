@@ -170,14 +170,20 @@ export function useItineraryEditor() {
     }
   }, [isDirty, currentItineraryId, convertDataForSave, updateItinerary, createItinerary, user?.id])
 
-  // 30 秒自動存檔
+  // 保持 performAutoSave 的最新引用
+  const performAutoSaveRef = useRef(performAutoSave)
+  useEffect(() => {
+    performAutoSaveRef.current = performAutoSave
+  }, [performAutoSave])
+
+  // 30 秒自動存檔 - 只依賴 isDirty，避免 tourData/performAutoSave 變化觸發無限迴圈
   useEffect(() => {
     if (isDirty) {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current)
       }
       autoSaveTimerRef.current = setTimeout(() => {
-        performAutoSave()
+        performAutoSaveRef.current()
       }, 30000)
     }
 
@@ -186,13 +192,19 @@ export function useItineraryEditor() {
         clearTimeout(autoSaveTimerRef.current)
       }
     }
-  }, [isDirty, tourData, performAutoSave])
+  }, [isDirty])
 
-  // 離開頁面前存檔
+  // 保持 isDirty 的最新引用（用於 beforeunload）
+  const isDirtyRef = useRef(isDirty)
+  useEffect(() => {
+    isDirtyRef.current = isDirty
+  }, [isDirty])
+
+  // 離開頁面前存檔 - 使用 ref 避免頻繁重新綁定事件
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        performAutoSave()
+      if (isDirtyRef.current) {
+        performAutoSaveRef.current()
         e.preventDefault()
         e.returnValue = '您有未儲存的變更，確定要離開嗎？'
         return e.returnValue
@@ -201,7 +213,7 @@ export function useItineraryEditor() {
 
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [isDirty, performAutoSave])
+  }, [])
 
   // 版本切換處理
   const handleVersionChange = useCallback((index: number, versionData?: ItineraryVersionRecord) => {

@@ -80,6 +80,7 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
       record_locator: parsedData.recordLocator,
       workspace_id: currentWorkspace.id,
       employee_id: user.id,
+      tour_id: null,
       raw_pnr: rawPNR,
       passenger_names: parsedData.passengerNames,
       ticketing_deadline: parsedData.ticketingDeadline?.toISOString() ?? null,

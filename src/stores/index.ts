@@ -148,21 +148,21 @@ export const useMemberStore = createStore<Member>({
 /**
  * 報價項目 Store
  * 無獨立編號，依附於報價單
- * 🔒 啟用 Workspace 隔離
+ * ⚠️ 無 workspace_id 欄位，RLS 已禁用
  */
 export const useQuoteItemStore = createStore<import('@/types/quote.types').QuoteItem>({
   tableName: 'quote_items',
-  workspaceScoped: true,
+  workspaceScoped: false,
 })
 
 /**
  * 團體加購項目 Store
  * 無獨立編號，依附於旅遊團
- * 🔒 啟用 Workspace 隔離
+ * ⚠️ 無 workspace_id 欄位，RLS 已禁用
  */
 export const useTourAddOnStore = createStore<import('./types').TourAddOn>({
   tableName: 'tour_addons',
-  workspaceScoped: true,
+  workspaceScoped: false,
 })
 
 // ============================================

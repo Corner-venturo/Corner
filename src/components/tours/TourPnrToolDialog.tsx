@@ -272,25 +272,57 @@ export function TourPnrToolDialog({
         status: 'active',
         tour_id: tourId,
         created_by: user.id || null,
-      } as Omit<PNR, 'id' | 'created_at' | 'updated_at'> & { tour_id: string })
+      } as Omit<PNR, 'id' | 'created_at' | 'updated_at'>)
 
       // 2. 更新團員的 PNR 欄位
       const { supabase } = await import('@/lib/supabase/client')
       const recordLocator = parsedPNR.recordLocator || ''
+      let updateCount = 0
+      const errors: string[] = []
+
+      // 計算有多少配對成功的團員
+      const matchedMembers = passengerMatches.filter(m => m.memberId)
+      toast.info(`開始更新 ${matchedMembers.length} 位團員的 PNR: ${recordLocator}`)
 
       for (const match of passengerMatches) {
         if (match.memberId) {
-          await supabase
+          const updateData: Record<string, unknown> = {
+            pnr: recordLocator,
+          }
+
+          // 只有有值時才更新
+          if (match.ticketPrice !== null) {
+            updateData.flight_cost = match.ticketPrice
+          }
+
+          // 更新餐食（如果有）
+          if (match.meal.length > 0) {
+            updateData.special_meal = match.meal.join(', ')
+          }
+
+          const { data, error } = await supabase
             .from('order_members')
-            .update({
-              pnr: recordLocator,
-              flight_cost: match.ticketPrice,
-            })
+            .update(updateData)
             .eq('id', match.memberId)
+            .select('id, pnr, special_meal, flight_cost')
+
+          if (error) {
+            errors.push(`${match.pnrName}: ${error.message}`)
+          } else if (data && data.length > 0) {
+            updateCount++
+            // 顯示更新後的值確認
+            toast.info(`${match.pnrName} 已更新: pnr=${data[0].pnr}`)
+          } else {
+            errors.push(`${match.pnrName}: 找不到該團員(${match.memberId})`)
+          }
         }
       }
 
-      toast.success(`PNR ${recordLocator} 已儲存並關聯到 ${tourCode}`)
+      if (errors.length > 0) {
+        toast.error(`更新失敗: ${errors.join(', ')}`)
+      }
+
+      toast.success(`PNR ${recordLocator} 已儲存，更新 ${updateCount} 位團員`)
       onSuccess?.()
       onClose()
     } catch (err) {

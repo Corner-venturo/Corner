@@ -9,6 +9,7 @@ export interface PNR {
   record_locator: string; // Amadeus 6位訂位代號
   workspace_id: string;
   employee_id: string | null;
+  tour_id: string | null; // 關聯的團號
 
   // 電報原始內容
   raw_pnr: string;
@@ -57,6 +58,7 @@ export interface CreatePNRInput {
   record_locator: string;
   workspace_id: string;
   employee_id?: string;
+  tour_id?: string | null;
   raw_pnr: string;
   passenger_names: string[];
   ticketing_deadline?: Date | null;

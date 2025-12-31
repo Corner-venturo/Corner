@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Users, Plus, Printer, Hotel, Bus, Plane, Coins, Link2 } from 'lucide-react'
+import { Users, Plus, Printer, Hotel, Bus, Plane, Coins } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -36,7 +36,6 @@ import {
   CustomerMatchDialog,
   CustomCostFieldsSection,
   MemberTableHeader,
-  PnrMatchDialog,
 } from './components'
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
 import type { EditFormData } from './components/member-edit/hooks/useMemberEdit'
@@ -68,7 +67,17 @@ export function OrderMembersExpandable({
   const [isComposing, setIsComposing] = useState(false)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
-  const [showPnrMatchDialog, setShowPnrMatchDialog] = useState(false)
+
+  // 從 members 資料初始化 pnrValues
+  React.useEffect(() => {
+    const initialPnrValues: Record<string, string> = {}
+    membersData.members.forEach(m => {
+      if (m.pnr) {
+        initialPnrValues[m.id] = m.pnr
+      }
+    })
+    setPnrValues(initialPnrValues)
+  }, [membersData.members])
 
   // Handlers
   const handleUpdateField = useCallback(async (memberId: string, field: keyof OrderMember, value: string | number | null) => {
@@ -136,16 +145,6 @@ export function OrderMembersExpandable({
               </Button>
               <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrColumn(!showPnrColumn)}>
                 <Plane size={14} className={showPnrColumn ? 'text-morandi-gold' : ''} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 px-2"
-                onClick={() => setShowPnrMatchDialog(true)}
-                title="PNR 配對"
-              >
-                <Link2 size={14} className="mr-1" />
-                PNR配對
               </Button>
             </>
           )}
@@ -299,17 +298,6 @@ export function OrderMembersExpandable({
           roomVehicle.setShowVehicleManager(open)
           if (!open) roomVehicle.loadVehicleAssignments()
         }}
-      />
-      <PnrMatchDialog
-        isOpen={showPnrMatchDialog}
-        onClose={() => setShowPnrMatchDialog(false)}
-        members={membersData.members.map(m => ({
-          id: m.id,
-          chinese_name: m.chinese_name ?? null,
-          passport_name: m.passport_name ?? null,
-          pnr: m.pnr ?? null,
-        }))}
-        onSuccess={membersData.loadMembers}
       />
     </div>
   )

@@ -5106,6 +5106,7 @@ export type Database = {
           remarks: string | null
           selling_price: number | null
           special_meal: string | null
+          ticket_number: string | null
           total_payable: number | null
           transport_cost: number | null
           updated_by: string | null
@@ -5146,6 +5147,7 @@ export type Database = {
           remarks?: string | null
           selling_price?: number | null
           special_meal?: string | null
+          ticket_number?: string | null
           total_payable?: number | null
           transport_cost?: number | null
           updated_by?: string | null
@@ -5186,6 +5188,7 @@ export type Database = {
           remarks?: string | null
           selling_price?: number | null
           special_meal?: string | null
+          ticket_number?: string | null
           total_payable?: number | null
           transport_cost?: number | null
           updated_by?: string | null
@@ -6508,6 +6511,7 @@ export type Database = {
           special_requests: string[] | null
           status: string | null
           ticketing_deadline: string | null
+          tour_id: string | null
           updated_at: string | null
           updated_by: string | null
           workspace_id: string
@@ -6527,6 +6531,7 @@ export type Database = {
           special_requests?: string[] | null
           status?: string | null
           ticketing_deadline?: string | null
+          tour_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id: string
@@ -6546,6 +6551,7 @@ export type Database = {
           special_requests?: string[] | null
           status?: string | null
           ticketing_deadline?: string | null
+          tour_id?: string | null
           updated_at?: string | null
           updated_by?: string | null
           workspace_id?: string

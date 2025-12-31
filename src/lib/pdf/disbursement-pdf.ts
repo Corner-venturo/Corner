@@ -13,6 +13,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { DisbursementOrder, PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { formatDate } from '@/lib/utils'
+import { loadChineseFonts } from './pdf-fonts'
 
 interface DisbursementPDFData {
   order: DisbursementOrder
@@ -124,16 +125,16 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
     format: [208, 295],
   })
 
-  // 設定字體
-  doc.setFont('helvetica')
+  // 載入中文字體
+  await loadChineseFonts(doc)
 
   // ========== 標題區 ==========
   doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('ChironHeiHK', 'bold')
   doc.text(`出納單號 ${order.order_number || '-'}`, 15, 15)
 
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('ChironHeiHK', 'normal')
   doc.text(`出帳日期: ${order.disbursement_date ? formatDate(order.disbursement_date) : '-'}`, 15, 22)
 
   // ========== 準備表格資料 ==========
@@ -174,7 +175,7 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
     foot: [['TOTAL', '', '', '', '', '', (order.amount || 0).toLocaleString()]],
     theme: 'grid',
     styles: {
-      font: 'helvetica',
+      font: 'ChironHeiHK',
       fontSize: 9,
       cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
       lineWidth: 0.1,
@@ -215,7 +216,7 @@ export async function generateDisbursementPDF(data: DisbursementPDFData): Promis
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setFontSize(8)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('ChironHeiHK', 'normal')
     doc.setTextColor(150)
 
     const pageHeight = doc.internal.pageSize.getHeight()

@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { generateId } from '@/lib/data/create-data-store'
 
 // 計算下一個週四
 function getNextThursday(): Date {
@@ -148,12 +149,15 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
       const { data, error } = await dynamicFrom('disbursement_orders')
         .insert({
-          id: crypto.randomUUID(),
+          id: generateId(),
           code: orderNumber,
+          order_number: orderNumber,
+          disbursement_date: disbursementDate,
+          payment_request_ids: selectedRequestIds,
           amount: selectedAmount,
           status: 'pending',
-          created_by: user?.id || null,
           workspace_id: user?.workspace_id || null,
+          created_by: user?.id || null,
         })
         .select()
         .single()

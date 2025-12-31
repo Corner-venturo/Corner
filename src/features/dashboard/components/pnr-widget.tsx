@@ -135,6 +135,7 @@ export function PNRWidget() {
         record_locator: parsedPNR.recordLocator || 'UNKNWN',
         workspace_id: user.workspace_id,
         employee_id: user.id || null,
+        tour_id: null,
         raw_pnr: rawPNR,
         passenger_names: parsedPNR.passengerNames,
         ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
