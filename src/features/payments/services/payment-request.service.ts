@@ -5,6 +5,7 @@ import { ValidationError } from '@/core/errors/app-errors'
 import { generateId } from '@/lib/data/create-data-store'
 import { generateVoucherFromPaymentRequest } from '@/services/voucher-auto-generator'
 import { logger } from '@/lib/utils/logger'
+import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 
 class PaymentRequestService extends BaseService<PaymentRequest> {
   protected resourceName = 'payment_requests'
@@ -80,6 +81,10 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     const itemIndex = existingItems.length + 1
     const itemNumber = `${request.code}-${itemIndex}`
 
+    // 確保有 workspace_id（RLS 必須）
+    // 優先使用 request.workspace_id，但如果不存在則從 auth context 取得
+    const workspaceId = request.workspace_id || getRequiredWorkspaceId()
+
     // 資料庫欄位是 unitprice（無底線），轉換欄位名稱
     const item = {
       request_id: requestId,
@@ -93,7 +98,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       subtotal: itemData.unit_price * itemData.quantity,
       note: itemData.note,
       sort_order: itemData.sort_order,
-      workspace_id: request.workspace_id, // RLS 需要
+      workspace_id: workspaceId, // RLS 需要
     }
 
     // 使用 itemStore 新增項目
