@@ -23,8 +23,7 @@ import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
-import { LinkQuoteToTourDialog } from './LinkQuoteToTourDialog'
-import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
+import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
@@ -297,7 +296,7 @@ export const ToursPage: React.FC = () => {
       />
 
       {quoteDialogTour && (
-        <LinkQuoteToTourDialog
+        <DocumentVersionPicker
           isOpen={!!quoteDialogTour}
           onClose={closeQuoteDialog}
           tour={quoteDialogTour}
@@ -305,7 +304,7 @@ export const ToursPage: React.FC = () => {
       )}
 
       {itineraryDialogTour && (
-        <LinkItineraryToTourDialog
+        <ItineraryVersionPicker
           isOpen={!!itineraryDialogTour}
           onClose={closeItineraryDialog}
           tour={itineraryDialogTour}
