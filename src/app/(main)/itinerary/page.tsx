@@ -55,7 +55,8 @@ export default function ItineraryPage() {
 
   useEffect(() => {
     regionsStore.fetchAll()
-  }, [regionsStore])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Custom hooks
   const pageState = useItineraryPageState()
