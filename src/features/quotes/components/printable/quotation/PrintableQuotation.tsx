@@ -95,6 +95,12 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
       <style>
         {`
           @media print {
+            /* 隱藏頁面其他元素 */
+            body > *:not(#printable-quotation-overlay) {
+              display: none !important;
+            }
+
+            /* 重置 overlay 容器 */
             #printable-quotation-overlay {
               position: static !important;
               inset: auto !important;
@@ -106,17 +112,34 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
               z-index: 1 !important;
             }
 
-            body > *:not(#printable-quotation-overlay) {
+            /* 重置內部容器 */
+            #printable-quotation-overlay > div {
+              max-width: 100% !important;
+              max-height: none !important;
+              overflow: visible !important;
+              border-radius: 0 !important;
+              box-shadow: none !important;
+            }
+
+            /* 隱藏螢幕版本 */
+            #printable-quotation-overlay .print\\:hidden,
+            #printable-quotation .print\\:hidden {
               display: none !important;
             }
 
-            #printable-quotation-overlay .print\\:hidden {
-              display: none !important;
-            }
-
-            /* 顯示列印版本的 table（覆蓋 hidden class） */
-            table.print-wrapper {
+            /* 強制顯示列印版本的 table */
+            #printable-quotation table.print-wrapper,
+            table.print-wrapper,
+            table.print-wrapper.hidden {
               display: table !important;
+              visibility: visible !important;
+              width: 100% !important;
+            }
+
+            /* 確保 table 內容可見 */
+            #printable-quotation table.print-wrapper *,
+            table.print-wrapper * {
+              visibility: visible !important;
             }
 
             table.print-wrapper tbody > tr {
@@ -125,6 +148,12 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
 
             table.print-wrapper tbody > tr > td {
               vertical-align: top;
+            }
+
+            /* 內容區域重置 */
+            #printable-quotation {
+              padding: 0 !important;
+              width: 100% !important;
             }
           }
         `}
