@@ -1,6 +1,6 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2025-12-29 (SITEMAP 規範強化 + 工具模組)
+> **最後更新**: 2025-12-31 (Stale Closure 防範規範)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
@@ -283,6 +283,75 @@ import { Plus, Save, Check, X, Trash2, Edit2, Printer } from 'lucide-react'
 | 上傳 | `Upload` | `lucide-react` |
 | 搜尋 | `Search` | `lucide-react` |
 | 重設 | `RotateCcw` | `lucide-react` |
+
+---
+
+## 🔒 安全修改規範 - Stale Closure 防範 (2025-12-31 新增)
+
+> **背景**: 多次修復發現的共同問題模式 - React 閉包陷阱導致資料更新失敗
+
+### 問題說明
+
+**Stale Closure（過時閉包）** 是 React 中最常見的 bug 來源之一：
+
+```typescript
+// ❌ 危險模式：callback 中使用外部狀態變數
+const handleSave = useCallback(() => {
+  // data 可能是過時的！
+  updateField('image', url)
+  updateField('position', { x: 50, y: 50 })  // 這裡的 data 可能已經過時
+}, [updateField])  // 缺少 data 依賴，或 data 更新後 callback 未重建
+
+// ❌ 危險模式：SWR mutate 使用過時陣列
+mutate(KEY, [...items, newItem], false)  // items 可能是 stale 的！
+```
+
+### ✅ 正確做法
+
+```typescript
+// ✅ 方案 1：合併多個狀態更新為一次
+const handleSave = useCallback(() => {
+  // 一次性更新多個欄位，避免連續調用導致 stale
+  onChange({
+    ...data,
+    image: url,
+    position: { x: 50, y: 50 },
+  })
+}, [data, onChange])
+
+// ✅ 方案 2：SWR 使用 functional update
+mutate(KEY, (currentItems) => [...(currentItems || []), newItem], false)
+
+// ✅ 方案 3：React setState 使用 functional update
+setItems(prev => [...prev, newItem])
+```
+
+### 必須檢查的情境
+
+| 情境 | 檢查項目 |
+|------|---------|
+| **SWR mutate 樂觀更新** | 必須使用 `(current) => ...` 函式形式 |
+| **連續多次 setState** | 考慮合併為單次更新 |
+| **useCallback 中使用外部狀態** | 確認依賴陣列完整 |
+| **事件處理器中讀取狀態** | 使用 `useRef` 或 functional update |
+| **異步操作後更新狀態** | 確認使用最新值而非閉包捕獲的舊值 |
+
+### 已修復的案例（供參考）
+
+1. **封面圖片上傳** (`CoverInfoSection.tsx`)
+   - 問題：連續設定 `coverImage` 和 `coverImagePosition` 導致第二次覆蓋第一次
+   - 修復：合併為單次 `onChange` 調用
+
+2. **待辦事項 CRUD** (`useTodos.ts`, `createCloudHook.ts`)
+   - 問題：`mutate(KEY, [...items, newItem])` 使用過時的 items
+   - 修復：改用 `mutate(KEY, (current) => [...current, newItem])`
+
+### 開發時自問
+
+- [ ] 這個 callback 內使用的變數，在執行時是最新的嗎？
+- [ ] 連續呼叫多次 setState/update，會不會互相覆蓋？
+- [ ] 異步操作完成後，使用的狀態是當時的還是最新的？
+- [ ] useCallback/useMemo 的依賴陣列是否完整？
 
 ---
 

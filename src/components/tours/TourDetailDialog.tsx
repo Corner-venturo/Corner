@@ -21,6 +21,7 @@ import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/Crea
 import { MessageSquare, FileText, X, Printer, Loader2, Plane } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
+import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
 import { Input } from '@/components/ui/input'
 import { Dialog as EntryCardDialog, DialogContent as EntryCardDialogContent, DialogHeader as EntryCardDialogHeader, DialogTitle as EntryCardDialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
@@ -68,6 +69,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [showDepartureDialog, setShowDepartureDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showPnrToolDialog, setShowPnrToolDialog] = useState(false)
+  const [showQuotePicker, setShowQuotePicker] = useState(false)
+  const [showItineraryPicker, setShowItineraryPicker] = useState(false)
 
   // 入境卡列印
   const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
@@ -214,7 +217,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         return (
           <div className="space-y-6">
             {/* 基本資訊 */}
-            <TourOverview tour={tour} onEdit={() => setShowEditDialog(true)} />
+            <TourOverview
+              tour={tour}
+              onEdit={() => setShowEditDialog(true)}
+              onManageQuote={() => setShowQuotePicker(true)}
+              onManageItinerary={() => setShowItineraryPicker(true)}
+            />
 
             {/* 收款紀錄 */}
             <TourPayments
@@ -398,6 +406,20 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               onClose={() => setShowEditDialog(false)}
               tour={tour}
               onSuccess={handleSuccess}
+            />
+
+            {/* 報價單版本選擇器 */}
+            <DocumentVersionPicker
+              isOpen={showQuotePicker}
+              onClose={() => setShowQuotePicker(false)}
+              tour={tour}
+            />
+
+            {/* 行程表版本選擇器 */}
+            <ItineraryVersionPicker
+              isOpen={showItineraryPicker}
+              onClose={() => setShowItineraryPicker(false)}
+              tour={tour}
             />
 
             {/* PNR 電報工具 */}
