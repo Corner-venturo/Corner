@@ -175,7 +175,7 @@ export function PaymentItemRow({
             value={item.amount || ''}
             onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
             placeholder="0"
-            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm text-right placeholder:text-morandi-muted"
+            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm placeholder:text-morandi-muted"
           />
         </td>
 
