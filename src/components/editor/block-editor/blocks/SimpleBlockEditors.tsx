@@ -184,7 +184,7 @@ export function PricingBlockEditor({ data, onChange }: PricingBlockEditorProps) 
   const pricing = data.pricingDetails || { included_items: [], excluded_items: [], notes: [] }
 
   return (
-    <div className="text-sm text-morandi-secondary">
+    <div className="text-sm text-morandi-primary">
       <div className="space-y-2">
         <div>費用包含：{pricing.included_items?.length || 0} 項</div>
         <div>費用不含：{pricing.excluded_items?.length || 0} 項</div>

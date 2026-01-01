@@ -97,7 +97,7 @@ export function DayCard({
               建議方案
             </span>
           )}
-          <span className="text-sm text-morandi-secondary">
+          <span className="text-sm text-morandi-primary">
             {day.title || '尚未設定行程標題'}
           </span>
         </div>
@@ -134,7 +134,7 @@ export function DayCard({
                 onChange={e => updateDailyItinerary(dayIndex, 'isAlternative', e.target.checked)}
                 className="h-4 w-4 text-morandi-gold focus:ring-morandi-gold border-morandi-container rounded"
               />
-              <span className="text-sm text-morandi-secondary">建議方案</span>
+              <span className="text-sm text-morandi-primary">建議方案</span>
             </label>
           )}
           {dayIndex === data.dailyItinerary.length - 1 && (

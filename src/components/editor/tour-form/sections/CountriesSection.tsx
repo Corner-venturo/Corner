@@ -152,7 +152,7 @@ export function CountriesSection({
     <div className="space-y-4">
       <div className="border-b-2 border-[#B8A99A] pb-2">
         <h2 className="text-lg font-bold text-morandi-primary">🌍 旅遊國家/地區</h2>
-        <p className="text-xs text-morandi-secondary mt-1">
+        <p className="text-xs text-morandi-primary mt-1">
           設定此行程會前往的國家，方便後續選擇景點
         </p>
       </div>

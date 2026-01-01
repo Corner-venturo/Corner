@@ -44,7 +44,7 @@ export function AccommodationSection({
               }
             }}
           />
-          <span className="text-sm text-morandi-secondary">
+          <span className="text-sm text-morandi-primary">
             續住
             {data.dailyItinerary[dayIndex - 1]?.accommodation && (
               <span className="text-morandi-gold ml-1">
