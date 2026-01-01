@@ -25,6 +25,13 @@ interface PaymentItemRowProps {
   onRemove: (id: string) => void
   canRemove: boolean
   isNewRow?: boolean
+  /** 訂單資訊，用於 LinkPay 預設值 */
+  orderInfo?: {
+    order_number?: string
+    tour_name?: string
+    contact_person?: string
+    contact_email?: string
+  }
 }
 
 export function PaymentItemRow({
@@ -34,9 +41,39 @@ export function PaymentItemRow({
   onRemove,
   canRemove,
   isNewRow = false,
+  orderInfo,
 }: PaymentItemRowProps) {
   const receiptTypeLabel =
     RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label || '現金'
+
+  // 當收款方式變更為 LinkPay 時，自動帶入預設值
+  const handleReceiptTypeChange = (newType: ReceiptType) => {
+    const updates: Partial<PaymentItem> = { receipt_type: newType }
+
+    // 如果切換到 LinkPay，自動帶入預設值
+    if (newType === RECEIPT_TYPES.LINK_PAY) {
+      // 預設付款截止日為 7 天後
+      if (!item.pay_dateline) {
+        const deadline = new Date()
+        deadline.setDate(deadline.getDate() + 7)
+        updates.pay_dateline = deadline.toISOString().split('T')[0]
+      }
+      // 預設 Email 從訂單聯絡人
+      if (!item.email && orderInfo?.contact_email) {
+        updates.email = orderInfo.contact_email
+      }
+      // 預設收款對象從訂單聯絡人
+      if (!item.receipt_account && orderInfo?.contact_person) {
+        updates.receipt_account = orderInfo.contact_person.slice(0, 5) // 五字內
+      }
+      // 預設付款名稱
+      if (!item.payment_name && orderInfo?.tour_name) {
+        updates.payment_name = orderInfo.tour_name
+      }
+    }
+
+    onUpdate(item.id, updates)
+  }
 
   return (
     <>
@@ -51,7 +88,7 @@ export function PaymentItemRow({
         <td className="py-1.5 px-2" style={{ width: '110px' }}>
           <Select
             value={item.receipt_type.toString()}
-            onValueChange={value => onUpdate(item.id, { receipt_type: Number(value) as ReceiptType })}
+            onValueChange={value => handleReceiptTypeChange(Number(value) as ReceiptType)}
           >
             <SelectTrigger className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1">
               <SelectValue />
@@ -87,13 +124,20 @@ export function PaymentItemRow({
           />
         </td>
 
-        {/* 付款人姓名 */}
+        {/* 付款人姓名 / 收款對象 */}
         <td className="py-1.5 px-2" style={{ width: '180px' }}>
           <input
             type="text"
             value={item.receipt_account || ''}
-            onChange={e => onUpdate(item.id, { receipt_account: e.target.value })}
-            placeholder="輸入付款人"
+            onChange={e => {
+              // LinkPay 限制五字內
+              const value = item.receipt_type === RECEIPT_TYPES.LINK_PAY
+                ? e.target.value.slice(0, 5)
+                : e.target.value
+              onUpdate(item.id, { receipt_account: value })
+            }}
+            placeholder={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? '收款對象(五字內)' : '輸入付款人'}
+            maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? 5 : undefined}
             className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
           />
         </td>

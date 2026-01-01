@@ -471,6 +471,12 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
                     onRemove={removePaymentItem}
                     canRemove={paymentItems.length > 1}
                     isNewRow={index === paymentItems.length - 1}
+                    orderInfo={selectedOrder ? {
+                      order_number: selectedOrder.order_number || undefined,
+                      tour_name: selectedOrder.tour_name || undefined,
+                      contact_person: selectedOrder.contact_person || undefined,
+                      contact_email: selectedOrder.contact_email || undefined,
+                    } : undefined}
                   />
                 ))}
               </tbody>
