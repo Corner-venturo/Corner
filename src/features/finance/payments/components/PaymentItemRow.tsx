@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react'
-import { Trash2, Link2, Copy, Check, Loader2, ExternalLink } from 'lucide-react'
+import { Link2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useToast } from '@/components/ui/use-toast'
@@ -141,20 +141,15 @@ export function PaymentItemRow({
 
   return (
     <>
-      {/* 主要資料行 - 文青風格 */}
-      <tr
-        className={cn(
-          'border-b border-morandi-container/30 transition-colors',
-          isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
-        )}
-      >
+      {/* 主要資料行 */}
+      <tr>
         {/* 收款方式 */}
-        <td className="py-1.5 px-2" style={{ width: '110px' }}>
+        <td className="py-2 px-3 border border-border">
           <Select
             value={item.receipt_type.toString()}
             onValueChange={value => handleReceiptTypeChange(Number(value) as ReceiptType)}
           >
-            <SelectTrigger className="input-no-focus h-9 border-0 shadow-none bg-transparent text-sm px-1">
+            <SelectTrigger className="h-auto p-0 border-0 shadow-none bg-transparent text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -168,17 +163,17 @@ export function PaymentItemRow({
         </td>
 
         {/* 交易日期 */}
-        <td className="py-1.5 px-2" style={{ width: '150px' }}>
+        <td className="py-2 px-3 border border-border">
           <DatePicker
             value={item.transaction_date}
             onChange={(date) => onUpdate(item.id, { transaction_date: date })}
-            className="input-no-focus h-9 border-0 shadow-none bg-transparent"
             placeholder="選擇日期"
+            buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
           />
         </td>
 
         {/* 付款人姓名 / 收款對象 */}
-        <td className="py-1.5 px-2" style={{ width: '180px' }}>
+        <td className="py-2 px-3 border border-border">
           <input
             type="text"
             value={item.receipt_account || ''}
@@ -191,155 +186,134 @@ export function PaymentItemRow({
             }}
             placeholder={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? '收款對象(五字內)' : '輸入付款人'}
             maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? 5 : undefined}
-            className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
+            className="w-full bg-transparent outline-none text-sm"
           />
         </td>
 
         {/* 備註 */}
-        <td className="py-1.5 px-2">
+        <td className="py-2 px-3 border border-border">
           <input
             type="text"
             value={item.note || ''}
             onChange={e => onUpdate(item.id, { note: e.target.value })}
             placeholder="備註（選填）"
-            className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
+            className="w-full bg-transparent outline-none text-sm"
           />
         </td>
 
         {/* 金額 */}
-        <td className="py-1.5 px-2" style={{ width: '120px' }}>
+        <td className="py-2 px-3 border border-border text-right">
           <input
             type="number"
             value={item.amount || ''}
             onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
             placeholder="0"
-            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm text-right placeholder:text-morandi-muted"
+            className="w-full bg-transparent outline-none text-sm text-right"
           />
         </td>
 
         {/* 操作 */}
-        <td className="py-2 px-3 w-20 text-center">
+        <td className="py-2 px-3 border border-border text-center">
           {canRemove && (
-            <Button
-              variant="ghost"
-              size="sm"
+            <span
               onClick={() => onRemove(item.id)}
-              className="h-9 text-morandi-red hover:bg-morandi-red/10"
+              className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
+              title="刪除"
             >
-              <Trash2 size={16} />
-            </Button>
+              ✕
+            </span>
           )}
         </td>
       </tr>
 
       {/* LinkPay 額外欄位 - 表頭 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr className="border-b border-morandi-gold/20 bg-morandi-gold/5">
-          <td colSpan={6} className="py-1.5 px-2">
-            <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 pl-4 border-l-2 border-morandi-gold/30">
-              <span className="text-xs font-medium text-morandi-secondary">Email *</span>
-              <span className="text-xs font-medium text-morandi-secondary">付款截止日 *</span>
-              <span className="text-xs font-medium text-morandi-secondary">付款名稱（客戶看到的）</span>
-              <span></span>
-            </div>
-          </td>
+        <tr className="text-xs text-morandi-secondary font-medium bg-morandi-gold/10">
+          <th className="text-left py-2 px-3 border border-border">Email *</th>
+          <th className="text-left py-2 px-3 border border-border">付款截止日 *</th>
+          <th className="text-left py-2 px-3 border border-border" colSpan={2}>付款名稱（客戶看到的）</th>
+          <th className="border border-border" colSpan={2}></th>
         </tr>
       )}
 
       {/* LinkPay 額外欄位 - 輸入 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr className={cn(
-          'border-b border-morandi-container/30',
-          isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
-        )}>
-          <td colSpan={6} className="py-1.5 px-2">
-            <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 items-center pl-4 border-l-2 border-morandi-gold/30">
-              <input
-                type="email"
-                value={item.email || ''}
-                onChange={e => onUpdate(item.id, { email: e.target.value })}
-                placeholder="user@example.com"
-                className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
-              />
-              <DatePicker
-                value={item.pay_dateline || ''}
-                onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
-                className="input-no-focus h-9 border-0 shadow-none bg-transparent"
-                placeholder="選擇日期"
-              />
-              <input
-                type="text"
-                value={item.payment_name || ''}
-                onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
-                placeholder="例如：峇里島五日遊 - 尾款"
-                className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
-              />
-              <Button
-                type="button"
-                onClick={handleGenerateLink}
-                disabled={isGenerating || !item.email || !item.amount || !item.pay_dateline}
-                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    產生中...
-                  </>
-                ) : (
-                  <>
-                    <Link2 size={14} />
-                    產生連結
-                  </>
-                )}
-              </Button>
-            </div>
+        <tr>
+          <td className="py-2 px-3 border border-border">
+            <input
+              type="email"
+              value={item.email || ''}
+              onChange={e => onUpdate(item.id, { email: e.target.value })}
+              placeholder="user@example.com"
+              className="w-full bg-transparent outline-none text-sm"
+            />
+          </td>
+          <td className="py-2 px-3 border border-border">
+            <DatePicker
+              value={item.pay_dateline || ''}
+              onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
+              placeholder="選擇日期"
+              buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
+            />
+          </td>
+          <td className="py-2 px-3 border border-border" colSpan={2}>
+            <input
+              type="text"
+              value={item.payment_name || ''}
+              onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
+              placeholder="例如：峇里島五日遊 - 尾款"
+              className="w-full bg-transparent outline-none text-sm"
+            />
+          </td>
+          <td className="py-2 px-3 border border-border text-center" colSpan={2}>
+            <Button
+              type="button"
+              onClick={handleGenerateLink}
+              disabled={isGenerating || !item.email || !item.amount || !item.pay_dateline}
+              size="sm"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  產生中...
+                </>
+              ) : (
+                <>
+                  <Link2 size={14} />
+                  產生連結
+                </>
+              )}
+            </Button>
           </td>
         </tr>
       )}
 
       {/* LinkPay 產生的連結 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && generatedLink && (
-        <tr className="border-b border-morandi-container/30 bg-morandi-gold/5">
-          <td colSpan={6} className="py-2 px-2">
-            <div className="flex items-center gap-2 pl-4 border-l-2 border-morandi-gold/30">
-              <Link2 size={14} className="text-morandi-gold shrink-0" />
-              <span className="text-xs text-morandi-secondary shrink-0">付款連結：</span>
-              <input
-                type="text"
-                value={generatedLink}
-                readOnly
-                className="input-no-focus flex-1 h-8 px-2 bg-white text-xs rounded border border-morandi-gold/30"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyLink}
-                className="h-8 gap-1 text-morandi-gold hover:bg-morandi-gold/20"
-              >
-                {copied ? (
-                  <>
-                    <Check size={12} />
-                    已複製
-                  </>
-                ) : (
-                  <>
-                    <Copy size={12} />
-                    複製
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => window.open(generatedLink, '_blank')}
-                className="h-8 gap-1 text-morandi-secondary hover:bg-morandi-container/50"
-              >
-                <ExternalLink size={12} />
-                開啟
-              </Button>
-            </div>
+        <tr className="bg-morandi-gold/5">
+          <td className="py-2 px-3 border border-border text-xs text-morandi-secondary">付款連結</td>
+          <td className="py-2 px-3 border border-border" colSpan={3}>
+            <input
+              type="text"
+              value={generatedLink}
+              readOnly
+              className="w-full bg-transparent outline-none text-xs"
+            />
+          </td>
+          <td className="py-2 px-3 border border-border text-center" colSpan={2}>
+            <span
+              onClick={handleCopyLink}
+              className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm mr-3"
+            >
+              {copied ? '✓ 已複製' : '複製'}
+            </span>
+            <span
+              onClick={() => window.open(generatedLink, '_blank')}
+              className="text-morandi-secondary cursor-pointer hover:text-morandi-primary text-sm"
+            >
+              開啟
+            </span>
           </td>
         </tr>
       )}

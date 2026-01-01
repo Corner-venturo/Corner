@@ -392,20 +392,18 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           </div>
 
           <div className="flex-1 overflow-visible">
-            {/* 表頭 */}
-            <div className="border-b border-morandi-container/60">
-              <div className="grid grid-cols-[110px_150px_180px_1fr_120px_60px] px-2 py-2.5">
-                <span className="text-xs font-medium text-morandi-secondary">收款方式</span>
-                <span className="text-xs font-medium text-morandi-secondary">交易日期</span>
-                <span className="text-xs font-medium text-morandi-secondary">付款人姓名</span>
-                <span className="text-xs font-medium text-morandi-secondary">備註</span>
-                <span className="text-xs font-medium text-morandi-secondary text-right pr-2">金額</span>
-                <span></span>
-              </div>
-            </div>
-
-            {/* 項目列表 */}
-            <table className="w-full">
+            {/* 項目表格 */}
+            <table className="w-full border-collapse border border-border">
+              <thead>
+                <tr className="text-xs text-morandi-secondary font-medium bg-morandi-container/30">
+                  <th className="text-left py-2 px-3 border border-border" style={{ width: '110px' }}>收款方式</th>
+                  <th className="text-left py-2 px-3 border border-border" style={{ width: '150px' }}>交易日期</th>
+                  <th className="text-left py-2 px-3 border border-border" style={{ width: '180px' }}>付款人姓名</th>
+                  <th className="text-left py-2 px-3 border border-border">備註</th>
+                  <th className="text-right py-2 px-3 border border-border" style={{ width: '120px' }}>金額</th>
+                  <th className="border border-border" style={{ width: '50px' }}></th>
+                </tr>
+              </thead>
               <tbody>
                 {paymentItems.map((item, index) => (
                   <PaymentItemRow
