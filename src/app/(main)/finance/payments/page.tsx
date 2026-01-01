@@ -183,6 +183,33 @@ export default function PaymentsPage() {
     { key: 'tour_name', label: '團名', sortable: true },
     { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
     { key: 'receipt_type', label: '收款方式', sortable: true },
+    {
+      key: 'link',
+      label: '付款連結',
+      render: (_, row) => {
+        if (!row.link) return <span className="text-morandi-muted">-</span>
+        return (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleCopyLink(row.link!)}
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 gap-1 h-7 px-2"
+          >
+            {copiedLink === row.link ? (
+              <>
+                <Check size={14} />
+                已複製
+              </>
+            ) : (
+              <>
+                <Link2 size={14} />
+                複製連結
+              </>
+            )}
+          </Button>
+        )
+      },
+    },
     { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
     { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
   ]
