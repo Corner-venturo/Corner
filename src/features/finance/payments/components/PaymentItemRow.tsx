@@ -142,7 +142,7 @@ export function PaymentItemRow({
   return (
     <>
       {/* 主要資料行 */}
-      <tr className="bg-white">
+      <tr className={cn('bg-white', index > 0 && 'border-t-2 border-t-morandi-container')}>
         {/* 收款方式 */}
         <td className="py-2 px-3 border-b border-r border-border">
           <Select
@@ -228,7 +228,7 @@ export function PaymentItemRow({
 
       {/* LinkPay 額外欄位 - 表頭 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
+        <tr className="text-xs text-morandi-primary font-medium bg-white">
           <th className="text-left py-2.5 px-3 border-b border-r border-border">Email *</th>
           <th className="text-left py-2.5 px-3 border-b border-r border-border">付款截止日 *</th>
           <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>付款名稱（客戶看到的）</th>
