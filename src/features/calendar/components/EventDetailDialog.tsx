@@ -61,31 +61,30 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
             {/* 日期時間 */}
             <div className="space-y-2">
               {(() => {
-                // 🔧 修正：明確使用台灣時區，避免時區轉換問題
-                const startDate = event.start.includes('T') ? event.start : `${event.start}T00:00:00`
-                const endDate = event.end
-                  ? event.end.includes('T')
-                    ? event.end
-                    : `${event.end}T00:00:00`
-                  : null
-
-                const isAllDay = event.allDay ?? true // 預設為全天事件
-
-                // 統一的時區設定
+                // 🔧 修正：全天事件使用日期字串直接解析（因為已經在 useCalendarEvents 轉換過）
+                // 非全天事件才需要時區轉換
+                const isAllDay = event.allDay ?? true
                 const taipeiTZ = 'Asia/Taipei'
 
                 if (isAllDay) {
-                  // 全天事件：只顯示日期
-                  const start = new Date(startDate)
-                  const end = endDate ? new Date(endDate) : null
+                  // 全天事件：event.start 已經是正確的日期字串（YYYY-MM-DD 格式）
+                  // 直接解析為本地日期，不需要 UTC 轉換
+                  const startStr = event.start.split('T')[0] // 取日期部分
+                  const endStr = event.end?.split('T')[0]
 
-                  // FullCalendar 的全天事件 end 是隔天 00:00，所以要減一天
-                  const actualEnd = end ? new Date(end.getTime() - 24 * 60 * 60 * 1000) : null
+                  // 使用本地時區解析日期（避免 UTC 問題）
+                  const [startYear, startMonth, startDay] = startStr.split('-').map(Number)
+                  const start = new Date(startYear, startMonth - 1, startDay)
 
-                  // 使用台灣時區比較日期
-                  const startDateStr = start.toLocaleDateString('sv-SE', { timeZone: taipeiTZ })
-                  const endDateStr = actualEnd?.toLocaleDateString('sv-SE', { timeZone: taipeiTZ })
-                  const isSameDay = !endDateStr || startDateStr === endDateStr
+                  let actualEnd: Date | null = null
+                  if (endStr) {
+                    const [endYear, endMonth, endDay] = endStr.split('-').map(Number)
+                    const end = new Date(endYear, endMonth - 1, endDay)
+                    // FullCalendar 的全天事件 end 是隔天，所以要減一天
+                    actualEnd = new Date(end.getTime() - 24 * 60 * 60 * 1000)
+                  }
+
+                  const isSameDay = !actualEnd || start.getTime() === actualEnd.getTime()
 
                   return (
                     <>
@@ -93,7 +92,6 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                         <CalendarIcon size={16} className="text-morandi-secondary" />
                         <span className="text-morandi-primary">
                           {start.toLocaleDateString('zh-TW', {
-                            timeZone: taipeiTZ,
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -106,7 +104,6 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                           <span className="text-morandi-secondary ml-6">至</span>
                           <span className="text-morandi-primary">
                             {actualEnd.toLocaleDateString('zh-TW', {
-                              timeZone: taipeiTZ,
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -118,9 +115,9 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                     </>
                   )
                 } else {
-                  // 指定時間事件：顯示日期 + 時間範圍
-                  const start = new Date(startDate)
-                  const end = endDate ? new Date(endDate) : null
+                  // 指定時間事件：需要正確處理時區
+                  const start = new Date(event.start)
+                  const end = event.end ? new Date(event.end) : null
 
                   return (
                     <>
