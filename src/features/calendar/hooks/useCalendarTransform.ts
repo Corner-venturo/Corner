@@ -46,6 +46,20 @@ const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   }
 }
 
+// 🔧 修正：從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
+// 用於全天事件，避免 FullCalendar 時區轉換問題
+const getDateInTaipei = (isoString: string): string => {
+  if (!isoString) return ''
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return isoString
+    // 使用 sv-SE locale 取得 YYYY-MM-DD 格式
+    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+  } catch {
+    return isoString
+  }
+}
+
 /**
  * 行事曆資料轉換邏輯
  * 將各種資料來源轉換為 FullCalendarEvent 格式：
@@ -132,11 +146,15 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
         const timeStr = getDisplayTime(event.start, event.all_day)
         const displayTitle = timeStr ? `${timeStr} ${event.title}` : event.title
 
+        // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
+        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+
         return {
           id: event.id,
           title: displayTitle,
-          start: event.start,
-          end: event.end,
+          start: startDate,
+          end: endDate,
           allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
@@ -180,11 +198,15 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
           ? `${timeStr} 公司｜${event.title}`
           : `公司｜${event.title}`
 
+        // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
+        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+
         return {
           id: event.id,
           title: displayTitle,
-          start: event.start,
-          end: event.end,
+          start: startDate,
+          end: endDate,
           allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
