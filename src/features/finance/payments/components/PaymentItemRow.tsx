@@ -195,7 +195,7 @@ export function PaymentItemRow({
                   </div>
                   <div>
                     <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      付款截止日 *
+                      刷卡期限 *
                     </label>
                     <DatePicker
                       value={item.pay_dateline || ''}
