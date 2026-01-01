@@ -5,6 +5,7 @@
  * 1. 查看收款單完整資訊
  * 2. 待確認狀態可輸入實收金額並確認
  * 3. 編輯部分欄位
+ * 4. LinkPay 收款方式可建立付款連結
  */
 
 'use client'
@@ -20,14 +21,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useReceiptStore, useOrderStore } from '@/stores'
-import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard } from 'lucide-react'
+import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
+import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
-import { RECEIPT_TYPE_LABELS } from '@/types/receipt.types'
+import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import type { Receipt } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
+import { CreateLinkPayDialog } from './CreateLinkPayDialog'
+import { LinkPayLogsTable } from './LinkPayLogsTable'
 
 interface ReceiptDetailDialogProps {
   open: boolean
@@ -45,11 +48,18 @@ export function ReceiptDetailDialog({
   const { update: updateReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: orders, update: updateOrder } = useOrderStore()
   const { items: receipts } = useReceiptStore()
+  const { items: allLinkPayLogs, fetchAll: fetchLinkPayLogs } = useLinkPayLogStore()
 
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [actualAmount, setActualAmount] = useState<number>(0)
   const [note, setNote] = useState('')
+  const [showLinkPayDialog, setShowLinkPayDialog] = useState(false)
+
+  // 取得此收款單的 LinkPay 記錄
+  const linkPayLogs = receipt
+    ? allLinkPayLogs.filter(log => log.receipt_number === receipt.receipt_number)
+    : []
 
   // 當 receipt 改變時重置狀態
   useEffect(() => {
@@ -60,10 +70,18 @@ export function ReceiptDetailDialog({
     }
   }, [receipt])
 
+  // 載入 LinkPay 記錄
+  useEffect(() => {
+    if (open && receipt && Number(receipt.receipt_type) === ReceiptType.LINK_PAY) {
+      fetchLinkPayLogs()
+    }
+  }, [open, receipt, fetchLinkPayLogs])
+
   if (!receipt) return null
 
   const isPending = Number(receipt.status) === 0
   const isConfirmed = Number(receipt.status) === 1
+  const isLinkPay = Number(receipt.receipt_type) === ReceiptType.LINK_PAY
 
   // 確認收款
   const handleConfirm = async () => {
@@ -221,6 +239,37 @@ export function ReceiptDetailDialog({
             </div>
           )}
 
+          {/* LinkPay 區塊 */}
+          {isLinkPay && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Link2 className="h-5 w-5 text-blue-600" />
+                  <span className="font-medium text-blue-800">LinkPay 付款連結</span>
+                </div>
+                {isPending && (
+                  <Button
+                    size="sm"
+                    onClick={() => setShowLinkPayDialog(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white gap-1"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    建立付款連結
+                  </Button>
+                )}
+              </div>
+
+              {/* 顯示 LinkPay 記錄 */}
+              {linkPayLogs.length > 0 ? (
+                <LinkPayLogsTable logs={linkPayLogs} />
+              ) : (
+                <div className="text-sm text-blue-600">
+                  尚未建立付款連結，請點擊上方按鈕建立。
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 金額區塊 */}
           <div className="bg-morandi-container/20 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -315,6 +364,19 @@ export function ReceiptDetailDialog({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* LinkPay 建立對話框 */}
+      {isLinkPay && (
+        <CreateLinkPayDialog
+          isOpen={showLinkPayDialog}
+          onClose={() => setShowLinkPayDialog(false)}
+          receipt={receipt}
+          onSuccess={() => {
+            fetchLinkPayLogs()
+            onSuccess?.()
+          }}
+        />
+      )}
     </Dialog>
   )
 }
