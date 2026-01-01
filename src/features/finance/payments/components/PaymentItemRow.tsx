@@ -168,17 +168,6 @@ export function PaymentItemRow({
           </Select>
         </td>
 
-        {/* 金額 */}
-        <td className="py-1.5 px-2" style={{ width: '120px' }}>
-          <input
-            type="number"
-            value={item.amount || ''}
-            onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
-            placeholder="0"
-            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm placeholder:text-morandi-muted"
-          />
-        </td>
-
         {/* 交易日期 */}
         <td className="py-1.5 px-2" style={{ width: '150px' }}>
           <DatePicker
@@ -215,6 +204,17 @@ export function PaymentItemRow({
             onChange={e => onUpdate(item.id, { note: e.target.value })}
             placeholder="備註（選填）"
             className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
+          />
+        </td>
+
+        {/* 金額 */}
+        <td className="py-1.5 px-2" style={{ width: '120px' }}>
+          <input
+            type="number"
+            value={item.amount || ''}
+            onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
+            placeholder="0"
+            className="input-no-focus w-full h-9 px-2 bg-transparent text-sm text-right placeholder:text-morandi-muted"
           />
         </td>
 
