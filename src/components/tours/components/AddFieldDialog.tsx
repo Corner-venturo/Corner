@@ -30,7 +30,7 @@ export function AddFieldDialog({ open, onOpenChange, onAdd }: AddFieldDialogProp
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
               欄位名稱
             </label>
             <Input

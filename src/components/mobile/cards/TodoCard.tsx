@@ -23,7 +23,7 @@ const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string
   urgent: { label: '緊急', color: 'text-red-700', bg: 'bg-red-100' },
   high: { label: '高', color: 'text-orange-700', bg: 'bg-orange-100' },
   medium: { label: '中', color: 'text-yellow-700', bg: 'bg-yellow-100' },
-  low: { label: '低', color: 'text-gray-700', bg: 'bg-gray-100' },
+  low: { label: '低', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
 }
 
 export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) {

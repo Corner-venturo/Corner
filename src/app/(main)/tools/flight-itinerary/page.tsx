@@ -6,10 +6,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { CornerFlightItinerary } from '@/features/itinerary/components/CornerFlightItinerary'
 import { Button } from '@/components/ui/button'
-import { X, Printer } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Printer } from 'lucide-react'
 
 // 預設資料（從 PDF 提取）
 const SAMPLE_DATA_1 = {
@@ -103,12 +103,7 @@ const PRINT_STYLES = `
 export default function FlightItineraryPage() {
   const [currentItinerary, setCurrentItinerary] = useState(1)
   const [isOpen, setIsOpen] = useState(true)
-  const [mounted, setMounted] = useState(false)
   const [language, setLanguage] = useState<'zh' | 'en'>('zh')
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const getCurrentData = () => {
     switch (currentItinerary) {
@@ -121,10 +116,6 @@ export default function FlightItineraryPage() {
     window.print()
   }
 
-  const handleClose = () => {
-    setIsOpen(false)
-  }
-
   if (!isOpen) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted">
@@ -133,66 +124,55 @@ export default function FlightItineraryPage() {
     )
   }
 
-  if (!mounted) {
-    return null
-  }
-
-  return createPortal(
-    <div
-      className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-transparent print:block"
-      onClick={handleClose}
-      id="flight-itinerary-printable"
-    >
+  return (
+    <>
       <style>{PRINT_STYLES}</style>
-
-      <div
-        className="bg-white rounded-lg max-w-[900px] w-full max-h-[90vh] overflow-y-auto print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* 控制面板 - 只在螢幕上顯示 */}
-        <div className="print:hidden sticky top-0 bg-white border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-lg">
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              size="sm"
-              variant={currentItinerary === 1 ? 'default' : 'outline'}
-              onClick={() => setCurrentItinerary(1)}
-            >
-              LAI TINGCHANG (台北-東京)
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <div className="flex gap-1 mr-4">
-              <Button
-                size="sm"
-                variant={language === 'zh' ? 'default' : 'outline'}
-                onClick={() => setLanguage('zh')}
-              >
-                中文
-              </Button>
-              <Button
-                size="sm"
-                variant={language === 'en' ? 'default' : 'outline'}
-                onClick={() => setLanguage('en')}
-              >
-                English
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-[900px] max-h-[90vh] overflow-y-auto p-0 print:max-w-full print:rounded-none print:max-h-none print:overflow-visible print:shadow-none" id="flight-itinerary-printable">
+          {/* 控制面板 - 只在螢幕上顯示 */}
+          <div className="print:hidden sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
+            <DialogHeader className="flex-row items-center gap-2">
+              <DialogTitle className="sr-only">機票行程單</DialogTitle>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  size="sm"
+                  variant={currentItinerary === 1 ? 'default' : 'outline'}
+                  onClick={() => setCurrentItinerary(1)}
+                >
+                  LAI TINGCHANG (台北-東京)
+                </Button>
+              </div>
+            </DialogHeader>
+            <div className="flex gap-2">
+              <div className="flex gap-1 mr-4">
+                <Button
+                  size="sm"
+                  variant={language === 'zh' ? 'default' : 'outline'}
+                  onClick={() => setLanguage('zh')}
+                >
+                  中文
+                </Button>
+                <Button
+                  size="sm"
+                  variant={language === 'en' ? 'default' : 'outline'}
+                  onClick={() => setLanguage('en')}
+                >
+                  English
+                </Button>
+              </div>
+              <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+                <Printer size={16} />
+                列印 / 儲存 PDF
               </Button>
             </div>
-            <Button size="sm" onClick={handlePrint} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
-              <Printer size={16} className="mr-2" />
-              列印 / 儲存 PDF
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleClose}>
-              <X size={16} />
-            </Button>
           </div>
-        </div>
 
-        {/* 行程單內容 */}
-        <div className="print:p-0">
-          <CornerFlightItinerary data={getCurrentData()} language={language} />
-        </div>
-      </div>
-    </div>,
-    document.body
+          {/* 行程單內容 */}
+          <div className="print:p-0">
+            <CornerFlightItinerary data={getCurrentData()} language={language} />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

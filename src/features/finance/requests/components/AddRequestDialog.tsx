@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Plus, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -163,14 +164,16 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!formData.tour_id || requestItems.length === 0}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
+              <Plus size={16} />
               新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
             </Button>
           </div>

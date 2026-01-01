@@ -201,12 +201,233 @@
 
 ---
 
+## 🪟 彈窗與遮罩規範（Modal/Overlay）
+
+### 標準遮罩樣式
+
+所有模態視窗（Dialog、Modal）必須使用統一的遮罩效果：
+
+```tsx
+// ✅ 標準方式：使用 shadcn Dialog 組件（推薦）
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>標題</DialogTitle>
+    </DialogHeader>
+    {/* 內容 */}
+  </DialogContent>
+</Dialog>
+```
+
+### 自訂彈窗遮罩（當不使用 Dialog 組件時）
+
+如果需要自訂彈窗，**必須**遵循以下樣式：
+
+```tsx
+// ✅ 正確：全螢幕遮罩 + 置中內容
+<div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+  <div className="bg-background rounded-xl shadow-lg border border-border p-6 max-w-lg w-full mx-4">
+    {/* 彈窗內容 */}
+  </div>
+</div>
+
+// ❌ 錯誤：遮罩沒有覆蓋全螢幕
+<div className="absolute bg-black/50">...</div>
+
+// ❌ 錯誤：缺少 backdrop-blur
+<div className="fixed inset-0 bg-black/50">...</div>
+```
+
+### 遮罩層級規範
+
+| z-index | 用途 |
+|---------|------|
+| `z-50` | 一般 Dialog、Modal |
+| `z-[9998]` | Dialog 遮罩層 (DialogOverlay) |
+| `z-[9999]` | Dialog 內容層 (DialogContent) |
+| `z-[10000]` | Dialog 關閉按鈕 |
+
+### 關鍵樣式說明
+
+| 樣式 | 說明 |
+|------|------|
+| `fixed inset-0` | **必須** - 確保遮罩覆蓋整個視窗 |
+| `bg-black/60` | 標準透明度 60%（比 50% 更明顯） |
+| `backdrop-blur-sm` | 模糊背景，增加層次感 |
+| `flex items-center justify-center` | 彈窗內容置中 |
+
+### 參考範例
+
+旅遊團快速操作 → 合約 Dialog 是標準實現範例。
+
+---
+
+## 🔘 按鈕規範（Button Standards）
+
+### 主要操作按鈕必須有圖標 + 文字
+
+所有 Dialog 和表單中的主要操作按鈕都必須包含圖標：
+
+```tsx
+import { Plus, Save, Check, X, Trash2 } from 'lucide-react'
+
+// ✅ 正確：主要操作按鈕
+<Button className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+  <Plus size={16} />
+  新增項目
+</Button>
+
+<Button className="gap-2">
+  <Save size={16} />
+  儲存
+</Button>
+
+<Button className="gap-2">
+  <Check size={16} />
+  確認
+</Button>
+
+// ✅ 正確：取消按鈕
+<Button variant="outline" className="gap-2">
+  <X size={16} />
+  取消
+</Button>
+
+// ✅ 正確：危險操作按鈕
+<Button variant="outline" className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white">
+  <Trash2 size={16} />
+  刪除
+</Button>
+
+// ❌ 錯誤：純文字按鈕
+<Button>儲存</Button>
+<Button>確認</Button>
+```
+
+### 按鈕圖標對應表
+
+| 操作 | 圖標 | 說明 |
+|------|------|------|
+| 新增 | `Plus` | 新增項目、建立資料 |
+| 儲存 | `Save` | 儲存變更 |
+| 確認 | `Check` | 確認操作 |
+| 取消 | `X` | 取消、關閉 |
+| 刪除 | `Trash2` | 刪除項目（危險操作） |
+| 編輯 | `Edit2` | 編輯模式 |
+| 同步 | `RefreshCw` | 同步資料 |
+| 上傳 | `Upload` | 上傳檔案 |
+| 下載 | `Download` | 下載檔案 |
+| 列印 | `Printer` | 列印功能 |
+
+---
+
+## 📝 表單組件規範（Form Components）
+
+### 表單標籤統一樣式
+
+```tsx
+// ✅ 正確：統一的標籤樣式
+<label className="block text-sm font-medium text-morandi-primary mb-2">
+  欄位名稱 <span className="text-morandi-red">*</span>
+</label>
+
+// ❌ 錯誤：不一致的顏色
+<label className="block text-sm font-medium text-morandi-secondary mb-2">
+  欄位名稱
+</label>
+```
+
+### 日期選擇器
+
+**統一使用 DatePicker 組件**：
+
+```tsx
+import { DatePicker } from '@/components/ui/date-picker'
+
+// ✅ 正確
+<DatePicker
+  value={date}
+  onChange={setDate}
+  placeholder="選擇日期"
+/>
+
+// ❌ 錯誤：使用其他日期組件
+// SimpleDateInput, DateInput 等都應改為 DatePicker
+```
+
+### 下拉選擇器
+
+**可搜尋選擇（選項多）用 Combobox**：
+
+```tsx
+import { Combobox } from '@/components/ui/combobox'
+
+// ✅ 客戶選擇、團號選擇、城市選擇（選項 > 10）
+<Combobox
+  options={options}
+  value={value}
+  onChange={setValue}
+  placeholder="搜尋..."
+/>
+```
+
+**固定選項（選項少）用 Select**：
+
+```tsx
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+// ✅ 狀態選擇、排序方式（選項 < 5）
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger>
+    <SelectValue placeholder="選擇..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="option1">選項一</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+### 驗證錯誤樣式
+
+```tsx
+// ✅ 正確：使用莫蘭迪配色
+<div className="bg-morandi-red/5 border border-morandi-red/20 rounded-md p-3 text-sm text-morandi-red">
+  錯誤訊息
+</div>
+
+// ❌ 錯誤：使用標準紅色
+<div className="bg-red-50 border border-red-200 text-red-700">
+  錯誤訊息
+</div>
+```
+
+---
+
+## 🛡️ 自動防範機制
+
+以下規則由 ESLint 自動檢查：
+
+| 規則 | 說明 | 嚴重程度 |
+|------|------|---------|
+| `venturo/no-forbidden-classes` | 禁止使用非設計系統的 CSS 類別 | warn |
+| `venturo/no-custom-modal` | 禁止自訂 Modal 遮罩層 | warn |
+| `venturo/button-requires-icon` | Dialog 按鈕需要圖標 | warn |
+| `venturo/consistent-form-label` | 表單標籤一致性 | warn |
+
+執行掃描：
+```bash
+node scripts/scan-design-violations.js
+```
+
+---
+
 ## 🚫 避免使用
 
 ### 不建議的圓角：
 
 - ❌ `rounded-sm` (太小)
-- ❌ `rounded-2xl` (太大)
 - ❌ `rounded-3xl` (太大)
 
 ### 不建議的陰影：
@@ -272,6 +493,6 @@
 
 ---
 
-**最後更新**：2025-10-29
+**最後更新**：2026-01-01
 **維護者**：William Chien
 **設計參考**：登入頁面 (`/login`)

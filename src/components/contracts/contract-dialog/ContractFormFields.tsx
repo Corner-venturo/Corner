@@ -17,7 +17,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅客資訊（甲方）</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">姓名</label>
+            <label className="text-xs text-morandi-primary block mb-1">姓名</label>
             <Input
               type="text"
               value={contractData.travelerName || ''}
@@ -25,7 +25,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">身分證字號</label>
+            <label className="text-xs text-morandi-primary block mb-1">身分證字號</label>
             <Input
               type="text"
               value={contractData.travelerIdNumber || ''}
@@ -33,7 +33,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             />
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-morandi-secondary block mb-1">住址</label>
+            <label className="text-xs text-morandi-primary block mb-1">住址</label>
             <Input
               type="text"
               value={contractData.travelerAddress || ''}
@@ -41,7 +41,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">電話</label>
+            <label className="text-xs text-morandi-primary block mb-1">電話</label>
             <Input
               type="text"
               value={contractData.travelerPhone || ''}
@@ -56,7 +56,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">集合時地</h3>
         <div className="space-y-2">
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">集合時間</label>
+            <label className="text-xs text-morandi-primary block mb-1">集合時間</label>
             <Input
               type="datetime-local"
               value={(() => {
@@ -98,7 +98,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">集合地點</label>
+            <label className="text-xs text-morandi-primary block mb-1">集合地點</label>
             <Input
               type="text"
               value={contractData.gatherLocation || ''}
@@ -114,7 +114,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊費用</h3>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">總金額（新台幣）</label>
+            <label className="text-xs text-morandi-primary block mb-1">總金額（新台幣）</label>
             <Input
               type="text"
               value={contractData.totalAmount || ''}
@@ -122,7 +122,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
             />
           </div>
           <div>
-            <label className="text-xs text-morandi-secondary block mb-1">定金（新台幣）</label>
+            <label className="text-xs text-morandi-primary block mb-1">定金（新台幣）</label>
             <Input
               type="text"
               value={contractData.depositAmount || ''}
@@ -136,7 +136,7 @@ export function ContractFormFields({ contractData, onFieldChange }: ContractForm
       <div>
         <h3 className="text-sm font-semibold text-morandi-primary mb-3">乙方聯絡資訊</h3>
         <div>
-          <label className="text-xs text-morandi-secondary block mb-1">
+          <label className="text-xs text-morandi-primary block mb-1">
             電話分機（02-7751-6051 #）
           </label>
           <Input

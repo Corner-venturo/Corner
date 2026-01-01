@@ -107,7 +107,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
           {/* 國家和城市選擇 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
               <Select value={data.country} onValueChange={(value) => updateField('country', value)}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇國家" />
@@ -125,7 +125,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">城市</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">城市</label>
               <Select value={data.city} onValueChange={handleCityChange} disabled={!data.country}>
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="選擇城市" />
@@ -147,7 +147,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-secondary mb-1">標題</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">標題</label>
             <InputIME
               value={data.title}
               onChange={value => updateField('title', value)}
@@ -156,7 +156,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-morandi-secondary mb-1">副標題 (詩意文案，用換行分隔)</label>
+            <label className="block text-xs font-medium text-morandi-primary mb-1">副標題 (詩意文案，用換行分隔)</label>
             <textarea
               value={data.subtitle}
               onChange={e => updateField('subtitle', e.target.value)}
@@ -166,7 +166,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格 (不含NT$和起)</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">價格 (不含NT$和起)</label>
               <InputIME
                 value={data.price}
                 onChange={value => updateField('price', value)}
@@ -175,7 +175,7 @@ export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) 
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">價格備註</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">價格備註</label>
               <InputIME
                 value={data.priceNote}
                 onChange={value => updateField('priceNote', value)}

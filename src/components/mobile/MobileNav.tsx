@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import {
   Home,
   Search,
@@ -18,8 +19,6 @@ import {
   Calendar,
   Stamp,
   FileCheck,
-  MessageCircle,
-  Database,
   Hotel,
   Truck,
   MapPinned,
@@ -86,13 +85,6 @@ export function MobileNav() {
     return pathname.startsWith(href)
   }
 
-  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
-    if (item.id === 'workbench') {
-      setShowWorkbench(true)
-      return
-    }
-  }
-
   return (
     <>
       {/* 底部導航欄 */}
@@ -137,63 +129,55 @@ export function MobileNav() {
         </div>
       </nav>
 
-      {/* 工作台彈出面板 */}
-      {showWorkbench && (
-        <div
-          className="fixed inset-0 bg-black/50 z-[100] flex items-end"
-          onClick={() => setShowWorkbench(false)}
-        >
-          <div
-            className="bg-white w-full rounded-t-2xl max-h-[80vh] overflow-auto animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* 標題列 */}
-            <div className="sticky top-0 bg-white border-b border-border px-4 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-morandi-primary">工作台</h2>
-              <button
-                onClick={() => setShowWorkbench(false)}
-                className="p-2 hover:bg-morandi-container rounded-lg transition-colors"
-              >
-                <X size={20} className="text-morandi-secondary" />
-              </button>
-            </div>
-
-            {/* 功能分類 */}
-            <div className="p-4 space-y-6">
-              {WORKBENCH_CATEGORIES.map((category) => (
-                <div key={category.title}>
-                  <h3 className="text-sm font-medium text-morandi-secondary mb-3">
-                    {category.title}
-                  </h3>
-                  <div className="grid grid-cols-4 gap-3">
-                    {category.items.map((item) => {
-                      const Icon = item.icon
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setShowWorkbench(false)}
-                          className="flex flex-col items-center p-3 rounded-xl hover:bg-morandi-container/50 transition-colors"
-                        >
-                          <div className={cn('p-2 rounded-xl bg-gray-100', item.color)}>
-                            <Icon size={22} />
-                          </div>
-                          <span className="text-xs mt-2 text-morandi-primary font-medium">
-                            {item.label}
-                          </span>
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 底部安全區域 */}
-            <div className="h-6" />
+      {/* 工作台彈出面板 - 使用 Dialog 作為底部抽屜 */}
+      <Dialog open={showWorkbench} onOpenChange={setShowWorkbench}>
+        <DialogContent className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-w-none w-full rounded-t-2xl rounded-b-none max-h-[80vh] overflow-auto p-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom">
+          {/* 標題列 */}
+          <div className="sticky top-0 bg-white border-b border-border px-4 py-3 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-morandi-primary">工作台</h2>
+            <button
+              onClick={() => setShowWorkbench(false)}
+              className="p-2 hover:bg-morandi-container rounded-lg transition-colors"
+            >
+              <X size={20} className="text-morandi-secondary" />
+            </button>
           </div>
-        </div>
-      )}
+
+          {/* 功能分類 */}
+          <div className="p-4 space-y-6">
+            {WORKBENCH_CATEGORIES.map((category) => (
+              <div key={category.title}>
+                <h3 className="text-sm font-medium text-morandi-secondary mb-3">
+                  {category.title}
+                </h3>
+                <div className="grid grid-cols-4 gap-3">
+                  {category.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setShowWorkbench(false)}
+                        className="flex flex-col items-center p-3 rounded-xl hover:bg-morandi-container/50 transition-colors"
+                      >
+                        <div className={cn('p-2 rounded-xl bg-morandi-container', item.color)}>
+                          <Icon size={22} />
+                        </div>
+                        <span className="text-xs mt-2 text-morandi-primary font-medium">
+                          {item.label}
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 底部安全區域 */}
+          <div className="h-6" />
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

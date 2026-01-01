@@ -63,7 +63,7 @@ const CATEGORIES = [
     title: '資料庫',
     items: [
       { icon: Hotel, label: '飯店', href: '/database/hotels', color: 'bg-violet-100 text-violet-600' },
-      { icon: Truck, label: '供應商', href: '/database/suppliers', color: 'bg-gray-100 text-gray-600' },
+      { icon: Truck, label: '供應商', href: '/database/suppliers', color: 'bg-morandi-container text-morandi-secondary' },
       { icon: MapPinned, label: '景點', href: '/database/attractions', color: 'bg-green-100 text-green-600' },
       { icon: UserCheck, label: '領隊', href: '/database/tour-leaders', color: 'bg-rose-100 text-rose-600' },
     ],

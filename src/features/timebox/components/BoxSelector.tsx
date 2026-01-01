@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Dumbbell, MessageSquare, Package } from 'lucide-react'
+import { Dumbbell, MessageSquare, Package, X } from 'lucide-react'
 import { type TimeboxBox } from '../hooks/useTimeboxData'
 
 const typeIcons = {
@@ -69,7 +69,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
         <div className="space-y-4">
           {/* 箱子選擇 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               選擇箱子
             </label>
             {boxes.length === 0 ? (
@@ -115,7 +115,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
           {/* 持續時間選擇 */}
           {selectedBox && (
             <div>
-              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
                 持續時間
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -139,7 +139,8 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
 
           {/* 按鈕 */}
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={onClose} className="text-morandi-secondary border-border">
+            <Button variant="outline" onClick={onClose} className="text-morandi-secondary border-border gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button

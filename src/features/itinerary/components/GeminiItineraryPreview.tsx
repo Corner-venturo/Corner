@@ -66,7 +66,7 @@ function HighlightCard({ spot, totalCount }: { spot: HighlightSpot; totalCount: 
       className={cn(
         'group relative bg-[#FAFAF8] rounded-2xl overflow-hidden',
         'border border-[#e8e5e0] hover:border-[#c9aa7c]/50',
-        'shadow-sm hover:shadow-xl transition-all duration-500',
+        'shadow-sm hover:shadow-lg transition-all duration-500',
         'cursor-pointer h-full',
         // 單一項目時橫向排列
         totalCount === 1 && 'md:flex md:flex-row'

@@ -83,7 +83,7 @@ export function PreviewPanel({
               // 手機框架和內容
               <div className="relative">
                 {/* iPhone 14 Pro 尺寸 */}
-                <div className="bg-black rounded-[45px] p-[8px] shadow-2xl">
+                <div className="bg-black rounded-[45px] p-[8px] shadow-lg">
                   {/* 頂部凹槽 (Dynamic Island) */}
                   <div className="absolute top-[20px] left-1/2 -translate-x-1/2 z-10">
                     <div className="bg-black w-[120px] h-[34px] rounded-full"></div>
@@ -112,7 +112,7 @@ export function PreviewPanel({
             ) : (
               // 電腦版
               <div
-                className="bg-white shadow-2xl rounded-lg overflow-hidden border border-border"
+                className="bg-white shadow-lg rounded-lg overflow-hidden border border-border"
                 style={{
                   width: '1200px',
                   height: '800px',

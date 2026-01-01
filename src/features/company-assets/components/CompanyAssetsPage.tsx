@@ -6,9 +6,14 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useCallback, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
-import { FolderArchive, X } from 'lucide-react'
+import { FolderArchive } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { CompanyAssetsList } from './CompanyAssetsList'
 import { CompanyAssetsDialog } from './CompanyAssetsDialog'
 import { supabase } from '@/lib/supabase/client'
@@ -297,52 +302,38 @@ export const CompanyAssetsPage: React.FC = () => {
         isLoading={isLoading}
       />
 
-      {/* 預覽彈窗 - 用 Portal 掛到 body */}
-      {previewAsset && createPortal(
-        <div
-          className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center"
-          onClick={() => setPreviewAsset(null)}
-        >
-          <div
-            className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* 標題列 */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="font-medium text-morandi-primary truncate">{previewAsset.name}</h3>
-              <button
-                className="text-morandi-secondary hover:text-morandi-primary transition-colors"
-                onClick={() => setPreviewAsset(null)}
-              >
-                <X size={20} />
-              </button>
-            </div>
+      {/* 預覽彈窗 */}
+      <Dialog open={!!previewAsset} onOpenChange={(open) => !open && setPreviewAsset(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-morandi-primary truncate">
+              {previewAsset?.name}
+            </DialogTitle>
+          </DialogHeader>
 
-            {/* 預覽內容 */}
-            <div className="p-4 flex items-center justify-center bg-morandi-container/20 min-h-[300px] max-h-[60vh]">
-              {previewAsset.asset_type === 'image' ? (
-                <img
-                  src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
-                  alt={previewAsset.name}
-                  className="max-w-full max-h-[55vh] object-contain"
-                />
-              ) : previewAsset.asset_type === 'video' ? (
-                <video
-                  src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
-                  controls
-                  className="max-w-full max-h-[55vh]"
-                />
-              ) : (
-                <iframe
-                  src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
-                  className="w-full h-[55vh] bg-white"
-                />
-              )}
-            </div>
+          {/* 預覽內容 */}
+          <div className="flex items-center justify-center bg-morandi-container/20 min-h-[300px] max-h-[60vh] rounded-lg">
+            {previewAsset?.asset_type === 'image' ? (
+              <img
+                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                alt={previewAsset.name}
+                className="max-w-full max-h-[55vh] object-contain"
+              />
+            ) : previewAsset?.asset_type === 'video' ? (
+              <video
+                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                controls
+                className="max-w-full max-h-[55vh]"
+              />
+            ) : previewAsset ? (
+              <iframe
+                src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
+                className="w-full h-[55vh] bg-white"
+              />
+            ) : null}
           </div>
-        </div>,
-        document.body
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

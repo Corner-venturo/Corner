@@ -37,7 +37,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
         <div className="flex items-center gap-2">
           {/* 餐飲類別：顯示自理 checkbox */}
           {isMealItem && (
-            <label className="flex items-center gap-1 text-xs text-morandi-secondary cursor-pointer flex-shrink-0">
+            <label className="flex items-center gap-1 text-xs text-morandi-primary cursor-pointer flex-shrink-0">
               <input
                 type="checkbox"
                 checked={item.is_self_arranged || false}

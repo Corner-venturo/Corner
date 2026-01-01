@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface BreathingExerciseProps {
   onComplete: () => void
@@ -64,53 +64,48 @@ export function BreathingExercise({ onComplete, onSkip }: BreathingExerciseProps
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <button
-        onClick={onSkip}
-        className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
-      >
-        <X size={32} />
-      </button>
+    <Dialog open onOpenChange={(open) => !open && onSkip()}>
+      <DialogContent className="max-w-none w-screen h-screen bg-black/80 border-none flex items-center justify-center p-0">
+        <div className="text-center">
+          <motion.div
+            className="w-64 h-64 mx-auto mb-8 rounded-full bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 border-2 border-morandi-gold/20"
+            animate={{
+              scale: circleScale[phase],
+            }}
+            transition={{
+              duration: 4,
+              ease: 'easeInOut',
+            }}
+          />
 
-      <div className="text-center">
-        <motion.div
-          className="w-64 h-64 mx-auto mb-8 rounded-full bg-gradient-to-br from-morandi-gold/30 to-morandi-gold/10 border-2 border-morandi-gold/20"
-          animate={{
-            scale: circleScale[phase],
-          }}
-          transition={{
-            duration: 4,
-            ease: 'easeInOut',
-          }}
-        />
+          {cycleCount < totalCycles ? (
+            <>
+              <motion.h2
+                key={phase}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-3xl font-light text-white mb-4"
+              >
+                {phaseText[phase]}
+              </motion.h2>
 
-        {cycleCount < totalCycles ? (
-          <>
+              <p className="text-white/60 text-lg">
+                {cycleCount + 1} / {totalCycles}
+              </p>
+
+              <p className="text-white/40 text-sm mt-8">讓我們先深呼吸，準備好進入顯化的旅程</p>
+            </>
+          ) : (
             <motion.h2
-              key={phase}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               className="text-3xl font-light text-white mb-4"
             >
-              {phaseText[phase]}
+              完成
             </motion.h2>
-
-            <p className="text-white/60 text-lg">
-              {cycleCount + 1} / {totalCycles}
-            </p>
-
-            <p className="text-white/40 text-sm mt-8">讓我們先深呼吸，準備好進入顯化的旅程</p>
-          </>
-        ) : (
-          <motion.h2
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-3xl font-light text-white mb-4"
-          >
-            完成 ✨
-          </motion.h2>
-        )}
-      </div>
-    </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

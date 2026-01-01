@@ -51,7 +51,7 @@ export function NotesWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-morandi-gold/10 via-white to-status-warning-bg flex flex-col">
+      <div className="h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80 bg-gradient-to-br from-morandi-gold/10 via-white to-status-warning-bg flex flex-col">
         <div className="p-5 pb-3 flex-shrink-0">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3">

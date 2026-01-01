@@ -252,7 +252,7 @@ export function TourItinerarySectionLuxury({
                             <div className="grid grid-cols-2 gap-6">
                               {/* 左側圖片 */}
                               <div
-                                className="relative h-56 overflow-hidden rounded-sm cursor-pointer group/img"
+                                className="relative h-56 overflow-hidden rounded-md cursor-pointer group/img"
                                 onClick={() => openImageGallery(allImages, 0)}
                               >
                                 <img
@@ -320,7 +320,7 @@ export function TourItinerarySectionLuxury({
                               {allImages.slice(0, 3).map((img, imgIdx) => (
                                 <div
                                   key={imgIdx}
-                                  className="relative h-44 overflow-hidden rounded-sm cursor-pointer group/img"
+                                  className="relative h-44 overflow-hidden rounded-md cursor-pointer group/img"
                                   onClick={() => openImageGallery(allImages, imgIdx)}
                                 >
                                   <img
@@ -359,7 +359,7 @@ export function TourItinerarySectionLuxury({
                         /* 無圖片時：顯示 Highlight 景點列表 */
                         day.activities && day.activities.length > 0 && (
                           <div
-                            className="p-5 rounded-sm mb-4"
+                            className="p-5 rounded-md mb-4"
                             style={{ backgroundColor: LUXURY.background }}
                           >
                             <h4
@@ -468,7 +468,7 @@ export function TourItinerarySectionLuxury({
                           </h5>
                           {day.accommodation ? (
                             <div
-                              className="bg-white p-4 shadow-sm rounded-sm border"
+                              className="bg-white p-4 shadow-sm rounded-md border"
                               style={{ borderColor: '#f0f0f0' }}
                             >
                               {/* 續住標示 */}

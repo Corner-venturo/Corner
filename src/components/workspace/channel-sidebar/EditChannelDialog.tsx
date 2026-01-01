@@ -2,6 +2,15 @@
  * 編輯頻道 Dialog
  */
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Save, X } from 'lucide-react'
+
 interface EditChannelDialogProps {
   isOpen: boolean
   channelName: string
@@ -21,15 +30,15 @@ export function EditChannelDialog({
   onClose,
   onSave,
 }: EditChannelDialogProps) {
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[400px] shadow-xl">
-        <h3 className="text-lg font-semibold text-morandi-primary mb-4">編輯頻道</h3>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="w-[400px]">
+        <DialogHeader>
+          <DialogTitle className="text-morandi-primary">編輯頻道</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
               頻道名稱
             </label>
             <input
@@ -41,7 +50,7 @@ export function EditChannelDialog({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
               描述（可選）
             </label>
             <textarea
@@ -54,21 +63,24 @@ export function EditChannelDialog({
           </div>
         </div>
         <div className="flex gap-2 mt-6">
-          <button
+          <Button
+            variant="outline"
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-morandi-gold/30 rounded-lg text-morandi-secondary hover:bg-morandi-container/20 transition-colors"
+            className="flex-1 gap-2"
           >
+            <X size={16} />
             取消
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onSave}
             disabled={!channelName.trim()}
-            className="flex-1 px-4 py-2 bg-morandi-gold text-white rounded-lg hover:bg-morandi-gold-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Save size={16} />
             儲存
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -16,7 +16,7 @@ export function DepartureBasicInfo({ data, isEditing, setData }: DepartureBasicI
       <h2 className="text-lg font-semibold text-morandi-primary mb-4">基本資訊</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
-          <Label className="text-sm text-morandi-secondary">隨團領隊</Label>
+          <Label className="text-sm text-morandi-primary">隨團領隊</Label>
           {isEditing ? (
             <Input
               value={data?.tour_leader || ''}
@@ -29,7 +29,7 @@ export function DepartureBasicInfo({ data, isEditing, setData }: DepartureBasicI
           )}
         </div>
         <div>
-          <Label className="text-sm text-morandi-secondary">領隊聯絡方式</Label>
+          <Label className="text-sm text-morandi-primary">領隊聯絡方式</Label>
           {isEditing ? (
             <Input
               value={data?.tour_leader_contact || ''}
@@ -42,7 +42,7 @@ export function DepartureBasicInfo({ data, isEditing, setData }: DepartureBasicI
           )}
         </div>
         <div>
-          <Label className="text-sm text-morandi-secondary">承辦業務</Label>
+          <Label className="text-sm text-morandi-primary">承辦業務</Label>
           {isEditing ? (
             <Input
               value={data?.sales_person || ''}
@@ -55,7 +55,7 @@ export function DepartureBasicInfo({ data, isEditing, setData }: DepartureBasicI
           )}
         </div>
         <div>
-          <Label className="text-sm text-morandi-secondary">助理人員</Label>
+          <Label className="text-sm text-morandi-primary">助理人員</Label>
           {isEditing ? (
             <Input
               value={data?.assistant_person || ''}
@@ -68,7 +68,7 @@ export function DepartureBasicInfo({ data, isEditing, setData }: DepartureBasicI
           )}
         </div>
         <div className="col-span-2 md:col-span-4">
-          <Label className="text-sm text-morandi-secondary">航班資訊</Label>
+          <Label className="text-sm text-morandi-primary">航班資訊</Label>
           {isEditing ? (
             <Input
               value={data?.flight_info || ''}

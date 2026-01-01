@@ -20,7 +20,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 中文姓名 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">中文姓名</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">中文姓名</label>
         <input
           type="text"
           value={formData.chinese_name || ''}
@@ -31,7 +31,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 護照拼音 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">護照拼音</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">護照拼音</label>
         <input
           type="text"
           value={formData.passport_name || ''}
@@ -42,7 +42,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 出生年月日 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">出生年月日</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">出生年月日</label>
         <input
           type="text"
           value={formData.birth_date || ''}
@@ -54,7 +54,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 性別 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">性別</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">性別</label>
         <select
           value={formData.gender || ''}
           onChange={e => onChange({ ...formData, gender: e.target.value })}
@@ -68,7 +68,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 身分證號 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">身分證號</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">身分證號</label>
         <input
           type="text"
           value={formData.id_number || ''}
@@ -79,7 +79,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 護照號碼 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">護照號碼</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">護照號碼</label>
         <input
           type="text"
           value={formData.passport_number || ''}
@@ -90,7 +90,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 護照效期 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">護照效期</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">護照效期</label>
         <input
           type="text"
           value={formData.passport_expiry || ''}
@@ -102,7 +102,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 特殊餐食 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">特殊餐食</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">特殊餐食</label>
         <input
           type="text"
           value={formData.special_meal || ''}
@@ -113,7 +113,7 @@ export function MemberInfoForm({ formData, onChange }: MemberInfoFormProps) {
 
       {/* 備註 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">備註</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">備註</label>
         <textarea
           value={formData.remarks || ''}
           onChange={e => onChange({ ...formData, remarks: e.target.value })}

@@ -138,7 +138,7 @@ export function PaymentItemRow({
               {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       Email *
                     </label>
                     <Input
@@ -150,7 +150,7 @@ export function PaymentItemRow({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       付款截止日 *
                     </label>
                     <DatePicker
@@ -161,7 +161,7 @@ export function PaymentItemRow({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       付款名稱（客戶看到的）
                     </label>
                     <Input
@@ -178,7 +178,7 @@ export function PaymentItemRow({
               {item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       匯入帳戶 *
                     </label>
                     <Select
@@ -198,7 +198,7 @@ export function PaymentItemRow({
                     </Select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       手續費
                     </label>
                     <Input
@@ -216,7 +216,7 @@ export function PaymentItemRow({
               {item.receipt_type === RECEIPT_TYPES.CREDIT_CARD && (
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       卡號後四碼
                     </label>
                     <Input
@@ -230,7 +230,7 @@ export function PaymentItemRow({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       授權碼
                     </label>
                     <Input
@@ -241,7 +241,7 @@ export function PaymentItemRow({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       手續費
                     </label>
                     <Input
@@ -259,7 +259,7 @@ export function PaymentItemRow({
               {item.receipt_type === RECEIPT_TYPES.CHECK && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       支票號碼
                     </label>
                     <Input
@@ -270,7 +270,7 @@ export function PaymentItemRow({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
                       開票銀行
                     </label>
                     <Input

@@ -465,7 +465,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                 {/* 設定區域 */}
                 <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">航班號碼</label>
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">航班號碼</label>
                     <Input
                       value={entryCardSettings.flightNumber}
                       onChange={e => setEntryCardSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
@@ -474,7 +474,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店名稱</label>
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店名稱</label>
                     <Input
                       value={entryCardSettings.hotelName}
                       onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelName: e.target.value }))}
@@ -483,7 +483,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店地址</label>
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店地址</label>
                     <Input
                       value={entryCardSettings.hotelAddress}
                       onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
@@ -492,7 +492,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店電話</label>
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店電話</label>
                     <Input
                       value={entryCardSettings.hotelPhone}
                       onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
@@ -501,7 +501,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-morandi-secondary mb-1 block">停留天數</label>
+                    <label className="text-xs font-medium text-morandi-primary mb-1 block">停留天數</label>
                     <Input
                       type="number"
                       min={1}

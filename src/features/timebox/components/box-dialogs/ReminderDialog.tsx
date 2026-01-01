@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Trash2, Check } from 'lucide-react'
+import { Trash2, Check, X } from 'lucide-react'
 import {
   useTimeboxScheduledBoxes,
   useTimeboxBoxes,
@@ -137,7 +137,8 @@ export default function ReminderDialog({ scheduledBox, box, onClose }: ReminderD
               移除排程
             </Button>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" className="gap-2" onClick={onClose}>
+                <X size={16} />
                 取消
               </Button>
               <Button variant="outline" onClick={handleUpdate} className="gap-1">

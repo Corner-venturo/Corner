@@ -13,6 +13,14 @@ import {
   Calendar,
   MapPin,
 } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useItineraryStore, useRegionsStore, useAuthStore } from '@/stores'
 import type { Tour, Itinerary } from '@/stores/types'
@@ -33,14 +41,12 @@ interface ItineraryVersionPickerProps {
   isOpen: boolean
   onClose: () => void
   tour: Tour
-  anchorEl?: HTMLElement | null
 }
 
 export function ItineraryVersionPicker({
   isOpen,
   onClose,
   tour,
-  anchorEl,
 }: ItineraryVersionPickerProps) {
   const router = useRouter()
   const { items: itineraries, fetchAll, create, update, loading } = useItineraryStore()
@@ -50,7 +56,6 @@ export function ItineraryVersionPicker({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
 
   // 載入行程表與區域資料
   useEffect(() => {
@@ -61,19 +66,6 @@ export function ItineraryVersionPicker({
       }
     }
   }, [isOpen, fetchAll, fetchRegions, countries.length])
-
-  // 點擊外部關閉
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, onClose])
 
   // 編輯時自動聚焦
   useEffect(() => {
@@ -235,49 +227,16 @@ export function ItineraryVersionPicker({
     }
   }
 
-  if (!isOpen) return null
-
-  // 計算位置（如果有 anchor）
-  const style: React.CSSProperties = anchorEl
-    ? {
-        position: 'fixed',
-        top: anchorEl.getBoundingClientRect().bottom + 8,
-        left: anchorEl.getBoundingClientRect().left,
-        zIndex: 50,
-      }
-    : {
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 50,
-      }
-
   return (
-    <>
-      {/* 背景遮罩 */}
-      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
-
-      {/* 懸浮面板 */}
-      <div
-        ref={panelRef}
-        style={style}
-        className="bg-white rounded-xl shadow-2xl border border-border w-[400px] max-h-[500px] overflow-hidden"
-      >
-        {/* 標題 */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-morandi-container/20">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[400px] max-h-[500px] overflow-hidden p-0">
+        <DialogHeader className="px-4 py-3 border-b border-border bg-morandi-container/20">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-morandi-primary" />
-            <span className="font-medium text-morandi-primary">行程表管理</span>
+            <DialogTitle className="font-medium text-morandi-primary">行程表管理</DialogTitle>
             <span className="text-sm text-morandi-secondary">- {tour.code}</span>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-morandi-container rounded transition-colors"
-          >
-            <X size={18} className="text-morandi-secondary" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* 內容區 */}
         <div className="flex flex-col">
@@ -367,11 +326,12 @@ export function ItineraryVersionPicker({
           </div>
 
           {/* 新增按鈕 */}
-          <div className="p-2 border-t border-border">
-            <button
+          <DialogFooter className="p-2 border-t border-border">
+            <Button
               onClick={handleCreate}
               disabled={isCreating}
-              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-morandi-primary hover:bg-morandi-container/50 rounded-lg transition-colors disabled:opacity-50"
+              variant="ghost"
+              className="w-full gap-2"
             >
               {isCreating ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -379,10 +339,10 @@ export function ItineraryVersionPicker({
                 <Plus size={14} />
               )}
               新增
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </div>
-      </div>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

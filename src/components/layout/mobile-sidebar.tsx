@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  X,
   ChevronDown,
   Home,
   MapPin,
@@ -36,6 +35,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { isMenuItemHidden } from '@/constants/menu-items'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 interface MenuItem {
   href: string
@@ -220,33 +220,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   }
 
   return (
-    <>
-      {/* 背景遮罩 */}
-      <div
-        className={cn(
-          'lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity',
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        )}
-        onClick={onClose}
-      />
-
-      {/* 側邊欄 */}
-      <aside
-        className={cn(
-          'lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-xl transition-transform duration-300',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="lg:hidden fixed top-0 left-0 bottom-0 right-auto w-72 max-w-[80vw] translate-x-0 translate-y-0 bg-background shadow-lg rounded-none rounded-r-xl p-0 gap-0 data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left"
       >
         {/* 頂部標題 */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-border">
-          <span className="text-lg font-bold text-morandi-gold">Venturo</span>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted"
-            aria-label="關閉選單"
-          >
-            <X className="w-5 h-5 text-morandi-secondary" />
-          </button>
+          <DialogTitle className="text-lg font-bold text-morandi-gold">Venturo</DialogTitle>
         </div>
 
         {/* 選單內容 */}
@@ -272,7 +252,7 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </Link>
           </nav>
         </div>
-      </aside>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

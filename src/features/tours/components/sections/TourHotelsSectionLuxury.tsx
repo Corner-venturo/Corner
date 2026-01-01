@@ -128,7 +128,7 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
       className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto"
     >
       {/* 左側：圖片輪播 */}
-      <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl group">
+      <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg group">
         {currentImage ? (
           <img
             src={currentImage}
@@ -278,7 +278,7 @@ function HotelCard({
       className="group cursor-pointer"
     >
       {/* 圖片區 */}
-      <div className="relative h-64 rounded-sm overflow-hidden mb-6 shadow-lg">
+      <div className="relative h-64 rounded-md overflow-hidden mb-6 shadow-lg">
         {currentImage ? (
           <img
             src={currentImage}

@@ -1,7 +1,8 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { ImageGalleryState, ImageInfo } from '../utils/itineraryLuxuryUtils'
 
 interface ImageGalleryModalProps {
@@ -24,79 +25,65 @@ export function ImageGalleryModal({
   const currentImage = imageGallery.images[imageGallery.currentIndex]
 
   return (
-    <AnimatePresence>
-      {imageGallery && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-          onClick={onClose}
-        >
-          {/* 關閉按鈕 */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onClose()
-            }}
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
-
+    <Dialog open={!!imageGallery} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="max-w-5xl w-full bg-black/90 border-none p-0 gap-0"
+        aria-describedby={undefined}
+      >
+        <div className="relative flex items-center justify-center min-h-[60vh]">
           {/* 左箭頭 */}
           {imageGallery.images.length > 1 && (
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onPrev()
-              }}
+              onClick={onPrev}
               className="absolute left-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8 text-white" />
             </button>
           )}
 
           {/* 主圖片 */}
-          <motion.div
-            key={imageGallery.currentIndex}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="max-w-5xl max-h-[80vh] relative"
-            onClick={e => e.stopPropagation()}
-          >
-            <img
-              src={currentImage.url}
-              alt={currentImage.title || ''}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
-            />
-            {/* 圖片標題和描述 */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
-              {currentImage.title && (
-                <h3
-                  className="text-white text-xl font-bold mb-2"
-                  style={{ fontFamily: "'Noto Serif TC', serif" }}
-                >
-                  {currentImage.title}
-                </h3>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={imageGallery.currentIndex}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-5xl max-h-[80vh] relative"
+            >
+              <img
+                src={currentImage.url}
+                alt={currentImage.title || ''}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+              {/* 圖片標題和描述 */}
+              {(currentImage.title || currentImage.description) && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
+                  {currentImage.title && (
+                    <h3
+                      className="text-white text-xl font-bold mb-2"
+                      style={{ fontFamily: "'Noto Serif TC', serif" }}
+                    >
+                      {currentImage.title}
+                    </h3>
+                  )}
+                  {currentImage.description && (
+                    <p className="text-white/80 text-sm">
+                      {currentImage.description}
+                    </p>
+                  )}
+                </div>
               )}
-              {currentImage.description && (
-                <p className="text-white/80 text-sm">
-                  {currentImage.description}
-                </p>
-              )}
-            </div>
-          </motion.div>
+            </motion.div>
+          </AnimatePresence>
 
           {/* 右箭頭 */}
           {imageGallery.images.length > 1 && (
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onNext()
-              }}
+              onClick={onNext}
               className="absolute right-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8 text-white" />
             </button>
@@ -108,15 +95,13 @@ export function ImageGalleryModal({
               {imageGallery.images.map((img: ImageInfo, idx: number) => (
                 <button
                   key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSelectIndex(idx)
-                  }}
+                  onClick={() => onSelectIndex(idx)}
                   className={`w-16 h-12 rounded overflow-hidden border-2 transition-all ${
                     idx === imageGallery.currentIndex
                       ? 'border-white opacity-100'
                       : 'border-transparent opacity-50 hover:opacity-75'
                   }`}
+                  aria-label={`View image ${idx + 1}`}
                 >
                   <img
                     src={img.url}
@@ -127,8 +112,8 @@ export function ImageGalleryModal({
               ))}
             </div>
           )}
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

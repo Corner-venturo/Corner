@@ -93,7 +93,7 @@ export function CustomerSearchDialog({
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">基本資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">
+                <label className="text-sm text-morandi-primary mb-2 block">
                   姓名 / 身份證號 / 護照號碼
                 </label>
                 <Input
@@ -104,7 +104,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">電話</label>
+                <label className="text-sm text-morandi-primary mb-2 block">電話</label>
                 <Input
                   value={searchParams.phone || ''}
                   onChange={e => updateParam('phone', e.target.value)}
@@ -113,7 +113,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">Email</label>
+                <label className="text-sm text-morandi-primary mb-2 block">Email</label>
                 <Input
                   type="email"
                   value={searchParams.email || ''}
@@ -123,7 +123,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">城市</label>
+                <label className="text-sm text-morandi-primary mb-2 block">城市</label>
                 <Input
                   value={searchParams.city || ''}
                   onChange={e => updateParam('city', e.target.value)}
@@ -138,7 +138,7 @@ export function CustomerSearchDialog({
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">護照資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">
+                <label className="text-sm text-morandi-primary mb-2 block">
                   護照拼音（姓氏/名字）
                 </label>
                 <Input
@@ -149,7 +149,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div className="col-span-1 md:col-span-2">
-                <label className="text-sm text-morandi-secondary mb-2 block">護照效期範圍</label>
+                <label className="text-sm text-morandi-primary mb-2 block">護照效期範圍</label>
                 <div className="grid grid-cols-2 gap-2">
                   <DatePicker
                     value={searchParams.passport_expiry_start || ''}
@@ -171,7 +171,7 @@ export function CustomerSearchDialog({
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">VIP 與來源</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">VIP 狀態</label>
+                <label className="text-sm text-morandi-primary mb-2 block">VIP 狀態</label>
                 <Select
                   value={searchParams.is_vip?.toString() || 'all'}
                   onValueChange={value =>
@@ -190,7 +190,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">VIP 等級</label>
+                <label className="text-sm text-morandi-primary mb-2 block">VIP 等級</label>
                 <Select
                   value={searchParams.vip_level || 'all'}
                   onValueChange={value =>
@@ -211,7 +211,7 @@ export function CustomerSearchDialog({
               </div>
 
               <div>
-                <label className="text-sm text-morandi-secondary mb-2 block">客戶來源</label>
+                <label className="text-sm text-morandi-primary mb-2 block">客戶來源</label>
                 <Select
                   value={searchParams.source || 'all'}
                   onValueChange={value =>

@@ -386,7 +386,7 @@ const FlightConfirmationContent: React.FC<{ data: FlightData }> = ({ data }) => 
       <div className="avoid-break">
         <table className="w-full text-sm" style={{
           borderCollapse: 'collapse',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
+          fontFamily: "'Noto Sans TC', sans-serif"
         }}>
           <thead>
             <tr style={{

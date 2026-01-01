@@ -7,6 +7,12 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Home,
   Calendar,
   MapPin,
@@ -17,6 +23,7 @@ import {
   Database,
   MoreHorizontal,
   Settings,
+  Check,
 } from 'lucide-react'
 
 // 可用的導航項目配置
@@ -281,28 +288,12 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[500] flex items-end md:items-center justify-center p-0 md:p-4">
-      <div
-        className="bg-background w-full md:max-w-md md:rounded-2xl rounded-t-2xl shadow-2xl border border-border overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 w-full max-w-full md:max-w-md md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] md:bottom-auto rounded-t-xl md:rounded-xl p-0 gap-0">
         {/* 標題列 */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-bold text-morandi-primary">自訂底部導航欄</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-morandi-container/50 rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+        <DialogHeader className="p-4 border-b border-border">
+          <DialogTitle className="text-lg font-bold text-morandi-primary">自訂底部導航欄</DialogTitle>
+        </DialogHeader>
 
         {/* 提示 */}
         <div className="p-4 bg-morandi-gold/5 border-b border-border">
@@ -336,13 +327,7 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
                   <Icon size={20} />
                   <span className="font-medium">{item.label}</span>
                   {isSelected && (
-                    <svg className="w-5 h-5 ml-auto" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <Check className="w-5 h-5 ml-auto" />
                   )}
                 </button>
               )
@@ -365,7 +350,7 @@ function MobileNavSettings({ availableItems, selectedItemIds, onSave, onClose }:
             儲存
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -14,10 +14,11 @@ import {
   JapaneseAccommodationCard,
   JapaneseMealsCard,
 } from '@/components/tour-preview'
-import { ArrowRight, Sparkles, X } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import { TourFormData } from '@/components/editor/tour-form/types'
 import { SectionTitle } from './SectionTitle'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface TourItinerarySectionProps {
   data: TourFormData
@@ -383,7 +384,7 @@ export function TourItinerarySection({
                                     description={activity.description || ''}
                                     image={activity.image}
                                     layout="vertical"
-                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                     onClick={() => handleActivityClick(activity)}
                                   />
                                 ))}
@@ -408,7 +409,7 @@ export function TourItinerarySection({
                                     description={activity.description || ''}
                                     image={activity.image}
                                     layout="horizontal"
-                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                     onClick={() => handleActivityClick(activity)}
                                   />
                                 ))}
@@ -427,7 +428,7 @@ export function TourItinerarySection({
                                     description={withImage[0].description || ''}
                                     image={withImage[0].image}
                                     layout="fullwidth"
-                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                    className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                     onClick={() => handleActivityClick(withImage[0])}
                                   />
                                 </div>
@@ -441,7 +442,7 @@ export function TourItinerarySection({
                                         description={activity.description || ''}
                                         image={activity.image}
                                         layout="horizontal"
-                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full"
                                         onClick={() => handleActivityClick(activity)}
                                       />
                                     </div>
@@ -477,7 +478,7 @@ export function TourItinerarySection({
                                         description={activity.description || ''}
                                         image={activity.image}
                                         layout="vertical"
-                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                         onClick={() => handleActivityClick(activity)}
                                       />
                                     ))}
@@ -498,7 +499,7 @@ export function TourItinerarySection({
                                         description={activity.description || ''}
                                         image={activity.image}
                                         layout="horizontal"
-                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                        className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                         onClick={() => handleActivityClick(activity)}
                                       />
                                     ))}
@@ -518,7 +519,7 @@ export function TourItinerarySection({
                                   description={activity.description || ''}
                                   image={activity.image}
                                   layout={activity.image ? "vertical" : "horizontal"}
-                                  className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                  className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                   onClick={() => handleActivityClick(activity)}
                                 />
                               ))}
@@ -531,7 +532,7 @@ export function TourItinerarySection({
 
                   {day.recommendations && day.recommendations.length > 0 && (
                     <div className={cn(
-                      "rounded-2xl sm:rounded-3xl border border-emerald-200 bg-emerald-50/80 shadow-inner",
+                      "rounded-xl sm:rounded-2xl border border-emerald-200 bg-emerald-50/80 shadow-inner",
                       viewMode === 'mobile' ? 'mb-4 p-3' : 'mb-8 p-6'
                     )}>
                       <h4 className={cn(
@@ -694,69 +695,46 @@ export function TourItinerarySection({
       </div>
 
       {/* 懸浮視窗 Modal - 桌面版景點詳情 */}
-      <AnimatePresence>
-        {selectedActivity !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-            onClick={() => setSelectedActivity(null)}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: '100vw',
-              height: '100vh'
-            }}
-          >
-            {/* 懸浮卡片 */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative bg-white rounded-2xl overflow-hidden max-w-[85vw] max-h-[70vh] w-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* 圖片 - 有圖片才顯示 */}
-              {selectedActivity?.image && selectedActivity.image.trim() !== '' && (
-                <div className="relative w-full aspect-[3/2] max-h-[40vh]">
-                  <Image
-                    src={selectedActivity.image}
-                    alt={selectedActivity.title}
-                    fill
-                    className="object-cover"
-                    sizes="85vw"
-                  />
-                </div>
-              )}
-
-              {/* 關閉按鈕 - 固定在右上角 */}
-              <button
-                onClick={() => setSelectedActivity(null)}
-                className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white z-30 transition-all"
+      <Dialog open={selectedActivity !== null} onOpenChange={(open) => !open && setSelectedActivity(null)}>
+        <DialogContent className="max-w-[85vw] max-h-[70vh] w-auto p-0 overflow-hidden">
+          <AnimatePresence mode="wait">
+            {selectedActivity && (
+              <motion.div
+                key={selectedActivity.title}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
-                <X size={20} />
-              </button>
-
-              {/* 內容區 */}
-              <div className="p-6">
-                <h3 className="font-bold text-xl mb-3 text-morandi-primary">
-                  {selectedActivity?.title}
-                </h3>
-                {selectedActivity?.description && (
-                  <p className="text-sm leading-relaxed text-morandi-secondary">
-                    {selectedActivity.description}
-                  </p>
+                {/* 圖片 - 有圖片才顯示 */}
+                {selectedActivity.image && selectedActivity.image.trim() !== '' && (
+                  <div className="relative w-full aspect-[3/2] max-h-[40vh]">
+                    <Image
+                      src={selectedActivity.image}
+                      alt={selectedActivity.title}
+                      fill
+                      className="object-cover"
+                      sizes="85vw"
+                    />
+                  </div>
                 )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+                {/* 內容區 */}
+                <div className="p-6">
+                  <h3 className="font-bold text-xl mb-3 text-morandi-primary">
+                    {selectedActivity.title}
+                  </h3>
+                  {selectedActivity.description && (
+                    <p className="text-sm leading-relaxed text-morandi-secondary">
+                      {selectedActivity.description}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

@@ -61,7 +61,7 @@ export default function FitnessSettingsPage() {
 
       <div className="px-4 pt-6 space-y-6">
         {/* 使用者資訊 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-2xl p-4 shadow-[0_2px_8px_rgba(61,41,20,0.08)]">
+        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl p-4 shadow-[0_2px_8px_rgba(61,41,20,0.08)]">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-[#B8A99A] rounded-full flex items-center justify-center">
               <User className="w-6 h-6 text-white" />
@@ -76,7 +76,7 @@ export default function FitnessSettingsPage() {
         </div>
 
         {/* 設定選項 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-2xl overflow-hidden">
+        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl overflow-hidden">
           {/* 清除本地資料 */}
           <button
             onClick={handleClearData}
@@ -111,7 +111,7 @@ export default function FitnessSettingsPage() {
         </div>
 
         {/* 關於 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-2xl p-4">
+        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl p-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-[#E8F4F8] rounded-full flex items-center justify-center flex-shrink-0">
               <Info className="w-5 h-5 text-[#61A9C9]" />

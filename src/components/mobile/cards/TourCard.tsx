@@ -24,7 +24,7 @@ interface TourCardProps {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   '提案': { label: '提案', color: 'text-amber-700', bg: 'bg-amber-100' },
   '進行中': { label: '進行中', color: 'text-green-700', bg: 'bg-green-100' },
-  '結案': { label: '結案', color: 'text-gray-700', bg: 'bg-gray-100' },
+  '結案': { label: '結案', color: 'text-morandi-secondary', bg: 'bg-morandi-container' },
   '取消': { label: '取消', color: 'text-red-700', bg: 'bg-red-100' },
 }
 

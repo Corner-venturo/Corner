@@ -339,28 +339,28 @@ export function CustomerVerifyDialog({
             <h3 className="text-sm font-medium text-morandi-primary">客戶資料</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-morandi-secondary">中文姓名</label>
+                <label className="text-xs text-morandi-primary">中文姓名</label>
                 <Input
                   value={formData.name || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary">護照英文名</label>
+                <label className="text-xs text-morandi-primary">護照英文名</label>
                 <Input
                   value={formData.passport_romanization || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, passport_romanization: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary">護照號碼</label>
+                <label className="text-xs text-morandi-primary">護照號碼</label>
                 <Input
                   value={formData.passport_number || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, passport_number: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary">護照效期</label>
+                <label className="text-xs text-morandi-primary">護照效期</label>
                 <DatePicker
                   value={formData.passport_expiry_date || ''}
                   onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry_date: date }))}
@@ -368,7 +368,7 @@ export function CustomerVerifyDialog({
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary">出生日期</label>
+                <label className="text-xs text-morandi-primary">出生日期</label>
                 <DatePicker
                   value={formData.date_of_birth || ''}
                   onChange={(date) => setFormData(prev => ({ ...prev, date_of_birth: date }))}
@@ -376,7 +376,7 @@ export function CustomerVerifyDialog({
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary">身分證字號</label>
+                <label className="text-xs text-morandi-primary">身分證字號</label>
                 <Input
                   value={formData.national_id || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, national_id: e.target.value }))}

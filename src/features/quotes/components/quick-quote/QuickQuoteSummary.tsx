@@ -68,28 +68,28 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
         <div className={`grid gap-4 ${isEditing ? 'grid-cols-5' : 'grid-cols-3'}`}>
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
-              <label className="text-sm font-medium text-morandi-secondary">總成本</label>
+              <label className="text-sm font-medium text-morandi-primary">總成本</label>
               <div className="mt-1 text-2xl font-bold text-morandi-primary">
                 NT$ {totalCost.toLocaleString()}
               </div>
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-secondary">應收金額</label>
+            <label className="text-sm font-medium text-morandi-primary">應收金額</label>
             <div className="mt-1 text-2xl font-bold text-morandi-primary">
               NT$ {totalAmount.toLocaleString()}
             </div>
           </div>
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
-              <label className="text-sm font-medium text-morandi-secondary">總利潤</label>
+              <label className="text-sm font-medium text-morandi-primary">總利潤</label>
               <div className={`mt-1 text-2xl font-bold ${totalProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                 NT$ {totalProfit.toLocaleString()}
               </div>
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-secondary">已收金額</label>
+            <label className="text-sm font-medium text-morandi-primary">已收金額</label>
             {isEditing ? (
               <Input
                 type="text"
@@ -118,7 +118,7 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
             )}
           </div>
           <div className="p-4 bg-morandi-container/10 rounded-lg">
-            <label className="text-sm font-medium text-morandi-secondary">應收餘額</label>
+            <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
             <div
               className={`mt-1 text-2xl font-bold ${
                 balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'

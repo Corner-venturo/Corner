@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 import prettierConfig from 'eslint-config-prettier';
+import venturoDesignSystem from './eslint-rules/venturo-design-system.js';
 
 export default tseslint.config(
   // 全域忽略
@@ -49,8 +50,24 @@ export default tseslint.config(
   {
     plugins: {
       'react-hooks': reactHooks,
+      'venturo': venturoDesignSystem,
     },
     rules: {
+      // =====================================================
+      // Venturo 設計系統規則 (2026-01-01 更新)
+      // @see docs/DESIGN_SYSTEM.md
+      // =====================================================
+      // 先設為 warn，穩定後改為 error
+      'venturo/no-forbidden-classes': 'warn',
+      // 頁面佈局檢查 - 暫時關閉，待修復現有頁面後開啟
+      'venturo/prefer-standard-layout': 'off',
+      // 禁止自訂 Modal/Dialog - 應使用標準 Dialog 組件
+      'venturo/no-custom-modal': 'warn',
+      // Dialog 按鈕需要圖標
+      'venturo/button-requires-icon': 'warn',
+      // 表單標籤一致性
+      'venturo/consistent-form-label': 'warn',
+
       // 暫時保留原設定中被放寬的規則，以避免一次性出現大量新錯誤
       'prefer-const': 'off',
       '@typescript-eslint/no-unused-vars': 'off',

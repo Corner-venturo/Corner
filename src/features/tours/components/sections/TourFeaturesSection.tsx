@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { morandiColors } from '@/lib/constants/morandi-colors'
 import { SectionTitle } from './SectionTitle'
 import { TourFeaturesSectionCollage, type FeatureCardStyle } from './TourFeaturesSectionCollage'
@@ -365,53 +366,40 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
       </div>
 
       {/* Lightbox 圖片放大檢視 */}
-      <AnimatePresence>
-        {lightboxImages.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center"
-            onClick={closeLightbox}
-          >
-            {/* 關閉按鈕 */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
-            >
-              <X size={24} />
-            </button>
-
+      <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
+        <DialogContent className="max-w-5xl bg-black/90 border-none p-0">
+          <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToPrev() }}
+                onClick={goToPrev}
                 className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
               </button>
             )}
 
-            {/* 圖片容器 - 統一尺寸（純圖片，不含文字） */}
-            <motion.div
-              key={lightboxIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={lightboxImages[lightboxIndex]}
-                alt={`圖片 ${lightboxIndex + 1}`}
-                className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
-              />
-            </motion.div>
+            {/* 圖片容器 */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={lightboxIndex}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center justify-center px-16"
+              >
+                <img
+                  src={lightboxImages[lightboxIndex]}
+                  alt={`圖片 ${lightboxIndex + 1}`}
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg"
+                />
+              </motion.div>
+            </AnimatePresence>
 
             {/* 右箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToNext() }}
+                onClick={goToNext}
                 className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
@@ -424,9 +412,9 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                 {lightboxIndex + 1} / {lightboxImages.length}
               </div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

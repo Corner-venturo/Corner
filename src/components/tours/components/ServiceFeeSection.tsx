@@ -22,7 +22,7 @@ export function ServiceFeeSection({ data, isEditing, serviceFee, setData }: Serv
       <h2 className="text-lg font-semibold text-morandi-primary mb-4">服務費用設定</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
-          <Label className="text-sm text-morandi-secondary">領隊服務費（每人）</Label>
+          <Label className="text-sm text-morandi-primary">領隊服務費（每人）</Label>
           {isEditing ? (
             <Input
               type="number"
@@ -35,11 +35,11 @@ export function ServiceFeeSection({ data, isEditing, serviceFee, setData }: Serv
           )}
         </div>
         <div>
-          <Label className="text-sm text-morandi-secondary">服務費小計</Label>
+          <Label className="text-sm text-morandi-primary">服務費小計</Label>
           <p className="mt-1 font-semibold text-morandi-gold">{formatMoney(serviceFee)}</p>
         </div>
         <div>
-          <Label className="text-sm text-morandi-secondary">零用金</Label>
+          <Label className="text-sm text-morandi-primary">零用金</Label>
           {isEditing ? (
             <Input
               type="number"

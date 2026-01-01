@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, DollarSign, Calendar } from 'lucide-react'
+import { DollarSign, Calendar, X, Save } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,6 +10,13 @@ import type { CreateInput } from '@/stores/core/types'
 import type { ReceiptOrder } from '@/types'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -20,11 +27,12 @@ interface CreateReceiptDialogProps {
     paid_amount: number
     gap: number
   }
+  open: boolean
   onClose: () => void
   onSuccess: (receiptId: string) => void
 }
 
-export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceiptDialogProps) {
+export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateReceiptDialogProps) {
   const { create: createReceipt } = useReceiptOrderStore()
 
   const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0])
@@ -61,21 +69,14 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div className="card-morandi-elevated w-[500px]" onClick={e => e.stopPropagation()}>
-        {/* 標題列 */}
-        <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
-          <div className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-[500px]">
+        <DialogHeader className="pb-3 border-b border-morandi-gold/20">
+          <DialogTitle className="flex items-center gap-2">
             <DollarSign className="text-morandi-gold" size={20} />
-            <h3 className="text-lg font-semibold text-morandi-primary">建立收款單</h3>
-          </div>
-          <button onClick={onClose} className="btn-icon-morandi !w-8 !h-8">
-            <X size={16} />
-          </button>
-        </div>
+            <span>建立收款單</span>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* 內容 */}
         <div className="space-y-4 my-4">
@@ -110,7 +111,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
 
           {/* 收款日期 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               收款日期
             </label>
             <div className="relative">
@@ -129,7 +130,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
 
           {/* 收款方式 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               收款方式
             </label>
             <Select
@@ -154,7 +155,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
 
           {/* 收款金額 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               收款金額
             </label>
             <Input
@@ -167,7 +168,7 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
 
           {/* 備註 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               備註（選填）
             </label>
             <Textarea
@@ -180,19 +181,21 @@ export function CreateReceiptDialog({ order, onClose, onSuccess }: CreateReceipt
         </div>
 
         {/* 底部操作按鈕 */}
-        <div className="flex gap-2 justify-end pt-3 border-t border-morandi-gold/20">
-          <button className="btn-morandi-secondary !py-2 !px-4" onClick={onClose}>
+        <DialogFooter className="pt-3 border-t border-morandi-gold/20">
+          <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+            <X size={16} />
             取消
           </button>
           <button
-            className="btn-morandi-primary !py-2 !px-4"
+            className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2"
             onClick={handleCreate}
             disabled={!amount || parseFloat(amount) <= 0}
           >
+            <Save size={16} />
             建立收款單
           </button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

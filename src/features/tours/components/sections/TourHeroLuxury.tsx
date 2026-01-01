@@ -144,7 +144,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
 
           {/* 右側：主視覺圖片 */}
           <div className={`${isMobile ? '' : 'lg:col-span-7'} relative`}>
-            <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-lg">
               <img
                 src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=80&auto=format&fit=crop'}
                 alt={data.title}

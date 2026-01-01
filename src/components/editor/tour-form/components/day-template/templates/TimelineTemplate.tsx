@@ -32,7 +32,7 @@ export function TimelineTemplate({
   uploading,
 }: TimelineTemplateProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       {/* 標題區 */}
       <div className="p-6 bg-[#4a6fa5] text-white">
         <div className="flex items-center gap-4">

@@ -102,7 +102,7 @@ export function ReturnDocumentsDialog({
 
         {/* 選中的簽證清單 */}
         <div className="border-t border-border pt-3">
-          <label className="text-xs text-morandi-secondary mb-2 block">
+          <label className="text-xs text-morandi-primary mb-2 block">
             共 {selectedVisas.length} 筆簽證
           </label>
           <div className="max-h-[150px] overflow-y-auto space-y-1">

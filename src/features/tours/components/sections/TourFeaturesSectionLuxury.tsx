@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, ArrowRight, ChevronDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowRight, ChevronDown } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 // Luxury 配色
 const LUXURY = {
@@ -170,63 +171,55 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
       </div>
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxImages.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center"
-            onClick={closeLightbox}
-          >
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
-            >
-              <X size={24} />
-            </button>
-
+      <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
+        <DialogContent className="max-w-5xl bg-black/90 border-none p-0">
+          <div className="relative flex items-center justify-center min-h-[60vh]">
+            {/* 左箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToPrev() }}
+                onClick={goToPrev}
                 className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
               </button>
             )}
 
-            <motion.div
-              key={lightboxIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={lightboxImages[lightboxIndex]}
-                alt={`圖片 ${lightboxIndex + 1}`}
-                className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
-              />
-            </motion.div>
+            {/* 圖片容器 */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={lightboxIndex}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center justify-center px-16"
+              >
+                <img
+                  src={lightboxImages[lightboxIndex]}
+                  alt={`圖片 ${lightboxIndex + 1}`}
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg"
+                />
+              </motion.div>
+            </AnimatePresence>
 
+            {/* 右箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToNext() }}
+                onClick={goToNext}
                 className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
               </button>
             )}
 
+            {/* 圖片計數 */}
             {lightboxImages.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                 {lightboxIndex + 1} / {lightboxImages.length}
               </div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
@@ -276,7 +269,7 @@ function FeatureCard({
     >
       {/* 圖片區 */}
       <div
-        className="relative h-64 rounded-sm overflow-hidden mb-6 shadow-md border border-border cursor-pointer"
+        className="relative h-64 rounded-md overflow-hidden mb-6 shadow-md border border-border cursor-pointer"
         onClick={() => hasImages && onImageClick(validImages, currentImageIndex)}
       >
         {hasImages ? (

@@ -3,6 +3,7 @@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Save, X } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EditEventDialogState } from '../types'
@@ -185,14 +186,16 @@ export function EditEventDialog({
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button
               type="submit"
               disabled={!dialog.title.trim()}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Save size={16} />
               儲存變更
             </Button>
           </div>

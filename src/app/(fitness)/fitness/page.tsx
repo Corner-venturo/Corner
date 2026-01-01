@@ -4,7 +4,6 @@ import { useState } from 'react'
 import {
   Plus,
   X,
-  Clock,
   CheckCircle,
   Circle,
   ClipboardList,
@@ -15,6 +14,7 @@ import { EXERCISES, MUSCLE_GROUPS } from '@/data/fitness/exercises'
 import { ExerciseIcon, MuscleGroupIcon } from './components/ExerciseIcons'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
 interface WorkoutSet {
@@ -36,7 +36,6 @@ export default function FitnessPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [showExercisePicker, setShowExercisePicker] = useState(false)
   const [workoutExercises, setWorkoutExercises] = useState<WorkoutExercise[]>([])
-  const [restTimer, setRestTimer] = useState(90) // 90秒休息時間
 
   // 新增動作到訓練清單
   const addExercise = (exerciseId: number, exerciseName: string) => {
@@ -308,70 +307,60 @@ export default function FitnessPage() {
       </div>
 
       {/* 動作選擇對話框 */}
-      {showExercisePicker && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-background rounded-t-3xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4 rounded-t-3xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-foreground">選擇訓練動作</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setShowExercisePicker(false)
-                    setSelectedCategory(null)
-                  }}
-                  className="text-muted-foreground"
-                >
-                  <X className="w-6 h-6" />
-                </Button>
-              </div>
+      <Dialog open={showExercisePicker} onOpenChange={(open) => {
+        setShowExercisePicker(open)
+        if (!open) setSelectedCategory(null)
+      }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden p-0 rounded-t-3xl sm:rounded-xl">
+          <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4">
+            <DialogHeader className="flex-row items-center justify-between">
+              <DialogTitle className="text-lg font-bold text-foreground">選擇訓練動作</DialogTitle>
+            </DialogHeader>
 
-              {/* 部位篩選 */}
-              <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+            {/* 部位篩選 */}
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+              <Button
+                onClick={() => setSelectedCategory(null)}
+                variant={selectedCategory === null ? 'default' : 'outline'}
+                size="sm"
+                className="rounded-full text-xs whitespace-nowrap"
+              >
+                全部
+              </Button>
+              {MUSCLE_GROUPS.map(group => (
                 <Button
-                  onClick={() => setSelectedCategory(null)}
-                  variant={selectedCategory === null ? 'default' : 'outline'}
+                  key={group.id}
+                  onClick={() => setSelectedCategory(group.id)}
+                  variant={selectedCategory === group.id ? 'default' : 'outline'}
                   size="sm"
-                  className="rounded-full text-xs whitespace-nowrap"
+                  className="rounded-full text-xs whitespace-nowrap flex items-center gap-1.5"
                 >
-                  全部
-                </Button>
-                {MUSCLE_GROUPS.map(group => (
-                  <Button
-                    key={group.id}
-                    onClick={() => setSelectedCategory(group.id)}
-                    variant={selectedCategory === group.id ? 'default' : 'outline'}
-                    size="sm"
-                    className="rounded-full text-xs whitespace-nowrap flex items-center gap-1.5"
-                  >
-                    <MuscleGroupIcon groupId={group.id} className="w-3.5 h-3.5" />
-                    {group.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-4 space-y-2">
-              {filteredExercises.map(exercise => (
-                <Button
-                  key={exercise.id}
-                  variant="outline"
-                  onClick={() => addExercise(exercise.id, exercise.name)}
-                  className="w-full justify-start h-auto p-4 text-left transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <ExerciseIcon iconName={exercise.icon} className="w-6 h-6" />
-                    <span className="text-sm font-medium text-foreground">
-                      {exercise.name}
-                    </span>
-                  </div>
+                  <MuscleGroupIcon groupId={group.id} className="w-3.5 h-3.5" />
+                  {group.name}
                 </Button>
               ))}
             </div>
           </div>
-        </div>
-      )}
+
+          <div className="p-4 space-y-2 overflow-y-auto max-h-[60vh]">
+            {filteredExercises.map(exercise => (
+              <Button
+                key={exercise.id}
+                variant="outline"
+                onClick={() => addExercise(exercise.id, exercise.name)}
+                className="w-full justify-start h-auto p-4 text-left transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <ExerciseIcon iconName={exercise.icon} className="w-6 h-6" />
+                  <span className="text-sm font-medium text-foreground">
+                    {exercise.name}
+                  </span>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </FitnessLayout>
   )
 }

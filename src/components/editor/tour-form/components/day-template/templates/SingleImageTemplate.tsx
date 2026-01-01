@@ -34,7 +34,7 @@ export function SingleImageTemplate({
   uploading,
 }: SingleImageTemplateProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       {/* 大圖區域 */}
       <div className="relative h-64">
         <UploadableImage

@@ -91,7 +91,7 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
           >
             {viewMode === 'mobile' ? (
               <div className="relative">
-                <div className="bg-black rounded-[45px] p-[8px] shadow-2xl">
+                <div className="bg-black rounded-[45px] p-[8px] shadow-lg">
                   <div className="absolute top-[20px] left-1/2 -translate-x-1/2 z-10">
                     <div className="bg-black w-[120px] h-[34px] rounded-full"></div>
                   </div>
@@ -121,7 +121,7 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
               </div>
             ) : (
               <div
-                className="bg-white shadow-2xl rounded-lg overflow-hidden"
+                className="bg-white shadow-lg rounded-lg overflow-hidden"
                 style={{
                   width: '1200px',
                   height: '800px',

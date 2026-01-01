@@ -158,7 +158,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                     >
                       {tier.name}
                     </h3>
-                    <p className="text-sm text-gray-500 mb-8" style={{ fontFamily: "'Italiana', serif" }}>
+                    <p className="text-sm text-morandi-secondary mb-8" style={{ fontFamily: "'Italiana', serif" }}>
                       {tier.description || '專屬行程體驗'}
                     </p>
 
@@ -171,7 +171,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                         >
                           {formatPrice(tier.pricePerPerson)}
                         </span>
-                        <span className="text-sm text-gray-400">TWD / 人</span>
+                        <span className="text-sm text-morandi-secondary">TWD / 人</span>
                       </div>
                     </div>
 

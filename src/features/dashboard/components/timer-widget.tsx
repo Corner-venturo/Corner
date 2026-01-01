@@ -29,7 +29,7 @@ export function TimerWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:border-white/80 bg-gradient-to-br from-muted via-white to-status-info-bg">
+      <div className="h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80 bg-gradient-to-br from-muted via-white to-status-info-bg">
         <div className="p-5 space-y-4 h-full flex flex-col">
           {/* Header with Icon */}
           <div className="flex items-start gap-3">

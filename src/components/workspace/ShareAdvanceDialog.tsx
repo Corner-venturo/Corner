@@ -1,12 +1,19 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Plus, Trash2, X, Check } from 'lucide-react'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useUserStore } from '@/stores/user-store'
 import { Combobox } from '@/components/ui/combobox'
 import type { Employee } from '@/types/models'
 import { alert } from '@/lib/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface AdvanceRow {
   name: string
@@ -18,6 +25,7 @@ interface AdvanceRow {
 interface ShareAdvanceDialogProps {
   channelId: string
   currentUserId: string
+  open: boolean
   onClose: () => void
   onSuccess: () => void
 }
@@ -25,6 +33,7 @@ interface ShareAdvanceDialogProps {
 export function ShareAdvanceDialog({
   channelId,
   currentUserId,
+  open,
   onClose,
   onSuccess,
 }: ShareAdvanceDialogProps) {
@@ -104,21 +113,11 @@ export function ShareAdvanceDialog({
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div
-        className="card-morandi-elevated w-[800px] max-h-[80vh] overflow-hidden flex flex-col"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* 標題列 */}
-        <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
-          <h3 className="text-lg font-semibold text-morandi-primary">記錄代墊項目</h3>
-          <button onClick={onClose} className="btn-icon-morandi !w-8 !h-8">
-            <X size={16} />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-3 border-b border-morandi-gold/20">
+          <DialogTitle>記錄代墊項目</DialogTitle>
+        </DialogHeader>
 
         {/* 表格區域 */}
         <div className="flex-1 overflow-y-auto my-4">
@@ -210,23 +209,25 @@ export function ShareAdvanceDialog({
         </div>
 
         {/* 底部：總計與操作按鈕 */}
-        <div className="pt-3 border-t border-morandi-gold/20">
-          <div className="flex items-center justify-between mb-3">
+        <DialogFooter className="pt-3 border-t border-morandi-gold/20 flex-col gap-3">
+          <div className="flex items-center justify-between w-full">
             <span className="text-sm text-morandi-secondary">總計金額：</span>
             <span className="text-lg font-semibold text-morandi-primary">
               ${totalAmount.toLocaleString()}
             </span>
           </div>
-          <div className="flex gap-2 justify-end">
-            <button className="btn-morandi-secondary !py-2 !px-4" onClick={onClose}>
+          <div className="flex gap-2 justify-end w-full">
+            <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+              <X size={16} />
               取消
             </button>
-            <button className="btn-morandi-primary !py-2 !px-4" onClick={handleShare}>
+            <button className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2" onClick={handleShare}>
+              <Check size={16} />
               分享到頻道
             </button>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

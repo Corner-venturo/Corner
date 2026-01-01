@@ -105,7 +105,7 @@ export function DesktopActivityCarousel({
                 description={activity.description || ''}
                 image={activity.image}
                 layout="vertical"
-                className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+                className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
                 onClick={() => onActivityClick?.(activity)}
               />
             </div>

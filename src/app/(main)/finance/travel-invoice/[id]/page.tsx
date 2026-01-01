@@ -7,12 +7,13 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { FileText, FileX } from 'lucide-react'
+import { FileText, FileX, X, Check } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTravelInvoiceStore } from '@/stores/useTravelInvoiceStore'
@@ -274,38 +275,39 @@ export default function InvoiceDetailPage() {
       </ContentContainer>
 
       {/* 作廢對話框 */}
-      {showVoidDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-base">作廢發票</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="voidReason">作廢原因 *</Label>
-                <Input
-                  id="voidReason"
-                  value={voidReason}
-                  onChange={e => setVoidReason(e.target.value)}
-                  placeholder="請輸入作廢原因"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowVoidDialog(false)}>
-                  取消
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleVoid}
-                  disabled={!voidReason.trim() || isLoading}
-                >
-                  確認作廢
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>作廢發票</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="voidReason">作廢原因 *</Label>
+              <Input
+                id="voidReason"
+                value={voidReason}
+                onChange={e => setVoidReason(e.target.value)}
+                placeholder="請輸入作廢原因"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowVoidDialog(false)} className="gap-2">
+              <X size={16} />
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleVoid}
+              disabled={!voidReason.trim() || isLoading}
+              className="gap-2"
+            >
+              <Check size={16} />
+              確認作廢
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

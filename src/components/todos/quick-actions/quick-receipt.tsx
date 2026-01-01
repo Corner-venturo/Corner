@@ -131,7 +131,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       <div className="grid grid-cols-2 gap-3">
         {/* 選擇團體 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">團體</Label>
+          <Label className="text-sm font-medium text-morandi-primary">團體</Label>
           <Combobox
             options={(tours || []).map(tour => ({
               value: tour.id,
@@ -155,7 +155,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
 
         {/* 選擇訂單 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">訂單</Label>
+          <Label className="text-sm font-medium text-morandi-primary">訂單</Label>
           <Select
             disabled={!selectedTourId || availableOrders.length === 0}
             value={selectedOrderId}
@@ -186,7 +186,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {/* 第一排：固定欄位（所有收款方式都有） */}
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">收款方式 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">收款方式 *</Label>
           <Select
             value={paymentItem.receipt_type?.toString()}
             onValueChange={value => updatePaymentItem({ receipt_type: Number(value) })}
@@ -205,7 +205,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">金額 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">金額 *</Label>
           <Input
             type="number"
             placeholder="請輸入金額"
@@ -216,7 +216,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">交易日期 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">交易日期 *</Label>
           <DateInput
             value={paymentItem.transaction_date || ''}
             onChange={value => updatePaymentItem({ transaction_date: value })}
@@ -227,7 +227,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">付款人姓名</Label>
+          <Label className="text-sm font-medium text-morandi-primary">付款人姓名</Label>
           <Input
             placeholder="請輸入付款人姓名"
             value={paymentItem.receipt_account || ''}
@@ -237,7 +237,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
         </div>
 
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">備註</Label>
+          <Label className="text-sm font-medium text-morandi-primary">備註</Label>
           <Input
             placeholder="選填"
             value={paymentItem.note || ''}
@@ -250,7 +250,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {/* 第二排：根據收款方式顯示專屬欄位 */}
       {paymentItem.receipt_type === RECEIPT_TYPES.CASH && (
         <div className="pt-3 border-t">
-          <Label className="text-sm font-medium text-morandi-secondary">經手人</Label>
+          <Label className="text-sm font-medium text-morandi-primary">經手人</Label>
           <Input
             placeholder="請輸入經手人姓名"
             value={paymentItem.handler_name || ''}
@@ -263,7 +263,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === RECEIPT_TYPES.BANK_TRANSFER && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">匯入帳戶 *</Label>
+            <Label className="text-sm font-medium text-morandi-primary">匯入帳戶 *</Label>
             <Select
               value={paymentItem.account_info || ''}
               onValueChange={value => updatePaymentItem({ account_info: value })}
@@ -278,7 +278,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             </Select>
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">手續費</Label>
+            <Label className="text-sm font-medium text-morandi-primary">手續費</Label>
             <Input
               type="number"
               placeholder="選填，如有手續費"
@@ -293,7 +293,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === RECEIPT_TYPES.CREDIT_CARD && (
         <div className="grid grid-cols-3 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">卡號後四碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">卡號後四碼</Label>
             <Input
               placeholder="1234"
               value={paymentItem.card_last_four || ''}
@@ -305,7 +305,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">授權碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">授權碼</Label>
             <Input
               placeholder="請輸入授權碼"
               value={paymentItem.auth_code || ''}
@@ -314,7 +314,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">手續費</Label>
+            <Label className="text-sm font-medium text-morandi-primary">手續費</Label>
             <Input
               type="number"
               placeholder="選填，如有手續費"
@@ -329,7 +329,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === RECEIPT_TYPES.CHECK && (
         <div className="grid grid-cols-2 gap-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">支票號碼</Label>
+            <Label className="text-sm font-medium text-morandi-primary">支票號碼</Label>
             <Input
               placeholder="請輸入支票號碼"
               value={paymentItem.check_number || ''}
@@ -338,7 +338,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">開票銀行</Label>
+            <Label className="text-sm font-medium text-morandi-primary">開票銀行</Label>
             <Input
               placeholder="請輸入銀行名稱"
               value={paymentItem.check_bank || ''}
@@ -352,7 +352,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       {paymentItem.receipt_type === RECEIPT_TYPES.LINK_PAY && (
         <div className="space-y-3 pt-3 border-t">
           <div>
-            <Label className="text-sm font-medium text-morandi-secondary">Email *</Label>
+            <Label className="text-sm font-medium text-morandi-primary">Email *</Label>
             <Input
               type="email"
               placeholder="user@example.com"
@@ -363,7 +363,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-sm font-medium text-morandi-secondary">付款截止日 *</Label>
+              <Label className="text-sm font-medium text-morandi-primary">付款截止日 *</Label>
               <DateInput
                 value={paymentItem.pay_dateline || ''}
                 onChange={value => updatePaymentItem({ pay_dateline: value })}
@@ -371,7 +371,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
               />
             </div>
             <div>
-              <Label className="text-sm font-medium text-morandi-secondary">
+              <Label className="text-sm font-medium text-morandi-primary">
                 付款名稱（客戶看到的）
               </Label>
               <Input

@@ -102,7 +102,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                 />
 
                 {/* 圖片區 */}
-                <div className="overflow-hidden h-48 mb-4 border border-gray-200">
+                <div className="overflow-hidden h-48 mb-4 border border-border">
                   {image ? (
                     <img
                       src={image}
@@ -110,8 +110,8 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                       className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform ${rotation} group-hover:${hoverRotation}`}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-4xl text-gray-400">🏨</span>
+                    <div className="w-full h-full bg-morandi-container flex items-center justify-center">
+                      <span className="text-4xl text-morandi-secondary">🏨</span>
                     </div>
                   )}
                 </div>
@@ -121,7 +121,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                   {hotel.name || '飯店名稱'}
                 </h3>
                 <p
-                  className="text-xs text-gray-500 uppercase"
+                  className="text-xs text-morandi-secondary uppercase"
                   style={{ fontFamily: "'Space Mono', monospace" }}
                 >
                   {hotel.location || '地點'}

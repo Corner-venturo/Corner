@@ -6,7 +6,8 @@ import { useEmployeeStore, useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { Plus, Building2, Users, Shield } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Plus, Building2, Users, Shield, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -189,58 +190,60 @@ export default function WorkspacesPage() {
       </div>
 
       {/* 新增對話框 */}
-      {showAddDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md p-6 m-4">
-            <h2 className="text-xl font-bold text-morandi-primary mb-4">新增工作空間</h2>
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-morandi-primary">新增工作空間</DialogTitle>
+          </DialogHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  名稱 <span className="text-morandi-red">*</span>
-                </label>
-                <Input
-                  value={newWorkspace.name}
-                  onChange={e => setNewWorkspace(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="例如：台北總公司、台中分公司"
-                  className="border-morandi-container/30"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-morandi-secondary mb-2 block">
-                  說明
-                </label>
-                <Input
-                  value={newWorkspace.description}
-                  onChange={e =>
-                    setNewWorkspace(prev => ({ ...prev, description: e.target.value }))
-                  }
-                  placeholder="簡短說明此工作空間"
-                  className="border-morandi-container/30"
-                />
-              </div>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                名稱 <span className="text-morandi-red">*</span>
+              </label>
+              <Input
+                value={newWorkspace.name}
+                onChange={e => setNewWorkspace(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="例如：台北總公司、台中分公司"
+                className="border-morandi-container/30"
+              />
             </div>
 
-            <div className="flex gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setShowAddDialog(false)}
-                className="flex-1"
-              >
-                取消
-              </Button>
-              <Button
-                onClick={handleCreate}
-                disabled={!newWorkspace.name}
-                className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              >
-                建立
-              </Button>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                說明
+              </label>
+              <Input
+                value={newWorkspace.description}
+                onChange={e =>
+                  setNewWorkspace(prev => ({ ...prev, description: e.target.value }))
+                }
+                placeholder="簡短說明此工作空間"
+                className="border-morandi-container/30"
+              />
             </div>
-          </Card>
-        </div>
-      )}
+          </div>
+
+          <div className="flex gap-2 mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddDialog(false)}
+              className="flex-1 gap-2"
+            >
+              <X size={16} />
+              取消
+            </Button>
+            <Button
+              onClick={handleCreate}
+              disabled={!newWorkspace.name}
+              className="flex-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            >
+              <Plus size={16} />
+              建立
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Empty State */}
       {workspaces?.length === 0 && !showAddDialog && (

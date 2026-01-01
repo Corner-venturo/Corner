@@ -291,7 +291,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
             <h3 className="text-sm font-semibold text-morandi-primary mb-3">收件人資訊</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">收件人姓名 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">收件人姓名 *</label>
                 <Input
                   type="text"
                   value={recipient}
@@ -300,7 +300,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">收件地址 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">收件地址 *</label>
                 <Input
                   type="text"
                   value={recipientAddress}
@@ -309,7 +309,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">收件人電話 *</label>
+                <label className="text-xs text-morandi-primary block mb-1">收件人電話 *</label>
                 <Input
                   type="text"
                   value={recipientPhone}
@@ -326,7 +326,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-morandi-secondary block mb-1">公司名稱</label>
+                  <label className="text-xs text-morandi-primary block mb-1">公司名稱</label>
                   <Input
                     type="text"
                     value={senderCompany}
@@ -335,7 +335,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-morandi-secondary block mb-1">
+                  <label className="text-xs text-morandi-primary block mb-1">
                     員工姓名 <span className="text-morandi-gold">*</span>
                   </label>
                   <Input
@@ -347,7 +347,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">公司地址</label>
+                <label className="text-xs text-morandi-primary block mb-1">公司地址</label>
                 <Input
                   type="text"
                   value={senderAddress}
@@ -356,7 +356,7 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
                 />
               </div>
               <div>
-                <label className="text-xs text-morandi-secondary block mb-1">
+                <label className="text-xs text-morandi-primary block mb-1">
                   聯絡電話 <span className="text-morandi-gold">*</span>
                 </label>
                 <Input

@@ -1,21 +1,29 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { X, Search, Receipt } from 'lucide-react'
+import { Search, Receipt, X, Check } from 'lucide-react'
 import { useOrderStore } from '@/stores'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Order } from '@/stores/types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { alert } from '@/lib/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface ShareOrdersDialogProps {
   channelId: string
+  open: boolean
   onClose: () => void
   onSuccess: () => void
 }
 
-export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrdersDialogProps) {
+export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: ShareOrdersDialogProps) {
   const { items: orders } = useOrderStore()
   const { shareOrderList } = useWorkspaceWidgets()
   const { user } = useAuthStore()
@@ -119,24 +127,14 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div
-        className="card-morandi-elevated w-[900px] max-h-[80vh] overflow-hidden flex flex-col"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* 標題列 */}
-        <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
-          <div className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-[900px] max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-3 border-b border-morandi-gold/20">
+          <DialogTitle className="flex items-center gap-2">
             <Receipt className="text-morandi-gold" size={20} />
-            <h3 className="text-lg font-semibold text-morandi-primary">選擇待收款訂單</h3>
-          </div>
-          <button onClick={onClose} className="btn-icon-morandi !w-8 !h-8">
-            <X size={16} />
-          </button>
-        </div>
+            <span>選擇待收款訂單</span>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* 搜尋列 */}
         <div className="my-3">
@@ -248,8 +246,8 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
         </div>
 
         {/* 底部：統計與操作按鈕 */}
-        <div className="pt-3 border-t border-morandi-gold/20">
-          <div className="flex items-center justify-between mb-3">
+        <DialogFooter className="pt-3 border-t border-morandi-gold/20 flex-col gap-3">
+          <div className="flex items-center justify-between w-full">
             <div className="text-sm text-morandi-secondary">
               已選擇{' '}
               <span className="font-semibold text-morandi-primary">{selectedStats.count}</span>{' '}
@@ -262,20 +260,22 @@ export function ShareOrdersDialog({ channelId, onClose, onSuccess }: ShareOrders
               </div>
             </div>
           </div>
-          <div className="flex gap-2 justify-end">
-            <button className="btn-morandi-secondary !py-2 !px-4" onClick={onClose}>
+          <div className="flex gap-2 justify-end w-full">
+            <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>
+              <X size={16} />
               取消
             </button>
             <button
-              className="btn-morandi-primary !py-2 !px-4"
+              className="btn-morandi-primary !py-2 !px-4 flex items-center gap-2"
               onClick={handleShare}
               disabled={selectedOrders.size === 0}
             >
+              <Check size={16} />
               分享到頻道
             </button>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

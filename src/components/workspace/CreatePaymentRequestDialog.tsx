@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
-import { X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { useTourStore, usePaymentRequestStore } from '@/stores'
 import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -10,18 +10,27 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
   listId: string
-  onClose: () => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onSuccess: () => void
 }
 
 export function CreatePaymentRequestDialog({
   items,
   listId,
-  onClose,
+  open,
+  onOpenChange,
   onSuccess,
 }: CreatePaymentRequestDialogProps) {
   const { items: tours } = useTourStore()
@@ -90,7 +99,7 @@ export function CreatePaymentRequestDialog({
       }
 
       onSuccess()
-      onClose()
+      onOpenChange(false)
     } catch (error) {
       logger.error('建立請款單失敗：', error)
       void alert('建立失敗，請稍後再試', 'error')
@@ -98,23 +107,16 @@ export function CreatePaymentRequestDialog({
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
-      <div className="card-morandi-elevated w-[600px]" onClick={e => e.stopPropagation()}>
-        {/* 標題列 */}
-        <div className="flex items-center justify-between pb-3 border-b border-morandi-gold/20">
-          <h3 className="text-lg font-semibold text-morandi-primary">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>
             {isBatch ? `批次請款 (${itemsArray.length} 筆)` : '建立請款單'}
-          </h3>
-          <Button variant="ghost" size="iconSm" onClick={onClose}>
-            <X size={16} />
-          </Button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* 內容 */}
-        <div className="space-y-4 my-4">
+        <div className="space-y-4">
           {/* 代墊項目資訊 */}
           <div className="bg-morandi-container/5 rounded-lg p-3 border border-morandi-gold/20">
             <div className="text-sm font-medium text-morandi-secondary mb-2">代墊項目：</div>
@@ -140,7 +142,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 關聯旅遊團 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               關聯旅遊團 <span className="text-status-danger">*</span>
             </label>
             <Combobox
@@ -157,7 +159,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 類別 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">類別</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">類別</label>
             <Input
               type="text"
               value={category}
@@ -167,7 +169,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 供應商 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">供應商</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-2">供應商</label>
             <Input
               type="text"
               value={supplier}
@@ -177,7 +179,7 @@ export function CreatePaymentRequestDialog({
 
           {/* 請款日期 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-2">
+            <label className="block text-sm font-medium text-morandi-primary mb-2">
               請款日期 (預設下個週四)
             </label>
             <DatePicker
@@ -187,16 +189,17 @@ export function CreatePaymentRequestDialog({
           </div>
         </div>
 
-        {/* 底部操作按鈕 */}
-        <div className="flex gap-2 justify-end pt-3 border-t border-morandi-gold/20">
-          <Button variant="secondary" onClick={onClose}>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={handleCreate}>
+          <Button onClick={handleCreate} className="gap-2">
+            <Plus size={16} />
             建立請款單
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

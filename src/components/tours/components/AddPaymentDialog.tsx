@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Plus, X } from 'lucide-react'
 
 interface AddPaymentDialogProps {
   open: boolean
@@ -117,13 +118,15 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="gap-2" onClick={() => onOpenChange(false)}>
+              <X size={16} />
               取消
             </Button>
             <Button
               onClick={onAddPayment}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Plus size={16} />
               新增
             </Button>
           </div>

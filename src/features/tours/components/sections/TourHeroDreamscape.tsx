@@ -221,7 +221,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
             >
               {dateFormatted && (
                 <div
-                  className="px-6 py-3 rounded-full flex items-center gap-3 backdrop-blur-md border shadow-xl"
+                  className="px-6 py-3 rounded-full flex items-center gap-3 backdrop-blur-md border shadow-lg"
                   style={{
                     backgroundColor: 'rgba(255,255,255,0.3)',
                     borderColor: 'rgba(255,255,255,0.4)',
@@ -265,7 +265,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
 
             {/* 主圖片 (Blob 形狀) */}
             <motion.div
-              className="relative w-full h-full overflow-hidden shadow-2xl"
+              className="relative w-full h-full overflow-hidden shadow-lg"
               style={{
                 borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
                 boxShadow: `0 25px 50px -12px ${DREAM.purple}33`,
@@ -291,7 +291,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
             {/* 浮動卡片 - 天氣/城市 */}
             {data.city && (
               <motion.div
-                className="absolute z-20 p-4 rounded-2xl backdrop-blur-lg border shadow-2xl"
+                className="absolute z-20 p-4 rounded-2xl backdrop-blur-lg border shadow-lg"
                 style={{
                   top: '20%',
                   left: isMobile ? '0' : '-3rem',
@@ -321,7 +321,7 @@ export function TourHeroDreamscape({ data, viewMode }: TourHeroDreamscapeProps) 
             {/* 浮動卡片 - 天數 */}
             {dayCount > 0 && (
               <motion.div
-                className="absolute z-20 rounded-full backdrop-blur-lg border shadow-2xl flex flex-col justify-center items-center text-center"
+                className="absolute z-20 rounded-full backdrop-blur-lg border shadow-lg flex flex-col justify-center items-center text-center"
                 style={{
                   bottom: '15%',
                   right: isMobile ? '0' : '-2rem',

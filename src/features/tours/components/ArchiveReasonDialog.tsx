@@ -5,7 +5,7 @@
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Archive } from 'lucide-react'
+import { Archive, Check, X } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 
@@ -91,14 +91,16 @@ export function ArchiveReasonDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={!selectedReason}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Check size={16} />
             確認封存
           </Button>
         </div>

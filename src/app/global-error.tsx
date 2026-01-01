@@ -20,7 +20,7 @@ export default function GlobalError({
       <head>
         <title>系統錯誤</title>
       </head>
-      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif' }}>
+      <body style={{ margin: 0, fontFamily: "'Noto Sans TC', sans-serif" }}>
         <div
           style={{
             minHeight: '100vh',

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Plus, X } from 'lucide-react'
 
 interface QuickQuoteItem {
   id: string
@@ -312,14 +313,16 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
 
           {/* 動作按鈕 */}
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button
               type="submit"
               disabled={!formData.customer_name.trim()}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Plus size={16} />
               建立快速報價單
             </Button>
           </div>

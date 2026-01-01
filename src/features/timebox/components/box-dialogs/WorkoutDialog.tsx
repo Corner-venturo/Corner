@@ -466,7 +466,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
                 <div className="grid grid-cols-4 gap-3 mb-3">
                   <div className="col-span-2">
-                    <label className="text-xs text-morandi-secondary">動作名稱 *</label>
+                    <label className="text-xs text-morandi-primary">動作名稱 *</label>
                     <Input
                       value={exerciseForm.equipment}
                       onChange={(e) => setExerciseForm(prev => ({ ...prev, equipment: e.target.value }))}
@@ -476,7 +476,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   </div>
 
                   <div>
-                    <label className="text-xs text-morandi-secondary">重量 (kg)</label>
+                    <label className="text-xs text-morandi-primary">重量 (kg)</label>
                     <Input
                       type="number"
                       value={exerciseForm.weight || ''}
@@ -492,7 +492,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs text-morandi-secondary">次數</label>
+                      <label className="text-xs text-morandi-primary">次數</label>
                       <Input
                         type="number"
                         value={exerciseForm.reps || ''}
@@ -505,7 +505,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-morandi-secondary">組數</label>
+                      <label className="text-xs text-morandi-primary">組數</label>
                       <Input
                         type="number"
                         value={exerciseForm.sets || ''}

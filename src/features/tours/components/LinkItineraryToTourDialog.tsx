@@ -376,7 +376,7 @@ export function LinkItineraryToTourDialog({
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs text-morandi-secondary">行程標題 *</Label>
+                  <Label className="text-xs text-morandi-primary">行程標題 *</Label>
                   <Input
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -386,7 +386,7 @@ export function LinkItineraryToTourDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-secondary">國家</Label>
+                    <Label className="text-xs text-morandi-primary">國家</Label>
                     <Input
                       value={countryName || '(未設定)'}
                       disabled
@@ -394,7 +394,7 @@ export function LinkItineraryToTourDialog({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-secondary">城市</Label>
+                    <Label className="text-xs text-morandi-primary">城市</Label>
                     <Input
                       value={cityName || '(未設定)'}
                       disabled
@@ -405,7 +405,7 @@ export function LinkItineraryToTourDialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-secondary">出發日期</Label>
+                    <Label className="text-xs text-morandi-primary">出發日期</Label>
                     <Input
                       value={tour.departure_date || ''}
                       disabled
@@ -413,7 +413,7 @@ export function LinkItineraryToTourDialog({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-morandi-secondary">行程天數</Label>
+                    <Label className="text-xs text-morandi-primary">行程天數</Label>
                     <Input
                       value={`${calculateDays()} 天`}
                       disabled
@@ -423,7 +423,7 @@ export function LinkItineraryToTourDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-morandi-secondary">標語</Label>
+                  <Label className="text-xs text-morandi-primary">標語</Label>
                   <Input
                     value={formData.tagline}
                     onChange={e => setFormData({ ...formData, tagline: e.target.value })}
@@ -432,7 +432,7 @@ export function LinkItineraryToTourDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-morandi-secondary">副標題</Label>
+                  <Label className="text-xs text-morandi-primary">副標題</Label>
                   <textarea
                     value={formData.subtitle}
                     onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
@@ -444,7 +444,7 @@ export function LinkItineraryToTourDialog({
                 {/* 航班資訊（從旅遊團帶入） */}
                 {(tour.outbound_flight || tour.return_flight) && (
                   <div className="space-y-2 pt-4 border-t border-border">
-                    <Label className="text-xs text-morandi-secondary">航班資訊（自動帶入）</Label>
+                    <Label className="text-xs text-morandi-primary">航班資訊（自動帶入）</Label>
                     <div className="text-xs text-morandi-primary bg-muted/50 p-2 rounded space-y-1">
                       {tour.outbound_flight && (
                         <div>去程：{tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureTime}-{tour.outbound_flight.arrivalTime}</div>

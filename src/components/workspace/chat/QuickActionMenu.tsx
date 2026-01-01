@@ -24,7 +24,7 @@ export const QuickActionMenu = forwardRef<HTMLDivElement, QuickActionMenuProps>(
     return (
       <div
         ref={ref}
-        className="absolute bottom-full left-0 mb-2 bg-white border border-morandi-gold/20 rounded-lg shadow-xl py-1.5 min-w-[220px] z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+        className="absolute bottom-full left-0 mb-2 bg-white border border-morandi-gold/20 rounded-lg shadow-lg py-1.5 min-w-[220px] z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
       >
         <div className="px-3 py-1.5 border-b border-morandi-container/30">
           <p className="text-xs font-semibold text-morandi-secondary uppercase tracking-wider">

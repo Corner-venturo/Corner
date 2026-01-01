@@ -139,7 +139,7 @@ const DropdownMenuItem = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none',
+        'relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none',
         'hover:bg-morandi-container hover:text-morandi-primary',
         'focus:bg-morandi-container focus:text-morandi-primary',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',

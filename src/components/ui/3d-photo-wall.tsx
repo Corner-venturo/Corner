@@ -1,38 +1,33 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import { motion, useAnimationFrame } from 'framer-motion'
+import React, { useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
-import { createPortal } from 'react-dom'
+import {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogClose,
+} from '@/components/ui/dialog'
 
 interface PhotoWallProps {
   images: string[]
   onClose: () => void
   className?: string
+  open?: boolean
 }
 
-export function ThreeDPhotoWall({ images, onClose, className }: PhotoWallProps) {
-  const [mounted, setMounted] = React.useState(false)
-
-  // 確保在 client 端渲染
+export function ThreeDPhotoWall({ images, onClose, className, open = true }: PhotoWallProps) {
+  // 關閉時按 ESC (Dialog handles this automatically, but we need body overflow control)
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // 關閉時按 ESC
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleKeyDown)
     // 防止背景滾動
     document.body.style.overflow = 'hidden'
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
     }
-  }, [onClose])
+  }, [])
 
   // 將圖片分成 4 欄
   const columns = 4
@@ -50,76 +45,76 @@ export function ThreeDPhotoWall({ images, onClose, className }: PhotoWallProps) 
     }
   })
 
-  const content = (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className={cn(
-        'fixed inset-0 flex items-center justify-center bg-black overflow-hidden',
-        className
-      )}
-      style={{ zIndex: 99999 }}
-      onClick={onClose}
-    >
-      {/* 關閉按鈕 */}
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute top-6 right-6 z-[100000] p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors backdrop-blur-sm"
-      >
-        <X size={24} />
-      </button>
-
-      {/* 標題 */}
-      <div className="absolute top-6 left-6 z-[100000]">
-        <h2 className="text-2xl font-bold text-white/90">行程照片牆</h2>
-        <p className="text-sm text-white/60 mt-1">{images.length} 張照片</p>
-      </div>
-
-      {/* 3D 照片牆 */}
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{
-          perspective: '1200px',
-          perspectiveOrigin: 'center center',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className="flex items-center justify-center"
-          style={{
-            transform: 'rotateX(35deg) rotateZ(-20deg) scale(1.3)',
-            transformStyle: 'preserve-3d',
-          }}
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogPortal>
+        <DialogOverlay className="bg-black z-[99999]" />
+        <DialogContent
+          className={cn(
+            'fixed inset-0 flex items-center justify-center bg-transparent border-none shadow-none p-0 max-w-none w-full h-full translate-x-0 translate-y-0 left-0 top-0 rounded-none overflow-hidden',
+            className
+          )}
+          style={{ zIndex: 99999 }}
+          onClick={onClose}
         >
-          <div className="flex gap-5">
-            {columnImages.map((column, colIndex) => (
-              <MarqueeColumn
-                key={colIndex}
-                images={column}
-                direction={colIndex % 2 === 0 ? 'up' : 'down'}
-                duration={50 + colIndex * 5}
-              />
-            ))}
+          {/* 關閉按鈕 */}
+          <DialogClose asChild>
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-6 right-6 z-[100000] p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors backdrop-blur-sm"
+            >
+              <X size={24} />
+            </button>
+          </DialogClose>
+
+          {/* 標題 */}
+          <div className="absolute top-6 left-6 z-[100000]">
+            <h2 className="text-2xl font-bold text-white/90">行程照片牆</h2>
+            <p className="text-sm text-white/60 mt-1">{images.length} 張照片</p>
           </div>
-        </div>
-      </div>
 
-      {/* 漸層遮罩 */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black via-transparent to-black opacity-50" />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black via-transparent to-black opacity-30" />
+          {/* 3D 照片牆 */}
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{
+              perspective: '1200px',
+              perspectiveOrigin: 'center center',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="flex items-center justify-center"
+              style={{
+                transform: 'rotateX(35deg) rotateZ(-20deg) scale(1.3)',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div className="flex gap-5">
+                {columnImages.map((column, colIndex) => (
+                  <MarqueeColumn
+                    key={colIndex}
+                    images={column}
+                    direction={colIndex % 2 === 0 ? 'up' : 'down'}
+                    duration={50 + colIndex * 5}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
 
-      {/* 提示文字 */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 text-sm z-[100000]">
-        按 ESC 或點擊任意處關閉
-      </div>
-    </motion.div>
+          {/* 漸層遮罩 */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black via-transparent to-black opacity-50" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black via-transparent to-black opacity-30" />
+
+          {/* 提示文字 */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 text-sm z-[100000]">
+            按 ESC 或點擊任意處關閉
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   )
-
-  // 使用 portal 渲染到 body，確保全畫面
-  if (!mounted) return null
-  return createPortal(content, document.body)
 }
 
 // 單欄滾動組件 - 使用 CSS animation 避免停頓
@@ -154,7 +149,7 @@ function MarqueeColumn({
         {duplicatedImages.map((image, index) => (
           <motion.div
             key={`${image}-${index}`}
-            className="relative w-80 h-52 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 border border-white/10"
+            className="relative w-80 h-52 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 border border-white/10"
             whileHover={{
               scale: 1.08,
               zIndex: 10,

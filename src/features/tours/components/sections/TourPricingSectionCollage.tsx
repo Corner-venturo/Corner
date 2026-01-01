@@ -81,11 +81,11 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
           {/* 左側：價格卡片區 */}
           <div className={`${isMobile ? '' : 'lg:col-span-7'} flex flex-col gap-16 relative`}>
             {/* 背景裝飾 */}
-            <div className="absolute -inset-10 bg-gray-100/50 transform rotate-1 rounded-3xl border-2 border-dashed border-gray-300 -z-10" />
+            <div className="absolute -inset-10 bg-morandi-container/50 transform rotate-1 rounded-3xl border-2 border-dashed border-border -z-10" />
 
             {/* 手寫標題 */}
             <div
-              className="text-2xl text-gray-500 -ml-4 -rotate-[5deg] mb-[-20px] relative z-20 w-max"
+              className="text-2xl text-morandi-secondary -ml-4 -rotate-[5deg] mb-[-20px] relative z-20 w-max"
               style={{ fontFamily: "'Gloria Hallelujah', cursive" }}
             >
               <span className="bg-[#FFEB3B] px-2 border border-black">Pick a Plan!</span>
@@ -116,12 +116,12 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   <div className="flex justify-between items-start mb-4">
                     <span
-                      className="text-xs font-bold bg-gray-200 px-2 py-1 border border-black rounded-full"
+                      className="text-xs font-bold bg-morandi-container px-2 py-1 border border-black rounded-full"
                       style={{ fontFamily: "'Space Mono', monospace" }}
                     >
                       SMALL GROUP
                     </span>
-                    <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-morandi-secondary" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
                     </svg>
                   </div>
@@ -129,15 +129,15 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: "'Noto Serif TC', serif" }}>
                     {priceTiers[0].name}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
+                  <p className="text-xs text-morandi-secondary mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
                     {priceTiers[0].description || '專屬司導，行程彈性最大化'}
                   </p>
 
-                  <div className="mb-6 border-y-2 border-dashed border-gray-200 py-4">
+                  <div className="mb-6 border-y-2 border-dashed border-border py-4">
                     <div className="text-4xl font-bold text-[#FF0080]" style={{ fontFamily: "'Cinzel', serif" }}>
                       {formatPrice(priceTiers[0].pricePerPerson)}
                     </div>
-                    <div className="text-xs text-gray-400 text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
+                    <div className="text-xs text-morandi-secondary text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
                       TWD / 每人
                     </div>
                   </div>
@@ -197,12 +197,12 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
 
                   <div className="flex justify-between items-start mb-4">
                     <span
-                      className="text-xs font-bold bg-gray-800 text-gray-300 px-2 py-1 border border-gray-600 rounded-full"
+                      className="text-xs font-bold bg-morandi-primary text-morandi-secondary px-2 py-1 border border-border rounded-full"
                       style={{ fontFamily: "'Space Mono', monospace" }}
                     >
                       FAMILY SUITE
                     </span>
-                    <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-morandi-secondary" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A2.01 2.01 0 0 0 18.06 7h-.12a2 2 0 0 0-1.9 1.37l-.86 2.58c1.08.6 1.82 1.73 1.82 3.05v8h3zm-7.5-10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6h1.5v7h4zm6.5 0v-4h1v-4c0-.82-.68-1.5-1.5-1.5h-2c-.82 0-1.5.68-1.5 1.5v4h1v4h3z" />
                     </svg>
                   </div>
@@ -210,21 +210,21 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
                   <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: "'Noto Serif TC', serif" }}>
                     {priceTiers[1].name}
                   </h3>
-                  <p className="text-xs text-gray-400 mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
+                  <p className="text-xs text-morandi-secondary mb-6" style={{ fontFamily: "'Space Mono', monospace" }}>
                     {priceTiers[1].description || '豪華九人座，空間更寬敞'}
                   </p>
 
-                  <div className="mb-6 border-y-2 border-dashed border-gray-800 py-4">
+                  <div className="mb-6 border-y-2 border-dashed border-border py-4">
                     <div className="text-4xl font-bold text-[#C6FF00]" style={{ fontFamily: "'Cinzel', serif" }}>
                       {formatPrice(priceTiers[1].pricePerPerson)}
                     </div>
-                    <div className="text-xs text-gray-500 text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
+                    <div className="text-xs text-morandi-secondary text-right" style={{ fontFamily: "'Space Mono', monospace" }}>
                       TWD / 每人
                     </div>
                   </div>
 
                   {priceTiers[1].features && (
-                    <ul className="text-sm space-y-2 mb-6 text-gray-300" style={{ fontFamily: "'Space Mono', monospace" }}>
+                    <ul className="text-sm space-y-2 mb-6 text-morandi-secondary" style={{ fontFamily: "'Space Mono', monospace" }}>
                       {priceTiers[1].features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2">
                           <span className="w-1.5 h-1.5 bg-[#C6FF00] rounded-full" />

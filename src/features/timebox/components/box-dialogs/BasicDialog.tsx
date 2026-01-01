@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Trash2, Edit2, Save, Check, FileText } from 'lucide-react'
+import { Trash2, Edit2, Save, Check, FileText, X } from 'lucide-react'
 import { useTimeboxScheduledBoxes, useTimeboxBoxes, type TimeboxScheduledBox, type TimeboxBox, weekDayNames } from '../../hooks/useTimeboxData'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -142,7 +142,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-morandi-secondary mb-1">開始時間</label>
+                  <label className="block text-xs text-morandi-primary mb-1">開始時間</label>
                   <Select value={editStartTime} onValueChange={setEditStartTime}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -155,7 +155,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-xs text-morandi-secondary mb-1">持續時間</label>
+                  <label className="block text-xs text-morandi-primary mb-1">持續時間</label>
                   <Select value={editDuration.toString()} onValueChange={(v) => setEditDuration(Number(v))}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -169,7 +169,8 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsEditing(false)}>
+                  <X size={14} />
                   取消
                 </Button>
                 <Button size="sm" onClick={handleSaveEdit} className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1">
@@ -239,7 +240,8 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
               移除排程
             </Button>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" className="gap-2" onClick={onClose}>
+                <X size={16} />
                 取消
               </Button>
               <Button

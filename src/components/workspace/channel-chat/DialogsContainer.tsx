@@ -135,10 +135,11 @@ export function DialogsContainer({
   return (
     <>
       {/* Share Advance Dialog */}
-      {showShareAdvanceDialog && selectedChannel && user && (
+      {selectedChannel && user && (
         <ShareAdvanceDialog
           channelId={selectedChannel.id}
           currentUserId={user.id}
+          open={showShareAdvanceDialog}
           onClose={() => setShowShareAdvanceDialog(false)}
           onSuccess={() => {
             setShowShareAdvanceDialog(false)
@@ -147,18 +148,20 @@ export function DialogsContainer({
       )}
 
       {/* Share Orders Dialog */}
-      {showShareOrdersDialog && selectedChannel && (
+      {selectedChannel && (
         <ShareOrdersDialog
           channelId={selectedChannel.id}
+          open={showShareOrdersDialog}
           onClose={() => setShowShareOrdersDialog(false)}
           onSuccess={onShareOrdersSuccess}
         />
       )}
 
       {/* Create Receipt Dialog */}
-      {showCreateReceiptDialog && selectedOrder && (
+      {selectedOrder && (
         <CreateReceiptDialog
           order={selectedOrder}
+          open={showCreateReceiptDialog}
           onClose={() => {
             setShowCreateReceiptDialog(false)
             setSelectedOrder(null)
@@ -171,14 +174,17 @@ export function DialogsContainer({
       )}
 
       {/* Create Payment Dialog */}
-      {showCreatePaymentDialog && selectedAdvanceItem && selectedAdvanceListId && (
+      {selectedAdvanceItem && selectedAdvanceListId && (
         <CreatePaymentRequestDialog
           items={selectedAdvanceItem}
           listId={selectedAdvanceListId}
-          onClose={() => {
-            setShowCreatePaymentDialog(false)
-            setSelectedAdvanceItem(null)
-            setSelectedAdvanceListId('')
+          open={showCreatePaymentDialog}
+          onOpenChange={(open) => {
+            setShowCreatePaymentDialog(open)
+            if (!open) {
+              setSelectedAdvanceItem(null)
+              setSelectedAdvanceListId('')
+            }
           }}
           onSuccess={onCreatePaymentSuccess}
         />

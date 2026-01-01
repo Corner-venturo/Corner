@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 // Collage 配色
 const POP = {
@@ -81,7 +82,7 @@ function PolaroidCard({
     >
       {/* 背後的便條紙 */}
       <div
-        className="absolute -top-4 -left-4 w-[calc(100%+2rem)] h-[calc(100%+3rem)] rounded-sm"
+        className="absolute -top-4 -left-4 w-[calc(100%+2rem)] h-[calc(100%+3rem)] rounded-md"
         style={{
           backgroundColor: noteColor,
           transform: `rotate(${-rotation * 0.5}deg)`,
@@ -300,7 +301,7 @@ function FrameCard({
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
       whileHover={{ y: -6 }}
-      className="relative group cursor-pointer p-5 rounded-sm"
+      className="relative group cursor-pointer p-5 rounded-md"
       style={{
         backgroundColor: bgColor,
         boxShadow: '5px 5px 0px 0px rgba(0,0,0,0.8)',
@@ -593,27 +594,13 @@ export function TourFeaturesSectionCollage({
       </div>
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxImages.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center"
-            onClick={closeLightbox}
-          >
-            {/* 關閉按鈕 */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
-            >
-              <X size={24} />
-            </button>
-
+      <Dialog open={lightboxImages.length > 0} onOpenChange={(open) => !open && closeLightbox()}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/90 border-none">
+          <div className="relative flex items-center justify-center min-h-[60vh]">
             {/* 左箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToPrev() }}
+                onClick={goToPrev}
                 className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
@@ -621,25 +608,27 @@ export function TourFeaturesSectionCollage({
             )}
 
             {/* 圖片 */}
-            <motion.div
-              key={lightboxIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={lightboxImages[lightboxIndex]}
-                alt={`圖片 ${lightboxIndex + 1}`}
-                className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
-              />
-            </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={lightboxIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-center justify-center"
+              >
+                <img
+                  src={lightboxImages[lightboxIndex]}
+                  alt={`圖片 ${lightboxIndex + 1}`}
+                  className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+                />
+              </motion.div>
+            </AnimatePresence>
 
             {/* 右箭頭 */}
             {lightboxImages.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); goToNext() }}
+                onClick={goToNext}
                 className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
@@ -652,9 +641,9 @@ export function TourFeaturesSectionCollage({
                 {lightboxIndex + 1} / {lightboxImages.length}
               </div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* 載入 Google Fonts */}
       <style>{`

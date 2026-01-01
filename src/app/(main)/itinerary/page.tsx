@@ -413,7 +413,7 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
   return (
     <div className="pt-4 mt-4 relative">
       <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-morandi-muted/40 to-transparent" />
-      <Label className="text-morandi-secondary mb-3 block">航班資訊（選填）</Label>
+      <Label className="text-morandi-primary mb-3 block">航班資訊（選填）</Label>
       <div className="space-y-3">
         {/* 去程航班 */}
         <div className="p-2 rounded-lg border border-morandi-muted/30 space-y-2">

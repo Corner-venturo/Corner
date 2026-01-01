@@ -32,7 +32,7 @@ export function CardGridTemplate({
   uploading,
 }: CardGridTemplateProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       {/* 標題 */}
       <div className="p-6 border-b border-border/50">
         <div className="flex items-center gap-4">

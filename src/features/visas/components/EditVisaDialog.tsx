@@ -191,7 +191,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
           <label className="text-sm font-medium text-morandi-primary mb-2 block">日期資訊</label>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-xs text-morandi-secondary">收件時間</label>
+              <label className="text-xs text-morandi-primary">收件時間</label>
               <DatePicker
                 value={formData.received_date || ''}
                 onChange={(date) => updateField('received_date', date)}
@@ -200,7 +200,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">預計下件</label>
+              <label className="text-xs text-morandi-primary">預計下件</label>
               <DatePicker
                 value={formData.expected_issue_date || ''}
                 onChange={(date) => updateField('expected_issue_date', date)}
@@ -209,7 +209,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">送件時間</label>
+              <label className="text-xs text-morandi-primary">送件時間</label>
               <DatePicker
                 value={formData.actual_submission_date || ''}
                 onChange={(date) => updateField('actual_submission_date', date)}
@@ -218,7 +218,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">證件歸還</label>
+              <label className="text-xs text-morandi-primary">證件歸還</label>
               <DatePicker
                 value={formData.documents_returned_date || ''}
                 onChange={(date) => updateField('documents_returned_date', date)}
@@ -227,7 +227,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">取件時間</label>
+              <label className="text-xs text-morandi-primary">取件時間</label>
               <DatePicker
                 value={formData.pickup_date || ''}
                 onChange={(date) => updateField('pickup_date', date)}
@@ -243,7 +243,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
           <label className="text-sm font-medium text-morandi-primary mb-2 block">費用資訊</label>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-xs text-morandi-secondary">送件單位</label>
+              <label className="text-xs text-morandi-primary">送件單位</label>
               <Input
                 value={formData.vendor || ''}
                 onChange={e => updateField('vendor', e.target.value)}
@@ -258,7 +258,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               </datalist>
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">代辦費</label>
+              <label className="text-xs text-morandi-primary">代辦費</label>
               <Input
                 type="number"
                 value={formData.fee || 0}
@@ -267,7 +267,7 @@ export function EditVisaDialog({ open, onClose, visa }: EditVisaDialogProps) {
               />
             </div>
             <div>
-              <label className="text-xs text-morandi-secondary">成本</label>
+              <label className="text-xs text-morandi-primary">成本</label>
               <Input
                 type="number"
                 value={formData.cost || 0}

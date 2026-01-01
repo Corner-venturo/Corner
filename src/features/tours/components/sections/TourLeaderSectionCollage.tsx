@@ -88,7 +88,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-white p-3 pb-8 border border-gray-200 transform rotate-2 w-64 hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer relative"
+              className="bg-white p-3 pb-8 border border-border transform rotate-2 w-64 hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer relative"
               style={{ boxShadow: '10px 10px 0px 0px rgba(0,0,0,1)' }}
             >
               {/* 膠帶 */}
@@ -101,7 +101,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
                 }}
               />
 
-              <div className="h-48 bg-gray-200 border border-black mb-2 overflow-hidden">
+              <div className="h-48 bg-morandi-container border border-black mb-2 overflow-hidden">
                 {data.leader?.photo ? (
                   <img
                     src={data.leader.photo}
@@ -109,7 +109,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center text-6xl text-morandi-secondary">
                     👤
                   </div>
                 )}
@@ -118,20 +118,20 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               <div className="text-center" style={{ fontFamily: "'Gloria Hallelujah', cursive" }}>
                 <div className="text-xl">{data.leader?.name || '領隊姓名待定'}</div>
               </div>
-              <div className="text-center text-xs text-gray-400" style={{ fontFamily: "'Space Mono', monospace" }}>
+              <div className="text-center text-xs text-morandi-secondary" style={{ fontFamily: "'Space Mono', monospace" }}>
                 {data.leader?.title || 'YOUR GUIDE'}
               </div>
 
               {/* 聯絡資訊 */}
               {(data.leader?.domesticPhone || data.leader?.lineId) && (
-                <div className="mt-4 pt-3 border-t border-gray-200 text-xs space-y-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+                <div className="mt-4 pt-3 border-t border-border text-xs space-y-1" style={{ fontFamily: "'Space Mono', monospace" }}>
                   {data.leader?.domesticPhone && (
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-morandi-secondary">
                       <span>📞</span> {data.leader.domesticPhone}
                     </div>
                   )}
                   {data.leader?.lineId && (
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-morandi-secondary">
                       <span>💬</span> {data.leader.lineId}
                     </div>
                   )}

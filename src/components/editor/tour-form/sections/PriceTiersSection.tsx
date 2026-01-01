@@ -187,7 +187,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 方案名稱 */}
                 <div>
-                  <Label className="text-xs text-morandi-secondary">方案名稱</Label>
+                  <Label className="text-xs text-morandi-primary">方案名稱</Label>
                   <div className="flex gap-2 mt-1">
                     <Input
                       value={tier.label}
@@ -206,7 +206,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 價格 */}
                 <div>
-                  <Label className="text-xs text-morandi-secondary">價格</Label>
+                  <Label className="text-xs text-morandi-primary">價格</Label>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm text-morandi-secondary">NT$</span>
                     <Input
@@ -237,7 +237,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
 
                 {/* 加購說明 */}
                 <div>
-                  <Label className="text-xs text-morandi-secondary">加購說明（選填）</Label>
+                  <Label className="text-xs text-morandi-primary">加購說明（選填）</Label>
                   <Input
                     value={tier.addon || ''}
                     onChange={(e) => updatePriceTier(index, { addon: e.target.value })}

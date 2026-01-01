@@ -133,7 +133,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           {/* 客戶資訊 */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">客戶名稱</label>
+              <label className="text-xs font-medium text-morandi-primary">客戶名稱</label>
               <Input
                 value={customerInfo.customer_name}
                 onChange={e => setField('customer_name', e.target.value)}
@@ -143,7 +143,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">聯絡電話</label>
+              <label className="text-xs font-medium text-morandi-primary">聯絡電話</label>
               <Input
                 value={customerInfo.contact_phone}
                 onChange={e => setField('contact_phone', e.target.value)}
@@ -153,7 +153,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">團體編號</label>
+              <label className="text-xs font-medium text-morandi-primary">團體編號</label>
               <Input
                 value={customerInfo.tour_code}
                 onChange={e => setField('tour_code', e.target.value)}
@@ -163,7 +163,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">通訊地址</label>
+              <label className="text-xs font-medium text-morandi-primary">通訊地址</label>
               <Input
                 value={customerInfo.contact_address}
                 onChange={e => setField('contact_address', e.target.value)}
@@ -173,7 +173,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">承辦業務</label>
+              <label className="text-xs font-medium text-morandi-primary">承辦業務</label>
               <Input
                 value={customerInfo.handler_name}
                 onChange={e => setField('handler_name', e.target.value)}
@@ -183,7 +183,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-morandi-secondary">開單日期</label>
+              <label className="text-xs font-medium text-morandi-primary">開單日期</label>
               <DatePicker
                 value={customerInfo.issue_date}
                 onChange={(date) => setField('issue_date', date || '')}
@@ -197,7 +197,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           {/* 收費明細表 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-morandi-secondary">收費明細</label>
+              <label className="text-xs font-medium text-morandi-primary">收費明細</label>
               {!isReadOnly && (
                 <Button onClick={addItem} size="sm" variant="outline" className="h-7 text-xs gap-1">
                   <Plus className="h-3 w-3" />
@@ -320,7 +320,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
 
           {/* 費用說明 */}
           <div>
-            <label className="text-xs font-medium text-morandi-secondary">費用說明</label>
+            <label className="text-xs font-medium text-morandi-primary">費用說明</label>
             <textarea
               value={customerInfo.expense_description}
               onChange={e => setField('expense_description', e.target.value)}
@@ -334,28 +334,28 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           <div className={`grid gap-3 ${isReadOnly ? 'grid-cols-3' : 'grid-cols-5'}`}>
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
-                <label className="text-xs font-medium text-morandi-secondary">總成本</label>
+                <label className="text-xs font-medium text-morandi-primary">總成本</label>
                 <div className="mt-1 text-lg font-bold text-morandi-primary">
                   NT$ {totalCost.toLocaleString()}
                 </div>
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-secondary">應收金額</label>
+              <label className="text-xs font-medium text-morandi-primary">應收金額</label>
               <div className="mt-1 text-lg font-bold text-morandi-primary">
                 NT$ {totalAmount.toLocaleString()}
               </div>
             </div>
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
-                <label className="text-xs font-medium text-morandi-secondary">總利潤</label>
+                <label className="text-xs font-medium text-morandi-primary">總利潤</label>
                 <div className={`mt-1 text-lg font-bold ${totalProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
                   NT$ {totalProfit.toLocaleString()}
                 </div>
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-secondary">已收金額</label>
+              <label className="text-xs font-medium text-morandi-primary">已收金額</label>
               {!isReadOnly ? (
                 <Input
                   type="text"
@@ -374,7 +374,7 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
               )}
             </div>
             <div className="p-3 bg-morandi-container/10 rounded-lg">
-              <label className="text-xs font-medium text-morandi-secondary">應收餘額</label>
+              <label className="text-xs font-medium text-morandi-primary">應收餘額</label>
               <div className={`mt-1 text-lg font-bold ${balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'}`}>
                 NT$ {balanceAmount.toLocaleString()}
               </div>

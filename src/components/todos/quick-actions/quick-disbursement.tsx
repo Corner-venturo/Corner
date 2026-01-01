@@ -80,7 +80,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
       <div className="grid grid-cols-2 gap-3">
         {/* 選擇團體 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">團體 *</Label>
+          <Label className="text-sm font-medium text-morandi-primary">團體 *</Label>
           <Combobox
             options={(tours || []).map(tour => ({
               value: tour.id,
@@ -105,7 +105,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
         {/* 選擇訂單 */}
         <div>
-          <Label className="text-sm font-medium text-morandi-secondary">訂單（選填）</Label>
+          <Label className="text-sm font-medium text-morandi-primary">訂單（選填）</Label>
           <Select
             disabled={!formData.tour_id || filteredOrders.length === 0}
             value={formData.order_id}

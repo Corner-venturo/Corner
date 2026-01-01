@@ -32,7 +32,7 @@ export function MultiImageTemplate({
   uploading,
 }: MultiImageTemplateProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       {/* 標題區 */}
       <div className="p-6 bg-gradient-to-r from-[#8da399] to-[#6b8577]">
         <div className="text-white/80 text-sm mb-1">{dateDisplay}</div>

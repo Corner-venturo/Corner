@@ -4,16 +4,17 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Search, Calendar, Users } from 'lucide-react'
+import { Combobox, ComboboxOption } from '@/components/ui/combobox'
+import { X, Check, Calendar } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
@@ -31,73 +32,94 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
   tours,
   onSelect,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedTourId, setSelectedTourId] = useState('')
 
-  // 篩選團體
-  const filteredTours = tours.filter(tour => {
-    const search = searchTerm.toLowerCase()
+  // 將 tours 轉換為 Combobox 選項格式
+  const tourOptions: ComboboxOption<Tour>[] = useMemo(() => {
+    return tours.map(tour => ({
+      value: tour.id,
+      label: `${tour.code} - ${tour.name}`,
+      data: tour,
+    }))
+  }, [tours])
+
+  // 處理選擇確認
+  const handleConfirm = () => {
+    const selectedTour = tours.find(t => t.id === selectedTourId)
+    if (selectedTour) {
+      onSelect(selectedTour)
+      setSelectedTourId('')
+    }
+  }
+
+  // 處理關閉
+  const handleClose = () => {
+    setSelectedTourId('')
+    onClose()
+  }
+
+  // 自訂選項渲染（顯示團號、團名和日期）
+  const renderTourOption = (option: ComboboxOption<Tour>) => {
+    const tour = option.data
     return (
-      tour.name?.toLowerCase().includes(search) ||
-      tour.code?.toLowerCase().includes(search)
+      <div className="flex items-center justify-between w-full">
+        <div>
+          <div className="font-medium text-morandi-primary">{tour?.name}</div>
+          <div className="text-xs text-morandi-secondary">{tour?.code}</div>
+        </div>
+        {tour?.departure_date && (
+          <div className="flex items-center gap-1 text-xs text-morandi-secondary">
+            <Calendar size={12} />
+            {format(new Date(tour.departure_date), 'yyyy/MM/dd', { locale: zhTW })}
+          </div>
+        )}
+      </div>
     )
-  })
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>選擇團體建立合約</DialogTitle>
         </DialogHeader>
 
-        {/* 搜尋框 */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-morandi-secondary" />
-          <Input
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="搜尋團號或團名..."
-            className="pl-9"
-          />
-        </div>
-
-        {/* 團體列表 */}
-        <div className="max-h-[400px] overflow-auto space-y-2">
-          {filteredTours.length === 0 ? (
+        {/* 使用 Combobox 選擇旅遊團 */}
+        <div className="py-4">
+          {tours.length === 0 ? (
             <div className="text-center py-8 text-morandi-secondary">
-              {tours.length === 0 ? '所有團體都已建立合約' : '找不到符合的團體'}
+              所有團體都已建立合約
             </div>
           ) : (
-            filteredTours.map(tour => (
-              <div
-                key={tour.id}
-                className="p-3 border border-morandi-border rounded-lg hover:bg-morandi-container/20 cursor-pointer transition-colors"
-                onClick={() => onSelect(tour)}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-morandi-primary">{tour.name}</div>
-                    <div className="text-sm text-morandi-secondary">{tour.code}</div>
-                  </div>
-                  <div className="text-right text-sm text-morandi-secondary">
-                    {tour.departure_date && (
-                      <div className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {format(new Date(tour.departure_date), 'yyyy/MM/dd', { locale: zhTW })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
+            <Combobox<Tour>
+              value={selectedTourId}
+              onChange={setSelectedTourId}
+              options={tourOptions}
+              placeholder="搜尋團號或團名..."
+              emptyMessage="找不到符合的團體"
+              showSearchIcon
+              showClearButton
+              renderOption={renderTourOption}
+              maxHeight="20rem"
+            />
           )}
         </div>
 
         {/* 底部按鈕 */}
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
-        </div>
+          <Button
+            onClick={handleConfirm}
+            disabled={!selectedTourId}
+            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            <Check size={16} />
+            確認選擇
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

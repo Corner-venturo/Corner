@@ -206,7 +206,7 @@ export default function LoginPage() {
               onChange={e => setRememberMe(e.target.checked)}
               className="w-4 h-4 rounded border-border text-morandi-gold focus:ring-morandi-gold cursor-pointer"
             />
-            <label htmlFor="rememberMe" className="text-sm text-morandi-secondary cursor-pointer select-none">
+            <label htmlFor="rememberMe" className="text-sm text-morandi-primary cursor-pointer select-none">
               記住我（30 天內免重新登入）
             </label>
           </div>

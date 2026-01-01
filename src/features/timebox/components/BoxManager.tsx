@@ -136,7 +136,7 @@ export default function BoxManager() {
           <h3 className="font-medium mb-4">{editingBox ? '編輯箱子' : '新增箱子'}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
                 箱子名稱 *
               </label>
               <Input
@@ -147,7 +147,7 @@ export default function BoxManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
                 箱子類型
               </label>
               <Select
@@ -168,7 +168,7 @@ export default function BoxManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
                 顏色選擇
               </label>
               <div className="flex flex-wrap gap-2">
@@ -190,7 +190,7 @@ export default function BoxManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-morandi-secondary mb-2">
+              <label className="block text-sm font-medium text-morandi-primary mb-2">
                 預設時長
               </label>
               <div className="flex flex-wrap gap-2">

@@ -48,7 +48,7 @@ export function CardGridLayout({
             <img
               src={mainImage}
               alt={day.title || ''}
-              className="absolute inset-0 w-full h-full object-cover shadow-2xl cursor-pointer"
+              className="absolute inset-0 w-full h-full object-cover shadow-lg cursor-pointer"
               style={{ filter: 'contrast(125%) sepia(30%)' }}
               onMouseEnter={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(0%)' }}
               onMouseLeave={(e) => { e.currentTarget.style.filter = 'contrast(125%) sepia(30%)' }}

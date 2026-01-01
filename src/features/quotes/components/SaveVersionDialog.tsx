@@ -2,6 +2,7 @@ import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Save, X } from 'lucide-react'
 
 interface SaveVersionDialogProps {
   isOpen: boolean
@@ -40,14 +41,16 @@ export const SaveVersionDialog: React.FC<SaveVersionDialogProps> = ({
       maxWidth="md"
       footer={
         <div className="flex justify-end space-x-2">
-          <Button type="button" variant="outline" onClick={handleCancel}>
+          <Button type="button" variant="outline" onClick={handleCancel} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             type="submit"
             disabled={!versionName.trim()}
-            className="bg-morandi-green hover:bg-morandi-green-hover text-white"
+            className="bg-morandi-green hover:bg-morandi-green-hover text-white gap-2"
           >
+            <Save size={16} />
             保存 <span className="ml-1 text-xs opacity-70">(Enter)</span>
           </Button>
         </div>

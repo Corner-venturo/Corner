@@ -242,7 +242,7 @@ function BlobRightLayout({
             </div>
             {day.activities?.[0]?.title && (
               <div
-                className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-white/30 backdrop-blur-md border border-white/40 shadow-xl"
+                className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-white/30 backdrop-blur-md border border-white/40 shadow-lg"
               >
                 <span style={{ fontFamily: "'Cinzel', serif", fontSize: '1.5rem', color: DREAM.accent }}>
                   {day.activities[0].title}
@@ -255,12 +255,12 @@ function BlobRightLayout({
         {/* 右側圖片 */}
         {!isMobile && images[1] && (
           <div className="lg:col-span-4 lg:col-start-9 lg:row-start-1 h-[500px] relative mt-24 transform hover:translate-y-4 transition-transform duration-700">
-            <div className="absolute inset-0 rounded-t-full rounded-b-[200px] overflow-hidden rotate-[2deg] shadow-2xl">
+            <div className="absolute inset-0 rounded-t-full rounded-b-[200px] overflow-hidden rotate-[2deg] shadow-lg">
               <img className="w-full h-full object-cover" src={images[1]} alt="" />
             </div>
             {day.activities?.[1]?.title && (
               <div
-                className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-white/30 backdrop-blur-md border border-white/40 shadow-xl"
+                className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-white/30 backdrop-blur-md border border-white/40 shadow-lg"
               >
                 <span style={{ fontFamily: "'La Belle Aurore', cursive", fontSize: '1.25rem', textAlign: 'center', lineHeight: 1.2 }}>
                   {day.activities[1].title}
@@ -339,7 +339,7 @@ function FullHeroLayout({
         </span>
 
         <h2
-          className={`${isMobile ? 'text-5xl' : 'text-[5rem] lg:text-[10rem]'} leading-none mb-2 mix-blend-overlay drop-shadow-2xl`}
+          className={`${isMobile ? 'text-5xl' : 'text-[5rem] lg:text-[10rem]'} leading-none mb-2 mix-blend-overlay drop-shadow-lg`}
           style={{
             fontFamily: "'Cinzel', serif",
             textShadow: '2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white',
@@ -443,7 +443,7 @@ function GlassCardLayout({
                 <div
                   key={actualIndex}
                   ref={el => { dayRefs.current[actualIndex] = el }}
-                  className={`${isMobile ? 'w-[200px] h-[200px]' : 'w-[300px] h-[300px]'} rounded-full flex flex-col items-center justify-center text-center text-white p-8 relative hover:scale-105 transition-transform duration-300 shadow-2xl`}
+                  className={`${isMobile ? 'w-[200px] h-[200px]' : 'w-[300px] h-[300px]'} rounded-full flex flex-col items-center justify-center text-center text-white p-8 relative hover:scale-105 transition-transform duration-300 shadow-lg`}
                   style={{
                     background: `linear-gradient(to bottom right, ${DREAM.purple}, #4f46e5)`,
                   }}
@@ -475,7 +475,7 @@ function GlassCardLayout({
               <div
                 key={actualIndex}
                 ref={el => { dayRefs.current[actualIndex] = el }}
-                className={`${isMobile ? 'w-[280px]' : 'w-[350px] lg:w-[450px]'} aspect-[3/4] rounded-[3rem] p-8 flex flex-col relative group hover:-translate-y-4 transition-transform duration-500 bg-white/60 backdrop-blur-lg shadow-2xl border border-white/60`}
+                className={`${isMobile ? 'w-[280px]' : 'w-[350px] lg:w-[450px]'} aspect-[3/4] rounded-[3rem] p-8 flex flex-col relative group hover:-translate-y-4 transition-transform duration-500 bg-white/60 backdrop-blur-lg shadow-lg border border-white/60`}
               >
                 {/* Day 標籤 */}
                 <div

@@ -10,7 +10,7 @@ export function FlightPreview({ formData }: FlightPreviewProps) {
   const extendedData = data as Partial<FlightData> & { airlineContacts?: string[] }
 
   return (
-    <div className="p-8 space-y-4" style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
+    <div className="p-8 space-y-4" style={{ fontFamily: "'Noto Sans TC', sans-serif", fontSize: '14px' }}>
       {/* 頂部資訊 */}
       <div className="flex justify-between items-start pb-3 border-b" style={{ borderColor: '#e5e7eb' }}>
         <div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Pencil } from 'lucide-react'
+import { Pencil, Save, X } from 'lucide-react'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 
@@ -71,7 +71,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
         <div className="space-y-4 py-4">
           {/* 飯店名稱 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">飯店名稱</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">飯店名稱</label>
             <Input
               value={editRoomData.hotel_name}
               onChange={e => setEditRoomData(prev => ({ ...prev, hotel_name: e.target.value }))}
@@ -81,7 +81,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
 
           {/* 房型 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">房型</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">房型</label>
             <select
               value={editRoomData.room_type}
               onChange={e => setEditRoomData(prev => ({ ...prev, room_type: e.target.value }))}
@@ -95,7 +95,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
 
           {/* 入住人數 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">入住人數</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">入住人數</label>
             <Input
               type="number"
               min={1}
@@ -108,7 +108,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
 
           {/* 訂房代號 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">訂房代號</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">訂房代號</label>
             <Input
               value={editRoomData.booking_code}
               onChange={e => setEditRoomData(prev => ({ ...prev, booking_code: e.target.value }))}
@@ -118,7 +118,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
 
           {/* 費用 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">費用</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">費用</label>
             <Input
               type="number"
               value={editRoomData.amount}
@@ -129,10 +129,12 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
         </div>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-2" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={handleSave}>
+          <Button className="gap-2" onClick={handleSave}>
+            <Save size={16} />
             儲存
           </Button>
         </div>

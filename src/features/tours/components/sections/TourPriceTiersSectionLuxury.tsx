@@ -172,7 +172,7 @@ export function TourPriceTiersSectionLuxury({ data, viewMode }: TourPriceTiersSe
                 {/* 選擇按鈕 */}
                 <div className="p-6 pt-0 text-center">
                   <button
-                    className="w-full py-3 border text-xs font-bold uppercase tracking-widest rounded-sm transition-all duration-300 hover:-translate-y-0.5"
+                    className="w-full py-3 border text-xs font-bold uppercase tracking-widest rounded-md transition-all duration-300 hover:-translate-y-0.5"
                     style={{
                       borderColor: LUXURY.primary,
                       color: LUXURY.primary,

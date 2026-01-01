@@ -118,7 +118,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
 
           {/* 右側：主圖區塊 */}
           <div className={`relative group ${isMobile ? 'flex-1' : 'flex-1 w-full'}`}>
-            <div className={`relative w-full overflow-hidden shadow-2xl shadow-[#30abe8]/10 ${
+            <div className={`relative w-full overflow-hidden shadow-lg shadow-[#30abe8]/10 ${
               isMobile
                 ? 'aspect-[4/5] rounded-t-[30px] rounded-b-lg'
                 : 'aspect-[3/4] max-h-[650px] rounded-t-[100px] rounded-b-lg'

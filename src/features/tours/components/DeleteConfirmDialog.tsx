@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Trash2, X } from 'lucide-react'
 import { Tour } from '@/stores/types'
 
 interface DeleteConfirmDialogProps {
@@ -41,10 +41,12 @@ export function DeleteConfirmDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={onConfirm} className="bg-morandi-red hover:bg-morandi-red/90 text-white">
+          <Button onClick={onConfirm} className="bg-morandi-red hover:bg-morandi-red/90 text-white gap-2">
+            <Trash2 size={16} />
             確認刪除
           </Button>
         </div>

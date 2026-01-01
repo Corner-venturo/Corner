@@ -80,7 +80,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
         <div className="space-y-4 py-4">
           {/* 飯店名稱 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">飯店名稱</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">飯店名稱</label>
             <Input
               value={editRoomData.hotel_name}
               onChange={e => setEditRoomData(prev => ({ ...prev, hotel_name: e.target.value }))}
@@ -90,7 +90,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
 
           {/* 房型 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">房型</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">房型</label>
             <select
               value={editRoomData.room_type}
               onChange={e => setEditRoomData(prev => ({ ...prev, room_type: e.target.value }))}
@@ -104,7 +104,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
 
           {/* 入住人數 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">入住人數</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">入住人數</label>
             <Input
               type="number"
               min={1}
@@ -117,7 +117,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
 
           {/* 訂房代號 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">訂房代號</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">訂房代號</label>
             <Input
               value={editRoomData.booking_code}
               onChange={e => setEditRoomData(prev => ({ ...prev, booking_code: e.target.value }))}
@@ -127,7 +127,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
 
           {/* 費用 */}
           <div>
-            <label className="block text-sm font-medium text-morandi-secondary mb-1">費用</label>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">費用</label>
             <Input
               type="number"
               value={editRoomData.amount}

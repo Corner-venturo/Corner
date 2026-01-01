@@ -68,7 +68,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
 
         <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">航班號碼</label>
+            <label className="text-xs font-medium text-morandi-primary mb-1 block">航班號碼</label>
             <Input
               value={settings.flightNumber}
               onChange={e => onSettingsChange({ ...settings, flightNumber: e.target.value })}
@@ -77,7 +77,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店名稱</label>
+            <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店名稱</label>
             <Input
               value={settings.hotelName}
               onChange={e => onSettingsChange({ ...settings, hotelName: e.target.value })}
@@ -86,7 +86,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店地址</label>
+            <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店地址</label>
             <Input
               value={settings.hotelAddress}
               onChange={e => onSettingsChange({ ...settings, hotelAddress: e.target.value })}
@@ -95,7 +95,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">飯店電話</label>
+            <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店電話</label>
             <Input
               value={settings.hotelPhone}
               onChange={e => onSettingsChange({ ...settings, hotelPhone: e.target.value })}
@@ -104,7 +104,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-morandi-secondary mb-1 block">停留天數</label>
+            <label className="text-xs font-medium text-morandi-primary mb-1 block">停留天數</label>
             <Input
               type="number"
               min={1}

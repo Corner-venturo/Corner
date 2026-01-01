@@ -8,6 +8,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Plus, X } from 'lucide-react'
 import { Combobox } from '@/components/ui/combobox'
 import {
   Select,
@@ -192,14 +193,16 @@ export const QuoteDialog: React.FC<QuoteDialogProps> = ({
 
           {/* 動作按鈕 */}
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button
               type="submit"
               disabled={!formData.name.trim() || !formData.group_size || formData.group_size < 1}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Plus size={16} />
               新增 <span className="ml-1 text-xs opacity-70">(Enter)</span>
             </Button>
           </div>

@@ -109,7 +109,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
     >
       {/* 網點背景 */}
       <div
-        className="fixed inset-0 opacity-40 pointer-events-none z-0"
+        className="absolute inset-0 opacity-40 pointer-events-none z-0"
         style={{
           backgroundImage: 'radial-gradient(#ddd 1px, transparent 1px)',
           backgroundSize: '20px 20px',

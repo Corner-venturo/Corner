@@ -6,6 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, Layers, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
 
@@ -20,7 +21,15 @@ const BatchAllocateRequestDialog = dynamic(
 )
 const RequestDetailDialog = dynamic(
   () => import('@/features/finance/requests/components/RequestDetailDialog').then(m => m.RequestDetailDialog),
-  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div> }
+  {
+    loading: () => (
+      <Dialog open>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <Loader2 className="animate-spin text-white" size={32} />
+        </DialogContent>
+      </Dialog>
+    )
+  }
 )
 
 export default function RequestsPage() {

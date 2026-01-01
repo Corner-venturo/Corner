@@ -126,7 +126,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 問題 */}
                 <div>
-                  <Label className="text-xs text-morandi-secondary">問題 (Q)</Label>
+                  <Label className="text-xs text-morandi-primary">問題 (Q)</Label>
                   <Input
                     value={faq.question}
                     onChange={(e) => updateFAQ(index, { question: e.target.value })}
@@ -137,7 +137,7 @@ export function FAQSection({ data, onChange }: FAQSectionProps) {
 
                 {/* 答案 */}
                 <div>
-                  <Label className="text-xs text-morandi-secondary">答案 (A)</Label>
+                  <Label className="text-xs text-morandi-primary">答案 (A)</Label>
                   <Textarea
                     value={faq.answer}
                     onChange={(e) => updateFAQ(index, { answer: e.target.value })}

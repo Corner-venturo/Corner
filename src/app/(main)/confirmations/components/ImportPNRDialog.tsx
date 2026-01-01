@@ -5,7 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { FileText, Upload, CheckCircle } from 'lucide-react'
+import { FileText, Upload, CheckCircle, X } from 'lucide-react'
 import { parseFlightConfirmation, type ParsedHTMLConfirmation } from '@/lib/pnr-parser'
 import { toast } from 'sonner'
 
@@ -103,15 +103,16 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
               {/* 解析按鈕 */}
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={handleClose}>
+                <Button variant="outline" onClick={handleClose} className="gap-2">
+                  <X size={16} />
                   取消
                 </Button>
                 <Button
                   onClick={handleParse}
                   disabled={isParsing || !rawInput.trim()}
-                  className="bg-morandi-sky hover:bg-morandi-sky/90"
+                  className="bg-morandi-sky hover:bg-morandi-sky/90 gap-2"
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload size={16} />
                   {isParsing ? '解析中...' : '解析 PNR'}
                 </Button>
               </div>
@@ -196,14 +197,15 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
 
               {/* 匯入按鈕 */}
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={handleClose}>
+                <Button variant="outline" onClick={handleClose} className="gap-2">
+                  <X size={16} />
                   取消
                 </Button>
                 <Button
                   onClick={handleImport}
-                  className="bg-morandi-gold hover:bg-morandi-gold-hover"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <Upload size={16} />
                   匯入到確認單
                 </Button>
               </div>

@@ -1,11 +1,16 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { useUserStore } from '@/stores/user-store'
 import { cn } from '@/lib/utils'
-import { User, DollarSign, Shield, X, Edit, Save } from 'lucide-react'
+import { User, DollarSign, Shield, X, Edit, Save, Check } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 
 // 導入分頁組件
@@ -123,11 +128,11 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
     }
   }
 
-  const modalContent = (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[500] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-border">
+  return (
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-6xl h-[90vh] flex flex-col overflow-hidden p-0">
         {/* 標題列 */}
-        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
+        <DialogHeader className="flex-shrink-0 p-6 pb-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-morandi-container/30 flex items-center justify-center">
               {employee.avatar ? (
@@ -141,16 +146,13 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
               )}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-morandi-primary">
+              <DialogTitle className="text-xl font-bold text-morandi-primary">
                 {employee.display_name || employee.chinese_name || '未命名員工'}
-              </h2>
+              </DialogTitle>
               <p className="text-morandi-secondary">{employee.employee_number}</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X size={16} />
-          </Button>
-        </div>
+        </DialogHeader>
 
         {/* 分頁導航 */}
         <div className="flex items-center justify-between border-b border-border px-6 flex-shrink-0">
@@ -183,18 +185,18 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
             <div className="py-3">
               {isEditing ? (
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={handleSave}>
-                    <Save size={14} className="mr-1" />
+                  <Button size="sm" onClick={handleSave} className="gap-1">
+                    <Check size={14} />
                     儲存
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
-                    <X size={14} className="mr-1" />
+                  <Button size="sm" variant="outline" onClick={() => setIsEditing(false)} className="gap-1">
+                    <X size={14} />
                     取消
                   </Button>
                 </div>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
-                  <Edit size={14} className="mr-1" />
+                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="gap-1">
+                  <Edit size={14} />
                   編輯
                 </Button>
               )}
@@ -204,10 +206,7 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
 
         {/* 分頁內容 */}
         <div className="flex-1 overflow-y-auto">{renderTabContent()}</div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
-
-  // 使用 Portal 渲染到 body，確保能覆蓋 Sidebar
-  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null
 }

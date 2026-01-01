@@ -5,7 +5,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Key } from 'lucide-react'
+import { Key, Check, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -125,14 +125,16 @@ export function ResetPasswordDialog({
         </div>
 
         <div className="flex justify-end gap-2 pt-2 border-t">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleReset}
             disabled={!customer.email || !newPassword || isResetting}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Check size={16} />
             {isResetting ? '重置中...' : '確認重置'}
           </Button>
         </div>

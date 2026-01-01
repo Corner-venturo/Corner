@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { UserPlus, Upload, Loader2, X } from 'lucide-react'
+import { UserPlus, Upload, Loader2, X, Save, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -145,8 +145,9 @@ export function CustomerMatchDialog({
           {(currentPerson?.matchedCustomers.length ?? 0) === 0 && (
             <Button
               onClick={onAddNew}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
             >
+              <Plus size={16} />
               新增到 CRM
             </Button>
           )}
@@ -401,13 +402,16 @@ export function AddCustomerFormDialog({
           <Button
             variant="outline"
             onClick={onBack}
+            className="gap-2"
           >
-            返回
+            <X size={16} />
+            取消
           </Button>
           <Button
             onClick={onSave}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <Save size={16} />
             儲存
           </Button>
         </DialogFooter>

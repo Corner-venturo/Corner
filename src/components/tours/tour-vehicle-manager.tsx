@@ -423,7 +423,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-1.5">
-                <Label className="text-morandi-secondary">車輛名稱 *</Label>
+                <Label className="text-morandi-primary">車輛名稱 *</Label>
                 <Input
                   value={newVehicle.vehicle_name}
                   onChange={e => setNewVehicle({ ...newVehicle, vehicle_name: e.target.value })}
@@ -432,7 +432,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-morandi-secondary">車型</Label>
+                  <Label className="text-morandi-primary">車型</Label>
                   <Select
                     value={newVehicle.vehicle_type}
                     onValueChange={value => {
@@ -455,7 +455,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-morandi-secondary">座位數</Label>
+                  <Label className="text-morandi-primary">座位數</Label>
                   <Input
                     type="number"
                     min={1}
@@ -466,7 +466,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-morandi-secondary">司機姓名</Label>
+                  <Label className="text-morandi-primary">司機姓名</Label>
                   <Input
                     value={newVehicle.driver_name}
                     onChange={e => setNewVehicle({ ...newVehicle, driver_name: e.target.value })}
@@ -474,7 +474,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-morandi-secondary">司機電話</Label>
+                  <Label className="text-morandi-primary">司機電話</Label>
                   <Input
                     value={newVehicle.driver_phone}
                     onChange={e => setNewVehicle({ ...newVehicle, driver_phone: e.target.value })}
@@ -483,7 +483,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-morandi-secondary">車牌號碼</Label>
+                <Label className="text-morandi-primary">車牌號碼</Label>
                 <Input
                   value={newVehicle.license_plate}
                   onChange={e => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}

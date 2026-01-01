@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Button } from '@/components/ui/button'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, RefreshCw, X } from 'lucide-react'
 
 export interface MealDiff {
   day: number
@@ -42,14 +42,16 @@ export const SyncToItineraryDialog: React.FC<SyncToItineraryDialogProps> = ({
       maxWidth="lg"
       footer={
         <div className="flex justify-end space-x-2">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
             type="submit"
             disabled={diffs.length === 0}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
+            <RefreshCw size={16} />
             確認同步
           </Button>
         </div>

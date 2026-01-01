@@ -29,7 +29,7 @@ export function TourFlightInfo({
       <div className="space-y-3">
         {/* 去程航班 */}
         <div className="bg-morandi-container/20 p-3 rounded-lg">
-          <label className="text-xs font-medium text-morandi-secondary mb-2 block">去程航班</label>
+          <label className="text-xs font-medium text-morandi-primary mb-2 block">去程航班</label>
           <div className="flex gap-2">
             <div className="w-28">
               <Input
@@ -67,7 +67,7 @@ export function TourFlightInfo({
 
         {/* 回程航班 */}
         <div className="bg-morandi-container/20 p-3 rounded-lg">
-          <label className="text-xs font-medium text-morandi-secondary mb-2 block">回程航班</label>
+          <label className="text-xs font-medium text-morandi-primary mb-2 block">回程航班</label>
           <div className="flex gap-2">
             <div className="w-28">
               <Input

@@ -18,7 +18,7 @@ import type { Country, City } from '@/stores/region-store'
 // Dynamic import for large dialog component (807 lines)
 const AttractionsDialog = dynamic(
   () => import('../AttractionsDialog').then(m => m.AttractionsDialog),
-  { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
+  { ssr: false }
 )
 
 // ============================================
