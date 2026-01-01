@@ -7,7 +7,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useEffect, useState } from 'react'
-import { Plus, Save, X } from 'lucide-react'
+import { Plus, Save, X, Copy, ExternalLink, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -24,6 +24,13 @@ import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
 import { CurrencyCell } from '@/components/table-cells'
 import { RECEIPT_TYPES } from '../types'
+import { Input } from '@/components/ui/input'
+
+interface LinkPayResult {
+  receiptNumber: string
+  link: string
+}
+
 interface AddReceiptDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -50,6 +57,10 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     resetForm,
     validateForm,
   } = usePaymentForm()
+
+  // LinkPay 結果
+  const [linkPayResults, setLinkPayResults] = useState<LinkPayResult[]>([])
+  const [copiedLink, setCopiedLink] = useState<string | null>(null)
 
   // 載入資料
   useEffect(() => {
@@ -137,6 +148,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
       }
 
       // 為每個收款項目建立收款單
+      const newLinkPayResults: LinkPayResult[] = []
+
       for (const item of paymentItems) {
         // 生成收款單號（新格式：{團號}-R{2位數}）
         const receiptNumber = generateReceiptNumber(
@@ -155,6 +168,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         }
         const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
 
+        // 建立收款單
         await receiptStore.create({
           receipt_number: receiptNumber,
           workspace_id: user.workspace_id,
@@ -191,16 +205,66 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           link: null,
           linkpay_order_number: null,
         } as Parameters<typeof receiptStore.create>[0])
+
+        // 如果是 LinkPay，呼叫 API 產生付款連結
+        if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
+          try {
+            const response = await fetch('/api/linkpay', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                receiptNumber,
+                userName: item.receipt_account || '',
+                email: item.email || '',
+                paymentName: item.payment_name || tourCode,
+                createUser: user.id,
+                amount: item.amount,
+                endDate: item.pay_dateline || '',
+              }),
+            })
+            const data = await response.json()
+            if (data.success && data.data?.paymentLink) {
+              newLinkPayResults.push({
+                receiptNumber,
+                link: data.data.paymentLink
+              })
+              // 更新收款單的 link 欄位
+              const createdReceipt = receiptStore.items.find(r => r.receipt_number === receiptNumber)
+              if (createdReceipt) {
+                await receiptStore.update(createdReceipt.id, { link: data.data.paymentLink })
+              }
+            }
+          } catch (linkPayError) {
+            logger.error('LinkPay API 錯誤:', linkPayError)
+            // 不阻止流程，繼續處理其他收款項目
+          }
+        }
+      }
+
+      // 設定 LinkPay 結果
+      if (newLinkPayResults.length > 0) {
+        setLinkPayResults(newLinkPayResults)
       }
 
       // 收款單建立成功
-      toast({
-        title: '收款單建立成功',
-        description: `已新增 ${paymentItems.length} 項收款，總金額 NT$ ${totalAmount.toLocaleString()}`,
-      })
-      resetForm()
-      onOpenChange(false)
-      onSuccess?.()
+      if (newLinkPayResults.length > 0) {
+        // 有 LinkPay 結果，顯示在對話框中，不關閉
+        toast({
+          title: '收款單建立成功',
+          description: `已新增 ${paymentItems.length} 項收款，其中 ${newLinkPayResults.length} 項 LinkPay 已產生連結`,
+        })
+        resetForm()
+        onSuccess?.()
+        // 不關閉對話框，讓使用者複製連結
+      } else {
+        toast({
+          title: '收款單建立成功',
+          description: `已新增 ${paymentItems.length} 項收款，總金額 NT$ ${totalAmount.toLocaleString()}`,
+        })
+        resetForm()
+        onOpenChange(false)
+        onSuccess?.()
+      }
     } catch (error) {
       logger.error('❌ Create Receipt Error:', error)
 
@@ -234,6 +298,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   const handleCancel = () => {
     resetForm()
+    setLinkPayResults([])
+    setCopiedLink(null)
     onOpenChange(false)
   }
 
@@ -370,22 +436,79 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           </div>
         </div>
 
+        {/* LinkPay 結果區域 */}
+        {linkPayResults.length > 0 && (
+          <div className="space-y-3 pt-4 border-t border-morandi-gold/30 bg-morandi-gold/5 -mx-6 px-6 py-4">
+            <h3 className="text-sm font-medium text-morandi-gold flex items-center gap-2">
+              <ExternalLink size={16} />
+              LinkPay 付款連結已產生
+            </h3>
+            <div className="space-y-2">
+              {linkPayResults.map((result) => (
+                <div key={result.receiptNumber} className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 border border-morandi-gold/20">
+                  <span className="text-sm font-medium text-morandi-primary min-w-[120px]">
+                    {result.receiptNumber}
+                  </span>
+                  <Input
+                    value={result.link}
+                    readOnly
+                    className="flex-1 text-xs bg-morandi-container/30 border-0"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(result.link)
+                      setCopiedLink(result.receiptNumber)
+                      setTimeout(() => setCopiedLink(null), 2000)
+                    }}
+                    className="gap-1 text-morandi-gold hover:bg-morandi-gold/10"
+                  >
+                    {copiedLink === result.receiptNumber ? (
+                      <>
+                        <Check size={14} />
+                        已複製
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={14} />
+                        複製
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => window.open(result.link, '_blank')}
+                    className="gap-1 text-morandi-secondary hover:bg-morandi-container/50"
+                  >
+                    <ExternalLink size={14} />
+                    開啟
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* 操作按鈕 */}
         <div className="flex justify-end space-x-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={handleCancel} className="gap-2">
             <X size={16} />
-            取消
+            {linkPayResults.length > 0 ? '關閉' : '取消'}
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!formData.tour_id || !formData.order_id || paymentItems.length === 0}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
-          >
-            <Save size={16} />
-            <span className="inline-flex items-center gap-1">
-              新增收款單 (共 {paymentItems.length} 項，<CurrencyCell amount={totalAmount} className="inline" />)
-            </span>
-          </Button>
+          {linkPayResults.length === 0 && (
+            <Button
+              onClick={handleSubmit}
+              disabled={!formData.tour_id || !formData.order_id || paymentItems.length === 0}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            >
+              <Save size={16} />
+              <span className="inline-flex items-center gap-1">
+                新增收款單 (共 {paymentItems.length} 項，<CurrencyCell amount={totalAmount} className="inline" />)
+              </span>
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

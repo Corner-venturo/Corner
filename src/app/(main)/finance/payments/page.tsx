@@ -173,8 +173,8 @@ export default function PaymentsPage() {
     { key: 'receipt_date', label: '收款日期', sortable: true, render: (value) => <DateCell date={String(value)} /> },
     { key: 'order_number', label: '訂單編號', sortable: true },
     { key: 'tour_name', label: '團名', sortable: true },
-    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
-    { key: 'receipt_type', label: '收款方式', sortable: true },
+    { key: 'receipt_amount', label: '應收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
+    { key: 'actual_amount', label: '實收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
     { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
     { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
   ]
