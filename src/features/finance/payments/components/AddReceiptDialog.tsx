@@ -313,72 +313,70 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           </p>
         </DialogHeader>
 
-        {/* 基本資訊 - 單行 */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            {/* 選擇團體 */}
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">團體 *</Label>
-              <Combobox
-                options={tours.map(tour => ({
-                  value: tour.id,
-                  label: `${tour.code || ''} - ${tour.name || ''}`,
-                }))}
-                value={formData.tour_id}
-                onChange={value => {
-                  setFormData(prev => ({
-                    ...prev,
-                    tour_id: value,
-                    order_id: '',
-                  }))
-                }}
-                placeholder="請選擇團體..."
-                emptyMessage="找不到團體"
-                className="mt-1"
-              />
-            </div>
-
-            {/* 選擇訂單 */}
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">訂單 *</Label>
-              <Select
-                disabled={!formData.tour_id || filteredOrders.length === 0}
-                value={formData.order_id}
-                onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
-              >
-                <SelectTrigger className="mt-1 border-morandi-container/30">
-                  <SelectValue
-                    placeholder={
-                      !formData.tour_id
-                        ? '請先選擇團體'
-                        : filteredOrders.length === 0
-                          ? '此團體沒有訂單'
-                          : '請選擇訂單...'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredOrders.map(order => (
-                    <SelectItem key={order.id} value={order.id}>
-                      <span className="inline-flex items-center gap-1">
-                        {order.order_number} - {order.contact_person || '無聯絡人'} (待收: <CurrencyCell amount={order.remaining_amount || 0} className="inline" />)
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* 待收金額 */}
-            {selectedOrder && (
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">待收金額</Label>
-                <div className="mt-1 px-3 py-2 bg-muted rounded-md">
-                  <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
-                </div>
-              </div>
-            )}
+        {/* 基本資訊 */}
+        <div className="flex items-end gap-4">
+          {/* 選擇團體 */}
+          <div className="w-[300px]">
+            <Label className="text-sm font-medium text-muted-foreground">團體 *</Label>
+            <Combobox
+              options={tours.map(tour => ({
+                value: tour.id,
+                label: `${tour.code || ''} - ${tour.name || ''}`,
+              }))}
+              value={formData.tour_id}
+              onChange={value => {
+                setFormData(prev => ({
+                  ...prev,
+                  tour_id: value,
+                  order_id: '',
+                }))
+              }}
+              placeholder="請選擇團體..."
+              emptyMessage="找不到團體"
+              className="mt-1"
+            />
           </div>
+
+          {/* 選擇訂單 */}
+          <div className="w-[350px]">
+            <Label className="text-sm font-medium text-muted-foreground">訂單 *</Label>
+            <Select
+              disabled={!formData.tour_id || filteredOrders.length === 0}
+              value={formData.order_id}
+              onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
+            >
+              <SelectTrigger className="mt-1 border-morandi-container/30">
+                <SelectValue
+                  placeholder={
+                    !formData.tour_id
+                      ? '請先選擇團體'
+                      : filteredOrders.length === 0
+                        ? '此團體沒有訂單'
+                        : '請選擇訂單...'
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredOrders.map(order => (
+                  <SelectItem key={order.id} value={order.id}>
+                    <span className="inline-flex items-center gap-1">
+                      {order.order_number} - {order.contact_person || '無聯絡人'} (待收: <CurrencyCell amount={order.remaining_amount || 0} className="inline" />)
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 待收金額 */}
+          {selectedOrder && (
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">待收金額</Label>
+              <div className="mt-1 px-3 py-2 bg-muted rounded-md">
+                <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 收款項目 - 文青風表格 */}
@@ -393,17 +391,18 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
           <div className="flex-1 overflow-visible">
             {/* 項目表格 */}
-            <table className="w-full border-collapse border border-border">
-              <thead>
-                <tr className="text-xs text-morandi-secondary font-medium bg-morandi-container/30">
-                  <th className="text-left py-2 px-3 border border-border" style={{ width: '110px' }}>收款方式</th>
-                  <th className="text-left py-2 px-3 border border-border" style={{ width: '150px' }}>交易日期</th>
-                  <th className="text-left py-2 px-3 border border-border" style={{ width: '180px' }}>付款人姓名</th>
-                  <th className="text-left py-2 px-3 border border-border">備註</th>
-                  <th className="text-right py-2 px-3 border border-border" style={{ width: '120px' }}>金額</th>
-                  <th className="border border-border" style={{ width: '50px' }}></th>
-                </tr>
-              </thead>
+            <div className="border border-border rounded-lg overflow-hidden">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '110px' }}>收款方式</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '150px' }}>交易日期</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border" style={{ width: '180px' }}>付款人姓名</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border">備註</th>
+                    <th className="text-right py-2.5 px-3 border-b border-r border-border" style={{ width: '120px' }}>金額</th>
+                    <th className="border-b border-border" style={{ width: '50px' }}></th>
+                  </tr>
+                </thead>
               <tbody>
                 {paymentItems.map((item, index) => (
                   <PaymentItemRow
@@ -423,7 +422,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   />
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
 
             {paymentItems.length > 0 && (
               <div className="flex justify-end items-center gap-6 pt-4 mt-2">

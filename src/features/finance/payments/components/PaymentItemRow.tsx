@@ -142,9 +142,9 @@ export function PaymentItemRow({
   return (
     <>
       {/* 主要資料行 */}
-      <tr>
+      <tr className="bg-white">
         {/* 收款方式 */}
-        <td className="py-2 px-3 border border-border">
+        <td className="py-2 px-3 border-b border-r border-border">
           <Select
             value={item.receipt_type.toString()}
             onValueChange={value => handleReceiptTypeChange(Number(value) as ReceiptType)}
@@ -163,7 +163,7 @@ export function PaymentItemRow({
         </td>
 
         {/* 交易日期 */}
-        <td className="py-2 px-3 border border-border">
+        <td className="py-2 px-3 border-b border-r border-border">
           <DatePicker
             value={item.transaction_date}
             onChange={(date) => onUpdate(item.id, { transaction_date: date })}
@@ -173,7 +173,7 @@ export function PaymentItemRow({
         </td>
 
         {/* 付款人姓名 / 收款對象 */}
-        <td className="py-2 px-3 border border-border">
+        <td className="py-2 px-3 border-b border-r border-border">
           <input
             type="text"
             value={item.receipt_account || ''}
@@ -191,7 +191,7 @@ export function PaymentItemRow({
         </td>
 
         {/* 備註 */}
-        <td className="py-2 px-3 border border-border">
+        <td className="py-2 px-3 border-b border-r border-border">
           <input
             type="text"
             value={item.note || ''}
@@ -202,7 +202,7 @@ export function PaymentItemRow({
         </td>
 
         {/* 金額 */}
-        <td className="py-2 px-3 border border-border text-right">
+        <td className="py-2 px-3 border-b border-r border-border text-right">
           <input
             type="number"
             value={item.amount || ''}
@@ -213,7 +213,7 @@ export function PaymentItemRow({
         </td>
 
         {/* 操作 */}
-        <td className="py-2 px-3 border border-border text-center">
+        <td className="py-2 px-3 border-b border-border text-center">
           {canRemove && (
             <span
               onClick={() => onRemove(item.id)}
@@ -228,18 +228,18 @@ export function PaymentItemRow({
 
       {/* LinkPay 額外欄位 - 表頭 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr className="text-xs text-morandi-secondary font-medium bg-morandi-gold/10">
-          <th className="text-left py-2 px-3 border border-border">Email *</th>
-          <th className="text-left py-2 px-3 border border-border">付款截止日 *</th>
-          <th className="text-left py-2 px-3 border border-border" colSpan={2}>付款名稱（客戶看到的）</th>
-          <th className="border border-border" colSpan={2}></th>
+        <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
+          <th className="text-left py-2.5 px-3 border-b border-r border-border">Email *</th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border">付款截止日 *</th>
+          <th className="text-left py-2.5 px-3 border-b border-r border-border" colSpan={2}>付款名稱（客戶看到的）</th>
+          <th className="border-b border-border" colSpan={2}></th>
         </tr>
       )}
 
       {/* LinkPay 額外欄位 - 輸入 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr>
-          <td className="py-2 px-3 border border-border">
+        <tr className="bg-white">
+          <td className="py-2 px-3 border-b border-r border-border">
             <input
               type="email"
               value={item.email || ''}
@@ -248,7 +248,7 @@ export function PaymentItemRow({
               className="w-full bg-transparent outline-none text-sm"
             />
           </td>
-          <td className="py-2 px-3 border border-border">
+          <td className="py-2 px-3 border-b border-r border-border">
             <DatePicker
               value={item.pay_dateline || ''}
               onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
@@ -256,7 +256,7 @@ export function PaymentItemRow({
               buttonClassName="h-auto p-0 border-0 shadow-none bg-transparent"
             />
           </td>
-          <td className="py-2 px-3 border border-border" colSpan={2}>
+          <td className="py-2 px-3 border-b border-r border-border" colSpan={2}>
             <input
               type="text"
               value={item.payment_name || ''}
@@ -265,7 +265,7 @@ export function PaymentItemRow({
               className="w-full bg-transparent outline-none text-sm"
             />
           </td>
-          <td className="py-2 px-3 border border-border text-center" colSpan={2}>
+          <td className="py-2 px-3 border-b border-border text-center" colSpan={2}>
             <Button
               type="button"
               onClick={handleGenerateLink}
@@ -291,9 +291,9 @@ export function PaymentItemRow({
 
       {/* LinkPay 產生的連結 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && generatedLink && (
-        <tr className="bg-morandi-gold/5">
-          <td className="py-2 px-3 border border-border text-xs text-morandi-secondary">付款連結</td>
-          <td className="py-2 px-3 border border-border" colSpan={3}>
+        <tr className="bg-morandi-gold/10">
+          <td className="py-2 px-3 border-b border-r border-border text-xs text-morandi-secondary">付款連結</td>
+          <td className="py-2 px-3 border-b border-r border-border" colSpan={3}>
             <input
               type="text"
               value={generatedLink}
@@ -301,7 +301,7 @@ export function PaymentItemRow({
               className="w-full bg-transparent outline-none text-xs"
             />
           </td>
-          <td className="py-2 px-3 border border-border text-center" colSpan={2}>
+          <td className="py-2 px-3 border-b border-border text-center" colSpan={2}>
             <span
               onClick={handleCopyLink}
               className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm mr-3"

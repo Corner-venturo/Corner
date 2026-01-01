@@ -46,6 +46,7 @@ const SSR_ICONS: Record<SSRCategory, typeof Utensils> = {
   [SSRCategory.SEAT]: Armchair,
   [SSRCategory.BAGGAGE]: Briefcase,
   [SSRCategory.FREQUENT]: Award,
+  [SSRCategory.PASSENGER]: Users,
   [SSRCategory.OTHER]: Info,
 }
 

@@ -19,6 +19,7 @@ import { logger } from '@/lib/utils/logger'
 export interface ParsedPNR {
   recordLocator: string;
   passengerNames: string[];
+  passengers: PassengerInfo[];  // 2026-01-02: 完整旅客資訊（含嬰兒/兒童）
   segments: FlightSegment[];
   ticketingDeadline: Date | null;
   cancellationDeadline: Date | null;
@@ -28,6 +29,20 @@ export interface ParsedPNR {
   validation: ValidationResult;
   // 2025-12-29: PNR Enhancement - Fare Monitoring
   fareData: ParsedFareData | null;
+}
+
+/**
+ * 旅客資訊（含嬰兒/兒童）
+ */
+export interface PassengerInfo {
+  index: number;            // 旅客序號 (1-based)
+  name: string;             // 姓名 (SURNAME/GIVENNAME)
+  type: 'ADT' | 'CHD' | 'INF' | 'INS';  // ADT=成人, CHD=兒童, INF=嬰兒(不佔位), INS=嬰兒(佔位)
+  birthDate?: string;       // 出生日期 (DDMMMYY 格式)
+  infant?: {                // 附帶的嬰兒資訊
+    name: string;           // 嬰兒姓名
+    birthDate: string;      // 嬰兒出生日期
+  };
 }
 
 /**
@@ -81,6 +96,7 @@ export enum SSRCategory {
   SEAT = 'SEAT',        // 座位相關
   BAGGAGE = 'BAGGAGE',  // 行李相關
   FREQUENT = 'FREQUENT', // 會員相關
+  PASSENGER = 'PASSENGER', // 旅客類型 (INFT, CHLD)
   OTHER = 'OTHER'       // 其他
 }
 
@@ -126,6 +142,8 @@ const SSR_CATEGORIES: Record<string, SSRCategory> = {
   'SURF': SSRCategory.BAGGAGE, 'SKIS': SSRCategory.BAGGAGE, 'OOXY': SSRCategory.BAGGAGE,
   // 會員類
   'FQTV': SSRCategory.FREQUENT, 'FQTU': SSRCategory.FREQUENT, 'FQTR': SSRCategory.FREQUENT,
+  // 旅客類型
+  'INFT': SSRCategory.PASSENGER, 'CHLD': SSRCategory.PASSENGER,
 };
 
 /**
@@ -272,6 +290,7 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
   const result: ParsedPNR = {
     recordLocator: '',
     passengerNames: [],
+    passengers: [],
     segments: [],
     ticketingDeadline: null,
     cancellationDeadline: null,
@@ -295,14 +314,52 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       continue;
     }
 
-    // 1. 解析旅客姓名 (e.g., "1.WU/MINGTUNG  2.CHANG/TSEYUN")
-    // 可能在同一行有多個旅客
-    const multiNameMatch = line.match(/(\d+\.[A-Z]+\/[A-Z]+(?:\s+(?:MR|MRS|MS|MISS|MSTR|CHD|INF))?)/gi);
-    if (multiNameMatch) {
-      for (const match of multiNameMatch) {
-        const nameOnly = match.replace(/^\d+\./, '').trim();
-        if (nameOnly && !result.passengerNames.includes(nameOnly)) {
-          result.passengerNames.push(nameOnly);
+    // 1. 解析旅客姓名 (支援嬰兒/兒童格式)
+    // 格式範例:
+    // - "1.CHEN/YIHSUAN" - 普通成人
+    // - "5.PENG/ICHEN(INFHO/HAOYU/06MAY24)" - 成人帶嬰兒
+    // - "6.LIN/PINHSUAN(CHD/30JUN22)" - 兒童
+    const passengerLineMatch = line.match(/(\d+)\.([A-Z]+\/[A-Z]+)(?:\(([^)]+)\))?/gi);
+    if (passengerLineMatch) {
+      for (const match of passengerLineMatch) {
+        const passengerMatch = match.match(/(\d+)\.([A-Z]+\/[A-Z]+)(?:\(([^)]+)\))?/i);
+        if (passengerMatch) {
+          const index = parseInt(passengerMatch[1]);
+          const name = passengerMatch[2];
+          const extra = passengerMatch[3]; // INF.../CHD/...
+
+          // 加入姓名列表（向後兼容）
+          if (name && !result.passengerNames.includes(name)) {
+            result.passengerNames.push(name);
+          }
+
+          // 建立詳細旅客資訊
+          const passenger: PassengerInfo = {
+            index,
+            name,
+            type: 'ADT',
+          };
+
+          if (extra) {
+            // 檢查是否為兒童: (CHD/30JUN22)
+            const chdMatch = extra.match(/^CHD\/(\d{2}[A-Z]{3}\d{2})$/i);
+            if (chdMatch) {
+              passenger.type = 'CHD';
+              passenger.birthDate = chdMatch[1];
+            }
+
+            // 檢查是否帶嬰兒: (INFHO/HAOYU/06MAY24) 或 (INF/SURNAME/NAME/DDMMMYY)
+            // 格式: INF + 嬰兒姓氏 + / + 嬰兒名字 + / + 出生日期
+            const infMatch = extra.match(/^INF([A-Z]+)\/([A-Z]+)\/(\d{2}[A-Z]{3}\d{2})$/i);
+            if (infMatch) {
+              passenger.infant = {
+                name: `${infMatch[1]}/${infMatch[2]}`,
+                birthDate: infMatch[3],
+              };
+            }
+          }
+
+          result.passengers.push(passenger);
         }
       }
       continue;
@@ -347,7 +404,66 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       continue;
     }
 
-    // 4. 解析增強型 SSR (Special Service Requests)
+    // 4. 解析 SSR (Special Service Requests)
+
+    // 4a. 解析嬰兒 SSR: "15 SSR INFT CI HK1 HO/HAOYU 06MAY24/S9/P5"
+    const ssrInftMatch = line.match(/^\d+\s+SSR\s+INFT\s+([A-Z]{2})\s+([A-Z]{2})(\d+)\s+([A-Z]+\/[A-Z]+)\s+(\d{2}[A-Z]{3}\d{2})(?:\/S(\d+))?(?:\/P(\d+))?/i);
+    if (ssrInftMatch) {
+      const infantName = ssrInftMatch[4];
+      const infantBirthDate = ssrInftMatch[5];
+      const segmentNum = ssrInftMatch[6] ? parseInt(ssrInftMatch[6]) : undefined;
+      const passengerNum = ssrInftMatch[7] ? parseInt(ssrInftMatch[7]) : undefined;
+
+      result.specialRequests.push({
+        code: 'INFT',
+        description: `嬰兒: ${infantName} (${infantBirthDate})`,
+        segments: segmentNum ? [segmentNum] : undefined,
+        passenger: passengerNum,
+        airline: ssrInftMatch[1],
+        raw: line,
+        category: SSRCategory.PASSENGER
+      });
+
+      // 更新對應旅客的嬰兒資訊
+      if (passengerNum) {
+        const passenger = result.passengers.find(p => p.index === passengerNum);
+        if (passenger && !passenger.infant) {
+          passenger.infant = {
+            name: infantName,
+            birthDate: infantBirthDate,
+          };
+        }
+      }
+      continue;
+    }
+
+    // 4b. 解析兒童 SSR: "16 SSR CHLD CI HK1 30JUN22/P6"
+    const ssrChldMatch = line.match(/^\d+\s+SSR\s+CHLD\s+([A-Z]{2})\s+([A-Z]{2})(\d+)\s+(\d{2}[A-Z]{3}\d{2})(?:\/P(\d+))?/i);
+    if (ssrChldMatch) {
+      const childBirthDate = ssrChldMatch[4];
+      const passengerNum = ssrChldMatch[5] ? parseInt(ssrChldMatch[5]) : undefined;
+
+      result.specialRequests.push({
+        code: 'CHLD',
+        description: `兒童 (${childBirthDate})`,
+        passenger: passengerNum,
+        airline: ssrChldMatch[1],
+        raw: line,
+        category: SSRCategory.PASSENGER
+      });
+
+      // 更新對應旅客的類型和出生日期
+      if (passengerNum) {
+        const passenger = result.passengers.find(p => p.index === passengerNum);
+        if (passenger) {
+          passenger.type = 'CHD';
+          passenger.birthDate = childBirthDate;
+        }
+      }
+      continue;
+    }
+
+    // 4c. 標準增強型 SSR
     if (line.match(/^SR[A-Z]{4}/i)) {
       const ssr = parseEnhancedSSR(line);
       if (ssr) {
@@ -355,8 +471,8 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
         continue;
       }
     }
-    
-    // 舊格式SSR兼容
+
+    // 4d. 舊格式SSR兼容
     if (line.match(/^SR\s+/i) || line.match(/^SSR\s+/i)) {
       const rawText = line.replace(/^S{1,2}R\s+/i, '').trim();
       result.specialRequests.push({
