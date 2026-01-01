@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
-import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink } from 'lucide-react'
+import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
@@ -259,10 +259,56 @@ export function ReceiptDetailDialog({
                 )}
               </div>
 
-              {/* 顯示 LinkPay 記錄 */}
+              {/* 最新付款連結（直接從收款單取得） */}
+              {receipt.link && (
+                <div className="bg-white border border-blue-300 rounded-lg p-3">
+                  <label className="text-xs font-medium text-blue-700 block mb-2">
+                    付款連結（可直接複製）
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={receipt.link}
+                      readOnly
+                      className="flex-1 px-3 py-2 text-sm bg-blue-50 border border-blue-200 rounded font-mono"
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(receipt.link || '')
+                        void alert('連結已複製！', 'success')
+                      }}
+                      className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      複製
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(receipt.link || '', '_blank')}
+                      className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      開啟
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* 顯示 LinkPay 歷史記錄 */}
               {linkPayLogs.length > 0 ? (
-                <LinkPayLogsTable logs={linkPayLogs} />
-              ) : (
+                <details className="text-sm">
+                  <summary className="cursor-pointer text-blue-600 hover:text-blue-800">
+                    查看歷史記錄 ({linkPayLogs.length} 筆)
+                  </summary>
+                  <div className="mt-2">
+                    <LinkPayLogsTable logs={linkPayLogs} />
+                  </div>
+                </details>
+              ) : !receipt.link && (
                 <div className="text-sm text-blue-600">
                   尚未建立付款連結，請點擊上方按鈕建立。
                 </div>

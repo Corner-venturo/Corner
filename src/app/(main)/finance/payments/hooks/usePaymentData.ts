@@ -114,6 +114,8 @@ export function usePaymentData() {
         check_number: item.check_number || null,
         check_bank: item.check_bank || null,
         check_date: null, // 支票兌現日期
+        link: null, // LinkPay 連結（建立後由 API 填入）
+        linkpay_order_number: null, // LinkPay 訂單號
         note: item.note || null,
         deleted_at: null,
         created_by: user.id,

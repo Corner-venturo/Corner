@@ -202,6 +202,16 @@ export async function POST(req: NextRequest) {
         .eq('linkpay_order_number', orderNo)
 
       if (ret_code === '00') {
+        // 同時更新收款單的 link 欄位，方便直接複製
+        await supabase
+          .from('receipts')
+          .update({
+            link: hpp_url,
+            linkpay_order_number: orderNo,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('receipt_number', receiptNumber)
+
         return NextResponse.json({
           success: true,
           message: '付款連結生成成功',

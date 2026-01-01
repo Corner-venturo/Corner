@@ -38,6 +38,10 @@ export interface Receipt {
   check_bank: string | null // 開票銀行
   check_date: string | null // 支票兌現日期
 
+  // LinkPay 欄位（直接存在收款單方便複製）
+  link: string | null // 付款連結
+  linkpay_order_number: string | null // LinkPay 訂單號
+
   note: string | null
 
   // 系統欄位
