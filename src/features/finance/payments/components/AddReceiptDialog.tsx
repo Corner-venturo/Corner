@@ -6,8 +6,8 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useEffect } from 'react'
-import { Plus, Save, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus, Save, X, Copy, ExternalLink, Check } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -23,6 +23,13 @@ import { useToast } from '@/components/ui/use-toast'
 import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
 import { CurrencyCell } from '@/components/table-cells'
+import { RECEIPT_TYPES } from '../types'
+import { Input } from '@/components/ui/input'
+
+interface LinkPayResult {
+  receiptNumber: string
+  link: string
+}
 
 interface AddReceiptDialogProps {
   open: boolean
@@ -50,6 +57,10 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     resetForm,
     validateForm,
   } = usePaymentForm()
+
+  // LinkPay 結果
+  const [linkPayResults, setLinkPayResults] = useState<LinkPayResult[]>([])
+  const [copiedLink, setCopiedLink] = useState<string | null>(null)
 
   // 載入資料
   useEffect(() => {
@@ -137,6 +148,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
       }
 
       // 為每個收款項目建立收款單
+      const newLinkPayResults: LinkPayResult[] = []
+
       for (const item of paymentItems) {
         // 生成收款單號（新格式：{團號}-R{2位數}）
         const receiptNumber = generateReceiptNumber(
@@ -173,16 +186,57 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           deleted_at: null,
           check_date: null,
         } as Parameters<typeof receiptStore.create>[0])
+
+        // 如果是 LinkPay，呼叫 API 產生付款連結
+        if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
+          try {
+            const response = await fetch('/api/linkpay', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                receiptNumber,
+                userName: item.receipt_account || '',
+                email: item.email || '',
+                paymentName: item.payment_name || `${selectedOrder?.order_number || ''} 付款`,
+                createUser: user.id,
+                amount: item.amount,
+                endDate: item.pay_dateline || '',
+              }),
+            })
+
+            const data = await response.json()
+
+            if (data.success && data.link) {
+              newLinkPayResults.push({
+                receiptNumber,
+                link: data.link,
+              })
+            } else {
+              logger.error('LinkPay 建立失敗:', data.message)
+            }
+          } catch (error) {
+            logger.error('LinkPay API 錯誤:', error)
+          }
+        }
       }
 
-      toast({
-        title: '✅ 收款單建立成功',
-        description: `已新增 ${paymentItems.length} 項收款，總金額 NT$ ${totalAmount.toLocaleString()}`,
-      })
-
-      resetForm()
-      onOpenChange(false)
-      onSuccess?.()
+      // 如果有 LinkPay 連結，顯示結果而不是直接關閉
+      if (newLinkPayResults.length > 0) {
+        setLinkPayResults(newLinkPayResults)
+        toast({
+          title: '✅ 收款單建立成功',
+          description: `已新增 ${paymentItems.length} 項收款，請複製下方的付款連結`,
+        })
+        // 不要關閉對話框，讓用戶複製連結
+      } else {
+        toast({
+          title: '✅ 收款單建立成功',
+          description: `已新增 ${paymentItems.length} 項收款，總金額 NT$ ${totalAmount.toLocaleString()}`,
+        })
+        resetForm()
+        onOpenChange(false)
+        onSuccess?.()
+      }
     } catch (error) {
       logger.error('❌ Create Receipt Error:', error)
 
@@ -219,15 +273,100 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     onOpenChange(false)
   }
 
+  // 處理關閉並重設
+  const handleClose = () => {
+    setLinkPayResults([])
+    setCopiedLink(null)
+    resetForm()
+    onOpenChange(false)
+    if (linkPayResults.length > 0) {
+      onSuccess?.()
+    }
+  }
+
+  // 複製連結
+  const handleCopyLink = async (link: string) => {
+    await navigator.clipboard.writeText(link)
+    setCopiedLink(link)
+    setTimeout(() => setCopiedLink(null), 2000)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-[90vw] w-[90vw] h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>新增收款單</DialogTitle>
+          <DialogTitle>
+            {linkPayResults.length > 0 ? '✅ LinkPay 付款連結' : '新增收款單'}
+          </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            收款單號將自動產生
+            {linkPayResults.length > 0
+              ? '收款單已建立，請複製下方連結發送給客戶'
+              : '收款單號將自動產生'}
           </p>
         </DialogHeader>
+
+        {/* LinkPay 連結結果畫面 */}
+        {linkPayResults.length > 0 ? (
+          <div className="flex-1 flex flex-col gap-4 overflow-auto">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
+              <div className="flex items-center gap-2 text-blue-800">
+                <ExternalLink size={20} />
+                <span className="font-medium">付款連結已產生</span>
+              </div>
+
+              {linkPayResults.map((result) => (
+                <div key={result.receiptNumber} className="bg-white border border-blue-300 rounded-lg p-4 space-y-2">
+                  <div className="text-sm text-blue-700 font-medium">
+                    收款單號：{result.receiptNumber}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={result.link}
+                      readOnly
+                      className="flex-1 font-mono text-sm bg-blue-50"
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopyLink(result.link)}
+                      className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100 gap-1"
+                    >
+                      {copiedLink === result.link ? (
+                        <>
+                          <Check size={14} />
+                          已複製
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          複製
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(result.link, '_blank')}
+                      className="shrink-0 border-blue-300 text-blue-700 hover:bg-blue-100 gap-1"
+                    >
+                      <ExternalLink size={14} />
+                      開啟
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-border">
+              <Button onClick={handleClose} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+                <Check size={16} />
+                完成
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
 
         {/* 基本資訊 - 單行 */}
         <div className="space-y-4">
@@ -363,6 +502,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
             </span>
           </Button>
         </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )
