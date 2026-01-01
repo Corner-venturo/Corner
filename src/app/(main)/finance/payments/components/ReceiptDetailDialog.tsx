@@ -45,7 +45,7 @@ export function ReceiptDetailDialog({
   receipt,
   onSuccess,
 }: ReceiptDetailDialogProps) {
-  const { update: updateReceipt, remove: deleteReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { update: updateReceipt, delete: deleteReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: orders, update: updateOrder } = useOrderStore()
   const { items: receipts } = useReceiptStore()
   const { items: allLinkPayLogs, fetchAll: fetchLinkPayLogs } = useLinkPayLogStore()
@@ -147,7 +147,7 @@ export function ReceiptDetailDialog({
   const handleDelete = async () => {
     const confirmed = await confirm(
       `確定要刪除收款單 ${receipt.receipt_number} 嗎？此操作無法復原。`,
-      { title: '刪除收款單', type: 'danger' }
+      { title: '刪除收款單', type: 'warning' }
     )
     if (!confirmed) return
 

@@ -69,9 +69,9 @@ interface CalendarEvent {
 }
 
 export function useCalendarEvents() {
-  const { items: tours } = useTourStore()
-  const { items: orders } = useOrderStore()
-  const { items: members } = useMemberStore()
+  const { items: tours, fetchAll: fetchTours } = useTourStore()
+  const { items: orders, fetchAll: fetchOrders } = useOrderStore()
+  const { items: members, fetchAll: fetchMembers } = useMemberStore()
   const { items: customers } = useCustomerStore()
   const { settings } = useCalendarStore()
   const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
@@ -99,17 +99,21 @@ export function useCalendarEvents() {
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true
-      logger.log('[Calendar] 載入行事曆事件和員工資料...')
+      logger.log('[Calendar] 載入行事曆所需資料...')
       logger.log('[Calendar] 當前用戶:', {
         id: user?.id,
         workspace_id: user?.workspace_id,
         roles: user?.roles,
         isSuperAdmin,
       })
+      // 載入所有行事曆需要的資料
       fetchCalendarEvents()
       fetchEmployees()
+      fetchTours()
+      fetchOrders()
+      fetchMembers()
     }
-  }, [fetchCalendarEvents, fetchEmployees, user, isSuperAdmin])
+  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, user, isSuperAdmin])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
