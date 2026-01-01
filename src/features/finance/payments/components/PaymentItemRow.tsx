@@ -3,10 +3,12 @@
  * 收款項目行（表格式輸入）
  */
 
-import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Trash2, Link2, Copy, Check, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
+import { useToast } from '@/components/ui/use-toast'
 import {
   Select,
   SelectContent,
@@ -43,8 +45,71 @@ export function PaymentItemRow({
   isNewRow = false,
   orderInfo,
 }: PaymentItemRowProps) {
+  const { toast } = useToast()
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
   const receiptTypeLabel =
     RECEIPT_TYPE_OPTIONS.find(opt => opt.value === item.receipt_type)?.label || '現金'
+
+  // 產生 LinkPay 連結
+  const handleGenerateLink = async () => {
+    if (!item.email || !item.amount || !item.pay_dateline) {
+      toast({
+        title: '請填寫必要欄位',
+        description: 'Email、金額、付款截止日為必填',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      const { useAuthStore } = await import('@/stores')
+      const user = useAuthStore.getState().user
+
+      const response = await fetch('/api/linkpay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receiptNumber: `PREVIEW-${Date.now()}`, // 預覽用臨時編號
+          userName: item.receipt_account || '',
+          email: item.email,
+          paymentName: item.payment_name || orderInfo?.tour_name || '',
+          createUser: user?.id || '',
+          amount: item.amount,
+          endDate: item.pay_dateline,
+        }),
+      })
+      const data = await response.json()
+      if (data.success && data.data?.paymentLink) {
+        setGeneratedLink(data.data.paymentLink)
+        toast({
+          title: '連結產生成功',
+          description: '可複製連結發送給客戶',
+        })
+      } else {
+        throw new Error(data.error || '產生連結失敗')
+      }
+    } catch (error) {
+      toast({
+        title: '產生連結失敗',
+        description: error instanceof Error ? error.message : '請稍後再試',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleCopyLink = () => {
+    if (generatedLink) {
+      navigator.clipboard.writeText(generatedLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   // 當收款方式變更為 LinkPay 時，自動帶入預設值
   const handleReceiptTypeChange = (newType: ReceiptType) => {
@@ -178,7 +243,7 @@ export function PaymentItemRow({
         >
           <td colSpan={6} className="py-2 px-3">
             <div className="pl-4 border-l-2 border-morandi-gold/30">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3 items-end">
                 <div>
                   <label className="text-xs font-medium text-morandi-primary mb-1 block">
                     Email *
@@ -213,7 +278,68 @@ export function PaymentItemRow({
                     className="h-8 text-sm border-morandi-container/30"
                   />
                 </div>
+                <div>
+                  <Button
+                    type="button"
+                    onClick={handleGenerateLink}
+                    disabled={isGenerating || !item.email || !item.amount || !item.pay_dateline}
+                    className="h-8 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        產生中...
+                      </>
+                    ) : (
+                      <>
+                        <Link2 size={14} />
+                        產生連結
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
+
+              {/* 產生的連結 */}
+              {generatedLink && (
+                <div className="mt-3 flex items-center gap-2 bg-morandi-gold/10 rounded-lg px-3 py-2">
+                  <Link2 size={14} className="text-morandi-gold shrink-0" />
+                  <Input
+                    value={generatedLink}
+                    readOnly
+                    className="flex-1 h-7 text-xs bg-white border-0"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyLink}
+                    className="h-7 gap-1 text-morandi-gold hover:bg-morandi-gold/20"
+                  >
+                    {copied ? (
+                      <>
+                        <Check size={12} />
+                        已複製
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={12} />
+                        複製
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => window.open(generatedLink, '_blank')}
+                    className="h-7 gap-1 text-morandi-secondary hover:bg-morandi-container/50"
+                  >
+                    <ExternalLink size={12} />
+                    開啟
+                  </Button>
+                </div>
+              )}
             </div>
           </td>
         </tr>
