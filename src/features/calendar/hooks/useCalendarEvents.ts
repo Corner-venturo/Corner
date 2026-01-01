@@ -94,9 +94,12 @@ export function useCalendarEvents() {
     }
   }, [isSuperAdmin, loadWorkspaces])
 
-  // 確保資料已載入
+  // 確保資料已載入（當用戶登入後才載入）
   const initializedRef = useRef(false)
   useEffect(() => {
+    // 等待用戶資料載入後才開始抓取
+    if (!user?.id) return
+
     if (!initializedRef.current) {
       initializedRef.current = true
       logger.log('[Calendar] 載入行事曆所需資料...')
@@ -112,8 +115,13 @@ export function useCalendarEvents() {
       fetchTours()
       fetchOrders()
       fetchMembers()
+
+      // 顯示載入的資料數量（除錯用）
+      setTimeout(() => {
+        logger.log('[Calendar] 資料載入完成，tours 數量:', tours?.length || 0)
+      }, 2000)
     }
-  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, user, isSuperAdmin])
+  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, user, isSuperAdmin, tours?.length])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -159,6 +167,7 @@ export function useCalendarEvents() {
 
   // 轉換旅遊團為日曆事件（過濾掉特殊團）
   const tourEvents: FullCalendarEvent[] = useMemo(() => {
+    logger.log('[Calendar] 轉換 tours，原始數量:', tours?.length || 0)
     return (tours || [])
       .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
       .map(tour => {
