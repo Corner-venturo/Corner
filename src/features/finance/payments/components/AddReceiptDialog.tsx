@@ -396,7 +396,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
             <div className="border-b border-morandi-container/60">
               <div className="grid grid-cols-[110px_120px_150px_180px_1fr_60px] px-2 py-2.5">
                 <span className="text-xs font-medium text-morandi-secondary">收款方式</span>
-                <span className="text-xs font-medium text-morandi-secondary text-right pr-2">金額</span>
+                <span className="text-xs font-medium text-morandi-secondary">金額</span>
                 <span className="text-xs font-medium text-morandi-secondary">交易日期</span>
                 <span className="text-xs font-medium text-morandi-secondary">付款人姓名</span>
                 <span className="text-xs font-medium text-morandi-secondary">備註</span>
