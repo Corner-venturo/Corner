@@ -8,7 +8,7 @@ import type { Receipt } from '@/types/receipt.types'
 
 export const useReceiptStore = createStore<Receipt>({
   tableName: 'receipts',
-  codePrefix: 'R',
+  // 不使用 codePrefix，收款單號由 generateReceiptNumber 手動生成（格式：團號-R01）
   enableSupabase: true,
   fastInsert: true,
 })
