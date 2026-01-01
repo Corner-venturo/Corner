@@ -6,7 +6,6 @@
 import { useState } from 'react'
 import { Trash2, Link2, Copy, Check, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useToast } from '@/components/ui/use-toast'
 import {
@@ -235,7 +234,7 @@ export function PaymentItemRow({
 
       {/* LinkPay 額外欄位 - 表頭 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr className="bg-morandi-gold/5 border-b border-morandi-gold/20">
+        <tr className="border-b border-morandi-gold/20 bg-morandi-gold/5">
           <td colSpan={6} className="py-1.5 px-2">
             <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 pl-4 border-l-2 border-morandi-gold/30">
               <span className="text-xs font-medium text-morandi-secondary">Email *</span>
@@ -255,24 +254,25 @@ export function PaymentItemRow({
         )}>
           <td colSpan={6} className="py-1.5 px-2">
             <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 items-center pl-4 border-l-2 border-morandi-gold/30">
-              <Input
+              <input
                 type="email"
                 value={item.email || ''}
                 onChange={e => onUpdate(item.id, { email: e.target.value })}
                 placeholder="user@example.com"
-                className="h-9 text-sm border-morandi-container/30"
+                className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
               />
               <DatePicker
                 value={item.pay_dateline || ''}
                 onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
-                className="h-9 text-sm border-morandi-container/30"
+                className="input-no-focus h-9 border-0 shadow-none bg-transparent"
                 placeholder="選擇日期"
               />
-              <Input
+              <input
+                type="text"
                 value={item.payment_name || ''}
                 onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
                 placeholder="例如：峇里島五日遊 - 尾款"
-                className="h-9 text-sm border-morandi-container/30"
+                className="input-no-focus w-full h-9 px-1 bg-transparent text-sm placeholder:text-morandi-muted"
               />
               <Button
                 type="button"
@@ -304,10 +304,11 @@ export function PaymentItemRow({
             <div className="flex items-center gap-2 pl-4 border-l-2 border-morandi-gold/30">
               <Link2 size={14} className="text-morandi-gold shrink-0" />
               <span className="text-xs text-morandi-secondary shrink-0">付款連結：</span>
-              <Input
+              <input
+                type="text"
                 value={generatedLink}
                 readOnly
-                className="flex-1 h-8 text-xs bg-white border-morandi-container/30"
+                className="input-no-focus flex-1 h-8 px-2 bg-white text-xs rounded border border-morandi-gold/30"
               />
               <Button
                 type="button"
