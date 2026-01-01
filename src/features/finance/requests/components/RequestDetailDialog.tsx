@@ -11,10 +11,11 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Pencil, X, Save } from 'lucide-react'
 import { usePaymentRequestStore, usePaymentRequestItemStore, useTourStore, useSupplierStore } from '@/stores'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
-import { formatDate } from '@/lib/utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { logger } from '@/lib/utils/logger'
@@ -75,6 +76,12 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   // 取得關聯的團
   const tour = request.tour_id ? tours.find(t => t.id === request.tour_id) : null
+
+  // 供應商選項（給 Combobox 使用）
+  const supplierOptions = suppliers.map(s => ({
+    value: s.id,
+    label: s.name || '未命名',
+  }))
 
   // 刪除請款單
   const handleDelete = async () => {
@@ -220,12 +227,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
             <InfoItem label="團名" value={request.tour_name || tour?.name || '-'} />
             <InfoItem label="訂單編號" value={request.order_number || '-'} />
             <InfoItem label="請款人" value={request.created_by_name || '-'} />
-            <InfoItem label="請款日期" value={formatDate(request.created_at)} />
-            <InfoItem
-              label="總金額"
-              value={`NT$ ${(request.amount || 0).toLocaleString()}`}
-              highlight
-            />
+            <div>
+              <p className="text-xs text-morandi-muted mb-1">請款日期</p>
+              <DateCell date={request.created_at} showIcon={false} />
+            </div>
+            <div>
+              <p className="text-xs text-morandi-muted mb-1">總金額</p>
+              <CurrencyCell amount={request.amount || 0} className="font-semibold text-morandi-gold" />
+            </div>
           </div>
 
           {/* 請款項目 */}
@@ -247,233 +256,218 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               )}
             </div>
 
-            <div className="overflow-x-auto border border-morandi-container/20 rounded-lg">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-morandi-background/50 border-b border-morandi-container/20">
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">類別</th>
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">供應商</th>
-                    <th className="text-left py-2 px-3 text-morandi-muted font-medium">說明</th>
-                    <th className="text-right py-2 px-3 text-morandi-muted font-medium">單價</th>
-                    <th className="text-right py-2 px-3 text-morandi-muted font-medium">數量</th>
-                    <th className="text-right py-2 px-3 text-morandi-muted font-medium">小計</th>
-                    {canEdit && <th className="text-center py-2 px-3 text-morandi-muted font-medium w-20">操作</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* 新增項目表單 */}
-                  {isAddingItem && (
-                    <tr className="border-b border-morandi-container/10 bg-morandi-gold/5">
-                      <td className="py-2 px-2">
-                        <Select
-                          value={newItem.category}
-                          onValueChange={(value) => setNewItem({ ...newItem, category: value as PaymentRequestItem['category'] })}
-                        >
-                          <SelectTrigger className="h-8 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categoryOptions.map(opt => (
-                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                      <td className="py-2 px-2">
-                        <Select
-                          value={newItem.supplier_id}
-                          onValueChange={(value) => setNewItem({ ...newItem, supplier_id: value })}
-                        >
-                          <SelectTrigger className="h-8 text-xs">
-                            <SelectValue placeholder="選擇供應商" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {suppliers.map(s => (
-                              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                      <td className="py-2 px-2">
-                        <Input
-                          value={newItem.description}
-                          onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                          placeholder="說明"
-                          className="h-8 text-xs"
-                        />
-                      </td>
-                      <td className="py-2 px-2">
-                        <Input
-                          type="text"
-                          inputMode="decimal"
-                          value={newItem.unit_price || ''}
-                          onChange={(e) => {
-                            const num = parseFloat(e.target.value) || 0
-                            setNewItem({ ...newItem, unit_price: num })
-                          }}
-                          className="h-8 text-xs text-right w-24"
-                        />
-                      </td>
-                      <td className="py-2 px-2">
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          value={newItem.quantity || ''}
-                          onChange={(e) => {
-                            const num = parseInt(e.target.value) || 0
-                            setNewItem({ ...newItem, quantity: num })
-                          }}
-                          className="h-8 text-xs text-right w-16"
-                        />
-                      </td>
-                      <td className="py-2 px-3 text-right font-medium text-morandi-gold">
-                        NT$ {(newItem.unit_price * newItem.quantity).toLocaleString()}
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
-                            <Save size={14} className="text-status-success" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
-                            <X size={14} className="text-status-danger" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+            <div className="border border-morandi-container/20 rounded-lg overflow-hidden">
+              {/* 表頭 - 與 EditableRequestItemList 一致的 grid 結構 */}
+              <div className="bg-morandi-background/50 border-b border-morandi-container/20">
+                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-3 py-2.5`}>
+                  <span className="text-xs font-medium text-morandi-muted">類別</span>
+                  <span className="text-xs font-medium text-morandi-muted">供應商</span>
+                  <span className="text-xs font-medium text-morandi-muted">說明</span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">單價</span>
+                  <span className="text-xs font-medium text-morandi-muted text-center">數量</span>
+                  <span className="text-xs font-medium text-morandi-muted text-right">小計</span>
+                  {canEdit && <span className="text-xs font-medium text-morandi-muted text-center">操作</span>}
+                </div>
+              </div>
 
-                  {items.length === 0 && !isAddingItem ? (
-                    <tr>
-                      <td colSpan={canEdit ? 7 : 6} className="text-center py-8 text-morandi-muted">
-                        尚無請款項目
-                      </td>
-                    </tr>
-                  ) : (
-                    items.map((item) => (
-                      <tr key={item.id} className="border-b border-morandi-container/10">
-                        {editingItemId === item.id ? (
-                          /* 編輯模式 */
-                          <>
-                            <td className="py-2 px-2">
-                              <Select
-                                value={editItem.category || ''}
-                                onValueChange={(value) => setEditItem({ ...editItem, category: value as PaymentRequestItem['category'] })}
-                              >
-                                <SelectTrigger className="h-8 text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {categoryOptions.map(opt => (
-                                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </td>
-                            <td className="py-2 px-2">
-                              <Select
-                                value={editItem.supplier_id || ''}
-                                onValueChange={(value) => setEditItem({ ...editItem, supplier_id: value })}
-                              >
-                                <SelectTrigger className="h-8 text-xs">
-                                  <SelectValue placeholder="選擇供應商" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {suppliers.map(s => (
-                                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </td>
-                            <td className="py-2 px-2">
-                              <Input
-                                value={editItem.description || ''}
-                                onChange={(e) => setEditItem({ ...editItem, description: e.target.value })}
-                                className="h-8 text-xs"
-                              />
-                            </td>
-                            <td className="py-2 px-2">
-                              <Input
-                                type="text"
-                                inputMode="decimal"
-                                value={editItem.unit_price || ''}
-                                onChange={(e) => {
-                                  const num = parseFloat(e.target.value) || 0
-                                  setEditItem({ ...editItem, unit_price: num })
-                                }}
-                                className="h-8 text-xs text-right w-24"
-                              />
-                            </td>
-                            <td className="py-2 px-2">
-                              <Input
-                                type="text"
-                                inputMode="numeric"
-                                value={editItem.quantity || ''}
-                                onChange={(e) => {
-                                  const num = parseInt(e.target.value) || 0
-                                  setEditItem({ ...editItem, quantity: num })
-                                }}
-                                className="h-8 text-xs text-right w-16"
-                              />
-                            </td>
-                            <td className="py-2 px-3 text-right font-medium text-morandi-gold">
-                              NT$ {((editItem.unit_price || 0) * (editItem.quantity || 0)).toLocaleString()}
-                            </td>
-                            <td className="py-2 px-2 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
-                                  <Save size={14} className="text-status-success" />
-                                </Button>
-                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
-                                  <X size={14} className="text-status-danger" />
-                                </Button>
-                              </div>
-                            </td>
-                          </>
-                        ) : (
-                          /* 顯示模式 */
-                          <>
-                            <td className="py-2 px-3">
-                              {categoryOptions.find(c => c.value === item.category)?.label || item.category}
-                            </td>
-                            <td className="py-2 px-3">{item.supplier_name || '-'}</td>
-                            <td className="py-2 px-3">{item.description || '-'}</td>
-                            <td className="py-2 px-3 text-right">
-                              NT$ {(item.unit_price || 0).toLocaleString()}
-                            </td>
-                            <td className="py-2 px-3 text-right">{item.quantity}</td>
-                            <td className="py-2 px-3 text-right font-medium text-morandi-gold">
-                              NT$ {(item.subtotal || 0).toLocaleString()}
-                            </td>
-                            {canEdit && (
-                              <td className="py-2 px-2 text-center">
-                                <div className="flex items-center justify-center gap-1">
-                                  <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => startEditItem(item)}>
-                                    <Pencil size={14} className="text-morandi-secondary" />
-                                  </Button>
-                                  <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
-                                    <Trash2 size={14} className="text-status-danger" />
-                                  </Button>
-                                </div>
-                              </td>
-                            )}
-                          </>
-                        )}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-morandi-background/50">
-                    <td colSpan={canEdit ? 5 : 5} className="py-3 px-3 text-right font-semibold">
-                      合計
-                    </td>
-                    <td className="py-3 px-3 text-right font-bold text-morandi-gold">
-                      NT$ {(request.amount || 0).toLocaleString()}
-                    </td>
-                    {canEdit && <td></td>}
-                  </tr>
-                </tfoot>
-              </table>
+              {/* 項目區域 */}
+              <div className="max-h-[280px] overflow-y-auto">
+                {/* 新增項目表單 */}
+                {isAddingItem && (
+                  <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-2 py-1.5 border-b border-morandi-container/10 bg-morandi-gold/5 items-center`}>
+                    <div>
+                      <Select
+                        value={newItem.category}
+                        onValueChange={(value) => setNewItem({ ...newItem, category: value as PaymentRequestItem['category'] })}
+                      >
+                        <SelectTrigger className="h-8 text-xs border-0 shadow-none bg-transparent">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categoryOptions.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Combobox
+                        options={supplierOptions}
+                        value={newItem.supplier_id}
+                        onChange={(value) => setNewItem({ ...newItem, supplier_id: value })}
+                        placeholder="選擇供應商..."
+                        className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        value={newItem.description}
+                        onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                        placeholder="說明"
+                        className="h-8 text-xs border-0 shadow-none bg-transparent"
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={newItem.unit_price || ''}
+                        onChange={(e) => {
+                          const num = parseFloat(e.target.value) || 0
+                          setNewItem({ ...newItem, unit_price: num })
+                        }}
+                        className="h-8 text-xs text-right border-0 shadow-none bg-transparent"
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        value={newItem.quantity || ''}
+                        onChange={(e) => {
+                          const num = parseInt(e.target.value) || 0
+                          setNewItem({ ...newItem, quantity: num })
+                        }}
+                        className="h-8 text-xs text-center border-0 shadow-none bg-transparent"
+                      />
+                    </div>
+                    <div className="text-right pr-2">
+                      <CurrencyCell amount={newItem.unit_price * newItem.quantity} className="text-morandi-gold" />
+                    </div>
+                    <div className="flex items-center justify-center gap-1">
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
+                        <Save size={14} className="text-status-success" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
+                        <X size={14} className="text-status-danger" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {items.length === 0 && !isAddingItem ? (
+                  <div className="text-center py-8 text-morandi-muted">
+                    尚無請款項目
+                  </div>
+                ) : (
+                  items.map((item) => (
+                    <div key={item.id} className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-2 py-1.5 border-b border-morandi-container/10 items-center hover:bg-morandi-container/5`}>
+                      {editingItemId === item.id ? (
+                        /* 編輯模式 */
+                        <>
+                          <div>
+                            <Select
+                              value={editItem.category || ''}
+                              onValueChange={(value) => setEditItem({ ...editItem, category: value as PaymentRequestItem['category'] })}
+                            >
+                              <SelectTrigger className="h-8 text-xs border-0 shadow-none bg-transparent">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {categoryOptions.map(opt => (
+                                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Combobox
+                              options={supplierOptions}
+                              value={editItem.supplier_id || ''}
+                              onChange={(value) => setEditItem({ ...editItem, supplier_id: value })}
+                              placeholder="選擇供應商..."
+                              className="[&_input]:h-8 [&_input]:text-xs [&_input]:bg-transparent"
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              value={editItem.description || ''}
+                              onChange={(e) => setEditItem({ ...editItem, description: e.target.value })}
+                              className="h-8 text-xs border-0 shadow-none bg-transparent"
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type="text"
+                              inputMode="decimal"
+                              value={editItem.unit_price || ''}
+                              onChange={(e) => {
+                                const num = parseFloat(e.target.value) || 0
+                                setEditItem({ ...editItem, unit_price: num })
+                              }}
+                              className="h-8 text-xs text-right border-0 shadow-none bg-transparent"
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type="text"
+                              inputMode="numeric"
+                              value={editItem.quantity || ''}
+                              onChange={(e) => {
+                                const num = parseInt(e.target.value) || 0
+                                setEditItem({ ...editItem, quantity: num })
+                              }}
+                              className="h-8 text-xs text-center border-0 shadow-none bg-transparent"
+                            />
+                          </div>
+                          <div className="text-right pr-2">
+                            <CurrencyCell amount={(editItem.unit_price || 0) * (editItem.quantity || 0)} className="text-morandi-gold" />
+                          </div>
+                          <div className="flex items-center justify-center gap-1">
+                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
+                              <Save size={14} className="text-status-success" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingItemId(null)}>
+                              <X size={14} className="text-status-danger" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        /* 顯示模式 */
+                        <>
+                          <div className="text-sm px-1">
+                            {categoryOptions.find(c => c.value === item.category)?.label || item.category}
+                          </div>
+                          <div className="text-sm px-1">{item.supplier_name || '-'}</div>
+                          <div className="text-sm px-1">{item.description || '-'}</div>
+                          <div className="text-right pr-2">
+                            <CurrencyCell amount={item.unit_price || 0} className="text-sm" />
+                          </div>
+                          <div className="text-sm text-center">{item.quantity}</div>
+                          <div className="text-right pr-2">
+                            <CurrencyCell amount={item.subtotal || 0} className="text-morandi-gold" />
+                          </div>
+                          {canEdit && (
+                            <div className="flex items-center justify-center gap-1">
+                              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => startEditItem(item)}>
+                                <Pencil size={14} className="text-morandi-secondary" />
+                              </Button>
+                              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteItem(item.id)}>
+                                <Trash2 size={14} className="text-status-danger" />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 合計 */}
+              <div className="bg-morandi-background/50 border-t border-morandi-container/20">
+                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-3 py-3`}>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div className="text-right font-semibold text-sm">合計</div>
+                  <div className="text-right pr-2">
+                    <CurrencyCell amount={request.amount || 0} className="font-bold text-morandi-gold" />
+                  </div>
+                  {canEdit && <div></div>}
+                </div>
+              </div>
             </div>
           </div>
 

@@ -7,8 +7,9 @@
 import React, { useMemo } from 'react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
-import { Edit2, Trash2, FileText, Home } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DateCell } from '@/components/table-cells'
 import type { Confirmation } from '@/types/confirmation.types'
 
 interface ConfirmationsListProps {
@@ -107,9 +108,7 @@ export const ConfirmationsList: React.FC<ConfirmationsListProps> = ({
         render: (_: unknown, row: unknown) => {
           const conf = row as Confirmation
           return (
-            <span className="text-sm text-morandi-secondary">
-              {new Date(conf.created_at).toLocaleDateString('zh-TW')}
-            </span>
+            <DateCell date={conf.created_at} showIcon={false} className="text-morandi-secondary" />
           )
         },
       },

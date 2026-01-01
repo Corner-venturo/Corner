@@ -20,25 +20,8 @@ import {
 import { History, ChevronDown, Trash2 } from 'lucide-react'
 import { QuoteVersion } from '@/stores/types'
 import { confirm } from '@/lib/ui/alert-dialog'
-
-// 移除 HTML 標籤
-const stripHtml = (html: string | undefined): string => {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
-
-// 格式化日期時間
-const formatDateTime = (dateString: string) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleString('zh-TW', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+import { stripHtml } from '@/lib/utils/string-utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface QuickQuoteVersionPanelProps {
   versions: QuoteVersion[]
@@ -125,14 +108,18 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
                         <span className="font-medium">
                           {stripHtml(version.version_name) || `版本 ${version.version}`}
                         </span>
-                        <span className="text-xs text-morandi-secondary">
-                          {formatDateTime(version.created_at)}
-                        </span>
+                        <DateCell
+                          date={version.created_at}
+                          format="time"
+                          showIcon={false}
+                          className="text-xs text-morandi-secondary"
+                        />
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-xs text-morandi-secondary">
-                          NT$ {(version.total_amount || 0).toLocaleString()}
-                        </div>
+                        <CurrencyCell
+                          amount={version.total_amount || 0}
+                          className="text-xs text-morandi-secondary"
+                        />
                         {isCurrentEditing && (
                           <div className="text-xs bg-morandi-gold text-white px-2 py-0.5 rounded">當前</div>
                         )}

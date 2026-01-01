@@ -19,6 +19,7 @@ import { useTodoStore } from '@/stores'
 import { taskTemplates, calculateDeadlineFromDeparture } from '@/lib/task-templates'
 import { cn } from '@/lib/utils'
 import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react'
+import { DateCell } from '@/components/table-cells'
 
 interface TourTaskAssignmentProps {
   tour: Tour
@@ -205,12 +206,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       label: '期限',
       sortable: true,
       render: (value: unknown) => (
-        <div className="flex items-center gap-2">
-          <Calendar size={14} className="text-morandi-secondary" />
-          <span className="text-sm text-morandi-primary">
-            {value ? new Date(String(value)).toLocaleDateString() : '未設定'}
-          </span>
-        </div>
+        <DateCell date={value ? String(value) : null} fallback="未設定" />
       ),
     },
     {
@@ -400,8 +396,8 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
           <h3 className="text-lg font-semibold text-morandi-primary">
             此團已指派的任務 ({tourTasks.length})
           </h3>
-          <div className="text-sm text-morandi-secondary">
-            出發日期：{new Date(tour.departure_date).toLocaleDateString()}
+          <div className="text-sm text-morandi-secondary flex items-center gap-1">
+            出發日期：<DateCell date={tour.departure_date} showIcon={false} />
           </div>
         </div>
 

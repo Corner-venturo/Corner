@@ -85,7 +85,7 @@ export function AddDestinationDialog({
             ) : (
               <>
                 <Check size={16} />
-                確認新增
+                新增目的地
               </>
             )}
           </Button>

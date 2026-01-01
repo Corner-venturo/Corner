@@ -387,7 +387,7 @@ export default function CreateInvoicePage() {
               disabled={isLoading}
               className="min-w-[120px]"
             >
-              {isLoading ? '開立中...' : '確定開立'}
+              {isLoading ? '開立中...' : '開立發票'}
             </Button>
           </div>
         </form>

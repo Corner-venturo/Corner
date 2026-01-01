@@ -21,12 +21,7 @@ import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
 import { QuoteConfirmationSection } from './QuoteConfirmationSection'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
-
-// 移除 HTML 標籤
-const stripHtml = (html: string | undefined): string => {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
 

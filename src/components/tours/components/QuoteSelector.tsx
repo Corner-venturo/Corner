@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button'
 import { Calculator, ExternalLink, Check } from 'lucide-react'
 import type { Tour } from '@/types/tour.types'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface LinkedQuoteInfo {
   id: string
@@ -87,9 +88,9 @@ export function QuoteSelector({
                       </div>
                       <div className="text-sm text-morandi-primary mt-1">{quote.name || tour.name}</div>
                       <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
-                        <span>建立於 {new Date(quote.created_at).toLocaleDateString('zh-TW')}</span>
+                        <span className="flex items-center gap-1">建立於 <DateCell date={quote.created_at} showIcon={false} className="text-xs" /></span>
                         {quote.total_amount && (
-                          <span className="font-medium">NT$ {quote.total_amount.toLocaleString()}</span>
+                          <CurrencyCell amount={quote.total_amount} className="font-medium text-xs" />
                         )}
                       </div>
                     </div>

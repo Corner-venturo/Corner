@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { QuoteConfirmationStatus, QuoteConfirmationLog, ConfirmationResult } from '@/types/quote.types'
+import { DateCell } from '@/components/table-cells'
 
 interface QuoteConfirmationSectionProps {
   quoteId: string
@@ -195,18 +196,6 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
     }
   }
 
-  // 格式化日期
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
-
   // 動作標籤
   const actionLabels: Record<string, string> = {
     send_link: '發送確認連結',
@@ -249,7 +238,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               <>
                 <div className="px-2 py-2 text-sm">
                   <div className="text-morandi-secondary">確認時間</div>
-                  <div className="font-medium">{formatDate(confirmedAt)}</div>
+                  <DateCell date={confirmedAt} format="time" showIcon={false} className="font-medium" />
                   {confirmedByName && (
                     <>
                       <div className="text-morandi-secondary mt-1">確認者</div>
@@ -271,9 +260,9 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               <>
                 <div className="px-2 py-2 text-sm">
                   <div className="text-morandi-secondary">連結有效至</div>
-                  <div className={cn('font-medium', isTokenExpired && 'text-status-danger')}>
-                    {formatDate(confirmationTokenExpiresAt)}
-                    {isTokenExpired && <span className="ml-1">(已過期)</span>}
+                  <div className={cn('font-medium flex items-center gap-1', isTokenExpired && 'text-status-danger')}>
+                    <DateCell date={confirmationTokenExpiresAt} format="time" showIcon={false} />
+                    {isTokenExpired && <span>(已過期)</span>}
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -416,9 +405,12 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
                       <span className="font-medium">
                         {actionLabels[log.action] || log.action}
                       </span>
-                      <span className="text-xs text-morandi-secondary">
-                        {formatDate(log.created_at)}
-                      </span>
+                      <DateCell
+                        date={log.created_at}
+                        format="time"
+                        showIcon={false}
+                        className="text-xs text-morandi-secondary"
+                      />
                     </div>
                     {log.confirmed_by_name && (
                       <div className="text-morandi-secondary">

@@ -145,7 +145,7 @@ export function TourItinerarySectionLuxury({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl md:rounded-3xl shadow-lg overflow-hidden group"
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden group"
                   style={{ borderColor: '#f0f0f0' }}
                 >
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'lg:grid-cols-12'} h-full`}>

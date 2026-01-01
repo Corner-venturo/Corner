@@ -207,7 +207,7 @@ export function RestaurantSelector({
             disabled={selectedIds.size === 0}
             className="bg-rose-500 hover:bg-rose-600 text-white rounded-xl min-w-[120px]"
           >
-            確認新增 ({selectedIds.size})
+            新增餐廳 ({selectedIds.size})
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { RequestDateInput } from './RequestDateInput'
+import { CurrencyCell } from '@/components/table-cells'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
@@ -13,9 +14,13 @@ import { logger } from '@/lib/utils/logger'
 interface AddRequestDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** 預設團 ID（從快速請款按鈕傳入） */
+  defaultTourId?: string
+  /** 預設訂單 ID（從快速請款按鈕傳入） */
+  defaultOrderId?: string
 }
 
-export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) {
+export function AddRequestDialog({ open, onOpenChange, defaultTourId, defaultOrderId }: AddRequestDialogProps) {
   const {
     formData,
     setFormData,
@@ -33,6 +38,17 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
   } = useRequestForm()
 
   const { generateRequestCode, createRequest } = useRequestOperations()
+
+  // 當對話框開啟且有預設值時，自動帶入
+  useEffect(() => {
+    if (open && defaultTourId && !formData.tour_id) {
+      setFormData(prev => ({
+        ...prev,
+        tour_id: defaultTourId,
+        order_id: defaultOrderId || '',
+      }))
+    }
+  }, [open, defaultTourId, defaultOrderId, formData.tour_id, setFormData])
 
   // 如果只有一個訂單，自動帶入
   useEffect(() => {
@@ -174,7 +190,7 @@ export function AddRequestDialog({ open, onOpenChange }: AddRequestDialogProps) 
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
               <Plus size={16} />
-              新增請款單 (共 {requestItems.length} 項，NT$ {total_amount.toLocaleString()})
+              新增請款單 (共 {requestItems.length} 項，<CurrencyCell amount={total_amount} className="inline" />)
             </Button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Calendar } from 'lucide-react'
+import { DateCell } from '@/components/table-cells'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
 
@@ -104,9 +105,9 @@ export function PersonalInfoSection({
               placeholder="選擇日期"
             />
           ) : (
-            <p className="text-morandi-primary py-2">
-              {new Date(employee.personal_info.birthday).toLocaleDateString()}
-            </p>
+            <div className="py-2">
+              <DateCell date={employee.personal_info.birthday} showIcon={false} />
+            </div>
           )}
         </div>
       </div>

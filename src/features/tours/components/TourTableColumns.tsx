@@ -8,6 +8,7 @@ import { useMemo } from 'react'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour, Order } from '@/stores/types'
 import { cn } from '@/lib/utils'
+import { DateCell } from '@/components/table-cells'
 
 interface UseTourTableColumnsParams {
   orders: Order[]
@@ -35,13 +36,7 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         sortable: true,
         render: (value, row) => {
           const tour = row as Tour
-          if (!tour.departure_date) return <span className="text-sm text-morandi-red">未設定</span>
-          const date = new Date(tour.departure_date)
-          return (
-            <span className="text-sm text-morandi-primary">
-              {isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}
-            </span>
-          )
+          return <DateCell date={tour.departure_date} showIcon={false} />
         },
       },
       {
@@ -50,13 +45,7 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         sortable: true,
         render: (value, row) => {
           const tour = row as Tour
-          if (!tour.return_date) return <span className="text-sm text-morandi-secondary">-</span>
-          const date = new Date(tour.return_date)
-          return (
-            <span className="text-sm text-morandi-primary">
-              {isNaN(date.getTime()) ? '無效日期' : date.toLocaleDateString()}
-            </span>
-          )
+          return <DateCell date={tour.return_date} fallback="-" showIcon={false} />
         },
       },
       {

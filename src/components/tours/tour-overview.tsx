@@ -17,6 +17,7 @@ import {
   Route,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface TourOverviewProps {
   tour: Tour
@@ -39,17 +40,23 @@ export const TourOverview = React.memo(function TourOverview({
   const order = orderFilter ? orders.find(o => o.id === orderFilter) : null
 
   // 根據是否為訂單視圖，顯示不同的卡片資料
-  const overviewCards = order
+  const overviewCards: Array<{
+    title: string
+    value?: string
+    amount?: number
+    icon: typeof DollarSign
+    color: string
+  }> = order
     ? [
         {
           title: '訂單金額',
-          value: `NT$ ${(order.total_amount ?? 0).toLocaleString()}`,
+          amount: order.total_amount ?? 0,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
         {
           title: '付款狀態',
-          value: order.payment_status,
+          value: order.payment_status || '-',
           icon: order.payment_status === 'paid' ? CheckCircle : AlertCircle,
           color:
             order.payment_status === 'paid'
@@ -60,13 +67,13 @@ export const TourOverview = React.memo(function TourOverview({
         },
         {
           title: '已付金額',
-          value: `NT$ ${(order.paid_amount ?? 0).toLocaleString()}`,
+          amount: order.paid_amount ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
           title: '未付金額',
-          value: `NT$ ${(order.remaining_amount ?? 0).toLocaleString()}`,
+          amount: order.remaining_amount ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
@@ -78,7 +85,7 @@ export const TourOverview = React.memo(function TourOverview({
         },
         {
           title: '聯絡人',
-          value: order.contact_person,
+          value: order.contact_person || '-',
           icon: Users,
           color: 'text-morandi-primary',
         },
@@ -86,7 +93,7 @@ export const TourOverview = React.memo(function TourOverview({
     : [
         {
           title: '報價單價格',
-          value: `NT$ ${(tour.price ?? 0).toLocaleString()}`,
+          amount: tour.price ?? 0,
           icon: DollarSign,
           color: 'text-morandi-gold',
         },
@@ -98,19 +105,19 @@ export const TourOverview = React.memo(function TourOverview({
         },
         {
           title: '總收入',
-          value: `NT$ ${(tour.total_revenue ?? 0).toLocaleString()}`,
+          amount: tour.total_revenue ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-green',
         },
         {
           title: '總支出',
-          value: `NT$ ${(tour.total_cost ?? 0).toLocaleString()}`,
+          amount: tour.total_cost ?? 0,
           icon: TrendingUp,
           color: 'text-morandi-red',
         },
         {
           title: '淨利潤',
-          value: `NT$ ${(tour.profit ?? 0).toLocaleString()}`,
+          amount: tour.profit ?? 0,
           icon: TrendingUp,
           color: (tour.profit ?? 0) >= 0 ? 'text-morandi-green' : 'text-morandi-red',
         },
@@ -188,7 +195,11 @@ export const TourOverview = React.memo(function TourOverview({
                 </div>
                 <div>
                   <p className="text-xs text-morandi-secondary">{card.title}</p>
-                  <p className="text-sm font-semibold text-morandi-primary">{card.value}</p>
+                  {card.amount !== undefined ? (
+                    <CurrencyCell amount={card.amount} className="text-sm font-semibold text-morandi-primary" />
+                  ) : (
+                    <p className="text-sm font-semibold text-morandi-primary">{card.value}</p>
+                  )}
                 </div>
               </div>
             </React.Fragment>

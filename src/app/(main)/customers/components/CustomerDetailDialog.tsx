@@ -5,6 +5,7 @@
 'use client'
 
 import { Check, AlertTriangle, Mail, Phone } from 'lucide-react'
+import { DateCell } from '@/components/table-cells'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { Customer } from '@/types/customer.types'
@@ -57,11 +58,10 @@ export function CustomerDetailDialog({
             </div>
             <div>
               <label className="text-xs text-morandi-primary">生日</label>
-              <div>
-                {customer.date_of_birth
-                  ? new Date(customer.date_of_birth).toLocaleDateString('zh-TW')
-                  : '-'}
-              </div>
+              <DateCell
+                date={customer.date_of_birth}
+                showIcon={false}
+              />
             </div>
           </div>
           <div className="space-y-3">
@@ -75,11 +75,10 @@ export function CustomerDetailDialog({
             </div>
             <div>
               <label className="text-xs text-morandi-primary">護照效期</label>
-              <div>
-                {customer.passport_expiry_date
-                  ? new Date(customer.passport_expiry_date).toLocaleDateString('zh-TW')
-                  : '-'}
-              </div>
+              <DateCell
+                date={customer.passport_expiry_date}
+                showIcon={false}
+              />
             </div>
             <div>
               <label className="text-xs text-morandi-primary">驗證狀態</label>

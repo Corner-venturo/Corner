@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
+import { CurrencyCell } from '@/components/table-cells'
 import { useAuthStore } from '@/stores/auth-store'
 import { format } from 'date-fns'
 
@@ -214,8 +215,8 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                       <div className="font-medium text-sm">
                         {employee.display_name || employee.chinese_name}
                       </div>
-                      <div className="text-xs text-morandi-secondary">
-                        {employee.personal_info?.email || 'N/A'} · 預設薪資: NT$ {(employee.monthly_salary ?? 30000).toLocaleString()}
+                      <div className="text-xs text-morandi-secondary flex items-center gap-1">
+                        {employee.personal_info?.email || 'N/A'} · 預設薪資: <CurrencyCell amount={employee.monthly_salary ?? 30000} />
                       </div>
                     </div>
                     {isSelected && (
@@ -243,7 +244,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                 <span className="text-sm font-medium text-morandi-primary">
                   總計（{selectedEmployeeIds.length} 人）：
                 </span>
-                <span className="text-xl font-bold text-morandi-gold">NT$ {totalAmount.toLocaleString()}</span>
+                <span className="text-xl font-bold text-morandi-gold"><CurrencyCell amount={totalAmount} /></span>
               </div>
             </div>
           )}
@@ -259,7 +260,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
               disabled={!requestDate || selectedEmployeeIds.length === 0}
               className="bg-morandi-primary hover:bg-morandi-primary/90 text-white"
             >
-              建立請款單（{selectedEmployeeIds.length} 人，NT$ {totalAmount.toLocaleString()}）
+              建立請款單（{selectedEmployeeIds.length} 人，<CurrencyCell amount={totalAmount} />）
             </Button>
           </div>
         </div>

@@ -24,6 +24,7 @@ import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/typ
 import { Plus, Trash2, DollarSign, AlertCircle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface BatchReceiptDialogProps {
   open: boolean
@@ -193,7 +194,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     }
 
     if (unallocatedAmount !== 0) {
-      void alert(`還有 NT$ ${unallocatedAmount.toLocaleString()} 未分配，請確認分配金額`, 'warning')
+      void alert(`還有 NT$ ${unallocatedAmount.toLocaleString('zh-TW')} 未分配，請確認分配金額`, 'warning')
       return
     }
 
@@ -291,11 +292,9 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
               ))}
             </div>
 
-            <div className="text-right text-sm font-semibold">
+            <div className="text-right text-sm font-semibold flex items-center justify-end gap-2">
               總收款金額：
-              <span className="text-lg text-morandi-gold ml-2">
-                NT$ {totalPaymentAmount.toLocaleString()}
-              </span>
+              <CurrencyCell amount={totalPaymentAmount} className="text-lg text-morandi-gold" />
             </div>
           </div>
 
@@ -367,21 +366,19 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
             )}
 
             <div className="flex items-center justify-between p-3 border rounded-lg bg-morandi-container/10">
-              <div className="text-sm">
+              <div className="text-sm flex items-center gap-2">
                 <span className="text-morandi-secondary">已分配：</span>
-                <span className="font-semibold ml-2">
-                  NT$ {totalAllocatedAmount.toLocaleString()}
-                </span>
+                <CurrencyCell amount={totalAllocatedAmount} className="font-semibold" />
               </div>
               <div
                 className={cn(
-                  'text-sm',
+                  'text-sm flex items-center gap-2',
                   unallocatedAmount > 0 && 'text-morandi-gold',
                   unallocatedAmount < 0 && 'text-morandi-red'
                 )}
               >
                 <span>未分配：</span>
-                <span className="font-semibold ml-2">NT$ {unallocatedAmount.toLocaleString()}</span>
+                <CurrencyCell amount={unallocatedAmount} className="font-semibold" />
               </div>
             </div>
 

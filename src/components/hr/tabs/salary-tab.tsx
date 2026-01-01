@@ -5,6 +5,7 @@ import { Employee } from '@/stores/types'
 import { TrendingUp } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/stores/user-store'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface SalaryTabProps {
   employee: Employee
@@ -46,9 +47,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                 />
               </>
             ) : (
-              <p className="text-3xl font-bold text-morandi-primary">
-                NT$ {monthlySalary.toLocaleString()}
-              </p>
+              <CurrencyCell amount={monthlySalary} className="text-3xl font-bold text-morandi-primary" />
             )}
           </div>
           <p className="text-xs text-morandi-secondary mt-2">用於薪資請款的主要薪資金額</p>
@@ -60,15 +59,15 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
             <h4 className="font-medium text-morandi-primary mb-3 text-sm">薪資詳細結構（選填）</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
-                <p className="text-xl font-bold text-morandi-primary">NT$ {baseSalary.toLocaleString()}</p>
+                <CurrencyCell amount={baseSalary} className="text-xl font-bold text-morandi-primary" />
                 <p className="text-xs text-morandi-muted">底薪</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-morandi-gold">NT$ {totalAllowances.toLocaleString()}</p>
+                <CurrencyCell amount={totalAllowances} className="text-xl font-bold text-morandi-gold" />
                 <p className="text-xs text-morandi-muted">津貼</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-status-success">NT$ {(baseSalary + totalAllowances).toLocaleString()}</p>
+                <CurrencyCell amount={baseSalary + totalAllowances} className="text-xl font-bold text-status-success" />
                 <p className="text-xs text-morandi-muted">總薪資</p>
               </div>
             </div>
@@ -86,7 +85,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                   className="flex justify-between items-center py-2 border-b border-border/30"
                 >
                   <span className="text-morandi-primary">{allowance.type}</span>
-                  <span className="font-medium">NT$ {allowance.amount.toLocaleString()}</span>
+                  <CurrencyCell amount={allowance.amount} className="font-medium" />
                 </div>
               ))}
             </div>
@@ -108,15 +107,11 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
                 className="flex justify-between items-center p-3 bg-white rounded border"
               >
                 <div>
-                  <p className="font-medium text-morandi-primary">
-                    NT$ {record.base_salary.toLocaleString()}
-                  </p>
+                  <CurrencyCell amount={record.base_salary} className="font-medium text-morandi-primary" />
                   <p className="text-sm text-morandi-muted">{record.reason}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-morandi-secondary">
-                    {new Date(record.effective_date).toLocaleDateString()}
-                  </p>
+                  <DateCell date={record.effective_date} showIcon={false} className="text-sm text-morandi-secondary" />
                 </div>
               </div>
             ))}

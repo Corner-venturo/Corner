@@ -19,6 +19,7 @@ import { useRequestOperations } from '@/features/finance/requests/hooks/useReque
 import { EditableRequestItemList } from '@/features/finance/requests/components/RequestItemList'
 import { RequestDateInput } from '@/features/finance/requests/components/RequestDateInput'
 import { alert } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface QuickDisbursementProps {
   onSubmit?: () => void
@@ -174,7 +175,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
           className="w-full text-white shadow-sm bg-morandi-gold hover:bg-morandi-gold-hover"
         >
           <FileText size={16} className="mr-2" />
-          建立請款單 ({requestItems.length} 項，NT$ {total_amount.toLocaleString()})
+          建立請款單 ({requestItems.length} 項，<CurrencyCell amount={total_amount} className="inline text-white" />)
         </Button>
       </div>
     </div>

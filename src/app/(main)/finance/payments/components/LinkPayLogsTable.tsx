@@ -15,10 +15,10 @@ import { useState } from 'react'
 import { Copy, ExternalLink, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { formatDate } from '@/lib/utils'
 import type { LinkPayLog } from '@/types/receipt.types'
 import { LinkPayStatus, LINKPAY_STATUS_LABELS } from '@/types/receipt.types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface LinkPayLogsTableProps {
   logs: LinkPayLog[]
@@ -90,12 +90,12 @@ export function LinkPayLogsTable({ logs }: LinkPayLogsTableProps) {
 
               {/* 金額 & 到期日 */}
               <div className="flex items-center gap-4 text-sm text-morandi-secondary">
-                <span>NT$ {log.amount.toLocaleString()}</span>
+                <CurrencyCell amount={log.amount} />
                 {log.end_date && (
                   <>
                     <span className="text-morandi-muted">|</span>
-                    <span>
-                      到期日：{formatDate(log.end_date)}
+                    <span className="flex items-center gap-1">
+                      到期日：<DateCell date={log.end_date} showIcon={false} />
                       {new Date(log.end_date) < new Date() && (
                         <span className="ml-2 text-morandi-red">(已過期)</span>
                       )}
@@ -144,8 +144,8 @@ export function LinkPayLogsTable({ logs }: LinkPayLogsTableProps) {
               )}
 
               {/* 建立時間 */}
-              <div className="text-xs text-morandi-muted">
-                建立時間：{formatDate(log.created_at)}
+              <div className="text-xs text-morandi-muted flex items-center gap-1">
+                建立時間：<DateCell date={log.created_at} showIcon={false} className="text-xs text-morandi-muted" />
               </div>
             </div>
           </div>

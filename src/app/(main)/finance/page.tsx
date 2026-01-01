@@ -153,9 +153,9 @@ export default function FinancePage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-morandi-secondary mb-1">總收入</p>
-                            <p className="text-2xl font-bold text-morandi-green">
-                              NT$ {totalReceivable.toLocaleString()}
-                            </p>
+                            <div className="text-2xl font-bold">
+                              <CurrencyCell amount={totalReceivable} variant="income" />
+                            </div>
                           </div>
                           <TrendingUp size={24} className="text-morandi-green" />
                         </div>
@@ -165,9 +165,9 @@ export default function FinancePage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-morandi-secondary mb-1">總支出</p>
-                            <p className="text-2xl font-bold text-morandi-red">
-                              NT$ {totalPayable.toLocaleString()}
-                            </p>
+                            <div className="text-2xl font-bold">
+                              <CurrencyCell amount={totalPayable} variant="expense" />
+                            </div>
                           </div>
                           <TrendingDown size={24} className="text-morandi-red" />
                         </div>
@@ -177,9 +177,9 @@ export default function FinancePage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-morandi-secondary mb-1">淨利潤</p>
-                            <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-morandi-primary' : 'text-morandi-red'}`}>
-                              NT$ {netProfit.toLocaleString()}
-                            </p>
+                            <div className="text-2xl font-bold">
+                              <CurrencyCell amount={netProfit} variant={netProfit >= 0 ? 'default' : 'expense'} />
+                            </div>
                           </div>
                           <DollarSign size={24} className={'text-morandi-primary'} />
                         </div>
@@ -189,9 +189,9 @@ export default function FinancePage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-morandi-secondary mb-1">待確認款項</p>
-                            <p className="text-2xl font-bold text-morandi-gold">
-                              NT$ {pendingPayments.toLocaleString()}
-                            </p>
+                            <div className="text-2xl font-bold text-morandi-gold">
+                              <CurrencyCell amount={pendingPayments} />
+                            </div>
                           </div>
                           <AlertTriangle size={24} className="text-morandi-gold" />
                         </div>

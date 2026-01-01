@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, X, MapPin, User, Clock, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateCompact } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 
 interface SearchResult {
@@ -102,7 +103,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
             type: 'tour',
             id: tour.id,
             title: tour.code,
-            subtitle: `${tour.name} | ${tour.current_participants || 0}人 | ${formatDate(tour.departure_date)}`,
+            subtitle: `${tour.name} | ${tour.current_participants || 0}人 | ${formatDateCompact(tour.departure_date)}`,
           })
         })
       }
@@ -307,9 +308,3 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
   )
 }
 
-// 日期格式化
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return `${date.getMonth() + 1}/${date.getDate()}`
-}

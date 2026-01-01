@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface CreatePaymentRequestDialogProps {
   items: AdvanceItem | AdvanceItem[] // 單項或批次
@@ -84,7 +85,7 @@ export function CreatePaymentRequestDialog({
         supplier_name: supplier,
         status: 'pending',
         note: itemsArray.map((item, i) =>
-          `${i + 1}. ${item.name} - ${item.description} ($${item.amount.toLocaleString()})`
+          `${i + 1}. ${item.name} - ${item.description} (NT$ ${item.amount.toLocaleString()})`
         ).join('\n'),
       } as Parameters<typeof createPaymentRequest>[0])
 
@@ -126,17 +127,13 @@ export function CreatePaymentRequestDialog({
                   <span className="text-morandi-primary">
                     {index + 1}. {item.name} - {item.description}
                   </span>
-                  <span className="font-medium text-morandi-primary">
-                    ${item.amount.toLocaleString()}
-                  </span>
+                  <CurrencyCell amount={item.amount} className="font-medium text-morandi-primary" />
                 </div>
               ))}
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-morandi-gold/20">
               <span className="text-sm font-medium text-morandi-secondary">總計：</span>
-              <span className="text-lg font-semibold text-morandi-primary">
-                ${totalAmount.toLocaleString()}
-              </span>
+              <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
             </div>
           </div>
 

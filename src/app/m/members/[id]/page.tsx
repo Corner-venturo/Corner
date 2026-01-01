@@ -7,14 +7,12 @@ import {
   ArrowLeft,
   User,
   CreditCard,
-  MapPin,
-  Phone,
-  Calendar,
   Plane,
   Building,
   FileText,
   DollarSign,
 } from 'lucide-react'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
@@ -173,7 +171,7 @@ export default function MemberDetailPage() {
             <InfoItem label="英文姓名" value={member.passport_name} />
             <InfoItem label="性別" value={formatGender(member.gender)} />
             <InfoItem label="年齡" value={member.age ? `${member.age} 歲` : null} />
-            <InfoItem label="生日" value={formatDate(member.birth_date)} />
+            <InfoItem label="生日" value={member.birth_date} isDate />
             <InfoItem label="身份" value={member.identity} />
             <InfoItem label="類型" value={formatMemberType(member.member_type)} />
             <InfoItem label="身分證" value={member.id_number} />
@@ -188,7 +186,7 @@ export default function MemberDetailPage() {
           </h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <InfoItem label="護照號碼" value={member.passport_number} className="col-span-2" />
-            <InfoItem label="護照效期" value={formatDate(member.passport_expiry)} />
+            <InfoItem label="護照效期" value={member.passport_expiry} isDate />
             <InfoItem label="PNR" value={member.pnr} />
           </div>
         </section>
@@ -208,8 +206,8 @@ export default function MemberDetailPage() {
               <div className="text-sm text-morandi-secondary mt-1">
                 {member.tour.name}
               </div>
-              <div className="text-sm text-morandi-secondary mt-1">
-                {formatDate(member.tour.departure_date)} - {formatDate(member.tour.return_date)}
+              <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
+                <DateCell date={member.tour.departure_date} showIcon={false} /> - <DateCell date={member.tour.return_date} showIcon={false} />
               </div>
             </Link>
           </section>
@@ -226,16 +224,16 @@ export default function MemberDetailPage() {
               {member.hotel_1_name && (
                 <div className="p-3 bg-morandi-container/30 rounded-lg">
                   <div className="font-medium text-morandi-primary">{member.hotel_1_name}</div>
-                  <div className="text-sm text-morandi-secondary mt-1">
-                    {formatDate(member.hotel_1_checkin)} - {formatDate(member.hotel_1_checkout)}
+                  <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
+                    <DateCell date={member.hotel_1_checkin} showIcon={false} /> - <DateCell date={member.hotel_1_checkout} showIcon={false} />
                   </div>
                 </div>
               )}
               {member.hotel_2_name && (
                 <div className="p-3 bg-morandi-container/30 rounded-lg">
                   <div className="font-medium text-morandi-primary">{member.hotel_2_name}</div>
-                  <div className="text-sm text-morandi-secondary mt-1">
-                    {formatDate(member.hotel_2_checkin)} - {formatDate(member.hotel_2_checkout)}
+                  <div className="flex items-center gap-1 text-sm text-morandi-secondary mt-1">
+                    <DateCell date={member.hotel_2_checkin} showIcon={false} /> - <DateCell date={member.hotel_2_checkout} showIcon={false} />
                   </div>
                 </div>
               )}
@@ -253,7 +251,7 @@ export default function MemberDetailPage() {
             <div className="flex justify-between py-2 border-b border-border/50">
               <span className="text-morandi-secondary">售價</span>
               <span className="font-medium text-morandi-primary">
-                {formatCurrency(member.selling_price)}
+                {member.selling_price !== null ? <CurrencyCell amount={member.selling_price} /> : '-'}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-border/50">
@@ -261,7 +259,7 @@ export default function MemberDetailPage() {
                 訂金 {member.deposit_receipt_no && `(${member.deposit_receipt_no})`}
               </span>
               <span className="font-medium text-green-600">
-                {formatCurrency(member.deposit_amount)}
+                {member.deposit_amount !== null ? <CurrencyCell amount={member.deposit_amount} variant="income" /> : '-'}
               </span>
             </div>
             <div className="flex justify-between py-2">
@@ -272,7 +270,7 @@ export default function MemberDetailPage() {
                 'font-medium',
                 member.balance_amount && member.balance_amount > 0 ? 'text-orange-600' : 'text-green-600'
               )}>
-                {formatCurrency(member.balance_amount)}
+                {member.balance_amount !== null ? <CurrencyCell amount={member.balance_amount} variant={member.balance_amount && member.balance_amount > 0 ? 'expense' : 'income'} /> : '-'}
               </span>
             </div>
           </div>
@@ -311,26 +309,28 @@ function InfoItem({
   label,
   value,
   className,
+  isDate,
 }: {
   label: string
   value: string | number | null | undefined
   className?: string
+  isDate?: boolean
 }) {
   return (
     <div className={className}>
       <div className="text-morandi-secondary text-xs mb-0.5">{label}</div>
-      <div className="text-morandi-primary">{value || '-'}</div>
+      <div className="text-morandi-primary">
+        {isDate && value ? (
+          <DateCell date={String(value)} showIcon={false} />
+        ) : (
+          value || '-'
+        )}
+      </div>
     </div>
   )
 }
 
 // 格式化函數
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
-}
-
 function formatGender(gender: string | null): string {
   if (!gender) return '-'
   switch (gender.toUpperCase()) {
@@ -358,9 +358,4 @@ function formatMemberType(type: string): string {
     default:
       return type
   }
-}
-
-function formatCurrency(amount: number | null): string {
-  if (amount === null || amount === undefined) return '-'
-  return `NT$ ${amount.toLocaleString()}`
 }

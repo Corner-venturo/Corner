@@ -147,7 +147,7 @@ export default function BoxSelector({ boxes, onSelect, onClose, timeInterval }: 
               onClick={handleConfirm}
               disabled={!selectedBox}
             >
-              確認
+              選擇
             </Button>
           </div>
         </div>

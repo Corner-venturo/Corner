@@ -202,7 +202,7 @@ export function HotelSelector({
             disabled={selectedIds.size === 0}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-xl min-w-[120px]"
           >
-            確認新增 ({selectedIds.size})
+            新增飯店 ({selectedIds.size})
           </Button>
         </DialogFooter>
       </DialogContent>

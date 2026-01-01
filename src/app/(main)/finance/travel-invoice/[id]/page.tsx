@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { FileText, FileX, X, Check } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -134,7 +135,7 @@ export default function InvoiceDetailPage() {
               <div>
                 <p className="text-sm text-morandi-secondary">總金額</p>
                 <p className="font-medium text-lg text-morandi-gold">
-                  NT$ {currentInvoice.total_amount.toLocaleString()}
+                  <CurrencyCell amount={currentInvoice.total_amount} className="font-medium text-lg text-morandi-gold" />
                 </p>
               </div>
             </CardContent>
@@ -211,10 +212,10 @@ export default function InvoiceDetailPage() {
                           {item.item_unit}
                         </td>
                         <td className="py-3 px-4 text-sm text-morandi-primary text-right">
-                          NT$ {item.item_price.toLocaleString()}
+                          <CurrencyCell amount={item.item_price} className="text-sm text-morandi-primary" />
                         </td>
                         <td className="py-3 px-4 text-sm text-morandi-primary text-right font-medium">
-                          NT$ {item.itemAmt.toLocaleString()}
+                          <CurrencyCell amount={item.itemAmt} className="text-sm text-morandi-primary font-medium" />
                         </td>
                       </tr>
                     ))}
@@ -258,7 +259,7 @@ export default function InvoiceDetailPage() {
                   <p className="text-sm text-morandi-secondary">作廢時間</p>
                   <p className="font-medium text-morandi-primary">
                     {currentInvoice.voidDate
-                      ? new Date(currentInvoice.voidDate).toLocaleString('zh-TW')
+                      ? <DateCell date={currentInvoice.voidDate} format="time" showIcon={false} className="font-medium text-morandi-primary" />
                       : '-'}
                   </p>
                 </div>

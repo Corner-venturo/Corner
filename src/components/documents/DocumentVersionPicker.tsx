@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 import { useQuoteStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import type { Tour, Quote } from '@/stores/types'
@@ -214,7 +215,7 @@ export function DocumentVersionPicker({
 
                     {quote.total_amount ? (
                       <span className="text-xs text-morandi-secondary shrink-0 ml-auto mr-2">
-                        NT$ {quote.total_amount.toLocaleString()}
+                        <CurrencyCell amount={quote.total_amount} className="text-xs text-morandi-secondary" />
                       </span>
                     ) : null}
                   </div>

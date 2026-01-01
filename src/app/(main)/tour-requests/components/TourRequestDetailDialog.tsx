@@ -224,8 +224,8 @@ export function TourRequestDetailDialog({
           {/* 時間戳記 */}
           <div className="border-t border-border pt-4 text-xs text-morandi-secondary">
             <div className="flex justify-between">
-              <span>建立時間：{request.created_at ? new Date(request.created_at).toLocaleString('zh-TW') : '-'}</span>
-              <span>更新時間：{request.updated_at ? new Date(request.updated_at).toLocaleString('zh-TW') : '-'}</span>
+              <span className="flex items-center gap-1">建立時間：<DateCell date={request.created_at} format="time" showIcon={false} fallback="-" /></span>
+              <span className="flex items-center gap-1">更新時間：<DateCell date={request.updated_at} format="time" showIcon={false} fallback="-" /></span>
             </div>
           </div>
         </div>

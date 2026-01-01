@@ -327,7 +327,7 @@ export function AddRoomDialog({
                 className="btn-morandi-primary gap-1"
               >
                 <Check size={16} />
-                確認新增 ({totalRooms} 間)
+                新增 {totalRooms} 間房
               </Button>
             </div>
           </div>

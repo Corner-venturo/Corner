@@ -56,7 +56,7 @@ export function BankAccountDialog({
 
   // 篩選銀行存款類科目
   const bankAccountOptions = accounts.filter(a =>
-    a.type === 'asset' && (a.code.startsWith('110') || a.code.startsWith('111'))
+    a.account_type === 'asset' && (a.code.startsWith('110') || a.code.startsWith('111'))
   )
 
   useEffect(() => {

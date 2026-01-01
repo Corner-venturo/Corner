@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 import { MapPin, Users, Calendar, Plane, ChevronRight, Bed, Bus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateCompact } from '@/lib/utils/format-date'
 
 interface TourCardProps {
   tour: {
@@ -30,12 +31,6 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 export function TourCard({ tour, showActions = true, children, className }: TourCardProps) {
   const status = STATUS_CONFIG[tour.status || '提案'] || STATUS_CONFIG['提案']
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return ''
-    const date = new Date(dateStr)
-    return `${date.getMonth() + 1}/${date.getDate()}`
-  }
 
   const getDaysUntil = (dateStr: string | null) => {
     if (!dateStr) return null
@@ -83,8 +78,8 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
               <div className="flex items-center gap-1">
                 <Calendar size={14} />
                 <span>
-                  {formatDate(tour.departure_date)}
-                  {tour.return_date && ` - ${formatDate(tour.return_date)}`}
+                  {formatDateCompact(tour.departure_date)}
+                  {tour.return_date && ` - ${formatDateCompact(tour.return_date)}`}
                 </span>
               </div>
               <div className="flex items-center gap-1">

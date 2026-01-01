@@ -11,9 +11,11 @@ import { getRoomTypeLabel } from '../utils/room-utils'
  */
 export function useRoomAssignments(tourId: string) {
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
+  // member_id -> room_id mapping (用於判斷同房成員)
+  const [memberRoomMap, setMemberRoomMap] = useState<Record<string, string>>({})
 
-  const loadRoomAssignments = async () => {
-    if (!tourId) return
+  const loadRoomAssignments = async (): Promise<Record<string, string>> => {
+    if (!tourId) return {}
 
     try {
       // Get all rooms for this tour (sorted by display_order)
@@ -23,7 +25,7 @@ export function useRoomAssignments(tourId: string) {
         .eq('tour_id', tourId)
         .order('display_order', { ascending: true })
 
-      if (!rooms || rooms.length === 0) return
+      if (!rooms || rooms.length === 0) return {}
 
       // Get all assignment records
       const roomIds = rooms.map((r: { id: string }) => r.id)
@@ -32,7 +34,7 @@ export function useRoomAssignments(tourId: string) {
         .select('room_id, order_member_id')
         .in('room_id', roomIds)
 
-      if (!assignments || assignments.length === 0) return
+      if (!assignments || assignments.length === 0) return {}
 
       // Build room_id -> room info mapping
       const roomMap: Record<string, { room_type: string; hotel_name: string | null; room_number: string | null; display_order: number }> = {}
@@ -58,6 +60,9 @@ export function useRoomAssignments(tourId: string) {
 
       // Build member_id -> room name mapping
       const assignmentMap: Record<string, string> = {}
+      // Build member_id -> room_id mapping (用於判斷同房成員)
+      const roomIdMap: Record<string, string> = {}
+
       assignments.forEach((a: { room_id: string; order_member_id: string }) => {
         const room = roomMap[a.room_id]
         if (room) {
@@ -65,17 +70,22 @@ export function useRoomAssignments(tourId: string) {
           const variant = room.hotel_name ? `${room.hotel_name} ` : ''
           const roomNum = roomNumbers[a.room_id] || 1
           assignmentMap[a.order_member_id] = `${variant}${roomTypeLabel} ${roomNum}`
+          roomIdMap[a.order_member_id] = a.room_id
         }
       })
 
       setRoomAssignments(assignmentMap)
+      setMemberRoomMap(roomIdMap)
+      return roomIdMap
     } catch (err) {
       logger.error('載入房間分配失敗:', err)
+      return {}
     }
   }
 
   return {
     roomAssignments,
+    memberRoomMap,
     loadRoomAssignments,
   }
 }

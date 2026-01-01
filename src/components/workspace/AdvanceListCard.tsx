@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Receipt, Check, Trash2 } from 'lucide-react'
 import { AdvanceList } from '@/stores/workspace-store'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface AdvanceListCardProps {
   advanceList: AdvanceList
@@ -97,9 +98,7 @@ export function AdvanceListCard({
           </div>
           <div className="text-right">
             <div className="text-xs text-morandi-secondary">總計</div>
-            <div className="text-lg font-semibold text-morandi-primary">
-              ${totalAmount.toLocaleString()}
-            </div>
+            <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
           </div>
         </div>
 
@@ -131,9 +130,7 @@ export function AdvanceListCard({
               <div className="flex-1 grid grid-cols-4 gap-2 items-center">
                 <div className="font-medium text-morandi-primary">{item.name}</div>
                 <div className="text-sm text-morandi-secondary">{item.description || '-'}</div>
-                <div className="text-sm font-medium text-morandi-primary">
-                  ${item.amount.toLocaleString()}
-                </div>
+                <CurrencyCell amount={item.amount} className="text-sm font-medium text-morandi-primary" />
                 <div className="text-sm text-morandi-secondary">{item.advance_person}</div>
               </div>
 

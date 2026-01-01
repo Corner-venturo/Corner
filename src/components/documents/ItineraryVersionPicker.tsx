@@ -25,12 +25,7 @@ import { cn } from '@/lib/utils'
 import { useItineraryStore, useRegionsStore, useAuthStore } from '@/stores'
 import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 // 判斷是否為已確認版本（狀態為結案）
 function isConfirmedItinerary(itinerary: Itinerary): boolean {

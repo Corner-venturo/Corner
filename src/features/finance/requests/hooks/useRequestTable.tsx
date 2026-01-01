@@ -3,6 +3,7 @@ import { TableColumn, useEnhancedTable } from '@/components/ui/enhanced-table'
 import { PaymentRequest } from '@/stores/types'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors } from '../types' // Assuming statusLabels and statusColors are now correctly typed
 
 export function useRequestTable(payment_requests: PaymentRequest[]) {
@@ -63,10 +64,10 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
           <div className="text-sm">
             <div
               className={
-                row.is_special_billing ? 'text-morandi-gold font-medium' : 'text-morandi-secondary'
+                row.is_special_billing ? 'text-morandi-gold font-medium' : ''
               }
             >
-              {value ? new Date(value as string).toLocaleDateString('zh-TW') : '未設定'}
+              <DateCell date={value as string | null} showIcon={false} />
             </div>
             {row.is_special_billing && <div className="text-xs text-morandi-gold">⚠️ 特殊出帳</div>}
           </div>
@@ -78,8 +79,8 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         sortable: true,
         filterable: true,
         filterType: 'number',
-        render: (value: unknown, row: PaymentRequest) => ( // Value is number for amount
-          <div className="font-semibold text-morandi-gold">NT$ {(value as number).toLocaleString()}</div>
+        render: (value: unknown) => (
+          <CurrencyCell amount={value as number} className="font-semibold text-morandi-gold" />
         ),
       },
       {

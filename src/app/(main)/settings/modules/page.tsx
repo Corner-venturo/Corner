@@ -29,6 +29,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { DateCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -274,17 +275,14 @@ export default function ModulesManagementPage() {
                     {status.enabled && status.expiresAt && (
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-[#8C8C8C]">到期日</span>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-[#8C8C8C]" />
-                          <span
-                            className={cn(
-                              'font-medium',
-                              status.expired ? 'text-status-danger' : 'text-[#333333]'
-                            )}
-                          >
-                            {new Date(status.expiresAt).toLocaleDateString('zh-TW')}
-                          </span>
-                        </div>
+                        <DateCell
+                          date={status.expiresAt}
+                          showIcon={true}
+                          className={cn(
+                            'font-medium',
+                            status.expired ? 'text-status-danger' : 'text-[#333333]'
+                          )}
+                        />
                       </div>
                     )}
 

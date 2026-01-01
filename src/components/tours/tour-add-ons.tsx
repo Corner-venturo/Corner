@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Trash2, ShoppingCart } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface TourAddOnsProps {
   tour: Tour
@@ -141,7 +142,7 @@ export const TourAddOns = React.memo(function TourAddOns({
                           size="sm"
                           className="bg-morandi-green hover:bg-morandi-green-hover text-white"
                         >
-                          確定
+                          新增
                         </Button>
                         <Button
                           onClick={() => {
@@ -163,7 +164,7 @@ export const TourAddOns = React.memo(function TourAddOns({
                   <tr key={addOn.id} className="border-b border-border">
                     <td className="py-3 px-4 font-medium text-morandi-primary">{addOn.name}</td>
                     <td className="py-3 px-4 text-morandi-primary">
-                      NT$ {addOn.price.toLocaleString()}
+                      <CurrencyCell amount={addOn.price} />
                     </td>
                     <td className="py-3 px-4 text-morandi-secondary text-sm">
                       {addOn.description || '無'}

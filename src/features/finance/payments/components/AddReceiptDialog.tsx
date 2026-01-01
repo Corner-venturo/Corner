@@ -22,14 +22,19 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface AddReceiptDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
+  /** 預設團 ID（從快速收款按鈕傳入） */
+  defaultTourId?: string
+  /** 預設訂單 ID（從快速收款按鈕傳入） */
+  defaultOrderId?: string
 }
 
-export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDialogProps) {
+export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId }: AddReceiptDialogProps) {
   const { toast } = useToast()
   const {
     tours,
@@ -64,6 +69,32 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
       loadData()
     }
   }, [open])
+
+  // 當對話框開啟且有預設值時，自動帶入
+  useEffect(() => {
+    if (open && defaultOrderId && !formData.order_id) {
+      // 需要先找到訂單對應的團 ID
+      const findTourId = async () => {
+        const { useOrderStore } = await import('@/stores')
+        const orderStore = useOrderStore.getState()
+        const order = orderStore.items.find(o => o.id === defaultOrderId)
+        if (order?.tour_id) {
+          setFormData(prev => ({
+            ...prev,
+            tour_id: order.tour_id || '',
+            order_id: defaultOrderId,
+          }))
+        } else if (defaultTourId) {
+          setFormData(prev => ({
+            ...prev,
+            tour_id: defaultTourId,
+            order_id: defaultOrderId,
+          }))
+        }
+      }
+      findTourId()
+    }
+  }, [open, defaultTourId, defaultOrderId, formData.order_id, setFormData])
 
   // 如果只有一個訂單，自動帶入
   useEffect(() => {
@@ -245,8 +276,9 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
                 <SelectContent>
                   {filteredOrders.map(order => (
                     <SelectItem key={order.id} value={order.id}>
-                      {order.order_number} - {order.contact_person || '無聯絡人'} (待收: NT${' '}
-                      {order.remaining_amount?.toLocaleString() || 0})
+                      <span className="inline-flex items-center gap-1">
+                        {order.order_number} - {order.contact_person || '無聯絡人'} (待收: <CurrencyCell amount={order.remaining_amount || 0} className="inline" />)
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -257,8 +289,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
             {selectedOrder && (
               <div>
                 <Label className="text-sm font-medium text-muted-foreground">待收金額</Label>
-                <div className="mt-1 px-3 py-2 bg-muted rounded-md text-sm font-medium">
-                  NT$ {selectedOrder.remaining_amount?.toLocaleString() || 0}
+                <div className="mt-1 px-3 py-2 bg-muted rounded-md">
+                  <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
                 </div>
               </div>
             )}
@@ -308,9 +340,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
             {paymentItems.length > 0 && (
               <div className="flex justify-end items-center gap-6 pt-4 mt-2">
                 <span className="text-sm text-morandi-secondary">總金額</span>
-                <span className="text-lg font-semibold text-morandi-gold">
-                  NT$ {totalAmount.toLocaleString()}
-                </span>
+                <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-gold" />
               </div>
             )}
           </div>
@@ -328,7 +358,9 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess }: AddReceiptDi
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
           >
             <Save size={16} />
-            新增收款單 (共 {paymentItems.length} 項，NT$ {totalAmount.toLocaleString()})
+            <span className="inline-flex items-center gap-1">
+              新增收款單 (共 {paymentItems.length} 項，<CurrencyCell amount={totalAmount} className="inline" />)
+            </span>
           </Button>
         </div>
       </DialogContent>

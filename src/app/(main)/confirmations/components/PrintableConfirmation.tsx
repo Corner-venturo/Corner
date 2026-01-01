@@ -75,6 +75,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
   const title = isFlightConfirmation ? '機票確認單' : '住宿確認單'
 
   return createPortal(
+    /* eslint-disable venturo/no-custom-modal -- 列印預覽需要使用 createPortal */
     <div
       className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8 print:p-0 print:bg-transparent print:block"
       onClick={onClose}

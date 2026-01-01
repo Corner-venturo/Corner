@@ -2,12 +2,12 @@
 
 import { Edit2, Trash2 } from 'lucide-react'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { DateCell, CurrencyCell, TextCell, ActionCell } from '@/components/table-cells'
 import { cn } from '@/lib/utils'
 import { getVisaStatusLabel } from '@/constants/status-maps'
 import type { Visa } from '@/stores/types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
-import { Button } from '@/components/ui/button'
 
 interface VisasListProps {
   filteredVisas: Visa[]
@@ -36,22 +36,22 @@ export function VisasList({
       key: 'applicant_name',
       label: '申請人',
       sortable: true,
-      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
+      render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_person',
       label: '聯絡人',
-      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
+      render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_phone',
       label: '聯絡電話',
-      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
+      render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'country',
       label: '簽證',
-      render: (value) => <span className="text-sm text-morandi-primary">{String(value || '')}</span>,
+      render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'status',
@@ -79,60 +79,38 @@ export function VisasList({
         const visa = rowData as Visa
         // 優先用新欄位，向後相容舊欄位
         const date = value || visa.submission_date
-        return (
-          <span className="text-sm text-morandi-secondary">
-            {date ? new Date(String(date)).toLocaleDateString() : '-'}
-          </span>
-        )
+        return <DateCell date={date as string | null} />
       },
     },
     {
       key: 'actual_submission_date',
       label: '送件時間',
-      render: (value) => (
-        <span className="text-sm text-morandi-secondary">
-          {value ? new Date(String(value)).toLocaleDateString() : '-'}
-        </span>
-      ),
+      render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'expected_issue_date',
       label: '預計下件',
-      render: (value) => (
-        <span className="text-sm text-morandi-secondary">
-          {value ? new Date(String(value)).toLocaleDateString() : '-'}
-        </span>
-      ),
+      render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'vendor',
       label: '送件單位',
-      render: (value) => (
-        <span className="text-sm text-morandi-secondary">{typeof value === 'string' ? value : '-'}</span>
-      ),
+      render: (value) => <TextCell text={typeof value === 'string' ? value : ''} />,
     },
     {
       key: 'documents_returned_date',
       label: '證件歸還',
-      render: (value) => (
-        <span className="text-sm text-morandi-secondary">
-          {value ? new Date(String(value)).toLocaleDateString() : '-'}
-        </span>
-      ),
+      render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'fee',
       label: '代辦費',
-      render: (value) => (
-        <span className="text-sm text-morandi-primary">NT$ {Number(value || 0).toLocaleString()}</span>
-      ),
+      render: (value) => <CurrencyCell amount={Number(value || 0)} />,
     },
     {
       key: 'cost',
       label: '成本',
-      render: (value) => (
-        <span className="text-sm text-morandi-secondary">NT$ {Number(value || 0).toLocaleString()}</span>
-      ),
+      render: (value) => <CurrencyCell amount={Number(value || 0)} variant="default" />,
     },
   ]
 
@@ -141,42 +119,33 @@ export function VisasList({
     if (!canManageVisas) return null
 
     return (
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="iconSm"
-          onClick={e => {
-            e.stopPropagation()
-            onEdit?.(visa)
-          }}
-          className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 rounded transition-colors"
-          title="編輯"
-        >
-          <Edit2 size={14} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="iconSm"
-          onClick={async e => {
-            e.stopPropagation()
-            const confirmed = await confirm({
-              type: 'danger',
-              title: '刪除簽證記錄',
-              message: '確定要刪除此簽證記錄嗎？',
-              details: ['此操作無法復原'],
-              confirmLabel: '確認刪除',
-              cancelLabel: '取消',
-            })
-            if (confirmed) {
-              onDelete(visa.id)
-            }
-          }}
-          className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
-          title="刪除"
-        >
-          <Trash2 size={14} />
-        </Button>
-      </div>
+      <ActionCell
+        actions={[
+          {
+            icon: Edit2,
+            label: '編輯',
+            onClick: () => onEdit?.(visa),
+          },
+          {
+            icon: Trash2,
+            label: '刪除',
+            variant: 'danger',
+            onClick: async () => {
+              const confirmed = await confirm({
+                type: 'danger',
+                title: '刪除簽證記錄',
+                message: '確定要刪除此簽證記錄嗎？',
+                details: ['此操作無法復原'],
+                confirmLabel: '確認刪除',
+                cancelLabel: '取消',
+              })
+              if (confirmed) {
+                onDelete(visa.id)
+              }
+            },
+          },
+        ]}
+      />
     )
   }
 

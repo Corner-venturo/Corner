@@ -13,13 +13,14 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2 } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
-import { DateCell, StatusCell, ActionCell } from '@/components/table-cells'
+import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
 // Dynamic imports for dialogs (reduce initial bundle)
 const ReceiptSearchDialog = dynamic(
@@ -32,6 +33,7 @@ const BatchConfirmReceiptDialog = dynamic(
 )
 const ReceiptDetailDialog = dynamic(
   () => import('./components').then(m => m.ReceiptDetailDialog),
+  /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
   { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
 )
 const AddReceiptDialog = dynamic(
@@ -56,6 +58,9 @@ import type { ReceiptSearchFilters } from './components/ReceiptSearchDialog'
 import type { ReceiptItem } from '@/stores'
 
 export default function PaymentsPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
   // 資料與業務邏輯
   const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
   const { user } = useAuthStore()
@@ -64,6 +69,9 @@ export default function PaymentsPage() {
   const canBatchConfirm = user?.roles?.some(role =>
     ['super_admin', 'admin', 'accountant'].includes(role)
   )
+
+  // 讀取 URL 參數（從快速收款按鈕傳入）
+  const urlOrderId = searchParams.get('order_id')
 
   // UI 狀態
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -78,6 +86,22 @@ export default function PaymentsPage() {
   useEffect(() => {
     fetchReceipts()
   }, [fetchReceipts])
+
+  // 如果有 URL 參數，自動開啟新增對話框
+  useEffect(() => {
+    if (urlOrderId) {
+      setIsDialogOpen(true)
+    }
+  }, [urlOrderId])
+
+  // 當對話框關閉時，清除 URL 參數
+  const handleAddDialogClose = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open && urlOrderId) {
+      // 清除 URL 參數，避免重新開啟
+      router.replace('/finance/payments')
+    }
+  }
 
   // 篩選後的收款單
   const filteredReceipts = useMemo(() => {
@@ -149,7 +173,7 @@ export default function PaymentsPage() {
     { key: 'receipt_date', label: '收款日期', sortable: true, render: (value) => <DateCell date={String(value)} /> },
     { key: 'order_number', label: '訂單編號', sortable: true },
     { key: 'tour_name', label: '團名', sortable: true },
-    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => `NT$ ${Number(value).toLocaleString()}` },
+    { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
     { key: 'receipt_type', label: '收款方式', sortable: true },
     { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
     { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
@@ -242,8 +266,9 @@ export default function PaymentsPage() {
       {/* 新增收款對話框 */}
       <AddReceiptDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={handleAddDialogClose}
         onSuccess={fetchReceipts}
+        defaultOrderId={urlOrderId || undefined}
       />
 
       {/* 進階搜尋對話框 */}

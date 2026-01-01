@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { DateCell } from '@/components/table-cells'
 
 // 允許任何包含 id 的物件（用於編輯中的成員，可能有額外的 index, age 等欄位）
 type MemberData = Record<string, unknown> & { id?: string }
@@ -71,7 +72,7 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
               className="h-8 text-sm"
             />
           ) : (
-            <span>{row.birthday ? new Date(String(row.birthday)).toLocaleDateString() : '-'}</span>
+            <DateCell date={row.birthday as string | null} showIcon={false} />
           ),
       },
       {
@@ -125,7 +126,7 @@ export const MemberTable = forwardRef<HTMLDivElement, MemberTableProps>(
               className="h-8 text-sm"
             />
           ) : (
-            <span>{row.passport_expiry ? new Date(String(row.passport_expiry)).toLocaleDateString() : '-'}</span>
+            <DateCell date={row.passport_expiry as string | null} showIcon={false} />
           ),
       },
     ]

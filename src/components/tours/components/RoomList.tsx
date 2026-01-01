@@ -10,6 +10,7 @@ import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { calculateRoomNumbers, getRoomDisplayName, getRoomTypeKey } from '../hooks/room-utils'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface OrderMember {
   id: string
@@ -209,9 +210,9 @@ export function RoomList({
                     </div>
                   </div>
                   {(room.booking_code || room.amount) && (
-                    <div className="text-xs text-morandi-muted mb-1">
-                      {room.booking_code && <span className="mr-2">代號: {room.booking_code}</span>}
-                      {room.amount && <span>費用: ${room.amount.toLocaleString()}</span>}
+                    <div className="text-xs text-morandi-muted mb-1 flex items-center gap-2">
+                      {room.booking_code && <span>代號: {room.booking_code}</span>}
+                      {room.amount && <span className="flex items-center gap-1">費用: <CurrencyCell amount={room.amount} className="text-xs" /></span>}
                     </div>
                   )}
                   <div className="flex flex-wrap gap-1 min-h-[24px]">

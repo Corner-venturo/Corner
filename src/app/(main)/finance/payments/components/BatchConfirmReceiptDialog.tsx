@@ -25,6 +25,8 @@ import { CheckCircle, AlertCircle, DollarSign, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS, ReceiptStatus } from '@/types/receipt.types'
+import { CurrencyCell } from '@/components/table-cells'
+import { formatDate } from '@/lib/utils/format-date'
 import type { Receipt } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
 
@@ -142,8 +144,8 @@ export function BatchConfirmReceiptDialog({
           actual_amount: item.actualAmount,
           status: 1, // 已確認
           note: item.receipt.note
-            ? `${item.receipt.note}\n[會計批量確認] ${new Date().toLocaleDateString()}`
-            : `[會計批量確認] ${new Date().toLocaleDateString()}`,
+            ? `${item.receipt.note}\n[會計批量確認] ${formatDate(new Date())}`
+            : `[會計批量確認] ${formatDate(new Date())}`,
         })
 
         // 累計每個訂單的確認金額
@@ -231,8 +233,8 @@ export function BatchConfirmReceiptDialog({
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-morandi-gold" />
-                  <span className="text-sm font-medium">
-                    總計：NT$ {stats.totalAmount.toLocaleString()}
+                  <span className="text-sm font-medium flex items-center gap-1">
+                    總計：<CurrencyCell amount={stats.totalAmount} />
                   </span>
                 </div>
               </div>
@@ -295,7 +297,7 @@ export function BatchConfirmReceiptDialog({
                           </span>
                         </td>
                         <td className="py-3 px-3 text-right text-morandi-primary">
-                          NT$ {item.receipt.receipt_amount.toLocaleString()}
+                          <CurrencyCell amount={item.receipt.receipt_amount} />
                         </td>
                         <td className="py-3 px-3 text-right">
                           <Input

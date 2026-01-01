@@ -21,10 +21,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useReceiptStore, useOrderStore } from '@/stores'
-import { CheckCircle, Edit2, DollarSign, Calendar, User, FileText, CreditCard } from 'lucide-react'
+import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS } from '@/types/receipt.types'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import type { Receipt } from '@/types/receipt.types'
 import { logger } from '@/lib/utils/logger'
 
@@ -188,10 +189,7 @@ export function ReceiptDetailDialog({
             </div>
             <div className="space-y-1">
               <div className="text-morandi-secondary">收款日期</div>
-              <div className="font-medium text-morandi-primary flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                {new Date(receipt.receipt_date).toLocaleDateString()}
-              </div>
+              <DateCell date={receipt.receipt_date} className="font-medium text-morandi-primary" />
             </div>
             <div className="space-y-1">
               <div className="text-morandi-secondary">訂單編號</div>
@@ -227,9 +225,7 @@ export function ReceiptDetailDialog({
           <div className="bg-morandi-container/20 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-morandi-secondary">應收金額</span>
-              <span className="text-lg font-semibold text-morandi-primary">
-                NT$ {receipt.receipt_amount.toLocaleString()}
-              </span>
+              <CurrencyCell amount={receipt.receipt_amount} className="text-lg font-semibold text-morandi-primary" />
             </div>
 
             {isPending ? (
@@ -251,9 +247,7 @@ export function ReceiptDetailDialog({
             ) : (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-morandi-secondary">實收金額</span>
-                <span className="text-lg font-semibold text-morandi-green">
-                  NT$ {(receipt.actual_amount || 0).toLocaleString()}
-                </span>
+                <CurrencyCell amount={receipt.actual_amount || 0} className="text-lg font-semibold text-morandi-green" />
               </div>
             )}
 
@@ -261,15 +255,17 @@ export function ReceiptDetailDialog({
             {isPending && actualAmount !== receipt.receipt_amount && actualAmount > 0 && (
               <div
                 className={cn(
-                  'text-sm px-3 py-2 rounded',
+                  'text-sm px-3 py-2 rounded flex items-center gap-1',
                   actualAmount < receipt.receipt_amount
                     ? 'bg-morandi-red/10 text-morandi-red'
                     : 'bg-morandi-gold/10 text-morandi-gold'
                 )}
               >
-                {actualAmount < receipt.receipt_amount
-                  ? `少收 NT$ ${(receipt.receipt_amount - actualAmount).toLocaleString()}`
-                  : `多收 NT$ ${(actualAmount - receipt.receipt_amount).toLocaleString()}`}
+                {actualAmount < receipt.receipt_amount ? '少收' : '多收'}
+                <CurrencyCell
+                  amount={Math.abs(receipt.receipt_amount - actualAmount)}
+                  className={actualAmount < receipt.receipt_amount ? 'text-morandi-red' : 'text-morandi-gold'}
+                />
               </div>
             )}
           </div>

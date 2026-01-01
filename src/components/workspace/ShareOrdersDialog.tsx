@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface ShareOrdersDialogProps {
   channelId: string
@@ -214,13 +215,13 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
                         {order.contact_person || '-'}
                       </td>
                       <td className="py-2 px-2 text-sm text-right text-morandi-primary">
-                        ${(order.total_amount || 0).toLocaleString()}
+                        <CurrencyCell amount={order.total_amount || 0} className="justify-end" />
                       </td>
                       <td className="py-2 px-2 text-sm text-right text-morandi-primary">
-                        ${(order.paid_amount || 0).toLocaleString()}
+                        <CurrencyCell amount={order.paid_amount || 0} className="justify-end" />
                       </td>
-                      <td className="py-2 px-2 text-sm text-right font-semibold text-status-danger">
-                        ${order.gap.toLocaleString()}
+                      <td className="py-2 px-2 text-sm text-right">
+                        <CurrencyCell amount={order.gap} variant="expense" className="justify-end font-semibold" />
                       </td>
                       <td className="py-2 px-2 text-center">
                         {isFullyUnpaid ? (
@@ -255,9 +256,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
             </div>
             <div className="text-right">
               <div className="text-xs text-morandi-secondary">總缺口金額</div>
-              <div className="text-lg font-semibold text-status-danger">
-                ${selectedStats.totalGap.toLocaleString()}
-              </div>
+              <CurrencyCell amount={selectedStats.totalGap} variant="expense" className="text-lg font-semibold" />
             </div>
           </div>
           <div className="flex gap-2 justify-end w-full">

@@ -3,6 +3,7 @@ import { Tour } from '@/stores/types'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
 import { useOrderStore, useMemberStore } from '@/stores'
 import { cn } from '@/lib/utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 const paymentStore: { payment_requests: unknown[] } = { payment_requests: [] }
 
@@ -99,15 +100,11 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">出發日期:</span>
-              <span className="text-morandi-primary">
-                {new Date(tour.departure_date).toLocaleDateString()}
-              </span>
+              <DateCell date={tour.departure_date} showIcon={false} />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">返回日期:</span>
-              <span className="text-morandi-primary">
-                {new Date(tour.return_date).toLocaleDateString()}
-              </span>
+              <DateCell date={tour.return_date} showIcon={false} />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">參與人數:</span>
@@ -124,9 +121,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">建立時間:</span>
-              <span className="text-morandi-secondary text-sm">
-                {tour.created_at ? new Date(tour.created_at).toLocaleDateString() : '-'}
-              </span>
+              <DateCell date={tour.created_at} fallback="-" showIcon={false} className="text-morandi-secondary text-sm" />
             </div>
           </div>
         </div>
@@ -139,21 +134,15 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-morandi-secondary">報價單價格:</span>
-              <span className="text-morandi-primary font-medium">
-                NT$ {(quotePrice || 0).toLocaleString()}
-              </span>
+              <CurrencyCell amount={quotePrice || 0} className="font-medium" />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">應收帳款:</span>
-              <span className="text-morandi-blue font-medium">
-                NT$ {expectedRevenue.toLocaleString()}
-              </span>
+              <CurrencyCell amount={expectedRevenue} className="text-morandi-blue font-medium" />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">實收帳款:</span>
-              <span className="text-morandi-green font-semibold">
-                NT$ {actualRevenue.toLocaleString()}
-              </span>
+              <CurrencyCell amount={actualRevenue} variant="income" className="font-semibold" />
             </div>
             <div className="flex justify-between pt-2 border-t border-border">
               <span className="text-morandi-secondary">收款率:</span>
@@ -174,14 +163,13 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">待收餘額:</span>
-              <span
+              <CurrencyCell
+                amount={expectedRevenue - actualRevenue}
                 className={cn(
                   'font-medium',
                   expectedRevenue - actualRevenue > 0 ? 'text-morandi-red' : 'text-morandi-green'
                 )}
-              >
-                NT$ {(expectedRevenue - actualRevenue).toLocaleString()}
-              </span>
+              />
             </div>
           </div>
         </div>
@@ -194,31 +182,27 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-morandi-secondary">總成本:</span>
-              <span className="text-morandi-red font-medium">
-                NT$ {tour.total_cost.toLocaleString()}
-              </span>
+              <CurrencyCell amount={tour.total_cost} variant="expense" className="font-medium" />
             </div>
             <div className="flex justify-between pt-2 border-t border-border">
               <span className="text-morandi-secondary">毛利潤:</span>
-              <span
+              <CurrencyCell
+                amount={grossProfit}
                 className={cn(
                   'font-semibold',
                   grossProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
                 )}
-              >
-                NT$ {grossProfit.toLocaleString()}
-              </span>
+              />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">淨利潤:</span>
-              <span
+              <CurrencyCell
+                amount={netProfit}
                 className={cn(
                   'font-bold text-lg',
                   netProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'
                 )}
-              >
-                NT$ {netProfit.toLocaleString()}
-              </span>
+              />
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">利潤率:</span>
@@ -316,25 +300,26 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right text-morandi-secondary">
-                      NT$ {expense.budgetPerPerson.toLocaleString()}
+                      <CurrencyCell amount={expense.budgetPerPerson} className="text-morandi-secondary" />
                     </td>
                     <td className="py-3 px-4 text-right text-morandi-primary font-medium">
-                      NT$ {expense.budgetTotal.toLocaleString()}
+                      <CurrencyCell amount={expense.budgetTotal} className="font-medium" />
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <span
+                      <CurrencyCell
+                        amount={expense.actualTotal || 0}
                         className={cn(
                           'font-medium',
                           (expense.actualTotal || 0) > expense.budgetTotal
                             ? 'text-morandi-red'
                             : 'text-morandi-primary'
                         )}
-                      >
-                        NT$ {(expense.actualTotal || 0).toLocaleString()}
-                      </span>
+                      />
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <span
+                      <CurrencyCell
+                        amount={expense.variance}
+                        showSign
                         className={cn(
                           'font-semibold',
                           expense.variance > 0
@@ -343,9 +328,7 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
                               ? 'text-morandi-green'
                               : 'text-morandi-secondary'
                         )}
-                      >
-                        {expense.variance > 0 ? '+' : ''}NT$ {expense.variance.toLocaleString()}
-                      </span>
+                      />
                     </td>
                     <td className="py-3 px-4 text-right">
                       <span
@@ -370,32 +353,32 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
               <tr className="bg-morandi-container/10 font-semibold">
                 <td className="py-4 px-4 text-morandi-primary">總計</td>
                 <td className="py-4 px-4 text-right text-morandi-secondary">
-                  NT${' '}
-                  {actualExpenses
-                    .reduce((sum, exp) => sum + exp.budgetPerPerson, 0)
-                    .toLocaleString()}
+                  <CurrencyCell
+                    amount={actualExpenses.reduce((sum, exp) => sum + exp.budgetPerPerson, 0)}
+                    className="text-morandi-secondary"
+                  />
                 </td>
                 <td className="py-4 px-4 text-right text-morandi-primary">
-                  NT${' '}
-                  {actualExpenses.reduce((sum, exp) => sum + exp.budgetTotal, 0).toLocaleString()}
+                  <CurrencyCell
+                    amount={actualExpenses.reduce((sum, exp) => sum + exp.budgetTotal, 0)}
+                  />
                 </td>
                 <td className="py-4 px-4 text-right text-morandi-primary">
-                  NT${' '}
-                  {actualExpenses.reduce((sum, exp) => sum + (exp.actualTotal || 0), 0).toLocaleString()}
+                  <CurrencyCell
+                    amount={actualExpenses.reduce((sum, exp) => sum + (exp.actualTotal || 0), 0)}
+                  />
                 </td>
                 <td className="py-4 px-4 text-right">
-                  <span
+                  <CurrencyCell
+                    amount={actualExpenses.reduce((sum, exp) => sum + exp.variance, 0)}
+                    showSign
                     className={cn(
                       'font-bold',
                       actualExpenses.reduce((sum, exp) => sum + exp.variance, 0) > 0
                         ? 'text-morandi-red'
                         : 'text-morandi-green'
                     )}
-                  >
-                    {actualExpenses.reduce((sum, exp) => sum + exp.variance, 0) > 0 ? '+' : ''}
-                    NT${' '}
-                    {actualExpenses.reduce((sum, exp) => sum + exp.variance, 0).toLocaleString()}
-                  </span>
+                  />
                 </td>
                 <td className="py-4 px-4 text-right">
                   <span className="text-morandi-primary font-bold">

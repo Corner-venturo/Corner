@@ -8,6 +8,7 @@ import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { getPaymentStatusLabel } from '@/constants/status-maps'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 
 interface SimpleOrderTableProps {
@@ -147,7 +148,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                           : 'text-morandi-red'
                     )}
                   >
-                    {order.payment_status}
+                    {getPaymentStatusLabel(order.payment_status || '')}
                   </span>
                 </div>
 
@@ -193,7 +194,9 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                       variant="ghost"
                       onClick={e => {
                         e.stopPropagation()
-                        router.push(`/finance/requests`)
+                        router.push(
+                          `/finance/requests?tour_id=${order.tour_id}&order_id=${order.id}&order_number=${order.order_number}`
+                        )
                       }}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
                       title="快速請款"

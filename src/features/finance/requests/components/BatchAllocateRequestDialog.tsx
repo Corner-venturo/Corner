@@ -23,6 +23,7 @@ import { useTourStore, useSupplierStore } from '@/stores'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, Trash2, Receipt, AlertCircle, Search, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 import { alert } from '@/lib/ui/alert-dialog'
 import { PaymentItemCategory } from '@/stores/types'
 
@@ -195,6 +196,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
 
     if (unallocatedAmount !== 0) {
       void alert(`還有 NT$ ${unallocatedAmount.toLocaleString()} 未分配，請確認分配金額`, 'warning')
+      // Note: alert message uses toLocaleString for string interpolation
       return
     }
 
@@ -399,21 +401,26 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
             )}
 
             <div className="flex items-center justify-between pt-3 mt-3 border-t border-morandi-container/50">
-              <div className="text-sm">
+              <div className="flex items-center text-sm">
                 <span className="text-morandi-secondary">已分配</span>
-                <span className="font-medium ml-2">
-                  NT$ {totalAllocatedAmount.toLocaleString()}
-                </span>
+                <CurrencyCell amount={totalAllocatedAmount} className="ml-2" />
               </div>
               <div
                 className={cn(
-                  'text-sm',
+                  'flex items-center text-sm',
                   unallocatedAmount > 0 && 'text-morandi-gold',
                   unallocatedAmount < 0 && 'text-morandi-red'
                 )}
               >
                 <span>未分配</span>
-                <span className="font-medium ml-2">NT$ {unallocatedAmount.toLocaleString()}</span>
+                <CurrencyCell
+                  amount={unallocatedAmount}
+                  className={cn(
+                    'ml-2',
+                    unallocatedAmount > 0 && 'text-morandi-gold',
+                    unallocatedAmount < 0 && 'text-morandi-red'
+                  )}
+                />
               </div>
             </div>
 

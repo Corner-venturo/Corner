@@ -2,6 +2,7 @@
 
 import React from 'react'
 import type { Order } from '@/types/order.types'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface InvoicePreviewProps {
   totalAmount: number
@@ -18,7 +19,7 @@ export function InvoicePreview({ totalAmount, currentOrder }: InvoicePreviewProp
         <div className="flex justify-end items-center gap-4">
           <span className="text-sm font-medium">總計</span>
           <span className="text-lg font-bold text-primary">
-            NT$ {totalAmount.toLocaleString()}
+            <CurrencyCell amount={totalAmount} className="text-lg font-bold text-primary" />
           </span>
         </div>
       </div>
@@ -26,7 +27,7 @@ export function InvoicePreview({ totalAmount, currentOrder }: InvoicePreviewProp
       {/* 超開提醒 */}
       {isOverpaid && (
         <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning">
-          ⚠️ 發票金額超過已收款金額！已收款：NT$ {(currentOrder.paid_amount ?? 0).toLocaleString()}
+          ⚠️ 發票金額超過已收款金額！已收款：<CurrencyCell amount={currentOrder.paid_amount ?? 0} className="inline text-sm text-status-warning" />
         </div>
       )}
     </div>

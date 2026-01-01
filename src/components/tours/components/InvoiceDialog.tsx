@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FileText, Plus, Trash2, X } from 'lucide-react'
 import { TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface InvoiceDialogProps {
   open: boolean
@@ -273,7 +274,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               <div className="flex justify-end items-center gap-4">
                 <span className="text-sm font-medium">總計</span>
                 <span className="text-lg font-bold text-primary">
-                  NT$ {invoiceTotal.toLocaleString()}
+                  <CurrencyCell amount={invoiceTotal} />
                 </span>
               </div>
             </div>
@@ -284,8 +285,8 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
             const order = tourOrders.find(o => o.id === invoiceOrderId)
             if (order && invoiceTotal > (order.paid_amount ?? 0)) {
               return (
-                <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning">
-                  ⚠️ 發票金額超過已收款金額！已收款：NT$ {(order.paid_amount ?? 0).toLocaleString()}
+                <div className="p-3 bg-status-warning-bg border border-status-warning/30 rounded-md text-sm text-status-warning flex items-center gap-1 flex-wrap">
+                  ⚠️ 發票金額超過已收款金額！已收款：<CurrencyCell amount={order.paid_amount ?? 0} />
                 </div>
               )
             }
@@ -307,7 +308,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
               disabled={isInvoiceLoading}
               className="min-w-[100px]"
             >
-              {isInvoiceLoading ? '開立中...' : '確定開立'}
+              {isInvoiceLoading ? '開立中...' : '開立發票'}
             </Button>
           </div>
         </div>

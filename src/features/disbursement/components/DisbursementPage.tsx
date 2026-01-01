@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Eye, Trash2 } from 'lucide-react'
 import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
-import { formatDateTW } from '@/lib/utils/format-date'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { CreateDisbursementDialog } from './CreateDisbursementDialog'
@@ -93,9 +93,7 @@ export function DisbursementPage() {
       label: '出帳日期',
       sortable: true,
       render: (value) => (
-        <div className="text-sm text-morandi-secondary">
-          {value ? formatDateTW(String(value)) : '-'}
-        </div>
+        <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
       ),
     },
     {
@@ -112,8 +110,8 @@ export function DisbursementPage() {
       label: '總金額',
       sortable: true,
       render: (value) => (
-        <div className="font-semibold text-morandi-gold text-right">
-          NT$ {(Number(value) || 0).toLocaleString()}
+        <div className="text-right">
+          <CurrencyCell amount={Number(value) || 0} className="font-semibold text-morandi-gold" />
         </div>
       ),
     },
@@ -135,9 +133,7 @@ export function DisbursementPage() {
       label: '建立時間',
       sortable: true,
       render: (value) => (
-        <div className="text-sm text-morandi-secondary">
-          {value ? formatDateTW(String(value)) : '-'}
-        </div>
+        <DateCell date={value as string | null} showIcon={false} className="text-morandi-secondary" />
       ),
     },
     {
@@ -256,9 +252,9 @@ export function DisbursementPage() {
             <span className="text-morandi-muted">本月</span>
             <span className="ml-2 font-semibold text-morandi-primary">{thisMonthOrders.length} 筆</span>
           </div>
-          <div className="text-right">
+          <div className="text-right flex items-center gap-2">
             <span className="text-morandi-muted">本月金額</span>
-            <span className="ml-2 font-semibold text-morandi-green">NT$ {thisMonthAmount.toLocaleString()}</span>
+            <CurrencyCell amount={thisMonthAmount} className="font-semibold text-morandi-green" />
           </div>
         </div>
       </ResponsiveHeader>

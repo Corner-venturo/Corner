@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import { Plus, X } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface Employee {
   id: string
@@ -308,27 +309,27 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
             <div className="bg-morandi-container/20 rounded-lg p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">團費收入</span>
-                <span className="font-medium">${totalRevenue.toLocaleString()}</span>
+                <CurrencyCell amount={totalRevenue} className="font-medium" />
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">成本支出</span>
-                <span className="font-medium text-status-danger">-${totalCost.toLocaleString()}</span>
+                <CurrencyCell amount={-totalCost} variant="expense" className="font-medium" />
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
                 <span className="font-medium">毛利</span>
-                <span className="font-bold text-lg">${grossProfit.toLocaleString()}</span>
+                <CurrencyCell amount={grossProfit} className="font-bold text-lg" />
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">公司雜支 ({memberCount} 人 × $10)</span>
-                <span className="font-medium text-status-danger">-${miscExpense.toLocaleString()}</span>
+                <CurrencyCell amount={-miscExpense} variant="expense" className="font-medium" />
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-morandi-secondary">稅金 (12%)</span>
-                <span className="font-medium text-status-danger">-${tax.toLocaleString()}</span>
+                <CurrencyCell amount={-tax} variant="expense" className="font-medium" />
               </div>
               <div className="border-t border-morandi-gold/20 pt-2 flex justify-between">
                 <span className="font-bold">淨利潤</span>
-                <span className="font-bold text-xl text-status-success">${netProfit.toLocaleString()}</span>
+                <CurrencyCell amount={netProfit} variant="income" className="font-bold text-xl" />
               </div>
             </div>
 
@@ -372,9 +373,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
                       className="w-24"
                       placeholder="%"
                     />
-                    <span className="text-sm text-morandi-secondary min-w-[80px]">
-                      ${Math.round(netProfit * (recipient.percentage / 100)).toLocaleString()}
-                    </span>
+                    <CurrencyCell amount={Math.round(netProfit * (recipient.percentage / 100))} className="text-sm text-morandi-secondary min-w-[80px]" />
                     {salesRecipients.length > 1 && (
                       <Button
                         variant="ghost"
@@ -429,9 +428,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
                       className="w-24"
                       placeholder="%"
                     />
-                    <span className="text-sm text-morandi-secondary min-w-[80px]">
-                      ${Math.round(netProfit * (recipient.percentage / 100)).toLocaleString()}
-                    </span>
+                    <CurrencyCell amount={Math.round(netProfit * (recipient.percentage / 100))} className="text-sm text-morandi-secondary min-w-[80px]" />
                     {opRecipients.length > 1 && (
                       <Button
                         variant="ghost"

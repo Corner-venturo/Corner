@@ -22,7 +22,6 @@ import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import {
   CheckCircle,
   Clock,
-  Calendar,
   ChevronDown,
   X,
   Star,
@@ -39,6 +38,7 @@ import {
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
+import { DateCell } from '@/components/table-cells'
 import { TodoExpandedView } from '@/components/todos/todo-expanded-view'
 import { StarRating } from '@/components/ui/star-rating'
 import { Todo } from '@/stores/types'
@@ -243,11 +243,8 @@ export default function TodosPage() {
       sortable: true,
       width: '140px',
       render: (value: unknown) => (
-        <div className="flex items-center gap-2">
-          <Calendar size={14} className="text-morandi-secondary" />
-          <span className={cn('text-sm', getDeadlineColor(value ? String(value) : undefined))}>
-            {value ? new Date(String(value)).toLocaleDateString() : '未設定'}
-          </span>
+        <div className={cn(getDeadlineColor(value ? String(value) : undefined))}>
+          <DateCell date={value ? String(value) : null} fallback="未設定" showIcon />
         </div>
       ),
     },

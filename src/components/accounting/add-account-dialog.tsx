@@ -6,6 +6,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Wallet, CreditCard, PiggyBank, TrendingUp, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 
 interface AddAccountDialogProps {
@@ -313,14 +314,12 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                 <div className="text-xs text-[#8C8C8C] mt-0.5">{formData.description}</div>
               )}
             </div>
-            <div
-              className={cn(
-                'font-semibold text-sm',
-                parseFloat(formData.balance) >= 0 ? 'text-[#7B9B7E]' : 'text-[#C89B9B]'
-              )}
-            >
-              {parseFloat(formData.balance) >= 0 ? '+' : ''}
-              NT$ {Math.abs(parseFloat(formData.balance) || 0).toLocaleString()}
+            <div className="font-semibold text-sm">
+              <CurrencyCell
+                amount={parseFloat(formData.balance) || 0}
+                variant={parseFloat(formData.balance) >= 0 ? 'income' : 'expense'}
+                showSign
+              />
             </div>
           </div>
         </div>

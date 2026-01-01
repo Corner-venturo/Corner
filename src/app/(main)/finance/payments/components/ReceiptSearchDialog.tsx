@@ -181,7 +181,7 @@ export function ReceiptSearchDialog({
                 />
                 <label
                   htmlFor={`type-${option.value}`}
-                  className="text-sm text-morandi-secondary cursor-pointer"
+                  className="text-sm text-morandi-primary cursor-pointer"
                 >
                   {option.label}
                 </label>
@@ -203,7 +203,7 @@ export function ReceiptSearchDialog({
                 />
                 <label
                   htmlFor={`status-${option.value}`}
-                  className="text-sm text-morandi-secondary cursor-pointer"
+                  className="text-sm text-morandi-primary cursor-pointer"
                 >
                   {option.label}
                 </label>

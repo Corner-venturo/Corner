@@ -40,9 +40,10 @@ interface TourRoomManagerProps {
   members: OrderMember[]
   open: boolean
   onOpenChange: (open: boolean) => void
+  onClose?: () => void
 }
 
-export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: TourRoomManagerProps) {
+export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onClose }: TourRoomManagerProps) {
   const [selectedNight, setSelectedNight] = useState(1)
   const [isSorting, setIsSorting] = useState(false)
   const [showFullRooms, setShowFullRooms] = useState(true)
@@ -127,6 +128,7 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
 
       toast.success("房間順序已儲存")
       onOpenChange(false)
+      onClose?.()
     } catch (error) {
       logger.error("排序失敗:", error)
       toast.error("儲存排序失敗")
@@ -169,9 +171,17 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
   const totalAssigned = currentNightRooms.reduce((sum, r) => sum + r.assigned_count, 0)
   const totalCapacity = currentNightRooms.reduce((sum, r) => sum + r.capacity, 0)
 
+  // 處理對話框關閉（包含自動排序觸發）
+  const handleOpenChange = (newOpen: boolean) => {
+    onOpenChange(newOpen)
+    if (!newOpen) {
+      onClose?.()
+    }
+  }
+
   return (
     <>
-      <Dialog open={open && !addRoomOpen} onOpenChange={onOpenChange}>
+      <Dialog open={open && !addRoomOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-6xl w-[95vw] h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="pb-3 border-b border-border">
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">

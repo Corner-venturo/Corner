@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Receipt, ChevronDown, ChevronUp, DollarSign, Check } from 'lucide-react'
 import type { Order } from '@/stores/types'
+import { CurrencyCell } from '@/components/table-cells'
 
 // 使用統一的型別定義
 import type { SharedOrderList } from '@/stores/workspace/types'
@@ -75,8 +76,8 @@ export function OrderListCard({
             <div className="flex items-center gap-3">
               <div className="text-2xl">💰</div>
               <div>
-                <div className="font-medium text-morandi-primary">
-                  📋 待處理訂單 ({orderList.orders.length}筆 / ${totalGap.toLocaleString()})
+                <div className="font-medium text-morandi-primary flex items-center gap-1">
+                  📋 待處理訂單 ({orderList.orders.length}筆 / <CurrencyCell amount={totalGap} className="inline" />)
                 </div>
                 <div className="text-xs text-morandi-secondary mt-1">
                   {isExpanded ? '點擊收合詳情' : '點擊展開詳情'}
@@ -86,9 +87,7 @@ export function OrderListCard({
             <div className="flex items-center gap-3">
               <div className="text-right">
                 <div className="text-xs text-morandi-secondary">總缺口</div>
-                <div className="text-lg font-semibold text-status-danger">
-                  ${totalGap.toLocaleString()}
-                </div>
+                <CurrencyCell amount={totalGap} className="text-lg font-semibold text-status-danger" />
               </div>
               {isExpanded ? (
                 <ChevronUp className="text-morandi-secondary" size={20} />
@@ -148,13 +147,13 @@ export function OrderListCard({
                           {order.contact_person || '-'}
                         </td>
                         <td className="py-2 px-3 text-sm text-right text-morandi-primary">
-                          ${order.total_amount.toLocaleString()}
+                          <CurrencyCell amount={order.total_amount} />
                         </td>
                         <td className="py-2 px-3 text-sm text-right text-morandi-primary">
-                          ${order.paid_amount.toLocaleString()}
+                          <CurrencyCell amount={order.paid_amount} />
                         </td>
                         <td className="py-2 px-3 text-sm text-right font-semibold text-status-danger">
-                          ${order.gap.toLocaleString()}
+                          <CurrencyCell amount={order.gap} />
                         </td>
                         <td className="py-2 px-3 text-center">
                           <span
@@ -200,8 +199,8 @@ export function OrderListCard({
                     </span>
                   )}
                 </div>
-                <div className="font-medium text-morandi-primary">
-                  總缺口：${totalGap.toLocaleString()}
+                <div className="font-medium text-morandi-primary flex items-center gap-1">
+                  總缺口：<CurrencyCell amount={totalGap} className="inline" />
                 </div>
               </div>
             </div>

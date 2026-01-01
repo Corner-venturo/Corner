@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Plane, PlaneLanding, ClipboardList, AlertCircle, ChevronRight, Search } from 'lucide-react'
+import { DateCell } from '@/components/table-cells'
 import { TourCard } from '@/components/mobile/cards'
 import { TodoCard } from '@/components/mobile/cards'
 import { supabase } from '@/lib/supabase/client'
@@ -130,11 +131,7 @@ export default function MobileHomePage() {
               {getGreeting()}，{user?.name || '你好'}
             </h1>
             <p className="text-sm text-morandi-secondary mt-0.5">
-              {new Date().toLocaleDateString('zh-TW', {
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long',
-              })}
+              <DateCell date={new Date()} format="long" showIcon={false} />
             </p>
           </div>
           <Link

@@ -2,12 +2,7 @@
 
 import { useMemo } from 'react'
 import type { Itinerary } from '@/stores/types'
-
-// 移除 HTML 標籤，只保留純文字
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 interface UseItineraryFiltersProps {
   itineraries: Itinerary[]

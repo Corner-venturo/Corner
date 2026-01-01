@@ -18,6 +18,7 @@ import { Upload, FileSpreadsheet } from 'lucide-react'
 import type { CreateReceiptData } from '@/types/receipt.types'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { alert } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface BatchCreateReceiptDialogProps {
   isOpen: boolean
@@ -225,7 +226,7 @@ export function BatchCreateReceiptDialog({
                         <td className="px-2 py-1">{r.receipt_date}</td>
                         <td className="px-2 py-1">{RECEIPT_TYPE_LABELS[r.receipt_type]}</td>
                         <td className="px-2 py-1 text-right">
-                          NT$ {r.receipt_amount.toLocaleString()}
+                          <CurrencyCell amount={r.receipt_amount} />
                         </td>
                       </tr>
                     ))}

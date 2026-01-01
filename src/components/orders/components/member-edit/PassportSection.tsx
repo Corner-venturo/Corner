@@ -234,7 +234,7 @@ export function PassportSection({
       ) : (
         <label
           htmlFor="edit-passport-upload"
-          className="w-full h-48 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-secondary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
+          className="w-full h-48 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
         >
           <Upload size={32} className="mb-2 opacity-50" />
           <span className="text-sm">點擊上傳護照照片</span>

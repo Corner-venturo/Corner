@@ -34,6 +34,7 @@ import { useTourRequests } from '@/stores/tour-request-store'
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
   {
+    /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
     loading: () => (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <Loader2 className="animate-spin text-white" size={32} />

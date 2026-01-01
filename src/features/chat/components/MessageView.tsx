@@ -2,6 +2,7 @@
 
 import { useMessages } from '../hooks/useMessages'
 import { Loader2, AlertCircle } from 'lucide-react'
+import { DateCell } from '@/components/table-cells'
 import type { Channel } from '@/stores/workspace/types'
 
 interface MessageViewProps {
@@ -53,7 +54,12 @@ export function MessageView({ channel }: MessageViewProps) {
                   <p className="font-bold">
                     {message.author?.display_name || 'Unknown User'}
                     <span className="text-xs text-morandi-secondary font-normal ml-2">
-                      {new Date(message.created_at).toLocaleTimeString()}
+                      <DateCell
+                        date={message.created_at}
+                        format="time"
+                        showIcon={false}
+                        className="inline text-morandi-secondary"
+                      />
                     </span>
                   </p>
                   <p>{message.content}</p>

@@ -13,12 +13,8 @@ import { Archive, Calculator, Copy, Eye, Pin, Trash2, Users } from 'lucide-react
 import { cn } from '@/lib/utils'
 import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
 import { STATUS_COLORS } from '../constants'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface QuotesListProps {
   quotes: Quote[]
@@ -163,11 +159,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          return (
-            <span className="text-sm text-morandi-secondary">
-              NT$ {quote.total_cost?.toLocaleString() || 0}
-            </span>
-          )
+          return <CurrencyCell amount={quote.total_cost || 0} className="text-morandi-secondary" />
         },
       },
       {
@@ -176,11 +168,7 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          return (
-            <span className="text-sm text-morandi-secondary">
-              {new Date(quote.created_at).toLocaleDateString()}
-            </span>
-          )
+          return <DateCell date={quote.created_at} showIcon={false} className="text-morandi-secondary" />
         },
       },
     ],

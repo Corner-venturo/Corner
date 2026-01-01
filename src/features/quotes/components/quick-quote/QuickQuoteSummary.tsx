@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Input } from '@/components/ui/input'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface QuickQuoteSummaryProps {
   totalCost: number
@@ -69,23 +70,21 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
               <label className="text-sm font-medium text-morandi-primary">總成本</label>
-              <div className="mt-1 text-2xl font-bold text-morandi-primary">
-                NT$ {totalCost.toLocaleString()}
-              </div>
+              <CurrencyCell amount={totalCost} className="mt-1 text-2xl font-bold" />
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
             <label className="text-sm font-medium text-morandi-primary">應收金額</label>
-            <div className="mt-1 text-2xl font-bold text-morandi-primary">
-              NT$ {totalAmount.toLocaleString()}
-            </div>
+            <CurrencyCell amount={totalAmount} className="mt-1 text-2xl font-bold" />
           </div>
           {isEditing && (
             <div className="p-4 bg-morandi-container/10 rounded-lg">
               <label className="text-sm font-medium text-morandi-primary">總利潤</label>
-              <div className={`mt-1 text-2xl font-bold ${totalProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
-                NT$ {totalProfit.toLocaleString()}
-              </div>
+              <CurrencyCell
+                amount={totalProfit}
+                variant={totalProfit >= 0 ? 'income' : 'expense'}
+                className="mt-1 text-2xl font-bold"
+              />
             </div>
           )}
           <div className="p-4 bg-morandi-container/10 rounded-lg">
@@ -112,20 +111,16 @@ export const QuickQuoteSummary: React.FC<QuickQuoteSummaryProps> = ({
                 placeholder=""
               />
             ) : (
-              <div className="mt-1 text-2xl font-bold text-morandi-primary">
-                NT$ {receivedAmount.toLocaleString()}
-              </div>
+              <CurrencyCell amount={receivedAmount} className="mt-1 text-2xl font-bold" />
             )}
           </div>
           <div className="p-4 bg-morandi-container/10 rounded-lg">
             <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
-            <div
-              className={`mt-1 text-2xl font-bold ${
-                balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'
-              }`}
-            >
-              NT$ {balanceAmount.toLocaleString()}
-            </div>
+            <CurrencyCell
+              amount={balanceAmount}
+              variant={balanceAmount > 0 ? 'expense' : 'income'}
+              className="mt-1 text-2xl font-bold"
+            />
           </div>
         </div>
       </div>

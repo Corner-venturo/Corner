@@ -295,7 +295,7 @@ export function ImagePositionEditor({
                   onClick={handleConfirm}
                   className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                 >
-                  確認
+                  套用
                 </Button>
               </div>
             </div>

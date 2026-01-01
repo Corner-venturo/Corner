@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface CreateReceiptDialogProps {
   order: {
@@ -94,17 +95,15 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">總額：</span>
-                <span className="text-morandi-primary">${order.total_amount.toLocaleString()}</span>
+                <CurrencyCell amount={order.total_amount} className="text-morandi-primary" />
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-morandi-secondary">已收：</span>
-                <span className="text-morandi-primary">${order.paid_amount.toLocaleString()}</span>
+                <CurrencyCell amount={order.paid_amount} className="text-morandi-primary" />
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-morandi-gold/20">
                 <span className="text-morandi-secondary">待收金額：</span>
-                <span className="text-lg font-semibold text-status-danger">
-                  ${order.gap.toLocaleString()}
-                </span>
+                <CurrencyCell amount={order.gap} variant="expense" className="text-lg font-semibold" />
               </div>
             </div>
           </div>

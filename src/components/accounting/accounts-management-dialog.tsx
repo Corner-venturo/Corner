@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface AccountsManagementDialogProps {
   isOpen: boolean
@@ -64,7 +65,7 @@ export function AccountsManagementDialog({
       {/* 總資產卡片 */}
       <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#F9F8F6] to-[#F9F8F6]">
         <div className="text-sm text-[#8C8C8C] mb-1">總資產</div>
-        <div className="text-3xl font-bold text-[#333333]">NT$ {totalBalance.toLocaleString()}</div>
+        <div className="text-3xl font-bold text-[#333333]"><CurrencyCell amount={totalBalance} /></div>
         <div className="text-xs text-[#8C8C8C] mt-2">{accounts.length} 個帳戶</div>
       </div>
 
@@ -129,11 +130,11 @@ export function AccountsManagementDialog({
                             isNegative ? 'text-[#C89B9B]' : 'text-[#333333]'
                           )}
                         >
-                          {isNegative ? '-' : ''}NT$ {Math.abs(account.balance).toLocaleString()}
+                          <CurrencyCell amount={account.balance} />
                         </div>
                         {account.type === 'credit' && account.credit_limit && (
                           <div className="text-xs text-[#8C8C8C] mt-1">
-                            額度 NT$ {account.credit_limit.toLocaleString()}
+                            額度 <CurrencyCell amount={account.credit_limit} />
                           </div>
                         )}
                       </div>
@@ -144,7 +145,7 @@ export function AccountsManagementDialog({
                       <div className="mt-3">
                         <div className="flex items-center justify-between text-xs text-[#8C8C8C] mb-1">
                           <span>可用額度</span>
-                          <span>NT$ {account.available_credit.toLocaleString()}</span>
+                          <span><CurrencyCell amount={account.available_credit} /></span>
                         </div>
                         <div className="h-1.5 bg-[#F9F8F6] rounded-full overflow-hidden">
                           <div

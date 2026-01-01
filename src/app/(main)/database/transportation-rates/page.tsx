@@ -136,7 +136,7 @@ export default function TransportationRatesPage() {
                 取消
               </Button>
               <Button onClick={handleAddNewCountry}>
-                確認
+                新增國家
               </Button>
             </div>
           </div>

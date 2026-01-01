@@ -142,6 +142,7 @@ export const PrintableWrapper: React.FC<PrintableWrapperProps> = ({
   if (!isOpen || !isMounted) return null
 
   return createPortal(
+    /* eslint-disable venturo/no-custom-modal -- 列印預覽需要使用 createPortal */
     <div
       className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-8"
       onClick={onClose}

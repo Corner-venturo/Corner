@@ -126,7 +126,7 @@ export function QuickAddForm({
                 取消
               </Button>
               <Button onClick={onSelectCustomerSubmit} disabled={!selectedCustomer}>
-                確定新增
+                新增團員
               </Button>
             </div>
           </DialogContent>

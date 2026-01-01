@@ -14,6 +14,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Search, X, Plus, AlertTriangle, Edit, Trash2 } from 'lucide-react'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
+import { DateCell } from '@/components/table-cells'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -198,9 +199,11 @@ export default function CustomersPage() {
           const expiryInfo = formatPassportExpiryWithStatus(customer.passport_expiry_date)
           return (
             <div className={`text-xs ${expiryInfo.className || 'text-morandi-secondary'}`}>
-              {customer.passport_expiry_date
-                ? new Date(customer.passport_expiry_date).toLocaleDateString('zh-TW')
-                : '-'}
+              <DateCell
+                date={customer.passport_expiry_date}
+                showIcon={false}
+                className={`text-xs ${expiryInfo.className || 'text-morandi-secondary'}`}
+              />
               {expiryInfo.statusLabel && (
                 <span className="ml-1 text-[10px] font-medium">({expiryInfo.statusLabel})</span>
               )}
@@ -221,11 +224,11 @@ export default function CustomersPage() {
         label: '生日',
         sortable: false,
         render: (_value, customer: Customer) => (
-          <div className="text-xs text-morandi-secondary">
-            {customer.date_of_birth
-              ? new Date(customer.date_of_birth).toLocaleDateString('zh-TW')
-              : '-'}
-          </div>
+          <DateCell
+            date={customer.date_of_birth}
+            showIcon={false}
+            className="text-xs text-morandi-secondary"
+          />
         ),
       },
       {

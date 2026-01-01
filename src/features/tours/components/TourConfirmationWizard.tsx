@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { Tour } from '@/types/tour.types'
 import { toast } from 'sonner'
+import { QUOTE_STATUS_LABELS } from '@/constants/quote-status'
 import {
   Lock,
   FileText,
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 // 報價單資訊
 interface QuoteInfo {
@@ -286,18 +288,18 @@ export function TourConfirmationWizard({
                                   v{quote.version}
                                 </span>
                               </div>
-                              <div className="text-sm text-muted-foreground">
-                                {quote.code} · {quote.created_at ? new Date(quote.created_at).toLocaleDateString() : '-'}
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                {quote.code} · <DateCell date={quote.created_at} showIcon={false} />
                               </div>
                             </div>
                             <div className="text-right">
                               {quote.total_amount != null && (
                                 <div className="font-medium">
-                                  ${quote.total_amount.toLocaleString()}
+                                  <CurrencyCell amount={quote.total_amount} />
                                 </div>
                               )}
                               <div className="text-xs text-muted-foreground">
-                                {quote.status}
+                                {QUOTE_STATUS_LABELS[quote.status as keyof typeof QUOTE_STATUS_LABELS] || quote.status}
                               </div>
                             </div>
                           </div>
@@ -342,8 +344,8 @@ export function TourConfirmationWizard({
                                   v{itinerary.version}
                                 </span>
                               </div>
-                              <div className="text-sm text-muted-foreground">
-                                最後更新: {itinerary.updated_at ? new Date(itinerary.updated_at).toLocaleDateString() : '-'}
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                最後更新: <DateCell date={itinerary.updated_at} showIcon={false} />
                               </div>
                             </div>
                             <div className="text-xs text-muted-foreground">

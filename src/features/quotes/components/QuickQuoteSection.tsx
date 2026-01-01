@@ -12,6 +12,7 @@ import { Trash2, Plus, ChevronDown, ChevronRight, Printer } from 'lucide-react'
 import { QuickQuoteItem } from '@/types/quote.types'
 import { cn } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface QuickQuoteSectionProps {
   items: QuickQuoteItem[]
@@ -107,8 +108,8 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
           )}
           <h3 className="text-base font-semibold text-morandi-primary">快速報價單</h3>
           {items.length > 0 && (
-            <span className="text-sm text-morandi-secondary">
-              ({items.length} 項目，NT$ {totalAmount.toLocaleString()})
+            <span className="text-sm text-morandi-secondary flex items-center gap-1">
+              ({items.length} 項目，<CurrencyCell amount={totalAmount} className="inline" />)
             </span>
           )}
         </div>
@@ -271,14 +272,16 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                           className="h-7 text-sm text-right"
                         />
                       </td>
-                      <td className="px-2 py-1 text-right font-medium text-sm">
-                        {item.amount.toLocaleString()}
+                      <td className="px-2 py-1 text-right">
+                        <CurrencyCell amount={item.amount} className="text-sm font-medium justify-end" />
                       </td>
                       {!isReadOnly && (
-                        <td className="px-2 py-1 text-right text-sm">
-                          <span className={((item.unit_price - (item.cost || 0)) * item.quantity) >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>
-                            {((item.unit_price - (item.cost || 0)) * item.quantity).toLocaleString()}
-                          </span>
+                        <td className="px-2 py-1 text-right">
+                          <CurrencyCell
+                            amount={(item.unit_price - (item.cost || 0)) * item.quantity}
+                            variant={(item.unit_price - (item.cost || 0)) * item.quantity >= 0 ? 'income' : 'expense'}
+                            className="text-sm justify-end"
+                          />
                         </td>
                       )}
                       <td className="px-2 py-1">
@@ -335,23 +338,21 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
                 <label className="text-xs font-medium text-morandi-primary">總成本</label>
-                <div className="mt-1 text-lg font-bold text-morandi-primary">
-                  NT$ {totalCost.toLocaleString()}
-                </div>
+                <CurrencyCell amount={totalCost} className="mt-1 text-lg font-bold" />
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
               <label className="text-xs font-medium text-morandi-primary">應收金額</label>
-              <div className="mt-1 text-lg font-bold text-morandi-primary">
-                NT$ {totalAmount.toLocaleString()}
-              </div>
+              <CurrencyCell amount={totalAmount} className="mt-1 text-lg font-bold" />
             </div>
             {!isReadOnly && (
               <div className="p-3 bg-morandi-container/10 rounded-lg">
                 <label className="text-xs font-medium text-morandi-primary">總利潤</label>
-                <div className={`mt-1 text-lg font-bold ${totalProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
-                  NT$ {totalProfit.toLocaleString()}
-                </div>
+                <CurrencyCell
+                  amount={totalProfit}
+                  variant={totalProfit >= 0 ? 'income' : 'expense'}
+                  className="mt-1 text-lg font-bold"
+                />
               </div>
             )}
             <div className="p-3 bg-morandi-container/10 rounded-lg">
@@ -368,16 +369,16 @@ export const QuickQuoteSection: React.FC<QuickQuoteSectionProps> = ({
                   className="mt-1 h-8 text-lg font-bold"
                 />
               ) : (
-                <div className="mt-1 text-lg font-bold text-morandi-primary">
-                  NT$ {customerInfo.received_amount.toLocaleString()}
-                </div>
+                <CurrencyCell amount={customerInfo.received_amount} className="mt-1 text-lg font-bold" />
               )}
             </div>
             <div className="p-3 bg-morandi-container/10 rounded-lg">
               <label className="text-xs font-medium text-morandi-primary">應收餘額</label>
-              <div className={`mt-1 text-lg font-bold ${balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'}`}>
-                NT$ {balanceAmount.toLocaleString()}
-              </div>
+              <CurrencyCell
+                amount={balanceAmount}
+                variant={balanceAmount > 0 ? 'expense' : 'income'}
+                className="mt-1 text-lg font-bold"
+              />
             </div>
           </div>
         </div>

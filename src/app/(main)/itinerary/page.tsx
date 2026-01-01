@@ -24,14 +24,9 @@ import { useFlightSearch } from './hooks/useFlightSearch'
 import { useItineraryActions } from './hooks/useItineraryActions'
 import { useItineraryTableColumns } from './hooks/useItineraryTableColumns'
 import { useItineraryFilters } from './hooks/useItineraryFilters'
+import { stripHtml } from '@/lib/utils/string-utils'
 
 const statusFilters = ['全部', '提案', '進行中', '公司範例', '結案']
-
-// 移除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
 
 export default function ItineraryPage() {
   const router = useRouter()
@@ -51,12 +46,10 @@ export default function ItineraryPage() {
     if (isSuperAdmin && workspaces.length === 0) {
       loadWorkspaces()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuperAdmin])
 
   useEffect(() => {
     regionsStore.fetchAll()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Custom hooks
@@ -601,7 +594,7 @@ function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange,
             取消
           </Button>
           <Button onClick={onSubmit}>
-            確認
+            套用
           </Button>
         </DialogFooter>
       </DialogContent>

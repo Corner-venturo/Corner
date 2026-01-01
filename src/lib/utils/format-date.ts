@@ -44,6 +44,24 @@ export function formatDateTW(date: string | Date | null | undefined): string {
 }
 
 /**
+ * 格式化日期為簡短格式 (M/D)
+ * @param date - ISO 字串或 Date 物件
+ * @returns 1/15 格式的日期字串
+ */
+export function formatDateCompact(date: string | Date | null | undefined): string {
+  if (!date) return ''
+
+  try {
+    const d = typeof date === 'string' ? new Date(date) : date
+    if (isNaN(d.getTime())) return ''
+
+    return `${d.getMonth() + 1}/${d.getDate()}`
+  } catch {
+    return ''
+  }
+}
+
+/**
  * 格式化日期為顯示格式 (同 formatDateTW)
  * @param date - ISO 字串或 Date 物件
  * @returns 2024/1/15 格式的日期字串

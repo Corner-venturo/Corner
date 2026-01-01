@@ -11,6 +11,7 @@ import {
 import { useUserStore } from '@/stores/user-store'
 import { cn } from '@/lib/utils'
 import { User, DollarSign, Shield, X, Edit, Save, Check } from 'lucide-react'
+import { CurrencyCell } from '@/components/table-cells'
 import { alert } from '@/lib/ui/alert-dialog'
 
 // 導入分頁組件
@@ -56,10 +57,10 @@ export function EmployeeExpandedView({ employee_id, onClose }: EmployeeExpandedV
         const baseSalary = employee.salary_info?.base_salary || 0
         return (
           <div className="flex items-center gap-4 text-morandi-muted">
-            <span>底薪：NT$ {baseSalary.toLocaleString()}</span>
-            <span>津貼：NT$ {totalAllowances.toLocaleString()}</span>
-            <span className="text-morandi-primary font-medium">
-              總薪資：NT$ {(baseSalary + totalAllowances).toLocaleString()}
+            <span className="flex items-center gap-1">底薪：<CurrencyCell amount={baseSalary} /></span>
+            <span className="flex items-center gap-1">津貼：<CurrencyCell amount={totalAllowances} /></span>
+            <span className="text-morandi-primary font-medium flex items-center gap-1">
+              總薪資：<CurrencyCell amount={baseSalary + totalAllowances} />
             </span>
           </div>
         )

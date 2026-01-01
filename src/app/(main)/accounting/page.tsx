@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select'
 import { useAccountingStore } from '@/stores/accounting-store'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 
 import { toast } from 'sonner'
 
@@ -219,14 +220,15 @@ export default function AccountingPage() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>本月支出</CardDescription>
-                <CardTitle className="text-2xl text-foreground">
-                  NT$ {(stats?.monthly_expense || 0).toLocaleString()}
-                </CardTitle>
+                <div className="text-2xl text-foreground">
+                  <CurrencyCell amount={stats?.monthly_expense || 0} />
+                </div>
               </CardHeader>
               <CardContent>
                 {expenseDifference > 0 && (
-                  <div className="text-xs text-morandi-green">
-                    ↓ 比上月省 NT$ {expenseDifference.toLocaleString()}
+                  <div className="text-xs text-morandi-green flex items-center gap-1">
+                    <span>↓ 比上月省</span>
+                    <CurrencyCell amount={expenseDifference} variant="income" />
                   </div>
                 )}
               </CardContent>
@@ -236,9 +238,9 @@ export default function AccountingPage() {
             <Card>
               <CardHeader>
                 <CardDescription>本月收入</CardDescription>
-                <CardTitle className="text-2xl text-morandi-green">
-                  NT$ {(stats?.monthly_income || 0).toLocaleString()}
-                </CardTitle>
+                <div className="text-2xl">
+                  <CurrencyCell amount={stats?.monthly_income || 0} variant="income" />
+                </div>
               </CardHeader>
             </Card>
 
@@ -289,16 +291,12 @@ export default function AccountingPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span
-                          className={cn(
-                            'font-bold text-lg',
-                            transaction.type === 'expense'
-                              ? 'text-morandi-red'
-                              : 'text-morandi-green'
-                          )}
-                        >
-                          {transaction.type === 'expense' ? '-' : '+'}NT${' '}
-                          {transaction.amount.toLocaleString()}
+                        <span className="font-bold text-lg">
+                          <CurrencyCell
+                            amount={transaction.amount}
+                            variant={transaction.type === 'expense' ? 'expense' : 'income'}
+                            showSign
+                          />
                         </span>
                         <Button variant="ghost" size="iconSm">
                           <Edit3 size={16} />
@@ -326,19 +324,21 @@ export default function AccountingPage() {
           <Card>
             <CardHeader>
               <CardDescription>本月支出</CardDescription>
-              <CardTitle className="text-3xl">
-                NT$ {(stats?.monthly_expense || 0).toLocaleString()}
-              </CardTitle>
+              <div className="text-3xl">
+                <CurrencyCell amount={stats?.monthly_expense || 0} />
+              </div>
             </CardHeader>
             <CardContent className="text-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-morandi-green">
                   <TrendingUp size={14} />
-                  <span>收入 NT$ {(stats?.monthly_income || 0).toLocaleString()}</span>
+                  <span className="flex items-center gap-1">
+                    收入 <CurrencyCell amount={stats?.monthly_income || 0} variant="income" />
+                  </span>
                 </div>
                 {expenseDifference > 0 && (
-                  <span className="text-morandi-green">
-                    ↓ 省 NT$ {expenseDifference.toLocaleString()}
+                  <span className="text-morandi-green flex items-center gap-1">
+                    ↓ 省 <CurrencyCell amount={expenseDifference} variant="income" />
                   </span>
                 )}
               </div>
@@ -493,16 +493,12 @@ export default function AccountingPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span
-                          className={cn(
-                            'font-bold text-lg',
-                            transaction.type === 'expense'
-                              ? 'text-morandi-red'
-                              : 'text-morandi-green'
-                          )}
-                        >
-                          {transaction.type === 'expense' ? '-' : '+'}NT${' '}
-                          {transaction.amount.toLocaleString()}
+                        <span className="font-bold text-lg">
+                          <CurrencyCell
+                            amount={transaction.amount}
+                            variant={transaction.type === 'expense' ? 'expense' : 'income'}
+                            showSign
+                          />
                         </span>
                         <Button variant="ghost" size="iconSm">
                           <Edit3 size={14} />

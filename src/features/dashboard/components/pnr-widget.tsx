@@ -25,6 +25,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DateCell } from '@/components/table-cells'
 import {
   parseAmadeusPNR,
   isUrgent,
@@ -153,17 +154,6 @@ export function PNRWidget() {
       setIsSaving(false)
     }
   }, [parsedPNR, rawPNR, user, createPNR])
-
-  // 格式化日期
-  const formatDeadline = (date: Date | null) => {
-    if (!date) return null
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }
-    return date.toLocaleDateString('zh-TW', options)
-  }
 
   // 計算剩餘天數
   const getDaysRemaining = (date: Date | null) => {
@@ -352,7 +342,7 @@ TK TL20JAN/1200`}
                           出票期限
                         </span>
                       </div>
-                      <p
+                      <div
                         className={cn(
                           'text-sm font-bold',
                           isUrgent(parsedPNR.ticketingDeadline)
@@ -360,11 +350,21 @@ TK TL20JAN/1200`}
                             : 'text-morandi-primary'
                         )}
                       >
-                        {formatDeadline(parsedPNR.ticketingDeadline)}
+                        <DateCell
+                          date={parsedPNR.ticketingDeadline}
+                          format="short"
+                          showIcon={false}
+                          className={cn(
+                            'inline-flex',
+                            isUrgent(parsedPNR.ticketingDeadline)
+                              ? 'text-status-danger'
+                              : 'text-morandi-primary'
+                          )}
+                        />
                         {isUrgent(parsedPNR.ticketingDeadline) && (
                           <span className="ml-2 text-xs">(緊急！)</span>
                         )}
-                      </p>
+                      </div>
                     </div>
                   )}
 

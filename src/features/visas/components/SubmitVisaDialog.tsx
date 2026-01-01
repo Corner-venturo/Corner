@@ -4,6 +4,7 @@ import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
+import { CurrencyCell } from '@/components/table-cells'
 import { useVendorCostStore, useVisaStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
@@ -202,8 +203,8 @@ export function SubmitVisaDialog({
                       <span className="text-morandi-secondary ml-2">× {visas.length}</span>
                     </span>
                     {historyCost && (
-                      <span className="text-xs text-morandi-green">
-                        歷史成本: ${historyCost.cost.toLocaleString()}
+                      <span className="text-xs text-morandi-green flex items-center gap-1">
+                        歷史成本: <CurrencyCell amount={historyCost.cost} className="text-xs text-morandi-green" />
                       </span>
                     )}
                     {vendor && !historyCost && (
@@ -238,9 +239,7 @@ export function SubmitVisaDialog({
         {/* 總計 */}
         <div className="border-t border-border pt-3 flex justify-between items-center">
           <span className="text-sm text-morandi-secondary">總成本</span>
-          <span className="text-lg font-semibold text-morandi-primary">
-            ${Object.values(costs).reduce((sum, c) => sum + c, 0).toLocaleString()}
-          </span>
+          <CurrencyCell amount={Object.values(costs).reduce((sum, c) => sum + c, 0)} className="text-lg font-semibold text-morandi-primary" />
         </div>
       </div>
     </FormDialog>

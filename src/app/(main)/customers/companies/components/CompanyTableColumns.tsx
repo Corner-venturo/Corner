@@ -8,7 +8,7 @@ import type { TableColumn } from '@/components/ui/enhanced-table'
 import type { Company } from '@/stores'
 import { PAYMENT_METHOD_LABELS, VIP_LEVEL_LABELS } from '@/types/company.types'
 import { Badge } from '@/components/ui/badge'
-import { formatDate } from '@/lib/utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface UseCompanyColumnsProps {
   onView: (company: Company) => void
@@ -128,9 +128,10 @@ export function useCompanyColumns({ onView }: UseCompanyColumnsProps) {
           const limit = value as number
           return (
             <div className="text-right text-sm">
-              <span className="text-morandi-secondary">
-                NT$ {limit.toLocaleString()}
-              </span>
+              <CurrencyCell
+                amount={limit}
+                className="text-morandi-secondary"
+              />
             </div>
           )
         },
@@ -140,7 +141,11 @@ export function useCompanyColumns({ onView }: UseCompanyColumnsProps) {
         label: '建立日期',
         width: '120px',
         render: (value) => (
-          <span className="text-sm text-morandi-muted">{formatDate(value as string)}</span>
+          <DateCell
+            date={value as string}
+            showIcon={false}
+            className="text-sm text-morandi-muted"
+          />
         ),
       },
     ],

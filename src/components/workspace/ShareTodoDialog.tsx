@@ -17,6 +17,8 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Send, CheckCircle2, AlertCircle, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
+import { DateCell } from '@/components/table-cells'
+import { formatDateTW } from '@/lib/utils/format-date'
 import type { Todo } from '@/stores/types'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -74,7 +76,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         `📋 **共享代辦事項**\n\n` +
         `**標題：** ${selectedTodo.title}\n` +
         `**優先級：** ${'⭐'.repeat(selectedTodo.priority)}\n` +
-        `**截止日期：** ${selectedTodo.deadline ? new Date(selectedTodo.deadline).toLocaleDateString('zh-TW') : '無'}\n` +
+        `**截止日期：** ${selectedTodo.deadline ? formatDateTW(new Date(selectedTodo.deadline)) : '無'}\n` +
         `**狀態：** ${getStatusLabel(selectedTodo.status)}\n` +
         (assigneeInfo ? `**指派給：** ${assigneeInfo.display_name}\n` : '') +
         `\n👉 [查看詳細](#/todos/${selectedTodo.id})`
@@ -166,8 +168,8 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                               {'⭐'.repeat(todo.priority)}
                             </span>
                             {todo.deadline && (
-                              <span className="text-xs text-morandi-secondary">
-                                📅 {new Date(todo.deadline).toLocaleDateString('zh-TW')}
+                              <span className="text-xs text-morandi-secondary flex items-center gap-1">
+                                <DateCell date={todo.deadline} showIcon={false} className="text-xs text-morandi-secondary" />
                               </span>
                             )}
                             {todo.assignee && (
@@ -248,9 +250,10 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
                   </span>
                 </p>
                 {selectedTodo.deadline && (
-                  <p className="text-morandi-secondary">
-                    截止日期：{new Date(selectedTodo.deadline).toLocaleDateString('zh-TW')}
-                  </p>
+                  <div className="text-morandi-secondary flex items-center gap-1">
+                    <span>截止日期：</span>
+                    <DateCell date={selectedTodo.deadline} showIcon={false} className="text-morandi-secondary" />
+                  </div>
                 )}
                 {selectedAssignee && (
                   <p className="text-morandi-secondary">

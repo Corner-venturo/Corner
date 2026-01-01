@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Plus, X } from 'lucide-react'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface QuickQuoteItem {
   id: string
@@ -244,8 +245,8 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                           placeholder=""
                         />
                       </td>
-                      <td className="px-3 py-2 text-right font-medium">
-                        {item.amount.toLocaleString()}
+                      <td className="px-3 py-2 text-right">
+                        <CurrencyCell amount={item.amount} className="font-medium justify-end" />
                       </td>
                       <td className="px-3 py-2">
                         <Input
@@ -282,9 +283,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           <div className="grid grid-cols-3 gap-4 bg-morandi-container/10 p-4 rounded-md">
             <div>
               <label className="text-sm font-medium text-morandi-primary">應收金額</label>
-              <div className="mt-1 text-lg font-bold text-morandi-primary">
-                NT$ {totalAmount.toLocaleString()}
-              </div>
+              <CurrencyCell amount={totalAmount} className="mt-1 text-lg font-bold" />
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">已收金額</label>
@@ -302,13 +301,11 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
             </div>
             <div>
               <label className="text-sm font-medium text-morandi-primary">應收餘額</label>
-              <div
-                className={`mt-1 text-lg font-bold ${
-                  balanceAmount > 0 ? 'text-morandi-red' : 'text-morandi-green'
-                }`}
-              >
-                NT$ {balanceAmount.toLocaleString()}
-              </div>
+              <CurrencyCell
+                amount={balanceAmount}
+                variant={balanceAmount > 0 ? 'expense' : 'income'}
+                className="mt-1 text-lg font-bold"
+              />
             </div>
           </div>
 

@@ -5,6 +5,7 @@ import { Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { formatDateTW, formatDateTime } from '@/lib/utils/format-date'
+import { formatCurrency as formatCurrencyUtil } from '@/lib/utils/format-currency'
 import {
   getStatusColor,
   getStatusLabel,
@@ -112,16 +113,10 @@ function calculateDuration(start: Date, end: Date): number {
 }
 
 /**
- * 格式化金額
+ * 格式化金額（使用統一的格式化工具）
  */
 function formatCurrency(amount: number, currency: 'TWD' | 'USD' | 'CNY' = 'TWD'): string {
-  const prefix = {
-    TWD: 'NT$ ',
-    USD: '$ ',
-    CNY: '¥ ',
-  }[currency]
-
-  return `${prefix}${Math.abs(amount).toLocaleString()}`
+  return formatCurrencyUtil(amount, currency)
 }
 
 // ========== 組件 ==========

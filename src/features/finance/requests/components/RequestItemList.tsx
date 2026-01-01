@@ -11,6 +11,7 @@ import {
 import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus } from 'lucide-react'
 import { RequestItem, categoryOptions } from '../types'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface SupplierOption {
   id: string
@@ -155,9 +156,7 @@ export function EditableRequestItemList({
 
             {/* Subtotal */}
             <div className="text-right pr-2">
-              <span className="text-sm font-medium text-morandi-gold">
-                NT$ {(item.unit_price * item.quantity).toLocaleString()}
-              </span>
+              <CurrencyCell amount={item.unit_price * item.quantity} className="text-morandi-gold" />
             </div>
 
             {/* Actions */}
@@ -210,9 +209,7 @@ export function EditableRequestItemList({
       {/* Total */}
       <div className="flex justify-end items-center gap-6 pt-4 mt-2">
         <span className="text-sm text-morandi-secondary">總金額</span>
-        <span className="text-lg font-semibold text-morandi-gold">
-          NT$ {total_amount.toLocaleString()}
-        </span>
+        <CurrencyCell amount={total_amount} className="text-lg font-semibold text-morandi-gold" />
       </div>
     </div>
   )

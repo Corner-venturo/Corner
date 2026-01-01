@@ -8,12 +8,7 @@ import type { ItineraryVersionRecord } from '@/stores/types'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
-
-// 移除 HTML 標籤
-const stripHtml = (html: string | undefined): string => {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string

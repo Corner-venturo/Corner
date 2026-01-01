@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react'
 import { FileSignature, Save, Printer, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DateCell } from '@/components/table-cells'
 import {
   Dialog,
   DialogContent,
@@ -110,7 +111,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               <div>
                 <div className="text-xs text-morandi-secondary">出發日期</div>
                 <div className="text-sm text-morandi-primary font-medium">
-                  {new Date(tour.departure_date).toLocaleDateString()}
+                  <DateCell date={tour.departure_date} showIcon={false} />
                 </div>
               </div>
               <div>
@@ -188,7 +189,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
                   <div className="text-xs text-morandi-secondary">建立時間</div>
                   <div className="text-sm text-morandi-primary font-medium">
                     {tour.contract_created_at
-                      ? new Date(tour.contract_created_at).toLocaleString()
+                      ? <DateCell date={tour.contract_created_at} format="time" showIcon={false} />
                       : '-'}
                   </div>
                 </div>

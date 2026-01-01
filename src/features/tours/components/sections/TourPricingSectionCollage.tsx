@@ -81,7 +81,7 @@ export function TourPricingSectionCollage({ data, viewMode = 'desktop' }: TourPr
           {/* 左側：價格卡片區 */}
           <div className={`${isMobile ? '' : 'lg:col-span-7'} flex flex-col gap-16 relative`}>
             {/* 背景裝飾 */}
-            <div className="absolute -inset-10 bg-morandi-container/50 transform rotate-1 rounded-3xl border-2 border-dashed border-border -z-10" />
+            <div className="absolute -inset-10 bg-morandi-container/50 transform rotate-1 rounded-2xl border-2 border-dashed border-border -z-10" />
 
             {/* 手寫標題 */}
             <div

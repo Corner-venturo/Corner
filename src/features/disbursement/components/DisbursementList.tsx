@@ -14,7 +14,7 @@ import { PaymentRequest, DisbursementOrder } from '../types'
 import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
 import { cn } from '@/lib/utils'
-import { formatDateTW } from '@/lib/utils/format-date'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface PendingListProps {
   data: PaymentRequest[]
@@ -43,8 +43,8 @@ export function PendingList({
       {selectedRequests.length > 0 && (
         <div className="bg-morandi-gold/10 border border-morandi-gold/20 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-morandi-secondary">
-              已選 {selectedRequests.length} 筆，總金額 NT$ {selectedAmount.toLocaleString()}
+            <span className="text-sm text-morandi-secondary flex items-center gap-1">
+              已選 {selectedRequests.length} 筆，總金額 <CurrencyCell amount={selectedAmount} />
             </span>
             <Button
               onClick={onAddToDisbursement}
@@ -59,11 +59,13 @@ export function PendingList({
       {/* 統計資訊 */}
       {data.length > 0 && (
         <div className="mb-4 flex items-center justify-end">
-          <div className="text-sm text-morandi-secondary">
+          <div className="text-sm text-morandi-secondary flex items-center gap-1">
             {data.length} 筆 • 下次出帳日：
-            {typeof nextThursday === 'string'
-              ? nextThursday
-              : formatDateTW(nextThursday)}
+            <DateCell
+              date={nextThursday}
+              showIcon={false}
+              className="inline-flex text-morandi-secondary"
+            />
           </div>
         </div>
       )}
@@ -114,9 +116,10 @@ export function CurrentOrderList({
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-right">
-            <p className="text-2xl font-bold text-morandi-primary">
-              NT$ {currentOrder.amount.toLocaleString()}
-            </p>
+            <CurrencyCell
+              amount={currentOrder.amount}
+              className="text-2xl font-bold text-morandi-primary"
+            />
           </div>
           <Button
             variant="outline"
@@ -248,9 +251,10 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
         <div className="text-sm text-morandi-secondary">
           共 {filteredGroups.length} 個供應商
         </div>
-        <div className="text-lg font-bold text-morandi-gold">
-          總計 NT$ {totalAmount.toLocaleString()}
-        </div>
+        <CurrencyCell
+          amount={totalAmount}
+          className="text-lg font-bold text-morandi-gold"
+        />
       </div>
 
       {/* 供應商卡片列表 */}
@@ -279,9 +283,10 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-morandi-gold">
-                  NT$ {group.total.toLocaleString()}
-                </p>
+                <CurrencyCell
+                  amount={group.total}
+                  className="text-lg font-bold text-morandi-gold"
+                />
               </div>
             </div>
 
@@ -317,11 +322,11 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                           {item.description || '-'}
                         </td>
                         <td className="py-2 px-4 text-right">
-                          NT$ {(item.unit_price || 0).toLocaleString()}
+                          <CurrencyCell amount={item.unit_price || 0} />
                         </td>
                         <td className="py-2 px-4 text-right">{item.quantity}</td>
-                        <td className="py-2 px-4 text-right font-medium text-morandi-gold">
-                          NT$ {(item.subtotal || 0).toLocaleString()}
+                        <td className="py-2 px-4 text-right">
+                          <CurrencyCell amount={item.subtotal || 0} className="font-medium text-morandi-gold" />
                         </td>
                       </tr>
                     ))}
@@ -331,8 +336,8 @@ export function SupplierGroupList({ groups, searchTerm }: SupplierGroupListProps
                       <td colSpan={6} className="py-2 px-4 text-right font-semibold">
                         小計
                       </td>
-                      <td className="py-2 px-4 text-right font-bold text-morandi-gold">
-                        NT$ {group.total.toLocaleString()}
+                      <td className="py-2 px-4 text-right">
+                        <CurrencyCell amount={group.total} className="font-bold text-morandi-gold" />
                       </td>
                     </tr>
                   </tfoot>

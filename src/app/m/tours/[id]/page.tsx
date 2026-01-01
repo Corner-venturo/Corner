@@ -16,6 +16,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateCompact } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import { MemberCard } from '@/components/mobile/cards/MemberCard'
 import { PaymentCard } from '@/components/mobile/cards/PaymentCard'
@@ -147,11 +148,6 @@ function calculateNights(start: string, end: string): number {
   return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return `${date.getMonth() + 1}/${date.getDate()}`
-}
 
 export default function TourDetailPage() {
   const params = useParams()
@@ -465,7 +461,7 @@ export default function TourDetailPage() {
                   <Calendar size={16} className="text-morandi-secondary" />
                   <span className="text-morandi-secondary">出發日期</span>
                   <span className="ml-auto text-morandi-primary">
-                    {formatDate(tour.departure_date)} - {formatDate(tour.return_date)}
+                    {formatDateCompact(tour.departure_date)} - {formatDateCompact(tour.return_date)}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

@@ -3,12 +3,7 @@
 import React from 'react'
 import { Combobox } from '@/components/ui/combobox'
 import type { Itinerary, Quote } from '@/stores/types'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 interface TourDocumentLinksProps {
   availableItineraries: Itinerary[]

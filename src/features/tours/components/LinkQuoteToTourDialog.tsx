@@ -21,12 +21,7 @@ import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {

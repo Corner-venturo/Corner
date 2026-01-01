@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -33,16 +34,37 @@ const RequestDetailDialog = dynamic(
 )
 
 export default function RequestsPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const { payment_requests, loadPaymentRequests } = usePayments()
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null)
 
+  // 讀取 URL 參數（從快速請款按鈕傳入）
+  const urlTourId = searchParams.get('tour_id')
+  const urlOrderId = searchParams.get('order_id')
+
   // 載入資料（只執行一次）
   useEffect(() => {
     loadPaymentRequests()
-     
   }, [])
+
+  // 如果有 URL 參數，自動開啟新增對話框
+  useEffect(() => {
+    if (urlTourId) {
+      setIsAddDialogOpen(true)
+    }
+  }, [urlTourId])
+
+  // 當對話框關閉時，清除 URL 參數
+  const handleAddDialogClose = (open: boolean) => {
+    setIsAddDialogOpen(open)
+    if (!open && urlTourId) {
+      // 清除 URL 參數，避免重新開啟
+      router.replace('/finance/requests')
+    }
+  }
 
   const { tableColumns, filteredAndSortedRequests, handleSort, handleFilter } =
     useRequestTable(payment_requests)
@@ -87,7 +109,12 @@ export default function RequestsPage() {
         />
       </div>
 
-      <AddRequestDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
+      <AddRequestDialog
+        open={isAddDialogOpen}
+        onOpenChange={handleAddDialogClose}
+        defaultTourId={urlTourId || undefined}
+        defaultOrderId={urlOrderId || undefined}
+      />
 
       <BatchAllocateRequestDialog open={isBatchDialogOpen} onOpenChange={setIsBatchDialogOpen} />
 

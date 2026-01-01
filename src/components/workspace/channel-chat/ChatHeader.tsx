@@ -9,12 +9,7 @@ import { Users, MapPin, CircleDollarSign, ExternalLink, MessageCircle, Megaphone
 import { useQuoteStore } from '@/stores'
 import { cn } from '@/lib/utils'
 import type { ChatMode, TravelerConversationType } from './useTravelerMode'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 interface ChatHeaderProps {
   showMemberSidebar: boolean

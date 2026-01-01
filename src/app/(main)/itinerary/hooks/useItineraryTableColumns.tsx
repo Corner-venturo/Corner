@@ -4,14 +4,10 @@ import { useMemo, useCallback } from 'react'
 import { MapPin, Eye, Copy, Archive, Trash2, RotateCcw, Building2, CheckCircle2, Link2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TableColumn } from '@/components/ui/enhanced-table'
+import { DateCell } from '@/components/table-cells'
 import type { Itinerary, Employee, Tour } from '@/stores/types'
 import { alertSuccess, alertError } from '@/lib/ui/alert-dialog'
-
-// 移除 HTML 標籤，只保留純文字
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
 
 interface UseItineraryTableColumnsProps {
   countries: Array<{ id: string; name: string }>
@@ -192,9 +188,7 @@ export function useItineraryTableColumns({
         label: '建立時間',
         sortable: true,
         render: (_value, itinerary) => (
-          <span className="text-sm text-morandi-muted">
-            {new Date(itinerary.created_at).toLocaleDateString('zh-TW')}
-          </span>
+          <DateCell date={itinerary.created_at} showIcon={false} className="text-morandi-muted" />
         ),
       },
       {

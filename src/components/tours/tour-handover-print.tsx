@@ -2,6 +2,7 @@
 
 import { Tour } from '@/types/tour.types'
 import { Member as OrderMember } from '@/stores/types'
+import { DateCell } from '@/components/table-cells'
 
 interface MemberFieldValue {
   [memberId: string]: {
@@ -201,7 +202,7 @@ export function TourHandoverPrint({
 
       {/* 頁尾 */}
       <div className="mt-8 pt-4 border-t border-morandi-gold/30 text-xs text-morandi-text-light text-center">
-        <p>列印日期：{new Date().toLocaleDateString('zh-TW')}</p>
+        <p className="flex items-center justify-center gap-1">列印日期：<DateCell date={new Date()} showIcon={false} /></p>
       </div>
     </div>
   )

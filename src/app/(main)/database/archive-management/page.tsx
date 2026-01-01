@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
-import { DateCell, ActionCell } from '@/components/table-cells'
+import { DateCell, CurrencyCell, ActionCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
@@ -363,9 +363,11 @@ export default function ArchiveManagementPage() {
       label: '金額',
       width: '120px',
       render: (_: unknown, row: OrphanedQuote) => (
-        <span className="text-sm text-morandi-secondary">
-          {row.total_amount ? `NT$ ${row.total_amount.toLocaleString()}` : '-'}
-        </span>
+        row.total_amount ? (
+          <CurrencyCell amount={row.total_amount} className="text-sm text-morandi-secondary" />
+        ) : (
+          <span className="text-sm text-morandi-secondary">-</span>
+        )
       ),
     },
     {

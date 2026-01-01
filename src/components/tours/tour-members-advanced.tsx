@@ -69,7 +69,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
     getFieldValue,
   } = useCustomFields(tour.id)
 
-  const { roomAssignments, loadRoomAssignments } = useRoomAssignments(tour.id)
+  const { roomAssignments, memberRoomMap, loadRoomAssignments } = useRoomAssignments(tour.id)
   const { vehicleAssignments, loadVehicleAssignments } = useVehicleAssignments(tour.id)
 
   // Load custom fields and assignments
@@ -80,7 +80,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
     loadVehicleAssignments()
   }, [tour.id])
 
-  // Drag and drop handler
+  // Drag and drop handler - 同房成員一起移動
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
@@ -89,17 +89,132 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
     }
 
     setMembers(items => {
-      const oldIndex = items.findIndex(item => item.id === active.id)
-      const newIndex = items.findIndex(item => item.id === over.id)
+      const draggedId = active.id as string
+      const targetId = over.id as string
 
-      return arrayMove(items, oldIndex, newIndex)
+      // 找出被拖動成員的 room_id
+      const draggedRoomId = memberRoomMap[draggedId]
+
+      // 如果沒有分房，就單獨移動
+      if (!draggedRoomId) {
+        const oldIndex = items.findIndex(item => item.id === draggedId)
+        const newIndex = items.findIndex(item => item.id === targetId)
+        return arrayMove(items, oldIndex, newIndex)
+      }
+
+      // 找出所有同房成員的 ID
+      const roommateIds = Object.entries(memberRoomMap)
+        .filter(([, roomId]) => roomId === draggedRoomId)
+        .map(([memberId]) => memberId)
+
+      // 找出同房成員在陣列中的索引（按目前順序排列）
+      const roommateIndices = roommateIds
+        .map(id => items.findIndex(item => item.id === id))
+        .filter(idx => idx !== -1)
+        .sort((a, b) => a - b)
+
+      // 如果只有一個人，直接移動
+      if (roommateIndices.length <= 1) {
+        const oldIndex = items.findIndex(item => item.id === draggedId)
+        const newIndex = items.findIndex(item => item.id === targetId)
+        return arrayMove(items, oldIndex, newIndex)
+      }
+
+      // 取出同房成員（保持他們之間的相對順序）
+      const roommates = roommateIndices.map(idx => items[idx])
+
+      // 移除同房成員，建立新陣列
+      const remaining = items.filter(item => !roommateIds.includes(item.id))
+
+      // 找出目標位置在剩餘陣列中的索引
+      let insertIndex = remaining.findIndex(item => item.id === targetId)
+
+      // 如果目標是同房成員之一，找最近的非同房成員作為參考
+      if (insertIndex === -1) {
+        const targetOriginalIndex = items.findIndex(item => item.id === targetId)
+        // 往後找第一個非同房成員
+        for (let i = targetOriginalIndex + 1; i < items.length; i++) {
+          const idx = remaining.findIndex(item => item.id === items[i].id)
+          if (idx !== -1) {
+            insertIndex = idx
+            break
+          }
+        }
+        // 如果找不到，放到最後
+        if (insertIndex === -1) {
+          insertIndex = remaining.length
+        }
+      }
+
+      // 判斷是往前還是往後移動
+      const firstRoommateOriginalIndex = roommateIndices[0]
+      const targetOriginalIndex = items.findIndex(item => item.id === targetId)
+
+      if (targetOriginalIndex > firstRoommateOriginalIndex) {
+        // 往後移動，插入到目標之後
+        insertIndex = insertIndex + 1
+      }
+
+      // 插入同房成員群組
+      const result = [
+        ...remaining.slice(0, insertIndex),
+        ...roommates,
+        ...remaining.slice(insertIndex),
+      ]
+
+      return result
     })
 
-    toast.success('順序已更新')
+    toast.success('順序已更新（同房成員一起移動）')
   }
 
   const handleColumnVisibilityChange = (key: keyof typeof visibleColumns, value: boolean) => {
     setVisibleColumns(prev => ({ ...prev, [key]: value }))
+  }
+
+  // 分房後自動排序 - 讓同房成員相鄰
+  const handleRoomManagerClose = async () => {
+    // 重新載入房間分配，取得最新的 memberRoomMap
+    const newMemberRoomMap = await loadRoomAssignments()
+
+    if (Object.keys(newMemberRoomMap).length === 0) {
+      // 沒有分房資料，不需要排序
+      return
+    }
+
+    setMembers(currentMembers => {
+      // 取得所有房間 ID（按照 display_order 排序，因為 loadRoomAssignments 已經處理）
+      const roomIds = [...new Set(Object.values(newMemberRoomMap))]
+
+      // 分組：已分房的成員按房間分組，未分房的成員放最後
+      const roomGroups: Record<string, typeof currentMembers> = {}
+      const unassigned: typeof currentMembers = []
+
+      currentMembers.forEach(member => {
+        const roomId = newMemberRoomMap[member.id]
+        if (roomId) {
+          if (!roomGroups[roomId]) {
+            roomGroups[roomId] = []
+          }
+          roomGroups[roomId].push(member)
+        } else {
+          unassigned.push(member)
+        }
+      })
+
+      // 按房間順序組合成員
+      const sortedMembers: typeof currentMembers = []
+      roomIds.forEach(roomId => {
+        if (roomGroups[roomId]) {
+          sortedMembers.push(...roomGroups[roomId])
+        }
+      })
+      sortedMembers.push(...unassigned)
+
+      return sortedMembers
+    })
+
+    toast.success('已依分房結果自動排序')
   }
 
   if (loading) {
@@ -250,6 +365,7 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
         members={members}
         open={showRoomManager}
         onOpenChange={setShowRoomManager}
+        onClose={handleRoomManagerClose}
       />
 
       <TourVehicleManager

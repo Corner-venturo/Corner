@@ -19,7 +19,7 @@ import { Check, FileText, Plus, X, Trash2 } from 'lucide-react'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
 import { cn } from '@/lib/utils'
-import { formatDateTW } from '@/lib/utils/format-date'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -196,9 +196,9 @@ export function DisbursementDetailDialog({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="text-xl">出納單 {order.order_number}</DialogTitle>
-              <p className="text-sm text-morandi-muted mt-1">
-                出帳日期：{order.disbursement_date ? formatDateTW(order.disbursement_date) : '-'}
-              </p>
+              <div className="text-sm text-morandi-muted mt-1 flex items-center gap-1">
+                出帳日期：<DateCell date={order.disbursement_date} showIcon={false} className="text-morandi-muted" />
+              </div>
             </div>
             <Badge className={cn('text-white', status.color)}>
               {status.label}
@@ -210,16 +210,15 @@ export function DisbursementDetailDialog({
           {/* 基本資訊 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
             <InfoItem label="出納單號" value={order.order_number || '-'} />
-            <InfoItem
-              label="出帳日期"
-              value={order.disbursement_date ? formatDateTW(order.disbursement_date) : '-'}
-            />
+            <div>
+              <p className="text-xs text-morandi-muted mb-1">出帳日期</p>
+              <DateCell date={order.disbursement_date} showIcon={false} className="text-sm" />
+            </div>
             <InfoItem label="請款單數" value={`${order.payment_request_ids?.length || 0} 筆`} />
-            <InfoItem
-              label="總金額"
-              value={`NT$ ${(order.amount || 0).toLocaleString()}`}
-              highlight
-            />
+            <div>
+              <p className="text-xs text-morandi-muted mb-1">總金額</p>
+              <CurrencyCell amount={order.amount || 0} className="font-semibold text-morandi-gold" />
+            </div>
           </div>
 
           {/* 包含的請款單 */}
@@ -271,8 +270,8 @@ export function DisbursementDetailDialog({
                           {request.tour_name || '-'}
                         </td>
                         <td className="py-2 px-3 text-morandi-secondary">{request.created_by_name || '-'}</td>
-                        <td className="py-2 px-3 text-right font-medium text-morandi-gold">
-                          NT$ {(request.amount || 0).toLocaleString()}
+                        <td className="py-2 px-3 text-right">
+                          <CurrencyCell amount={request.amount || 0} className="font-medium text-morandi-gold" />
                         </td>
                         {order.status === 'pending' && (
                           <td className="py-2 px-3 text-center">
@@ -295,8 +294,8 @@ export function DisbursementDetailDialog({
                     <td colSpan={order.status === 'pending' ? 5 : 4} className="py-3 px-3 text-right font-semibold">
                       合計
                     </td>
-                    <td className="py-3 px-3 text-right font-bold text-morandi-gold">
-                      NT$ {(order.amount || 0).toLocaleString()}
+                    <td className="py-3 px-3 text-right">
+                      <CurrencyCell amount={order.amount || 0} className="font-bold text-morandi-gold" />
                     </td>
                   </tr>
                 </tfoot>
@@ -355,8 +354,8 @@ export function DisbursementDetailDialog({
                             </td>
                             <td className="py-2 px-2 font-medium text-morandi-primary">{request.code}</td>
                             <td className="py-2 px-2 text-morandi-secondary">{request.tour_code || '-'}</td>
-                            <td className="py-2 px-2 text-right text-morandi-gold">
-                              NT$ {(request.amount || 0).toLocaleString()}
+                            <td className="py-2 px-2 text-right">
+                              <CurrencyCell amount={request.amount || 0} className="text-morandi-gold" />
                             </td>
                           </tr>
                         ))}
@@ -365,14 +364,15 @@ export function DisbursementDetailDialog({
                   </div>
 
                   <div className="flex items-center justify-between mt-3">
-                    <p className="text-sm text-morandi-secondary">
+                    <p className="text-sm text-morandi-secondary flex items-center gap-1">
                       已選擇 {selectedToAdd.length} 筆，金額：
-                      <span className="font-semibold text-morandi-gold ml-1">
-                        NT$ {selectedToAdd.reduce((sum, id) => {
+                      <CurrencyCell
+                        amount={selectedToAdd.reduce((sum, id) => {
                           const req = payment_requests.find(r => r.id === id)
                           return sum + (req?.amount || 0)
-                        }, 0).toLocaleString()}
-                      </span>
+                        }, 0)}
+                        className="font-semibold text-morandi-gold"
+                      />
                     </p>
                     <Button
                       onClick={handleAddRequests}

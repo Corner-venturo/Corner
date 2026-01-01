@@ -268,7 +268,7 @@ export function ImagePositionEditor({
           className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
         >
           <Check size={16} className="mr-1" />
-          確定
+          套用
         </Button>
       </div>
     </div>

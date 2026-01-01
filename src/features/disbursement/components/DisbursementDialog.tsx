@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
+import { CurrencyCell } from '@/components/table-cells'
 import { FileText } from 'lucide-react'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { PaymentRequest } from '../types'
@@ -99,7 +100,7 @@ export function DisbursementDialog({
         sortable: true,
         render: (value: unknown) => (
           <div className="font-bold text-morandi-primary text-right">
-            NT$ {(value as number)?.toLocaleString() ?? 0}
+            <CurrencyCell amount={(value as number) ?? 0} />
           </div>
         ),
       },
@@ -138,7 +139,7 @@ export function DisbursementDialog({
                   <span className="text-sm text-morandi-secondary">
                     • 已選 {selectedRequests.length} 筆 •
                     <span className="font-bold text-morandi-primary ml-1">
-                      NT$ {selectedAmount.toLocaleString()}
+                      <CurrencyCell amount={selectedAmount} />
                     </span>
                   </span>
                 )}

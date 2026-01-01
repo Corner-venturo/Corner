@@ -24,12 +24,8 @@ import {
 } from 'lucide-react'
 import { useItineraryStore, useQuoteStore } from '@/stores'
 import type { Itinerary, Quote } from '@/stores/types'
-
-// 去除 HTML 標籤
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, '').trim()
-}
+import { stripHtml } from '@/lib/utils/string-utils'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface CreateTourSourceDialogProps {
   isOpen: boolean
@@ -295,9 +291,7 @@ export function CreateTourSourceDialog({
                             <span>{quote.days} 天</span>
                           )}
                           {quote.total_cost && (
-                            <span className="text-morandi-gold">
-                              NT$ {quote.total_cost.toLocaleString()}
-                            </span>
+                            <CurrencyCell amount={quote.total_cost} className="text-morandi-gold" />
                           )}
                         </div>
                       </div>

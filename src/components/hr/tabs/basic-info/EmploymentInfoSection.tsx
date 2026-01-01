@@ -3,6 +3,7 @@
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
+import { DateCell } from '@/components/table-cells'
 import { Employee } from '@/stores/types'
 import { BasicInfoFormData } from './types'
 
@@ -56,9 +57,9 @@ export function EmploymentInfoSection({
               placeholder="選擇日期"
             />
           ) : (
-            <p className="text-morandi-primary py-2">
-              {new Date(employee.job_info.hire_date).toLocaleDateString()}
-            </p>
+            <div className="py-2">
+              <DateCell date={employee.job_info.hire_date} showIcon={false} />
+            </div>
           )}
         </div>
       </div>

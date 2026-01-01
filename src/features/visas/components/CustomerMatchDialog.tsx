@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DateCell } from '@/components/table-cells'
 
 interface CustomerMatch {
   name: string
@@ -88,7 +89,7 @@ export function CustomerMatchDialog({
                         <div className="text-sm text-morandi-secondary space-x-3">
                           {customer.phone && <span>{customer.phone}</span>}
                           {customer.date_of_birth && (
-                            <span>{new Date(customer.date_of_birth).toLocaleDateString('zh-TW')}</span>
+                            <DateCell date={customer.date_of_birth} showIcon={false} className="inline text-sm text-morandi-secondary" />
                           )}
                           {customer.national_id && <span>{customer.national_id}</span>}
                         </div>

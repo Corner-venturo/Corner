@@ -22,7 +22,8 @@ interface PaymentRequestWithItems {
   items?: PaymentRequestItem[]
   [key: string]: unknown
 }
-import { Receipt, Calendar, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
+import { Receipt, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { useToast } from '@/components/ui/use-toast'
 import { generateUUID } from '@/lib/utils/uuid'
 
@@ -326,21 +327,21 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
       {showSummary && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6 text-sm">
-            <div>
+            <div className="flex items-center">
               <span className="text-morandi-secondary">總成本</span>
-              <span className="ml-2 font-semibold text-morandi-primary">NT$ {totalCosts.toLocaleString()}</span>
+              <CurrencyCell amount={totalCosts} className="ml-2 font-semibold text-morandi-primary" />
             </div>
-            <div>
+            <div className="flex items-center">
               <span className="text-morandi-secondary">已確認</span>
-              <span className="ml-2 font-semibold text-morandi-green">NT$ {confirmedCosts.toLocaleString()}</span>
+              <CurrencyCell amount={confirmedCosts} className="ml-2 font-semibold text-morandi-green" />
             </div>
-            <div>
+            <div className="flex items-center">
               <span className="text-morandi-secondary">待確認</span>
-              <span className="ml-2 font-semibold text-morandi-gold">NT$ {pendingCosts.toLocaleString()}</span>
+              <CurrencyCell amount={pendingCosts} className="ml-2 font-semibold text-morandi-gold" />
             </div>
-            <div>
+            <div className="flex items-center">
               <span className="text-morandi-secondary">預估利潤</span>
-              <span className="ml-2 font-semibold text-morandi-red">NT$ {Math.max(0, tour.total_revenue - totalCosts).toLocaleString()}</span>
+              <CurrencyCell amount={Math.max(0, tour.total_revenue - totalCosts)} className="ml-2 font-semibold text-morandi-red" />
             </div>
           </div>
           <Button
@@ -384,15 +385,10 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
                 className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-morandi-container/20"
               >
                 <div className="col-span-2">
-                  <div className="flex items-center text-sm text-morandi-primary">
-                    <Calendar size={14} className="mr-1 text-morandi-secondary" />
-                    {new Date(cost.created_at).toLocaleDateString()}
-                  </div>
+                  <DateCell date={cost.created_at} showIcon className="text-sm text-morandi-primary" />
                 </div>
                 <div className="col-span-2">
-                  <div className="font-medium text-morandi-red">
-                    NT$ {cost.amount.toLocaleString()}
-                  </div>
+                  <CurrencyCell amount={cost.amount} className="font-medium text-morandi-red" />
                 </div>
                 <div className="col-span-2">
                   <div className="flex items-center text-sm text-morandi-primary">

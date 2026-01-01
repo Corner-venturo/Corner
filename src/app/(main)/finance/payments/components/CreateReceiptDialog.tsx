@@ -17,6 +17,7 @@ import { Plus, Save, X } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
 import { Combobox } from '@/components/ui/combobox'
 import { useTourStore } from '@/stores'
+import { CurrencyCell } from '@/components/table-cells'
 import type { ReceiptItem, Order } from '@/stores'
 
 const RECEIPT_TYPES = {
@@ -170,8 +171,8 @@ export function CreateReceiptDialog({
                           <div className="font-medium">
                             {order.order_number} - {order.contact_person}
                           </div>
-                          <div className="text-sm text-morandi-secondary">
-                            待收: NT$ {order.remaining_amount?.toLocaleString() || 0}
+                          <div className="text-sm text-morandi-secondary flex items-center gap-1">
+                            待收: <CurrencyCell amount={order.remaining_amount || 0} />
                           </div>
                         </div>
                       </SelectItem>
@@ -185,11 +186,9 @@ export function CreateReceiptDialog({
                   <label className="text-sm font-medium text-morandi-primary mb-2 block">
                     待收金額
                   </label>
-                  <Input
-                    value={`NT$ ${selectedOrder.remaining_amount?.toLocaleString() || 0}`}
-                    disabled
-                    className="bg-morandi-container/30"
-                  />
+                  <div className="flex h-10 w-full rounded-md border border-input bg-morandi-container/30 px-3 py-2 text-sm">
+                    <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
+                  </div>
                 </div>
               )}
             </div>
@@ -223,9 +222,7 @@ export function CreateReceiptDialog({
           <div className="bg-morandi-container/20 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-lg font-semibold">總收款金額</span>
-              <span className="text-2xl font-bold text-morandi-gold">
-                NT$ {totalAmount.toLocaleString()}
-              </span>
+              <CurrencyCell amount={totalAmount} className="text-2xl font-bold text-morandi-gold" />
             </div>
           </div>
 

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { ArrowUpRight, ArrowDownRight, Plus, ChevronLeft, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -323,7 +324,9 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
           <SelectContent>
             {accounts.map(account => (
               <SelectItem key={account.id} value={account.id}>
-                {account.name} (NT$ {account.balance.toLocaleString()})
+                <span className="flex items-center gap-1">
+                  {account.name} (<CurrencyCell amount={account.balance} />)
+                </span>
               </SelectItem>
             ))}
           </SelectContent>

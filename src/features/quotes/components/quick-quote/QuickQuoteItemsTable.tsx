@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Trash2 } from 'lucide-react'
@@ -21,7 +21,16 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
   onRemoveItem,
   onUpdateItem,
 }) => {
+  // IME 組合輸入狀態追蹤
+  const isComposingRef = useRef(false)
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 組合輸入中按 Enter 不處理
+    if (e.key === 'Enter' && isComposingRef.current) {
+      e.preventDefault()
+      e.stopPropagation()
+      return
+    }
     if (e.key === 'Enter') {
       e.preventDefault()
       e.currentTarget.blur()
@@ -37,6 +46,27 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
     val = val.replace(/[－]/g, '-')
     return val
   }
+
+  // 處理文字欄位變更（支援 IME）
+  const handleTextChange = useCallback((
+    id: string,
+    field: 'description' | 'notes',
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // 組合輸入中不更新狀態
+    if (isComposingRef.current) return
+    onUpdateItem(id, field, e.target.value)
+  }, [onUpdateItem])
+
+  // 組合輸入結束時更新
+  const handleCompositionEnd = useCallback((
+    id: string,
+    field: 'description' | 'notes',
+    e: React.CompositionEvent<HTMLInputElement>
+  ) => {
+    isComposingRef.current = false
+    onUpdateItem(id, field, e.currentTarget.value)
+  }, [onUpdateItem])
 
   // 儲存格樣式
   const cellClass = "px-2 py-1.5 border border-morandi-gold/20"
@@ -74,8 +104,10 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                 <td className={cellClass}>
                   <input
                     value={item.description}
-                    onChange={e => onUpdateItem(item.id, 'description', e.target.value)}
+                    onChange={e => handleTextChange(item.id, 'description', e)}
                     onKeyDown={handleKeyDown}
+                    onCompositionStart={() => { isComposingRef.current = true }}
+                    onCompositionEnd={e => handleCompositionEnd(item.id, 'description', e)}
                     placeholder="項目說明"
                     disabled={!isEditing}
                     className={inputClass}
@@ -155,8 +187,10 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                 <td className={cellClass}>
                   <input
                     value={item.notes}
-                    onChange={e => onUpdateItem(item.id, 'notes', e.target.value)}
+                    onChange={e => handleTextChange(item.id, 'notes', e)}
                     onKeyDown={handleKeyDown}
+                    onCompositionStart={() => { isComposingRef.current = true }}
+                    onCompositionEnd={e => handleCompositionEnd(item.id, 'notes', e)}
                     placeholder="備註"
                     disabled={!isEditing}
                     className={inputClass}

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2 } from 'lucide-react'
+import { formatDateCompact } from '@/lib/utils/format-date'
 
 interface TableItem {
   id: string
@@ -24,16 +25,6 @@ interface DepartureTableProps {
   nameField: 'restaurant_name' | 'hotel_name' | 'venue_name' | 'item_name'
   nameLabel: string
   isEditing: boolean
-}
-
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return '-'
-  try {
-    const date = new Date(dateStr)
-    return `${date.getMonth() + 1}/${date.getDate()}`
-  } catch {
-    return dateStr
-  }
 }
 
 const formatMoney = (amount: number | null | undefined) => {
@@ -77,7 +68,7 @@ export function DepartureTable({ title, items, nameField, nameLabel, isEditing }
             ) : (
               items.map((item) => (
                 <tr key={item.id} className="border-t border-border">
-                  <td className="px-3 py-2 text-morandi-secondary">{formatDate(item.date)}</td>
+                  <td className="px-3 py-2 text-morandi-secondary">{formatDateCompact(item.date) || '-'}</td>
                   <td className="px-3 py-2 text-morandi-primary font-medium">{item[nameField] || '-'}</td>
                   <td className="px-3 py-2 text-right text-morandi-secondary">{formatMoney(item.unit_price)}</td>
                   <td className="px-3 py-2 text-right text-morandi-secondary">{item.quantity || '-'}</td>

@@ -6,6 +6,7 @@ import { Order } from '@/types'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, TrendingDown, CreditCard, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DateCell, CurrencyCell } from '@/components/table-cells'
 
 interface ReceiptPayment extends Payment {
   method?: string
@@ -73,8 +74,8 @@ export const PaymentRow = React.memo(function PaymentRow({
 }: PaymentRowProps) {
   return (
     <tr className="border-b border-border/30">
-      <td className="py-3 px-4 text-morandi-primary">
-        {new Date(payment.created_at).toLocaleDateString()}
+      <td className="py-3 px-4">
+        <DateCell date={payment.created_at} showIcon={false} className="text-morandi-primary" />
       </td>
       <td className="py-3 px-4">
         <div className="flex items-center space-x-2">
@@ -85,14 +86,12 @@ export const PaymentRow = React.memo(function PaymentRow({
         </div>
       </td>
       <td className="py-3 px-4">
-        <span
-          className={cn(
-            'font-medium',
-            payment.type === 'receipt' ? 'text-morandi-green' : 'text-morandi-red'
-          )}
-        >
-          {payment.type === 'receipt' ? '+' : '-'} NT$ {payment.amount.toLocaleString()}
-        </span>
+        <CurrencyCell
+          amount={payment.amount}
+          variant={payment.type === 'receipt' ? 'income' : 'expense'}
+          showSign
+          className="font-medium"
+        />
       </td>
       <td className="py-3 px-4 text-morandi-primary">{payment.description}</td>
       <td className="py-3 px-4">

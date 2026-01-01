@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface AdvanceRow {
   name: string
@@ -212,9 +213,7 @@ export function ShareAdvanceDialog({
         <DialogFooter className="pt-3 border-t border-morandi-gold/20 flex-col gap-3">
           <div className="flex items-center justify-between w-full">
             <span className="text-sm text-morandi-secondary">總計金額：</span>
-            <span className="text-lg font-semibold text-morandi-primary">
-              ${totalAmount.toLocaleString()}
-            </span>
+            <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-primary" />
           </div>
           <div className="flex gap-2 justify-end w-full">
             <button className="btn-morandi-secondary !py-2 !px-4 flex items-center gap-2" onClick={onClose}>

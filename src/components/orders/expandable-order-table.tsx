@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button'
 import { useTourStore, useOrderStore } from '@/stores'
 import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CurrencyCell } from '@/components/table-cells'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { useAuthStore } from '@/stores'
 import { Order } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { getPaymentStatusLabel } from '@/constants/status-maps'
 
 interface ExpandableOrderTableProps {
   orders: Order[]
@@ -203,7 +205,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                               : 'text-morandi-red'
                         )}
                       >
-                        {order.payment_status}
+                        {getPaymentStatusLabel(order.payment_status || '')}
                       </span>
                     </td>
 
@@ -351,22 +353,16 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                                       <div className="space-y-1">
                                         <div className="flex justify-between">
                                           <span className="text-morandi-secondary">總金額:</span>
-                                          <span className="text-morandi-primary font-medium">
-                                            NT$ {order.total_amount.toLocaleString()}
-                                          </span>
+                                          <CurrencyCell amount={order.total_amount} className="text-morandi-primary font-medium" />
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-morandi-secondary">已收款:</span>
-                                          <span className="text-morandi-green font-medium">
-                                            NT$ {order.paid_amount.toLocaleString()}
-                                          </span>
+                                          <CurrencyCell amount={order.paid_amount} variant="income" className="font-medium" />
                                         </div>
                                         {order.remaining_amount > 0 && (
                                           <div className="flex justify-between">
                                             <span className="text-morandi-secondary">餘款:</span>
-                                            <span className="text-morandi-red font-medium">
-                                              NT$ {order.remaining_amount.toLocaleString()}
-                                            </span>
+                                            <CurrencyCell amount={order.remaining_amount} variant="expense" className="font-medium" />
                                           </div>
                                         )}
                                         <div className="flex justify-between">
@@ -377,7 +373,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                                               getPaymentBadge(order.payment_status)
                                             )}
                                           >
-                                            {order.payment_status}
+                                            {getPaymentStatusLabel(order.payment_status || '')}
                                           </span>
                                         </div>
                                       </div>

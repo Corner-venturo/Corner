@@ -8,7 +8,7 @@ import { FileDown, FileText } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { TableColumn } from '@/components/ui/enhanced-table'
-import { DateCell, ActionCell } from '@/components/table-cells'
+import { DateCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface TourClosingReport {
@@ -346,22 +346,24 @@ export default function TourClosingReportPage() {
       key: 'total_revenue',
       label: '收入',
       sortable: true,
-      render: (value: unknown) => <span className="text-morandi-green">NT$ {Number(value).toLocaleString()}</span>,
+      render: (value: unknown) => <CurrencyCell amount={Number(value)} variant="income" />,
     },
     {
       key: 'total_cost',
       label: '成本',
       sortable: true,
-      render: (value: unknown) => <span className="text-morandi-red">NT$ {Number(value).toLocaleString()}</span>,
+      render: (value: unknown) => <CurrencyCell amount={Number(value)} variant="expense" />,
     },
     {
       key: 'net_profit',
       label: '淨利',
       sortable: true,
       render: (value: unknown) => (
-        <span className={Number(value) >= 0 ? 'text-morandi-primary font-bold' : 'text-morandi-red font-bold'}>
-          NT$ {Number(value).toLocaleString()}
-        </span>
+        <CurrencyCell
+          amount={Number(value)}
+          variant={Number(value) >= 0 ? 'default' : 'expense'}
+          className="font-bold"
+        />
       ),
     },
   ]

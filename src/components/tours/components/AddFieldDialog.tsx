@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { X } from 'lucide-react'
+import { X, Plus } from 'lucide-react'
 
 interface AddFieldDialogProps {
   open: boolean
@@ -58,8 +58,9 @@ export function AddFieldDialog({ open, onOpenChange, onAdd }: AddFieldDialogProp
               <X size={16} />
               取消
             </Button>
-            <Button onClick={handleAdd}>
-              確定
+            <Button onClick={handleAdd} className="gap-1">
+              <Plus size={16} />
+              新增欄位
             </Button>
           </div>
         </div>

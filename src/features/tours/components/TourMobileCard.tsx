@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { MapPin, Calendar, Users, DollarSign, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { CurrencyCell } from '@/components/table-cells'
 
 interface TourMobileCardProps {
   tour: Tour
@@ -93,9 +94,7 @@ export function TourMobileCard({ tour: tourProp, onClick, getStatusColor }: Tour
         {'price_per_person' in tour && typeof tour.price_per_person === 'number' ? (
           <div className="flex items-center text-sm">
             <DollarSign size={16} className="text-morandi-secondary mr-2 flex-shrink-0" />
-            <span className="text-morandi-primary font-medium">
-              NT$ {tour.price_per_person.toLocaleString()}
-            </span>
+            <CurrencyCell amount={tour.price_per_person} className="text-morandi-primary font-medium" />
             <span className="text-morandi-secondary text-xs ml-1">/ 人</span>
           </div>
         ) : null}

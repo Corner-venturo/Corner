@@ -7,6 +7,7 @@ import { useRegionsStore } from '@/stores/region-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
+import { stripHtml } from '@/lib/utils/string-utils'
 
 export function useItineraryList() {
   const router = useRouter()
@@ -83,11 +84,6 @@ export function useItineraryList() {
     return false
   }, [])
 
-  // 移除 HTML 標籤，只保留純文字
-  const stripHtml = useCallback((html: string | null | undefined): string => {
-    if (!html) return ''
-    return html.replace(/<[^>]*>/g, '').trim()
-  }, [])
 
   // 過濾資料
   const filteredItineraries = useMemo(() => {
@@ -154,7 +150,7 @@ export function useItineraryList() {
     })
 
     return filtered
-  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id, isSuperAdmin, stripHtml])
+  }, [itineraries, statusFilter, searchTerm, isItineraryClosed, authorFilter, user?.id, isSuperAdmin])
 
   return {
     // 資料

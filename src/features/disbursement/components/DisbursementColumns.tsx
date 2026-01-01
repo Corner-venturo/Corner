@@ -7,9 +7,9 @@ import { useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TableColumn } from '@/components/ui/enhanced-table'
+import { DateCell, CurrencyCell, TextCell, ActionCell } from '@/components/table-cells'
 import { X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { formatDateTW } from '@/lib/utils/format-date'
 import {
   STATUS_LABELS,
   STATUS_COLORS,
@@ -76,13 +76,13 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'amount',
         label: '金額',
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
+        render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
+        render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'status',
@@ -130,13 +130,13 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         key: 'amount',
         label: '金額',
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
+        render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
+        render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'actions',
@@ -145,14 +145,17 @@ export function useCurrentOrderColumns({ currentOrder, onRemove }: UseCurrentOrd
         render: (_value: unknown, row: unknown) => {
           const typedRow = row as CurrentOrderTableRow
           return (
-            <button
-              onClick={() => onRemove(typedRow.id)}
-              disabled={currentOrder?.status !== 'pending'}
-              className="p-1 text-status-danger hover:text-status-danger hover:bg-status-danger-bg rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="移除"
-            >
-              <X size={14} />
-            </button>
+            <ActionCell
+              actions={[
+                {
+                  icon: X,
+                  label: '移除',
+                  onClick: () => onRemove(typedRow.id),
+                  variant: 'danger',
+                  disabled: currentOrder?.status !== 'pending',
+                },
+              ]}
+            />
           )
         },
       },
@@ -178,13 +181,13 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'disbursement_date',
         label: '出帳日期',
         sortable: true,
-        render: (value: unknown) => <div className="text-sm text-morandi-secondary">{value as string}</div>,
+        render: (value: unknown) => <DateCell date={value as string} />,
       },
       {
         key: 'amount',
         label: '總金額',
         sortable: true,
-        render: (value: unknown) => <div className="font-medium text-right">NT$ {(value as number).toLocaleString()}</div>,
+        render: (value: unknown) => <CurrencyCell amount={value as number} />,
       },
       {
         key: 'payment_request_ids',
@@ -209,11 +212,7 @@ export function useHistoryColumns({ onPrintPDF }: UseHistoryColumnsProps) {
         key: 'created_at',
         label: '建立時間',
         sortable: true,
-        render: (value: unknown) => (
-          <div className="text-sm text-morandi-secondary">
-            {formatDateTW(value as string)}
-          </div>
-        ),
+        render: (value: unknown) => <DateCell date={value as string} format="long" />,
       },
       {
         key: 'actions',

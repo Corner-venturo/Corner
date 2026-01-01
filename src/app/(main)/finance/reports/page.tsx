@@ -5,6 +5,7 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
 import { useTourStore, useOrderStore } from '@/stores'
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react'
+import { CurrencyCell } from '@/components/table-cells'
 
 export default function ReportsPage() {
   const { items: tours } = useTourStore()
@@ -43,9 +44,7 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">總收入</p>
-                <p className="text-2xl font-bold text-morandi-green">
-                  NT$ {total_revenue.toLocaleString()}
-                </p>
+                <CurrencyCell amount={total_revenue} variant="income" className="text-2xl font-bold" />
               </div>
               <TrendingUp size={24} className="text-morandi-green" />
             </div>
@@ -55,9 +54,7 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">總支出</p>
-                <p className="text-2xl font-bold text-morandi-red">
-                  NT$ {totalCosts.toLocaleString()}
-                </p>
+                <CurrencyCell amount={totalCosts} variant="expense" className="text-2xl font-bold" />
               </div>
               <TrendingDown size={24} className="text-morandi-red" />
             </div>
@@ -67,11 +64,11 @@ export default function ReportsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-morandi-secondary mb-1">淨利潤</p>
-                <p
-                  className={`text-2xl font-bold ${netProfit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}
-                >
-                  NT$ {netProfit.toLocaleString()}
-                </p>
+                <CurrencyCell
+                  amount={netProfit}
+                  variant={netProfit >= 0 ? 'income' : 'expense'}
+                  className="text-2xl font-bold"
+                />
               </div>
               <DollarSign
                 size={24}
@@ -94,25 +91,20 @@ export default function ReportsPage() {
                   <p className="text-sm text-morandi-secondary">{tour.code}</p>
                 </div>
                 <div className="text-right">
-                  <p
-                    className={`font-medium ${tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}
-                  >
-                    利潤: NT$ {tour.profit.toLocaleString()}
+                  <p className="font-medium flex items-center gap-1 justify-end">
+                    <span className={tour.profit >= 0 ? 'text-morandi-green' : 'text-morandi-red'}>利潤:</span>
+                    <CurrencyCell amount={tour.profit} variant={tour.profit >= 0 ? 'income' : 'expense'} className="font-medium" />
                   </p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <p className="text-morandi-secondary">收入</p>
-                  <p className="font-medium text-morandi-green">
-                    NT$ {tour.total_revenue.toLocaleString()}
-                  </p>
+                  <CurrencyCell amount={tour.total_revenue} variant="income" className="font-medium" />
                 </div>
                 <div>
                   <p className="text-morandi-secondary">支出</p>
-                  <p className="font-medium text-morandi-red">
-                    NT$ {tour.total_cost.toLocaleString()}
-                  </p>
+                  <CurrencyCell amount={tour.total_cost} variant="expense" className="font-medium" />
                 </div>
                 <div>
                   <p className="text-morandi-secondary">利潤率</p>
