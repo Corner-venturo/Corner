@@ -233,113 +233,111 @@ export function PaymentItemRow({
         </td>
       </tr>
 
-      {/* LinkPay 額外欄位行（只有 LinkPay 需要額外欄位） */}
+      {/* LinkPay 額外欄位 - 表頭 */}
       {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-        <tr
-          className={cn(
-            'border-b border-morandi-container/30',
-            isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
-          )}
-        >
-          <td colSpan={6} className="py-2 px-3">
-            <div className="pl-4 border-l-2 border-morandi-gold/30">
-              <div className="grid grid-cols-4 gap-3 items-end">
-                <div>
-                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                    Email *
-                  </label>
-                  <Input
-                    type="email"
-                    value={item.email || ''}
-                    onChange={e => onUpdate(item.id, { email: e.target.value })}
-                    placeholder="user@example.com"
-                    className="h-8 text-sm border-morandi-container/30"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                    付款截止日 *
-                  </label>
-                  <DatePicker
-                    value={item.pay_dateline || ''}
-                    onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
-                    className="h-8 text-sm border-morandi-container/30"
-                    placeholder="選擇日期"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                    付款名稱（客戶看到的）
-                  </label>
-                  <Input
-                    value={item.payment_name || ''}
-                    onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
-                    placeholder="例如：峇里島五日遊 - 尾款"
-                    className="h-8 text-sm border-morandi-container/30"
-                  />
-                </div>
-                <div>
-                  <Button
-                    type="button"
-                    onClick={handleGenerateLink}
-                    disabled={isGenerating || !item.email || !item.amount || !item.pay_dateline}
-                    className="h-8 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        產生中...
-                      </>
-                    ) : (
-                      <>
-                        <Link2 size={14} />
-                        產生連結
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+        <tr className="bg-morandi-gold/5 border-b border-morandi-gold/20">
+          <td colSpan={6} className="py-1.5 px-2">
+            <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 pl-4 border-l-2 border-morandi-gold/30">
+              <span className="text-xs font-medium text-morandi-secondary">Email *</span>
+              <span className="text-xs font-medium text-morandi-secondary">付款截止日 *</span>
+              <span className="text-xs font-medium text-morandi-secondary">付款名稱（客戶看到的）</span>
+              <span></span>
+            </div>
+          </td>
+        </tr>
+      )}
 
-              {/* 產生的連結 */}
-              {generatedLink && (
-                <div className="mt-3 flex items-center gap-2 bg-morandi-gold/10 rounded-lg px-3 py-2">
-                  <Link2 size={14} className="text-morandi-gold shrink-0" />
-                  <Input
-                    value={generatedLink}
-                    readOnly
-                    className="flex-1 h-7 text-xs bg-white border-0"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopyLink}
-                    className="h-7 gap-1 text-morandi-gold hover:bg-morandi-gold/20"
-                  >
-                    {copied ? (
-                      <>
-                        <Check size={12} />
-                        已複製
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} />
-                        複製
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(generatedLink, '_blank')}
-                    className="h-7 gap-1 text-morandi-secondary hover:bg-morandi-container/50"
-                  >
-                    <ExternalLink size={12} />
-                    開啟
-                  </Button>
-                </div>
-              )}
+      {/* LinkPay 額外欄位 - 輸入 */}
+      {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
+        <tr className={cn(
+          'border-b border-morandi-container/30',
+          isNewRow ? 'bg-white' : 'hover:bg-morandi-container/5'
+        )}>
+          <td colSpan={6} className="py-1.5 px-2">
+            <div className="grid grid-cols-[1fr_150px_1fr_120px] gap-3 items-center pl-4 border-l-2 border-morandi-gold/30">
+              <Input
+                type="email"
+                value={item.email || ''}
+                onChange={e => onUpdate(item.id, { email: e.target.value })}
+                placeholder="user@example.com"
+                className="h-9 text-sm border-morandi-container/30"
+              />
+              <DatePicker
+                value={item.pay_dateline || ''}
+                onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
+                className="h-9 text-sm border-morandi-container/30"
+                placeholder="選擇日期"
+              />
+              <Input
+                value={item.payment_name || ''}
+                onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
+                placeholder="例如：峇里島五日遊 - 尾款"
+                className="h-9 text-sm border-morandi-container/30"
+              />
+              <Button
+                type="button"
+                onClick={handleGenerateLink}
+                disabled={isGenerating || !item.email || !item.amount || !item.pay_dateline}
+                className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    產生中...
+                  </>
+                ) : (
+                  <>
+                    <Link2 size={14} />
+                    產生連結
+                  </>
+                )}
+              </Button>
+            </div>
+          </td>
+        </tr>
+      )}
+
+      {/* LinkPay 產生的連結 */}
+      {item.receipt_type === RECEIPT_TYPES.LINK_PAY && generatedLink && (
+        <tr className="border-b border-morandi-container/30 bg-morandi-gold/5">
+          <td colSpan={6} className="py-2 px-2">
+            <div className="flex items-center gap-2 pl-4 border-l-2 border-morandi-gold/30">
+              <Link2 size={14} className="text-morandi-gold shrink-0" />
+              <span className="text-xs text-morandi-secondary shrink-0">付款連結：</span>
+              <Input
+                value={generatedLink}
+                readOnly
+                className="flex-1 h-8 text-xs bg-white border-morandi-container/30"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyLink}
+                className="h-8 gap-1 text-morandi-gold hover:bg-morandi-gold/20"
+              >
+                {copied ? (
+                  <>
+                    <Check size={12} />
+                    已複製
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} />
+                    複製
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => window.open(generatedLink, '_blank')}
+                className="h-8 gap-1 text-morandi-secondary hover:bg-morandi-container/50"
+              >
+                <ExternalLink size={12} />
+                開啟
+              </Button>
             </div>
           </td>
         </tr>
