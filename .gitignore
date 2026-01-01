@@ -37,6 +37,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Production env (contains secrets - use Vercel env vars instead)
+.env.production
+
 # vercel
 .vercel
 
