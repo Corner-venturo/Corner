@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2 } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2, Link2, Copy, Check } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
@@ -81,6 +81,14 @@ export default function PaymentsPage() {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
+  const [copiedLink, setCopiedLink] = useState<string | null>(null)
+
+  // 複製連結
+  const handleCopyLink = useCallback(async (link: string) => {
+    await navigator.clipboard.writeText(link)
+    setCopiedLink(link)
+    setTimeout(() => setCopiedLink(null), 2000)
+  }, [])
 
   // 初始化載入資料
   useEffect(() => {

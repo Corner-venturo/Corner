@@ -43,12 +43,20 @@ export function DatePicker({
   const [open, setOpen] = React.useState(false)
 
   // 將各種格式的值轉換為 Date 物件
+  // 🔧 修正：使用本地時區解析日期，避免 UTC 轉換導致的日期跳動問題
   const parseValue = (val: string | Date | null | undefined): Date | undefined => {
     if (!val) return undefined
     if (val instanceof Date) return val
     // 支援 YYYY-MM-DD 和 YYYY/MM/DD 格式
     const normalized = val.replace(/\//g, '-')
-    const date = new Date(normalized)
+    // 拆解日期字串並使用本地時區創建 Date（避免 new Date('YYYY-MM-DD') 的 UTC 問題）
+    const parts = normalized.split('-')
+    if (parts.length !== 3) return undefined
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1 // 月份是 0-indexed
+    const day = parseInt(parts[2], 10)
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return undefined
+    const date = new Date(year, month, day) // 使用本地時區
     return isNaN(date.getTime()) ? undefined : date
   }
 
@@ -61,9 +69,11 @@ export function DatePicker({
   }
 
   // 顯示用的日期格式（統一為 YYYY / MM / DD）
+  // 使用 parseValue 後的本地日期，確保顯示一致
   const displayValue = (val: string | Date | null | undefined): string => {
     const date = parseValue(val)
     if (!date) return ''
+    // 使用本地時區的日期方法（與 parseValue 一致）
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')

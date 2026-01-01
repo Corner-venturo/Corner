@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Itinerary } from '@/stores/types'
 import type { Quote } from '@/types/quote.types'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
+import type { PageStateApi } from './useItineraryPageState'
 
 // 公司密碼（統編）
 const COMPANY_PASSWORD = '83212711'
@@ -18,23 +19,7 @@ interface UseItineraryActionsProps {
   quotes: Quote[]
   userId?: string
   userName?: string
-  pageState: {
-    // Setters (stable references)
-    setDuplicateSource: (source: Itinerary | null) => void
-    setDuplicateTourCode: (code: string) => void
-    setDuplicateTitle: (title: string) => void
-    setIsDuplicateDialogOpen: (open: boolean) => void
-    setIsDuplicating: (duplicating: boolean) => void
-    setPendingEditId: (id: string | null) => void
-    setPasswordInput: (input: string) => void
-    setIsPasswordDialogOpen: (open: boolean) => void
-    // Stable getter functions (for use in callbacks)
-    getDuplicateSource: () => Itinerary | null
-    getDuplicateTourCode: () => string
-    getDuplicateTitle: () => string
-    getPasswordInput: () => string
-    getPendingEditId: () => string | null
-  }
+  pageState: PageStateApi
 }
 
 export function useItineraryActions({
@@ -50,19 +35,38 @@ export function useItineraryActions({
 }: UseItineraryActionsProps) {
   const router = useRouter()
 
-  // 打開複製行程對話框
-  const handleOpenDuplicateDialog = useCallback((itinerary: Itinerary) => {
-    pageState.setDuplicateSource(itinerary)
-    pageState.setDuplicateTourCode('')
-    pageState.setDuplicateTitle('')
-    pageState.setIsDuplicateDialogOpen(true)
-  }, [pageState])
+  // ===== 解構穩定的函數（這些都是 stable 的）=====
+  const {
+    // Setters
+    setDuplicateSource,
+    setDuplicateTourCode,
+    setDuplicateTitle,
+    setIsDuplicateDialogOpen,
+    setIsDuplicating,
+    setPendingEditId,
+    setPasswordInput,
+    setIsPasswordDialogOpen,
+    // Getters
+    getDuplicateSource,
+    getDuplicateTourCode,
+    getDuplicateTitle,
+    getPasswordInput,
+    getPendingEditId,
+  } = pageState
 
-  // 執行複製行程 - 使用 getter 函數避免 stale closure
+  // 打開複製行程對話框 - 只依賴穩定的 setters
+  const handleOpenDuplicateDialog = useCallback((itinerary: Itinerary) => {
+    setDuplicateSource(itinerary)
+    setDuplicateTourCode('')
+    setDuplicateTitle('')
+    setIsDuplicateDialogOpen(true)
+  }, [setDuplicateSource, setDuplicateTourCode, setDuplicateTitle, setIsDuplicateDialogOpen])
+
+  // 執行複製行程 - 使用穩定的 getters 和 setters
   const handleDuplicateSubmit = useCallback(async () => {
-    const duplicateSource = pageState.getDuplicateSource()
-    const duplicateTourCode = pageState.getDuplicateTourCode()
-    const duplicateTitle = pageState.getDuplicateTitle()
+    const duplicateSource = getDuplicateSource()
+    const duplicateTourCode = getDuplicateTourCode()
+    const duplicateTitle = getDuplicateTitle()
 
     if (!duplicateSource) return
     if (!duplicateTourCode.trim() || !duplicateTitle.trim()) {
@@ -70,7 +74,7 @@ export function useItineraryActions({
       return
     }
 
-    pageState.setIsDuplicating(true)
+    setIsDuplicating(true)
     try {
       const {
         id: sourceItineraryId,
@@ -101,7 +105,6 @@ export function useItineraryActions({
       let quoteCopiedCount = 0
 
       for (const quote of linkedQuotes) {
-        // 複製報價單，清空客戶資料
         const newQuote: Partial<Quote> = {
           code: quote.code,
           quote_type: quote.quote_type,
@@ -135,16 +138,21 @@ export function useItineraryActions({
         ? `行程已複製成功！同時複製了 ${quoteCopiedCount} 個報價單（客戶資料已清空）`
         : '行程已複製成功！'
       await alertSuccess(successMsg)
-      pageState.setIsDuplicateDialogOpen(false)
-      pageState.setDuplicateSource(null)
-      pageState.setDuplicateTourCode('')
-      pageState.setDuplicateTitle('')
+      setIsDuplicateDialogOpen(false)
+      setDuplicateSource(null)
+      setDuplicateTourCode('')
+      setDuplicateTitle('')
     } catch {
       await alertError('複製失敗，請稍後再試')
     } finally {
-      pageState.setIsDuplicating(false)
+      setIsDuplicating(false)
     }
-  }, [pageState, createItinerary, createQuote, quotes, userId, userName])
+  }, [
+    getDuplicateSource, getDuplicateTourCode, getDuplicateTitle,
+    setIsDuplicating, setIsDuplicateDialogOpen, setDuplicateSource,
+    setDuplicateTourCode, setDuplicateTitle,
+    createItinerary, createQuote, quotes, userId, userName
+  ])
 
   // 封存行程
   const handleArchive = useCallback(
@@ -286,36 +294,36 @@ export function useItineraryActions({
     [updateItinerary]
   )
 
-  // 處理行程點擊
+  // 處理行程點擊 - 只依賴穩定的 setters
   const handleRowClick = useCallback(
     (itinerary: Itinerary) => {
       if (itinerary.status === '進行中') {
-        pageState.setPendingEditId(itinerary.id)
-        pageState.setPasswordInput('')
-        pageState.setIsPasswordDialogOpen(true)
+        setPendingEditId(itinerary.id)
+        setPasswordInput('')
+        setIsPasswordDialogOpen(true)
       } else {
         router.push(`/itinerary/new?itinerary_id=${itinerary.id}`)
       }
     },
-    [router, pageState]
+    [router, setPendingEditId, setPasswordInput, setIsPasswordDialogOpen]
   )
 
-  // 密碼驗證 - 使用 getter 函數避免 stale closure
+  // 密碼驗證 - 使用穩定的 getters 和 setters
   const handlePasswordSubmit = useCallback(() => {
-    const passwordInput = pageState.getPasswordInput()
-    const pendingEditId = pageState.getPendingEditId()
+    const passwordInput = getPasswordInput()
+    const pendingEditId = getPendingEditId()
 
     if (passwordInput === COMPANY_PASSWORD) {
-      pageState.setIsPasswordDialogOpen(false)
+      setIsPasswordDialogOpen(false)
       if (pendingEditId) {
         router.push(`/itinerary/new?itinerary_id=${pendingEditId}`)
       }
     } else {
       alertError('密碼錯誤！')
     }
-  }, [pageState, router])
+  }, [getPasswordInput, getPendingEditId, setIsPasswordDialogOpen, router])
 
-  // 判斷行程是否已結案
+  // 判斷行程是否已結案 - 純函數，無依賴
   const isItineraryClosed = useCallback((itinerary: Itinerary) => {
     if (itinerary.closed_at) return true
     if (itinerary.is_template) return false
@@ -328,7 +336,8 @@ export function useItineraryActions({
     return false
   }, [])
 
-  return {
+  // 使用 useMemo 確保返回的物件穩定
+  return useMemo(() => ({
     handleOpenDuplicateDialog,
     handleDuplicateSubmit,
     handleArchive,
@@ -340,5 +349,17 @@ export function useItineraryActions({
     handleRowClick,
     handlePasswordSubmit,
     isItineraryClosed,
-  }
+  }), [
+    handleOpenDuplicateDialog,
+    handleDuplicateSubmit,
+    handleArchive,
+    handleUnarchive,
+    handleDelete,
+    handleSetTemplate,
+    handleClose,
+    handleReopen,
+    handleRowClick,
+    handlePasswordSubmit,
+    isItineraryClosed,
+  ])
 }

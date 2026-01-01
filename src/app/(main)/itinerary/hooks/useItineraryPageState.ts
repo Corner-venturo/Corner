@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useMemo } from 'react'
 import type { Itinerary } from '@/stores/types'
 
 /**
  * Hook for managing itinerary page state
- * Includes: filters, search, dialogs, and password state
  *
- * Note: Returns stable setter references to prevent infinite re-render loops.
- * DO NOT wrap return in useMemo - it causes object recreation on every state change.
+ * 🔧 重要：使用 useMemo + 穩定的 ref pattern 來避免無限迴圈
+ * - 所有 setter 函數都是穩定的（來自 useState）
+ * - 所有 getter 函數都是穩定的（使用 useCallback + ref）
+ * - 返回的物件只在首次創建，之後保持穩定引用
  */
 export function useItineraryPageState() {
   // Filter states
@@ -31,62 +32,112 @@ export function useItineraryPageState() {
   const [duplicateTitle, setDuplicateTitle] = useState('')
   const [isDuplicating, setIsDuplicating] = useState(false)
 
-  // Use refs to store latest values for stable callbacks
-  const duplicateSourceRef = useRef(duplicateSource)
-  duplicateSourceRef.current = duplicateSource
-  const duplicateTourCodeRef = useRef(duplicateTourCode)
-  duplicateTourCodeRef.current = duplicateTourCode
-  const duplicateTitleRef = useRef(duplicateTitle)
-  duplicateTitleRef.current = duplicateTitle
+  // ===== Refs for stable getters =====
+  const statusFilterRef = useRef(statusFilter)
+  statusFilterRef.current = statusFilter
+
+  const authorFilterRef = useRef(authorFilter)
+  authorFilterRef.current = authorFilter
+
+  const searchTermRef = useRef(searchTerm)
+  searchTermRef.current = searchTerm
+
+  const isTypeSelectOpenRef = useRef(isTypeSelectOpen)
+  isTypeSelectOpenRef.current = isTypeSelectOpen
+
+  const isPasswordDialogOpenRef = useRef(isPasswordDialogOpen)
+  isPasswordDialogOpenRef.current = isPasswordDialogOpen
+
+  const isDuplicateDialogOpenRef = useRef(isDuplicateDialogOpen)
+  isDuplicateDialogOpenRef.current = isDuplicateDialogOpen
+
   const passwordInputRef = useRef(passwordInput)
   passwordInputRef.current = passwordInput
+
   const pendingEditIdRef = useRef(pendingEditId)
   pendingEditIdRef.current = pendingEditId
 
-  // Stable getter functions for values that change frequently
+  const duplicateSourceRef = useRef(duplicateSource)
+  duplicateSourceRef.current = duplicateSource
+
+  const duplicateTourCodeRef = useRef(duplicateTourCode)
+  duplicateTourCodeRef.current = duplicateTourCode
+
+  const duplicateTitleRef = useRef(duplicateTitle)
+  duplicateTitleRef.current = duplicateTitle
+
+  const isDuplicatingRef = useRef(isDuplicating)
+  isDuplicatingRef.current = isDuplicating
+
+  // ===== Stable getter functions =====
+  const getStatusFilter = useCallback(() => statusFilterRef.current, [])
+  const getAuthorFilter = useCallback(() => authorFilterRef.current, [])
+  const getSearchTerm = useCallback(() => searchTermRef.current, [])
+  const getIsTypeSelectOpen = useCallback(() => isTypeSelectOpenRef.current, [])
+  const getIsPasswordDialogOpen = useCallback(() => isPasswordDialogOpenRef.current, [])
+  const getIsDuplicateDialogOpen = useCallback(() => isDuplicateDialogOpenRef.current, [])
+  const getPasswordInput = useCallback(() => passwordInputRef.current, [])
+  const getPendingEditId = useCallback(() => pendingEditIdRef.current, [])
   const getDuplicateSource = useCallback(() => duplicateSourceRef.current, [])
   const getDuplicateTourCode = useCallback(() => duplicateTourCodeRef.current, [])
   const getDuplicateTitle = useCallback(() => duplicateTitleRef.current, [])
-  const getPasswordInput = useCallback(() => passwordInputRef.current, [])
-  const getPendingEditId = useCallback(() => pendingEditIdRef.current, [])
+  const getIsDuplicating = useCallback(() => isDuplicatingRef.current, [])
 
-  // Return object directly - useState setters are already stable
-  return {
-    // Filter states
-    statusFilter,
+  // ===== 返回穩定的物件（只在首次創建）=====
+  // 使用空依賴陣列的 useMemo，物件引用永遠穩定
+  // 內部的 setter 來自 useState 本身就是穩定的
+  // 內部的 getter 使用 ref 所以永遠能取得最新值
+  const stableApi = useMemo(() => ({
+    // Setters (stable from useState)
     setStatusFilter,
-    authorFilter,
     setAuthorFilter,
-    searchTerm,
     setSearchTerm,
-
-    // Dialog states
-    isTypeSelectOpen,
     setIsTypeSelectOpen,
-    isPasswordDialogOpen,
     setIsPasswordDialogOpen,
-    isDuplicateDialogOpen,
     setIsDuplicateDialogOpen,
-
-    // Password state - use getters for callbacks, direct values for rendering
-    passwordInput,
     setPasswordInput,
-    getPasswordInput,
-    pendingEditId,
     setPendingEditId,
-    getPendingEditId,
-
-    // Duplicate state - use getters for callbacks, direct values for rendering
-    duplicateSource,
     setDuplicateSource,
-    getDuplicateSource,
-    duplicateTourCode,
     setDuplicateTourCode,
-    getDuplicateTourCode,
-    duplicateTitle,
     setDuplicateTitle,
-    getDuplicateTitle,
-    isDuplicating,
     setIsDuplicating,
+
+    // Getters (stable via refs)
+    getStatusFilter,
+    getAuthorFilter,
+    getSearchTerm,
+    getIsTypeSelectOpen,
+    getIsPasswordDialogOpen,
+    getIsDuplicateDialogOpen,
+    getPasswordInput,
+    getPendingEditId,
+    getDuplicateSource,
+    getDuplicateTourCode,
+    getDuplicateTitle,
+    getIsDuplicating,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []) // 空依賴 - 物件只創建一次
+
+  // 返回穩定 API + 當前狀態值（用於渲染）
+  return {
+    // 穩定的 API（setters 和 getters）
+    ...stableApi,
+
+    // 當前狀態值（用於渲染，會觸發 re-render）
+    statusFilter,
+    authorFilter,
+    searchTerm,
+    isTypeSelectOpen,
+    isPasswordDialogOpen,
+    isDuplicateDialogOpen,
+    passwordInput,
+    pendingEditId,
+    duplicateSource,
+    duplicateTourCode,
+    duplicateTitle,
+    isDuplicating,
   }
 }
+
+// 導出類型，方便其他 hook 使用
+export type PageStateApi = ReturnType<typeof useItineraryPageState>
