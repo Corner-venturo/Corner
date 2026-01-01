@@ -338,12 +338,21 @@ export function createStore<T extends BaseEntity>(
             errorMessage = err.error
           } else if (err.code) {
             errorMessage = `資料庫錯誤 (${err.code})`
+          } else if (err.hint) {
+            errorMessage = err.hint
           } else if (Object.keys(error).length === 0) {
             errorMessage = '資料庫操作失敗，請檢查必填欄位或權限設定'
+          } else {
+            // 嘗試序列化整個錯誤物件
+            try {
+              errorMessage = JSON.stringify(error)
+            } catch {
+              errorMessage = '未知錯誤'
+            }
           }
         }
 
-        logger.error(`[${tableName}] create 失敗:`, error)
+        logger.error(`[${tableName}] create 失敗:`, error, 'errorMessage:', errorMessage)
         set({ error: errorMessage, loading: false })
 
         // 拋出帶有訊息的 Error，方便上層處理

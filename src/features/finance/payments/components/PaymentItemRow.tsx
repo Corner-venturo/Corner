@@ -168,8 +168,8 @@ export function PaymentItemRow({
         </td>
       </tr>
 
-      {/* 額外欄位行（根據收款方式顯示） */}
-      {item.receipt_type !== RECEIPT_TYPES.CASH && (
+      {/* LinkPay 額外欄位行（只有 LinkPay 需要額外欄位） */}
+      {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
         <tr
           className={cn(
             'border-b border-morandi-container/30',
@@ -178,154 +178,42 @@ export function PaymentItemRow({
         >
           <td colSpan={6} className="py-2 px-3">
             <div className="pl-4 border-l-2 border-morandi-gold/30">
-              {/* LinkPay 額外欄位 */}
-              {item.receipt_type === RECEIPT_TYPES.LINK_PAY && (
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      Email *
-                    </label>
-                    <Input
-                      type="email"
-                      value={item.email || ''}
-                      onChange={e => onUpdate(item.id, { email: e.target.value })}
-                      placeholder="user@example.com"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      刷卡期限 *
-                    </label>
-                    <DatePicker
-                      value={item.pay_dateline || ''}
-                      onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
-                      className="h-8 text-sm border-morandi-container/30"
-                      placeholder="選擇日期"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      付款名稱（客戶看到的）
-                    </label>
-                    <Input
-                      value={item.payment_name || ''}
-                      onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
-                      placeholder="例如：峇里島五日遊 - 尾款"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
+                    Email *
+                  </label>
+                  <Input
+                    type="email"
+                    value={item.email || ''}
+                    onChange={e => onUpdate(item.id, { email: e.target.value })}
+                    placeholder="user@example.com"
+                    className="h-8 text-sm border-morandi-container/30"
+                  />
                 </div>
-              )}
-
-              {/* 匯款額外欄位 */}
-              {item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      匯入帳戶 *
-                    </label>
-                    <Select
-                      value={item.account_info || ''}
-                      onValueChange={value => onUpdate(item.id, { account_info: value })}
-                    >
-                      <SelectTrigger className="h-8 text-sm border-morandi-container/30">
-                        <SelectValue placeholder="請選擇帳戶" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {BANK_ACCOUNTS.map(bank => (
-                          <SelectItem key={bank.value} value={bank.value}>
-                            {bank.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      手續費
-                    </label>
-                    <Input
-                      type="number"
-                      value={item.fees || ''}
-                      onChange={e => onUpdate(item.id, { fees: Number(e.target.value) })}
-                      placeholder="選填"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
+                    付款截止日 *
+                  </label>
+                  <DatePicker
+                    value={item.pay_dateline || ''}
+                    onChange={(date) => onUpdate(item.id, { pay_dateline: date })}
+                    className="h-8 text-sm border-morandi-container/30"
+                    placeholder="選擇日期"
+                  />
                 </div>
-              )}
-
-              {/* 刷卡額外欄位 */}
-              {item.receipt_type === RECEIPT_TYPES.CREDIT_CARD && (
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      卡號後四碼
-                    </label>
-                    <Input
-                      maxLength={4}
-                      value={item.card_last_four || ''}
-                      onChange={e =>
-                        onUpdate(item.id, { card_last_four: e.target.value.replace(/\D/g, '') })
-                      }
-                      placeholder="1234"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      授權碼
-                    </label>
-                    <Input
-                      value={item.auth_code || ''}
-                      onChange={e => onUpdate(item.id, { auth_code: e.target.value })}
-                      placeholder="授權碼"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      手續費
-                    </label>
-                    <Input
-                      type="number"
-                      value={item.fees || ''}
-                      onChange={e => onUpdate(item.id, { fees: Number(e.target.value) })}
-                      placeholder="選填"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">
+                    付款名稱（客戶看到的）
+                  </label>
+                  <Input
+                    value={item.payment_name || ''}
+                    onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
+                    placeholder="例如：峇里島五日遊 - 尾款"
+                    className="h-8 text-sm border-morandi-container/30"
+                  />
                 </div>
-              )}
-
-              {/* 支票額外欄位 */}
-              {item.receipt_type === RECEIPT_TYPES.CHECK && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      支票號碼
-                    </label>
-                    <Input
-                      value={item.check_number || ''}
-                      onChange={e => onUpdate(item.id, { check_number: e.target.value })}
-                      placeholder="支票號碼"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">
-                      開票銀行
-                    </label>
-                    <Input
-                      value={item.check_bank || ''}
-                      onChange={e => onUpdate(item.id, { check_bank: e.target.value })}
-                      placeholder="銀行名稱"
-                      className="h-8 text-sm border-morandi-container/30"
-                    />
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </td>
         </tr>

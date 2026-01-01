@@ -20,7 +20,7 @@ export interface Receipt {
   receipt_type: ReceiptType // 0:匯款 1:現金 2:刷卡 3:支票 4:LinkPay
   receipt_amount: number // 應收金額
   actual_amount: number // 實收金額
-  status: ReceiptStatus // 0:待確認 1:已確認 2:異常
+  status: string // '0':待確認 '1':已確認 '2':異常（資料庫存字串）
 
   // 收款方式相關欄位
   receipt_account: string | null // 付款人姓名/收款帳號
@@ -160,17 +160,19 @@ export function getReceiptTypeName(type: ReceiptType): string {
 }
 
 /**
- * 取得收款狀態名稱
+ * 取得收款狀態名稱（支援數字或字串）
  */
-export function getReceiptStatusName(status: ReceiptStatus): string {
-  return RECEIPT_STATUS_LABELS[status] || '未知'
+export function getReceiptStatusName(status: ReceiptStatus | string | number): string {
+  const numStatus = typeof status === 'string' ? parseInt(status, 10) : status
+  return RECEIPT_STATUS_LABELS[numStatus as ReceiptStatus] || '未知'
 }
 
 /**
- * 取得收款狀態顏色
+ * 取得收款狀態顏色（支援數字或字串）
  */
-export function getReceiptStatusColor(status: ReceiptStatus): string {
-  return RECEIPT_STATUS_COLORS[status] || 'text-morandi-secondary'
+export function getReceiptStatusColor(status: ReceiptStatus | string | number): string {
+  const numStatus = typeof status === 'string' ? parseInt(status, 10) : status
+  return RECEIPT_STATUS_COLORS[numStatus as ReceiptStatus] || 'text-morandi-secondary'
 }
 
 // ============================================

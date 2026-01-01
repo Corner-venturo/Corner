@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2, Link2, Copy, Check } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2 } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
@@ -81,14 +81,6 @@ export default function PaymentsPage() {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
-  const [copiedLink, setCopiedLink] = useState<string | null>(null)
-
-  // 複製連結
-  const handleCopyLink = useCallback(async (link: string) => {
-    await navigator.clipboard.writeText(link)
-    setCopiedLink(link)
-    setTimeout(() => setCopiedLink(null), 2000)
-  }, [])
 
   // 初始化載入資料
   useEffect(() => {
@@ -183,33 +175,6 @@ export default function PaymentsPage() {
     { key: 'tour_name', label: '團名', sortable: true },
     { key: 'receipt_amount', label: '收款金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
     { key: 'receipt_type', label: '收款方式', sortable: true },
-    {
-      key: 'link',
-      label: '付款連結',
-      render: (_, row) => {
-        if (!row.link) return <span className="text-morandi-muted">-</span>
-        return (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleCopyLink(row.link!)}
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 gap-1 h-7 px-2"
-          >
-            {copiedLink === row.link ? (
-              <>
-                <Check size={14} />
-                已複製
-              </>
-            ) : (
-              <>
-                <Link2 size={14} />
-                複製連結
-              </>
-            )}
-          </Button>
-        )
-      },
-    },
     { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
     { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
   ]

@@ -22,9 +22,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
-import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy } from 'lucide-react'
+import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { alert } from '@/lib/ui/alert-dialog'
+import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import type { Receipt } from '@/types/receipt.types'
@@ -45,7 +45,7 @@ export function ReceiptDetailDialog({
   receipt,
   onSuccess,
 }: ReceiptDetailDialogProps) {
-  const { update: updateReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { update: updateReceipt, remove: deleteReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: orders, update: updateOrder } = useOrderStore()
   const { items: receipts } = useReceiptStore()
   const { items: allLinkPayLogs, fetchAll: fetchLinkPayLogs } = useLinkPayLogStore()
@@ -96,7 +96,7 @@ export function ReceiptDetailDialog({
       // 更新收款單
       await updateReceipt(receipt.id, {
         actual_amount: actualAmount,
-        status: 1,
+        status: '1',
         note: note || receipt.note,
       })
 
@@ -138,6 +138,29 @@ export function ReceiptDetailDialog({
     } catch (error) {
       logger.error('確認收款失敗:', error)
       void alert('確認失敗，請稍後再試', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // 刪除收款單
+  const handleDelete = async () => {
+    const confirmed = await confirm(
+      `確定要刪除收款單 ${receipt.receipt_number} 嗎？此操作無法復原。`,
+      { title: '刪除收款單', type: 'danger' }
+    )
+    if (!confirmed) return
+
+    setIsSubmitting(true)
+    try {
+      await deleteReceipt(receipt.id)
+      await fetchReceipts()
+      await alert('收款單已刪除', 'success')
+      onOpenChange(false)
+      onSuccess?.()
+    } catch (error) {
+      logger.error('刪除收款單失敗:', error)
+      void alert('刪除失敗，請稍後再試', 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -383,12 +406,28 @@ export function ReceiptDetailDialog({
           </div>
         </div>
 
-        <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-            {isEditing ? '取消' : '關閉'}
-          </Button>
+        <DialogFooter className="mt-4 flex justify-between">
+          <div>
+            {/* 刪除按鈕 - 只有待確認狀態才能刪除 */}
+            {isPending && (
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+                disabled={isSubmitting}
+                className="text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                刪除
+              </Button>
+            )}
+          </div>
 
-          {isPending && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+              {isEditing ? '取消' : '關閉'}
+            </Button>
+
+            {isPending && (
             <Button
               onClick={handleConfirm}
               disabled={isSubmitting || actualAmount <= 0}
@@ -408,6 +447,7 @@ export function ReceiptDetailDialog({
               {isSubmitting ? '儲存中...' : '儲存'}
             </Button>
           )}
+          </div>
         </DialogFooter>
       </DialogContent>
 

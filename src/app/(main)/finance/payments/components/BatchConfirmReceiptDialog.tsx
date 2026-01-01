@@ -142,7 +142,7 @@ export function BatchConfirmReceiptDialog({
         // 更新收款單狀態
         await updateReceipt(item.receipt.id, {
           actual_amount: item.actualAmount,
-          status: 1, // 已確認
+          status: '1', // 已確認
           note: item.receipt.note
             ? `${item.receipt.note}\n[會計批量確認] ${formatDate(new Date())}`
             : `[會計批量確認] ${formatDate(new Date())}`,

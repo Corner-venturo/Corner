@@ -58,6 +58,7 @@ export interface PaymentItem {
   // 支票專屬
   check_number?: string // 支票號碼
   check_bank?: string // 開票銀行
+  check_date?: string // 兌現日期
 }
 
 /**

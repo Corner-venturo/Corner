@@ -101,7 +101,7 @@ export function usePaymentData() {
         receipt_type: item.receipt_type,
         receipt_amount: item.amount,
         actual_amount: 0, // 待會計確認
-        status: 0, // 待確認 (ReceiptStatus.PENDING)
+        status: '0', // 待確認
         receipt_account: item.receipt_account || null,
         email: item.email || null,
         payment_name: item.payment_name || null,

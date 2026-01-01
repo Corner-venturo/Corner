@@ -362,8 +362,28 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
     },
   },
 
-  // 收據狀態
+  // 收據狀態（資料庫存字串 '0'/'1'/'2'）
   receipt: {
+    // 數字字串格式（資料庫存的格式）
+    '0': {
+      color: 'text-morandi-gold',
+      label: '待確認',
+      icon: Clock,
+      bgColor: 'bg-morandi-gold/10',
+    },
+    '1': {
+      color: 'text-morandi-green',
+      label: '已確認',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    '2': {
+      color: 'text-morandi-red',
+      label: '異常',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+    },
+    // 英文格式（相容舊程式碼）
     pending: {
       color: 'text-morandi-gold',
       label: '待確認',

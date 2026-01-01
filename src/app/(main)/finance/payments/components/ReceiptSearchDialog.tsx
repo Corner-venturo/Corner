@@ -27,7 +27,7 @@ export interface ReceiptSearchFilters {
   dateFrom?: string
   dateTo?: string
   receiptTypes?: ReceiptType[]
-  statuses?: ReceiptStatus[]
+  statuses?: string[]  // '0'=待確認, '1'=已確認
   limit?: number
 }
 
@@ -65,10 +65,10 @@ export function ReceiptSearchDialog({
     { value: 4, label: getReceiptTypeName(4) },
   ]
 
-  // 狀態選項
-  const statusOptions: { value: ReceiptStatus; label: string }[] = [
-    { value: 0, label: getReceiptStatusName(0) },
-    { value: 1, label: getReceiptStatusName(1) },
+  // 狀態選項（使用字串值）
+  const statusOptions: { value: string; label: string }[] = [
+    { value: '0', label: getReceiptStatusName('0') },
+    { value: '1', label: getReceiptStatusName('1') },
   ]
 
   // 切換收款方式
@@ -81,7 +81,7 @@ export function ReceiptSearchDialog({
   }
 
   // 切換狀態
-  const toggleStatus = (status: ReceiptStatus) => {
+  const toggleStatus = (status: string) => {
     const statuses = filters.statuses || []
     const newStatuses = statuses.includes(status)
       ? statuses.filter(s => s !== status)

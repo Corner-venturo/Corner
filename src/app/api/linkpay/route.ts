@@ -146,12 +146,10 @@ export async function POST(req: NextRequest) {
 
     // 先建立 linkpay_logs 記錄
     const logData = {
-      receipt_id: receipt.id,
       receipt_number: receiptNumber,
       workspace_id: receipt.workspace_id,
       linkpay_order_number: orderNo,
       price: amount,
-      amount: amount,
       end_date: endDate,
       status: 0,
       payment_name: finalPaymentName,

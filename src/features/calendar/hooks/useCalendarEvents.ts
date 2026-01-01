@@ -41,6 +41,20 @@ const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   }
 }
 
+// 🔧 修正：從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
+// 用於全天事件，避免 FullCalendar 時區轉換問題
+const getDateInTaipei = (isoString: string): string => {
+  if (!isoString) return ''
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return isoString
+    // 使用 sv-SE locale 取得 YYYY-MM-DD 格式
+    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+  } catch {
+    return isoString
+  }
+}
+
 // 定義 CalendarEvent 類型（從 store 推斷）
 interface CalendarEvent {
   id: string
@@ -190,11 +204,15 @@ export function useCalendarEvents() {
         const timeStr = getDisplayTime(event.start, event.all_day)
         const displayTitle = timeStr ? `${timeStr} ${event.title}` : event.title
 
+        // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
+        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+
         return {
           id: event.id,
           title: displayTitle,
-          start: event.start,
-          end: event.end,
+          start: startDate,
+          end: endDate,
           allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
@@ -248,11 +266,15 @@ export function useCalendarEvents() {
           ? `${timeStr} 公司｜${event.title}`
           : `公司｜${event.title}`
 
+        // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
+        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+
         return {
           id: event.id,
           title: displayTitle,
-          start: event.start,
-          end: event.end,
+          start: startDate,
+          end: endDate,
           allDay: event.all_day,
           backgroundColor: color.bg,
           borderColor: color.border,
@@ -264,7 +286,7 @@ export function useCalendarEvents() {
           },
         } as FullCalendarEvent
       })
-  }, [calendarEvents, getEventColor, employees, user])
+  }, [calendarEvents, getEventColor, employees, user, isSuperAdmin, selectedWorkspaceId])
 
   // 轉換會員生日為日曆事件
   const memberBirthdayEvents: FullCalendarEvent[] = useMemo(() => {

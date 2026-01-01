@@ -606,63 +606,6 @@ export type Database = {
           },
         ]
       }
-      airport_images: {
-        Row: {
-          id: string
-          airport_code: string
-          image_url: string
-          label: string | null
-          season: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
-          is_default: boolean
-          display_order: number
-          uploaded_by: string | null
-          workspace_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          airport_code: string
-          image_url: string
-          label?: string | null
-          season?: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
-          is_default?: boolean
-          display_order?: number
-          uploaded_by?: string | null
-          workspace_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          airport_code?: string
-          image_url?: string
-          label?: string | null
-          season?: 'spring' | 'summer' | 'autumn' | 'winter' | 'all' | null
-          is_default?: boolean
-          display_order?: number
-          uploaded_by?: string | null
-          workspace_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "airport_images_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "airport_images_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       advance_lists: {
         Row: {
           _deleted: boolean | null
@@ -710,6 +653,63 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      airport_images: {
+        Row: {
+          airport_code: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_default: boolean | null
+          label: string | null
+          season: string | null
+          updated_at: string | null
+          uploaded_by: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          airport_code: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_default?: boolean | null
+          label?: string | null
+          season?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          airport_code?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_default?: boolean | null
+          label?: string | null
+          season?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airport_images_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airport_images_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -2822,6 +2822,7 @@ export type Database = {
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string | null
+          created_by: string | null
           disbursement_date: string | null
           handled_at: string | null
           handled_by: string | null
@@ -2841,6 +2842,7 @@ export type Database = {
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string | null
+          created_by?: string | null
           disbursement_date?: string | null
           handled_at?: string | null
           handled_by?: string | null
@@ -2860,6 +2862,7 @@ export type Database = {
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string | null
+          created_by?: string | null
           disbursement_date?: string | null
           handled_at?: string | null
           handled_by?: string | null
@@ -6560,12 +6563,12 @@ export type Database = {
           employee_id: string | null
           id: string
           notes: string | null
-          other_info: Json | null
+          other_info: string[] | null
           passenger_names: string[]
           raw_pnr: string
           record_locator: string
           segments: Json | null
-          special_requests: Json | null
+          special_requests: string[] | null
           status: string | null
           ticketing_deadline: string | null
           tour_id: string | null
@@ -6580,12 +6583,12 @@ export type Database = {
           employee_id?: string | null
           id?: string
           notes?: string | null
-          other_info?: Json | null
+          other_info?: string[] | null
           passenger_names?: string[]
           raw_pnr: string
           record_locator: string
           segments?: Json | null
-          special_requests?: Json | null
+          special_requests?: string[] | null
           status?: string | null
           ticketing_deadline?: string | null
           tour_id?: string | null
@@ -6600,12 +6603,12 @@ export type Database = {
           employee_id?: string | null
           id?: string
           notes?: string | null
-          other_info?: Json | null
+          other_info?: string[] | null
           passenger_names?: string[]
           raw_pnr?: string
           record_locator?: string
           segments?: Json | null
-          special_requests?: Json | null
+          special_requests?: string[] | null
           status?: string | null
           ticketing_deadline?: string | null
           tour_id?: string | null
@@ -6626,6 +6629,20 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnrs_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pnrs_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
             referencedColumns: ["id"]
           },
           {
@@ -7729,18 +7746,21 @@ export type Database = {
           bank_name: string | null
           card_last_four: string | null
           check_bank: string | null
+          check_date: string | null
           check_number: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string | null
           created_by: string | null
-          customer_id: string
+          customer_id: string | null
           customer_name: string | null
           deleted_at: string | null
           email: string | null
           fees: number | null
           handler_name: string | null
           id: string
+          link: string | null
+          linkpay_order_number: string | null
           note: string | null
           notes: string | null
           order_id: string
@@ -7772,18 +7792,21 @@ export type Database = {
           bank_name?: string | null
           card_last_four?: string | null
           check_bank?: string | null
+          check_date?: string | null
           check_number?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string | null
           created_by?: string | null
-          customer_id: string
+          customer_id?: string | null
           customer_name?: string | null
           deleted_at?: string | null
           email?: string | null
           fees?: number | null
           handler_name?: string | null
           id?: string
+          link?: string | null
+          linkpay_order_number?: string | null
           note?: string | null
           notes?: string | null
           order_id: string
@@ -7815,18 +7838,21 @@ export type Database = {
           bank_name?: string | null
           card_last_four?: string | null
           check_bank?: string | null
+          check_date?: string | null
           check_number?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string | null
           created_by?: string | null
-          customer_id?: string
+          customer_id?: string | null
           customer_name?: string | null
           deleted_at?: string | null
           email?: string | null
           fees?: number | null
           handler_name?: string | null
           id?: string
+          link?: string | null
+          linkpay_order_number?: string | null
           note?: string | null
           notes?: string | null
           order_id?: string
