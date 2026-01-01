@@ -182,7 +182,8 @@ export function BatchPickupDialog({
         <DialogFooter className="gap-2 pt-4 border-t">
           {step === 'upload' ? (
             <>
-              <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
+              <Button variant="outline" className="gap-1" onClick={handleClose} disabled={isProcessing}>
+                <X size={16} />
                 取消
               </Button>
               <Button

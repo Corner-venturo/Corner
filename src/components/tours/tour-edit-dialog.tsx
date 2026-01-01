@@ -3,6 +3,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { X } from 'lucide-react'
 import { Tour } from '@/stores/types'
 import { useTourEditDialog } from './hooks/useTourEditDialog'
 import { BasicInfoSection } from './edit-dialog/BasicInfoSection'
@@ -106,7 +107,8 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
 
         {/* 按鈕 */}
         <div className="flex justify-end space-x-2 pt-4 border-t">
-          <Button variant="outline" onClick={onClose} disabled={submitting}>
+          <Button variant="outline" onClick={onClose} disabled={submitting} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button

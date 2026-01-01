@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { FileText, Plus, Trash2 } from 'lucide-react'
+import { FileText, Plus, Trash2, X } from 'lucide-react'
 import { TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
 
 interface InvoiceDialogProps {
@@ -297,8 +297,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="min-w-[100px]"
+              className="min-w-[100px] gap-1"
             >
+              <X size={16} />
               取消
             </Button>
             <Button

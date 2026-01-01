@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { useTourStore, useSupplierStore } from '@/stores'
 import { usePayments } from '@/features/payments/hooks/usePayments'
-import { Plus, Trash2, Receipt, AlertCircle, Search } from 'lucide-react'
+import { Plus, Trash2, Receipt, AlertCircle, Search, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { PaymentItemCategory } from '@/stores/types'
@@ -440,14 +440,16 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
             disabled={unallocatedAmount !== 0 || tourAllocations.length === 0}
           >
+            <Check size={16} />
             建立批次請款（{tourAllocations.length} 筆）
           </Button>
         </DialogFooter>

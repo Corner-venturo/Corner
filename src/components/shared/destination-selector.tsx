@@ -77,7 +77,7 @@ export function DestinationSelector({
       {/* 國家/城市選擇 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
             國家/地區 <span className="text-morandi-red">*</span>
           </label>
           <Combobox
@@ -99,7 +99,7 @@ export function DestinationSelector({
         </div>
 
         <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
             城市 <span className="text-morandi-red">*</span>
           </label>
           {countryCode === '__custom__' ? (
@@ -132,7 +132,7 @@ export function DestinationSelector({
       {showCustomFields && countryCode === '__custom__' && (
         <>
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
               國家名稱
             </label>
             <Input
@@ -143,7 +143,7 @@ export function DestinationSelector({
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
               3 碼城市代號
             </label>
             <Input

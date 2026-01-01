@@ -448,7 +448,8 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
             {/* 按鈕 */}
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+                <X size={16} />
                 取消
               </Button>
               <Button onClick={handleCloseTour} disabled={loading}>

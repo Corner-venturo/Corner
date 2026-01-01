@@ -46,7 +46,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
 
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="block text-xs text-morandi-secondary mb-1">航空公司</label>
+            <label className="block text-xs text-morandi-primary mb-1">航空公司</label>
             <Input
               value={flight.airline || ''}
               onChange={e => updateFlight(type, 'airline', e.target.value)}
@@ -55,7 +55,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-morandi-secondary mb-1">航班編號</label>
+            <label className="block text-xs text-morandi-primary mb-1">航班編號</label>
             <Input
               value={flight.flightNumber || ''}
               onChange={e => updateFlight(type, 'flightNumber', e.target.value)}
@@ -64,7 +64,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-morandi-secondary mb-1">飛行時間</label>
+            <label className="block text-xs text-morandi-primary mb-1">飛行時間</label>
             <Input
               value={flight.duration || ''}
               onChange={e => updateFlight(type, 'duration', e.target.value)}
@@ -76,7 +76,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
 
         <div className="flex items-center gap-2">
           <div className="flex-1">
-            <label className="block text-xs text-morandi-secondary mb-1">起飛機場</label>
+            <label className="block text-xs text-morandi-primary mb-1">起飛機場</label>
             <Input
               value={flight.departureAirport || ''}
               onChange={e => updateFlight(type, 'departureAirport', e.target.value)}
@@ -85,7 +85,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-morandi-secondary mb-1">起飛時間</label>
+            <label className="block text-xs text-morandi-primary mb-1">起飛時間</label>
             <Input
               value={flight.departureTime || ''}
               onChange={e => updateFlight(type, 'departureTime', e.target.value)}
@@ -95,7 +95,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
           </div>
           <ArrowRight size={16} className="text-morandi-secondary mt-4" />
           <div className="flex-1">
-            <label className="block text-xs text-morandi-secondary mb-1">抵達機場</label>
+            <label className="block text-xs text-morandi-primary mb-1">抵達機場</label>
             <Input
               value={flight.arrivalAirport || ''}
               onChange={e => updateFlight(type, 'arrivalAirport', e.target.value)}
@@ -104,7 +104,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-morandi-secondary mb-1">抵達時間</label>
+            <label className="block text-xs text-morandi-primary mb-1">抵達時間</label>
             <Input
               value={flight.arrivalTime || ''}
               onChange={e => updateFlight(type, 'arrivalTime', e.target.value)}
@@ -121,7 +121,7 @@ export function FlightBlockEditor({ data, onChange }: FlightBlockEditorProps) {
     <div className="space-y-4">
       {/* 航班風格 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">航班風格</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">航班風格</label>
         <Select
           value={data.flightStyle || 'original'}
           onValueChange={(value) => onChange({ flightStyle: value as FlightStyleType })}

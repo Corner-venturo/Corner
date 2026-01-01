@@ -14,7 +14,7 @@ import { useTodoStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { Send, CheckCircle2, AlertCircle, Search } from 'lucide-react'
+import { Send, CheckCircle2, AlertCircle, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import type { Todo } from '@/stores/types'
@@ -263,7 +263,8 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button onClick={handleShare} disabled={!selectedTodo || isSubmitting}>

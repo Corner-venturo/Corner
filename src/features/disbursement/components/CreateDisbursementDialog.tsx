@@ -19,6 +19,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { X } from 'lucide-react'
 import { PaymentRequest } from '@/stores/types'
 import { useCreateDisbursement } from '../hooks/useCreateDisbursement'
 import { DisbursementForm } from './create-dialog/DisbursementForm'
@@ -100,7 +101,8 @@ export function CreateDisbursementDialog({
         </div>
 
         <DialogFooter className="flex-shrink-0 mt-4">
-          <Button variant="outline" onClick={() => handleClose(false)}>
+          <Button variant="outline" onClick={() => handleClose(false)} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button

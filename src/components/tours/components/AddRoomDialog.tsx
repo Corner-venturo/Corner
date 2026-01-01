@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { BedDouble, Plus, Trash2, X } from 'lucide-react'
+import { BedDouble, Plus, Trash2, X, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { generateUUID } from '../hooks/room-utils'
@@ -317,14 +317,16 @@ export function AddRoomDialog({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => { onOpenChange(false); resetForm() }}>
+              <Button variant="outline" className="gap-1" onClick={() => { onOpenChange(false); resetForm() }}>
+                <X size={16} />
                 取消
               </Button>
               <Button
                 onClick={handleAddRooms}
                 disabled={totalRooms === 0}
-                className="btn-morandi-primary"
+                className="btn-morandi-primary gap-1"
               >
+                <Check size={16} />
                 確認新增 ({totalRooms} 間)
               </Button>
             </div>

@@ -439,8 +439,9 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                     size="sm"
                     onClick={handleSaveAsTemplate}
                     disabled={!templateName.trim()}
-                    className="bg-morandi-gold hover:bg-morandi-gold-hover"
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
                   >
+                    <Save size={16} />
                     儲存
                   </Button>
                 </div>
@@ -682,7 +683,8 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                 <Trash2 size={16} className="mr-1" />
                 移除排程
               </Button>
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={onClose} className="gap-1">
+                <X size={16} />
                 關閉
               </Button>
             </div>

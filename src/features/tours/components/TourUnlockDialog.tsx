@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Tour } from '@/types/tour.types'
 import { toast } from 'sonner'
-import { Unlock, Loader2, AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import { Unlock, Loader2, AlertTriangle, Eye, EyeOff, X, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 
@@ -173,19 +173,17 @@ export function TourUnlockDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={submitting}>
+          <Button variant="outline" onClick={handleClose} disabled={submitting} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleUnlock}
             disabled={submitting || !password}
-            className="bg-morandi-gold hover:bg-morandi-gold/90"
+            className="bg-morandi-gold hover:bg-morandi-gold/90 gap-1"
           >
-            {submitting ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Unlock className="h-4 w-4 mr-2" />
-            )}
+            <Check size={16} className={submitting ? 'hidden' : ''} />
+            <Loader2 className={submitting ? 'h-4 w-4 animate-spin' : 'hidden'} />
             確認解鎖
           </Button>
         </DialogFooter>

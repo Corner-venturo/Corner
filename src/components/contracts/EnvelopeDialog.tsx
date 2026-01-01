@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Mail, Printer } from 'lucide-react'
+import { Mail, Printer, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -375,7 +375,8 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button onClick={handlePrint}>

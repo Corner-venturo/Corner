@@ -167,7 +167,7 @@ export function CountriesSection({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">國家</label>
+              <label className="block text-xs font-medium text-morandi-primary mb-1">國家</label>
               <Combobox
                 value={primaryCountry.country_id}
                 onChange={value => {
@@ -184,7 +184,7 @@ export function CountriesSection({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-morandi-secondary mb-1">
+              <label className="block text-xs font-medium text-morandi-primary mb-1">
                 主要城市（選填）
               </label>
               <Combobox
@@ -230,7 +230,7 @@ export function CountriesSection({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-morandi-secondary mb-1">
+                  <label className="block text-xs font-medium text-morandi-primary mb-1">
                     國家
                   </label>
                   <Combobox
@@ -244,7 +244,7 @@ export function CountriesSection({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-morandi-secondary mb-1">
+                  <label className="block text-xs font-medium text-morandi-primary mb-1">
                     主要城市（選填）
                   </label>
                   <Combobox

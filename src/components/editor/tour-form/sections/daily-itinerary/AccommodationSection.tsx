@@ -97,7 +97,7 @@ export function AccommodationSection({
       {/* 住宿輸入欄位 */}
       <div className={`flex flex-wrap gap-3 ${day.isSameAccommodation ? 'opacity-50' : ''}`}>
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-medium text-morandi-secondary mb-1">住宿名稱</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">住宿名稱</label>
           <Input
             id={`accommodation-input-${dayIndex}`}
             type="text"
@@ -109,7 +109,7 @@ export function AccommodationSection({
           />
         </div>
         <div className="w-24">
-          <label className="block text-xs font-medium text-morandi-secondary mb-1">星級</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">星級</label>
           <Select
             value={String(day.accommodationRating ?? 5)}
             onValueChange={val => {
@@ -131,7 +131,7 @@ export function AccommodationSection({
           </Select>
         </div>
         <div className="flex-1 min-w-[180px]">
-          <label className="block text-xs font-medium text-morandi-secondary mb-1">飯店連結</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">飯店連結</label>
           <Input
             type="url"
             value={day.accommodationUrl || ''}

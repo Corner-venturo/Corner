@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAccounts } from '../hooks'
+import { X, Save } from 'lucide-react'
 import type { BankAccount } from '@/types/accounting.types'
 
 interface BankAccountDialogProps {
@@ -164,13 +165,16 @@ export function BankAccountDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || !formData.name}
+            className="gap-1"
           >
+            <Save size={16} />
             {isSubmitting ? '儲存中...' : '儲存'}
           </Button>
         </DialogFooter>

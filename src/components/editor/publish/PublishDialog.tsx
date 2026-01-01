@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { FilePlus, Files } from 'lucide-react'
+import { FilePlus, Files, X } from 'lucide-react'
 
 interface PublishDialogProps {
   type: 'version' | 'file'
@@ -65,7 +65,8 @@ export function PublishDialog({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button

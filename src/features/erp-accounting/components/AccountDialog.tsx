@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { X, Save } from 'lucide-react'
 import type { Account, AccountType, AccountFormData } from '@/types/accounting.types'
 
 interface AccountDialogProps {
@@ -152,13 +153,16 @@ export function AccountDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || !formData.code || !formData.name}
+            className="gap-1"
           >
+            <Save size={16} />
             {isSubmitting ? '儲存中...' : '儲存'}
           </Button>
         </DialogFooter>

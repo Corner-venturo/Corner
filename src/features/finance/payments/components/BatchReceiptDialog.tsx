@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { useOrderStore, useReceiptOrderStore } from '@/stores'
 import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/types'
-import { Plus, Trash2, DollarSign, AlertCircle } from 'lucide-react'
+import { Plus, Trash2, DollarSign, AlertCircle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -408,14 +408,16 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
             disabled={unallocatedAmount !== 0 || orderAllocations.length === 0}
           >
+            <Check size={16} />
             建立批量收款單
           </Button>
         </DialogFooter>

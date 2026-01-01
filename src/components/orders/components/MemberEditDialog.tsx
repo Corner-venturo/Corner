@@ -17,7 +17,7 @@
 'use client'
 
 import React from 'react'
-import { AlertTriangle, Pencil } from 'lucide-react'
+import { AlertTriangle, Pencil, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useMemberEdit } from './member-edit/hooks/useMemberEdit'
@@ -110,7 +110,8 @@ export function MemberEditDialog({
 
         {/* 按鈕區域 - 固定在底部 */}
         <div className="flex-shrink-0 flex justify-end gap-3 pt-4 pb-2 border-t bg-white">
-          <Button variant="outline" onClick={handleClose} disabled={isSaving}>
+          <Button variant="outline" className="gap-1" onClick={handleClose} disabled={isSaving}>
+            <X size={16} />
             取消
           </Button>
           <Button

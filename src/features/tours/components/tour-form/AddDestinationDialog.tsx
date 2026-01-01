@@ -4,7 +4,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Loader2, X, Check } from 'lucide-react'
 
 interface AddDestinationDialogProps {
   open: boolean
@@ -67,7 +67,9 @@ export function AddDestinationDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={savingDestination}
+            className="gap-1"
           >
+            <X size={16} />
             取消
           </Button>
           <Button
@@ -81,7 +83,10 @@ export function AddDestinationDialog({
                 儲存中...
               </>
             ) : (
-              '確認新增'
+              <>
+                <Check size={16} />
+                確認新增
+              </>
             )}
           </Button>
         </div>

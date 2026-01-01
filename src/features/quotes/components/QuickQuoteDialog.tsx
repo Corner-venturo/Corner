@@ -174,8 +174,9 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-morandi-primary">收費明細表</label>
-              <Button type="button" size="sm" onClick={addItem} variant="outline">
-                + 新增項目
+              <Button type="button" size="sm" onClick={addItem} variant="outline" className="gap-1">
+                <Plus size={16} />
+                新增項目
               </Button>
             </div>
             <div className="border border-border rounded-md overflow-hidden">

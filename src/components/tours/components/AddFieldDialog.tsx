@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { X } from 'lucide-react'
 
 interface AddFieldDialogProps {
   open: boolean
@@ -48,11 +49,13 @@ export function AddFieldDialog({ open, onOpenChange, onAdd }: AddFieldDialogProp
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
+              className="gap-1"
               onClick={() => {
                 onOpenChange(false)
                 setFieldName('')
               }}
             >
+              <X size={16} />
               取消
             </Button>
             <Button onClick={handleAdd}>

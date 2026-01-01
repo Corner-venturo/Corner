@@ -244,7 +244,8 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4 mt-4">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+          <Button variant="outline" onClick={onClose} disabled={saving} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button onClick={onSave} disabled={saving || (mode === 'create' && !selectedTemplate)}>

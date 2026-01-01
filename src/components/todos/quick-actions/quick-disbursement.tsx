@@ -156,7 +156,7 @@ export function QuickDisbursement({ onSubmit }: QuickDisbursementProps) {
 
       {/* Note */}
       <div className="pt-3 border-t border-morandi-container/20">
-        <label className="text-sm font-medium text-morandi-secondary mb-2 block">備註</label>
+        <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
         <Textarea
           placeholder="請款相關說明..."
           rows={2}

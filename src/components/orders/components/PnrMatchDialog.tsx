@@ -337,7 +337,8 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" className="gap-1" onClick={handleClose}>
+            <X size={16} />
             取消
           </Button>
           <Button

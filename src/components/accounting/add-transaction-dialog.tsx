@@ -5,7 +5,7 @@ import { useAccountingStore } from '@/stores/accounting-store'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
-import { ArrowUpRight, ArrowDownRight, Plus, ChevronLeft } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Plus, ChevronLeft, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEnterSubmit } from '@/hooks/useEnterSubmit'
 import { Button } from '@/components/ui/button'
@@ -238,15 +238,17 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                   setNewCategoryName('')
                 }}
                 variant="outline"
-                className="flex-1 border-[#E8E4E0]"
+                className="flex-1 border-[#E8E4E0] gap-1"
               >
+                <X size={16} />
                 取消
               </Button>
               <Button
                 onClick={handleAddCategory}
                 disabled={!newCategoryName.trim()}
-                className="flex-1 bg-[#B8A99A] hover:bg-[#9E8C7A] text-white"
+                className="flex-1 bg-[#B8A99A] hover:bg-[#9E8C7A] text-white gap-1"
               >
+                <Plus size={16} />
                 新增
               </Button>
             </div>

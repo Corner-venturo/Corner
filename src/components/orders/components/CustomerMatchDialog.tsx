@@ -8,7 +8,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Search, User } from 'lucide-react'
+import { Search, User, X } from 'lucide-react'
 import type { Customer } from '@/types'
 import type { MatchType } from '../hooks/useCustomerMatch'
 
@@ -116,7 +116,8 @@ export function CustomerMatchDialog({
         </div>
 
         <div className="flex-shrink-0 flex justify-end pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" className="gap-1" onClick={onClose}>
+            <X size={16} />
             取消
           </Button>
         </div>

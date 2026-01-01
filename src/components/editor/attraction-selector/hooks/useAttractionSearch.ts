@@ -178,7 +178,7 @@ export function useAttractionSearch({
             latitude,
             longitude,
             address,
-            cities!inner (
+            cities (
               name
             )
           `

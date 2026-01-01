@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Pencil } from 'lucide-react'
+import { Pencil, X, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { ROOM_TYPES } from '@/types/room-vehicle.types'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
@@ -138,10 +138,12 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
         </div>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={handleSave}>
+          <Button className="gap-1" onClick={handleSave}>
+            <Save size={16} />
             儲存
           </Button>
         </div>

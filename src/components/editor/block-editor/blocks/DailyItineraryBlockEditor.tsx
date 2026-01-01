@@ -77,7 +77,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
       {/* 標題和風格 */}
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-morandi-secondary mb-1">行程副標題</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">行程副標題</label>
           <Input
             value={data.itinerarySubtitle || ''}
             onChange={e => onChange({ itinerarySubtitle: e.target.value })}
@@ -87,7 +87,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
         </div>
 
         <div className="w-36">
-          <label className="block text-xs font-medium text-morandi-secondary mb-1">風格</label>
+          <label className="block text-xs font-medium text-morandi-primary mb-1">風格</label>
           <Select
             value={data.itineraryStyle || 'original'}
             onValueChange={(value) => onChange({ itineraryStyle: value as ItineraryStyleType })}
@@ -151,7 +151,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                 <div className="p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">Day 標籤</label>
+                      <label className="block text-xs text-morandi-primary mb-1">Day 標籤</label>
                       <Input
                         value={day.dayLabel || ''}
                         onChange={e => updateDay(index, 'dayLabel', e.target.value)}
@@ -160,7 +160,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">日期</label>
+                      <label className="block text-xs text-morandi-primary mb-1">日期</label>
                       <Input
                         value={day.date || ''}
                         onChange={e => updateDay(index, 'date', e.target.value)}
@@ -169,7 +169,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">標題</label>
+                      <label className="block text-xs text-morandi-primary mb-1">標題</label>
                       <Input
                         value={day.title || ''}
                         onChange={e => updateDay(index, 'title', e.target.value)}
@@ -180,7 +180,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                   </div>
 
                   <div>
-                    <label className="block text-xs text-morandi-secondary mb-1">
+                    <label className="block text-xs text-morandi-primary mb-1">
                       <MapPin size={12} className="inline mr-1" />
                       亮點
                     </label>
@@ -194,7 +194,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
 
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">
+                      <label className="block text-xs text-morandi-primary mb-1">
                         <Utensils size={12} className="inline mr-1" />
                         早餐
                       </label>
@@ -206,7 +206,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">午餐</label>
+                      <label className="block text-xs text-morandi-primary mb-1">午餐</label>
                       <Input
                         value={day.meals?.lunch || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, lunch: e.target.value })}
@@ -215,7 +215,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-morandi-secondary mb-1">晚餐</label>
+                      <label className="block text-xs text-morandi-primary mb-1">晚餐</label>
                       <Input
                         value={day.meals?.dinner || ''}
                         onChange={e => updateDay(index, 'meals', { ...day.meals, dinner: e.target.value })}
@@ -226,7 +226,7 @@ export function DailyItineraryBlockEditor({ data, onChange }: DailyItineraryBloc
                   </div>
 
                   <div>
-                    <label className="block text-xs text-morandi-secondary mb-1">
+                    <label className="block text-xs text-morandi-primary mb-1">
                       <Building size={12} className="inline mr-1" />
                       住宿
                     </label>

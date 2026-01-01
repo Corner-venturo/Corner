@@ -75,7 +75,7 @@ export function FlightSegmentCard({
       </div>
       <div className="grid grid-cols-4 gap-2">
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             航空公司
           </label>
           <Input
@@ -87,7 +87,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             航班號碼
           </label>
           <Input
@@ -99,7 +99,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             日期 (月/日)
           </label>
           <Input
@@ -112,7 +112,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             飛行時間
           </label>
           <Input
@@ -124,7 +124,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             出發機場
           </label>
           <Input
@@ -136,7 +136,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             出發時間
           </label>
           <Input
@@ -148,7 +148,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             抵達機場
           </label>
           <Input
@@ -160,7 +160,7 @@ export function FlightSegmentCard({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-medium text-morandi-secondary mb-0.5">
+          <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">
             抵達時間
           </label>
           <Input

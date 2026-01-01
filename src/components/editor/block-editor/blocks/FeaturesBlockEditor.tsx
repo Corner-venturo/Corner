@@ -42,7 +42,7 @@ export function FeaturesBlockEditor({ data, onChange }: FeaturesBlockEditorProps
     <div className="space-y-3">
       {/* 風格選擇 */}
       <div>
-        <label className="block text-xs font-medium text-morandi-secondary mb-1">顯示風格</label>
+        <label className="block text-xs font-medium text-morandi-primary mb-1">顯示風格</label>
         <Select
           value={data.featuresStyle || 'original'}
           onValueChange={(value) => onChange({ featuresStyle: value as FeaturesStyleType })}

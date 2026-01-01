@@ -119,7 +119,8 @@ export function CustomerMatchDialog({
                       <div className="text-sm text-morandi-secondary">建立「{currentPerson?.name}」的新資料</div>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="text-morandi-green border-morandi-green/50">
+                  <Button size="sm" variant="outline" className="text-morandi-green border-morandi-green/50 gap-1">
+                    <Plus size={16} />
                     新增
                   </Button>
                 </div>

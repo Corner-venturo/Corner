@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { X } from 'lucide-react'
 import type { ChannelMember } from '@/services/workspace-members'
 import type { Channel, ChannelGroup } from '@/stores/workspace-store'
 
@@ -45,7 +46,8 @@ export function MemberManagementDialog({
           」移出頻道嗎？
         </p>
         <DialogFooter className="mt-4">
-          <Button variant="ghost" onClick={onClose} disabled={isRemovingMember}>
+          <Button variant="ghost" onClick={onClose} disabled={isRemovingMember} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember}>
@@ -93,8 +95,9 @@ export function ChannelDeleteDialog({
             variant="ghost"
             onClick={onClose}
             disabled={isDeletingChannel}
-            className="text-morandi-secondary hover:text-morandi-primary"
+            className="gap-1 text-morandi-secondary hover:text-morandi-primary"
           >
+            <X size={16} />
             取消
           </Button>
           <Button
@@ -160,8 +163,9 @@ export function GroupDeleteDialog({
             variant="ghost"
             onClick={onClose}
             disabled={isDeletingGroup}
-            className="text-morandi-secondary hover:text-morandi-primary"
+            className="gap-1 text-morandi-secondary hover:text-morandi-primary"
           >
+            <X size={16} />
             取消
           </Button>
           <Button

@@ -585,11 +585,8 @@ export function TourPnrToolDialog({
             disabled={!parsedPNR || isSaving}
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
           >
-            {isSaving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Save size={16} />
-            )}
+            <Save size={16} className={isSaving ? 'hidden' : ''} />
+            <Loader2 size={16} className={isSaving ? 'animate-spin' : 'hidden'} />
             儲存並關聯
           </Button>
         </div>

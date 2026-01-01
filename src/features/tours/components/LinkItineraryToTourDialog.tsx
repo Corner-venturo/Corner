@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, FileText, Loader2, ExternalLink, Calendar, MapPin, ArrowLeft, Save, AlertCircle } from 'lucide-react'
+import { Plus, FileText, Loader2, ExternalLink, Calendar, MapPin, ArrowLeft, Save, AlertCircle, X } from 'lucide-react'
 import { useItineraryStore, useRegionsStore, useAuthStore } from '@/stores'
 import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
@@ -466,7 +466,8 @@ export function LinkItineraryToTourDialog({
 
                 {/* 底部按鈕 */}
                 <div className="flex justify-end gap-2 pt-4 border-t border-border">
-                  <Button variant="outline" onClick={() => setShowForm(false)} disabled={isCreating}>
+                  <Button variant="outline" onClick={() => setShowForm(false)} disabled={isCreating} className="gap-1">
+                    <X size={16} />
                     取消
                   </Button>
                   <Button

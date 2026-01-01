@@ -243,7 +243,8 @@ export function CustomerSearchDialog({
             <X size={16} />
             重置
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="gap-1">
+            <X size={16} />
             取消
           </Button>
           <Button

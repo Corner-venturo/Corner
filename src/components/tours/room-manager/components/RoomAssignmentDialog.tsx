@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { BedDouble, Plus, Trash2 } from 'lucide-react'
+import { BedDouble, Plus, Trash2, X, Check } from 'lucide-react'
 
 // Helper: Generate UUID with fallback for older browsers
 function generateUUID(): string {
@@ -249,17 +249,19 @@ export function RoomAssignmentDialog({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => {
+              <Button variant="outline" className="gap-1" onClick={() => {
                 onOpenChange(false)
                 resetRoomRows()
               }}>
+                <X size={16} />
                 取消
               </Button>
               <Button
                 onClick={handleAddRooms}
                 disabled={totalRooms === 0}
-                className="btn-morandi-primary"
+                className="btn-morandi-primary gap-1"
               >
+                <Check size={16} />
                 確認新增 ({totalRooms} 間)
               </Button>
             </div>

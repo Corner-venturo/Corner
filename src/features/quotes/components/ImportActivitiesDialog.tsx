@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Loader2, MapPin } from 'lucide-react'
+import { Loader2, MapPin, X, Download } from 'lucide-react'
 import { CostItem } from '../types'
 
 interface ActivityItem {
@@ -177,17 +177,20 @@ export function ImportActivitiesDialog({
 
           {/* 按鈕 */}
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">
+            <Button variant="outline" onClick={onClose} className="flex-1 gap-1">
+              <X size={16} />
               取消
             </Button>
             <Button
               onClick={handleImport}
               disabled={selectedActivities.size === 0 || isLoading}
-              className="flex-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white"
+              className="flex-1 bg-[var(--morandi-gold)] hover:bg-[var(--morandi-gold-hover)] text-white gap-1"
             >
               {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-              ) : null}
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download size={16} />
+              )}
               匯入 {selectedActivities.size > 0 ? `(${selectedActivities.size})` : ''}
             </Button>
           </div>

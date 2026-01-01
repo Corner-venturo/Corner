@@ -152,7 +152,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       {/* 旅遊團資訊 */}
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
             旅遊團名稱 <span className="text-morandi-red">*</span>
           </label>
           <Input
@@ -184,7 +184,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
               出發日期 <span className="text-morandi-red">*</span>
             </label>
             <SimpleDateInput
@@ -204,7 +204,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
               返回日期 <span className="text-morandi-red">*</span>
             </label>
             <SimpleDateInput
@@ -239,7 +239,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">聯絡人</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">聯絡人</label>
             <Input
               value={newOrder.contact_person}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_person: e.target.value }))}
@@ -248,7 +248,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-morandi-secondary mb-2 block">電話</label>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">電話</label>
             <Input
               value={newOrder.contact_phone}
               onChange={e => setNewOrder(prev => ({ ...prev, contact_phone: e.target.value }))}
@@ -261,7 +261,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         {newOrder.contact_person && (
           <>
             <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-2 block">
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
                 業務人員
               </label>
               <Combobox
@@ -280,7 +280,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-morandi-secondary mb-2 block">助理</label>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">助理</label>
               <Combobox
                 value={newOrder.assistant}
                 onChange={assistant => setNewOrder(prev => ({ ...prev, assistant }))}

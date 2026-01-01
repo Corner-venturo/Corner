@@ -258,7 +258,8 @@ export function ImagePositionEditor({
 
       {/* 操作按鈕 */}
       <div className="flex justify-end gap-2 pt-2 border-t border-morandi-container">
-        <Button type="button" variant="ghost" onClick={onClose}>
+        <Button type="button" variant="ghost" className="gap-1" onClick={onClose}>
+          <X size={16} />
           取消
         </Button>
         <Button

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Employee } from '@/stores/types'
 import { cn } from '@/lib/utils'
+import { X } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { format } from 'date-fns'
 
@@ -132,7 +133,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium text-morandi-secondary">
+                  <label className="text-sm font-medium text-morandi-primary">
                     請款日期 <span className="text-morandi-red">*</span>
                   </label>
                   <div className="flex items-center space-x-1">
@@ -175,7 +176,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
               </div>
 
               <div>
-                <label className="text-sm font-medium text-morandi-secondary">備註（選填）</label>
+                <label className="text-sm font-medium text-morandi-primary">備註（選填）</label>
                 <Input
                   value={note}
                   onChange={e => setNote(e.target.value)}
@@ -249,7 +250,8 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+              <X size={16} />
               取消
             </Button>
             <Button

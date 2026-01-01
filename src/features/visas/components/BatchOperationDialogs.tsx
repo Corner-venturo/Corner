@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { DatePicker } from '@/components/ui/date-picker'
+import { X, Check } from 'lucide-react'
 
 interface BatchPickupDialogProps {
   open: boolean
@@ -48,13 +49,15 @@ export function BatchPickupDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" className="gap-1" onClick={onCancel}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={onConfirm}
-            className="bg-morandi-green hover:bg-morandi-green/90"
+            className="bg-morandi-green hover:bg-morandi-green/90 gap-1"
           >
+            <Check size={16} />
             確認取件
           </Button>
         </div>
@@ -101,13 +104,15 @@ export function BatchRejectDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" className="gap-1" onClick={onCancel}>
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={onConfirm}
-            className="bg-morandi-red hover:bg-morandi-red/90"
+            className="bg-morandi-red hover:bg-morandi-red/90 gap-1"
           >
+            <Check size={16} />
             確認退件
           </Button>
         </div>

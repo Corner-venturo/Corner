@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import { FileText } from 'lucide-react'
+import { FileText, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { Order } from '@/types/order.types'
@@ -116,7 +116,8 @@ export function InvoiceDialog({
 
           {/* 按鈕 */}
           <div className="flex justify-center gap-4 pt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="min-w-[100px]">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="min-w-[100px] gap-1">
+              <X size={16} />
               取消
             </Button>
             <Button

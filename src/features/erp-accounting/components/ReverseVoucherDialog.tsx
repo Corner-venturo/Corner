@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { X, RotateCcw } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
@@ -102,14 +103,17 @@ export function ReverseVoucherDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+            <X size={16} />
             取消
           </Button>
           <Button
             variant="destructive"
+            className="gap-1"
             onClick={handleSubmit}
             disabled={isSubmitting || !reason.trim()}
           >
+            <RotateCcw size={16} />
             {isSubmitting ? '處理中...' : '確認反沖'}
           </Button>
         </DialogFooter>
