@@ -23,7 +23,8 @@ import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
-import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
+import { DocumentVersionPicker } from '@/components/documents'
+import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
@@ -49,8 +50,6 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [selectedItineraryId, setSelectedItineraryId] = useState<string | null>(null)
-  const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
   const [tourRequestDialogTour, setTourRequestDialogTour] = useState<Tour | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
@@ -264,8 +263,6 @@ export const ToursPage: React.FC = () => {
         isOpen={dialog.isOpen}
         onClose={() => {
           resetForm()
-          setSelectedItineraryId(null)
-          setSelectedQuoteId(null)
           closeDialog()
         }}
         mode={dialog.type === 'edit' ? 'edit' : 'create'}
@@ -276,10 +273,6 @@ export const ToursPage: React.FC = () => {
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}
-        selectedItineraryId={selectedItineraryId}
-        setSelectedItineraryId={setSelectedItineraryId}
-        selectedQuoteId={selectedQuoteId}
-        setSelectedQuoteId={setSelectedQuoteId}
       />
 
       <DeleteConfirmDialog
@@ -305,7 +298,7 @@ export const ToursPage: React.FC = () => {
       )}
 
       {itineraryDialogTour && (
-        <ItineraryVersionPicker
+        <LinkItineraryToTourDialog
           isOpen={!!itineraryDialogTour}
           onClose={closeItineraryDialog}
           tour={itineraryDialogTour}

@@ -51,14 +51,16 @@ export function processChannels(
     ),
   }))
 
-  // 4. 未分組頻道（已加入但無群組）
+  // 4. 未分組頻道（已加入但無群組，排除 DM 頻道）
   const ungroupedChannels = sortChannels(
     filteredChannels.filter(
       ch =>
         !ch.group_id &&
         !ch.is_archived &&
         checkIsMember(ch.id) &&
-        !favoriteChannelIds.has(ch.id)
+        !favoriteChannelIds.has(ch.id) &&
+        ch.type !== 'direct' &&
+        !ch.name.startsWith('dm:')
     )
   )
 

@@ -30,7 +30,6 @@ import {
   ImageIcon,
   Bus,
   CheckSquare,
-  FolderTree,
   ClipboardList,
   MessageCircle,
   Archive,
@@ -38,6 +37,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { isMenuItemHidden } from '@/constants/menu-items'
+import { isFeatureAvailable, RestrictedFeature } from '@/lib/feature-restrictions'
 
 interface MenuItem {
   href: string
@@ -45,6 +45,7 @@ interface MenuItem {
   icon: React.ElementType
   children?: MenuItem[]
   requiredPermission?: string
+  restrictedFeature?: RestrictedFeature // 受限功能（非 TP/TC 不可見）
 }
 
 const menuItems: MenuItem[] = [
@@ -68,7 +69,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
       { href: '/erp-accounting/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
-      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice' },
+      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
@@ -91,7 +92,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/hr', label: '人資管理', icon: UserCog, requiredPermission: 'hr' },
-  { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr' },
+  { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
 const personalToolItems: MenuItem[] = [
@@ -157,12 +158,17 @@ export function Sidebar() {
     userRoles.includes('super_admin')
 
   const visibleMenuItems = useMemo(() => {
+    const workspaceCode = user?.workspace_code
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) return items.filter(item => !item.requiredPermission)
 
       return items
         .map(item => {
           if (isMenuItemHidden(item.href, hiddenMenuItems)) return null
+          // 檢查功能限制（非 TP/TC 不可見）
+          if (item.restrictedFeature && !isFeatureAvailable(item.restrictedFeature, workspaceCode)) {
+            return null
+          }
           if (!isSuperAdmin && preferredFeatures.length > 0 && item.requiredPermission) {
             if (!preferredFeatures.includes(item.requiredPermission)) return null
           }
@@ -180,7 +186,7 @@ export function Sidebar() {
         .filter((item): item is MenuItem => item !== null)
     }
     return filterMenuByPermissions(menuItems)
-  }, [user?.id, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, user?.workspace_code, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   const visiblePersonalToolItems = useMemo(() => {
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
@@ -326,25 +332,6 @@ export function Sidebar() {
         <ul className="space-y-px">
           {visibleMenuItems.map(item => renderMenuItem(item))}
           {visiblePersonalToolItems.map(item => renderMenuItem(item))}
-
-          {/* 開發者地圖 */}
-          <li>
-            <Link
-              href="/dev-map"
-              prefetch={false}
-              onClick={closeSidebar}
-              className={cn(
-                'w-full relative block h-9 text-xs text-morandi-secondary transition-all duration-200',
-                'hover:bg-morandi-gold/5 hover:text-morandi-gold',
-                mounted && pathname === '/dev-map' && 'bg-morandi-gold/10 text-morandi-gold border-l-3 border-morandi-gold'
-              )}
-            >
-              <FolderTree size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
-              {isExpanded && (
-                <span className="ml-12 block text-left leading-9">開發者地圖</span>
-              )}
-            </Link>
-          </li>
 
           {/* 設定 */}
           <li>

@@ -35,6 +35,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { isMenuItemHidden } from '@/constants/menu-items'
+import { isFeatureAvailable, RestrictedFeature } from '@/lib/feature-restrictions'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 interface MenuItem {
@@ -43,6 +44,7 @@ interface MenuItem {
   icon: React.ElementType
   children?: MenuItem[]
   requiredPermission?: string
+  restrictedFeature?: RestrictedFeature // 受限功能（非 TP/TC 不可見）
 }
 
 // 主選單項目
@@ -67,7 +69,7 @@ const menuItems: MenuItem[] = [
       { href: '/finance/requests', label: '請款管理', icon: TrendingDown, requiredPermission: 'requests' },
       { href: '/finance/treasury', label: '出納管理', icon: Wallet, requiredPermission: 'disbursement' },
       { href: '/erp-accounting/vouchers', label: '會計傳票', icon: FileText, requiredPermission: 'vouchers' },
-      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice' },
+      { href: '/finance/travel-invoice', label: '代轉發票', icon: FileText, requiredPermission: 'travel_invoice', restrictedFeature: 'travel_invoices' },
       { href: '/finance/reports', label: '報表管理', icon: BarChart3, requiredPermission: 'reports' },
     ],
   },
@@ -89,7 +91,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/hr', label: '人資管理', icon: UserCog, requiredPermission: 'hr' },
-  { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr' },
+  { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
 // 個人工具
@@ -140,12 +142,17 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   }
 
   // 過濾選單（與桌面版一致的權限邏輯）
+  const workspaceCode = user?.workspace_code
   const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
     if (!user) return items.filter(item => !item.requiredPermission)
 
     return items
       .map(item => {
         if (isMenuItemHidden(item.href, hiddenMenuItems)) return null
+        // 檢查功能限制（非 TP/TC 不可見）
+        if (item.restrictedFeature && !isFeatureAvailable(item.restrictedFeature, workspaceCode)) {
+          return null
+        }
         if (!isSuperAdmin && preferredFeatures.length > 0 && item.requiredPermission) {
           if (!preferredFeatures.includes(item.requiredPermission)) return null
         }

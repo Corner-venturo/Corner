@@ -18,8 +18,9 @@ import { PasswordAndRoleFields } from './PasswordAndRoleFields'
 import { JobInfoFields } from './JobInfoFields'
 import { SuccessDialog } from './SuccessDialog'
 import { AddEmployeeFormProps } from './types'
-import { getAvailableWorkspaces, isSuperAdmin as checkIsSuperAdmin } from '@/lib/workspace-helpers'
+import { getAvailableWorkspaces, isSuperAdmin as checkIsSuperAdmin, getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { useWorkspaceStoreData } from '@/stores/workspace/workspace-store'
+import { hasFullFeatures } from '@/lib/feature-restrictions'
 
 export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
   const {
@@ -57,7 +58,11 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
     }
   }, [workspaces])
 
-  const showWorkspaceSelector = (isSuperAdmin || checkIsSuperAdmin()) && availableWorkspaces.length > 1
+  // 只有完整功能的公司（TP/TC）的 super_admin 才能選擇不同 workspace
+  const currentWorkspaceCode = getCurrentWorkspaceCode()
+  const showWorkspaceSelector = (isSuperAdmin || checkIsSuperAdmin()) &&
+    availableWorkspaces.length > 1 &&
+    hasFullFeatures(currentWorkspaceCode)
 
   return (
     <>

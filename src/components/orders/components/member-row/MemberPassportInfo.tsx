@@ -1,6 +1,6 @@
 /**
  * MemberPassportInfo - 成員護照資訊欄位
- * 包含：護照拼音、護照號碼、護照效期
+ * 包含：護照號碼、護照效期
  */
 
 'use client'
@@ -9,12 +9,14 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import type { OrderMember } from '../../order-member.types'
+import type { ColumnVisibility } from '../../OrderMembersExpandable'
 
 interface MemberPassportInfoProps {
   member: OrderMember
   index: number
   isEditMode: boolean
   departureDate: string | null
+  columnVisibility?: ColumnVisibility
   onUpdateField: (memberId: string, field: keyof OrderMember, value: string | number | null) => void
   onKeyDown: (e: React.KeyboardEvent, memberIndex: number, field: string) => void
 }
@@ -24,9 +26,25 @@ export function MemberPassportInfo({
   index,
   isEditMode,
   departureDate,
+  columnVisibility,
   onUpdateField,
   onKeyDown,
 }: MemberPassportInfoProps) {
+
+  // 預設全部顯示
+  const cv = columnVisibility || {
+    passport_name: true,
+    birth_date: true,
+    gender: true,
+    id_number: true,
+    passport_number: true,
+    passport_expiry: true,
+    special_meal: true,
+    total_payable: true,
+    deposit_amount: true,
+    balance: true,
+    remarks: true,
+  }
 
   // 處理護照效期日期輸入
   const handlePassportExpiryInput = (value: string) => {
@@ -49,51 +67,55 @@ export function MemberPassportInfo({
   return (
     <>
       {/* 護照號碼 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.passport_number || ''}
-            onChange={e => onUpdateField(member.id, 'passport_number', e.target.value)}
-            onKeyDown={e => onKeyDown(e, index, 'passport_number')}
-            data-member={member.id}
-            data-field="passport_number"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
-        ) : (
-          <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
-        )}
-      </td>
+      {cv.passport_number && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.passport_number || ''}
+              onChange={e => onUpdateField(member.id, 'passport_number', e.target.value)}
+              onKeyDown={e => onKeyDown(e, index, 'passport_number')}
+              data-member={member.id}
+              data-field="passport_number"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
+          )}
+        </td>
+      )}
 
       {/* 護照效期 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.passport_expiry || ''}
-            onChange={e => handlePassportExpiryInput(e.target.value)}
-            onKeyDown={e => onKeyDown(e, index, 'passport_expiry')}
-            data-member={member.id}
-            data-field="passport_expiry"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="YYYYMMDD"
-          />
-        ) : (
-          (() => {
-            const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
-            return (
-              <span className={cn("text-xs", expiryInfo.className)}>
-                {expiryInfo.text}
-                {expiryInfo.statusLabel && (
-                  <span className="ml-1 text-[10px] font-medium">
-                    ({expiryInfo.statusLabel})
-                  </span>
-                )}
-              </span>
-            )
-          })()
-        )}
-      </td>
+      {cv.passport_expiry && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.passport_expiry || ''}
+              onChange={e => handlePassportExpiryInput(e.target.value)}
+              onKeyDown={e => onKeyDown(e, index, 'passport_expiry')}
+              data-member={member.id}
+              data-field="passport_expiry"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              placeholder="YYYYMMDD"
+            />
+          ) : (
+            (() => {
+              const expiryInfo = formatPassportExpiryWithStatus(member.passport_expiry, departureDate)
+              return (
+                <span className={cn("text-xs", expiryInfo.className)}>
+                  {expiryInfo.text}
+                  {expiryInfo.statusLabel && (
+                    <span className="ml-1 text-[10px] font-medium">
+                      ({expiryInfo.statusLabel})
+                    </span>
+                  )}
+                </span>
+              )
+            })()
+          )}
+        </td>
+      )}
     </>
   )
 }

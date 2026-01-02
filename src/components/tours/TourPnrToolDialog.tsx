@@ -28,6 +28,7 @@ import {
   Loader2,
   Users,
   ArrowRight,
+  Baby,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -57,6 +58,9 @@ interface TourPnrToolDialogProps {
 interface PassengerMatch {
   pnrIndex: number
   pnrName: string
+  passengerType: 'ADT' | 'CHD' | 'INF' | 'INS'  // 旅客類型
+  birthDate?: string                              // 兒童生日
+  infant?: { name: string; birthDate: string }   // 隨行嬰兒資訊
   memberId: string | null
   memberName: string | null
   memberPassportName: string | null
@@ -180,14 +184,17 @@ export function TourPnrToolDialog({
       setParsedPNR(result)
       setError(null)
 
-      // 自動比對旅客
-      const matches: PassengerMatch[] = result.passengerNames.map((name, index) => {
-        const matchedMember = matchPassengerToMember(name, members)
+      // 自動比對旅客（使用 passengers 陣列取得完整資訊）
+      const matches: PassengerMatch[] = result.passengers.map((passenger, index) => {
+        const matchedMember = matchPassengerToMember(passenger.name, members)
         const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
 
         return {
           pnrIndex: index,
-          pnrName: name,
+          pnrName: passenger.name,
+          passengerType: passenger.type,
+          birthDate: passenger.birthDate,
+          infant: passenger.infant,
           memberId: matchedMember?.id || null,
           memberName: matchedMember?.chinese_name || null,
           memberPassportName: matchedMember?.passport_name || null,
@@ -386,13 +393,16 @@ export function TourPnrToolDialog({
                 try {
                   const result = parseAmadeusPNR(draft.rawPNR)
                   setParsedPNR(result)
-                  // 自動比對旅客
-                  const matches: PassengerMatch[] = result.passengerNames.map((name, index) => {
-                    const matchedMember = matchPassengerToMember(name, members)
+                  // 自動比對旅客（使用 passengers 陣列取得完整資訊）
+                  const matches: PassengerMatch[] = result.passengers.map((passenger, index) => {
+                    const matchedMember = matchPassengerToMember(passenger.name, members)
                     const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
                     return {
                       pnrIndex: index,
-                      pnrName: name,
+                      pnrName: passenger.name,
+                      passengerType: passenger.type,
+                      birthDate: passenger.birthDate,
+                      infant: passenger.infant,
                       memberId: matchedMember?.id || null,
                       memberName: matchedMember?.chinese_name || null,
                       memberPassportName: matchedMember?.passport_name || null,
@@ -415,10 +425,15 @@ export function TourPnrToolDialog({
     }
   }, [isOpen, tourId, storageKey, members])
 
-  // 保存草稿到 localStorage
+  // 保存草稿到 localStorage（空字串時清除）
   useEffect(() => {
-    if (tourId && rawPNR) {
-      localStorage.setItem(storageKey, JSON.stringify({ rawPNR }))
+    if (tourId) {
+      if (rawPNR.trim()) {
+        localStorage.setItem(storageKey, JSON.stringify({ rawPNR }))
+      } else {
+        // 當使用者手動清空輸入框時，也清除 localStorage
+        localStorage.removeItem(storageKey)
+      }
     }
   }, [tourId, rawPNR, storageKey])
 
@@ -426,7 +441,9 @@ export function TourPnrToolDialog({
   const matchStats = useMemo(() => {
     const matched = passengerMatches.filter(m => m.memberId).length
     const total = passengerMatches.length
-    return { matched, total, allMatched: matched === total && total > 0 }
+    const infantCount = passengerMatches.filter(m => m.infant).length
+    const childCount = passengerMatches.filter(m => m.passengerType === 'CHD').length
+    return { matched, total, infantCount, childCount, allMatched: matched === total && total > 0 }
   }, [passengerMatches])
 
   return (
@@ -516,10 +533,23 @@ export function TourPnrToolDialog({
                   </div>
                 )}
 
-                <div className="flex items-center gap-1 text-sm text-morandi-secondary ml-auto">
-                  <Users size={14} />
-                  {matchStats.matched}/{matchStats.total} 人已比對
-                  {matchStats.allMatched && <Check size={14} className="text-green-600 ml-1" />}
+                <div className="flex items-center gap-2 text-sm text-morandi-secondary ml-auto">
+                  <div className="flex items-center gap-1">
+                    <Users size={14} />
+                    {matchStats.matched}/{matchStats.total} 人已比對
+                    {matchStats.allMatched && <Check size={14} className="text-green-600 ml-1" />}
+                  </div>
+                  {matchStats.childCount > 0 && (
+                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      {matchStats.childCount} 兒童
+                    </span>
+                  )}
+                  {matchStats.infantCount > 0 && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-pink-100 text-pink-700 text-xs rounded-full">
+                      <Baby size={12} />
+                      +{matchStats.infantCount} 嬰兒
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -560,6 +590,7 @@ export function TourPnrToolDialog({
                       <tr>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">#</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">PNR 姓名</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary w-16">類型</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">團員</th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">
                           <Briefcase size={14} className="inline mr-1" />
@@ -576,7 +607,32 @@ export function TourPnrToolDialog({
                       {passengerMatches.map((match, i) => (
                         <tr key={i} className="border-t border-border hover:bg-morandi-container/20">
                           <td className="px-3 py-2 text-morandi-secondary">{i + 1}</td>
-                          <td className="px-3 py-2 font-mono">{match.pnrName}</td>
+                          <td className="px-3 py-2">
+                            <div className="font-mono">{match.pnrName}</div>
+                            {/* 顯示隨行嬰兒資訊 */}
+                            {match.infant && (
+                              <div className="flex items-center gap-1 mt-1 text-xs text-pink-600">
+                                <Baby size={12} />
+                                <span>{match.infant.name}</span>
+                                <span className="text-pink-400">({match.infant.birthDate})</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-3 py-2">
+                            {/* 顯示旅客類型徽章 */}
+                            {match.passengerType === 'CHD' ? (
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                兒童
+                                {match.birthDate && <span className="ml-1 text-blue-500">({match.birthDate})</span>}
+                              </span>
+                            ) : match.infant ? (
+                              <span className="px-2 py-0.5 bg-pink-100 text-pink-700 text-xs rounded-full">
+                                +嬰兒
+                              </span>
+                            ) : (
+                              <span className="text-xs text-morandi-secondary">成人</span>
+                            )}
+                          </td>
                           <td className="px-3 py-2">
                             {match.memberId ? (
                               <div className="flex items-center gap-1">

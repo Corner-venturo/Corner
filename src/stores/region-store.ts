@@ -8,7 +8,6 @@
 import { createStore } from './core/create-store'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { seedRegions } from '@/lib/db/seed-regions'
 
 // ============================================
 // 型別定義
@@ -23,6 +22,7 @@ export interface Country {
   has_regions: boolean
   display_order: number
   is_active: boolean
+  workspace_id?: string
   created_at: string
   updated_at: string
 }
@@ -35,6 +35,7 @@ export interface Region {
   description?: string
   display_order: number
   is_active: boolean
+  workspace_id?: string
   created_at: string
   updated_at: string
 }
@@ -54,6 +55,7 @@ export interface City {
   display_order: number
   is_active: boolean
   is_major?: boolean // 主要城市（有機場，用於開團/封面選擇）
+  workspace_id?: string
   created_at: string
   updated_at: string
 }
@@ -81,9 +83,9 @@ export type CityUpdate = Partial<CityInput>
 // 內部 Stores（使用 createStore 工廠）
 // ============================================
 
-const useCountryStoreInternal = createStore<Country>('countries')
-const useRegionStoreInternal = createStore<Region>('regions')
-const useCityStoreInternal = createStore<City>('cities')
+const useCountryStoreInternal = createStore<Country>({ tableName: 'countries', workspaceScoped: true })
+const useRegionStoreInternal = createStore<Region>({ tableName: 'regions', workspaceScoped: true })
+const useCityStoreInternal = createStore<City>({ tableName: 'cities', workspaceScoped: true })
 
 // ============================================
 // 統計資料 Store (簡單的 Zustand store，不需要離線支援)
@@ -144,19 +146,7 @@ export const useRegionsStore = () => {
   // ============================================
   const fetchCountries = useCallback(async () => {
     await countryStore.fetchAll()
-
-    // 如果 countries 是空的，自動初始化預設資料
-    if (countryStore.items.length === 0) {
-      logger.info('📦 [RegionStore] 偵測到空資料，開始初始化預設地區資料...')
-      try {
-        await seedRegions()
-        // 重新載入資料
-        await countryStore.fetchAll()
-        logger.info('✅ [RegionStore] 預設地區資料初始化完成')
-      } catch (error) {
-        logger.error('❌ [RegionStore] 初始化失敗:', error)
-      }
-    }
+    // 註：新公司需要自行建立國家/城市資料，不再自動 seed
   }, [countryStore])
 
   // ============================================
@@ -176,23 +166,9 @@ export const useRegionsStore = () => {
   // 載入所有資料（保留向後相容）
   // ============================================
   const fetchAll = useCallback(async () => {
-    // 先載入現有資料
+    // 載入資料（會自動依 workspace_id 過濾）
     await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
-
-    // 如果 countries 是空的，自動初始化預設資料
-    if (countryStore.items.length === 0) {
-      logger.info('📦 [RegionStore] 偵測到空資料，開始初始化預設地區資料...')
-      try {
-        await seedRegions()
-
-        // 重新載入資料
-        await Promise.all([countryStore.fetchAll(), regionStore.fetchAll(), cityStore.fetchAll()])
-
-        logger.info('✅ [RegionStore] 預設地區資料初始化完成')
-      } catch (error) {
-        logger.error('❌ [RegionStore] 初始化失敗:', error)
-      }
-    }
+    // 註：新公司需要自行建立國家/城市資料，不再自動 seed
 
     logger.info('✅ 地區資料載入完成', {
       countries: countryStore.items.length,

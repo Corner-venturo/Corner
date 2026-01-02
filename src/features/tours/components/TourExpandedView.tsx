@@ -30,6 +30,7 @@ import { TourAddOns } from '@/components/tours/tour-add-ons'
 import { TourTaskAssignment } from '@/components/tours/tour-task-assignment'
 import { TourOverviewTab } from './TourOverviewTab'
 import { TourOperationsAddButton } from './TourOperationsAddButton'
+import { TourDocumentsTab } from './TourDocumentsTab'
 
 const TourMembers = dynamic(
   () => import('@/components/tours/tour-members').then(m => m.TourMembers),
@@ -275,12 +276,7 @@ export function TourExpandedView({
         {activeTabs[tour.id] === 'costs' && (
           <TourCosts tour={tour} />
         )}
-        {activeTabs[tour.id] === 'documents' && (
-          <div className="text-center py-8 text-morandi-secondary">
-            <FileCheck size={48} className="mx-auto mb-4 opacity-50" />
-            <p>文件確認功能開發中...</p>
-          </div>
-        )}
+        {activeTabs[tour.id] === 'documents' && <TourDocumentsTab tour={tour} />}
         {activeTabs[tour.id] === 'tasks' && <TourTaskAssignment tour={tour} />}
       </div>
     </div>

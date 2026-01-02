@@ -238,6 +238,7 @@ export function ChatMessages({
           advanceLists={advanceLists}
           sharedOrderLists={sharedOrderLists}
           channelName={channelName}
+          channelType={channel.type || undefined}
           currentUserId={currentUserId}
           isLoading={isLoading}
           onReaction={onReaction}

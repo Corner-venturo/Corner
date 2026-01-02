@@ -54,7 +54,7 @@ export const TourTable: React.FC<TourTableProps> = ({
   renderActions,
   getStatusColor,
 }) => {
-  const columns = useTourTableColumns({ orders, getStatusColor })
+  const columns = useTourTableColumns({ getStatusColor })
 
   const renderExpanded = useCallback(
     (row: unknown) => {

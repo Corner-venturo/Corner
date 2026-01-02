@@ -2,6 +2,7 @@
  * 收款項目表單組件
  */
 
+import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DateInput } from '@/components/ui/date-input'
@@ -14,6 +15,8 @@ import {
 } from '@/components/ui/select'
 import { Trash2 } from 'lucide-react'
 import type { ReceiptItem } from '@/stores'
+import { useAuthStore } from '@/stores/auth-store'
+import { isFeatureAvailable } from '@/lib/feature-restrictions'
 
 const RECEIPT_TYPES = {
   BANK_TRANSFER: 0,
@@ -23,7 +26,7 @@ const RECEIPT_TYPES = {
   LINK_PAY: 4,
 } as const
 
-const RECEIPT_TYPE_OPTIONS = [
+const ALL_RECEIPT_TYPE_OPTIONS = [
   { value: RECEIPT_TYPES.CASH, label: '現金' },
   { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
   { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
@@ -51,6 +54,16 @@ export function PaymentItemForm({
   onRemove,
   canRemove,
 }: PaymentItemFormProps) {
+  const { user } = useAuthStore()
+
+  // 根據 workspace 過濾收款方式選項（非 TP/TC 隱藏 LinkPay）
+  const RECEIPT_TYPE_OPTIONS = useMemo(() => {
+    if (isFeatureAvailable('linkpay', user?.workspace_code)) {
+      return ALL_RECEIPT_TYPE_OPTIONS
+    }
+    return ALL_RECEIPT_TYPE_OPTIONS.filter(opt => opt.value !== RECEIPT_TYPES.LINK_PAY)
+  }, [user?.workspace_code])
+
   return (
     <div className="border border-border rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">

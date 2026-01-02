@@ -22,6 +22,8 @@ export interface OrderMember {
   passport_expiry?: string | null
   special_meal?: string | null
   pnr?: string | null
+  ticket_number?: string | null
+  ticketing_deadline?: string | null
   flight_cost?: number | null
   hotel_1_name?: string | null
   hotel_1_checkin?: string | null
@@ -121,6 +123,8 @@ export interface OrderMembersExpandableProps {
   mode?: 'order' | 'tour'
   /** 是否嵌入在其他組件中（如訂單展開），嵌入時不顯示外框 */
   embedded?: boolean
+  /** 強制顯示 PNR 欄位（PNR 配對後自動開啟） */
+  forceShowPnr?: boolean
 }
 
 export interface MemberRowProps {

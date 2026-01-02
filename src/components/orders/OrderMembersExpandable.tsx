@@ -10,8 +10,16 @@
 
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
-import { Users, Plus, Printer, Hotel, Bus, Plane, Coins } from 'lucide-react'
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
+import { Plus, Printer, Hotel, Bus, Coins, Settings } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -40,6 +48,60 @@ import {
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
 import type { EditFormData } from './components/member-edit/hooks/useMemberEdit'
 
+// 可切換顯示的欄位定義
+export interface ColumnVisibility {
+  passport_name: boolean
+  birth_date: boolean
+  gender: boolean
+  id_number: boolean
+  passport_number: boolean
+  passport_expiry: boolean
+  special_meal: boolean
+  total_payable: boolean
+  deposit_amount: boolean
+  balance: boolean
+  remarks: boolean
+  pnr: boolean
+  ticket_number: boolean
+  ticketing_deadline: boolean
+}
+
+// 預設全部顯示
+const defaultColumnVisibility: ColumnVisibility = {
+  passport_name: true,
+  birth_date: true,
+  gender: true,
+  id_number: true,
+  passport_number: true,
+  passport_expiry: true,
+  special_meal: true,
+  total_payable: true,
+  deposit_amount: true,
+  balance: true,
+  remarks: true,
+  pnr: false,
+  ticket_number: false,
+  ticketing_deadline: false,
+}
+
+// 欄位標籤對照
+const columnLabels: Record<keyof ColumnVisibility, string> = {
+  passport_name: '護照拼音',
+  birth_date: '出生年月日',
+  gender: '性別',
+  id_number: '身分證號',
+  passport_number: '護照號碼',
+  passport_expiry: '護照效期',
+  special_meal: '飲食禁忌',
+  total_payable: '應付金額',
+  deposit_amount: '訂金',
+  balance: '尾款',
+  remarks: '備註',
+  pnr: 'PNR',
+  ticket_number: '機票號碼',
+  ticketing_deadline: '開票期限',
+}
+
 export function OrderMembersExpandable({
   orderId,
   tourId,
@@ -47,6 +109,7 @@ export function OrderMembersExpandable({
   onClose,
   mode: propMode,
   embedded = false,
+  forceShowPnr = false,
 }: OrderMembersExpandableProps) {
   const mode = propMode || (orderId ? 'order' : 'tour')
 
@@ -60,13 +123,67 @@ export function OrderMembersExpandable({
   const passportUpload = usePassportUpload({ orderId, workspaceId, onSuccess: membersData.loadMembers })
   const { isRecognizing, recognizePassport } = useOcrRecognition()
 
+  // 從 localStorage 讀取欄位顯示設定
+  const getInitialColumnVisibility = (): ColumnVisibility => {
+    if (typeof window === 'undefined') return defaultColumnVisibility
+    try {
+      const saved = localStorage.getItem('memberListColumnVisibility')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        // 合併預設值，確保新增的欄位也有預設值
+        return { ...defaultColumnVisibility, ...parsed }
+      }
+    } catch {
+      // ignore
+    }
+    return defaultColumnVisibility
+  }
+
   // UI State
-  const [showIdentityColumn, setShowIdentityColumn] = useState(false)
-  const [showPnrColumn, setShowPnrColumn] = useState(false)
+  const [showIdentityColumn, setShowIdentityColumn] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('memberListShowIdentity') === 'true'
+  })
   const [isAllEditMode, setIsAllEditMode] = useState(false)
   const [isComposing, setIsComposing] = useState(false)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(getInitialColumnVisibility)
+
+  // 切換欄位可見性
+  const toggleColumnVisibility = useCallback((column: keyof ColumnVisibility) => {
+    setColumnVisibility(prev => ({ ...prev, [column]: !prev[column] }))
+  }, [])
+
+  // 追蹤是否已初始化（避免初次渲染時觸發 localStorage 保存）
+  const isInitialMount = useRef(true)
+
+  // 儲存欄位顯示設定到 localStorage（跳過初次渲染）
+  useEffect(() => {
+    if (isInitialMount.current) return
+    localStorage.setItem('memberListColumnVisibility', JSON.stringify(columnVisibility))
+  }, [columnVisibility])
+
+  // 儲存身份欄位顯示設定（跳過初次渲染）
+  useEffect(() => {
+    if (isInitialMount.current) return
+    localStorage.setItem('memberListShowIdentity', String(showIdentityColumn))
+  }, [showIdentityColumn])
+
+  // 標記初始化完成
+  useEffect(() => {
+    isInitialMount.current = false
+  }, [])
+
+  // PNR 配對成功後自動顯示 PNR 欄位
+  useEffect(() => {
+    if (forceShowPnr) {
+      setColumnVisibility(prev => {
+        if (prev.pnr) return prev // 已經是 true，不更新
+        return { ...prev, pnr: true }
+      })
+    }
+  }, [forceShowPnr])
 
   // 從 members 資料初始化 pnrValues
   React.useEffect(() => {
@@ -143,9 +260,6 @@ export function OrderMembersExpandable({
               <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowVehicleManager(true)}>
                 <Bus size={14} className="mr-1" />分車
               </Button>
-              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrColumn(!showPnrColumn)}>
-                <Plane size={14} className={showPnrColumn ? 'text-morandi-gold' : ''} />
-              </Button>
             </>
           )}
           <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
@@ -169,6 +283,108 @@ export function OrderMembersExpandable({
           <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => memberExport.setIsExportDialogOpen(true)}>
             <Printer size={14} />
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 px-2">
+                <Settings size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel className="text-xs">顯示欄位</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.passport_name}
+                onCheckedChange={() => toggleColumnVisibility('passport_name')}
+              >
+                {columnLabels.passport_name}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.birth_date}
+                onCheckedChange={() => toggleColumnVisibility('birth_date')}
+              >
+                {columnLabels.birth_date}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.gender}
+                onCheckedChange={() => toggleColumnVisibility('gender')}
+              >
+                {columnLabels.gender}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.id_number}
+                onCheckedChange={() => toggleColumnVisibility('id_number')}
+              >
+                {columnLabels.id_number}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.passport_number}
+                onCheckedChange={() => toggleColumnVisibility('passport_number')}
+              >
+                {columnLabels.passport_number}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.passport_expiry}
+                onCheckedChange={() => toggleColumnVisibility('passport_expiry')}
+              >
+                {columnLabels.passport_expiry}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.special_meal}
+                onCheckedChange={() => toggleColumnVisibility('special_meal')}
+              >
+                {columnLabels.special_meal}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.total_payable}
+                onCheckedChange={() => toggleColumnVisibility('total_payable')}
+              >
+                {columnLabels.total_payable}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.deposit_amount}
+                onCheckedChange={() => toggleColumnVisibility('deposit_amount')}
+              >
+                {columnLabels.deposit_amount}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.balance}
+                onCheckedChange={() => toggleColumnVisibility('balance')}
+              >
+                {columnLabels.balance}
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.remarks}
+                onCheckedChange={() => toggleColumnVisibility('remarks')}
+              >
+                {columnLabels.remarks}
+              </DropdownMenuCheckboxItem>
+              {mode === 'tour' && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.pnr}
+                    onCheckedChange={() => toggleColumnVisibility('pnr')}
+                  >
+                    {columnLabels.pnr}
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.ticket_number}
+                    onCheckedChange={() => toggleColumnVisibility('ticket_number')}
+                  >
+                    {columnLabels.ticket_number}
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.ticketing_deadline}
+                    onCheckedChange={() => toggleColumnVisibility('ticketing_deadline')}
+                  >
+                    {columnLabels.ticketing_deadline}
+                  </DropdownMenuCheckboxItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="default" size="sm" className="h-8 px-3" onClick={membersData.handleAddMember}>
             <Plus size={14} className="mr-1" />新增
           </Button>
@@ -182,9 +398,11 @@ export function OrderMembersExpandable({
             mode={mode}
             orderCount={membersData.orderCount}
             showIdentityColumn={showIdentityColumn}
-            showPnrColumn={showPnrColumn}
+            showPnrColumn={columnVisibility.pnr}
             showRoomColumn={roomVehicle.showRoomColumn}
+            showVehicleColumn={roomVehicle.showVehicleColumn}
             customCostFields={customCostFields}
+            columnVisibility={columnVisibility}
           />
           <tbody>
             {sortedMembers.map((member, index) => (
@@ -194,8 +412,9 @@ export function OrderMembersExpandable({
                 index={index}
                 isEditMode={isAllEditMode}
                 showIdentityColumn={showIdentityColumn}
-                showPnrColumn={showPnrColumn}
+                showPnrColumn={columnVisibility.pnr}
                 showRoomColumn={roomVehicle.showRoomColumn}
+                showVehicleColumn={roomVehicle.showVehicleColumn}
                 showOrderCode={mode === 'tour' && membersData.orderCount > 1}
                 departureDate={membersData.departureDate}
                 roomAssignment={roomVehicle.roomAssignments[member.id]}
@@ -203,6 +422,7 @@ export function OrderMembersExpandable({
                 pnrValue={pnrValues[member.id]}
                 customCostFields={customCostFields}
                 mode={mode}
+                columnVisibility={columnVisibility}
                 onUpdateField={handleUpdateField}
                 onDelete={membersData.handleDeleteMember}
                 onEdit={memberEdit.openEditDialog}

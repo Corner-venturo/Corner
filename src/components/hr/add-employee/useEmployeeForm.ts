@@ -113,12 +113,21 @@ export function useEmployeeForm(onSubmit: () => void) {
 
       // 建立 Supabase Auth 帳號（用於 RLS）
       try {
+        // 取得 workspace code（用於 Auth email 格式）
+        const { supabase } = await import('@/lib/supabase/client')
+        const { data: workspace } = await supabase
+          .from('workspaces')
+          .select('code')
+          .eq('id', targetWorkspaceId)
+          .single()
+
         const authResponse = await fetch('/api/auth/create-employee-auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             employee_number,
             password: formData.defaultPassword,
+            workspace_code: workspace?.code || null,
           }),
         })
 

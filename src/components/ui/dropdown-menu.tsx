@@ -163,10 +163,63 @@ const DropdownMenuSeparator = React.forwardRef<
 ))
 DropdownMenuSeparator.displayName = 'DropdownMenuSeparator'
 
+const DropdownMenuLabel = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn('px-2 py-1.5 text-sm font-semibold text-morandi-primary', className)}
+    {...props}
+  />
+))
+DropdownMenuLabel.displayName = 'DropdownMenuLabel'
+
+const DropdownMenuCheckboxItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    checked?: boolean
+    onCheckedChange?: (checked: boolean) => void
+  }
+>(({ className, children, checked, onCheckedChange, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'relative flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 pl-8 text-sm outline-none',
+      'hover:bg-morandi-container hover:text-morandi-primary',
+      'focus:bg-morandi-container focus:text-morandi-primary',
+      className
+    )}
+    onClick={(e) => {
+      e.stopPropagation()
+      onCheckedChange?.(!checked)
+    }}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      {checked && (
+        <svg
+          className="h-4 w-4 text-morandi-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+    </span>
+    {children}
+  </div>
+))
+DropdownMenuCheckboxItem.displayName = 'DropdownMenuCheckboxItem'
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuCheckboxItem,
 }

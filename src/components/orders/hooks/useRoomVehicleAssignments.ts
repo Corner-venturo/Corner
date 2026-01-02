@@ -15,6 +15,8 @@ interface UseRoomVehicleAssignmentsReturn {
   setShowVehicleManager: (show: boolean) => void
   showRoomColumn: boolean
   setShowRoomColumn: (show: boolean) => void
+  showVehicleColumn: boolean
+  setShowVehicleColumn: (show: boolean) => void
   roomAssignments: Record<string, string>
   roomSortKeys: Record<string, number>
   vehicleAssignments: Record<string, string>
@@ -29,6 +31,7 @@ export function useRoomVehicleAssignments({
   const [showRoomManager, setShowRoomManager] = useState(false)
   const [showVehicleManager, setShowVehicleManager] = useState(false)
   const [showRoomColumn, setShowRoomColumn] = useState(false)
+  const [showVehicleColumn, setShowVehicleColumn] = useState(false)
   const [roomAssignments, setRoomAssignments] = useState<Record<string, string>>({})
   const [roomSortKeys, setRoomSortKeys] = useState<Record<string, number>>({})
   const [vehicleAssignments, setVehicleAssignments] = useState<Record<string, string>>({})
@@ -102,6 +105,10 @@ export function useRoomVehicleAssignments({
 
         setRoomAssignments(map)
         setRoomSortKeys(sortKeys)
+        // 有分房資料時自動顯示欄位
+        if (Object.keys(map).length > 0) {
+          setShowRoomColumn(true)
+        }
       }
     } catch (error) {
       logger.error('載入分房資訊失敗:', error)
@@ -133,6 +140,10 @@ export function useRoomVehicleAssignments({
           }
         })
         setVehicleAssignments(map)
+        // 有分車資料時自動顯示欄位
+        if (Object.keys(map).length > 0) {
+          setShowVehicleColumn(true)
+        }
       }
     } catch (error) {
       logger.error('載入分車資訊失敗:', error)
@@ -146,6 +157,8 @@ export function useRoomVehicleAssignments({
     setShowVehicleManager,
     showRoomColumn,
     setShowRoomColumn,
+    showVehicleColumn,
+    setShowVehicleColumn,
     roomAssignments,
     roomSortKeys,
     vehicleAssignments,

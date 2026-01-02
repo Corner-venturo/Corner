@@ -9,6 +9,7 @@ import React, { useState } from 'react'
 import { Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { OrderMember } from '../../order-member.types'
+import type { ColumnVisibility } from '../../OrderMembersExpandable'
 
 interface MemberBasicInfoProps {
   member: OrderMember
@@ -16,6 +17,7 @@ interface MemberBasicInfoProps {
   isEditMode: boolean
   showIdentityColumn: boolean
   showOrderCode: boolean
+  columnVisibility?: ColumnVisibility
   onUpdateField: (memberId: string, field: keyof OrderMember, value: string | number | null) => void
   onPreview: (member: OrderMember) => void
   onKeyDown: (e: React.KeyboardEvent, memberIndex: number, field: string) => void
@@ -29,6 +31,7 @@ export function MemberBasicInfo({
   isEditMode,
   showIdentityColumn,
   showOrderCode,
+  columnVisibility,
   onUpdateField,
   onPreview,
   onKeyDown,
@@ -36,6 +39,21 @@ export function MemberBasicInfo({
   onIdNumberSearch,
 }: MemberBasicInfoProps) {
   const [isComposing, setIsComposing] = useState(false)
+
+  // 預設全部顯示
+  const cv = columnVisibility || {
+    passport_name: true,
+    birth_date: true,
+    gender: true,
+    id_number: true,
+    passport_number: true,
+    passport_expiry: true,
+    special_meal: true,
+    total_payable: true,
+    deposit_amount: true,
+    balance: true,
+    remarks: true,
+  }
 
   // 處理日期輸入（自動格式化）
   const handleDateInput = (value: string) => {
@@ -57,40 +75,14 @@ export function MemberBasicInfo({
 
   return (
     <>
-      {/* 序號 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-center">
+      {/* 序號 - 凍結欄位 */}
+      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-center sticky left-0 z-10">
         <span className="text-xs text-morandi-secondary">{index + 1}</span>
       </td>
 
-      {/* 團體模式：訂單序號 */}
-      {showOrderCode && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-status-info-bg text-center">
-          <span className="text-xs text-status-info font-medium">{member.order_code || '-'}</span>
-        </td>
-      )}
-
-      {/* 身份（領隊勾選） */}
-      {showIdentityColumn && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-white" : "bg-muted")}>
-          {isEditMode ? (
-            <input
-              type="checkbox"
-              checked={member.identity === '領隊'}
-              onChange={e => onUpdateField(member.id, 'identity', e.target.checked ? '領隊' : '大人')}
-              data-member={member.id}
-              data-field="identity"
-              className="w-4 h-4 cursor-pointer accent-morandi-primary"
-              title="勾選設為領隊"
-            />
-          ) : (
-            <span className="text-xs text-morandi-primary">{member.identity === '領隊' ? '✓ 領隊' : '-'}</span>
-          )}
-        </td>
-      )}
-
-      {/* 中文姓名 */}
+      {/* 中文姓名 - 凍結欄位 */}
       <td className={cn(
-        "border border-morandi-gold/20 px-2 py-1",
+        "border border-morandi-gold/20 px-2 py-1 sticky left-[40px] z-10",
         isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted')
       )}>
         {isEditMode ? (
@@ -141,87 +133,121 @@ export function MemberBasicInfo({
         )}
       </td>
 
+      {/* 團體模式：訂單序號 */}
+      {showOrderCode && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-status-info-bg text-center">
+          <span className="text-xs text-status-info font-medium">{member.order_code || '-'}</span>
+        </td>
+      )}
+
+      {/* 身份（領隊勾選） */}
+      {showIdentityColumn && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="checkbox"
+              checked={member.identity === '領隊'}
+              onChange={e => onUpdateField(member.id, 'identity', e.target.checked ? '領隊' : '大人')}
+              data-member={member.id}
+              data-field="identity"
+              className="w-4 h-4 cursor-pointer accent-morandi-primary"
+              title="勾選設為領隊"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.identity === '領隊' ? '✓ 領隊' : '-'}</span>
+          )}
+        </td>
+      )}
+
       {/* 護照拼音 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.passport_name || ''}
-            onChange={e => onUpdateField(member.id, 'passport_name', e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={e => {
-              setIsComposing(false)
-              setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
-            }}
-            onKeyDown={e => onKeyDown(e, index, 'passport_name')}
-            data-member={member.id}
-            data-field="passport_name"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
-        ) : (
-          <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
-        )}
-      </td>
+      {cv.passport_name && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.passport_name || ''}
+              onChange={e => onUpdateField(member.id, 'passport_name', e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={e => {
+                setIsComposing(false)
+                setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
+              }}
+              onKeyDown={e => onKeyDown(e, index, 'passport_name')}
+              data-member={member.id}
+              data-field="passport_name"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
+          )}
+        </td>
+      )}
 
       {/* 出生年月日 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.birth_date || ''}
-            onChange={e => handleDateInput(e.target.value)}
-            onKeyDown={e => onKeyDown(e, index, 'birth_date')}
-            data-member={member.id}
-            data-field="birth_date"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="YYYYMMDD"
-          />
-        ) : (
-          <span className="text-xs text-morandi-primary">{member.birth_date || '-'}</span>
-        )}
-      </td>
+      {cv.birth_date && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.birth_date || ''}
+              onChange={e => handleDateInput(e.target.value)}
+              onKeyDown={e => onKeyDown(e, index, 'birth_date')}
+              data-member={member.id}
+              data-field="birth_date"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              placeholder="YYYYMMDD"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.birth_date || '-'}</span>
+          )}
+        </td>
+      )}
 
       {/* 性別 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <select
-            value={member.gender || ''}
-            onChange={e => onUpdateField(member.id, 'gender', e.target.value)}
-            data-member={member.id}
-            data-field="gender"
-            className="w-full bg-transparent text-xs text-center border-none outline-none shadow-none"
-          >
-            <option value="">-</option>
-            <option value="M">男</option>
-            <option value="F">女</option>
-          </select>
-        ) : (
-          <span className="text-morandi-primary">
-            {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
-          </span>
-        )}
-      </td>
+      {cv.gender && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <select
+              value={member.gender || ''}
+              onChange={e => onUpdateField(member.id, 'gender', e.target.value)}
+              data-member={member.id}
+              data-field="gender"
+              className="w-full bg-transparent text-xs text-center border-none outline-none shadow-none"
+            >
+              <option value="">-</option>
+              <option value="M">男</option>
+              <option value="F">女</option>
+            </select>
+          ) : (
+            <span className="text-morandi-primary">
+              {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
+            </span>
+          )}
+        </td>
+      )}
 
       {/* 身分證號 */}
-      <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
-        {isEditMode ? (
-          <input
-            type="text"
-            value={member.id_number || ''}
-            onChange={e => {
-              onUpdateField(member.id, 'id_number', e.target.value)
-              onIdNumberSearch?.(member.id, e.target.value, index)
-            }}
-            onKeyDown={e => onKeyDown(e, index, 'id_number')}
-            data-member={member.id}
-            data-field="id_number"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="輸入身分證搜尋..."
-          />
-        ) : (
-          <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
-        )}
-      </td>
+      {cv.id_number && (
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.id_number || ''}
+              onChange={e => {
+                onUpdateField(member.id, 'id_number', e.target.value)
+                onIdNumberSearch?.(member.id, e.target.value, index)
+              }}
+              onKeyDown={e => onKeyDown(e, index, 'id_number')}
+              data-member={member.id}
+              data-field="id_number"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              placeholder="輸入身分證搜尋..."
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
+          )}
+        </td>
+      )}
     </>
   )
 }

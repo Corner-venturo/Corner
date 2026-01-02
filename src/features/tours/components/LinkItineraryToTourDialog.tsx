@@ -23,6 +23,7 @@ import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { hasFullFeatures } from '@/lib/feature-restrictions'
 
 interface ItineraryFormData {
   title: string
@@ -46,6 +47,20 @@ export function LinkItineraryToTourDialog({
   const { items: itineraries, fetchAll, create, loading } = useItineraryStore()
   const { countries, cities, fetchAll: fetchRegions } = useRegionsStore()
   const { user: currentUser } = useAuthStore()
+
+  // 判斷是否有完整功能（TP/TC 有完整編輯器，其他公司只有簡易列印）
+  const hasFullEditor = useMemo(() => {
+    return hasFullFeatures(currentUser?.workspace_code)
+  }, [currentUser?.workspace_code])
+
+  // 根據權限決定行程表頁面路徑
+  const getItineraryUrl = (itineraryId: string) => {
+    if (hasFullEditor) {
+      return `/itinerary/new?itinerary_id=${itineraryId}`
+    }
+    return `/itinerary/print?itinerary_id=${itineraryId}`
+  }
+
   const [isCreating, setIsCreating] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
@@ -60,10 +75,7 @@ export function LinkItineraryToTourDialog({
   useEffect(() => {
     if (isOpen) {
       fetchAll()
-      // 載入國家/城市資料（如果還沒載入）
-      if (countries.length === 0) {
-        fetchRegions()
-      }
+      fetchRegions()
       // 重設表單狀態
       setShowForm(false)
       setCreateError(null)
@@ -74,7 +86,8 @@ export function LinkItineraryToTourDialog({
         description: '',
       })
     }
-  }, [isOpen, fetchAll, fetchRegions, countries.length, tour.name])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, tour.name])
 
   // 根據 country_id 和 main_city_id 查詢名稱
   const countryName = useMemo(() => {
@@ -196,7 +209,7 @@ export function LinkItineraryToTourDialog({
       if (newItinerary?.id) {
         logger.log('行程表建立成功:', newItinerary.id)
         onClose()
-        router.push(`/itinerary/new?itinerary_id=${newItinerary.id}`)
+        router.push(getItineraryUrl(newItinerary.id))
       } else {
         setCreateError('建立失敗：未取得行程表 ID')
       }
@@ -213,7 +226,7 @@ export function LinkItineraryToTourDialog({
   // 查看已連結的行程表
   const handleViewItinerary = (itinerary: Itinerary) => {
     onClose()
-    router.push(`/itinerary/new?itinerary_id=${itinerary.id}`)
+    router.push(getItineraryUrl(itinerary.id))
   }
 
   // 計算天數

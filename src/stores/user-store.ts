@@ -9,12 +9,11 @@ import { TABLES } from '@/lib/db/schemas'
 import { generateUUID } from '@/lib/utils/uuid'
 import { useAuthStore } from './auth-store'
 
-// 建立員工 Store
-export const useUserStore = createStore<User>(
-  TABLES.EMPLOYEES,
-  undefined, // 員工使用 employee_number 而非 code，所以不需要 codePrefix
-  true // enableSupabase
-)
+// 建立員工 Store（啟用 workspace 隔離）
+export const useUserStore = createStore<User>({
+  tableName: TABLES.EMPLOYEES,
+  workspaceScoped: true, // 員工資料按 workspace 隔離
+})
 
 // 擴充自訂方法（如果需要）
 export const userStoreHelpers = {

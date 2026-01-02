@@ -1,22 +1,16 @@
 'use client'
 
-import { useEffect, useMemo, useState, useCallback } from 'react'
-import { useItineraryStore, useQuoteStore } from '@/stores'
+import { useState, useCallback } from 'react'
 import { useTourDestinations } from './useTourDestinations'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { toast } from 'sonner'
 import type { NewTourData } from '../types'
-import type { OrderFormData } from '@/components/orders/add-order-form'
 
 interface UseTourFormProps {
   isOpen: boolean
   mode: 'create' | 'edit'
   newTour: NewTourData
   setNewTour: React.Dispatch<React.SetStateAction<NewTourData>>
-  selectedItineraryId?: string | null
-  setSelectedItineraryId?: (id: string | null) => void
-  selectedQuoteId?: string | null
-  setSelectedQuoteId?: (id: string | null) => void
 }
 
 export function useTourForm({
@@ -24,15 +18,7 @@ export function useTourForm({
   mode,
   newTour,
   setNewTour,
-  selectedItineraryId,
-  setSelectedItineraryId,
-  selectedQuoteId,
-  setSelectedQuoteId,
 }: UseTourFormProps) {
-  // 載入行程表和報價單資料
-  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
-  const { items: quotes, fetchAll: fetchQuotes } = useQuoteStore()
-
   // 使用目的地系統
   const {
     destinations,
@@ -48,7 +34,6 @@ export function useTourForm({
   const [loadingReturn, setLoadingReturn] = useState(false)
 
   // 目的地輸入狀態
-  const [cityInput, setCityInput] = useState('')
   const [showAirportCodeDialog, setShowAirportCodeDialog] = useState(false)
   const [newAirportCode, setNewAirportCode] = useState('')
   const [pendingCity, setPendingCity] = useState('')
@@ -121,69 +106,6 @@ export function useTourForm({
     }
   }, [newTour.return_flight_number, newTour.return_date, setNewTour])
 
-  // 打開對話框時載入資料
-  useEffect(() => {
-    if (isOpen && mode === 'create') {
-      fetchItineraries()
-      fetchQuotes()
-    }
-  }, [isOpen, mode, fetchItineraries, fetchQuotes])
-
-  // 過濾可用的行程表（未關聯旅遊團的）
-  const availableItineraries = useMemo(() => {
-    return itineraries
-      .filter(i => !i.tour_id && !(i as { _deleted?: boolean })._deleted)
-      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
-  }, [itineraries])
-
-  // 過濾可用的報價單（未關聯旅遊團的）
-  const availableQuotes = useMemo(() => {
-    return quotes
-      .filter(q => !q.tour_id && !(q as { _deleted?: boolean })._deleted)
-      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
-  }, [quotes])
-
-  // 處理選擇行程表
-  const handleItinerarySelect = (itineraryId: string) => {
-    if (!itineraryId) {
-      setSelectedItineraryId?.(null)
-      return
-    }
-
-    const itinerary = itineraries.find(i => i.id === itineraryId)
-    if (itinerary) {
-      setSelectedItineraryId?.(itineraryId)
-      setSelectedQuoteId?.(null)
-      setNewTour(prev => ({
-        ...prev,
-        name: itinerary.title || prev.name,
-        departure_date: itinerary.departure_date
-          ? itinerary.departure_date.replace(/\//g, '-')
-          : prev.departure_date,
-      }))
-    }
-  }
-
-  // 處理選擇報價單
-  const handleQuoteSelect = (quoteId: string) => {
-    if (!quoteId) {
-      setSelectedQuoteId?.(null)
-      return
-    }
-
-    const quote = quotes.find(q => q.id === quoteId)
-    if (quote) {
-      setSelectedQuoteId?.(quoteId)
-      setSelectedItineraryId?.(null)
-      setNewTour(prev => ({
-        ...prev,
-        name: quote.name || prev.name,
-        price: Math.round((quote.total_cost ?? 0) / (quote.group_size ?? 1)),
-        max_participants: quote.group_size || prev.max_participants,
-      }))
-    }
-  }
-
   // 處理新增目的地
   const handleAddDestination = async () => {
     if (newAirportCode.length !== 3) {
@@ -221,12 +143,6 @@ export function useTourForm({
   }
 
   return {
-    // 資料
-    itineraries,
-    quotes,
-    availableItineraries,
-    availableQuotes,
-
     // 目的地系統
     destinations,
     countries,
@@ -251,8 +167,6 @@ export function useTourForm({
     // 處理函數
     handleSearchOutbound,
     handleSearchReturn,
-    handleItinerarySelect,
-    handleQuoteSelect,
     handleAddDestination,
     openAddDestinationDialog,
   }

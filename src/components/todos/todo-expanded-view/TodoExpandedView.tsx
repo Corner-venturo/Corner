@@ -7,7 +7,9 @@ import { StarRating } from '@/components/ui/star-rating'
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Check, Calendar, Eye } from 'lucide-react'
 import { TodoExpandedViewProps } from './types'
 import { useTodoExpandedView } from './useTodoExpandedView'
@@ -37,6 +39,9 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
   return (
     <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-full max-w-[95vw] sm:max-w-[900px] lg:max-w-[1200px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
+        <VisuallyHidden>
+          <DialogTitle>{todo.title || '待辦事項詳情'}</DialogTitle>
+        </VisuallyHidden>
         {/* 唯讀提示 */}
         {!canEdit && (
           <div className="absolute top-1 left-1 z-10 flex items-center gap-1 bg-morandi-gold/20 text-morandi-gold px-2 py-1 rounded-lg text-xs">

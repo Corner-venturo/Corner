@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Send, Smile } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -11,6 +11,10 @@ import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
 import { logger } from '@/lib/utils/logger'
+import { useEmployeeStore } from '@/stores'
+
+// 系統機器人 ID
+const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
 
 interface MessageInputProps {
   channel: Channel
@@ -62,9 +66,31 @@ export function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
+  const employees = useEmployeeStore(state => state.items)
 
   const isAnnouncementChannel = !!channel.is_announcement
   const isDisabled = isAnnouncementChannel && !isAdmin
+
+  // 解析 DM 頻道名稱，取得對方名字
+  const displayChannelName = useMemo(() => {
+    if (channelName.startsWith('dm:') || channel.type === 'direct') {
+      const parts = channelName.replace('dm:', '').split(':')
+
+      // 檢查是否是機器人
+      if (parts.includes(SYSTEM_BOT_ID)) {
+        return '角落機器人'
+      }
+
+      // 查找員工名字
+      const employee = employees.find(e => parts.includes(e.id))
+      if (employee) {
+        return employee.chinese_name || employee.display_name || '同事'
+      }
+
+      return '私訊'
+    }
+    return channelName
+  }, [channelName, channel.type, employees])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -367,7 +393,7 @@ export function MessageInput({
                 }
               }
             }}
-            placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `在 #${channelName} 中輸入訊息...`}
+            placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `傳送訊息給 ${displayChannelName}...`}
             className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
             rows={1}
             style={{

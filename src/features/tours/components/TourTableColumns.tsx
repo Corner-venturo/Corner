@@ -6,16 +6,15 @@
 
 import { useMemo } from 'react'
 import { TableColumn } from '@/components/ui/enhanced-table'
-import { Tour, Order } from '@/stores/types'
+import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
 
 interface UseTourTableColumnsParams {
-  orders: Order[]
   getStatusColor: (status: string) => string
 }
 
-export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColumnsParams) {
+export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParams) {
   return useMemo<TableColumn[]>(
     () => [
       {
@@ -49,17 +48,6 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         },
       },
       {
-        key: 'participants',
-        label: '人數',
-        render: (value, row) => {
-          const tour = row as Tour
-          const tourOrders = orders.filter(order => order.tour_id === tour.id)
-          // 計算預計人數：訂單的 member_count 加總
-          const plannedCount = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
-          return <span className="text-sm text-morandi-primary">{plannedCount}</span>
-        },
-      },
-      {
         key: 'status',
         label: '狀態',
         sortable: true,
@@ -74,6 +62,6 @@ export function useTourTableColumns({ orders, getStatusColor }: UseTourTableColu
         },
       },
     ],
-    [orders, getStatusColor]
+    [getStatusColor]
   )
 }

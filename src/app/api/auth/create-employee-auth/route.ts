@@ -9,14 +9,17 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
-    const { employee_number, password } = await request.json()
+    const { employee_number, password, workspace_code } = await request.json()
 
     if (!employee_number || !password) {
       return NextResponse.json({ error: 'Missing employee_number or password' }, { status: 400 })
     }
 
     const supabaseAdmin = getSupabaseAdminClient()
-    const email = `${employee_number}@venturo.com`
+    // Email 格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
+    const email = workspace_code
+      ? `${workspace_code.toUpperCase()}_${employee_number}@venturo.com`
+      : `${employee_number}@venturo.com`
 
     // 使用 Admin API 建立用戶
     const { data, error } = await supabaseAdmin.auth.admin.createUser({

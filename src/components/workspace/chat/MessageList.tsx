@@ -19,6 +19,7 @@ interface MessageListProps {
   advanceLists: AdvanceList[]
   sharedOrderLists: SharedOrderList[]
   channelName: string
+  channelType?: string
   currentUserId?: string
   isLoading: boolean
   onReaction: (messageId: string, emoji: string) => void
@@ -45,6 +46,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
     advanceLists,
     sharedOrderLists,
     channelName,
+    channelType,
     currentUserId,
     isLoading,
     onReaction,
@@ -109,7 +111,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   if (hasNoContent) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
-        <EmptyState channelName={channelName} />
+        <EmptyState channelName={channelName} channelType={channelType} />
       </div>
     )
   }

@@ -12,19 +12,22 @@ export async function getOrCreateDmChannel(otherUserId: string) {
     throw new Error(auth.error.error)
   }
 
-  const { user, workspaceId } = auth.data
+  const { workspaceId, employeeId } = auth.data
   const supabase = await getAuthenticatedSupabase()
 
-  // Call the RPC function
+  // Call the RPC function（使用 employeeId 而非 auth user.id）
   const { data, error } = await supabase.rpc('get_or_create_dm_channel', {
-    p_user_1_id: user.id,
+    p_user_1_id: employeeId,
     p_user_2_id: otherUserId,
     p_workspace_id: workspaceId,
   })
 
   if (error) {
-    logger.error('Error calling get_or_create_dm_channel RPC:', error)
-    throw new Error('Could not get or create DM channel.')
+    logger.error('Error calling get_or_create_dm_channel RPC:', {
+      error,
+      params: { p_user_1_id: employeeId, p_user_2_id: otherUserId, p_workspace_id: workspaceId }
+    })
+    throw new Error(`Could not get or create DM channel: ${error.message}`)
   }
 
   // The RPC function returns an array with a single channel object

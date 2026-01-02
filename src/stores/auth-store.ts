@@ -192,14 +192,41 @@ export const useAuthStore = create<AuthState>()(
           logger.log('✅ Supabase authentication successful')
 
           // Supabase Auth 登入（必須成功才能繼續）
-          const email = `${username}@venturo.com`
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
+          // 新格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
+          // 舊格式：{employee_number}@venturo.com（向後兼容現有用戶）
+          const newFormatEmail = code
+            ? `${code.toUpperCase()}_${username}@venturo.com`
+            : `${username}@venturo.com`
+          const oldFormatEmail = `${username}@venturo.com`
+
+          // 先嘗試新格式
+          let authData = null
+          let authError = null
+
+          const newResult = await supabase.auth.signInWithPassword({
+            email: newFormatEmail,
             password,
           })
 
-          if (authError) {
-            logger.error('❌ Supabase Auth session sign-in failed:', authError.message)
+          if (newResult.error) {
+            // 新格式失敗，嘗試舊格式（向後兼容）
+            if (code && newFormatEmail !== oldFormatEmail) {
+              logger.log('⚠️ 新格式登入失敗，嘗試舊格式:', oldFormatEmail)
+              const oldResult = await supabase.auth.signInWithPassword({
+                email: oldFormatEmail,
+                password,
+              })
+              authData = oldResult.data
+              authError = oldResult.error
+            } else {
+              authError = newResult.error
+            }
+          } else {
+            authData = newResult.data
+          }
+
+          if (authError || !authData) {
+            logger.error('❌ Supabase Auth session sign-in failed:', authError?.message)
             // 密碼不同步，需要重設
             return {
               success: false,
@@ -209,40 +236,40 @@ export const useAuthStore = create<AuthState>()(
 
           logger.log('✅ Supabase Auth session created:', authData.user?.id)
 
-          // 🔧 關鍵修正：確保 employees.supabase_user_id 與 auth.uid() 匹配
-          // 這樣 RLS 函數才能正確找到員工的 workspace
+          // 🔧 關鍵修正：使用 API 繞過 RLS 來同步員工資料
+          // 直接用 client 更新會被 RLS 擋住（雞生蛋問題）
           if (authData.user?.id) {
             try {
-              await supabase
-                .from('employees')
-                .update({ supabase_user_id: authData.user.id })
-                .eq('id', employeeData.id)
-              logger.log('✅ Updated employees.supabase_user_id:', authData.user.id)
-            } catch (updateError) {
-              logger.warn('⚠️ Failed to update supabase_user_id:', updateError)
-            }
-          }
-
-          // 同步 workspace_id 和 employee_id 到 user_metadata
-          // 這樣 Server Actions 可以直接從 user_metadata 讀取，不用每次查 DB
-          if (employeeData.workspace_id) {
-            try {
-              await supabase.auth.updateUser({
-                data: {
+              const response = await fetch('/api/auth/sync-employee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  employee_id: employeeData.id,
+                  supabase_user_id: authData.user.id,
                   workspace_id: employeeData.workspace_id,
-                  employee_id: employeeData.id
-                }
+                }),
               })
-              logger.log('✅ Synced workspace_id to user_metadata')
 
-              // 呼叫 set_current_workspace 設定 RLS session（作為備用方案）
-              await supabase.rpc('set_current_workspace', {
-                p_workspace_id: employeeData.workspace_id
-              })
-              logger.log('✅ Set current workspace for RLS:', employeeData.workspace_id)
-            } catch (metadataError) {
-              // 非關鍵錯誤，只記錄警告
-              logger.warn('⚠️ Failed to sync user_metadata:', metadataError)
+              if (response.ok) {
+                logger.log('✅ Synced employee via API:', authData.user.id)
+              } else {
+                const error = await response.json()
+                logger.warn('⚠️ Failed to sync employee:', error)
+              }
+            } catch (syncError) {
+              logger.warn('⚠️ Failed to call sync-employee API:', syncError)
+            }
+
+            // 呼叫 set_current_workspace 設定 RLS session（作為備用方案）
+            if (employeeData.workspace_id) {
+              try {
+                await supabase.rpc('set_current_workspace', {
+                  p_workspace_id: employeeData.workspace_id
+                })
+                logger.log('✅ Set current workspace for RLS:', employeeData.workspace_id)
+              } catch (rpcError) {
+                logger.warn('⚠️ Failed to set current workspace:', rpcError)
+              }
             }
           }
 

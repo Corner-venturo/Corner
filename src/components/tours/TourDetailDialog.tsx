@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -18,7 +18,7 @@ import { TourRequests } from '@/components/tours/tour-requests'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
-import { MessageSquare, FileText, X, Printer, Loader2, Plane } from 'lucide-react'
+import { MessageSquare, FileText, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
 import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
@@ -72,6 +72,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [showQuotePicker, setShowQuotePicker] = useState(false)
   const [showItineraryPicker, setShowItineraryPicker] = useState(false)
 
+  // PNR 開票期限
+  const [pnrTicketingDeadline, setPnrTicketingDeadline] = useState<Date | null>(null)
+  const [pnrRecordLocator, setPnrRecordLocator] = useState<string | null>(null)
+  const [ticketStatus, setTicketStatus] = useState<'none' | 'partial' | 'all'>('none') // 開票狀態
+  const [forceShowPnr, setForceShowPnr] = useState(false) // PNR 配對後自動顯示欄位
+
   // 入境卡列印
   const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
   const [entryCardSettings, setEntryCardSettings] = useState({
@@ -92,6 +98,62 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     flight_cost?: number | null
     pnr?: string | null
   }>>([])
+
+  // 載入 PNR 開票期限 + 檢查票號狀態
+  useEffect(() => {
+    const loadPnrDeadlineAndTicketStatus = async () => {
+      if (!tour?.id) return
+      const { supabase } = await import('@/lib/supabase/client')
+
+      // 1. 取得最緊急的開票期限
+      const { data: pnrs } = await supabase
+        .from('pnrs')
+        .select('record_locator, ticketing_deadline')
+        .eq('tour_id', tour.id)
+        .not('ticketing_deadline', 'is', null)
+        .order('ticketing_deadline', { ascending: true })
+        .limit(1)
+
+      if (pnrs && pnrs.length > 0) {
+        setPnrRecordLocator(pnrs[0].record_locator)
+        setPnrTicketingDeadline(pnrs[0].ticketing_deadline ? new Date(pnrs[0].ticketing_deadline) : null)
+      } else {
+        setPnrRecordLocator(null)
+        setPnrTicketingDeadline(null)
+      }
+
+      // 2. 檢查團員票號狀態
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tour_id', tour.id)
+
+      if (orders && orders.length > 0) {
+        const orderIds = orders.map(o => o.id)
+        const { data: members } = await supabase
+          .from('order_members')
+          .select('id, ticket_number')
+          .in('order_id', orderIds)
+
+        if (members && members.length > 0) {
+          const withTicket = members.filter(m => m.ticket_number)
+          if (withTicket.length === members.length) {
+            setTicketStatus('all') // 全部已開票
+          } else if (withTicket.length > 0) {
+            setTicketStatus('partial') // 部分已開票
+          } else {
+            setTicketStatus('none') // 都未開票
+          }
+        } else {
+          setTicketStatus('none')
+        }
+      }
+    }
+
+    if (isOpen && tour?.id) {
+      loadPnrDeadlineAndTicketStatus()
+    }
+  }, [isOpen, tour?.id])
 
   // 載入團員資料（用於入境卡列印）
   useEffect(() => {
@@ -204,9 +266,68 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     setSelectedMembers([])
   }
 
-  const handleSuccess = () => {
+  // 計算開票期限狀態
+  const deadlineStatus = useMemo(() => {
+    if (!pnrTicketingDeadline) return null
+    const now = new Date()
+    const diffDays = Math.ceil((pnrTicketingDeadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+    if (diffDays < 0) return { text: '已過期', color: 'bg-red-500', urgent: true }
+    if (diffDays === 0) return { text: '今日', color: 'bg-red-500', urgent: true }
+    if (diffDays === 1) return { text: '明日', color: 'bg-orange-500', urgent: true }
+    if (diffDays <= 3) return { text: `${diffDays}天`, color: 'bg-yellow-500', urgent: true }
+    return { text: `${diffDays}天`, color: 'bg-green-500', urgent: false }
+  }, [pnrTicketingDeadline])
+
+  const handleSuccess = async () => {
     actions.refresh()
     onDataChange?.()
+    setForceShowPnr(true) // 自動顯示 PNR 欄位
+    setActiveTab('members') // 切換到團員名單頁籤
+
+    // 重新載入 PNR 開票期限 + 票號狀態
+    if (tour?.id) {
+      const { supabase } = await import('@/lib/supabase/client')
+
+      // 重新載入開票期限
+      const { data: pnrs } = await supabase
+        .from('pnrs')
+        .select('record_locator, ticketing_deadline')
+        .eq('tour_id', tour.id)
+        .not('ticketing_deadline', 'is', null)
+        .order('ticketing_deadline', { ascending: true })
+        .limit(1)
+
+      if (pnrs && pnrs.length > 0) {
+        setPnrRecordLocator(pnrs[0].record_locator)
+        setPnrTicketingDeadline(pnrs[0].ticketing_deadline ? new Date(pnrs[0].ticketing_deadline) : null)
+      }
+
+      // 重新檢查票號狀態
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('tour_id', tour.id)
+
+      if (orders && orders.length > 0) {
+        const orderIds = orders.map(o => o.id)
+        const { data: members } = await supabase
+          .from('order_members')
+          .select('id, ticket_number')
+          .in('order_id', orderIds)
+
+        if (members && members.length > 0) {
+          const withTicket = members.filter(m => m.ticket_number)
+          if (withTicket.length === members.length) {
+            setTicketStatus('all')
+          } else if (withTicket.length > 0) {
+            setTicketStatus('partial')
+          } else {
+            setTicketStatus('none')
+          }
+        }
+      }
+    }
   }
 
   const renderTabContent = () => {
@@ -245,7 +366,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
-        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" />
+        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} />
       case 'requests':
         return <TourRequests tourId={tour.id} />
       default:
@@ -322,6 +443,36 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                   <Plane size={15} className="mr-1" />
                   PNR
                 </Button>
+                {/* PNR 開票狀態顯示 */}
+                {ticketStatus === 'all' ? (
+                  <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">
+                    <Check size={12} />
+                    <span>已開票</span>
+                  </div>
+                ) : ticketStatus === 'partial' ? (
+                  <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500 text-white">
+                    <AlertTriangle size={12} />
+                    <span>部分已開票</span>
+                    {pnrTicketingDeadline && deadlineStatus && (
+                      <span className={cn("ml-1 px-1 rounded", deadlineStatus.urgent ? "bg-white/30" : "")}>
+                        {pnrTicketingDeadline.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                ) : pnrTicketingDeadline && deadlineStatus ? (
+                  <div className={cn(
+                    "flex items-center gap-1 px-2 py-1 rounded text-xs font-medium",
+                    deadlineStatus.color,
+                    "text-white"
+                  )}>
+                    {deadlineStatus.urgent && <AlertTriangle size={12} />}
+                    <Clock size={12} />
+                    <span>
+                      {pnrRecordLocator} 開票: {pnrTicketingDeadline.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })}
+                      ({deadlineStatus.text})
+                    </span>
+                  </div>
+                ) : null}
                 <Button
                   variant="ghost"
                   size="sm"

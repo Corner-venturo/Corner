@@ -7,7 +7,8 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, Layers, Loader2 } from 'lucide-react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { useRequestTable } from '@/features/finance/requests/hooks/useRequestTable'
 import { PaymentRequest } from '@/stores/types'
 
@@ -26,6 +27,9 @@ const RequestDetailDialog = dynamic(
     loading: () => (
       <Dialog open>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <VisuallyHidden>
+            <DialogTitle>載入中</DialogTitle>
+          </VisuallyHidden>
           <Loader2 className="animate-spin text-white" size={32} />
         </DialogContent>
       </Dialog>

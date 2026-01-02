@@ -10878,6 +10878,71 @@ export type Database = {
           },
         ]
       }
+      // === 手動添加：tour_documents (2026-01-02) ===
+      // Note: tour_id is text (not uuid) to match tours.id type
+      tour_documents: {
+        Row: {
+          id: string
+          tour_id: string // text type to match tours.id
+          workspace_id: string
+          name: string
+          description: string | null
+          file_path: string
+          public_url: string
+          file_name: string
+          file_size: number | null
+          mime_type: string | null
+          uploaded_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tour_id: string
+          workspace_id: string
+          name: string
+          description?: string | null
+          file_path: string
+          public_url: string
+          file_name: string
+          file_size?: number | null
+          mime_type?: string | null
+          uploaded_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tour_id?: string
+          workspace_id?: string
+          name?: string
+          description?: string | null
+          file_path?: string
+          public_url?: string
+          file_name?: string
+          file_size?: number | null
+          mime_type?: string | null
+          uploaded_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_documents_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           amount: number

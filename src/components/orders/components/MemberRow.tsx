@@ -13,6 +13,7 @@
 import React, { useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import type { OrderMember, CustomCostField } from '../order-member.types'
+import type { ColumnVisibility } from '../OrderMembersExpandable'
 import { MemberBasicInfo, MemberPassportInfo, MemberActions } from './member-row'
 
 interface MemberRowProps {
@@ -22,6 +23,7 @@ interface MemberRowProps {
   showIdentityColumn: boolean
   showPnrColumn: boolean
   showRoomColumn: boolean
+  showVehicleColumn: boolean
   showOrderCode: boolean
   departureDate: string | null
   roomAssignment?: string
@@ -29,6 +31,7 @@ interface MemberRowProps {
   pnrValue?: string
   customCostFields: CustomCostField[]
   mode: 'order' | 'tour'
+  columnVisibility?: ColumnVisibility
   onUpdateField: (memberId: string, field: keyof OrderMember, value: string | number | null) => void
   onDelete: (memberId: string) => void
   onEdit: (member: OrderMember, mode: 'verify' | 'edit') => void
@@ -47,12 +50,15 @@ export function MemberRow({
   showIdentityColumn,
   showPnrColumn,
   showRoomColumn,
+  showVehicleColumn,
   showOrderCode,
   departureDate,
   roomAssignment,
+  vehicleAssignment,
   pnrValue,
   customCostFields,
   mode,
+  columnVisibility,
   onUpdateField,
   onDelete,
   onEdit,
@@ -64,6 +70,24 @@ export function MemberRow({
   onIdNumberSearch,
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
+
+  // 預設全部顯示
+  const cv = columnVisibility || {
+    passport_name: true,
+    birth_date: true,
+    gender: true,
+    id_number: true,
+    passport_number: true,
+    passport_expiry: true,
+    special_meal: true,
+    total_payable: true,
+    deposit_amount: true,
+    balance: true,
+    remarks: true,
+    pnr: false,
+    ticket_number: false,
+    ticketing_deadline: false,
+  }
 
   // 處理數字輸入
   const handleNumberInput = useCallback((field: keyof OrderMember, value: string) => {
@@ -80,6 +104,7 @@ export function MemberRow({
         isEditMode={isEditMode}
         showIdentityColumn={showIdentityColumn}
         showOrderCode={showOrderCode}
+        columnVisibility={cv}
         onUpdateField={onUpdateField}
         onPreview={onPreview}
         onKeyDown={onKeyDown}
@@ -93,74 +118,92 @@ export function MemberRow({
         index={index}
         isEditMode={isEditMode}
         departureDate={departureDate}
+        columnVisibility={cv}
         onUpdateField={onUpdateField}
         onKeyDown={onKeyDown}
       />
 
       {/* 飲食禁忌 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-status-warning-bg">
-        <input
-          type="text"
-          value={member.special_meal || ''}
-          onChange={e => onUpdateField(member.id, 'special_meal', e.target.value)}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={e => {
-            setIsComposing(false)
-            setTimeout(() => onUpdateField(member.id, 'special_meal', e.currentTarget.value), 0)
-          }}
-          onKeyDown={e => onKeyDown(e, index, 'special_meal')}
-          data-member={member.id}
-          data-field="special_meal"
-          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-        />
-      </td>
+      {cv.special_meal && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-status-warning-bg">
+          <input
+            type="text"
+            value={member.special_meal || ''}
+            onChange={e => onUpdateField(member.id, 'special_meal', e.target.value)}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={e => {
+              setIsComposing(false)
+              setTimeout(() => onUpdateField(member.id, 'special_meal', e.currentTarget.value), 0)
+            }}
+            onKeyDown={e => onKeyDown(e, index, 'special_meal')}
+            data-member={member.id}
+            data-field="special_meal"
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+          />
+        </td>
+      )}
 
       {/* 應付金額 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={member.total_payable || ''}
-          onChange={e => handleNumberInput('total_payable', e.target.value)}
-          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-        />
-      </td>
+      {cv.total_payable && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={member.total_payable || ''}
+            onChange={e => handleNumberInput('total_payable', e.target.value)}
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+          />
+        </td>
+      )}
 
       {/* 訂金 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={member.deposit_amount || ''}
-          onChange={e => handleNumberInput('deposit_amount', e.target.value)}
-          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-        />
-      </td>
+      {cv.deposit_amount && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={member.deposit_amount || ''}
+            onChange={e => handleNumberInput('deposit_amount', e.target.value)}
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+          />
+        </td>
+      )}
 
       {/* 尾款 (自動計算) */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-xs text-center text-morandi-secondary">
-        {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
-      </td>
+      {cv.balance && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-xs text-center text-morandi-secondary">
+          {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
+        </td>
+      )}
 
       {/* 備註 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-        <input
-          type="text"
-          value={member.remarks || ''}
-          onChange={e => onUpdateField(member.id, 'remarks', e.target.value)}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={e => {
-            setIsComposing(false)
-            setTimeout(() => onUpdateField(member.id, 'remarks', e.currentTarget.value), 0)
-          }}
-          className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-        />
-      </td>
+      {cv.remarks && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+          <input
+            type="text"
+            value={member.remarks || ''}
+            onChange={e => onUpdateField(member.id, 'remarks', e.target.value)}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={e => {
+              setIsComposing(false)
+              setTimeout(() => onUpdateField(member.id, 'remarks', e.currentTarget.value), 0)
+            }}
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+          />
+        </td>
+      )}
 
       {/* 團體模式：分房欄位 */}
       {mode === 'tour' && showRoomColumn && (
         <td className="border border-morandi-gold/20 px-2 py-1 bg-emerald-50/50 text-xs">
           {roomAssignment || '-'}
+        </td>
+      )}
+
+      {/* 團體模式：分車欄位 */}
+      {mode === 'tour' && showVehicleColumn && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-amber-50/50 text-xs">
+          {vehicleAssignment || '-'}
         </td>
       )}
 
@@ -173,6 +216,31 @@ export function MemberRow({
             onChange={e => onPnrChange(member.id, e.target.value)}
             className="w-full bg-transparent text-xs border-none outline-none shadow-none"
             placeholder="輸入 PNR"
+          />
+        </td>
+      )}
+
+      {/* 團體模式：機票號碼 */}
+      {mode === 'tour' && cv.ticket_number && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-sky-50/50">
+          <input
+            type="text"
+            value={member.ticket_number || ''}
+            onChange={e => onUpdateField(member.id, 'ticket_number', e.target.value)}
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            placeholder="機票號碼"
+          />
+        </td>
+      )}
+
+      {/* 團體模式：開票期限 */}
+      {mode === 'tour' && cv.ticketing_deadline && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-orange-50/50">
+          <input
+            type="date"
+            value={member.ticketing_deadline || ''}
+            onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
           />
         </td>
       )}

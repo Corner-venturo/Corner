@@ -1,15 +1,13 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Globe, Map, Star } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
-import { confirm } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 
 interface Country {
@@ -42,14 +40,11 @@ interface City {
   is_major: boolean | null
 }
 
-type SubTabType = 'countries' | 'regions'
-
 export default function RegionsTab() {
   const [countries, setCountries] = useState<Country[]>([])
   const [regions, setRegions] = useState<Region[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
-  const [subTab, setSubTab] = useState<SubTabType>('countries')
 
   // 城市管理視窗
   const [isCitiesDialogOpen, setIsCitiesDialogOpen] = useState(false)
@@ -98,43 +93,6 @@ export default function RegionsTab() {
     }
 
     setCities(prev => prev.map(c => (c.id === cityId ? { ...c, is_major: !currentStatus } : c)))
-  }
-
-  // 切換地區狀態
-  const handleToggleRegionStatus = async (id: string, currentStatus: boolean) => {
-    const { error } = await supabase
-      .from('regions')
-      .update({ is_active: !currentStatus })
-      .eq('id', id)
-
-    if (error) {
-      logger.error('Error updating region:', error)
-      toast.error('更新失敗')
-      return
-    }
-
-    toast.success('更新成功')
-    fetchData()
-  }
-
-  // 刪除地區
-  const handleDeleteRegion = async (id: string) => {
-    const confirmed = await confirm('確定要刪除這個地區嗎？', {
-      title: '刪除地區',
-      type: 'warning',
-    })
-    if (!confirmed) return
-
-    const { error } = await supabase.from('regions').delete().eq('id', id)
-
-    if (error) {
-      logger.error('Error deleting region:', error)
-      toast.error('刪除失敗')
-      return
-    }
-
-    toast.success('刪除成功')
-    fetchData()
   }
 
   // 取得選中國家的城市
@@ -222,111 +180,16 @@ export default function RegionsTab() {
     [cities]
   )
 
-  // 地區表格欄位
-  const regionColumns: TableColumn<Region>[] = useMemo(
-    () => [
-      {
-        key: 'country_id',
-        label: '國家',
-        render: (_value, row) => {
-          const country = countries.find(c => c.id === row.country_id)
-          return <span>{country?.name || row.country_id}</span>
-        },
-      },
-      {
-        key: 'name',
-        label: '地區名稱',
-        sortable: true,
-        filterable: true,
-        render: (_value, row) => (
-          <div>
-            <div className="font-medium text-foreground">{row.name}</div>
-            <div className="text-xs text-muted-foreground">{row.name_en}</div>
-          </div>
-        ),
-      },
-      {
-        key: 'description',
-        label: '描述',
-        render: (_value, row) => (
-          <span className="text-sm text-muted-foreground truncate max-w-xs block">
-            {row.description || '-'}
-          </span>
-        ),
-      },
-      {
-        key: 'is_active',
-        label: '狀態',
-        render: (_value, row) => (
-          <span className={row.is_active ? 'text-status-success' : 'text-muted-foreground'}>
-            {row.is_active ? '啟用' : '停用'}
-          </span>
-        ),
-      },
-      {
-        key: 'id',
-        label: '操作',
-        render: (_value, row) => (
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleToggleRegionStatus(row.id, row.is_active ?? false)}
-              className="h-8 px-2 text-xs"
-            >
-              {row.is_active ? '停用' : '啟用'}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDeleteRegion(row.id)}
-              className="h-8 px-2 text-xs text-status-danger hover:text-status-danger"
-            >
-              刪除
-            </Button>
-          </div>
-        ),
-      },
-    ],
-    [countries]
-  )
-
   return (
     <div className="h-full flex flex-col">
-      {/* 子分頁 */}
-      <div className="px-4 pt-2 border-b">
-        <Tabs value={subTab} onValueChange={v => setSubTab(v as SubTabType)}>
-          <TabsList className="h-9">
-            <TabsTrigger value="countries" className="text-xs gap-1.5">
-              <Globe size={14} />
-              國家
-            </TabsTrigger>
-            <TabsTrigger value="regions" className="text-xs gap-1.5">
-              <Map size={14} />
-              地區
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
       {/* 表格內容 */}
       <div className="flex-1 overflow-auto">
-        {subTab === 'countries' && (
-          <EnhancedTable<Country>
-            columns={countryColumns}
-            data={countries}
-            isLoading={loading}
-            emptyMessage="尚無國家資料"
-          />
-        )}
-        {subTab === 'regions' && (
-          <EnhancedTable<Region>
-            columns={regionColumns}
-            data={regions}
-            isLoading={loading}
-            emptyMessage="尚無地區資料"
-          />
-        )}
+        <EnhancedTable<Country>
+          columns={countryColumns}
+          data={countries}
+          isLoading={loading}
+          emptyMessage="尚無國家資料"
+        />
       </div>
 
       {/* 城市管理視窗 */}

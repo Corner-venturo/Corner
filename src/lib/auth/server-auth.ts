@@ -60,13 +60,25 @@ export async function getServerAuth(): Promise<AuthResult> {
   // 使用 admin client 繞過 RLS，確保能查到員工資料
   if (!workspaceId || !employeeId) {
     const adminClient = getSupabaseAdminClient()
-    const { data: employee, error: employeeError } = await adminClient
+
+    // 先用 supabase_user_id 查
+    let { data: employee } = await adminClient
       .from('employees')
       .select('id, workspace_id')
       .eq('supabase_user_id', user.id)
       .single()
 
-    if (employeeError || !employee) {
+    // 如果找不到，用 id 查（有些系統 employee.id = auth.uid）
+    if (!employee) {
+      const { data: emp2 } = await adminClient
+        .from('employees')
+        .select('id, workspace_id')
+        .eq('id', user.id)
+        .single()
+      employee = emp2
+    }
+
+    if (!employee) {
       return {
         success: false,
         error: {

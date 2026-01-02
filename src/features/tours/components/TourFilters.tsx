@@ -8,8 +8,8 @@ import {
   MapPin,
   BarChart3,
   FileCheck,
-  AlertCircle,
   Archive,
+  Star,
 } from 'lucide-react'
 
 interface TourFiltersProps {
@@ -46,6 +46,7 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
         { value: '提案', label: '提案', icon: FileText },
         { value: '進行中', label: '進行中', icon: Calendar },
         { value: '結案', label: '結案', icon: FileCheck },
+        { value: '特殊團', label: '特殊團', icon: Star },
         { value: 'archived', label: '封存', icon: Archive },
       ]}
       activeTab={activeTab}

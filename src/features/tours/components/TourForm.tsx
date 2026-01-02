@@ -11,7 +11,6 @@ import {
   TourBasicInfo,
   TourFlightInfo,
   TourSettings,
-  TourDocumentLinks,
   TourOrderSection,
   AddDestinationDialog,
 } from './tour-form'
@@ -27,10 +26,6 @@ interface TourFormProps {
   submitting: boolean
   formError: string | null
   onSubmit: () => void
-  selectedItineraryId?: string | null
-  setSelectedItineraryId?: (id: string | null) => void
-  selectedQuoteId?: string | null
-  setSelectedQuoteId?: (id: string | null) => void
 }
 
 export function TourForm({
@@ -44,15 +39,9 @@ export function TourForm({
   submitting,
   formError,
   onSubmit,
-  selectedItineraryId,
-  setSelectedItineraryId,
-  selectedQuoteId,
-  setSelectedQuoteId,
 }: TourFormProps) {
   // 使用自定義 hook 處理所有表單邏輯
   const {
-    availableItineraries,
-    availableQuotes,
     countries,
     destinationsLoading,
     getCitiesByCountry,
@@ -68,8 +57,6 @@ export function TourForm({
     savingDestination,
     handleSearchOutbound,
     handleSearchReturn,
-    handleItinerarySelect,
-    handleQuoteSelect,
     handleAddDestination,
     openAddDestinationDialog,
   } = useTourForm({
@@ -77,10 +64,6 @@ export function TourForm({
     mode,
     newTour,
     setNewTour,
-    selectedItineraryId,
-    setSelectedItineraryId,
-    selectedQuoteId,
-    setSelectedQuoteId,
   })
 
   return (
@@ -148,18 +131,6 @@ export function TourForm({
           {/* Right side - Order info */}
           <div className="flex-1 pl-6">
             <div className="h-full overflow-y-auto">
-              {/* 關聯行程表或報價單（僅在新增模式顯示） */}
-              {mode === 'create' && (
-                <TourDocumentLinks
-                  availableItineraries={availableItineraries}
-                  availableQuotes={availableQuotes}
-                  selectedItineraryId={selectedItineraryId}
-                  selectedQuoteId={selectedQuoteId}
-                  handleItinerarySelect={handleItinerarySelect}
-                  handleQuoteSelect={handleQuoteSelect}
-                />
-              )}
-
               <TourOrderSection newOrder={newOrder} setNewOrder={setNewOrder} />
             </div>
           </div>

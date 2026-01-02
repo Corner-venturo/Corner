@@ -1,7 +1,6 @@
-import React from 'react'
 import { Tour } from '@/stores/types'
 import { useQuotes } from '@/features/quotes/hooks/useQuotes'
-import { useOrderStore, useMemberStore } from '@/stores'
+import { useOrderStore } from '@/stores'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 
@@ -14,7 +13,6 @@ interface TourOverviewTabProps {
 export function TourOverviewTab({ tour }: TourOverviewTabProps) {
   const { quotes } = useQuotes()
   const { items: orders } = useOrderStore()
-  const { items: members } = useMemberStore()
 
   // Find tour's quote (approved or latest)
   const tourQuote =
@@ -25,11 +23,8 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
   const tourOrders = orders.filter(order => order.tour_id === tour.id)
   const totalPaidAmount = tourOrders.reduce((sum, order) => sum + (order.paid_amount || 0), 0)
 
-  // Calculate current participants (from members)
-  const tourMembers = members.filter(member =>
-    tourOrders.some(order => order.id === member.order_id)
-  )
-  const currentParticipants = tourMembers.length
+  // 使用訂單中的 member_count 計算，避免額外資料庫查詢
+  const currentParticipants = tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
 
   // Financial calculations
   const quotePrice = tourQuote?.total_cost || tour.price || 0
@@ -105,19 +100,6 @@ export function TourOverviewTab({ tour }: TourOverviewTabProps) {
             <div className="flex justify-between">
               <span className="text-morandi-secondary">返回日期:</span>
               <DateCell date={tour.return_date} showIcon={false} />
-            </div>
-            <div className="flex justify-between">
-              <span className="text-morandi-secondary">參與人數:</span>
-              <span className="text-morandi-primary font-medium">
-                {(() => {
-                  const tourOrders = orders.filter(order => order.tour_id === tour.id)
-                  const actualMembers = members.filter(member =>
-                    tourOrders.some(order => order.id === member.order_id)
-                  ).length
-                  return actualMembers
-                })()}
-                /{tour.max_participants}
-              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-morandi-secondary">建立時間:</span>
