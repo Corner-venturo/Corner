@@ -59,23 +59,30 @@ export function LinkQuoteToTourDialog({
   }, [quotes, tour.id])
 
   // 建立新報價單
-  const handleCreateNew = async () => {
+  const handleCreateNew = async (quoteType: 'standard' | 'quick') => {
     try {
       setIsCreating(true)
 
-      const code = generateCode('TP', { quoteType: 'standard' }, quotes)
+      const code = generateCode('TP', { quoteType }, quotes)
 
-
-      const newQuote = await create({
+      const baseData = {
         code,
         name: tour.name,
-        quote_type: 'standard',
-        status: 'draft',
+        quote_type: quoteType,
+        status: 'draft' as const,
         tour_id: tour.id,
-        categories: DEFAULT_CATEGORIES,
-        group_size: tour.max_participants || 20,
-        customer_name: '', // 必填欄位，預設空字串
-      })
+        customer_name: '',
+      }
+
+      const newQuote = await create(
+        quoteType === 'standard'
+          ? {
+              ...baseData,
+              categories: DEFAULT_CATEGORIES,
+              group_size: tour.max_participants || 20,
+            }
+          : baseData
+      )
 
 
       if (newQuote?.id) {
@@ -106,31 +113,59 @@ export function LinkQuoteToTourDialog({
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
-          {/* 建立新報價單 */}
-          <div className="border-2 border-dashed border-morandi-primary/30 rounded-lg p-4 bg-morandi-primary/5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-morandi-primary/20 flex items-center justify-center">
-                <Plus className="w-5 h-5 text-morandi-primary" />
+          {/* 建立新報價單 - 兩個選項 */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* 團體報價單 */}
+            <div className="border-2 border-dashed border-morandi-primary/30 rounded-lg p-4 bg-morandi-primary/5">
+              <div className="flex flex-col items-center text-center mb-3">
+                <div className="w-12 h-12 rounded-lg bg-morandi-primary/20 flex items-center justify-center mb-2">
+                  <Calculator className="w-6 h-6 text-morandi-primary" />
+                </div>
+                <div className="font-medium text-morandi-primary">團體報價單</div>
+                <div className="text-xs text-morandi-secondary mt-1">完整行程報價</div>
               </div>
-              <div>
-                <div className="font-medium text-morandi-primary">建立新報價單</div>
-                <div className="text-sm text-morandi-secondary">為此旅遊團建立全新的報價單</div>
-              </div>
+              <Button
+                onClick={() => handleCreateNew('standard')}
+                disabled={isCreating}
+                variant="outline"
+                className="w-full"
+              >
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-1" />
+                    建立
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={handleCreateNew}
-              disabled={isCreating}
-              className="w-full"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  建立中...
-                </>
-              ) : (
-                '建立新報價單'
-              )}
-            </Button>
+
+            {/* 快速報價單 */}
+            <div className="border-2 border-dashed border-amber-400/30 rounded-lg p-4 bg-amber-50">
+              <div className="flex flex-col items-center text-center mb-3">
+                <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center mb-2">
+                  <Zap className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="font-medium text-amber-700">快速報價單</div>
+                <div className="text-xs text-amber-600 mt-1">簡易項目報價</div>
+              </div>
+              <Button
+                onClick={() => handleCreateNew('quick')}
+                disabled={isCreating}
+                variant="outline"
+                className="w-full border-amber-400 text-amber-700 hover:bg-amber-100"
+              >
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-1" />
+                    建立
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* 已關聯的報價單 */}

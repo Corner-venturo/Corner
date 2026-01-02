@@ -238,7 +238,7 @@ export const useAuthStore = create<AuthState>()(
 
           // 🔧 關鍵修正：使用 API 繞過 RLS 來同步員工資料
           // 直接用 client 更新會被 RLS 擋住（雞生蛋問題）
-          if (authData.user?.id) {
+          if (authData.user?.id && authData.session?.access_token) {
             try {
               const response = await fetch('/api/auth/sync-employee', {
                 method: 'POST',
@@ -247,6 +247,7 @@ export const useAuthStore = create<AuthState>()(
                   employee_id: employeeData.id,
                   supabase_user_id: authData.user.id,
                   workspace_id: employeeData.workspace_id,
+                  access_token: authData.session.access_token, // 傳遞 token 讓 API 驗證
                 }),
               })
 

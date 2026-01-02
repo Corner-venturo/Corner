@@ -15,7 +15,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { employee_id, supabase_user_id, workspace_id } = await request.json()
+    const { employee_id, supabase_user_id, workspace_id, access_token } = await request.json()
 
     if (!employee_id || !supabase_user_id) {
       return NextResponse.json(
@@ -24,18 +24,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 驗證請求者身份：確認 supabase_user_id 對應的用戶已登入
-    const supabase = await createSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user || user.id !== supabase_user_id) {
-      return NextResponse.json(
-        { error: 'Unauthorized: user mismatch' },
-        { status: 401 }
-      )
-    }
-
+    // 驗證請求者身份
+    // 方法1: 使用 access_token 驗證（登入後 session cookie 可能還沒設好）
+    // 方法2: 使用 session cookie 驗證（已登入的情況）
     const supabaseAdmin = getSupabaseAdminClient()
+
+    if (access_token) {
+      // 用 admin client 驗證 token 對應的用戶
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(access_token)
+      if (error || !user || user.id !== supabase_user_id) {
+        logger.error('❌ Token 驗證失敗:', error?.message || 'user mismatch')
+        return NextResponse.json(
+          { error: 'Unauthorized: invalid token' },
+          { status: 401 }
+        )
+      }
+      logger.log('✅ Token 驗證成功:', user.id)
+    } else {
+      // 備用：用 cookie session 驗證
+      const supabase = await createSupabaseServerClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user || user.id !== supabase_user_id) {
+        return NextResponse.json(
+          { error: 'Unauthorized: user mismatch' },
+          { status: 401 }
+        )
+      }
+    }
 
     // 1. 更新 employees.supabase_user_id（繞過 RLS）
     const { error: updateError } = await supabaseAdmin

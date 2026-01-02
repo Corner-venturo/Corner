@@ -16,12 +16,15 @@ interface A5HandbookDialogProps {
 export function A5HandbookDialog({ open, onOpenChange, itinerary }: A5HandbookDialogProps) {
   const printRef = useRef<HTMLDivElement>(null)
 
-  // 安全取得字串值
+  // 安全取得字串值（並清除 HTML 標籤）
   const safeString = (value: unknown): string => {
     if (value === null || value === undefined) return ''
-    if (typeof value === 'string') return value
-    if (typeof value === 'number') return String(value)
-    return ''
+    let str = ''
+    if (typeof value === 'string') str = value
+    else if (typeof value === 'number') str = String(value)
+    else return ''
+    // 清除 HTML 標籤
+    return str.replace(/<[^>]*>/g, '').trim()
   }
 
   // 轉換行程表資料為 A5 手冊格式

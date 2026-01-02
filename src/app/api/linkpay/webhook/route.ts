@@ -15,10 +15,11 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 
 interface TaishinWebhookParams {
   order_no: string // 訂單編號（含我們的收款單號）
-  return_code: string // '00' 表示成功
-  tx_amt: string // 交易金額（以分為單位，需除以 100）
+  ret_code: string // '00' 表示成功（依手冊 v1.8 為 ret_code）
+  tx_amt: string // 交易授權金額（含小數 2 位，如 "10000" 代表 100.00 元）
   auth_code?: string // 授權碼
   card_no?: string // 卡號（遮蔽）
+  ret_msg?: string // 回傳訊息
 }
 
 interface TaishinWebhookRequest {
@@ -34,16 +35,16 @@ export async function POST(req: NextRequest) {
     const body: TaishinWebhookRequest = await req.json()
     logger.log('📝 LinkPay Webhook 收到通知:', body)
 
-    const { order_no, return_code, tx_amt } = body.params
+    const { order_no, ret_code, tx_amt } = body.params
 
     if (!order_no) {
       logger.error('Webhook 缺少 order_no')
       return NextResponse.json({ success: false }, { status: 400 })
     }
 
-    // 解析收款單號（order_no 格式：{receiptNumber}R{timestamp}）
+    // 解析收款單號（order_no 格式：{receiptNumber}R{timestamp}，已移除 - 和 _）
     const receiptNumber = order_no.split('R')[0]
-    const isSuccess = return_code === '00'
+    const isSuccess = ret_code === '00'
     const status = isSuccess ? 1 : 2 // 1: 已付款, 2: 失敗
 
     const supabase = getSupabaseAdminClient()
@@ -64,12 +65,14 @@ export async function POST(req: NextRequest) {
 
     // 如果付款成功，自動回填資訊（但保持待確認狀態，讓會計最後確認）
     if (isSuccess) {
-      // 計算實際金額（台新以分為單位，扣除 2% 手續費）
+      // 計算實際金額
+      // tx_amt 格式：含小數 2 位，如 "10000" 代表 100.00 元
+      // 扣除信用卡手續費 2%
       let actualAmount = 0
       if (tx_amt) {
-        const originalAmount = parseInt(tx_amt, 10)
-        // 原金額（分 → 元）× 98%（扣除 2% 手續費）
-        actualAmount = Math.round((originalAmount / 100) * 0.98)
+        const originalAmount = parseInt(tx_amt, 10) / 100 // 轉換為元
+        // 扣除 2% 手續費
+        actualAmount = Math.round(originalAmount * 0.98)
       }
 
       // 自動回填實收金額和收款日期，但 status 保持 0（待確認）
@@ -99,7 +102,7 @@ export async function POST(req: NextRequest) {
         })
         .eq('receipt_number', receiptNumber)
 
-      logger.log(`❌ 收款單 ${receiptNumber} 付款失敗，return_code: ${return_code}`)
+      logger.log(`❌ 收款單 ${receiptNumber} 付款失敗，ret_code: ${ret_code}`)
     }
 
     // 回應台新銀行（必須回應成功，否則會重複通知）

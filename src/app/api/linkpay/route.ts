@@ -32,19 +32,31 @@ interface CreateLinkPayRequest {
 
 interface TaishinAuthParams {
   order_no: string
-  price: number
+  amt: string // 金額，不含小數，如 "100" 代表 100 元
+  cur: string // 幣別，固定 "NTD"
   order_desc: string
+  notification: number // 1=Email, 2=簡訊
   payment_name: string
   mer_phone_num: string
   user_name: string
-  notification: number
   gender?: number | null
   email: string
   link_end_date: string
-  result_url: string
+  trans_gen: string // 一般交易，固定 "1"
+  capt_flag: string // 授權同步請款標記，0=不同步請款, 1=同步請款
+  post_back_url: string // 前台通知網址（交易完成後導向）
+  result_flag: string // 回傳訊息標記，0=不查詢, 1=查詢
+  result_url: string // 後台通知網址（必須 https）
 }
 
+// 完整的台新 API 請求格式（依據手冊 3.2 章節）
 interface TaishinAuthRequest {
+  sender: string // 固定 "rest"
+  ver: string // 固定 "1.0.0"
+  mid: string // 特店代號 (15碼)
+  tid: string // 端末代號 (8碼)
+  pay_type: number // 付款類別，固定 1 (信用卡)
+  tx_type: number // 交易類型，1=授權
   params: TaishinAuthParams
 }
 
@@ -64,7 +76,11 @@ interface TaishinAuthResponse {
 const TAISHIN_API_URL = 'https://tspg.taishinbank.com.tw/tspglinkpay/restapi/auth.ashx'
 const MERCHANT_PHONE = '0277516051'
 
-// Webhook 回調 URL（從環境變數讀取）
+// 台新銀行特店資訊（從環境變數讀取）
+const TAISHIN_MID = process.env.TAISHIN_MID || '' // 特店代號 (15碼)
+const TAISHIN_TID = process.env.TAISHIN_TID || '' // 端末代號 (8碼)
+
+// Webhook 回調 URL（從環境變數讀取，正式環境必須是 https）
 const WEBHOOK_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 // ============================================
@@ -73,6 +89,15 @@ const WEBHOOK_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:30
 
 function removePunctuations(input: string): string {
   return input.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
+}
+
+/**
+ * 清理訂單號碼，移除 - 和 _ 字元
+ * 銀聯卡 UnionPay 交易要求：訂單號碼需由英、數字組成，不得包含 "_" 及 "-" 字元
+ * @see 手冊 v1.8 第15頁
+ */
+function sanitizeOrderNo(input: string): string {
+  return input.replace(/[-_]/g, '')
 }
 
 function formatEndDate(dateStr: string): string {
@@ -121,24 +146,36 @@ export async function POST(req: NextRequest) {
     const tourName = (receipt.tours as { name?: string } | null)?.name || receipt.tour_name || ''
     const finalPaymentName = paymentName || `${removePunctuations(tourName)} ${receipt.receipt_account || ''}`
 
-    // 生成唯一訂單號
+    // 生成唯一訂單號（移除 - 和 _ 以符合銀聯卡規範）
     const timestamp = Date.now()
-    const orderNo = `${receiptNumber}R${timestamp.toString().slice(-6)}`
+    const rawOrderNo = `${receiptNumber}R${timestamp.toString().slice(-6)}`
+    const orderNo = sanitizeOrderNo(rawOrderNo)
 
-    // 組裝台新 API 請求
+    // 組裝台新 API 請求（依據手冊 v1.8 格式）
     const taishinRequest: TaishinAuthRequest = {
+      sender: 'rest',
+      ver: '1.0.0',
+      mid: TAISHIN_MID,
+      tid: TAISHIN_TID,
+      pay_type: 1, // 信用卡
+      tx_type: 1, // 授權交易
       params: {
         order_no: orderNo,
-        price: amount,
-        order_desc: receiptNumber,
+        amt: String(amount), // 金額不含小數，轉為字串
+        cur: 'NTD',
+        order_desc: sanitizeOrderNo(receiptNumber),
+        notification: 1, // Email 通知
         payment_name: finalPaymentName.slice(0, 40),
         mer_phone_num: MERCHANT_PHONE,
         user_name: userName.slice(0, 5),
-        notification: 1,
         gender: gender || null,
         email: email,
         link_end_date: formatEndDate(endDate),
-        result_url: `${WEBHOOK_BASE_URL}/api/linkpay/webhook`,
+        trans_gen: '1', // 一般交易
+        capt_flag: '1', // 授權同步請款
+        post_back_url: `${WEBHOOK_BASE_URL}/payment/complete`, // 前台通知（交易完成導向）
+        result_flag: '1', // 查詢回傳訊息
+        result_url: `${WEBHOOK_BASE_URL}/api/linkpay/webhook`, // 後台通知（Webhook）
       },
     }
 
