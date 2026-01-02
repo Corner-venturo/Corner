@@ -22,7 +22,6 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
-import { CurrencyCell } from '@/components/table-cells'
 import { RECEIPT_TYPES } from '../types'
 import { Input } from '@/components/ui/input'
 
@@ -333,7 +332,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               }}
               placeholder="請選擇團體..."
               emptyMessage="找不到團體"
-              className="mt-1"
+              className="mt-1 bg-white"
             />
           </div>
 
@@ -345,7 +344,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               value={formData.order_id}
               onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
             >
-              <SelectTrigger className="mt-1 border-morandi-container/30">
+              <SelectTrigger className="mt-1 bg-white border-morandi-container/30">
                 <SelectValue
                   placeholder={
                     !formData.tour_id
@@ -359,24 +358,13 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               <SelectContent>
                 {filteredOrders.map(order => (
                   <SelectItem key={order.id} value={order.id}>
-                    <span className="inline-flex items-center gap-1">
-                      {order.order_number} - {order.contact_person || '無聯絡人'} (待收: <CurrencyCell amount={order.remaining_amount || 0} className="inline" />)
-                    </span>
+                    {order.order_number} - {order.contact_person || '無聯絡人'}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* 待收金額 */}
-          {selectedOrder && (
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">待收金額</Label>
-              <div className="mt-1 px-3 py-2 bg-muted rounded-md">
-                <CurrencyCell amount={selectedOrder.remaining_amount || 0} />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* 收款項目 - 文青風表格 */}
@@ -389,9 +377,9 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
             </Button>
           </div>
 
-          <div className="flex-1 overflow-visible">
+          <div className="flex-1 overflow-auto">
             {/* 項目表格 */}
-            <div className="border border-border rounded-lg overflow-hidden">
+            <div className="border border-border rounded-lg overflow-hidden bg-white">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
@@ -425,12 +413,6 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               </table>
             </div>
 
-            {paymentItems.length > 0 && (
-              <div className="flex justify-end items-center gap-6 pt-4 mt-2">
-                <span className="text-sm text-morandi-secondary">總金額</span>
-                <CurrencyCell amount={totalAmount} className="text-lg font-semibold text-morandi-gold" />
-              </div>
-            )}
           </div>
         </div>
 
@@ -490,23 +472,32 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         )}
 
         {/* 操作按鈕 */}
-        <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={handleCancel} className="gap-2">
-            <X size={16} />
-            {linkPayResults.length > 0 ? '關閉' : '取消'}
-          </Button>
-          {linkPayResults.length === 0 && (
-            <Button
-              onClick={handleSubmit}
-              disabled={!formData.tour_id || !formData.order_id || paymentItems.length === 0}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
-            >
-              <Save size={16} />
-              <span className="inline-flex items-center gap-1">
-                新增收款單 (共 {paymentItems.length} 項，<CurrencyCell amount={totalAmount} className="inline" />)
-              </span>
+        <div className="flex justify-between items-center pt-4 border-t border-border">
+          {/* 左側：總金額 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-morandi-secondary">總金額</span>
+            <span className="text-lg font-semibold text-morandi-gold w-[120px]">
+              NT$ {totalAmount.toLocaleString()}
+            </span>
+          </div>
+
+          {/* 右側：按鈕 */}
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleCancel} className="gap-2">
+              <X size={16} />
+              {linkPayResults.length > 0 ? '關閉' : '取消'}
             </Button>
-          )}
+            {linkPayResults.length === 0 && (
+              <Button
+                onClick={handleSubmit}
+                disabled={!formData.tour_id || !formData.order_id || paymentItems.length === 0}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+              >
+                <Save size={16} />
+                新增收款單 (共 {paymentItems.length} 項)
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

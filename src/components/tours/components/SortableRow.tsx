@@ -5,6 +5,12 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical } from 'lucide-react'
 import { OrderMember, VisibleColumns } from '../types'
 
+interface StickyPositions {
+  drag: number
+  index: number
+  name: number
+}
+
 interface SortableRowProps {
   member: OrderMember
   index: number
@@ -18,6 +24,7 @@ interface SortableRowProps {
   visibleColumns: VisibleColumns
   roomAssignment: string
   vehicleAssignment: string
+  stickyLeftPositions: StickyPositions
 }
 
 export function SortableRow({
@@ -33,6 +40,7 @@ export function SortableRow({
   visibleColumns,
   roomAssignment,
   vehicleAssignment,
+  stickyLeftPositions,
 }: SortableRowProps) {
   const {
     attributes,
@@ -49,25 +57,42 @@ export function SortableRow({
     opacity: isDragging ? 0.5 : 1,
   }
 
+  // 根據奇偶行決定背景色
+  const rowBgClass = index % 2 === 0 ? 'bg-blue-50' : 'bg-green-50'
+  const stickyBgClass = index % 2 === 0 ? 'bg-blue-50' : 'bg-green-50'
+
   return (
     <tr
       ref={setNodeRef}
       style={style}
-      className={`border-b border-morandi-gold/10 hover:bg-morandi-container/10 ${
-        index % 2 === 0 ? 'bg-status-info-bg' : 'bg-status-success-bg'
-      } ${isDragging ? 'z-50' : ''}`}
+      className={`border-b border-morandi-gold/10 hover:bg-morandi-container/10 ${rowBgClass} ${isDragging ? 'z-50' : ''}`}
     >
-      {/* Drag handle */}
+      {/* 固定欄位：拖拉手柄 */}
       {isDragMode && (
-        <td className="px-2 py-2 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
+        <td
+          className={`px-2 py-2 cursor-grab active:cursor-grabbing sticky z-10 ${stickyBgClass}`}
+          style={{ left: stickyLeftPositions.drag }}
+          {...attributes}
+          {...listeners}
+        >
           <GripVertical size={16} className="text-morandi-text-light" />
         </td>
       )}
 
-      <td className="px-2 py-2 text-xs text-morandi-text-light">
+      {/* 固定欄位：序號 */}
+      <td
+        className={`px-2 py-2 text-xs text-morandi-text-light sticky z-10 ${stickyBgClass}`}
+        style={{ left: stickyLeftPositions.index }}
+      >
         {index + 1}
       </td>
-      <td className="px-2 py-2">{member.chinese_name || '-'}</td>
+      {/* 固定欄位：中文姓名 */}
+      <td
+        className={`px-2 py-2 sticky z-10 border-r border-morandi-gold/20 font-medium ${stickyBgClass}`}
+        style={{ left: stickyLeftPositions.name }}
+      >
+        {member.chinese_name || '-'}
+      </td>
       {visibleColumns.passport_name && (
         <td className="px-2 py-2">{member.passport_name || '-'}</td>
       )}

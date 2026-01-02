@@ -1,0 +1,140 @@
+/**
+ * 機器人通知 API
+ * 用於發送系統通知到指定用戶
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
+
+// 系統機器人 ID
+const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
+
+interface NotificationRequest {
+  recipientId: string       // 接收者員工 ID
+  message: string           // 通知內容
+  type?: 'info' | 'warning' | 'error'  // 通知類型
+  metadata?: Record<string, unknown>   // 額外資料
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json() as NotificationRequest
+    const { recipientId, message, type = 'info', metadata } = body
+
+    if (!recipientId || !message) {
+      return NextResponse.json(
+        { success: false, message: '缺少必要參數' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = getSupabaseAdminClient()
+
+    // 1. 查找或建立機器人與接收者的 DM 頻道
+    const { data: existingChannel } = await supabase
+      .from('channels')
+      .select('*')
+      .eq('type', 'direct')
+      .or(`name.ilike.dm:${SYSTEM_BOT_ID}:${recipientId},name.ilike.dm:${recipientId}:${SYSTEM_BOT_ID}`)
+      .single()
+
+    let channelId: string
+
+    if (existingChannel) {
+      channelId = existingChannel.id
+    } else {
+      // 取得接收者的 workspace_id
+      const { data: recipient } = await supabase
+        .from('employees')
+        .select('workspace_id')
+        .eq('id', recipientId)
+        .single()
+
+      if (!recipient?.workspace_id) {
+        return NextResponse.json(
+          { success: false, message: '找不到接收者' },
+          { status: 404 }
+        )
+      }
+
+      // 建立新的 DM 頻道
+      const { data: newChannel, error: createError } = await supabase
+        .from('channels')
+        .insert({
+          name: `dm:${SYSTEM_BOT_ID}:${recipientId}`,
+          type: 'direct',
+          channel_type: 'direct',
+          is_announcement: false,
+          workspace_id: recipient.workspace_id,
+          created_by: SYSTEM_BOT_ID,
+        })
+        .select()
+        .single()
+
+      if (createError || !newChannel) {
+        logger.error('建立機器人 DM 頻道失敗:', createError)
+        return NextResponse.json(
+          { success: false, message: '建立通知頻道失敗' },
+          { status: 500 }
+        )
+      }
+
+      // 加入頻道成員
+      await supabase
+        .from('channel_members')
+        .insert([
+          { channel_id: newChannel.id, employee_id: SYSTEM_BOT_ID, role: 'owner', workspace_id: recipient.workspace_id },
+          { channel_id: newChannel.id, employee_id: recipientId, role: 'member', workspace_id: recipient.workspace_id },
+        ])
+
+      channelId = newChannel.id
+    }
+
+    // 2. 發送訊息
+    const { data: messageData, error: messageError } = await supabase
+      .from('messages')
+      .insert({
+        channel_id: channelId,
+        content: message,
+        author_id: SYSTEM_BOT_ID,
+        metadata: {
+          type: 'bot_notification',
+          notification_type: type,
+          ...metadata,
+        },
+      })
+      .select()
+      .single()
+
+    if (messageError) {
+      logger.error('發送機器人訊息失敗:', messageError)
+      return NextResponse.json(
+        { success: false, message: '發送訊息失敗' },
+        { status: 500 }
+      )
+    }
+
+    logger.info('機器人通知已發送', {
+      recipientId,
+      channelId,
+      messageId: messageData.id,
+      type,
+    })
+
+    return NextResponse.json({
+      success: true,
+      message: '通知已發送',
+      data: {
+        channelId,
+        messageId: messageData.id,
+      },
+    })
+  } catch (error) {
+    logger.error('機器人通知 API 錯誤:', error)
+    return NextResponse.json(
+      { success: false, message: '伺服器錯誤' },
+      { status: 500 }
+    )
+  }
+}

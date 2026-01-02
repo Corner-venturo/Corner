@@ -6,6 +6,7 @@
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { User } from '@supabase/supabase-js'
 
 export interface ServerAuthResult {
@@ -56,11 +57,13 @@ export async function getServerAuth(): Promise<AuthResult> {
   let employeeId = user.user_metadata?.employee_id as string | undefined
 
   // 3. 如果 user_metadata 沒有，從 employees 表查詢（fallback）
+  // 使用 admin client 繞過 RLS，確保能查到員工資料
   if (!workspaceId || !employeeId) {
-    const { data: employee, error: employeeError } = await supabase
+    const adminClient = getSupabaseAdminClient()
+    const { data: employee, error: employeeError } = await adminClient
       .from('employees')
       .select('id, workspace_id')
-      .eq('id', user.id)
+      .eq('supabase_user_id', user.id)
       .single()
 
     if (employeeError || !employee) {
@@ -73,7 +76,7 @@ export async function getServerAuth(): Promise<AuthResult> {
       }
     }
 
-    workspaceId = employee.workspace_id
+    workspaceId = employee.workspace_id ?? undefined
     employeeId = employee.id
   }
 

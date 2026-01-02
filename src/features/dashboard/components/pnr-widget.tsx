@@ -23,6 +23,7 @@ import {
   X,
   ArrowRight,
   Loader2,
+  Baby,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
@@ -31,6 +32,7 @@ import {
   isUrgent,
   type ParsedPNR,
   type FlightSegment,
+  type PassengerInfo,
   SSRCategory,
 } from '@/lib/pnr-parser'
 import { useReferenceData } from '@/lib/pnr/use-reference-data'
@@ -370,19 +372,40 @@ TK TL20JAN/1200`}
                   )}
 
                   {/* Passengers */}
-                  {parsedPNR.passengerNames.length > 0 && (
+                  {parsedPNR.passengers.length > 0 && (
                     <div className="rounded-lg bg-white/50 p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
-                          旅客 ({parsedPNR.passengerNames.length})
+                          旅客 ({parsedPNR.passengers.length})
+                          {parsedPNR.passengers.some(p => p.infant) && (
+                            <span className="ml-1 text-morandi-secondary">
+                              +{parsedPNR.passengers.filter(p => p.infant).length} 嬰兒
+                            </span>
+                          )}
                         </span>
                       </div>
-                      <div className="space-y-1">
-                        {parsedPNR.passengerNames.map((name, idx) => (
-                          <p key={idx} className="text-xs text-morandi-primary font-medium">
-                            {name}
-                          </p>
+                      <div className="space-y-1.5">
+                        {parsedPNR.passengers.map((pax) => (
+                          <div key={pax.index} className="text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="text-morandi-secondary w-4">{pax.index}.</span>
+                              <span className="text-morandi-primary font-medium">{pax.name}</span>
+                              {pax.type === 'CHD' && (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-medium">
+                                  兒童 {pax.birthDate}
+                                </span>
+                              )}
+                            </div>
+                            {pax.infant && (
+                              <div className="flex items-center gap-2 ml-6 mt-0.5 text-morandi-secondary">
+                                <Baby className="w-3 h-3 text-pink-400" />
+                                <span className="text-[10px]">
+                                  嬰兒: {pax.infant.name} ({pax.infant.birthDate})
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>

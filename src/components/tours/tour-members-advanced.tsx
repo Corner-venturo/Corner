@@ -32,7 +32,6 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
   // State
   const [isDragMode, setIsDragMode] = useState(false)
   const [showPrintPreview, setShowPrintPreview] = useState(false)
-  const [showColumnSettings, setShowColumnSettings] = useState(false)
   const [showAddFieldDialog, setShowAddFieldDialog] = useState(false)
   const [showRoomManager, setShowRoomManager] = useState(false)
   const [showVehicleManager, setShowVehicleManager] = useState(false)
@@ -252,12 +251,6 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
           >
             {isDragMode ? '完成排序' : '排序模式'}
           </Button>
-          <ColumnSettings
-            visibleColumns={visibleColumns}
-            onVisibilityChange={handleColumnVisibilityChange}
-            open={showColumnSettings}
-            onOpenChange={setShowColumnSettings}
-          />
           <Button
             variant="outline"
             size="sm"
@@ -301,6 +294,14 @@ export function TourMembersAdvanced({ tour }: TourMembersAdvancedProps) {
             列印交接單
           </Button>
         </div>
+      </div>
+
+      {/* 欄位顯示設定 */}
+      <div className="px-6 py-2 border-b border-morandi-gold/10 bg-morandi-container/10">
+        <ColumnSettings
+          visibleColumns={visibleColumns}
+          onVisibilityChange={handleColumnVisibilityChange}
+        />
       </div>
 
       {/* Members table */}

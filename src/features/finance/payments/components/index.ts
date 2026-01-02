@@ -6,3 +6,4 @@
 export { AddReceiptDialog } from './AddReceiptDialog'
 export { PaymentItemRow } from './PaymentItemRow'
 export { BatchReceiptDialog } from './BatchReceiptDialog'
+export { ReceiptConfirmDialog } from './ReceiptConfirmDialog'

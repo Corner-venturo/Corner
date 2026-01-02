@@ -31,8 +31,8 @@ const BatchConfirmReceiptDialog = dynamic(
   () => import('./components').then(m => m.BatchConfirmReceiptDialog),
   { loading: () => null }
 )
-const ReceiptDetailDialog = dynamic(
-  () => import('./components').then(m => m.ReceiptDetailDialog),
+const ReceiptConfirmDialog = dynamic(
+  () => import('@/features/finance/payments').then(m => m.ReceiptConfirmDialog),
   /* eslint-disable venturo/no-custom-modal -- 動態載入時的 loading 狀態 */
   { loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><Loader2 className="animate-spin text-white" size={32} /></div> }
 )
@@ -62,7 +62,7 @@ export default function PaymentsPage() {
   const router = useRouter()
 
   // 資料與業務邏輯
-  const { receipts, availableOrders, fetchReceipts, handleCreateReceipt } = usePaymentData()
+  const { receipts, availableOrders, fetchReceipts, handleCreateReceipt, handleConfirmReceipt } = usePaymentData()
   const { user } = useAuthStore()
 
   // 檢查是否為可批量確認的角色（管理員、會計、超級管理員）
@@ -289,11 +289,12 @@ export default function PaymentsPage() {
         onSuccess={fetchReceipts}
       />
 
-      {/* 收款單詳情對話框 */}
-      <ReceiptDetailDialog
+      {/* 收款單確認對話框 */}
+      <ReceiptConfirmDialog
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         receipt={selectedReceipt}
+        onConfirm={handleConfirmReceipt}
         onSuccess={fetchReceipts}
       />
     </div>

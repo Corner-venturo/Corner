@@ -18,6 +18,8 @@ import {
 import type { Channel, ChannelGroup } from '@/stores/workspace-store'
 import { ChannelListSection, GroupedChannelList } from './ChannelListSection'
 import { getWorkspaceMembers } from '@/lib/actions/user-actions'
+import { BotSection } from './BotSection'
+import { ColleaguesSection } from './ColleaguesSection'
 
 interface ChannelListProps {
   announcementChannels: Channel[]
@@ -139,6 +141,12 @@ export function ChannelList({
             />
           )}
 
+          {/* 1.5 角落機器人（公告下方） */}
+          <BotSection
+            onSelectBot={onSelectMember}
+            selectedBotId={selectedChannelId}
+          />
+
           {/* 🔥 2. 我的最愛（starred channels） */}
           {favoriteChannels.length > 0 && (
             <ChannelListSection
@@ -204,29 +212,13 @@ export function ChannelList({
             />
           )}
           
-          {/* New Section for Direct Messages */}
-          {dmChannels.length > 0 && (
-            <ChannelListSection
-              channels={dmChannels}
-              selectedChannelId={selectedChannelId}
-              onSelectChannel={(channel) => {
-                if (channel?.id) {
-                  onSelectMember(channel.id)
-                }
-              }}
-              toggleChannelFavorite={() => {}} // No favorite for DMs
-              onDelete={() => {}} // No delete for DMs
-              onEdit={() => {}} // No edit for DMs
-              onJoinChannel={() => {}} // No join for DMs
-              onLeaveChannel={() => {}} // No leave for DMs
-              isAdmin={isAdmin}
-              checkIsMember={() => true} // Always a member of your own DMs
-              isExpanded={expandedSections.directMessages !== false}
-              onToggleExpanded={() => onToggleExpanded('directMessages', !expandedSections.directMessages)}
-              title="私訊"
-              icon="user"
-            />
-          )}
+          {/* 同事區塊（按辦公室分組） */}
+          <ColleaguesSection
+            isExpanded={expandedSections.colleagues !== false}
+            onToggleExpanded={() => onToggleExpanded('colleagues', !expandedSections.colleagues)}
+            onSelectMember={onSelectMember}
+            selectedMemberId={selectedChannelId}
+          />
 
           {/* 4. 搜尋結果：未加入的頻道（只在搜尋時顯示） */}
           {isSearching && unjoinedChannels.length > 0 && (

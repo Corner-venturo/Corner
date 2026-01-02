@@ -341,21 +341,36 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
           };
 
           if (extra) {
-            // 檢查是否為兒童: (CHD/30JUN22)
-            const chdMatch = extra.match(/^CHD\/(\d{2}[A-Z]{3}\d{2})$/i);
+            // 檢查是否為兒童: (CHD/30JUN22) 或 (CHD30JUN22)
+            const chdMatch = extra.match(/^CHD\/?(\d{2}[A-Z]{3}\d{2})$/i);
             if (chdMatch) {
               passenger.type = 'CHD';
               passenger.birthDate = chdMatch[1];
+              logger.log('    ✅ 找到兒童:', name, '生日:', chdMatch[1]);
             }
 
-            // 檢查是否帶嬰兒: (INFHO/HAOYU/06MAY24) 或 (INF/SURNAME/NAME/DDMMMYY)
+            // 檢查是否帶嬰兒: (INFHO/HAOYU/06MAY24)
             // 格式: INF + 嬰兒姓氏 + / + 嬰兒名字 + / + 出生日期
+            // 注意: INF 和姓氏之間沒有分隔符
             const infMatch = extra.match(/^INF([A-Z]+)\/([A-Z]+)\/(\d{2}[A-Z]{3}\d{2})$/i);
             if (infMatch) {
               passenger.infant = {
                 name: `${infMatch[1]}/${infMatch[2]}`,
                 birthDate: infMatch[3],
               };
+              logger.log('    ✅ 找到嬰兒:', passenger.infant.name, '生日:', infMatch[3], '隨行成人:', name);
+            }
+
+            // 備用格式: (INF SURNAME/GIVENNAME DDMMMYY) - 有空格分隔
+            if (!passenger.infant) {
+              const infMatch2 = extra.match(/^INF\s+([A-Z]+\/[A-Z]+)\s+(\d{2}[A-Z]{3}\d{2})$/i);
+              if (infMatch2) {
+                passenger.infant = {
+                  name: infMatch2[1],
+                  birthDate: infMatch2[2],
+                };
+                logger.log('    ✅ 找到嬰兒(備用格式):', passenger.infant.name, '生日:', infMatch2[2]);
+              }
             }
           }
 

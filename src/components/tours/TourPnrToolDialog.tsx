@@ -223,13 +223,20 @@ export function TourPnrToolDialog({
     }
   }, [])
 
-  // 清除
+  // 持久化 PNR 資料到 localStorage
+  const storageKey = `pnr-draft-${tourId}`
+
+  // 清除（含清除 localStorage）
   const handleClear = useCallback(() => {
+    localStorage.removeItem(storageKey)
     setRawPNR('')
     setParsedPNR(null)
     setError(null)
     setPassengerMatches([])
-  }, [])
+  }, [storageKey])
+
+  // 清除草稿（儲存成功後）
+  const clearDraft = handleClear
 
   // 更新旅客票價
   const handlePriceChange = useCallback((index: number, price: string) => {
@@ -354,6 +361,7 @@ export function TourPnrToolDialog({
       }
 
       toast.success(`PNR ${recordLocator} 已儲存，更新 ${updateCount} 位團員`)
+      clearDraft()  // 儲存成功後清除草稿
       onSuccess?.()
       onClose()
     } catch (err) {
@@ -363,15 +371,56 @@ export function TourPnrToolDialog({
     }
   }, [parsedPNR, rawPNR, user, tourId, tourCode, passengerMatches, createPNR, onSuccess, onClose])
 
-  // 重置狀態當關閉
+  // 載入保存的草稿
   useEffect(() => {
-    if (!isOpen) {
-      setRawPNR('')
-      setParsedPNR(null)
-      setError(null)
-      setPassengerMatches([])
+    if (isOpen && tourId) {
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        try {
+          const draft = JSON.parse(saved)
+          if (draft.rawPNR) {
+            setRawPNR(draft.rawPNR)
+            // 如果有保存的電報，自動解析
+            if (draft.rawPNR.trim()) {
+              setTimeout(() => {
+                try {
+                  const result = parseAmadeusPNR(draft.rawPNR)
+                  setParsedPNR(result)
+                  // 自動比對旅客
+                  const matches: PassengerMatch[] = result.passengerNames.map((name, index) => {
+                    const matchedMember = matchPassengerToMember(name, members)
+                    const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
+                    return {
+                      pnrIndex: index,
+                      pnrName: name,
+                      memberId: matchedMember?.id || null,
+                      memberName: matchedMember?.chinese_name || null,
+                      memberPassportName: matchedMember?.passport_name || null,
+                      baggage,
+                      meal,
+                      ticketPrice: matchedMember?.flight_cost || null,
+                    }
+                  })
+                  setPassengerMatches(matches)
+                } catch {
+                  // 解析失敗時不處理
+                }
+              }, 100)
+            }
+          }
+        } catch {
+          // 解析失敗時忽略
+        }
+      }
     }
-  }, [isOpen])
+  }, [isOpen, tourId, storageKey, members])
+
+  // 保存草稿到 localStorage
+  useEffect(() => {
+    if (tourId && rawPNR) {
+      localStorage.setItem(storageKey, JSON.stringify({ rawPNR }))
+    }
+  }, [tourId, rawPNR, storageKey])
 
   // 統計比對結果
   const matchStats = useMemo(() => {

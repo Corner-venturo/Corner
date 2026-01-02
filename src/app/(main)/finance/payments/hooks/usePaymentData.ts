@@ -4,7 +4,8 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
-import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore, useTourStore } from '@/stores'
+import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore, useTourStore, useEmployeeStore } from '@/stores'
+import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
 import { useAccountingModule } from '@/hooks/use-accounting-module'
@@ -20,10 +21,11 @@ const RECEIPT_TYPES = {
 
 export function usePaymentData() {
   const { items: orders } = useOrderStore()
-  const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { items: receipts, create: createReceipt, update: updateReceipt, fetchAll: fetchReceipts } = useReceiptStore()
   const { items: linkpayLogs } = useLinkPayLogStore()
   const { items: tours } = useTourStore()
   const { user } = useAuthStore()
+  const { items: employees } = useEmployeeStore()
   const { hasAccounting, isExpired } = useAccountingModule()
 
   // 過濾可用訂單（未收款或部分收款）
@@ -176,6 +178,60 @@ export function usePaymentData() {
     await fetchReceipts()
   }
 
+  // 確認收款（更新實收金額和狀態，異常時記錄備註並通知建立者）
+  const handleConfirmReceipt = async (receiptId: string, actualAmount: number, isAbnormal: boolean = false) => {
+    if (!user?.id) {
+      throw new Error('請先登入')
+    }
+
+    // 找到收款單資訊
+    const receipt = receipts.find(r => r.id === receiptId)
+
+    // 如果金額異常，在備註中記錄
+    const abnormalNote = isAbnormal && receipt
+      ? `[金額異常] 應收 NT$ ${(receipt.receipt_amount || 0).toLocaleString()}，實收 NT$ ${actualAmount.toLocaleString()}`
+      : null
+
+    await updateReceipt(receiptId, {
+      actual_amount: actualAmount,
+      status: '1', // 已確認
+      note: abnormalNote ? `${receipt?.note || ''} ${abnormalNote}`.trim() : receipt?.note,
+      updated_by: user.id,
+    })
+
+    // 如果金額異常，發送機器人通知給建立者
+    if (isAbnormal && receipt?.created_by && receipt.created_by !== user.id) {
+      const confirmer = employees.find(e => e.id === user.id)
+      const confirmerName = confirmer?.chinese_name || confirmer?.display_name || '會計'
+
+      try {
+        await sendPaymentAbnormalNotification({
+          recipientId: receipt.created_by,
+          receiptNumber: receipt.receipt_number || receiptId,
+          expectedAmount: receipt.receipt_amount || 0,
+          actualAmount,
+          confirmedBy: confirmerName,
+        })
+        logger.info('⚠️ 收款金額異常通知已發送', {
+          receiptId,
+          actualAmount,
+          expectedAmount: receipt?.receipt_amount,
+          creatorId: receipt.created_by,
+        })
+      } catch (error) {
+        logger.error('發送金額異常通知失敗:', error)
+        // 不阻斷主流程
+      }
+    }
+
+    if (isAbnormal) {
+      logger.info('⚠️ 收款金額異常已記錄', { receiptId, actualAmount, expectedAmount: receipt?.receipt_amount })
+    }
+
+    // 重新載入資料
+    await fetchReceipts()
+  }
+
   return {
     receipts,
     orders,
@@ -184,5 +240,6 @@ export function usePaymentData() {
     user,
     fetchReceipts,
     handleCreateReceipt,
+    handleConfirmReceipt,
   }
 }
