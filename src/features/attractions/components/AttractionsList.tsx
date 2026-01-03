@@ -91,20 +91,6 @@ export function AttractionsList({
       },
     },
     {
-      key: 'city',
-      label: '地點',
-      sortable: true,
-      render: (_: unknown, attraction: Attraction) => {
-        const country = countries.find(c => c.id === attraction.country_id)
-        const city = cities.find(c => c.id === attraction.city_id)
-        return (
-          <div className="text-sm text-morandi-secondary line-clamp-1">
-            {city?.name || attraction.city_id}
-          </div>
-        )
-      },
-    },
-    {
       key: 'category',
       label: '類別',
       sortable: true,

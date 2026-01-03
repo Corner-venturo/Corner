@@ -37,7 +37,7 @@ export default function DatabaseManagementPage() {
   useEffect(() => {
     const loadCountries = async () => {
       try {
-        const { data, error } = await supabase.from('countries').select('*').order('display_order')
+        const { data, error } = await supabase.from('countries').select('*').order('usage_count', { ascending: false })
 
         if (error) {
           logger.error('Error loading countries:', error)

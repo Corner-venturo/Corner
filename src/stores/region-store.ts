@@ -22,6 +22,7 @@ export interface Country {
   has_regions: boolean
   display_order: number
   is_active: boolean
+  usage_count?: number // 使用次數，常用的排前面
   workspace_id?: string
   created_at: string
   updated_at: string
@@ -54,7 +55,8 @@ export interface City {
   primary_image?: number // 1 or 2, indicates which image is primary
   display_order: number
   is_active: boolean
-  is_major?: boolean // 主要城市（有機場，用於開團/封面選擇）
+  is_major?: boolean // 已棄用，改用 airport_code 判斷
+  usage_count?: number // 使用次數，常用的排前面
   workspace_id?: string
   created_at: string
   updated_at: string
@@ -252,6 +254,43 @@ export const useRegionsStore = () => {
     [statsStore.stats]
   )
 
+  // ============================================
+  // 增加使用次數（讓常用的排前面）
+  // ============================================
+  const incrementCountryUsage = useCallback(
+    async (countryName: string) => {
+      const country = countryStore.items.find(c => c.name === countryName)
+      if (!country) return
+
+      const newCount = (country.usage_count || 0) + 1
+      await supabase
+        .from('countries')
+        .update({ usage_count: newCount })
+        .eq('id', country.id)
+
+      // 更新本地狀態
+      countryStore.update(country.id, { usage_count: newCount })
+    },
+    [countryStore]
+  )
+
+  const incrementCityUsage = useCallback(
+    async (cityName: string) => {
+      const city = cityStore.items.find(c => c.name === cityName)
+      if (!city) return
+
+      const newCount = (city.usage_count || 0) + 1
+      await supabase
+        .from('cities')
+        .update({ usage_count: newCount })
+        .eq('id', city.id)
+
+      // 更新本地狀態
+      cityStore.update(city.id, { usage_count: newCount })
+    },
+    [cityStore]
+  )
+
   // 使用 useMemo 確保回傳的物件引用穩定
   return useMemo(
     () => ({
@@ -285,6 +324,8 @@ export const useRegionsStore = () => {
       getCitiesByCountry,
       getCitiesByRegion,
       getCityStats,
+      incrementCountryUsage,
+      incrementCityUsage,
     }),
     [
       // 資料依賴
@@ -320,6 +361,8 @@ export const useRegionsStore = () => {
       getCitiesByCountry,
       getCitiesByRegion,
       getCityStats,
+      incrementCountryUsage,
+      incrementCityUsage,
     ]
   )
 }

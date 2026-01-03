@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
-import { useTourStore, useOrderStore } from '@/stores'
+import { useTourStore, useOrderStore, useRegionsStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -21,6 +21,7 @@ interface QuickGroupProps {
 export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const tourStore = useTourStore()
   const orderStore = useOrderStore()
+  const { incrementCountryUsage, incrementCityUsage, countries, cities } = useRegionsStore()
   const { items: employees } = useUserStore()
   const workspaceId = useWorkspaceId()
   const [submitting, setSubmitting] = useState(false)
@@ -96,6 +97,20 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
       }
 
       const createdTour = await tourStore.create(tourData as unknown as Parameters<typeof tourStore.create>[0])
+
+      // 更新國家和城市的使用次數（讓常用的排在前面）
+      if (newTour.countryCode !== '__custom__') {
+        // 找到國家名稱
+        const country = countries.find(c => c.code === newTour.countryCode)
+        if (country) {
+          incrementCountryUsage(country.name)
+        }
+        // 找到城市名稱
+        const city = cities.find(c => c.airport_code === newTour.cityCode)
+        if (city) {
+          incrementCityUsage(city.name)
+        }
+      }
 
       // 如果有填寫聯絡人，同時建立訂單
       if (newOrder.contact_person.trim()) {

@@ -966,6 +966,21 @@ input[type='number'] {
   width: 100% !important;
   height: 100% !important;
   z-index: 1;
+  cursor: grab !important;
+  touch-action: none !important;
+}
+
+.leaflet-container:active {
+  cursor: grabbing !important;
+}
+
+/* 確保地圖可以拖曳 */
+.leaflet-grab {
+  cursor: grab !important;
+}
+
+.leaflet-dragging .leaflet-grab {
+  cursor: grabbing !important;
 }
 
 .leaflet-div-icon {

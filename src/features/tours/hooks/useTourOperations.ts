@@ -10,6 +10,7 @@ import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import type { Order } from '@/types'
 import type { Quote } from '@/stores/types'
+import { useRegionsStore } from '@/stores'
 
 interface TourActions {
   create: (data: CreateInput<Tour>) => Promise<Tour>
@@ -35,6 +36,7 @@ interface UseTourOperationsParams {
 
 export function useTourOperations(params: UseTourOperationsParams) {
   const router = useRouter()
+  const { incrementCountryUsage, incrementCityUsage } = useRegionsStore()
   const {
     actions,
     addOrder,
@@ -166,6 +168,17 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         const createdTour = await actions.create(tourData)
 
+        // 更新國家和城市的使用次數（讓常用的排在前面）
+        const countryName = newTour.countryCode === '__custom__'
+          ? newTour.customCountry!
+          : newTour.countryCode
+        if (countryName) {
+          incrementCountryUsage(countryName)
+        }
+        if (cityName) {
+          incrementCityUsage(cityName)
+        }
+
         // If contact person is filled, also add order
         if (newOrder.contact_person?.trim()) {
           // 新建旅遊團的第一張訂單，編號格式: {團號}-O01
@@ -222,6 +235,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
       dialogType,
       dialogData,
       router,
+      incrementCountryUsage,
+      incrementCityUsage,
     ]
   )
 
@@ -251,6 +266,18 @@ export function useTourOperations(params: UseTourOperationsParams) {
       }
     },
     [actions, quotes, itineraries, updateQuote, updateItinerary]
+  )
+
+  const handleConfirmTour = useCallback(
+    async (tour: Tour) => {
+      try {
+        await tourService.lockTour(tour.id, {})
+        logger.info(`已確認鎖定旅遊團 ${tour.code}`)
+      } catch (err) {
+        logger.error('確認鎖定旅遊團失敗:', err)
+      }
+    },
+    []
   )
 
   const handleArchiveTour = useCallback(
@@ -289,6 +316,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
   return {
     handleAddTour,
     handleDeleteTour,
+    handleConfirmTour,
     handleArchiveTour,
   }
 }

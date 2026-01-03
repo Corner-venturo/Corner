@@ -83,10 +83,11 @@ export function useRegionData(data: { country?: string }) {
 
   // 📦 計算衍生資料
 
-  // 所有啟用的國家列表
+  // 所有啟用的國家列表（按使用次數排序，常用的在前面）
   const allDestinations = React.useMemo(() => {
     const result = countries
       .filter(c => c.is_active)
+      .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
       .map(c => ({
         id: c.id,
         code: c.code || '',
@@ -122,12 +123,14 @@ export function useRegionData(data: { country?: string }) {
       return []
     }
 
-    // 返回該國家的主要城市（用於封面選擇）
+    // 返回該國家有機場代碼的城市（有 airport_code = 主要城市）
+    // 按使用次數排序，常用的在前面
     const result = cities
-      .filter(c => c.country_id === country.id && c.is_active && c.is_major)
+      .filter(c => c.country_id === country.id && c.is_active && c.airport_code)
+      .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
       .map(c => ({
         id: c.id,
-        code: c.airport_code || c.name,
+        code: c.airport_code!,
         name: c.name
       }))
 

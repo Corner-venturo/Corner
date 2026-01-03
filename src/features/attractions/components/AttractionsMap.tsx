@@ -93,7 +93,7 @@ export function AttractionsMap({
         mapRef.current = null
       }
 
-      // 創建地圖 - 隱藏縮放控制
+      // 創建地圖 - 隱藏縮放控制，確保可拖曳
       const map = L.map(container, {
         center: [selectedAttraction.latitude!, selectedAttraction.longitude!],
         zoom: 14,
@@ -101,6 +101,7 @@ export function AttractionsMap({
         dragging: true,
         touchZoom: true,
         scrollWheelZoom: true,
+        keyboard: true,
       })
 
       // CartoDB Positron 淺色底圖
