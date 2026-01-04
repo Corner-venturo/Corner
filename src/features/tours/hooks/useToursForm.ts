@@ -3,10 +3,10 @@
 import { useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Tour } from '@/stores/types'
-import { useRegionsStore } from '@/stores'
 import { useTourPageState } from './useTourPageState'
 import { useEmployees } from '@/hooks/cloud-hooks'
 import { useQuotesListSlim } from '@/hooks/useListSlim'
+import { useTourDestinations } from './useTourDestinations'
 
 interface UseToursFormReturn {
   handleOpenCreateDialog: (fromQuoteId?: string) => Promise<void>
@@ -24,9 +24,9 @@ interface UseToursFormParams {
 
 export function useToursForm({ state, openDialog, dialog }: UseToursFormParams): UseToursFormReturn {
   const searchParams = useSearchParams()
-  const { countries, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { items: quotes } = useQuotesListSlim()
+  const { destinations, loading: destinationsLoading } = useTourDestinations()
 
   const {
     setNewTour,
@@ -35,7 +35,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     setFormError,
   } = state
 
-  // Lazy load: only load regions and employees when opening create dialog
+  // Lazy load: only load employees when opening create dialog
   const handleOpenCreateDialog = useCallback(
     async (fromQuoteId?: string) => {
       setNewTour({
@@ -52,15 +52,12 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
       })
       setAvailableCities([])
 
-      if (countries.length === 0) {
-        await fetchRegions()
-      }
       if (employees.length === 0) {
         await fetchEmployees()
       }
       openDialog('create', undefined, fromQuoteId)
     },
-    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog, setNewTour, setAvailableCities]
+    [employees.length, fetchEmployees, openDialog, setNewTour, setAvailableCities]
   )
 
   const resetForm = useCallback(() => {
@@ -87,74 +84,44 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     setFormError(null)
   }, [setNewTour, setAvailableCities, setNewOrder, setFormError])
 
-  // 打開編輯對話框 - 先確保國家資料已載入
+  // 打開編輯對話框
   const handleOpenEditDialog = useCallback(
     async (tour: Tour) => {
-      // 確保國家資料已載入
-      if (countries.length === 0) {
-        await fetchRegions()
-      }
       if (employees.length === 0) {
         await fetchEmployees()
       }
       // 打開對話框，handleEditDialogEffect 會處理資料填入
       openDialog('edit', tour)
     },
-    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog]
+    [employees.length, fetchEmployees, openDialog]
   )
 
   // Handle edit mode: load tour data when dialog opens in edit mode
   const handleEditDialogEffect = useCallback(() => {
-    if (dialog.type !== 'edit' || !dialog.data || countries.length === 0) return
+    if (dialog.type !== 'edit' || !dialog.data || destinationsLoading) return
 
     const tour = dialog.data as Tour
-    if (countries.length === 0) {
-      fetchRegions()
-      return
-    }
-
-    // Load country and city data
-    const activeCountries = countries
-      .filter(c => c.is_active)
-      .sort((a, b) => a.display_order - b.display_order)
-      .map(c => ({ id: c.id, code: c.code || '', name: c.name }))
 
     let countryCode = ''
     let cityCode = ''
 
-    // Try to find by IDs first
-    if (tour.country_id && tour.main_city_id) {
-      const matchedCountry = activeCountries.find(c => c.id === tour.country_id)
-      if (matchedCountry) {
-        countryCode = matchedCountry.code
-        const citiesInCountry = getCitiesByCountry(matchedCountry.id)
-          .filter(c => c.is_active)
-          .map(c => ({ id: c.id, code: c.airport_code || '', name: c.name, country_id: c.country_id }))
-        setAvailableCities(citiesInCountry)
-        const matchedCity = citiesInCountry.find(city => city.id === tour.main_city_id)
-        if (matchedCity) cityCode = matchedCity.code
+    // 用 location（城市名稱）在 tour_destinations 中查找
+    if (tour.location) {
+      const matchedDest = destinations.find(d => d.city === tour.location)
+      if (matchedDest) {
+        countryCode = matchedDest.country
+        cityCode = matchedDest.airport_code
       }
     }
 
-    // Fallback to location text matching
-    if (!countryCode && tour.location) {
-      for (const country of activeCountries) {
-        const citiesInCountry = getCitiesByCountry(country.id)
-          .filter(c => c.is_active)
-          .map(c => ({ id: c.id, code: c.airport_code || '', name: c.name, country_id: c.country_id }))
-        const matchedCity = citiesInCountry.find(city => city.name === tour.location)
-        if (matchedCity) {
-          countryCode = country.code
-          cityCode = matchedCity.code
-          setAvailableCities(citiesInCountry)
-          break
-        }
+    // 如果找不到，嘗試從團號提取城市代碼
+    if (!countryCode && tour.code) {
+      const codePrefix = tour.code.substring(0, 3)
+      const matchedDest = destinations.find(d => d.airport_code === codePrefix)
+      if (matchedDest) {
+        countryCode = matchedDest.country
+        cityCode = matchedDest.airport_code
       }
-    }
-
-    if (!countryCode) {
-      countryCode = '__custom__'
-      cityCode = '__custom__'
     }
 
     // Extract flight info
@@ -165,9 +132,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
       name: tour.name,
       countryCode,
       cityCode,
-      customLocation: countryCode === '__custom__' ? (tour.location || undefined) : undefined,
-      customCountry: countryCode === '__custom__' ? undefined : undefined,
-      customCityCode: countryCode === '__custom__' ? (tour.code?.substring(0, 3) || undefined) : undefined,
+      cityName: tour.location || '',
       departure_date: tour.departure_date || '',
       return_date: tour.return_date || '',
       price: tour.price ?? 0,
@@ -185,7 +150,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
         : '',
       enable_checkin: tour.enable_checkin || false,
     })
-  }, [dialog.type, dialog.data, countries, fetchRegions, getCitiesByCountry, setAvailableCities, setNewTour])
+  }, [dialog.type, dialog.data, destinations, destinationsLoading, setNewTour])
 
   // Handle navigation from quote
   const handleNavigationEffect = useCallback(() => {
