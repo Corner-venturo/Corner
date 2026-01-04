@@ -452,21 +452,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                   <Plane size={15} className="mr-1" />
                   PNR
                 </Button>
-                {/* PNR 開票期限警告（只在未全部開票且有期限時顯示） */}
-                {ticketStatus !== 'all' && pnrTicketingDeadline && deadlineStatus && (
-                  <div className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded text-xs font-medium",
-                    deadlineStatus.color,
-                    "text-white"
-                  )}>
-                    {deadlineStatus.urgent && <AlertTriangle size={12} />}
-                    <Clock size={12} />
-                    <span>
-                      {pnrRecordLocator} 開票: {formatDateMonthDayChinese(pnrTicketingDeadline)}
-                      ({deadlineStatus.text})
-                    </span>
-                  </div>
-                )}
                 <Button
                   variant="ghost"
                   size="sm"
