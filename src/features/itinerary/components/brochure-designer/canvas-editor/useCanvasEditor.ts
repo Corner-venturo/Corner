@@ -180,7 +180,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     const canvas = new Canvas(canvasEl, {
       width: A5_WIDTH_PX,
       height: A5_HEIGHT_PX,
-      backgroundColor: 'transparent',
+      backgroundColor: '#ffffff',
       selection: true,
       preserveObjectStacking: true,
       stopContextMenu: true,
@@ -720,7 +720,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     if (!canvas) return
 
     canvas.clear()
-    canvas.backgroundColor = 'transparent'
+    canvas.backgroundColor = '#ffffff'
     canvas.renderAll()
     setElements([])
     setEditorState((prev) => ({ ...prev, selectedIds: [] }))
@@ -770,7 +770,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
 
     // 清除現有元素
     canvas.clear()
-    canvas.backgroundColor = 'transparent'
+    canvas.backgroundColor = '#ffffff'
 
     // 依序加入元素
     for (const el of elementsToLoad) {
