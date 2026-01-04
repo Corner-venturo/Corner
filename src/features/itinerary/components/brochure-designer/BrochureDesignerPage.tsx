@@ -704,44 +704,6 @@ export function BrochureDesignerPage() {
                   編輯
                 </button>
               </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateBrochure}
-                disabled={isGenerating || !currentItinerary}
-                className="gap-1.5 border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
-              >
-                {isGenerating ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Sparkles size={16} />
-                )}
-                一鍵生成
-              </Button>
-
-              {/* 參考線控制 */}
-              <div className="h-6 w-px bg-border mx-1" />
-              <GuideControls
-                showBleed={showBleed}
-                showSafety={showSafety}
-                showCenter={showCenter}
-                onToggleBleed={() => setShowBleed(!showBleed)}
-                onToggleSafety={() => setShowSafety(!showSafety)}
-                onToggleCenter={() => setShowCenter(!showCenter)}
-              />
-
-              {editorMode === 'canvas' && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(showLayerPanel && 'bg-slate-100')}
-                  onClick={() => setShowLayerPanel(!showLayerPanel)}
-                  title="圖層面板"
-                >
-                  <Layers size={18} />
-                </Button>
-              )}
               <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
                 <FileDown size={16} />
                 匯出
@@ -801,7 +763,7 @@ export function BrochureDesignerPage() {
           <section className="flex-1 bg-white rounded-xl border-2 border-border flex flex-col overflow-hidden shadow-md">
             {/* 預覽/編輯區內容 */}
             {editorMode === 'template' ? (
-              // 模板模式 - 原有預覽
+              // 模板模式 - 原有預覽（使用與編輯模式相同的 A5 尺寸）
               <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
                 <div
                   className="absolute inset-0 opacity-[0.02]"
@@ -814,11 +776,13 @@ export function BrochureDesignerPage() {
                 <div
                   className="relative shadow-lg bg-white flex-shrink-0 overflow-hidden"
                   style={{
-                    width: 'min(420px, calc(100vh - 200px) / 1.414)',
-                    aspectRatio: '1 / 1.414',
+                    width: '559px',
+                    height: '794px',
+                    transform: 'scale(0.75)',
+                    transformOrigin: 'center center',
                   }}
                 >
-                  {/* 模板預覽 - 不顯示出血線（出血線只在編輯模式顯示） */}
+                  {/* 模板預覽 */}
                   {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
 
                   {currentPage?.type === 'blank' && (
