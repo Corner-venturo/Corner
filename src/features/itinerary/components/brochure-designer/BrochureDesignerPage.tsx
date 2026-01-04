@@ -865,7 +865,73 @@ export function BrochureDesignerPage() {
                     overflow: 'visible',
                   }}
                 >
-                  {/* Fabric.js Canvas 容器 */}
+                  {/* 底層：模板預覽（與模板模式相同） */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {currentPage?.type === 'cover' && <BrochureCoverPreview data={coverData} />}
+
+                    {currentPage?.type === 'blank' && (
+                      <div className="bg-white flex items-center justify-center w-full h-full">
+                        <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
+                      </div>
+                    )}
+
+                    {currentPage?.type === 'contents' && (
+                      <BrochureTableOfContents
+                        data={coverData}
+                        itinerary={currentItinerary}
+                        tripTitle={`${coverData.country} ${coverData.city} Trip`}
+                      />
+                    )}
+
+                    {currentPage?.type === 'overview-left' && (
+                      <BrochureOverviewLeft
+                        data={coverData}
+                        itinerary={currentItinerary}
+                        overviewImage={coverData.overviewImage}
+                      />
+                    )}
+
+                    {currentPage?.type === 'overview-right' && (
+                      <BrochureOverviewRight
+                        data={coverData}
+                        itinerary={currentItinerary}
+                      />
+                    )}
+
+                    {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
+                      currentPage.side === 'left' ? (
+                        <BrochureDailyLeft
+                          dayIndex={currentPage.dayIndex}
+                          day={dailyItinerary[currentPage.dayIndex]}
+                          departureDate={currentItinerary?.departure_date}
+                          tripName={`${coverData.country} ${coverData.city}`}
+                          pageNumber={currentPageIndex + 1}
+                        />
+                      ) : (
+                        <BrochureDailyRight
+                          dayIndex={currentPage.dayIndex}
+                          day={dailyItinerary[currentPage.dayIndex]}
+                          pageNumber={currentPageIndex + 1}
+                        />
+                      )
+                    )}
+
+                    {currentPage?.type === 'accommodation-left' && (
+                      <BrochureAccommodationLeft
+                        accommodations={accommodations}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    )}
+
+                    {currentPage?.type === 'accommodation-right' && (
+                      <BrochureAccommodationRight
+                        accommodations={accommodations}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    )}
+                  </div>
+
+                  {/* 上層：Fabric.js Canvas 編輯層（透明背景） */}
                   <div
                     ref={canvasContainerRef}
                     className="absolute inset-0"
