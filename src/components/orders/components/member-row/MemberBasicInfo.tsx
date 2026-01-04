@@ -75,15 +75,15 @@ export function MemberBasicInfo({
 
   return (
     <>
-      {/* 序號 - 凍結欄位 */}
-      <td className="border border-morandi-gold/20 px-2 py-1 bg-muted text-center sticky left-0 z-10">
+      {/* 序號 - 凍結欄位（使用實色背景避免內容穿透） */}
+      <td className="border border-morandi-gold/20 px-2 py-1 bg-[#f5f3f0] text-center sticky left-0 z-10">
         <span className="text-xs text-morandi-secondary">{index + 1}</span>
       </td>
 
-      {/* 中文姓名 - 凍結欄位 */}
+      {/* 中文姓名 - 凍結欄位（使用實色背景避免內容穿透） */}
       <td className={cn(
         "border border-morandi-gold/20 px-2 py-1 sticky left-[40px] z-10",
-        isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted')
+        isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-[#fde8e8]' : 'bg-[#f5f3f0]')
       )}>
         {isEditMode ? (
           <input

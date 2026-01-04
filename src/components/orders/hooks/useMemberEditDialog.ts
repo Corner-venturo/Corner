@@ -224,11 +224,13 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
       }
 
       // 3. 更新本地狀態（儲存後即為已驗證）
+      // 注意：同時同步 passport_image_url（可能在編輯過程中被裁剪/旋轉更新）
       setMembers(members.map(m =>
         m.id === editingMember.id
           ? {
               ...m,
               ...memberUpdateData,
+              passport_image_url: editingMember.passport_image_url,
               customer_id: newCustomerId || editingMember.customer_id,
               customer_verification_status: 'verified',
             }

@@ -19,7 +19,8 @@ interface MemberTableHeaderProps {
 }
 
 const thClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10"
-const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10 sticky z-20"
+// 凍結欄位必須使用實色背景，避免滾動時內容穿透
+const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-[#f0ebe3] sticky z-20"
 
 export function MemberTableHeader({
   mode,

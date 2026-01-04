@@ -31,6 +31,7 @@ interface OrderStats {
   order_code: string
   contact_person: string
   sales_person: string | null
+  assistant: string | null  // OP (助理)
   ticketed: number
   needs_ticketing: number
   no_record: number
@@ -181,7 +182,7 @@ export async function GET(request: NextRequest) {
 
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
-      .select('id, code, tour_id, contact_person, sales_person')
+      .select('id, code, tour_id, contact_person, sales_person, assistant')
       .in('tour_id', tourIds)
       .neq('status', 'cancelled')
 
@@ -251,6 +252,7 @@ export async function GET(request: NextRequest) {
           order_code: order.code,
           contact_person: order.contact_person,
           sales_person: order.sales_person,
+          assistant: order.assistant,
           ...stats,
           members: orderMembers,
           earliest_deadline: earliestDeadline,
@@ -368,24 +370,52 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 發送給各訂單的業務人員
+    // 發送給各訂單的業務人員和助理 (OP)
     if (notify_sales) {
-      const salesPersonIds = new Set<string>()
+      // 收集所有需要通知的員工名稱
+      const salesPersonNames = new Set<string>()
+      const assistantNames = new Set<string>()
 
       for (const tour of tours as TourStats[]) {
         for (const order of tour.orders) {
-          if (order.sales_person && (order.needs_ticketing > 0 || order.no_record > 0)) {
-            salesPersonIds.add(order.sales_person)
+          if (order.needs_ticketing > 0 || order.no_record > 0) {
+            if (order.sales_person) {
+              salesPersonNames.add(order.sales_person)
+            }
+            if (order.assistant) {
+              assistantNames.add(order.assistant)
+            }
           }
         }
       }
 
-      // 發送個人通知
-      for (const salesId of salesPersonIds) {
+      // 查詢員工 ID（sales_person 和 assistant 存的是 display_name）
+      const allNames = [...new Set([...salesPersonNames, ...assistantNames])]
+      const { data: employees } = await supabase
+        .from('employees')
+        .select('id, display_name')
+        .in('display_name', allNames)
+
+      // 建立名稱 -> ID 映射
+      const nameToIdMap = new Map<string, string>()
+      for (const emp of employees || []) {
+        if (emp.display_name) {
+          nameToIdMap.set(emp.display_name, emp.id)
+        }
+      }
+
+      // 發送給業務人員
+      for (const salesName of salesPersonNames) {
+        const salesId = nameToIdMap.get(salesName)
+        if (!salesId) {
+          logger.warn(`找不到業務員工: ${salesName}`)
+          continue
+        }
+
         // 過濾出該業務負責的訂單
         const relevantTours = (tours as TourStats[]).map(tour => ({
           ...tour,
-          orders: tour.orders.filter(o => o.sales_person === salesId)
+          orders: tour.orders.filter(o => o.sales_person === salesName)
         })).filter(t => t.orders.length > 0)
 
         const personalMessage = formatNotificationMessage(relevantTours)
@@ -399,11 +429,51 @@ export async function POST(request: NextRequest) {
               recipient_id: salesId,
               message: personalMessage,
               type: 'info',
-              metadata: { type: 'ticket_status_personal' },
+              metadata: { type: 'ticket_status_personal', role: 'sales' },
             }),
           })
+          logger.info(`已發送開票提醒給業務: ${salesName}`)
         } catch (notifyError) {
-          logger.error(`發送給業務 ${salesId} 失敗:`, notifyError)
+          logger.error(`發送給業務 ${salesName} 失敗:`, notifyError)
+        }
+      }
+
+      // 發送給助理 (OP)
+      for (const assistantName of assistantNames) {
+        const assistantId = nameToIdMap.get(assistantName)
+        if (!assistantId) {
+          logger.warn(`找不到助理員工: ${assistantName}`)
+          continue
+        }
+
+        // 如果助理和業務是同一人，跳過（避免重複通知）
+        if (salesPersonNames.has(assistantName)) {
+          continue
+        }
+
+        // 過濾出該助理負責的訂單
+        const relevantTours = (tours as TourStats[]).map(tour => ({
+          ...tour,
+          orders: tour.orders.filter(o => o.assistant === assistantName)
+        })).filter(t => t.orders.length > 0)
+
+        const personalMessage = formatNotificationMessage(relevantTours)
+
+        // 使用 bot-notification API 發送
+        try {
+          await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipient_id: assistantId,
+              message: personalMessage,
+              type: 'info',
+              metadata: { type: 'ticket_status_personal', role: 'assistant' },
+            }),
+          })
+          logger.info(`已發送開票提醒給助理: ${assistantName}`)
+        } catch (notifyError) {
+          logger.error(`發送給助理 ${assistantName} 失敗:`, notifyError)
         }
       }
     }

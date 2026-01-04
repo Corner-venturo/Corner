@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         .insert({
           name: `dm:${SYSTEM_BOT_ID}:${recipient_id}`,
           type: 'direct',
-          channel_type: 'direct',
+          channel_type: 'DIRECT',  // 必須大寫，與 RPC 一致
           is_announcement: false,
           workspace_id: recipientData.workspace_id,
           created_by: SYSTEM_BOT_ID,

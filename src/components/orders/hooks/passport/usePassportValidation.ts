@@ -150,13 +150,21 @@ export function usePassportValidation(): UsePassportValidationReturn {
       let matchedCustomer = false
       let newCustomer = false
 
-      if (newMember && (idNumber || birthDate || passportNumber)) {
+      // 驗證身份證格式（1英文+9數字）
+      const isValidIdNumber = idNumber && /^[A-Z][12]\d{8}$/i.test(idNumber)
+      // 驗證護照號碼格式（9位數字）
+      const isValidPassport = passportNumber && /^\d{9}$/.test(passportNumber)
+      // 只有完整身份證或護照號碼才嘗試比對/建立顧客
+      const canSyncCustomer = isValidIdNumber || isValidPassport
+
+      if (newMember && canSyncCustomer) {
         await useCustomerStore.getState().fetchAll()
         const freshCustomers = useCustomerStore.getState().items
 
         const existingCustomer = freshCustomers.find(c => {
-          if (passportNumber && c.passport_number === passportNumber) return true
-          if (idNumber && c.national_id === idNumber) return true
+          if (isValidPassport && c.passport_number === passportNumber) return true
+          if (isValidIdNumber && c.national_id === idNumber) return true
+          // 也比對姓名+生日（作為輔助比對，但不會因為這個而建立新顧客）
           if (cleanChineseName && birthDate &&
               c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
               c.date_of_birth === birthDate) return true

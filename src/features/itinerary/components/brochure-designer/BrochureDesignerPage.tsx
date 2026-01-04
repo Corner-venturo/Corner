@@ -812,19 +812,13 @@ export function BrochureDesignerPage() {
                 />
 
                 <div
-                  className="relative shadow-lg bg-white flex-shrink-0"
+                  className="relative shadow-lg bg-white flex-shrink-0 overflow-hidden"
                   style={{
                     width: 'min(420px, calc(100vh - 200px) / 1.414)',
                     aspectRatio: '1 / 1.414',
-                    overflow: 'visible',
                   }}
                 >
-                  {/* 出血線和參考線 */}
-                  <BleedGuides
-                    showBleed={showBleed}
-                    showSafety={showSafety}
-                    showCenter={showCenter}
-                  />
+                  {/* 模板預覽 - 不顯示出血線（出血線只在編輯模式顯示） */}
                   {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
 
                   {currentPage?.type === 'blank' && (

@@ -4902,6 +4902,7 @@ export type Database = {
           id: string
           is_pinned: boolean | null
           last_reply_at: string | null
+          metadata: Json | null
           parent_message_id: string | null
           reactions: Json | null
           reply_count: number | null
@@ -4924,6 +4925,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           last_reply_at?: string | null
+          metadata?: Json | null
           parent_message_id?: string | null
           reactions?: Json | null
           reply_count?: number | null
@@ -4946,6 +4948,7 @@ export type Database = {
           id?: string
           is_pinned?: boolean | null
           last_reply_at?: string | null
+          metadata?: Json | null
           parent_message_id?: string | null
           reactions?: Json | null
           reply_count?: number | null

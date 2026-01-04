@@ -139,7 +139,7 @@ export function PassportSection({
               onClick={() => imageEditor.startCrop()}
               className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
             >
-              <Crop size={16} className="text-purple-600" />
+              <Crop size={16} className="text-morandi-blue" />
               <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
             </button>
           </div>
@@ -170,8 +170,8 @@ export function PassportSection({
 
       {/* 裁剪模式工具列 */}
       {editingMember?.passport_image_url && imageEditor.isCropMode && (
-        <div className="flex items-center justify-between bg-purple-50 rounded-lg p-2">
-          <span className="text-xs text-purple-600">拖曳框選要保留的區域</span>
+        <div className="flex items-center justify-between bg-morandi-blue/10 rounded-lg p-2">
+          <span className="text-xs text-morandi-blue">拖曳框選要保留的區域</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -184,7 +184,7 @@ export function PassportSection({
               type="button"
               onClick={onConfirmCrop}
               disabled={imageEditor.cropRect.width < 20 || imageEditor.isSaving}
-              className="px-3 py-1 text-xs bg-purple-600 text-white rounded-md hover:bg-purple-600 disabled:opacity-50"
+              className="px-3 py-1 text-xs bg-morandi-blue text-white rounded-md hover:bg-morandi-blue/90 disabled:opacity-50"
             >
               {imageEditor.isSaving ? '處理中...' : '確認裁剪'}
             </button>
@@ -198,7 +198,7 @@ export function PassportSection({
           ref={imageEditor.containerRef}
           className={`relative overflow-hidden rounded-lg border bg-muted ${
             imageEditor.isCropMode
-              ? 'border-purple-600 cursor-crosshair'
+              ? 'border-morandi-blue cursor-crosshair'
               : 'cursor-grab active:cursor-grabbing'
           }`}
           style={{ height: '320px' }}
@@ -221,7 +221,7 @@ export function PassportSection({
           {/* 裁剪框 */}
           {imageEditor.isCropMode && imageEditor.cropRect.width > 0 && (
             <div
-              className="absolute border-2 border-purple-600 bg-purple-600/10"
+              className="absolute border-2 border-morandi-blue bg-morandi-blue/10"
               style={{
                 left: imageEditor.cropRect.x,
                 top: imageEditor.cropRect.y,
