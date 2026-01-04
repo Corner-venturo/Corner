@@ -698,6 +698,111 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     setEditorState((prev) => ({ ...prev, selectedIds: [] }))
   }, [])
 
+  // 載入元素到畫布
+  const loadElements = useCallback(async (elementsToLoad: CanvasElement[]) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    // 清除現有元素
+    canvas.clear()
+    canvas.backgroundColor = '#ffffff'
+
+    // 依序加入元素
+    for (const el of elementsToLoad) {
+      try {
+        if (el.type === 'text') {
+          const textEl = el as import('./types').TextElement
+          const fabricText = new Text(textEl.content || '', {
+            left: textEl.x,
+            top: textEl.y,
+            fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
+            fontSize: textEl.style?.fontSize || 16,
+            fill: textEl.style?.color || '#333333',
+            fontWeight: textEl.style?.fontWeight || 'normal',
+            fontStyle: textEl.style?.fontStyle || 'normal',
+            opacity: textEl.opacity,
+            angle: textEl.rotation,
+          }) as FabricObjectWithData
+
+          fabricText.data = {
+            elementId: el.id,
+            elementType: 'text',
+          }
+          canvas.add(fabricText)
+        } else if (el.type === 'shape') {
+          const shapeEl = el as import('./types').ShapeElement
+          if (shapeEl.variant === 'rectangle') {
+            const rect = new Rect({
+              left: shapeEl.x,
+              top: shapeEl.y,
+              width: shapeEl.width,
+              height: shapeEl.height,
+              fill: shapeEl.fill || '#e8e5e0',
+              stroke: shapeEl.stroke || '#d4c4b0',
+              strokeWidth: shapeEl.strokeWidth || 1,
+              rx: shapeEl.cornerRadius || 0,
+              ry: shapeEl.cornerRadius || 0,
+              opacity: shapeEl.opacity,
+              angle: shapeEl.rotation,
+            }) as FabricObjectWithData
+
+            rect.data = {
+              elementId: el.id,
+              elementType: 'shape',
+            }
+            canvas.add(rect)
+          } else if (shapeEl.variant === 'circle') {
+            const circle = new Circle({
+              left: shapeEl.x,
+              top: shapeEl.y,
+              radius: Math.min(shapeEl.width, shapeEl.height) / 2,
+              fill: shapeEl.fill || '#c9aa7c',
+              stroke: shapeEl.stroke || '#b8996b',
+              strokeWidth: shapeEl.strokeWidth || 1,
+              opacity: shapeEl.opacity,
+              angle: shapeEl.rotation,
+            }) as FabricObjectWithData
+
+            circle.data = {
+              elementId: el.id,
+              elementType: 'shape',
+            }
+            canvas.add(circle)
+          }
+        } else if (el.type === 'image') {
+          const imageEl = el as import('./types').ImageElement
+          try {
+            const img = await FabricImage.fromURL(imageEl.src, { crossOrigin: 'anonymous' })
+            const imgWithData = img as FabricObjectWithData
+
+            img.set({
+              left: imageEl.x,
+              top: imageEl.y,
+              scaleX: imageEl.width / (img.width || imageEl.width),
+              scaleY: imageEl.height / (img.height || imageEl.height),
+              opacity: imageEl.opacity,
+              angle: imageEl.rotation,
+            })
+
+            imgWithData.data = {
+              elementId: el.id,
+              elementType: 'image',
+            }
+            canvas.add(img)
+          } catch (error) {
+            logger.error('[CanvasEditor] Failed to load image:', imageEl.src, error)
+          }
+        }
+      } catch (error) {
+        logger.error('[CanvasEditor] Failed to load element:', el, error)
+      }
+    }
+
+    canvas.renderAll()
+    setElements(elementsToLoad)
+    setEditorState((prev) => ({ ...prev, selectedIds: [] }))
+  }, [])
+
   return {
     // Refs
     canvasRef,
@@ -720,6 +825,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     sendToBack,
     setZoom,
     clearCanvas,
+    loadElements,
 
     // Constants
     canvasWidth: A5_WIDTH_PX,

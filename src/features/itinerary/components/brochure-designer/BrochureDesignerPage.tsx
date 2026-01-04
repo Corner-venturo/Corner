@@ -184,6 +184,7 @@ export function BrochureDesignerPage() {
     sendToBack,
     setZoom,
     clearCanvas,
+    loadElements,
   } = useCanvasEditor({
     containerRef: canvasContainerRef,
     onElementSelect: setSelectedElementId,
@@ -525,6 +526,17 @@ export function BrochureDesignerPage() {
       setCanvasElements(page.elements)
     }
   }, [currentPageIndex, generatedBrochure])
+
+  // 當切換到編輯模式或元素變更時，載入元素到 Fabric.js 畫布
+  useEffect(() => {
+    if (editorMode === 'canvas' && canvasElements.length > 0) {
+      // 稍微延遲以確保 canvas 已初始化
+      const timer = setTimeout(() => {
+        loadElements(canvasElements)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [editorMode, canvasElements, loadElements])
 
   // 圖層操作
   const handleLayerSelect = useCallback((id: string) => {
