@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Plane, PlaneLanding, ClipboardList, AlertCircle, ChevronRight, Search } from 'lucide-react'
@@ -39,7 +41,7 @@ export default function MobileHomePage() {
 
   useEffect(() => {
     async function loadData() {
-      const today = new Date().toISOString().split('T')[0]
+      const today = getTodayString()
 
       try {
         const [departuresRes, returnsRes, todosRes] = await Promise.all([

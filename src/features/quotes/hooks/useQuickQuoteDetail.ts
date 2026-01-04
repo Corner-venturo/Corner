@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Quote, QuickQuoteItem, QuoteVersion } from '@/stores/types'
@@ -38,7 +40,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     contact_address: quote.contact_address || '',
     tour_code: quote.tour_code || '',
     handler_name: quote.handler_name || 'William',
-    issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
+    issue_date: quote.issue_date || getTodayString(),
     received_amount: quote.received_amount || 0,
     expense_description: (quote as typeof quote & { expense_description?: string }).expense_description || '',
   })
@@ -250,7 +252,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
       contact_address: versionData.contact_address || '',
       tour_code: versionData.tour_code || '',
       handler_name: versionData.handler_name || 'William',
-      issue_date: versionData.issue_date || new Date().toISOString().split('T')[0],
+      issue_date: versionData.issue_date || getTodayString(),
       received_amount: versionData.received_amount || 0,
       expense_description: versionData.expense_description || '',
     })

@@ -13,7 +13,7 @@
 import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
+import { formatDateChineseWithWeekday, formatDate } from '@/lib/utils/format-date'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Search, Loader2, Plane, Clock, MapPin } from 'lucide-react'
@@ -59,7 +59,7 @@ export function FlightRouteSearchDialog({
       }
     }
     // 否則使用今天
-    return today.toISOString().split('T')[0]
+    return formatDate(today)
   }
 
   // 搜尋條件

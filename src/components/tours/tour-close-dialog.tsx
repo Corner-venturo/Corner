@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -277,7 +279,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
         .from('tours')
         .update({
           status: '結案',
-          closing_date: new Date().toISOString().split('T')[0]
+          closing_date: getTodayString()
         })
         .eq('id', tour.id)
 

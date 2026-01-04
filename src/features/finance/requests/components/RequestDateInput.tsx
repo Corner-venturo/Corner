@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -26,7 +28,7 @@ function getNextThursday(): string {
   nextThursday.setDate(today.getDate() + daysUntilThursday)
 
   // 格式化為 YYYY-MM-DD
-  return nextThursday.toISOString().split('T')[0]
+  return formatDate(nextThursday)
 }
 
 export function RequestDateInput({ value, onChange, label = '請款日期' }: RequestDateInputProps) {

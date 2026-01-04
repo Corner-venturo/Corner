@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
@@ -34,7 +36,7 @@ export function useInvoiceDialog({
   const [dataLoaded, setDataLoaded] = useState(false)
   const [selectedTourId, setSelectedTourId] = useState<string>(defaultTourId || '')
   const [selectedOrderId, setSelectedOrderId] = useState<string>(defaultOrderId || '')
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
+  const [invoiceDate, setInvoiceDate] = useState(getTodayString())
   const [reportStatus, setReportStatus] = useState<'unreported' | 'reported'>('unreported')
   const [customNo, setCustomNo] = useState('')
   const [buyerInfo, setBuyerInfo] = useState<BuyerInfo>({
@@ -93,7 +95,7 @@ export function useInvoiceDialog({
     if (open) {
       setSelectedTourId(defaultTourId || fixedTour?.id || '')
       setSelectedOrderId(defaultOrderId || fixedOrder?.id || '')
-      setInvoiceDate(new Date().toISOString().split('T')[0])
+      setInvoiceDate(getTodayString())
       setReportStatus('unreported')
       setRemark('')
       setItems([{ item_name: '', item_count: 1, item_unit: '式', item_price: 0, itemAmt: 0 }])

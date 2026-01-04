@@ -10,6 +10,7 @@
 
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { FormDialog } from '@/components/dialog'
@@ -74,7 +75,7 @@ export function CreateLinkPayDialog({
   function getDefaultEndDate() {
     const date = new Date()
     date.setDate(date.getDate() + 7)
-    return date.toISOString().split('T')[0]
+    return formatDate(date)
   }
 
   const handleSubmit = async () => {
@@ -100,14 +101,14 @@ export function CreateLinkPayDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          receiptNumber: receipt.receipt_number,
-          userName: formData.userName.trim(),
+          receipt_number: receipt.receipt_number,
+          user_name: formData.userName.trim(),
           email: formData.email.trim(),
           gender: formData.gender ? parseInt(formData.gender) : undefined,
           amount: parseFloat(formData.amount),
-          endDate: formData.endDate,
-          paymentName: formData.paymentName || undefined,
-          createUser: user?.id,
+          end_date: formData.endDate,
+          payment_name: formData.paymentName || undefined,
+          create_user: user?.id,
         }),
       })
 
@@ -116,7 +117,7 @@ export function CreateLinkPayDialog({
       if (data.success) {
         setResult({
           success: true,
-          paymentLink: data.data?.paymentLink || data.data?.link,
+          paymentLink: data.data?.payment_link || data.data?.link,
           message: '付款連結已成功建立！',
         })
         onSuccess?.()

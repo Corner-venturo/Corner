@@ -1,3 +1,4 @@
+import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { useState } from 'react'
@@ -34,7 +35,7 @@ export function useEmployeeForm(onSubmit: () => void) {
       },
     },
     job_info: {
-      hire_date: new Date().toISOString().split('T')[0],
+      hire_date: getTodayString(),
     },
     salary_info: {
       base_salary: 0,

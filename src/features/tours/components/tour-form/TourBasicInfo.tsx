@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React from 'react'
 import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
@@ -131,7 +133,7 @@ export function TourBasicInfo({
                 }
               })
             }}
-            min={new Date().toISOString().split('T')[0]}
+            min={getTodayString()}
             className="mt-1"
             required
           />
@@ -143,7 +145,7 @@ export function TourBasicInfo({
             onChange={return_date => {
               setNewTour(prev => ({ ...prev, return_date }))
             }}
-            min={newTour.departure_date || new Date().toISOString().split('T')[0]}
+            min={newTour.departure_date || getTodayString()}
             defaultMonth={newTour.departure_date}
             className="mt-1"
             required

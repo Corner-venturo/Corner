@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useEffect } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
@@ -142,7 +144,7 @@ export function useQuoteLoader(
       const otherItems: TourDepartureOther[] = []
 
       quoteItems?.forEach((item: any, index: number) => {
-        const baseDate = tour.departure_date || new Date().toISOString().split('T')[0]
+        const baseDate = tour.departure_date || getTodayString()
         const itemName = item.description || ''
         const category = item.category?.toLowerCase() || ''
         const itemType = item.item_type?.toLowerCase() || ''
@@ -213,7 +215,7 @@ export function useQuoteLoader(
 
       if (quickItems && Array.isArray(quickItems)) {
         quickItems.forEach((item, index) => {
-          const baseDate = tour.departure_date || new Date().toISOString().split('T')[0]
+          const baseDate = tour.departure_date || getTodayString()
           const desc = item.description?.toLowerCase() || ''
 
           if (desc.includes('餐') || desc.includes('meal')) {

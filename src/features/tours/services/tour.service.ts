@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/utils/format-date'
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
@@ -112,7 +113,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
     const exists = await this.isTourCodeExists(code)
     if (exists) {
       // 如果仍然重複，嘗試下一個字母
-      const dateStr = date.toISOString().split('T')[0].replace(/-/g, '').slice(2) // YYMMDD
+      const dateStr = formatDate(date).replace(/-/g, '').slice(2) // YYMMDD
       const lastChar = code.slice(-1)
       const nextChar = String.fromCharCode(lastChar.charCodeAt(0) + 1)
       return `${cityCode.toUpperCase()}${dateStr}${nextChar}`
@@ -292,7 +293,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       workspace_id: workspaceId,
       code: visaCode,
       name: `${targetYear}年度簽證專用團`,
-      departure_date: departureDate.toISOString().split('T')[0],
+      departure_date: formatDate(departureDate),
       return_date: `${targetYear}-12-31`,
       status: '特殊團',
       location: '簽證專用',
@@ -374,7 +375,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       workspace_id: workspaceId,
       code: esimCode,
       name: `${targetYear}年度網卡專用團`,
-      departure_date: departureDate.toISOString().split('T')[0],
+      departure_date: formatDate(departureDate),
       return_date: `${targetYear}-12-31`,
       status: '特殊團',
       location: '網卡專用',

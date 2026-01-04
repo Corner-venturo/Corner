@@ -3,6 +3,7 @@
  * 處理出納單的數據獲取和操作
  */
 
+import { formatDate } from '@/lib/utils/format-date'
 import { useMemo, useCallback, useEffect } from 'react'
 import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
 import { PaymentRequest, DisbursementOrder } from '../types'
@@ -152,7 +153,7 @@ export function useDisbursementData() {
         .filter(r => requestIds.includes(r.id))
         .reduce((sum, r) => sum + (r.amount || 0), 0)
 
-      const disbursementDateStr = nextThursday.toISOString().split('T')[0]
+      const disbursementDateStr = formatDate(nextThursday)
 
       await createOrder({
         order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
@@ -219,7 +220,7 @@ export function useDisbursementData() {
       .filter(r => requestIds.includes(r.id))
       .reduce((sum, r) => sum + (r.amount || 0), 0)
 
-    const disbursementDateStr = nextThursday.toISOString().split('T')[0]
+    const disbursementDateStr = formatDate(nextThursday)
 
     await createOrder({
       order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),

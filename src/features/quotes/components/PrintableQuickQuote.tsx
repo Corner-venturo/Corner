@@ -4,6 +4,7 @@
 
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
@@ -473,7 +474,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
             </div>
             <div className="info-row" style={{ display: 'flex' }}>
               <span className="info-label" style={{ fontWeight: 600, width: '80px', flexShrink: 0 }}>開單日期：</span>
-              <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.issue_date || new Date().toISOString().split('T')[0]}</span>
+              <span className="info-value" style={{ flex: 1, borderBottom: '1px solid #ccc', paddingBottom: '2px' }}>{quote.issue_date || getTodayString()}</span>
             </div>
           </div>
 

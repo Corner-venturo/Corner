@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 /**
  * 開立代轉發票頁面
  * 仿藍新金流介面風格
@@ -24,7 +26,7 @@ export default function CreateInvoicePage() {
   const [error, setError] = useState<string | null>(null)
 
   // 基本資訊
-  const [invoice_date, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
+  const [invoice_date, setInvoiceDate] = useState(getTodayString())
   const [tax_type, setTaxType] = useState<'dutiable' | 'zero' | 'free'>('dutiable')
   const [reportStatus, setReportStatus] = useState<'unreported' | 'reported'>('unreported')
   const [remark, setRemark] = useState('')

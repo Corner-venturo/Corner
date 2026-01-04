@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useState, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -50,7 +52,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
     for (let i = 0; i < 20; i++) {
       const thursdayDate = new Date(today)
       thursdayDate.setDate(today.getDate() + daysUntilThursday + i * 7)
-      thursdays.push(thursdayDate.toISOString().split('T')[0])
+      thursdays.push(formatDate(thursdayDate))
     }
     return thursdays
   }, [])

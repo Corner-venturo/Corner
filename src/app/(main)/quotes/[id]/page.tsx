@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React, { useRef, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
@@ -213,7 +215,7 @@ export default function QuoteDetailPage() {
             contact_address: versionData.contact_address || '',
             tour_code: versionData.name || '', // 使用版本名稱作為團號
             handler_name: versionData.handler_name || 'William',
-            issue_date: versionData.issue_date || new Date().toISOString().split('T')[0],
+            issue_date: versionData.issue_date || getTodayString(),
             received_amount: versionData.received_amount || 0,
             expense_description: versionData.expense_description || '',
           })

@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString, formatDate } from '@/lib/utils/format-date'
+
 import { useState, useEffect } from 'react'
 import { Cloud, MapPin, Loader2, AlertCircle, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -108,9 +110,9 @@ export function WeatherWidgetWeekly() {
   }
 
   const loadSavedDate = (): string => {
-    if (typeof window === 'undefined') return new Date().toISOString().split('T')[0]
+    if (typeof window === 'undefined') return getTodayString()
     const saved = localStorage.getItem(STORAGE_DATE_KEY)
-    return saved || new Date().toISOString().split('T')[0]
+    return saved || getTodayString()
   }
 
   const [weeklyWeather, setWeeklyWeather] = useState<DailyWeather[]>([])
@@ -146,7 +148,7 @@ export function WeatherWidgetWeekly() {
       const end = new Date(startDate)
       end.setDate(end.getDate() + 6)
 
-      const endDate = end.toISOString().split('T')[0]
+      const endDate = formatDate(end)
 
       // 使用預報 API（支援未來16天）
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia/Taipei&forecast_days=16`
@@ -204,15 +206,15 @@ export function WeatherWidgetWeekly() {
   }
 
   // 格式化日期顯示
-  const formatDate = (dateStr: string) => {
+  const formatDateLabel = (dateStr: string) => {
     const date = new Date(dateStr)
     const today = new Date()
     const tomorrow = new Date(today)
     tomorrow.setDate(tomorrow.getDate() + 1)
 
     const dateOnly = dateStr
-    const todayStr = today.toISOString().split('T')[0]
-    const tomorrowStr = tomorrow.toISOString().split('T')[0]
+    const todayStr = formatDate(today)
+    const tomorrowStr = formatDate(tomorrow)
 
     if (dateOnly === todayStr) return '今天'
     if (dateOnly === tomorrowStr) return '明天'
@@ -318,7 +320,7 @@ export function WeatherWidgetWeekly() {
                 {weeklyWeather.map((day, index) => {
                   const weatherInfo =
                     WEATHER_DESCRIPTIONS[day.weatherCode] || WEATHER_DESCRIPTIONS[0]
-                  const isToday = day.date === new Date().toISOString().split('T')[0]
+                  const isToday = day.date === getTodayString()
 
                   return (
                     <div
@@ -339,7 +341,7 @@ export function WeatherWidgetWeekly() {
                               isToday ? 'text-status-info' : 'text-morandi-primary'
                             )}
                           >
-                            {formatDate(day.date)}
+                            {formatDateLabel(day.date)}
                           </p>
                         </div>
 

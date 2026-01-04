@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useState, useCallback, useMemo } from 'react'
 import type { ComboboxOption } from '@/components/ui/combobox'
 
@@ -78,7 +80,7 @@ export function useVisasDialog(tours: Tour[]) {
     }
 
     date.setDate(date.getDate() + days)
-    return date.toISOString().split('T')[0]
+    return formatDate(date)
   }, [])
 
   // 計算代辦費

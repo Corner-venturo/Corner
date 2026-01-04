@@ -3,6 +3,7 @@
  * 收款表單狀態管理
  */
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useCallback, useMemo } from 'react'
 import { useTourStore, useOrderStore } from '@/stores'
 import type { PaymentFormData, PaymentItem } from '../types'
@@ -16,7 +17,7 @@ export function usePaymentForm() {
   const [formData, setFormData] = useState<PaymentFormData>({
     tour_id: '',
     order_id: '',
-    receipt_date: new Date().toISOString().split('T')[0],
+    receipt_date: getTodayString(),
   })
 
   // 收款項目列表
@@ -25,7 +26,7 @@ export function usePaymentForm() {
       id: '1',
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     },
   ])
 
@@ -51,7 +52,7 @@ export function usePaymentForm() {
       id: Date.now().toString(),
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     }
     setPaymentItems(prev => [...prev, newItem])
   }, [])
@@ -74,14 +75,14 @@ export function usePaymentForm() {
     setFormData({
       tour_id: '',
       order_id: '',
-      receipt_date: new Date().toISOString().split('T')[0],
+      receipt_date: getTodayString(),
     })
     setPaymentItems([
       {
         id: '1',
         receipt_type: RECEIPT_TYPES.CASH,
         amount: 0,
-        transaction_date: new Date().toISOString().split('T')[0],
+        transaction_date: getTodayString(),
       },
     ])
   }, [])

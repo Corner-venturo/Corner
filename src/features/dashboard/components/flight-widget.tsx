@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useEffect, useTransition } from 'react'
 import {
   Plane,
@@ -58,7 +60,7 @@ export function FlightWidget() {
 
   // 航班號查詢
   const [flightNumber, setFlightNumber] = useState('')
-  const [queryDate, setQueryDate] = useState(new Date().toISOString().split('T')[0])
+  const [queryDate, setQueryDate] = useState(getTodayString())
   const [flightData, setFlightData] = useState<FlightData | null>(null)
 
   // 機場查詢

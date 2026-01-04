@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
@@ -46,14 +48,14 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
 
   // 配對結果
   const [matchedItems, setMatchedItems] = useState<MatchedItem[]>([])
-  const [pickupDate, setPickupDate] = useState(new Date().toISOString().split('T')[0])
+  const [pickupDate, setPickupDate] = useState(getTodayString())
 
   // 重置狀態
   const resetState = () => {
     setStep('upload')
     setFiles([])
     setMatchedItems([])
-    setPickupDate(new Date().toISOString().split('T')[0])
+    setPickupDate(getTodayString())
     setIsProcessing(false)
   }
 

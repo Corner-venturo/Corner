@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React, { useState, useCallback } from 'react'
 import { TourFormData } from '../../types'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
@@ -50,7 +52,7 @@ export function useFlightSearch({
 
     if (!fullDate) {
       // 使用今天日期
-      fullDate = new Date().toISOString().split('T')[0]
+      fullDate = getTodayString()
     }
 
     setLoadingOutbound(true)
@@ -115,7 +117,7 @@ export function useFlightSearch({
     }
 
     if (!fullDate) {
-      fullDate = new Date().toISOString().split('T')[0]
+      fullDate = getTodayString()
     }
 
     setLoadingReturn(true)

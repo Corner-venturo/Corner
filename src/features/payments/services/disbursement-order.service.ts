@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/utils/format-date'
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
@@ -65,7 +66,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       nextThursday.setDate(today.getDate() + daysUntilThursday)
     }
 
-    return nextThursday.toISOString().split('T')[0]
+    return formatDate(nextThursday)
   }
 
   /**

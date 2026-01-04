@@ -6,7 +6,7 @@
 import { logger } from './logger'
 
 interface SendBotNotificationParams {
-  recipientId: string
+  recipient_id: string
   message: string
   type?: 'info' | 'warning' | 'error'
   metadata?: Record<string, unknown>
@@ -16,7 +16,7 @@ interface SendBotNotificationParams {
  * 發送機器人通知
  */
 export async function sendBotNotification({
-  recipientId,
+  recipient_id,
   message,
   type = 'info',
   metadata,
@@ -26,7 +26,7 @@ export async function sendBotNotification({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        recipientId,
+        recipient_id,
         message,
         type,
         metadata,
@@ -51,38 +51,38 @@ export async function sendBotNotification({
  * 發送收款異常通知
  */
 export async function sendPaymentAbnormalNotification({
-  recipientId,
-  receiptNumber,
-  expectedAmount,
-  actualAmount,
-  confirmedBy,
+  recipient_id,
+  receipt_number,
+  expected_amount,
+  actual_amount,
+  confirmed_by,
 }: {
-  recipientId: string
-  receiptNumber: string
-  expectedAmount: number
-  actualAmount: number
-  confirmedBy: string
+  recipient_id: string
+  receipt_number: string
+  expected_amount: number
+  actual_amount: number
+  confirmed_by: string
 }): Promise<boolean> {
   const message = `收款金額異常通知
 
-收款單號：${receiptNumber}
-應收金額：NT$ ${expectedAmount.toLocaleString()}
-實收金額：NT$ ${actualAmount.toLocaleString()}
-差異金額：NT$ ${(actualAmount - expectedAmount).toLocaleString()}
-確認者：${confirmedBy}
+收款單號：${receipt_number}
+應收金額：NT$ ${expected_amount.toLocaleString()}
+實收金額：NT$ ${actual_amount.toLocaleString()}
+差異金額：NT$ ${(actual_amount - expected_amount).toLocaleString()}
+確認者：${confirmed_by}
 
 請確認此異常情況。`
 
   return sendBotNotification({
-    recipientId,
+    recipient_id,
     message,
     type: 'warning',
     metadata: {
       category: 'payment_abnormal',
-      receiptNumber,
-      expectedAmount,
-      actualAmount,
-      difference: actualAmount - expectedAmount,
+      receipt_number,
+      expected_amount,
+      actual_amount,
+      difference: actual_amount - expected_amount,
     },
   })
 }

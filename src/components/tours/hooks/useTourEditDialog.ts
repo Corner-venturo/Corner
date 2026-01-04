@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Tour, FlightInfo } from '@/stores/types'
 import type { Json } from '@/lib/supabase/types'
@@ -215,7 +217,7 @@ export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: (
     if (formData.departure_date) {
       fullDate = formData.departure_date
     } else {
-      fullDate = new Date().toISOString().split('T')[0]
+      fullDate = getTodayString()
     }
 
     setLoadingOutbound(true)
@@ -260,7 +262,7 @@ export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: (
     if (formData.return_date) {
       fullDate = formData.return_date
     } else {
-      fullDate = new Date().toISOString().split('T')[0]
+      fullDate = getTodayString()
     }
 
     setLoadingReturn(true)

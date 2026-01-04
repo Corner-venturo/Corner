@@ -41,13 +41,13 @@ export function usePaymentData() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          receiptNumber,
-          userName: item.receipt_account || '',
+          receipt_number: receiptNumber,
+          user_name: item.receipt_account || '',
           email: item.email || '',
-          paymentName: item.payment_name || '',
-          createUser: user?.id || '',
+          payment_name: item.payment_name || '',
+          create_user: user?.id || '',
           amount: item.amount,
-          endDate: item.pay_dateline || '',
+          end_date: item.pay_dateline || '',
         }),
       })
 
@@ -206,11 +206,11 @@ export function usePaymentData() {
 
       try {
         await sendPaymentAbnormalNotification({
-          recipientId: receipt.created_by,
-          receiptNumber: receipt.receipt_number || receiptId,
-          expectedAmount: receipt.receipt_amount || 0,
-          actualAmount,
-          confirmedBy: confirmerName,
+          recipient_id: receipt.created_by,
+          receipt_number: receipt.receipt_number || receiptId,
+          expected_amount: receipt.receipt_amount || 0,
+          actual_amount: actualAmount,
+          confirmed_by: confirmerName,
         })
         logger.info('⚠️ 收款金額異常通知已發送', {
           receiptId,

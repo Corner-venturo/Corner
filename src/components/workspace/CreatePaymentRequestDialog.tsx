@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Plus, X } from 'lucide-react'
@@ -64,7 +66,7 @@ export function CreatePaymentRequestDialog({
       const daysUntilThursday = (4 - dayOfWeek + 7) % 7
       const nextThursday = new Date(today)
       nextThursday.setDate(today.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday))
-      return nextThursday.toISOString().split('T')[0]
+      return formatDate(nextThursday)
     }
     setRequestDate(getNextThursday())
   }, [])

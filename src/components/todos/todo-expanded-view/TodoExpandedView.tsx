@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { InputIME } from '@/components/ui/input-ime'
@@ -119,7 +121,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                     onClick={() => {
                       const newDeadline = new Date()
                       newDeadline.setDate(newDeadline.getDate() + 7)
-                      onUpdate({ deadline: newDeadline.toISOString().split('T')[0] })
+                      onUpdate({ deadline: formatDate(newDeadline) })
                     }}
                     className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all gap-2"
                   >

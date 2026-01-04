@@ -5,6 +5,7 @@
 
 'use client'
 
+import { getTodayString, formatDate } from '@/lib/utils/format-date'
 import { useState, useMemo, useCallback } from 'react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
@@ -61,7 +62,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
   // 狀態
   const [disbursementDate, setDisbursementDate] = useState(
-    getNextThursday().toISOString().split('T')[0]
+    formatDate(getNextThursday())
   )
   const [selectedRequestIds, setSelectedRequestIds] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -123,7 +124,7 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
   // 設為今日
   const setToday = useCallback(() => {
-    setDateFilter(new Date().toISOString().split('T')[0])
+    setDateFilter(getTodayString())
   }, [])
 
   // 清除篩選

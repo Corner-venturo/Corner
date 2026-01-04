@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useMemo, useCallback } from 'react'
 import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useEmployeeStore, useAuthStore } from '@/stores'
 import { Tour } from '@/stores/types'
@@ -115,7 +117,7 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
         if (end_date && end_date !== tour.departure_date) {
           const returnDateObj = new Date(end_date)
           returnDateObj.setDate(returnDateObj.getDate() + 1)
-          end_date = returnDateObj.toISOString().split('T')[0]
+          end_date = formatDate(returnDateObj)
         }
 
         return {

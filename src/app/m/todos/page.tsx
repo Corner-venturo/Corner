@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Plus } from 'lucide-react'
@@ -87,18 +89,18 @@ export default function MobileTodosPage() {
         case 'today':
           query = query
             .in('status', ['pending', 'in_progress'])
-            .eq('deadline', today.toISOString().split('T')[0])
+            .eq('deadline', formatDate(today))
           break
         case 'week':
           query = query
             .in('status', ['pending', 'in_progress'])
-            .gte('deadline', today.toISOString().split('T')[0])
-            .lte('deadline', weekEnd.toISOString().split('T')[0])
+            .gte('deadline', formatDate(today))
+            .lte('deadline', formatDate(weekEnd))
           break
         case 'overdue':
           query = query
             .in('status', ['pending', 'in_progress'])
-            .lt('deadline', today.toISOString().split('T')[0])
+            .lt('deadline', formatDate(today))
           break
         case 'completed':
           query = query.eq('status', 'completed')

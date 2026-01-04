@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { Tour } from '@/stores/types'
@@ -238,7 +240,7 @@ export function useTourDetails(tour_id: string) {
     // 檢查是否重複，嘗試下一個字母
     const exists = (existingTours || []).some(t => t.code === code)
     if (exists) {
-      const dateStr = date.toISOString().split('T')[0].replace(/-/g, '').slice(2)
+      const dateStr = formatDate(date).replace(/-/g, '').slice(2)
       const lastChar = code.slice(-1)
       const nextChar = String.fromCharCode(lastChar.charCodeAt(0) + 1)
       return `${cityCode}${dateStr}${nextChar}`

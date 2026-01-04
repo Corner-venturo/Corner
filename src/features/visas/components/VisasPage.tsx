@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React, { useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle, RotateCcw, Info, Upload } from 'lucide-react'
@@ -314,7 +316,7 @@ export default function VisasPage() {
                   </button>
                   <button
                     onClick={() => {
-                      batchOps.setPickupDate(new Date().toISOString().split('T')[0])
+                      batchOps.setPickupDate(getTodayString())
                       batchOps.setIsPickupDialogOpen(true)
                     }}
                     disabled={!buttonAvailability.pickup}
@@ -341,7 +343,7 @@ export default function VisasPage() {
                   </button>
                   <button
                     onClick={() => {
-                      batchOps.setRejectDate(new Date().toISOString().split('T')[0])
+                      batchOps.setRejectDate(getTodayString())
                       batchOps.setIsRejectDialogOpen(true)
                     }}
                     disabled={!buttonAvailability.reject}

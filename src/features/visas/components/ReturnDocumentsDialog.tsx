@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -29,7 +31,7 @@ export function ReturnDocumentsDialog({
   // 重置表單，預設今天日期
   React.useEffect(() => {
     if (open) {
-      const today = new Date().toISOString().split('T')[0]
+      const today = getTodayString()
       setReturnDate(today)
       setReturnNote('')
     }

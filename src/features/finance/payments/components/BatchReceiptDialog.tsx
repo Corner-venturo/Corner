@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useMemo } from 'react'
 import {
   Dialog,
@@ -43,7 +45,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   const { items: orders } = useOrderStore()
   const { create: createReceiptOrder } = useReceiptOrderStore()
 
-  const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0])
+  const [receiptDate, setReceiptDate] = useState(getTodayString())
   const [note, setNote] = useState('')
 
   // 訂單分配列表
@@ -54,7 +56,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     {
       payment_method: 'cash',
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     },
   ])
 
@@ -134,7 +136,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
       {
         payment_method: 'cash',
         amount: 0,
-        transaction_date: new Date().toISOString().split('T')[0],
+        transaction_date: getTodayString(),
       },
     ])
   }
@@ -169,14 +171,14 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
 
   // 重置表單
   const resetForm = () => {
-    setReceiptDate(new Date().toISOString().split('T')[0])
+    setReceiptDate(getTodayString())
     setNote('')
     setOrderAllocations([])
     setPaymentItems([
       {
         payment_method: 'cash',
         amount: 0,
-        transaction_date: new Date().toISOString().split('T')[0],
+        transaction_date: getTodayString(),
       },
     ])
   }

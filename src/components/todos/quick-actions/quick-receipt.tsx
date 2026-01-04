@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useMemo } from 'react'
 import { Receipt as ReceiptIcon } from 'lucide-react'
@@ -67,7 +69,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
     id: '1',
     receipt_type: RECEIPT_TYPES.CASH,
     amount: 0,
-    transaction_date: new Date().toISOString().split('T')[0],
+    transaction_date: getTodayString(),
   })
 
   // 可用訂單（根據選中的團體過濾）
@@ -94,7 +96,7 @@ export function QuickReceipt({ onSubmit, defaultTourId, defaultOrderId }: QuickR
       id: '1',
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     })
   }
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState } from 'react'
 import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
@@ -206,7 +208,7 @@ export default function CalendarPage() {
               <Button
                 size="sm"
                 onClick={() => {
-                  const today = new Date().toISOString().split('T')[0]
+                  const today = getTodayString()
                   setAddEventDialog({ open: true, selectedDate: today })
                 }}
                 className="h-9 bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm hover:shadow-md transition-all font-medium rounded-lg"

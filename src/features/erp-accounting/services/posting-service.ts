@@ -3,6 +3,7 @@
  * 負責將 ERP 事件轉換為傳票
  */
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Json } from '@/lib/supabase/types'
@@ -116,7 +117,7 @@ export async function postCustomerReceipt(
 ): Promise<PostingResult> {
   const { payment_method, amount, fee_rate = 0, bank_account_id, tour_id, memo } = request
 
-  const eventDate = new Date().toISOString().split('T')[0]
+  const eventDate = getTodayString()
   const now = new Date().toISOString()
 
   // 計算金額
@@ -261,7 +262,7 @@ export async function postSupplierPayment(
 ): Promise<PostingResult> {
   const { amount, bank_account_id, tour_id, memo } = request
 
-  const eventDate = new Date().toISOString().split('T')[0]
+  const eventDate = getTodayString()
   const now = new Date().toISOString()
 
   // 建立會計事件
@@ -383,7 +384,7 @@ export async function postGroupSettlement(
     memo,
   } = request
 
-  const eventDate = new Date().toISOString().split('T')[0]
+  const eventDate = getTodayString()
   const now = new Date().toISOString()
 
   // 計算
@@ -719,7 +720,7 @@ export async function reverseVoucher(
     return { success: false, error: '只有已過帳的傳票可以反沖' }
   }
 
-  const eventDate = new Date().toISOString().split('T')[0]
+  const eventDate = getTodayString()
   const now = new Date().toISOString()
 
   // 建立反沖事件

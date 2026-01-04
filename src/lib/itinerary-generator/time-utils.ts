@@ -3,6 +3,7 @@
  * 用於行程時間規劃
  */
 
+import { formatDate } from '@/lib/utils/format-date'
 import type { DailyTimeSlot, FlightConstraint, SchedulingConfig } from './types'
 import { DEFAULT_SCHEDULING_CONFIG } from './types'
 
@@ -119,7 +120,7 @@ export function calculateDailyTimeSlots(
 
     slots.push({
       dayNumber: day + 1,
-      date: currentDate.toISOString().split('T')[0],
+      date: formatDate(currentDate),
       displayDate: formatDisplayDate(currentDate),
       availableMinutes: Math.max(0, availableMinutes),
       startTime,

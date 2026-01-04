@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/utils/format-date'
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoreLinkArg } from '@fullcalendar/core'
@@ -37,7 +38,7 @@ export function useMoreEventsDialog() {
   const handleMoreLinkClick = useCallback(
     (info: MoreLinkArg, filteredEvents: FullCalendarEvent[]) => {
       info.jsEvent.preventDefault()
-      const clickedDate = info.date.toISOString().split('T')[0]
+      const clickedDate = formatDate(info.date)
 
       const dayEvents = (filteredEvents || []).filter((event: FullCalendarEvent) => {
         if (!event?.start) return false

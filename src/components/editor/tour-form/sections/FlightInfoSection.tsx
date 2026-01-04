@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString, formatDate } from '@/lib/utils/format-date'
+
 import React, { useMemo, useCallback, useState } from 'react'
 import { TourFormData, FlightStyleType } from '../types'
 import { Button } from '@/components/ui/button'
@@ -126,7 +128,7 @@ export function FlightInfoSection({
     if (flightType === 'outbound') {
       if (data.departureDate) {
         const dep = parseDate(data.departureDate)
-        if (dep) return dep.toISOString().split('T')[0]
+        if (dep) return formatDate(dep)
       }
     } else {
       if (data.returnFlight?.departureDate && data.departureDate) {
@@ -141,7 +143,7 @@ export function FlightInfoSection({
         }
       }
     }
-    return new Date().toISOString().split('T')[0]
+    return getTodayString()
   }, [data.departureDate, data.returnFlight?.departureDate])
 
   return (

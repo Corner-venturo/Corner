@@ -180,52 +180,93 @@ export function createCloudHook<T extends BaseEntity>(
 
       // 自動生成 code（如果該表格需要且未提供）
       const codePrefix = TABLE_CODE_PREFIX[tableName]
-      let generatedCode: string | undefined
-      if (codePrefix && !dataRecord.code) {
-        // 從資料庫查詢最大 code，確保唯一性
-        // 注意：不使用 .single()，因為空結果會導致錯誤
-        const { data: maxCodeResults } = await supabase
-          .from(tableName)
-          .select('code')
-          .like('code', `${codePrefix}%`)
-          .order('code', { ascending: false })
-          .limit(1)
+      const needsCodeGeneration = codePrefix && !dataRecord.code
 
-        let nextNumber = 1
-        const codeResults = maxCodeResults as Array<{ code?: string }> | null
-        if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
-          // 提取數字部分，例如 'C000032' -> 32
-          const numericPart = codeResults[0].code.replace(codePrefix, '')
-          const currentMax = parseInt(numericPart, 10)
-          if (!isNaN(currentMax)) {
-            nextNumber = currentMax + 1
+      // 使用樂觀鎖重試機制處理 code 生成的競態條件
+      // 當 unique constraint 失敗時，重新生成 code 並重試
+      const maxInsertRetries = 3
+      let lastError: unknown = null
+
+      for (let insertAttempt = 0; insertAttempt < maxInsertRetries; insertAttempt++) {
+        let generatedCode: string | undefined
+
+        // 每次重試都重新查詢並生成 code
+        if (needsCodeGeneration) {
+          // 從資料庫查詢最大 code，確保唯一性
+          const { data: maxCodeResults } = await supabase
+            .from(tableName)
+            .select('code')
+            .like('code', `${codePrefix}%`)
+            .order('code', { ascending: false })
+            .limit(1)
+
+          let nextNumber = 1
+          const codeResults = maxCodeResults as Array<{ code?: string }> | null
+          if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
+            // 提取數字部分，例如 'C000032' -> 32
+            const numericPart = codeResults[0].code.replace(codePrefix, '')
+            const currentMax = parseInt(numericPart, 10)
+            if (!isNaN(currentMax)) {
+              nextNumber = currentMax + 1
+            }
           }
+
+          // 加入偏移量避免並發衝突（第二次重試開始）
+          if (insertAttempt > 0) {
+            nextNumber += insertAttempt
+          }
+
+          generatedCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
         }
-        generatedCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
+
+        const newItem = {
+          ...data,
+          id: generateUUID(),
+          created_at: now,
+          updated_at: now,
+          ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),
+          ...(generatedCode ? { code: generatedCode } : {}),
+        } as T
+
+        // 樂觀更新：使用 functional update 避免 stale closure 問題
+        mutate(SWR_KEY, (currentItems: T[] | undefined) => [...(currentItems || []), newItem], false)
+
+        try {
+          const { error } = await supabase.from(tableName).insert(newItem)
+
+          if (!error) {
+            // 插入成功
+            mutate(SWR_KEY)
+            return newItem
+          }
+
+          // 檢查是否為 unique constraint 錯誤（code 重複）
+          const errorCode = (error as { code?: string })?.code
+          const errorMessage = (error as { message?: string })?.message || ''
+          const isUniqueViolation = errorCode === '23505' ||
+            errorMessage.includes('duplicate key') ||
+            errorMessage.includes('unique constraint') ||
+            errorMessage.includes('violates unique constraint')
+
+          if (isUniqueViolation && needsCodeGeneration && insertAttempt < maxInsertRetries - 1) {
+            // unique constraint 錯誤且還有重試次數，回滾樂觀更新並繼續重試
+            logger.warn(`[${tableName}] Code 重複，重試第 ${insertAttempt + 1} 次`)
+            mutate(SWR_KEY) // 回滾樂觀更新
+            lastError = error
+            continue
+          }
+
+          // 非 unique constraint 錯誤或已用完重試次數，拋出錯誤
+          mutate(SWR_KEY)
+          throw error
+        } catch (err) {
+          mutate(SWR_KEY)
+          throw err
+        }
       }
 
-      const newItem = {
-        ...data,
-        id: generateUUID(),
-        created_at: now,
-        updated_at: now,
-        ...(isWorkspaceScoped && workspace_id ? { workspace_id } : {}),
-        ...(generatedCode ? { code: generatedCode } : {}),
-      } as T
-
-      // 樂觀更新：使用 functional update 避免 stale closure 問題
-      mutate(SWR_KEY, (currentItems: T[] | undefined) => [...(currentItems || []), newItem], false)
-
-      try {
-        const { error } = await supabase.from(tableName).insert(newItem)
-        if (error) throw error
-
-        mutate(SWR_KEY)
-        return newItem
-      } catch (err) {
-        mutate(SWR_KEY)
-        throw err
-      }
+      // 如果所有重試都失敗，拋出最後的錯誤
+      throw lastError || new Error('建立失敗：已達最大重試次數')
     }
 
     // 更新

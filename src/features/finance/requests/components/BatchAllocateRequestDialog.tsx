@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useMemo, useEffect } from 'react'
 import {
   Dialog,
@@ -60,7 +62,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
   const { items: suppliers } = useSupplierStore()
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
 
-  const [requestDate, setRequestDate] = useState(new Date().toISOString().split('T')[0])
+  const [requestDate, setRequestDate] = useState(getTodayString())
   const [category, setCategory] = useState<PaymentItemCategory>('住宿')
   const [supplierId, setSupplierId] = useState('')
   const [description, setDescription] = useState('')
@@ -172,7 +174,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
 
   // 重置表單
   const resetForm = () => {
-    setRequestDate(new Date().toISOString().split('T')[0])
+    setRequestDate(getTodayString())
     setCategory('住宿')
     setSupplierId('')
     setDescription('')

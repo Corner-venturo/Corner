@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import {
@@ -70,7 +72,7 @@ export default function AccountingPage() {
   ]
 
   // 今日交易
-  const today = new Date().toISOString().split('T')[0]
+  const today = getTodayString()
   const todayTransactions = useMemo(
     () =>
       transactions

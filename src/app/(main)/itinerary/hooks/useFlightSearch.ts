@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString, formatDate } from '@/lib/utils/format-date'
+
 import { useState, useCallback } from 'react'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { alertError } from '@/lib/ui/alert-dialog'
@@ -48,7 +50,7 @@ export function useFlightSearch({
 
     setLoadingOutboundFlight(true)
     try {
-      const result = await searchFlightAction(flightNumber, departureDate || new Date().toISOString().split('T')[0])
+      const result = await searchFlightAction(flightNumber, departureDate || getTodayString())
       if (result.error) {
         await alertError(result.error)
         return
@@ -81,11 +83,11 @@ export function useFlightSearch({
     }
 
     // Calculate return date
-    let returnDateStr = new Date().toISOString().split('T')[0]
+    let returnDateStr = getTodayString()
     if (departureDate && days) {
       const returnDate = new Date(departureDate)
       returnDate.setDate(returnDate.getDate() + parseInt(days) - 1)
-      returnDateStr = returnDate.toISOString().split('T')[0]
+      returnDateStr = formatDate(returnDate)
     }
 
     setLoadingReturnFlight(true)

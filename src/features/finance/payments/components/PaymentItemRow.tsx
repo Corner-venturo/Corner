@@ -3,6 +3,7 @@
  * 收款項目行（表格式輸入）
  */
 
+import { formatDate } from '@/lib/utils/format-date'
 import { useState } from 'react'
 import { Link2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -72,18 +73,18 @@ export function PaymentItemRow({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          receiptNumber: `PREVIEW-${Date.now()}`, // 預覽用臨時編號
-          userName: item.receipt_account || '',
+          receipt_number: `PREVIEW-${Date.now()}`, // 預覽用臨時編號
+          user_name: item.receipt_account || '',
           email: item.email,
-          paymentName: item.payment_name || orderInfo?.tour_name || '',
-          createUser: user?.id || '',
+          payment_name: item.payment_name || orderInfo?.tour_name || '',
+          create_user: user?.id || '',
           amount: item.amount,
-          endDate: item.pay_dateline,
+          end_date: item.pay_dateline,
         }),
       })
       const data = await response.json()
-      if (data.success && data.data?.paymentLink) {
-        setGeneratedLink(data.data.paymentLink)
+      if (data.success && data.data?.payment_link) {
+        setGeneratedLink(data.data.payment_link)
         toast({
           title: '連結產生成功',
           description: '可複製連結發送給客戶',
@@ -120,7 +121,7 @@ export function PaymentItemRow({
       if (!item.pay_dateline) {
         const deadline = new Date()
         deadline.setDate(deadline.getDate() + 7)
-        updates.pay_dateline = deadline.toISOString().split('T')[0]
+        updates.pay_dateline = formatDate(deadline)
       }
       // 預設 Email 從訂單聯絡人
       if (!item.email && orderInfo?.contact_email) {

@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateTourCode } from '@/stores/utils/code-generator'
@@ -95,8 +97,8 @@ export const useQuoteTour = ({
     const newTour = await addTour({
       name: quoteName,
       location: location,
-      departure_date: departure_date.toISOString().split('T')[0],
-      return_date: return_date.toISOString().split('T')[0],
+      departure_date: formatDate(departure_date),
+      return_date: formatDate(return_date),
       price: Math.round(total_cost / groupSize), // 每人單價
       status: 'draft',
       code: tourCode,

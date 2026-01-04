@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
@@ -301,7 +303,7 @@ export default function TourClosingReportPage() {
     XLSX.utils.book_append_sheet(wb, ws, monthLabel)
 
     // 匯出檔案
-    const fileName = `結團報表_${monthLabel}_${new Date().toISOString().split('T')[0]}.xlsx`
+    const fileName = `結團報表_${monthLabel}_${getTodayString()}.xlsx`
     XLSX.writeFile(wb, fileName)
 
     toast.success('報表已匯出')

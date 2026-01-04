@@ -1,3 +1,4 @@
+import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
@@ -174,7 +175,7 @@ export const useQuoteState = () => {
         contact_address: quote.contact_address || '',
         tour_code: quote.tour_code || relatedTour?.code || '',
         handler_name: quote.handler_name || 'William',
-        issue_date: quote.issue_date || new Date().toISOString().split('T')[0],
+        issue_date: quote.issue_date || getTodayString(),
         received_amount: quote.received_amount || 0,
         expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
       })
@@ -237,7 +238,7 @@ export const useQuoteState = () => {
     contact_address: quote?.contact_address || '',
     tour_code: quote?.tour_code || relatedTour?.code || '',
     handler_name: quote?.handler_name || 'William',
-    issue_date: quote?.issue_date || new Date().toISOString().split('T')[0],
+    issue_date: quote?.issue_date || getTodayString(),
     received_amount: quote?.received_amount || 0,
     expense_description: (quote as typeof quote & { expense_description?: string })?.expense_description || '',
   })

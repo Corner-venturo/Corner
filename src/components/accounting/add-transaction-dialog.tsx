@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React, { useState, useEffect } from 'react'
 import { useAccountingStore } from '@/stores/accounting-store'
 import { FormDialog } from '@/components/dialog'
@@ -32,7 +34,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
     account_id: '',
     amount: '',
     description: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getTodayString(),
   })
 
   // 當 accounts 載入完成時，設定預設帳戶
@@ -83,7 +85,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       account_id: accounts.length > 0 ? accounts[0].id : '',
       amount: '',
       description: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayString(),
     })
     setStep('selectType')
     setTransactionType('expense')

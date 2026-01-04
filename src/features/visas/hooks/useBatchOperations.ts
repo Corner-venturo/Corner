@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import type { Visa } from '@/stores/types'
@@ -17,8 +19,8 @@ export function useBatchOperations(
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false)
   const [isPickupDialogOpen, setIsPickupDialogOpen] = useState(false)
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
-  const [pickupDate, setPickupDate] = useState(new Date().toISOString().split('T')[0])
-  const [rejectDate, setRejectDate] = useState(new Date().toISOString().split('T')[0])
+  const [pickupDate, setPickupDate] = useState(getTodayString())
+  const [rejectDate, setRejectDate] = useState(getTodayString())
 
   // 取得選中的簽證資料
   const selectedVisas = useMemo(() => {

@@ -262,67 +262,76 @@ export function createStore<T extends BaseEntity>(
           }
         }
 
-        if (codePrefix && !(data as Record<string, unknown>).code) {
-          // 生成唯一編號（帶重試機制避免競爭條件）
-          const generateUniqueCode = async (): Promise<string> => {
-            const maxRetries = 5
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-              // 從資料庫查詢最大 code
-              const { data: maxCodeResults } = await dynamicFrom(tableName)
-                .select('code')
-                .like('code', `${codePrefix}%`)
-                .order('code', { ascending: false })
-                .limit(1)
+        // 使用樂觀鎖重試機制處理 code 生成的競態條件
+        // 當 unique constraint 失敗時，重新生成 code 並重試
+        const maxInsertRetries = 3
+        let lastError: unknown = null
 
-              let nextNumber = 1
-              const codeResults = maxCodeResults as Array<{ code?: string }> | null
-              if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
-                const numericPart = codeResults[0].code.replace(codePrefix, '')
-                const currentMax = parseInt(numericPart, 10)
-                if (!isNaN(currentMax)) {
-                  nextNumber = currentMax + 1 + attempt // 加上 attempt 避免重複
-                }
+        for (let insertAttempt = 0; insertAttempt < maxInsertRetries; insertAttempt++) {
+          // 每次重試都重新生成 code
+          if (codePrefix && !(data as Record<string, unknown>).code) {
+            // 從資料庫查詢最大 code
+            const { data: maxCodeResults } = await dynamicFrom(tableName)
+              .select('code')
+              .like('code', `${codePrefix}%`)
+              .order('code', { ascending: false })
+              .limit(1)
+
+            let nextNumber = 1
+            const codeResults = maxCodeResults as Array<{ code?: string }> | null
+            if (codeResults && codeResults.length > 0 && codeResults[0]?.code) {
+              const numericPart = codeResults[0].code.replace(codePrefix, '')
+              const currentMax = parseInt(numericPart, 10)
+              if (!isNaN(currentMax)) {
+                nextNumber = currentMax + 1
               }
-
-              const candidateCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
-
-              // 檢查這個 code 是否已存在
-              const { data: existing } = await dynamicFrom(tableName)
-                .select('id')
-                .eq('code', candidateCode)
-                .limit(1)
-
-              if (!existing || existing.length === 0) {
-                return candidateCode
-              }
-
-              // 如果存在，繼續下一次嘗試
-              logger.warn(`[${tableName}] Code ${candidateCode} 已存在，重試第 ${attempt + 1} 次`)
             }
 
-            // 最後手段：使用時間戳確保唯一
-            const timestamp = Date.now().toString(36).toUpperCase()
-            return `${codePrefix}${timestamp}`
+            // 加入隨機偏移量避免並發衝突（第二次重試開始）
+            if (insertAttempt > 0) {
+              nextNumber += insertAttempt
+            }
+
+            const candidateCode = `${codePrefix}${String(nextNumber).padStart(6, '0')}`
+            ;(insertData as Record<string, unknown>).code = candidateCode
           }
 
-          ;(insertData as Record<string, unknown>).code = await generateUniqueCode()
+          const { data: newItem, error } = await dynamicFrom(tableName)
+            .insert(insertData as Record<string, unknown>)
+            .select()
+            .single()
+
+          if (!error) {
+            // 插入成功，跳出重試迴圈
+            const createdItem = castRow<T>(newItem) as T
+            set(state => ({
+              items: [createdItem, ...state.items],
+              loading: false,
+            }))
+            return createdItem
+          }
+
+          // 檢查是否為 unique constraint 錯誤（code 重複）
+          const errorCode = (error as { code?: string })?.code
+          const errorMessage = (error as { message?: string })?.message || ''
+          const isUniqueViolation = errorCode === '23505' ||
+            errorMessage.includes('duplicate key') ||
+            errorMessage.includes('unique constraint') ||
+            errorMessage.includes('violates unique constraint')
+
+          if (isUniqueViolation && codePrefix && insertAttempt < maxInsertRetries - 1) {
+            // unique constraint 錯誤且還有重試次數，繼續重試
+            logger.warn(`[${tableName}] Code 重複，重試第 ${insertAttempt + 1} 次`)
+            lastError = error
+            continue
+          }
+
+          // 非 unique constraint 錯誤或已用完重試次數，拋出錯誤
+          throw error
         }
 
-        const { data: newItem, error } = await dynamicFrom(tableName)
-          .insert(insertData as Record<string, unknown>)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        const createdItem = castRow<T>(newItem) as T
-        // 樂觀更新 UI
-        set(state => ({
-          items: [createdItem, ...state.items],
-          loading: false,
-        }))
-
-        return createdItem
+        // 如果所有重試都失敗，拋出最後的錯誤
+        throw lastError || new Error('建立失敗：已達最大重試次數')
       } catch (error) {
         // 解析錯誤訊息
         let errorMessage = '建立失敗'

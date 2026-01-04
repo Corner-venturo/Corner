@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/utils/format-date'
 export interface TaskTemplate {
   id: string
   title: string
@@ -72,5 +73,5 @@ export function calculateDeadlineFromDeparture(departure_date: string, daysBefor
   const departure = new Date(departure_date)
   const deadline = new Date(departure)
   deadline.setDate(deadline.getDate() + daysBefore) // daysBefore 是負數
-  return deadline.toISOString().split('T')[0]
+  return formatDate(deadline)
 }

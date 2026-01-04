@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useEffect, useTransition } from 'react'
 import {
   Cloud,
@@ -72,12 +74,12 @@ const WEATHER_DESCRIPTIONS: Record<number, { label: string; icon: string }> = {
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayString())
   const [selectedCity, setSelectedCity] = useState<City>(CITIES[0])
   const [isPending, startTransition] = useTransition()
 
   const handleFetchWeather = (date: string, city: City) => {
-    const isPast = date < new Date().toISOString().split('T')[0]
+    const isPast = date < getTodayString()
     startTransition(async () => {
       setError(null)
       const result = await getWeatherAction(date, isPast, city)
@@ -112,7 +114,7 @@ export function WeatherWidget() {
   }
 
   const weatherInfo = weather ? WEATHER_DESCRIPTIONS[weather.weatherCode] || WEATHER_DESCRIPTIONS[0] : null
-  const today = new Date().toISOString().split('T')[0]
+  const today = getTodayString()
   const minDate = new Date()
   minDate.setFullYear(minDate.getFullYear() - 5)
   const maxDate = new Date()

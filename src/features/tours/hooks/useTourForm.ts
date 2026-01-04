@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState, useCallback } from 'react'
 import { useTourDestinations } from './useTourDestinations'
 import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
@@ -48,7 +50,7 @@ export function useTourForm({
       return
     }
 
-    const flightDate = newTour.departure_date || new Date().toISOString().split('T')[0]
+    const flightDate = newTour.departure_date || getTodayString()
 
     setLoadingOutbound(true)
     try {
@@ -81,7 +83,7 @@ export function useTourForm({
       return
     }
 
-    const flightDate = newTour.return_date || new Date().toISOString().split('T')[0]
+    const flightDate = newTour.return_date || getTodayString()
 
     setLoadingReturn(true)
     try {

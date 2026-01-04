@@ -4,6 +4,7 @@
 
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores'
@@ -36,7 +37,7 @@ const getInitialFormData = (): QuickQuoteFormData => ({
   contact_address: '',
   tour_code: '',
   handler_name: '', // 由 useEffect 自動填入當前登入者名稱
-  issue_date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+  issue_date: getTodayString(), // Today's date in YYYY-MM-DD format
   items: [],
   received_amount: '',
 })
@@ -63,7 +64,7 @@ export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {
       if (saved) {
         const parsed = JSON.parse(saved)
         // 確保日期是今天（避免載入舊的日期）
-        parsed.issue_date = new Date().toISOString().split('T')[0]
+        parsed.issue_date = getTodayString()
         return parsed
       }
     } catch (error) {

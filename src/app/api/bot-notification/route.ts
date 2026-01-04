@@ -11,7 +11,7 @@ import { logger } from '@/lib/utils/logger'
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
 
 interface NotificationRequest {
-  recipientId: string       // 接收者員工 ID
+  recipient_id: string       // 接收者員工 ID
   message: string           // 通知內容
   type?: 'info' | 'warning' | 'error'  // 通知類型
   metadata?: Record<string, unknown>   // 額外資料
@@ -20,9 +20,9 @@ interface NotificationRequest {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as NotificationRequest
-    const { recipientId, message, type = 'info', metadata } = body
+    const { recipient_id, message, type = 'info', metadata } = body
 
-    if (!recipientId || !message) {
+    if (!recipient_id || !message) {
       return NextResponse.json(
         { success: false, message: '缺少必要參數' },
         { status: 400 }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       .from('channels')
       .select('*')
       .eq('type', 'direct')
-      .or(`name.ilike.dm:${SYSTEM_BOT_ID}:${recipientId},name.ilike.dm:${recipientId}:${SYSTEM_BOT_ID}`)
+      .or(`name.ilike.dm:${SYSTEM_BOT_ID}:${recipient_id},name.ilike.dm:${recipient_id}:${SYSTEM_BOT_ID}`)
       .single()
 
     let channelId: string
@@ -45,13 +45,13 @@ export async function POST(request: NextRequest) {
       channelId = existingChannel.id
     } else {
       // 取得接收者的 workspace_id
-      const { data: recipient } = await supabase
+      const { data: recipientData } = await supabase
         .from('employees')
         .select('workspace_id')
-        .eq('id', recipientId)
+        .eq('id', recipient_id)
         .single()
 
-      if (!recipient?.workspace_id) {
+      if (!recipientData?.workspace_id) {
         return NextResponse.json(
           { success: false, message: '找不到接收者' },
           { status: 404 }
@@ -62,11 +62,11 @@ export async function POST(request: NextRequest) {
       const { data: newChannel, error: createError } = await supabase
         .from('channels')
         .insert({
-          name: `dm:${SYSTEM_BOT_ID}:${recipientId}`,
+          name: `dm:${SYSTEM_BOT_ID}:${recipient_id}`,
           type: 'direct',
           channel_type: 'direct',
           is_announcement: false,
-          workspace_id: recipient.workspace_id,
+          workspace_id: recipientData.workspace_id,
           created_by: SYSTEM_BOT_ID,
         })
         .select()
@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('channel_members')
         .insert([
-          { channel_id: newChannel.id, employee_id: SYSTEM_BOT_ID, role: 'owner', workspace_id: recipient.workspace_id },
-          { channel_id: newChannel.id, employee_id: recipientId, role: 'member', workspace_id: recipient.workspace_id },
+          { channel_id: newChannel.id, employee_id: SYSTEM_BOT_ID, role: 'owner', workspace_id: recipientData.workspace_id },
+          { channel_id: newChannel.id, employee_id: recipient_id, role: 'member', workspace_id: recipientData.workspace_id },
         ])
 
       channelId = newChannel.id
@@ -116,9 +116,9 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('機器人通知已發送', {
-      recipientId,
-      channelId,
-      messageId: messageData.id,
+      recipient_id,
+      channel_id: channelId,
+      message_id: messageData.id,
       type,
     })
 
@@ -126,8 +126,8 @@ export async function POST(request: NextRequest) {
       success: true,
       message: '通知已發送',
       data: {
-        channelId,
-        messageId: messageData.id,
+        channel_id: channelId,
+        message_id: messageData.id,
       },
     })
   } catch (error) {

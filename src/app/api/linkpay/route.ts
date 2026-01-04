@@ -20,13 +20,13 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 // ============================================
 
 interface CreateLinkPayRequest {
-  receiptNumber: string // 收款單號
-  userName: string // 付款人姓名
+  receipt_number: string // 收款單號
+  user_name: string // 付款人姓名
   email: string // 客戶 Email
-  paymentName?: string // 付款名稱（客戶看到的標題）
-  createUser?: string // 建立人員 UUID
+  payment_name?: string // 付款名稱（客戶看到的標題）
+  create_user?: string // 建立人員 UUID
   amount: number // 金額
-  endDate: string // 付款截止日 (YYYY-MM-DD)
+  end_date: string // 付款截止日 (YYYY-MM-DD)
   gender?: number // 性別 1:男 2:女
 }
 
@@ -115,12 +115,12 @@ function formatEndDate(dateStr: string): string {
 export async function POST(req: NextRequest) {
   try {
     const body: CreateLinkPayRequest = await req.json()
-    const { receiptNumber, userName, email, paymentName, createUser, amount, endDate, gender } = body
+    const { receipt_number, user_name, email, payment_name, create_user, amount, end_date, gender } = body
 
     // 驗證必填欄位
-    if (!receiptNumber || !userName || !email || !amount) {
+    if (!receipt_number || !user_name || !email || !amount) {
       return NextResponse.json(
-        { success: false, message: '缺少必填欄位：receiptNumber, userName, email, amount' },
+        { success: false, message: '缺少必填欄位：receipt_number, user_name, email, amount' },
         { status: 400 }
       )
     }
@@ -131,11 +131,11 @@ export async function POST(req: NextRequest) {
     const { data: receipt, error: receiptError } = await supabase
       .from('receipts')
       .select('*, tours(*)')
-      .eq('receipt_number', receiptNumber)
+      .eq('receipt_number', receipt_number)
       .single()
 
     if (receiptError || !receipt) {
-      logger.error('找不到收款單:', receiptNumber)
+      logger.error('找不到收款單:', receipt_number)
       return NextResponse.json(
         { success: false, message: '找不到收款單' },
         { status: 404 }
@@ -144,11 +144,11 @@ export async function POST(req: NextRequest) {
 
     // 組裝付款名稱
     const tourName = (receipt.tours as { name?: string } | null)?.name || receipt.tour_name || ''
-    const finalPaymentName = paymentName || `${removePunctuations(tourName)} ${receipt.receipt_account || ''}`
+    const finalPaymentName = payment_name || `${removePunctuations(tourName)} ${receipt.receipt_account || ''}`
 
     // 生成唯一訂單號（移除 - 和 _ 以符合銀聯卡規範）
     const timestamp = Date.now()
-    const rawOrderNo = `${receiptNumber}R${timestamp.toString().slice(-6)}`
+    const rawOrderNo = `${receipt_number}R${timestamp.toString().slice(-6)}`
     const orderNo = sanitizeOrderNo(rawOrderNo)
 
     // 組裝台新 API 請求（依據手冊 v1.8 格式）
@@ -163,14 +163,14 @@ export async function POST(req: NextRequest) {
         order_no: orderNo,
         amt: String(amount), // 金額不含小數，轉為字串
         cur: 'NTD',
-        order_desc: sanitizeOrderNo(receiptNumber),
+        order_desc: sanitizeOrderNo(receipt_number),
         notification: 1, // Email 通知
         payment_name: finalPaymentName.slice(0, 40),
         mer_phone_num: MERCHANT_PHONE,
-        user_name: userName.slice(0, 5),
+        user_name: user_name.slice(0, 5),
         gender: gender || null,
         email: email,
-        link_end_date: formatEndDate(endDate),
+        link_end_date: formatEndDate(end_date),
         trans_gen: '1', // 一般交易
         capt_flag: '1', // 授權同步請款
         post_back_url: `${WEBHOOK_BASE_URL}/payment/complete`, // 前台通知（交易完成導向）
@@ -183,15 +183,15 @@ export async function POST(req: NextRequest) {
 
     // 先建立 linkpay_logs 記錄
     const logData = {
-      receipt_number: receiptNumber,
+      receipt_number: receipt_number,
       workspace_id: receipt.workspace_id,
       linkpay_order_number: orderNo,
       price: amount,
-      end_date: endDate,
+      end_date: end_date,
       status: 0,
       payment_name: finalPaymentName,
-      created_by: createUser || null,
-      updated_by: createUser || null,
+      created_by: create_user || null,
+      updated_by: create_user || null,
     }
 
     const { error: logError } = await supabase
@@ -245,17 +245,17 @@ export async function POST(req: NextRequest) {
             linkpay_order_number: orderNo,
             updated_at: new Date().toISOString(),
           })
-          .eq('receipt_number', receiptNumber)
+          .eq('receipt_number', receipt_number)
 
         return NextResponse.json({
           success: true,
           message: '付款連結生成成功',
           data: {
-            paymentLink: hpp_url,
-            linkpayOrderNumber: orderNo,
+            payment_link: hpp_url,
+            linkpay_order_number: orderNo,
             link: hpp_url,
             status: 0,
-            end_date: endDate,
+            end_date: end_date,
           },
         })
       } else {

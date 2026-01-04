@@ -4,6 +4,7 @@
 
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
 import React from 'react'
 import { Quote } from '@/types/quote.types'
 
@@ -39,7 +40,7 @@ export const QuickQuoteCustomerInfo: React.FC<QuickQuoteCustomerInfoProps> = ({ 
       <div className="flex">
         <span className="font-semibold w-24">開單日期：</span>
         <span className="flex-1 border-b border-border">
-          {quote.issue_date || new Date().toISOString().split('T')[0]}
+          {quote.issue_date || getTodayString()}
         </span>
       </div>
     </div>

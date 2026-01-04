@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React, { useState } from 'react'
 
 import { Users } from 'lucide-react'
@@ -213,7 +215,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
                   return { ...prev, departure_date, return_date: newReturnDate }
                 })
               }}
-              min={new Date().toISOString().split('T')[0]}
+              min={getTodayString()}
               className="border-morandi-container/30"
               required
             />
@@ -227,7 +229,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
               onChange={return_date => {
                 setNewTour(prev => ({ ...prev, return_date }))
               }}
-              min={newTour.departure_date || new Date().toISOString().split('T')[0]}
+              min={newTour.departure_date || getTodayString()}
               className="border-morandi-container/30"
               required
             />

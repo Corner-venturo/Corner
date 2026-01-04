@@ -2,6 +2,7 @@
  * 新增收款單 Dialog
  */
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useMemo } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -49,7 +50,7 @@ export function CreateReceiptDialog({
       id: '1',
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     },
   ])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -69,7 +70,7 @@ export function CreateReceiptDialog({
       id: Date.now().toString(),
       receipt_type: RECEIPT_TYPES.CASH,
       amount: 0,
-      transaction_date: new Date().toISOString().split('T')[0],
+      transaction_date: getTodayString(),
     }
     setPaymentItems(prev => [...prev, newItem])
   }
@@ -92,7 +93,7 @@ export function CreateReceiptDialog({
         id: '1',
         receipt_type: RECEIPT_TYPES.CASH,
         amount: 0,
-        transaction_date: new Date().toISOString().split('T')[0],
+        transaction_date: getTodayString(),
       },
     ])
   }

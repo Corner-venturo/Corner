@@ -212,25 +212,25 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                receiptNumber,
-                userName: item.receipt_account || '',
+                receipt_number: receiptNumber,
+                user_name: item.receipt_account || '',
                 email: item.email || '',
-                paymentName: item.payment_name || tourCode,
-                createUser: user.id,
+                payment_name: item.payment_name || tourCode,
+                create_user: user.id,
                 amount: item.amount,
-                endDate: item.pay_dateline || '',
+                end_date: item.pay_dateline || '',
               }),
             })
             const data = await response.json()
-            if (data.success && data.data?.paymentLink) {
+            if (data.success && data.data?.payment_link) {
               newLinkPayResults.push({
                 receiptNumber,
-                link: data.data.paymentLink
+                link: data.data.payment_link
               })
               // 更新收款單的 link 欄位
               const createdReceipt = receiptStore.items.find(r => r.receipt_number === receiptNumber)
               if (createdReceipt) {
-                await receiptStore.update(createdReceipt.id, { link: data.data.paymentLink })
+                await receiptStore.update(createdReceipt.id, { link: data.data.payment_link })
               }
             }
           } catch (linkPayError) {

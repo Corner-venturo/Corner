@@ -3,6 +3,7 @@
  * 快取優先架構：Supabase（雲端）+ IndexedDB（快取）
  */
 
+import { getTodayString } from '@/lib/utils/format-date'
 import { User } from './types'
 import { createStore } from './core/create-store'
 import { TABLES } from '@/lib/db/schemas'
@@ -148,7 +149,7 @@ export const userStoreHelpers = {
     const newHistory = [
       ...user.salary_info.salary_history,
       {
-        effective_date: new Date().toISOString().split('T')[0],
+        effective_date: getTodayString(),
         base_salary: newSalary,
         reason,
       },

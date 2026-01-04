@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Tour, Payment } from '@/stores/types'
@@ -51,7 +53,7 @@ export function useTourPayments({
   // 代轉發票 Dialog 狀態
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
   const [invoiceOrderId, setInvoiceOrderId] = useState<string>('')
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0])
+  const [invoiceDate, setInvoiceDate] = useState(getTodayString())
   const [reportStatus, setReportStatus] = useState<'unreported' | 'reported'>('unreported')
   const [invoiceBuyer, setInvoiceBuyer] = useState<BuyerInfo>({
     buyerName: '',

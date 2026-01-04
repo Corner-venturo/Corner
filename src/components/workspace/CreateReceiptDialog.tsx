@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import { useState } from 'react'
 import { DollarSign, Calendar, X, Save } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -36,7 +38,7 @@ interface CreateReceiptDialogProps {
 export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateReceiptDialogProps) {
   const { create: createReceipt } = useReceiptOrderStore()
 
-  const [receiptDate, setReceiptDate] = useState(new Date().toISOString().split('T')[0])
+  const [receiptDate, setReceiptDate] = useState(getTodayString())
   const [paymentMethod, setPaymentMethod] = useState<'現金' | '匯款' | '刷卡' | '支票'>('匯款')
   const [amount, setAmount] = useState(order.gap.toString())
   const [note, setNote] = useState('')

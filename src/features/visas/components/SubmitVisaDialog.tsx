@@ -1,5 +1,7 @@
 'use client'
 
+import { getTodayString } from '@/lib/utils/format-date'
+
 import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
@@ -23,7 +25,7 @@ export function SubmitVisaDialog({
   onSubmitComplete,
 }: SubmitVisaDialogProps) {
   const [vendor, setVendor] = React.useState('')
-  const [submitDate, setSubmitDate] = React.useState(new Date().toISOString().split('T')[0])
+  const [submitDate, setSubmitDate] = React.useState(getTodayString())
   const [costs, setCosts] = React.useState<Record<string, number>>({})
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -62,7 +64,7 @@ export function SubmitVisaDialog({
   React.useEffect(() => {
     if (open) {
       setVendor('')
-      setSubmitDate(new Date().toISOString().split('T')[0])
+      setSubmitDate(getTodayString())
       setCosts({})
     }
   }, [open])

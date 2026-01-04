@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@/lib/utils/format-date'
+
 import { useState, useCallback } from 'react'
 import { FileSpreadsheet, Upload, X, Check, AlertCircle, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -173,7 +175,7 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
             if (excelDate > 0) {
               // Excel 日期序列數字轉換
               const date = new Date((excelDate - 25569) * 86400 * 1000)
-              value = date.toISOString().split('T')[0]
+              value = formatDate(date)
             }
           }
 
