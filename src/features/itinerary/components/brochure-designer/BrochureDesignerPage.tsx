@@ -15,6 +15,8 @@ import {
   Pencil,
   Layers,
   Sparkles,
+  MousePointer2,
+  Eye,
 } from 'lucide-react'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { useAuthStore } from '@/stores/auth-store'
@@ -39,6 +41,12 @@ import {
   type CanvasElement,
   type DecorationCategory,
 } from './canvas-editor'
+import {
+  BleedGuides,
+  GuideControls,
+  A5_WIDTH,
+  A5_HEIGHT,
+} from './canvas-editor/BleedGuides'
 import {
   generateBrochure,
   type GeneratedBrochure,
@@ -132,6 +140,14 @@ export function BrochureDesignerPage() {
   // 編輯模式
   const [editorMode, setEditorMode] = useState<EditorMode>('template')
   const [showLayerPanel, setShowLayerPanel] = useState(true)
+
+  // 參考線顯示狀態
+  const [showBleed, setShowBleed] = useState(true)
+  const [showSafety, setShowSafety] = useState(true)
+  const [showCenter, setShowCenter] = useState(true)
+
+  // 畫布編輯模式（預覽 vs 可拖曳編輯）
+  const [isCanvasEditMode, setIsCanvasEditMode] = useState(false)
 
   const { items: itineraries, isLoading, update } = useItineraries()
   const [coverData, setCoverData] = useState<BrochureCoverData>(DEFAULT_COVER_DATA)
@@ -569,96 +585,184 @@ export function BrochureDesignerPage() {
           sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]'
         )}
       >
-        {/* 頂部工具列 */}
-        <header className="flex items-center justify-between px-6 h-[72px] flex-shrink-0 relative">
+        {/* 頂部工具列 - 對齊側邊欄高度 */}
+        <header className="h-[72px] flex-shrink-0 relative bg-background">
+          {/* 底部分割線 - 對齊側邊欄 Logo 區的線 */}
           <div
             className="absolute bottom-0 left-0 right-0 pointer-events-none"
             style={{
-              marginLeft: '20px',
-              marginRight: '20px',
+              marginLeft: '24px',
+              marginRight: '24px',
               borderTop: '1px solid var(--border)',
               height: '1px',
             }}
           />
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={handleBack}>
-              <ArrowLeft size={20} />
-            </Button>
-            <div className="flex items-center gap-2">
-              <BookOpen size={20} className="text-morandi-gold" />
-              <h1 className="text-lg font-bold text-morandi-primary">手冊設計</h1>
-            </div>
 
-            {/* 模式切換 */}
-            <div className="ml-4 flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-              <button
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
-                  editorMode === 'template'
-                    ? 'bg-white text-morandi-primary shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                )}
-                onClick={() => setEditorMode('template')}
-              >
-                <LayoutTemplate size={14} />
-                模板模式
-              </button>
-              <button
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
-                  editorMode === 'canvas'
-                    ? 'bg-white text-morandi-primary shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                )}
-                onClick={() => setEditorMode('canvas')}
-              >
-                <Pencil size={14} />
-                自由編輯
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* 一鍵生成按鈕 */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleGenerateBrochure}
-              disabled={isGenerating || !currentItinerary}
-              className="gap-1.5 border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
-            >
-              {isGenerating ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Sparkles size={16} />
-              )}
-              一鍵生成
-            </Button>
-
-            {editorMode === 'canvas' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(showLayerPanel && 'bg-slate-100')}
-                onClick={() => setShowLayerPanel(!showLayerPanel)}
-                title="圖層面板"
-              >
-                <Layers size={18} />
+          <div className="h-full flex items-center justify-between px-6">
+            {/* 左側：返回 + 標題 */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Button variant="ghost" size="icon" onClick={handleBack}>
+                <ArrowLeft size={20} />
               </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
-              <FileDown size={16} />
-              匯出手冊
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving || !hasChanges}
-              className="gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            >
-              {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              儲存
-            </Button>
+              <div className="flex items-center gap-2">
+                <BookOpen size={20} className="text-morandi-gold" />
+                <h1 className="text-lg font-bold text-morandi-primary">手冊設計</h1>
+              </div>
+            </div>
+
+            {/* 中間：頁面切換器 */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              {generatedBrochure && editorMode === 'canvas' ? (
+                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full"
+                    onClick={() => handleGeneratedPageChange(currentPageIndex - 1)}
+                    disabled={currentPageIndex === 0}
+                  >
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[400px] scrollbar-hide px-1">
+                    {generatedBrochure.pages.map((page, index) => (
+                      <button
+                        key={page.id}
+                        data-index={index}
+                        onClick={() => handleGeneratedPageChange(index)}
+                        className={cn(
+                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
+                          currentPageIndex === index
+                            ? 'bg-white text-morandi-primary shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {page.name}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full"
+                    onClick={() => handleGeneratedPageChange(currentPageIndex + 1)}
+                    disabled={currentPageIndex === generatedBrochure.pages.length - 1}
+                  >
+                    <ChevronRight size={14} />
+                  </Button>
+                  <span className="ml-2 px-2 py-0.5 bg-morandi-gold/10 text-morandi-gold text-[10px] font-medium rounded">
+                    {generatedBrochure.theme.name}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToPrev} disabled={currentPageIndex === 0}>
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[400px] scrollbar-hide px-1">
+                    {allPages.map((page, index) => (
+                      <button
+                        key={page.type}
+                        data-index={index}
+                        onClick={() => setCurrentPageIndex(index)}
+                        className={cn(
+                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
+                          currentPageIndex === index
+                            ? 'bg-white text-morandi-primary shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {index + 1}. {page.label}
+                      </button>
+                    ))}
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToNext} disabled={currentPageIndex === allPages.length - 1}>
+                    <ChevronRight size={14} />
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* 右側：操作按鈕 */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* 模式切換 */}
+              <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 mr-2">
+                <button
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
+                    editorMode === 'template'
+                      ? 'bg-white text-morandi-primary shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  )}
+                  onClick={() => setEditorMode('template')}
+                >
+                  <LayoutTemplate size={14} />
+                  模板
+                </button>
+                <button
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
+                    editorMode === 'canvas'
+                      ? 'bg-white text-morandi-primary shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  )}
+                  onClick={() => setEditorMode('canvas')}
+                >
+                  <Pencil size={14} />
+                  編輯
+                </button>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateBrochure}
+                disabled={isGenerating || !currentItinerary}
+                className="gap-1.5 border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
+              >
+                {isGenerating ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Sparkles size={16} />
+                )}
+                一鍵生成
+              </Button>
+
+              {/* 參考線控制 */}
+              <div className="h-6 w-px bg-border mx-1" />
+              <GuideControls
+                showBleed={showBleed}
+                showSafety={showSafety}
+                showCenter={showCenter}
+                onToggleBleed={() => setShowBleed(!showBleed)}
+                onToggleSafety={() => setShowSafety(!showSafety)}
+                onToggleCenter={() => setShowCenter(!showCenter)}
+              />
+
+              {editorMode === 'canvas' && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(showLayerPanel && 'bg-slate-100')}
+                  onClick={() => setShowLayerPanel(!showLayerPanel)}
+                  title="圖層面板"
+                >
+                  <Layers size={18} />
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
+                <FileDown size={16} />
+                匯出
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={isSaving || !hasChanges}
+                className="gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              >
+                {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                儲存
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -701,81 +805,7 @@ export function BrochureDesignerPage() {
           </aside>
 
           {/* 中間預覽/編輯區 */}
-          <section className="flex-1 bg-white rounded-xl border border-border flex flex-col overflow-hidden shadow-sm">
-            {/* 頁面選擇器 */}
-            <div className="flex items-center justify-center px-5 py-3 border-b border-border flex-shrink-0">
-              {/* 生成的手冊頁面選擇器 */}
-              {generatedBrochure && editorMode === 'canvas' ? (
-                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 rounded-full"
-                    onClick={() => handleGeneratedPageChange(currentPageIndex - 1)}
-                    disabled={currentPageIndex === 0}
-                  >
-                    <ChevronLeft size={14} />
-                  </Button>
-                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[500px] scrollbar-hide px-1">
-                    {generatedBrochure.pages.map((page, index) => (
-                      <button
-                        key={page.id}
-                        data-index={index}
-                        onClick={() => handleGeneratedPageChange(index)}
-                        className={cn(
-                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
-                          currentPageIndex === index
-                            ? 'bg-white text-morandi-primary shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
-                        )}
-                      >
-                        {page.name}
-                      </button>
-                    ))}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 rounded-full"
-                    onClick={() => handleGeneratedPageChange(currentPageIndex + 1)}
-                    disabled={currentPageIndex === generatedBrochure.pages.length - 1}
-                  >
-                    <ChevronRight size={14} />
-                  </Button>
-                  <span className="ml-2 px-2 py-0.5 bg-morandi-gold/10 text-morandi-gold text-[10px] font-medium rounded">
-                    {generatedBrochure.theme.name}
-                  </span>
-                </div>
-              ) : (
-                /* 模板模式頁面選擇器 */
-                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
-                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToPrev} disabled={currentPageIndex === 0}>
-                    <ChevronLeft size={14} />
-                  </Button>
-                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[450px] scrollbar-hide px-1">
-                    {allPages.map((page, index) => (
-                      <button
-                        key={page.type}
-                        data-index={index}
-                        onClick={() => setCurrentPageIndex(index)}
-                        className={cn(
-                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
-                          currentPageIndex === index
-                            ? 'bg-white text-morandi-primary shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
-                        )}
-                      >
-                        {index + 1}. {page.label}
-                      </button>
-                    ))}
-                  </div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToNext} disabled={currentPageIndex === allPages.length - 1}>
-                    <ChevronRight size={14} />
-                  </Button>
-                </div>
-              )}
-            </div>
-
+          <section className="flex-1 bg-white rounded-xl border-2 border-border flex flex-col overflow-hidden shadow-md">
             {/* 預覽/編輯區內容 */}
             {editorMode === 'template' ? (
               // 模板模式 - 原有預覽
@@ -789,12 +819,19 @@ export function BrochureDesignerPage() {
                 />
 
                 <div
-                  className="relative shadow-lg bg-white overflow-hidden flex-shrink-0"
+                  className="relative shadow-lg bg-white flex-shrink-0"
                   style={{
                     width: 'min(420px, calc(100vh - 200px) / 1.414)',
                     aspectRatio: '1 / 1.414',
+                    overflow: 'visible',
                   }}
                 >
+                  {/* 出血線和參考線 */}
+                  <BleedGuides
+                    showBleed={showBleed}
+                    showSafety={showSafety}
+                    showCenter={showCenter}
+                  />
                   {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
 
                   {currentPage?.type === 'blank' && (
@@ -865,17 +902,59 @@ export function BrochureDesignerPage() {
             ) : (
               // Canvas 編輯模式
               <div className="flex-1 relative overflow-auto bg-slate-50 flex items-center justify-center p-6">
+                {/* 編輯模式切換按鈕 */}
+                {generatedBrochure && (
+                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm border border-border">
+                    <button
+                      className={cn(
+                        'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all',
+                        !isCanvasEditMode
+                          ? 'bg-morandi-gold text-white shadow-sm'
+                          : 'text-slate-500 hover:bg-slate-100'
+                      )}
+                      onClick={() => setIsCanvasEditMode(false)}
+                      title="預覽模式"
+                    >
+                      <Eye size={14} />
+                      預覽
+                    </button>
+                    <button
+                      className={cn(
+                        'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all',
+                        isCanvasEditMode
+                          ? 'bg-morandi-gold text-white shadow-sm'
+                          : 'text-slate-500 hover:bg-slate-100'
+                      )}
+                      onClick={() => setIsCanvasEditMode(true)}
+                      title="拖曳編輯模式 - 可使用智慧對齊參考線"
+                    >
+                      <MousePointer2 size={14} />
+                      編輯
+                    </button>
+                  </div>
+                )}
+
                 {/* 生成的手冊預覽 */}
-                {generatedBrochure && canvasElements.length > 0 ? (
+                {generatedBrochure && canvasElements.length > 0 && !isCanvasEditMode ? (
                   <div
-                    className="relative bg-white shadow-lg overflow-hidden flex-shrink-0"
+                    className="relative bg-white shadow-lg flex-shrink-0"
                     style={{
                       width: '559px',
                       height: '794px',
                       transform: 'scale(0.75)',
                       transformOrigin: 'center center',
+                      overflow: 'visible',
                     }}
                   >
+                    {/* 出血線和參考線 */}
+                    <BleedGuides
+                      width={559}
+                      height={794}
+                      showBleed={showBleed}
+                      showSafety={showSafety}
+                      showCenter={showCenter}
+                      zoom={1}
+                    />
                     {/* 渲染生成的元素 */}
                     {canvasElements.map((element) => {
                       if (element.type === 'shape') {
@@ -967,13 +1046,23 @@ export function BrochureDesignerPage() {
                     />
 
                     {/* Canvas 模式提示 */}
-                    {elements.length === 0 && !generatedBrochure && (
+                    {elements.length === 0 && !generatedBrochure && !isCanvasEditMode && (
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="text-center">
                           <Sparkles size={48} className="mx-auto text-morandi-gold/30 mb-3" />
                           <p className="text-morandi-secondary text-sm">點擊「一鍵生成」自動生成手冊</p>
                           <p className="text-morandi-secondary/60 text-xs mt-1">或從左側元素庫手動添加元素</p>
                         </div>
+                      </div>
+                    )}
+
+                    {/* 編輯模式提示 */}
+                    {isCanvasEditMode && (
+                      <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm border border-border">
+                        <p className="text-xs text-morandi-secondary">
+                          <MousePointer2 size={12} className="inline mr-1" />
+                          拖曳元素時會自動顯示對齊參考線
+                        </p>
                       </div>
                     )}
                   </>
