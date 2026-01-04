@@ -51,6 +51,7 @@ import {
   type GeneratedPage,
   type GeneratorOptions,
 } from './templates/brochure-generator'
+import { pageToElements } from './utils/templateToElements'
 import { ALL_THEMES, type BrochureTheme } from './templates/themes'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
@@ -518,25 +519,29 @@ export function BrochureDesignerPage() {
     }
   }, [generatedBrochure])
 
-  // 當頁面索引變化時，同步更新 canvas 元素（確保編輯模式顯示正確的頁面）
+  // 當切換到編輯模式或頁面變更時，自動將模板轉換為 Canvas 元素
   useEffect(() => {
-    if (!generatedBrochure) return
-    const page = generatedBrochure.pages[currentPageIndex]
-    if (page) {
-      setCanvasElements(page.elements)
-    }
-  }, [currentPageIndex, generatedBrochure])
+    if (editorMode !== 'canvas') return
+    if (!currentPage) return
 
-  // 當切換到編輯模式或元素變更時，載入元素到 Fabric.js 畫布
-  useEffect(() => {
-    if (editorMode === 'canvas' && canvasElements.length > 0) {
+    // 根據當前頁面類型生成對應的 Canvas 元素
+    const elements = pageToElements(currentPage.type, {
+      coverData,
+      itinerary: currentItinerary,
+      dayIndex: currentPage.dayIndex,
+      day: currentPage.dayIndex !== undefined ? dailyItinerary[currentPage.dayIndex] : undefined,
+      accommodations,
+    })
+
+    if (elements.length > 0) {
+      setCanvasElements(elements)
       // 稍微延遲以確保 canvas 已初始化
       const timer = setTimeout(() => {
-        loadElements(canvasElements)
-      }, 100)
+        loadElements(elements)
+      }, 150)
       return () => clearTimeout(timer)
     }
-  }, [editorMode, canvasElements, loadElements])
+  }, [editorMode, currentPage, currentPageIndex, coverData, currentItinerary, dailyItinerary, accommodations, loadElements])
 
   // 圖層操作
   const handleLayerSelect = useCallback((id: string) => {
