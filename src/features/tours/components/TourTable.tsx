@@ -1,33 +1,17 @@
 'use client'
 
-import React, { useCallback, Dispatch, SetStateAction } from 'react'
+import React from 'react'
 import { MapPin } from 'lucide-react'
-import { Tour, Order } from '@/stores/types'
+import { Tour } from '@/stores/types'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { TourMobileCard } from './TourMobileCard'
-import { TourExpandedView } from './TourExpandedView'
 import { useTourTableColumns } from './TourTableColumns'
-import { TourExtraFields } from '../types'
 
 interface TourTableProps {
   tours: Tour[]
   loading: boolean
-  orders: Order[]
-  expandedRows: string[]
-  activeTabs: Record<string, string>
-  tourExtraFields: Record<string, TourExtraFields>
-  triggerAddOnAdd: Record<string, boolean>
-  triggerPaymentAdd: Record<string, boolean>
-  triggerCostAdd: Record<string, boolean>
   onSort: (field: string, order: 'asc' | 'desc') => void
-  onExpand: (id: string) => void
   onRowClick: (row: unknown) => void
-  onActiveTabChange: (tourId: string, tab: string) => void
-  onTourExtraFieldsChange: Dispatch<SetStateAction<Record<string, TourExtraFields>>>
-  onTriggerAddOnAdd: Dispatch<SetStateAction<Record<string, boolean>>>
-  onTriggerPaymentAdd: Dispatch<SetStateAction<Record<string, boolean>>>
-  onTriggerCostAdd: Dispatch<SetStateAction<Record<string, boolean>>>
-  openDialog: (type: string, data?: Tour) => void
   renderActions: (row: unknown) => React.ReactNode
   getStatusColor: (status: string) => string
 }
@@ -35,63 +19,12 @@ interface TourTableProps {
 export const TourTable: React.FC<TourTableProps> = ({
   tours,
   loading,
-  orders,
-  expandedRows,
-  activeTabs,
-  tourExtraFields,
-  triggerAddOnAdd,
-  triggerPaymentAdd,
-  triggerCostAdd,
   onSort,
-  onExpand,
   onRowClick,
-  onActiveTabChange,
-  onTourExtraFieldsChange,
-  onTriggerAddOnAdd,
-  onTriggerPaymentAdd,
-  onTriggerCostAdd,
-  openDialog,
   renderActions,
   getStatusColor,
 }) => {
   const columns = useTourTableColumns({ getStatusColor })
-
-  const renderExpanded = useCallback(
-    (row: unknown) => {
-      const tour = row as Tour
-      return (
-        <TourExpandedView
-          tour={tour}
-          orders={orders}
-          activeTabs={activeTabs}
-          setActiveTab={onActiveTabChange}
-          openDialog={openDialog}
-          tourExtraFields={tourExtraFields}
-          setTourExtraFields={onTourExtraFieldsChange}
-          triggerAddOnAdd={triggerAddOnAdd}
-          setTriggerAddOnAdd={onTriggerAddOnAdd}
-          triggerPaymentAdd={triggerPaymentAdd}
-          setTriggerPaymentAdd={onTriggerPaymentAdd}
-          triggerCostAdd={triggerCostAdd}
-          setTriggerCostAdd={onTriggerCostAdd}
-        />
-      )
-    },
-    [
-      orders,
-      activeTabs,
-      onActiveTabChange,
-      openDialog,
-      tourExtraFields,
-      onTourExtraFieldsChange,
-      triggerAddOnAdd,
-      onTriggerAddOnAdd,
-      triggerPaymentAdd,
-      onTriggerPaymentAdd,
-      triggerCostAdd,
-      onTriggerCostAdd,
-    ]
-  )
 
   return (
     <>
@@ -102,11 +35,6 @@ export const TourTable: React.FC<TourTableProps> = ({
           data={tours}
           loading={loading}
           onSort={onSort}
-          expandable={{
-            expanded: expandedRows,
-            onExpand,
-            renderExpanded,
-          }}
           actions={renderActions}
           onRowClick={onRowClick}
           bordered={true}

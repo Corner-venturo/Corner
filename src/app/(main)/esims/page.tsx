@@ -129,7 +129,7 @@ export default function EsimsPage() {
       key: 'status',
       label: '狀態',
       render: (_: unknown, row: Esim) => (
-        <StatusCell type="order" status={row.status?.toString() || '0'} />
+        <StatusCell type="esim" status={row.status?.toString() || '0'} />
       ),
     },
     {

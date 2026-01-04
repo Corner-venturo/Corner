@@ -7,7 +7,11 @@ import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { getAllTodos } from '@/lib/data/todos'
 import type { Todo } from '@/stores/types'
+import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
+
+// Supabase Insert 類型
+type TodoInsert = Database['public']['Tables']['todos']['Insert']
 
 // SWR key
 const TODOS_KEY = 'todos'
@@ -108,8 +112,20 @@ export function useTodos() {
     mutate(TODOS_KEY, (currentTodos: Todo[] | undefined) => [...(currentTodos || []), newTodo], false)
 
     try {
-       
-      const { error } = await supabase.from('todos').insert(newTodo as any)
+      // 確保 workspace_id 存在（Supabase 必填欄位）
+      if (!workspace_id) {
+        throw new Error('無法取得 workspace_id，請重新登入')
+      }
+
+      // 轉換為 Supabase Insert 類型（Json 欄位需要轉型）
+      const insertData: TodoInsert = {
+        ...newTodo,
+        workspace_id,
+        related_items: newTodo.related_items as unknown as TodoInsert['related_items'],
+        sub_tasks: newTodo.sub_tasks as unknown as TodoInsert['sub_tasks'],
+        notes: newTodo.notes as unknown as TodoInsert['notes'],
+      }
+      const { error } = await supabase.from('todos').insert(insertData)
       if (error) throw error
 
       // 成功後重新驗證

@@ -3,8 +3,23 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Save, FileDown, Loader2, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  ArrowLeft,
+  Save,
+  FileDown,
+  Loader2,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  LayoutTemplate,
+  Pencil,
+  Layers,
+  Sparkles,
+} from 'lucide-react'
 import { useItineraries } from '@/hooks/cloud-hooks'
+import { useAuthStore } from '@/stores/auth-store'
+import { MobileHeader } from '@/components/layout/mobile-header'
+import { MobileSidebar } from '@/components/layout/mobile-sidebar'
 import { BrochureSidebar } from './BrochureSidebar'
 import { BrochureCoverPreview } from './BrochureCoverPreview'
 import { BrochureTableOfContents } from './BrochureTableOfContents'
@@ -12,15 +27,35 @@ import { BrochureOverviewLeft } from './BrochureOverviewLeft'
 import { BrochureOverviewRight } from './BrochureOverviewRight'
 import { BrochureDailyLeft } from './BrochureDailyLeft'
 import { BrochureDailyRight } from './BrochureDailyRight'
-import { BrochureAccommodation, extractAccommodations } from './BrochureAccommodation'
+import { BrochureAccommodationLeft, extractAccommodations } from './BrochureAccommodationLeft'
+import { BrochureAccommodationRight } from './BrochureAccommodationRight'
 import { DEFAULT_COVER_DATA, type BrochureCoverData } from './types'
+import {
+  CanvasEditor,
+  ElementLibrary,
+  LayerPanel,
+  Toolbar,
+  useCanvasEditor,
+  type CanvasElement,
+  type DecorationCategory,
+} from './canvas-editor'
+import {
+  generateBrochure,
+  type GeneratedBrochure,
+  type GeneratedPage,
+  type GeneratorOptions,
+} from './templates/brochure-generator'
+import { ALL_THEMES, type BrochureTheme } from './templates/themes'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { Itinerary } from '@/stores/types'
 
+// 編輯模式
+type EditorMode = 'template' | 'canvas'
+
 // 頁面類型（基本頁面 + 動態每日頁面）
-type BasePageType = 'cover' | 'blank' | 'contents' | 'overview-left' | 'overview-right' | 'accommodation'
+type BasePageType = 'cover' | 'blank' | 'contents' | 'overview-left' | 'overview-right' | 'accommodation-left' | 'accommodation-right'
 type DailyPageType = `day-${number}-left` | `day-${number}-right`
 type PageType = BasePageType | DailyPageType
 
@@ -42,7 +77,8 @@ const BASE_PAGES: PageConfig[] = [
 
 // 結尾頁面配置
 const END_PAGES: PageConfig[] = [
-  { type: 'accommodation', label: '住宿' },
+  { type: 'accommodation-left', label: '住宿(左)' },
+  { type: 'accommodation-right', label: '住宿(右)' },
 ]
 
 // 清除 HTML 標籤
@@ -90,6 +126,12 @@ export function BrochureDesignerPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const itineraryId = searchParams.get('id')
+  const { sidebarCollapsed } = useAuthStore()
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  // 編輯模式
+  const [editorMode, setEditorMode] = useState<EditorMode>('template')
+  const [showLayerPanel, setShowLayerPanel] = useState(true)
 
   const { items: itineraries, isLoading, update } = useItineraries()
   const [coverData, setCoverData] = useState<BrochureCoverData>(DEFAULT_COVER_DATA)
@@ -97,10 +139,50 @@ export function BrochureDesignerPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Canvas Editor 狀態
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
+  const [canvasElements, setCanvasElements] = useState<CanvasElement[]>([])
+
+  // 一鍵生成狀態
+  const [generatedBrochure, setGeneratedBrochure] = useState<GeneratedBrochure | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null)
+
   const coverRef = useRef<HTMLDivElement>(null)
   const contentsRef = useRef<HTMLDivElement>(null)
   const overviewLeftRef = useRef<HTMLDivElement>(null)
   const overviewRightRef = useRef<HTMLDivElement>(null)
+  const tabsContainerRef = useRef<HTMLDivElement>(null)
+
+  // Canvas Editor Hook
+  const {
+    editorState,
+    elements,
+    snapGuides,
+    overlaps,
+    canvasWidth,
+    canvasHeight,
+    setEditorState,
+    addTextElement,
+    addRectangle,
+    addCircle,
+    addImage,
+    deleteSelected,
+    bringToFront,
+    sendToBack,
+    setZoom,
+    clearCanvas,
+  } = useCanvasEditor({
+    containerRef: canvasContainerRef,
+    onElementSelect: setSelectedElementId,
+    onElementChange: (el) => {
+      setCanvasElements((prev) =>
+        prev.map((e) => (e.id === el.id ? el : e))
+      )
+      setHasChanges(true)
+    },
+  })
 
   // 取得當前行程表
   const currentItinerary = itineraries.find((i) => i.id === itineraryId) || null
@@ -139,6 +221,15 @@ export function BrochureDesignerPage() {
 
   const currentPage = allPages[currentPageIndex] || allPages[0]
 
+  // 自動捲動 tabs 到當前選中的頁面
+  useEffect(() => {
+    if (!tabsContainerRef.current) return
+    const activeTab = tabsContainerRef.current.querySelector(`[data-index="${currentPageIndex}"]`)
+    if (activeTab) {
+      activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+  }, [currentPageIndex])
+
   // 載入行程表資料
   useEffect(() => {
     if (!itineraryId || isLoading) return
@@ -154,6 +245,13 @@ export function BrochureDesignerPage() {
     setHasChanges(true)
   }, [])
 
+  // 更新行程表資料
+  const handleItineraryChange = useCallback((changes: Partial<Itinerary>) => {
+    if (!itineraryId || !currentItinerary) return
+    update(itineraryId, changes)
+    setHasChanges(true)
+  }, [itineraryId, currentItinerary, update])
+
   // 儲存到行程表
   const handleSave = async () => {
     if (!itineraryId) return
@@ -167,9 +265,9 @@ export function BrochureDesignerPage() {
         leader: { domesticPhone: coverData.emergencyContact },
       } as Partial<Itinerary>)
       setHasChanges(false)
-      toast.success('封面設定已儲存')
+      toast.success('手冊設定已儲存')
     } catch (error) {
-      logger.error('儲存封面設定失敗:', error)
+      logger.error('儲存手冊設定失敗:', error)
       toast.error('儲存失敗，請稍後再試')
     } finally {
       setIsSaving(false)
@@ -211,21 +309,9 @@ export function BrochureDesignerPage() {
             }
             .page:last-child { page-break-after: auto; }
 
-            /* 空白頁 */
-            .blank-page {
-              background: white;
-            }
+            .blank-page { background: white; }
 
-            /* 封面樣式 */
-            .cover-page > div {
-              width: 100% !important;
-              height: 100% !important;
-              max-width: none !important;
-              aspect-ratio: unset !important;
-            }
-
-            /* 目錄樣式 */
-            .contents-page > div {
+            .cover-page > div, .contents-page > div {
               width: 100% !important;
               height: 100% !important;
               max-width: none !important;
@@ -236,7 +322,6 @@ export function BrochureDesignerPage() {
               body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             }
 
-            /* 預覽模式 */
             @media screen {
               body {
                 background: #e5e7eb;
@@ -254,38 +339,18 @@ export function BrochureDesignerPage() {
           </style>
         </head>
         <body>
-          <!-- 第 1 頁：封面 -->
-          <div class="page cover-page">
-            ${coverHtml}
-          </div>
-
-          <!-- 第 2 頁：空白（封面背面） -->
+          <div class="page cover-page">${coverHtml}</div>
           <div class="page blank-page"></div>
-
-          <!-- 第 3 頁：目錄 -->
-          <div class="page contents-page">
-            ${contentsHtml}
-          </div>
-
-          <!-- 第 4 頁：總攬左（航班/集合/領隊） -->
-          <div class="page overview-page">
-            ${overviewLeftHtml}
-          </div>
-
-          <!-- 第 5 頁：總攬右（每日行程） -->
-          <div class="page overview-page">
-            ${overviewRightHtml}
-          </div>
+          <div class="page contents-page">${contentsHtml}</div>
+          <div class="page overview-page">${overviewLeftHtml}</div>
+          <div class="page overview-page">${overviewRightHtml}</div>
         </body>
       </html>
     `)
 
     printWindow.document.close()
     printWindow.focus()
-
-    setTimeout(() => {
-      printWindow.print()
-    }, 500)
+    setTimeout(() => printWindow.print(), 500)
   }
 
   // 頁面切換
@@ -305,6 +370,157 @@ export function BrochureDesignerPage() {
     router.back()
   }
 
+  // Canvas 元素操作
+  const handleAddText = useCallback(() => {
+    addTextElement('新增文字', 100, 100)
+  }, [addTextElement])
+
+  const handleAddRectangle = useCallback(() => {
+    addRectangle(100, 100, 150, 100)
+  }, [addRectangle])
+
+  const handleAddCircle = useCallback(() => {
+    addCircle(150, 150, 50)
+  }, [addCircle])
+
+  const handleAddTriangle = useCallback(() => {
+    // 暫時用矩形代替
+    addRectangle(100, 100, 100, 100)
+  }, [addRectangle])
+
+  const handleAddLine = useCallback(() => {
+    addRectangle(100, 200, 200, 2)
+  }, [addRectangle])
+
+  const handleAddImageClick = useCallback(async () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const url = URL.createObjectURL(file)
+      await addImage(url, 100, 100, 300, 200)
+    }
+    input.click()
+  }, [addImage])
+
+  const handleAddDecoration = useCallback((category: DecorationCategory, assetId: string) => {
+    // 暫時用矩形代替裝飾
+    addRectangle(100, 100, 60, 60)
+    toast.info(`已添加 ${category} 裝飾`)
+  }, [addRectangle])
+
+  const handleAddSpotCard = useCallback(() => {
+    // 添加景點卡片組合
+    addRectangle(50, 50, 200, 250)
+    addTextElement('景點名稱', 60, 220)
+  }, [addRectangle, addTextElement])
+
+  const handleAddItineraryItem = useCallback(() => {
+    addRectangle(50, 50, 300, 80)
+    addTextElement('Day 1 - 行程項目', 60, 70)
+  }, [addRectangle, addTextElement])
+
+  const handleAddFlightInfo = useCallback(() => {
+    addRectangle(50, 50, 250, 100)
+    addTextElement('航班資訊', 60, 80)
+  }, [addRectangle, addTextElement])
+
+  const handleAddAccommodationCard = useCallback(() => {
+    addRectangle(50, 50, 200, 150)
+    addTextElement('飯店名稱', 60, 170)
+  }, [addRectangle, addTextElement])
+
+  const handleAddDayHeader = useCallback(() => {
+    addRectangle(50, 50, 300, 60)
+    addTextElement('Day 1', 60, 70)
+  }, [addRectangle, addTextElement])
+
+  const handleUploadAsset = useCallback(() => {
+    toast.info('素材上傳功能即將推出')
+  }, [])
+
+  // 一鍵生成手冊
+  const handleGenerateBrochure = useCallback(async () => {
+    if (!currentItinerary) {
+      toast.error('請先選擇行程表')
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      const options: GeneratorOptions = {
+        themeId: selectedThemeId || undefined,
+        companyName: '角落旅行社',
+      }
+
+      const brochure = generateBrochure(currentItinerary, options)
+      setGeneratedBrochure(brochure)
+      setCurrentPageIndex(0)
+
+      // 載入第一頁的元素到 canvas
+      if (brochure.pages.length > 0) {
+        setCanvasElements(brochure.pages[0].elements)
+      }
+
+      // 切換到 canvas 模式
+      setEditorMode('canvas')
+      setHasChanges(true)
+      toast.success(`已生成 ${brochure.pages.length} 頁手冊，可開始微調編輯`)
+    } catch (error) {
+      logger.error('生成手冊失敗:', error)
+      toast.error('生成失敗，請稍後再試')
+    } finally {
+      setIsGenerating(false)
+    }
+  }, [currentItinerary, selectedThemeId])
+
+  // 切換生成的手冊頁面
+  const handleGeneratedPageChange = useCallback((pageIndex: number) => {
+    if (!generatedBrochure) return
+    const page = generatedBrochure.pages[pageIndex]
+    if (page) {
+      setCurrentPageIndex(pageIndex)
+      setCanvasElements(page.elements)
+    }
+  }, [generatedBrochure])
+
+  // 圖層操作
+  const handleLayerSelect = useCallback((id: string) => {
+    setSelectedElementId(id)
+  }, [])
+
+  const handleLayerMultiSelect = useCallback((ids: string[]) => {
+    setEditorState((prev) => ({ ...prev, selectedIds: ids }))
+  }, [setEditorState])
+
+  const handleToggleVisibility = useCallback((id: string) => {
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, visible: !el.visible } : el))
+    )
+  }, [])
+
+  const handleToggleLock = useCallback((id: string) => {
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, locked: !el.locked } : el))
+    )
+  }, [])
+
+  const handleDeleteElement = useCallback((id: string) => {
+    deleteSelected()
+  }, [deleteSelected])
+
+  const handleDuplicateElement = useCallback((id: string) => {
+    toast.info('複製功能即將推出')
+  }, [])
+
+  const handleRenameElement = useCallback((id: string, newName: string) => {
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, name: newName } : el))
+    )
+  }, [])
+
   if (!itineraryId) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -314,150 +530,458 @@ export function BrochureDesignerPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-morandi-background">
-      {/* 頂部工具列 */}
-      <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-border">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft size={20} />
-          </Button>
-          <div className="flex items-center gap-2">
-            <BookOpen size={20} className="text-morandi-gold" />
-            <h1 className="text-lg font-bold text-morandi-primary">手冊設計</h1>
-          </div>
-        </div>
+    <>
+      {/* 手機版頂部標題列 */}
+      <MobileHeader onMenuClick={() => setMobileSidebarOpen(true)} />
+      <MobileSidebar
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
-            <FileDown size={16} />
-            匯出手冊
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={isSaving || !hasChanges}
-            className="gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            儲存
-          </Button>
-        </div>
-      </header>
-
-      {/* 主要內容區 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 左側編輯面板 */}
-        <aside className="w-[380px] bg-white border-r border-border overflow-y-auto">
-          <BrochureSidebar data={coverData} onChange={handleChange} />
-        </aside>
-
-        {/* 右側預覽區 */}
-        <main className="flex-1 bg-slate-100 flex flex-col overflow-hidden">
-          {/* 頁面選擇器 */}
-          <div className="flex items-center justify-center gap-2 py-3 bg-white border-b border-border overflow-x-auto">
-            <Button variant="ghost" size="icon" onClick={goToPrev} disabled={currentPageIndex === 0}>
-              <ChevronLeft size={18} />
+      {/* 主內容區域 */}
+      <main
+        className={cn(
+          'fixed right-0 bottom-0 overflow-hidden flex flex-col bg-morandi-background',
+          'top-14 left-0',
+          'lg:top-0',
+          sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]'
+        )}
+      >
+        {/* 頂部工具列 */}
+        <header className="flex items-center justify-between px-6 h-[72px] flex-shrink-0 relative">
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+            style={{
+              marginLeft: '20px',
+              marginRight: '20px',
+              borderTop: '1px solid var(--border)',
+              height: '1px',
+            }}
+          />
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={handleBack}>
+              <ArrowLeft size={20} />
             </Button>
-            <div className="flex gap-1 flex-wrap justify-center max-w-[600px]">
-              {allPages.map((page, index) => (
-                <button
-                  key={page.type}
-                  onClick={() => setCurrentPageIndex(index)}
-                  className={cn(
-                    'px-2 py-1 text-[10px] font-medium rounded transition-colors whitespace-nowrap',
-                    currentPageIndex === index
-                      ? 'bg-morandi-gold text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  )}
-                >
-                  {index + 1}. {page.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <BookOpen size={20} className="text-morandi-gold" />
+              <h1 className="text-lg font-bold text-morandi-primary">手冊設計</h1>
             </div>
-            <Button variant="ghost" size="icon" onClick={goToNext} disabled={currentPageIndex === allPages.length - 1}>
-              <ChevronRight size={18} />
-            </Button>
+
+            {/* 模式切換 */}
+            <div className="ml-4 flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+              <button
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  editorMode === 'template'
+                    ? 'bg-white text-morandi-primary shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                )}
+                onClick={() => setEditorMode('template')}
+              >
+                <LayoutTemplate size={14} />
+                模板模式
+              </button>
+              <button
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  editorMode === 'canvas'
+                    ? 'bg-white text-morandi-primary shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                )}
+                onClick={() => setEditorMode('canvas')}
+              >
+                <Pencil size={14} />
+                自由編輯
+              </button>
+            </div>
           </div>
 
-          {/* 預覽區 */}
-          <div className="flex-1 flex items-center justify-center p-8 overflow-auto relative">
-            {/* 背景網格 */}
-            <div
-              className="absolute inset-0 opacity-[0.03]"
-              style={{
-                backgroundImage: 'radial-gradient(#888 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
-              }}
-            />
+          <div className="flex items-center gap-2">
+            {/* 一鍵生成按鈕 */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateBrochure}
+              disabled={isGenerating || !currentItinerary}
+              className="gap-1.5 border-morandi-gold text-morandi-gold hover:bg-morandi-gold hover:text-white"
+            >
+              {isGenerating ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )}
+              一鍵生成
+            </Button>
 
-            {/* 頁面預覽 */}
-            <div className="relative shadow-2xl">
-              {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
+            {editorMode === 'canvas' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(showLayerPanel && 'bg-slate-100')}
+                onClick={() => setShowLayerPanel(!showLayerPanel)}
+                title="圖層面板"
+              >
+                <Layers size={18} />
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
+              <FileDown size={16} />
+              匯出手冊
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving || !hasChanges}
+              className="gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              儲存
+            </Button>
+          </div>
+        </header>
 
-              {currentPage?.type === 'blank' && (
-                <div
-                  className="bg-white flex items-center justify-center"
-                  style={{ width: '420px', aspectRatio: '1 / 1.414' }}
-                >
-                  <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
+        {/* 主要內容區 */}
+        <div className="flex-1 flex gap-5 p-5 bg-morandi-background overflow-hidden">
+          {/* 左側面板 */}
+          <aside className="w-[280px] bg-white rounded-xl border border-border flex flex-col overflow-hidden shadow-sm">
+            {editorMode === 'template' ? (
+              <>
+                <div className="px-5 py-4 bg-morandi-primary/90 text-white flex-shrink-0 rounded-t-xl">
+                  <h2 className="text-base font-semibold">編輯手冊</h2>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  <BrochureSidebar
+                    data={coverData}
+                    onChange={handleChange}
+                    currentPageType={currentPage?.type}
+                    itinerary={currentItinerary}
+                    onItineraryChange={handleItineraryChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <ElementLibrary
+                onAddText={handleAddText}
+                onAddRectangle={handleAddRectangle}
+                onAddCircle={handleAddCircle}
+                onAddTriangle={handleAddTriangle}
+                onAddLine={handleAddLine}
+                onAddImage={handleAddImageClick}
+                onAddDecoration={handleAddDecoration}
+                onAddSpotCard={handleAddSpotCard}
+                onAddItineraryItem={handleAddItineraryItem}
+                onAddFlightInfo={handleAddFlightInfo}
+                onAddAccommodationCard={handleAddAccommodationCard}
+                onAddDayHeader={handleAddDayHeader}
+                onUploadAsset={handleUploadAsset}
+              />
+            )}
+          </aside>
+
+          {/* 中間預覽/編輯區 */}
+          <section className="flex-1 bg-white rounded-xl border border-border flex flex-col overflow-hidden shadow-sm">
+            {/* 頁面選擇器 */}
+            <div className="flex items-center justify-center px-5 py-3 border-b border-border flex-shrink-0">
+              {/* 生成的手冊頁面選擇器 */}
+              {generatedBrochure && editorMode === 'canvas' ? (
+                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full"
+                    onClick={() => handleGeneratedPageChange(currentPageIndex - 1)}
+                    disabled={currentPageIndex === 0}
+                  >
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[500px] scrollbar-hide px-1">
+                    {generatedBrochure.pages.map((page, index) => (
+                      <button
+                        key={page.id}
+                        data-index={index}
+                        onClick={() => handleGeneratedPageChange(index)}
+                        className={cn(
+                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
+                          currentPageIndex === index
+                            ? 'bg-white text-morandi-primary shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {page.name}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 rounded-full"
+                    onClick={() => handleGeneratedPageChange(currentPageIndex + 1)}
+                    disabled={currentPageIndex === generatedBrochure.pages.length - 1}
+                  >
+                    <ChevronRight size={14} />
+                  </Button>
+                  <span className="ml-2 px-2 py-0.5 bg-morandi-gold/10 text-morandi-gold text-[10px] font-medium rounded">
+                    {generatedBrochure.theme.name}
+                  </span>
+                </div>
+              ) : (
+                /* 模板模式頁面選擇器 */
+                <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToPrev} disabled={currentPageIndex === 0}>
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <div ref={tabsContainerRef} className="flex gap-0.5 overflow-x-auto max-w-[450px] scrollbar-hide px-1">
+                    {allPages.map((page, index) => (
+                      <button
+                        key={page.type}
+                        data-index={index}
+                        onClick={() => setCurrentPageIndex(index)}
+                        className={cn(
+                          'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
+                          currentPageIndex === index
+                            ? 'bg-white text-morandi-primary shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {index + 1}. {page.label}
+                      </button>
+                    ))}
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={goToNext} disabled={currentPageIndex === allPages.length - 1}>
+                    <ChevronRight size={14} />
+                  </Button>
                 </div>
               )}
-
-              {currentPage?.type === 'contents' && (
-                <BrochureTableOfContents
-                  ref={contentsRef}
-                  data={coverData}
-                  itinerary={currentItinerary}
-                  tripTitle={`${coverData.country} ${coverData.city} Trip`}
-                />
-              )}
-
-              {currentPage?.type === 'overview-left' && (
-                <BrochureOverviewLeft
-                  ref={overviewLeftRef}
-                  data={coverData}
-                  itinerary={currentItinerary}
-                />
-              )}
-
-              {currentPage?.type === 'overview-right' && (
-                <BrochureOverviewRight
-                  ref={overviewRightRef}
-                  data={coverData}
-                  itinerary={currentItinerary}
-                />
-              )}
-
-              {/* 每日行程頁面 */}
-              {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
-                currentPage.side === 'left' ? (
-                  <BrochureDailyLeft
-                    dayIndex={currentPage.dayIndex}
-                    day={dailyItinerary[currentPage.dayIndex]}
-                    departureDate={currentItinerary?.departure_date}
-                    tripName={`${coverData.country} ${coverData.city}`}
-                    pageNumber={currentPageIndex + 1}
-                  />
-                ) : (
-                  <BrochureDailyRight
-                    dayIndex={currentPage.dayIndex}
-                    day={dailyItinerary[currentPage.dayIndex]}
-                    pageNumber={currentPageIndex + 1}
-                  />
-                )
-              )}
-
-              {/* 住宿頁面 */}
-              {currentPage?.type === 'accommodation' && (
-                <BrochureAccommodation
-                  accommodations={accommodations}
-                  pageNumber={currentPageIndex + 1}
-                />
-              )}
             </div>
-          </div>
-        </main>
-      </div>
-    </div>
+
+            {/* 預覽/編輯區內容 */}
+            {editorMode === 'template' ? (
+              // 模板模式 - 原有預覽
+              <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
+                <div
+                  className="absolute inset-0 opacity-[0.02]"
+                  style={{
+                    backgroundImage: 'radial-gradient(#888 1px, transparent 1px)',
+                    backgroundSize: '20px 20px',
+                  }}
+                />
+
+                <div
+                  className="relative shadow-2xl bg-white overflow-hidden flex-shrink-0"
+                  style={{
+                    width: 'min(420px, calc(100vh - 200px) / 1.414)',
+                    aspectRatio: '1 / 1.414',
+                  }}
+                >
+                  {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
+
+                  {currentPage?.type === 'blank' && (
+                    <div className="bg-white flex items-center justify-center w-full h-full">
+                      <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
+                    </div>
+                  )}
+
+                  {currentPage?.type === 'contents' && (
+                    <BrochureTableOfContents
+                      ref={contentsRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                      tripTitle={`${coverData.country} ${coverData.city} Trip`}
+                    />
+                  )}
+
+                  {currentPage?.type === 'overview-left' && (
+                    <BrochureOverviewLeft
+                      ref={overviewLeftRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                      overviewImage={coverData.overviewImage}
+                    />
+                  )}
+
+                  {currentPage?.type === 'overview-right' && (
+                    <BrochureOverviewRight
+                      ref={overviewRightRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                    />
+                  )}
+
+                  {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
+                    currentPage.side === 'left' ? (
+                      <BrochureDailyLeft
+                        dayIndex={currentPage.dayIndex}
+                        day={dailyItinerary[currentPage.dayIndex]}
+                        departureDate={currentItinerary?.departure_date}
+                        tripName={`${coverData.country} ${coverData.city}`}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    ) : (
+                      <BrochureDailyRight
+                        dayIndex={currentPage.dayIndex}
+                        day={dailyItinerary[currentPage.dayIndex]}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    )
+                  )}
+
+                  {currentPage?.type === 'accommodation-left' && (
+                    <BrochureAccommodationLeft
+                      accommodations={accommodations}
+                      pageNumber={currentPageIndex + 1}
+                    />
+                  )}
+
+                  {currentPage?.type === 'accommodation-right' && (
+                    <BrochureAccommodationRight
+                      accommodations={accommodations}
+                      pageNumber={currentPageIndex + 1}
+                    />
+                  )}
+                </div>
+              </div>
+            ) : (
+              // Canvas 編輯模式
+              <div className="flex-1 relative overflow-auto bg-slate-50 flex items-center justify-center p-6">
+                {/* 生成的手冊預覽 */}
+                {generatedBrochure && canvasElements.length > 0 ? (
+                  <div
+                    className="relative bg-white shadow-2xl overflow-hidden flex-shrink-0"
+                    style={{
+                      width: '559px',
+                      height: '794px',
+                      transform: 'scale(0.75)',
+                      transformOrigin: 'center center',
+                    }}
+                  >
+                    {/* 渲染生成的元素 */}
+                    {canvasElements.map((element) => {
+                      if (element.type === 'shape') {
+                        const shape = element as CanvasElement & { variant: string; fill: string; stroke: string; strokeWidth: number; cornerRadius: number }
+                        return (
+                          <div
+                            key={element.id}
+                            className="absolute"
+                            style={{
+                              left: element.x,
+                              top: element.y,
+                              width: element.width,
+                              height: element.height,
+                              backgroundColor: shape.fill?.startsWith('linear') ? undefined : shape.fill,
+                              background: shape.fill?.startsWith('linear') ? shape.fill : undefined,
+                              borderRadius: shape.cornerRadius,
+                              border: shape.stroke !== 'transparent' ? `${shape.strokeWidth}px solid ${shape.stroke}` : undefined,
+                              opacity: element.opacity,
+                              zIndex: element.zIndex,
+                            }}
+                          />
+                        )
+                      }
+                      if (element.type === 'text') {
+                        const text = element as CanvasElement & { content: string; style: { fontFamily: string; fontSize: number; fontWeight: string; textAlign: string; color: string; lineHeight: number; letterSpacing: number } }
+                        return (
+                          <div
+                            key={element.id}
+                            className="absolute overflow-hidden"
+                            style={{
+                              left: element.x,
+                              top: element.y,
+                              width: element.width,
+                              height: element.height,
+                              fontFamily: text.style.fontFamily,
+                              fontSize: text.style.fontSize,
+                              fontWeight: text.style.fontWeight,
+                              textAlign: text.style.textAlign as 'left' | 'center' | 'right',
+                              color: text.style.color,
+                              lineHeight: text.style.lineHeight,
+                              letterSpacing: text.style.letterSpacing,
+                              opacity: element.opacity,
+                              zIndex: element.zIndex,
+                            }}
+                          >
+                            {text.content}
+                          </div>
+                        )
+                      }
+                      if (element.type === 'image') {
+                        const img = element as CanvasElement & { src: string; objectFit: string }
+                        return (
+                          <div
+                            key={element.id}
+                            className="absolute overflow-hidden"
+                            style={{
+                              left: element.x,
+                              top: element.y,
+                              width: element.width,
+                              height: element.height,
+                              opacity: element.opacity,
+                              zIndex: element.zIndex,
+                              borderRadius: 8,
+                            }}
+                          >
+                            <img
+                              src={img.src}
+                              alt=""
+                              className="w-full h-full"
+                              style={{ objectFit: img.objectFit as 'cover' | 'contain' || 'cover' }}
+                            />
+                          </div>
+                        )
+                      }
+                      return null
+                    })}
+                  </div>
+                ) : (
+                  <>
+                    <CanvasEditor
+                      className="w-full h-full"
+                      onElementSelect={setSelectedElementId}
+                      onElementChange={(el) => {
+                        setCanvasElements((prev) =>
+                          prev.map((e) => (e.id === el.id ? el : e))
+                        )
+                        setHasChanges(true)
+                      }}
+                    />
+
+                    {/* Canvas 模式提示 */}
+                    {elements.length === 0 && !generatedBrochure && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="text-center">
+                          <Sparkles size={48} className="mx-auto text-morandi-gold/30 mb-3" />
+                          <p className="text-morandi-secondary text-sm">點擊「一鍵生成」自動生成手冊</p>
+                          <p className="text-morandi-secondary/60 text-xs mt-1">或從左側元素庫手動添加元素</p>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </section>
+
+          {/* 右側圖層面板 (Canvas 模式) */}
+          {editorMode === 'canvas' && showLayerPanel && (
+            <aside className="w-[240px] bg-white rounded-xl border border-border overflow-hidden shadow-sm">
+              <LayerPanel
+                elements={elements}
+                selectedIds={editorState.selectedIds}
+                onSelect={handleLayerSelect}
+                onMultiSelect={handleLayerMultiSelect}
+                onToggleVisibility={handleToggleVisibility}
+                onToggleLock={handleToggleLock}
+                onDelete={handleDeleteElement}
+                onDuplicate={handleDuplicateElement}
+                onBringForward={bringToFront}
+                onSendBackward={sendToBack}
+                onBringToFront={bringToFront}
+                onSendToBack={sendToBack}
+                onRename={handleRenameElement}
+              />
+            </aside>
+          )}
+        </div>
+      </main>
+    </>
   )
 }

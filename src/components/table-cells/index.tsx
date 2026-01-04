@@ -16,7 +16,7 @@ import type { LucideIcon } from 'lucide-react'
 
 // ========== 類型定義 ==========
 
-type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'voucher' | 'esim' | 'receipt'
+type StatusType = 'payment' | 'disbursement' | 'todo' | 'invoice' | 'tour' | 'order' | 'visa' | 'voucher' | 'esim' | 'receipt' | 'quote' | 'tour_request'
 
 export interface DateCellProps {
   date?: string | Date | null

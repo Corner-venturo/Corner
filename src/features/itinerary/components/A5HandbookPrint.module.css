@@ -26,12 +26,13 @@
 /* 每一頁 */
 .page {
   width: 148mm;
-  min-height: 210mm;
+  height: 210mm;
   padding: 12mm;
   box-sizing: border-box;
   page-break-after: always;
   position: relative;
   background: #fff;
+  overflow: hidden;
 }
 
 @media screen {

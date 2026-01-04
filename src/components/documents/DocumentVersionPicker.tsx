@@ -11,6 +11,7 @@ import {
   Loader2,
   ExternalLink,
   Zap,
+  Lock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -46,12 +47,18 @@ interface DocumentVersionPickerProps {
   isOpen: boolean
   onClose: () => void
   tour: Tour
+  /** 模式：manage=報價單管理, confirm=確認出團 */
+  mode?: 'manage' | 'confirm'
+  /** 確認鎖定回調（mode=confirm 時使用） */
+  onConfirmLock?: () => void
 }
 
 export function DocumentVersionPicker({
   isOpen,
   onClose,
   tour,
+  mode = 'manage',
+  onConfirmLock,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
   const { items: quotes, fetchAll, create, update, loading } = useQuoteStore()
@@ -294,18 +301,32 @@ export function DocumentVersionPicker({
             </div>
 
             <div className="flex-shrink-0 p-4 border-t border-border/50">
-              <button
-                onClick={handleCreateStandard}
-                disabled={isCreatingStandard}
-                className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-morandi-primary hover:bg-morandi-primary/90 rounded-lg transition-colors disabled:opacity-50"
-              >
-                {isCreatingStandard ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Plus size={16} />
-                )}
-                新增團體報價單
-              </button>
+              {mode === 'confirm' ? (
+                <button
+                  onClick={() => {
+                    onConfirmLock?.()
+                    onClose()
+                  }}
+                  disabled={standardQuotes.length === 0}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-status-success hover:bg-status-success/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Lock size={16} />
+                  確認鎖定
+                </button>
+              ) : (
+                <button
+                  onClick={handleCreateStandard}
+                  disabled={isCreatingStandard}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-morandi-primary hover:bg-morandi-primary/90 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {isCreatingStandard ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Plus size={16} />
+                  )}
+                  新增團體報價單
+                </button>
+              )}
             </div>
           </div>
 

@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { formatDateChinese } from '@/lib/utils/format-date'
 import type { Database } from '@/lib/supabase/types'
 import type {
   PNR,
@@ -534,12 +535,7 @@ function formatTime(time: string): string {
 function formatDateFull(dateStr: string): string {
   try {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long'
-    })
+    return formatDateChinese(date)
   } catch {
     return dateStr
   }

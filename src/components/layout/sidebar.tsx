@@ -314,8 +314,8 @@ export function Sidebar() {
       </button>
 
       {/* Logo區域 */}
-      <div className="shrink-0">
-        <div className="h-18 flex items-center relative mx-3">
+      <div className="shrink-0 border-b border-border mx-3">
+        <div className="h-18 flex items-center relative">
           <div className="absolute left-5 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-morandi-gold flex items-center justify-center shadow-sm flex-shrink-0 opacity-90">
             <span className="text-white font-semibold text-lg">V</span>
           </div>

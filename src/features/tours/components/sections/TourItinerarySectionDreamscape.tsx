@@ -4,6 +4,7 @@ import { MutableRefObject, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { TourFormData, DreamscapeDayLayout } from '@/components/editor/tour-form/types'
+import { formatDateMonthDayEN } from '@/lib/utils/format-date'
 
 // Dreamscape 配色
 const DREAM = {
@@ -184,7 +185,7 @@ function BlobRightLayout({
 }) {
   const dayNum = extractDayNumber(dayLabel)
   const images = day.activities?.map(a => a.image).filter(Boolean).slice(0, 2) || []
-  const dateFormatted = day.date ? new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''
+  const dateFormatted = day.date ? formatDateMonthDayEN(day.date) : ''
 
   return (
     <div

@@ -56,7 +56,7 @@ export default function TimeboxPage() {
 
   const isCurrentWeek = getWeekStart(new Date()).getTime() === weekStart.getTime()
 
-  // 簡潔的統計數據（文青風格）
+  // 統計數據
   const stats = useMemo(() => {
     if (!userId) return { completed: 0, total: 0, hours: 0 }
 
@@ -82,38 +82,23 @@ export default function TimeboxPage() {
           { label: '箱型時間', href: '/timebox' }
         ]}
         actions={(
-          <div className="flex items-center gap-4">
-            {/* 文青風格統計 - 簡潔的文字 */}
-            <div className="hidden lg:flex items-center gap-6 text-sm text-morandi-secondary">
-              <span>
-                完成 <span className="font-medium text-morandi-primary">{stats.completed}</span>
-                <span className="mx-1">/</span>
-                <span className="text-morandi-muted">{stats.total}</span>
-              </span>
-              <span className="text-border">·</span>
-              <span>
-                <span className="font-medium text-morandi-primary">{stats.hours}</span> 小時
-              </span>
-            </div>
-
-            <div className="hidden lg:block w-px h-6 bg-border" />
-
+          <div className="flex items-center gap-2">
             {/* 週選擇器 */}
-            <div className="flex items-center">
+            <div className="flex items-center border border-border rounded-lg overflow-hidden">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={goToPreviousWeek}
-                className="h-8 w-8 p-0 hover:text-morandi-gold"
+                className="h-8 w-8 p-0 rounded-none border-r border-border"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <button
                 onClick={goToCurrentWeek}
-                className={`text-sm px-3 py-1 rounded transition-colors ${
+                className={`text-sm px-3 h-8 transition-colors ${
                   isCurrentWeek
-                    ? 'text-morandi-gold font-medium'
-                    : 'text-morandi-secondary hover:text-morandi-primary'
+                    ? 'text-morandi-gold font-medium bg-morandi-gold/5'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
                 }`}
               >
                 {weekStart.getMonth() + 1}/{weekStart.getDate()} - {weekEnd.getMonth() + 1}/{weekEnd.getDate()}
@@ -122,59 +107,78 @@ export default function TimeboxPage() {
                 variant="ghost"
                 size="sm"
                 onClick={goToNextWeek}
-                className="h-8 w-8 p-0 hover:text-morandi-gold"
+                className="h-8 w-8 p-0 rounded-none border-l border-border"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
 
             {/* 時間間隔切換 */}
-            <div className="flex items-center text-sm">
+            <div className="flex border border-border rounded-lg overflow-hidden">
               <button
                 onClick={() => setTimeInterval(30)}
-                className={`px-2 py-1 rounded-l border border-r-0 transition-colors ${
+                className={`px-3 h-8 text-sm transition-colors ${
                   timeInterval === 30
-                    ? 'bg-morandi-gold/10 border-morandi-gold/30 text-morandi-gold'
-                    : 'border-border text-morandi-secondary hover:text-morandi-primary'
+                    ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
                 }`}
               >
                 30分
               </button>
               <button
                 onClick={() => setTimeInterval(60)}
-                className={`px-2 py-1 rounded-r border transition-colors ${
+                className={`px-3 h-8 text-sm border-l border-border transition-colors ${
                   timeInterval === 60
-                    ? 'bg-morandi-gold/10 border-morandi-gold/30 text-morandi-gold'
-                    : 'border-border text-morandi-secondary hover:text-morandi-primary'
+                    ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
+                    : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30'
                 }`}
               >
                 1小時
               </button>
             </div>
 
-            <button
-              onClick={() => setShowManifestation(true)}
-              className="text-morandi-secondary hover:text-morandi-gold transition-colors"
-              title="每日顯化"
-            >
-              <Sparkles className="h-4 w-4" />
-            </button>
+            {/* 統計（整合為一個區塊） */}
+            {stats.total > 0 && (
+              <div className="hidden lg:flex items-center h-8 px-3 border border-border rounded-lg text-sm text-morandi-secondary bg-morandi-container/20">
+                <span className="text-morandi-gold font-medium">{stats.completed}</span>
+                <span className="mx-0.5">/</span>
+                <span>{stats.total}</span>
+                <span className="mx-2 text-border">·</span>
+                <span className="text-morandi-gold font-medium">{stats.hours}</span>
+                <span className="ml-0.5">h</span>
+              </div>
+            )}
 
-            <button
-              onClick={() => setShowWeekReview(true)}
-              className="text-morandi-secondary hover:text-morandi-gold transition-colors"
-              title="週複盤"
-            >
-              <BookOpen className="h-4 w-4" />
-            </button>
-
-            <button
-              onClick={() => setShowBoxManager(true)}
-              className="text-morandi-secondary hover:text-morandi-gold transition-colors"
-              title="管理箱子"
-            >
-              <Settings className="h-4 w-4" />
-            </button>
+            {/* 功能按鈕群組 */}
+            <div className="flex border border-border rounded-lg overflow-hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowManifestation(true)}
+                className="h-8 w-8 p-0 rounded-none text-morandi-secondary hover:text-morandi-gold"
+                title="每日顯化"
+              >
+                <Sparkles className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowWeekReview(true)}
+                className="h-8 w-8 p-0 rounded-none border-l border-border text-morandi-secondary hover:text-morandi-gold"
+                title="週複盤"
+              >
+                <BookOpen className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBoxManager(true)}
+                className="h-8 w-8 p-0 rounded-none border-l border-border text-morandi-secondary hover:text-morandi-gold"
+                title="管理箱子"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       />
@@ -188,7 +192,7 @@ export default function TimeboxPage() {
 
       {/* 管理箱子對話框 */}
       <Dialog open={showBoxManager} onOpenChange={setShowBoxManager}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
+        <DialogContent className="max-w-sm max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>管理箱子</DialogTitle>
           </DialogHeader>

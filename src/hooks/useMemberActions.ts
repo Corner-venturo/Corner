@@ -7,6 +7,10 @@ import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import type { Member } from '@/stores/types'
+import type { Database } from '@/lib/supabase/types'
+
+// Supabase Insert 類型
+type MemberInsert = Database['public']['Tables']['members']['Insert']
 
 // SWR key 與 cloud-hooks 的 useMembers 一致，確保 mutate 時能同步
 const SWR_KEY = 'members'
@@ -88,9 +92,15 @@ export function useMemberActions(): MemberActionsReturn {
       ...(workspace_id ? { workspace_id } : {}),
     } as Member
 
-    // 使用 type assertion 避免 Supabase 嚴格類型檢查
-     
-    const { error } = await supabase.from('members').insert(newMember as any)
+    // 轉換為 Supabase Insert 類型
+    const insertData: MemberInsert = {
+      id: newMember.id,
+      name: newMember.name || '',
+      order_id: newMember.order_id,
+      created_at: newMember.created_at ?? undefined,
+      updated_at: newMember.updated_at ?? undefined,
+    }
+    const { error } = await supabase.from('members').insert(insertData)
     if (error) throw error
 
     // 觸發 SWR revalidate，讓其他頁面的 useMembers() 同步

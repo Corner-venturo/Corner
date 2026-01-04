@@ -1,8 +1,14 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import TimeGrid from './TimeGrid'
 import { getWeekStart, weekDayNames } from '../hooks/useTimeboxData'
+
+// 固定格子高度（像素）- 與 TimeGrid 保持一致
+const SLOT_HEIGHTS = {
+  30: 40,   // 30分鐘間隔：40px
+  60: 56,   // 60分鐘間隔：56px
+}
 
 interface WeekViewProps {
   selectedWeek: Date
@@ -10,6 +16,8 @@ interface WeekViewProps {
 }
 
 export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+
   const weekDays = useMemo(() => {
     const start = getWeekStart(selectedWeek)
     return Array.from({ length: 7 }, (_, i) => {
@@ -18,6 +26,32 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
       return day
     })
   }, [selectedWeek])
+
+  // 自動滾動到當前時間位置
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer) return
+
+    const now = new Date()
+    const currentHour = now.getHours()
+    const currentMinute = now.getMinutes()
+    const startHour = 6 // 與 TimeGrid 保持一致
+
+    // 如果當前時間在顯示範圍內，滾動到當前時間
+    if (currentHour >= startHour && currentHour < 24) {
+      const slotHeight = SLOT_HEIGHTS[timeInterval]
+      const slotMinutes = timeInterval
+      const minutesSinceStart = (currentHour - startHour) * 60 + currentMinute
+
+      // 計算當前時間位置，並往前偏移 1 小時讓時間線在畫面中間偏上
+      const scrollPosition = Math.max(0, (minutesSinceStart / slotMinutes) * slotHeight - 100)
+
+      scrollContainer.scrollTo({
+        top: scrollPosition,
+        behavior: 'smooth'
+      })
+    }
+  }, [timeInterval]) // 當時間間隔改變時重新計算
 
   return (
     <div className="h-full flex flex-col overflow-hidden border border-border rounded-xl">
@@ -49,7 +83,7 @@ export default function WeekView({ selectedWeek, timeInterval }: WeekViewProps) 
       </div>
 
       {/* 時間網格 */}
-      <div className="flex-1 overflow-auto scrollable-content">
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto scrollable-content">
         <TimeGrid
           weekDays={weekDays}
           timeInterval={timeInterval}

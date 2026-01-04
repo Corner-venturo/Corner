@@ -13,6 +13,7 @@
 import React, { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Search, Loader2, Plane, Clock, MapPin } from 'lucide-react'
@@ -129,13 +130,7 @@ export function FlightRouteSearchDialog({
 
   // 格式化日期顯示
   const formatDateDisplay = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short',
-    })
+    return formatDateChineseWithWeekday(dateStr)
   }
 
   return (

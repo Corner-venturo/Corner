@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useCalendarFilters } from './useCalendarFilters'
 import { useCalendarTransform } from './useCalendarTransform'
 import { FullCalendarEvent } from '../types'
+import type { CalendarEvent } from '@/types/calendar.types'
 
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
@@ -55,24 +56,11 @@ const getDateInTaipei = (isoString: string): string => {
   }
 }
 
-// 定義 CalendarEvent 類型（從 store 推斷）
-interface CalendarEvent {
-  id: string
-  title: string
-  start: string
-  end?: string
-  all_day?: boolean
-  visibility?: 'personal' | 'company'
-  description?: string
-  created_by?: string
-  workspace_id?: string
-}
-
 export function useCalendarEvents() {
   const { items: tours, fetchAll: fetchTours } = useTourStore()
   const { items: orders, fetchAll: fetchOrders } = useOrderStore()
   const { items: members, fetchAll: fetchMembers } = useMemberStore()
-  const { items: customers } = useCustomerStore()
+  const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
   const { settings } = useCalendarStore()
   const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
   const { user } = useAuthStore()
@@ -115,13 +103,14 @@ export function useCalendarEvents() {
       fetchTours()
       fetchOrders()
       fetchMembers()
+      fetchCustomers() // 🔧 修正：載入客戶資料以顯示客戶生日
 
       // 顯示載入的資料數量（除錯用）
       setTimeout(() => {
         logger.log('[Calendar] 資料載入完成，tours 數量:', tours?.length || 0)
       }, 2000)
     }
-  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, user, isSuperAdmin, tours?.length])
+  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, fetchCustomers, user, isSuperAdmin, tours?.length])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -214,24 +203,25 @@ export function useCalendarEvents() {
       .filter(event => event.visibility === 'personal' && event.created_by === user.id)
       .map(event => {
         const color = getEventColor('personal')
-        const timeStr = getDisplayTime(event.start, event.all_day)
+        const isAllDay = event.all_day ?? false // 轉換 null 為 false
+        const timeStr = getDisplayTime(event.start, isAllDay)
         const displayTitle = timeStr ? `${timeStr} ${event.title}` : event.title
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
-        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+        const startDate = isAllDay ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (isAllDay ? getDateInTaipei(event.end) : event.end) : undefined
 
         return {
           id: event.id,
           title: displayTitle,
           start: startDate,
           end: endDate,
-          allDay: event.all_day,
+          allDay: isAllDay || undefined, // FullCalendar 期望 boolean | undefined
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
             type: 'personal' as const,
-            description: event.description,
+            description: event.description ?? undefined,
           },
         }
       })
@@ -274,27 +264,28 @@ export function useCalendarEvents() {
             '未知使用者'
         }
 
-        const timeStr = getDisplayTime(event.start, event.all_day)
+        const isAllDay = event.all_day ?? false // 轉換 null 為 false
+        const timeStr = getDisplayTime(event.start, isAllDay)
         const displayTitle = timeStr
           ? `${timeStr} 公司｜${event.title}`
           : `公司｜${event.title}`
 
         // 🔧 修正：全天事件只傳日期字串，避免 FullCalendar 時區轉換問題
-        const startDate = event.all_day ? getDateInTaipei(event.start) : event.start
-        const endDate = event.end ? (event.all_day ? getDateInTaipei(event.end) : event.end) : undefined
+        const startDate = isAllDay ? getDateInTaipei(event.start) : event.start
+        const endDate = event.end ? (isAllDay ? getDateInTaipei(event.end) : event.end) : undefined
 
         return {
           id: event.id,
           title: displayTitle,
           start: startDate,
           end: endDate,
-          allDay: event.all_day,
+          allDay: isAllDay || undefined, // FullCalendar 期望 boolean | undefined
           backgroundColor: color.bg,
           borderColor: color.border,
           extendedProps: {
             type: 'company' as const,
-            description: event.description,
-            created_by: event.created_by,
+            description: event.description ?? undefined,
+            created_by: event.created_by ?? undefined,
             creator_name: creatorName, // 保留在 extendedProps，詳細頁面可以用
           },
         } as FullCalendarEvent
@@ -363,10 +354,10 @@ export function useCalendarEvents() {
     return [...memberBirthdayEvents, ...customerBirthdayEvents]
   }, [memberBirthdayEvents, customerBirthdayEvents])
 
-  // 合併所有事件
+  // 合併所有事件（生日改用獨立彈窗顯示，不在行事曆上顯示）
   const allEvents = useMemo(() => {
-    return [...tourEvents, ...personalCalendarEvents, ...companyCalendarEvents, ...birthdayEvents]
-  }, [tourEvents, personalCalendarEvents, companyCalendarEvents, birthdayEvents])
+    return [...tourEvents, ...personalCalendarEvents, ...companyCalendarEvents]
+  }, [tourEvents, personalCalendarEvents, companyCalendarEvents])
 
   // 過濾事件（根據 settings）
   const filteredEvents = useMemo(() => {
@@ -376,7 +367,6 @@ export function useCalendarEvents() {
       if (type === 'tour' && !settings.showTours) return false
       if (type === 'personal' && !settings.showPersonal) return false
       if (type === 'company' && !settings.showCompany) return false
-      if (type === 'birthday' && !settings.showBirthdays) return false
 
       return true
     })

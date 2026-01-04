@@ -32,8 +32,7 @@ export const BrochureOverviewRight = forwardRef<HTMLDivElement, BrochureOverview
     return (
       <div
         ref={ref}
-        className="bg-white overflow-hidden flex flex-col"
-        style={{ width: '100%', maxWidth: '420px', aspectRatio: '1 / 1.414' }}
+        className="bg-white overflow-hidden flex flex-col w-full h-full"
       >
         {/* 標題 */}
         <div className="pt-6 px-6 pb-4 flex-shrink-0">
@@ -92,24 +91,16 @@ export const BrochureOverviewRight = forwardRef<HTMLDivElement, BrochureOverview
               </div>
             ))}
 
-            {/* 裝飾尾部 */}
-            {dailyItinerary.length > 0 && dailyItinerary.length <= 5 && (
-              <div className="relative flex items-center flex-1 pt-3 min-h-[60px]">
-                <div className="w-10 flex-shrink-0 flex flex-col items-center z-10 bg-white opacity-30">
-                  <span className="text-[7px] text-slate-400 font-bold tracking-widest">DAY</span>
-                  <span className="text-base font-bold text-slate-300">
-                    {String(dailyItinerary.length + 1).padStart(2, '0')}
-                  </span>
-                </div>
-                <div className="flex-grow pl-3">
-                  <div className="flex items-center justify-center h-12 bg-slate-50/80 border border-slate-100 rounded">
-                    <p
-                      className="text-[11px] font-medium text-slate-300 tracking-[0.15em]"
-                      style={{ writingMode: 'vertical-rl' }}
-                    >
-                      旅の思い出は、心の中に
-                    </p>
-                  </div>
+            {/* 裝飾尾部（只在行程 3 天或以下時顯示） */}
+            {dailyItinerary.length > 0 && dailyItinerary.length <= 3 && (
+              <div className="relative flex items-center justify-center flex-1 pt-3 min-h-[60px]">
+                <div className="flex items-center justify-center px-4 py-2 bg-slate-50/80 border border-slate-100 rounded">
+                  <p
+                    className="text-[11px] font-medium text-slate-300 tracking-[0.15em]"
+                    style={{ writingMode: 'vertical-rl' }}
+                  >
+                    旅の思い出は、心の中に
+                  </p>
                 </div>
               </div>
             )}

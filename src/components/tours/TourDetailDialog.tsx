@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog as EntryCardDialog, DialogContent as EntryCardDialogContent, DialogHeader as EntryCardDialogHeader, DialogTitle as EntryCardDialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { formatDateMonthDayChinese } from '@/lib/utils/format-date'
 
 const TourEditDialog = dynamic(
   () => import('@/components/tours/tour-edit-dialog').then(m => m.TourEditDialog),
@@ -42,11 +43,17 @@ const TourCosts = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+const TourConfirmationSheet = dynamic(
+  () => import('@/components/tours/tour-confirmation-sheet').then(m => m.TourConfirmationSheet),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
 const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
   { value: 'requests', label: '需求管理' },
+  { value: 'confirmation', label: '團確單' },
 ]
 
 interface TourDetailDialogProps {
@@ -369,6 +376,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} />
       case 'requests':
         return <TourRequests tourId={tour.id} />
+      case 'confirmation':
+        return <TourConfirmationSheet tourId={tour.id} />
       default:
         return <TourOverview tour={tour} />
     }
@@ -455,7 +464,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     <span>部分已開票</span>
                     {pnrTicketingDeadline && deadlineStatus && (
                       <span className={cn("ml-1 px-1 rounded", deadlineStatus.urgent ? "bg-white/30" : "")}>
-                        {pnrTicketingDeadline.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })}
+                        {formatDateMonthDayChinese(pnrTicketingDeadline)}
                       </span>
                     )}
                   </div>
@@ -468,7 +477,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     {deadlineStatus.urgent && <AlertTriangle size={12} />}
                     <Clock size={12} />
                     <span>
-                      {pnrRecordLocator} 開票: {pnrTicketingDeadline.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })}
+                      {pnrRecordLocator} 開票: {formatDateMonthDayChinese(pnrTicketingDeadline)}
                       ({deadlineStatus.text})
                     </span>
                   </div>

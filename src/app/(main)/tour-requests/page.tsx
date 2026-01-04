@@ -83,7 +83,7 @@ const PRIORITY_VARIANTS: Record<string, 'default' | 'success' | 'warning' | 'dan
   low: 'info',
 }
 
-// 狀態 Tab 配置
+// 狀態 Tab 配置（與 status-config.ts tour_request 保持一致）
 const STATUS_TABS = [
   { value: 'all', label: '全部' },
   { value: 'pending', label: '待處理' },
@@ -91,6 +91,7 @@ const STATUS_TABS = [
   { value: 'replied', label: '已回復' },
   { value: 'confirmed', label: '已確認' },
   { value: 'completed', label: '已完成' },
+  { value: 'cancelled', label: '已取消' },
 ]
 
 export default function TourRequestsPage() {
@@ -194,7 +195,7 @@ export default function TourRequestsPage() {
       label: '狀態',
       width: '100px',
       render: (_, row) => (
-        <StatusCell type="todo" status={row.status || 'pending'} />
+        <StatusCell type="tour_request" status={row.status || 'pending'} />
       ),
     },
     {

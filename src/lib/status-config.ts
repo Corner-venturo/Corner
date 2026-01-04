@@ -41,6 +41,8 @@ type StatusType =
   | 'esim'
   | 'voucher'
   | 'receipt'
+  | 'quote'
+  | 'tour_request'
 
 /**
  * 所有狀態配置的中央存儲
@@ -83,31 +85,25 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
     },
   },
 
-  // 撥款狀態
+  // 出納單狀態（實際使用：pending → confirmed → paid）
   disbursement: {
     pending: {
       color: 'text-morandi-gold',
-      label: '待處理',
+      label: '待確認',
       icon: Clock,
       bgColor: 'bg-morandi-gold/10',
     },
-    processing: {
-      color: 'text-morandi-primary',
-      label: '處理中',
-      icon: Package,
-      bgColor: 'bg-morandi-primary/10',
-    },
-    completed: {
+    confirmed: {
       color: 'text-morandi-green',
-      label: '已完成',
+      label: '已確認',
       icon: CheckCircle,
       bgColor: 'bg-morandi-green/10',
     },
-    rejected: {
-      color: 'text-morandi-red',
-      label: '已駁回',
-      icon: XCircle,
-      bgColor: 'bg-morandi-red/10',
+    paid: {
+      color: 'text-morandi-primary',
+      label: '已付款',
+      icon: DollarSign,
+      bgColor: 'bg-morandi-primary/10',
     },
     default: {
       color: 'text-morandi-secondary',
@@ -221,17 +217,11 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
     },
   },
 
-  // 訂單狀態
+  // 訂單狀態（注意：訂單主要使用 payment_status，此為 order.status）
   order: {
-    draft: {
-      color: 'text-morandi-secondary',
-      label: '草稿',
-      icon: FileText,
-      bgColor: 'bg-morandi-secondary/10',
-    },
     pending: {
       color: 'text-morandi-gold',
-      label: '待處理',
+      label: '待確認',
       icon: Clock,
       bgColor: 'bg-morandi-gold/10',
     },
@@ -240,12 +230,6 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       label: '已確認',
       icon: CheckCircle,
       bgColor: 'bg-morandi-primary/10',
-    },
-    processing: {
-      color: 'text-morandi-gold',
-      label: '處理中',
-      icon: Package,
-      bgColor: 'bg-morandi-gold/10',
     },
     completed: {
       color: 'text-morandi-green',
@@ -395,6 +379,102 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       label: '已確認',
       icon: CheckCircle,
       bgColor: 'bg-morandi-green/10',
+    },
+    cancelled: {
+      color: 'text-morandi-red',
+      label: '已取消',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+    },
+    default: {
+      color: 'text-morandi-secondary',
+      label: '未知',
+      icon: AlertCircle,
+    },
+  },
+
+  // 報價單狀態（實際使用：draft → proposed → revised/進行中 → approved/rejected → converted）
+  quote: {
+    draft: {
+      color: 'text-morandi-secondary',
+      label: '草稿',
+      icon: FileText,
+      bgColor: 'bg-morandi-secondary/10',
+    },
+    proposed: {
+      color: 'text-morandi-gold',
+      label: '提案',
+      icon: Clock,
+      bgColor: 'bg-morandi-gold/10',
+    },
+    revised: {
+      color: 'text-status-info',
+      label: '修改中',
+      icon: FileText,
+      bgColor: 'bg-status-info/10',
+    },
+    '進行中': {
+      color: 'text-status-info',
+      label: '進行中',
+      icon: Truck,
+      bgColor: 'bg-status-info/10',
+    },
+    approved: {
+      color: 'text-morandi-green',
+      label: '已核准',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    converted: {
+      color: 'text-morandi-primary',
+      label: '已轉單',
+      icon: FileCheck,
+      bgColor: 'bg-morandi-primary/10',
+    },
+    rejected: {
+      color: 'text-morandi-red',
+      label: '已拒絕',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+    },
+    default: {
+      color: 'text-morandi-secondary',
+      label: '未知',
+      icon: AlertCircle,
+    },
+  },
+
+  // 需求單狀態
+  tour_request: {
+    pending: {
+      color: 'text-morandi-gold',
+      label: '待處理',
+      icon: Clock,
+      bgColor: 'bg-morandi-gold/10',
+    },
+    in_progress: {
+      color: 'text-morandi-primary',
+      label: '處理中',
+      icon: Package,
+      bgColor: 'bg-morandi-primary/10',
+    },
+    replied: {
+      color: 'text-status-info',
+      label: '已回復',
+      icon: FileText,
+      bgColor: 'bg-status-info/10',
+    },
+    confirmed: {
+      color: 'text-morandi-green',
+      label: '已確認',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    completed: {
+      color: 'text-morandi-primary',
+      label: '已完成',
+      icon: FileCheck,
+      bgColor: 'bg-morandi-primary/10',
     },
     cancelled: {
       color: 'text-morandi-red',

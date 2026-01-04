@@ -18,6 +18,7 @@ import {
   getWeekRange,
   type ManifestationReminderSnapshot,
 } from '@/lib/manifestation/reminder'
+import { logger } from '@/lib/utils/logger'
 
 interface ManifestationRecord {
   id: string
@@ -201,7 +202,7 @@ export default function ManifestationNotebook() {
       setSelectedChapter(null)
       setChapterForm({})
     } catch (error) {
-      console.error('[ManifestationNotebook] 保存章節失敗:', error)
+      logger.error('[ManifestationNotebook] 保存章節失敗:', error)
       alert(error instanceof Error ? error.message : '保存失敗，請稍後再試')
     }
   }

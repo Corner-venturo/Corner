@@ -1,6 +1,7 @@
 'use client'
 
-import { Plus, Building2 } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, Building2, Calendar, CalendarDays, CalendarClock, Cake } from 'lucide-react'
 import { CalendarSettingsDialog } from '@/components/calendar/calendar-settings-dialog'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ import {
   EditEventDialog,
   EventDetailDialog,
   MoreEventsDialog,
+  BirthdayListDialog,
 } from '@/features/calendar/components'
 import {
   useCalendarEvents,
@@ -26,7 +28,11 @@ import {
   useMoreEventsDialog,
 } from '@/features/calendar/hooks'
 
+type CalendarView = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'
+
 export default function CalendarPage() {
+  const [currentView, setCurrentView] = useState<CalendarView>('dayGridMonth')
+  const [birthdayDialogOpen, setBirthdayDialogOpen] = useState(false)
 
   // Custom hooks for calendar logic
   const {
@@ -56,6 +62,7 @@ export default function CalendarPage() {
     handleUpdateEvent,
     resetEditEventForm,
     resetAddEventForm,
+    handleEventDrop,
   } = useEventOperations()
 
   const {
@@ -109,6 +116,58 @@ export default function CalendarPage() {
                 今天
               </Button>
 
+              {/* 視圖切換按鈕 */}
+              <div className="flex items-center bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentView('dayGridMonth')
+                    calendarRef.current?.getApi().changeView('dayGridMonth')
+                  }}
+                  className={`h-9 px-3 rounded-none border-r border-border ${
+                    currentView === 'dayGridMonth'
+                      ? 'bg-morandi-gold/10 text-morandi-gold'
+                      : 'hover:bg-morandi-container/50'
+                  }`}
+                  title="月視圖"
+                >
+                  <Calendar size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentView('timeGridWeek')
+                    calendarRef.current?.getApi().changeView('timeGridWeek')
+                  }}
+                  className={`h-9 px-3 rounded-none border-r border-border ${
+                    currentView === 'timeGridWeek'
+                      ? 'bg-morandi-gold/10 text-morandi-gold'
+                      : 'hover:bg-morandi-container/50'
+                  }`}
+                  title="週視圖"
+                >
+                  <CalendarDays size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentView('timeGridDay')
+                    calendarRef.current?.getApi().changeView('timeGridDay')
+                  }}
+                  className={`h-9 px-3 rounded-none ${
+                    currentView === 'timeGridDay'
+                      ? 'bg-morandi-gold/10 text-morandi-gold'
+                      : 'hover:bg-morandi-container/50'
+                  }`}
+                  title="日視圖"
+                >
+                  <CalendarClock size={16} />
+                </Button>
+              </div>
+
               {/* 超級管理員專用：Workspace 篩選器 */}
               {isSuperAdmin && workspaces && workspaces.length > 0 && (
                 <Select
@@ -129,6 +188,18 @@ export default function CalendarPage() {
                   </SelectContent>
                 </Select>
               )}
+
+              {/* 生日名單按鈕 */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBirthdayDialogOpen(true)}
+                className="h-9 px-3 gap-1.5 border-border hover:bg-morandi-container/50 hover:border-morandi-gold/50 transition-all rounded-lg text-morandi-secondary hover:text-morandi-gold"
+                title="查看生日名單"
+              >
+                <Cake size={16} />
+                <span className="text-xs">生日</span>
+              </Button>
 
               <CalendarSettingsDialog />
 
@@ -154,9 +225,11 @@ export default function CalendarPage() {
               <CalendarGrid
                 calendarRef={calendarRef}
                 events={filteredEvents}
+                currentView={currentView}
                 onDateClick={handleDateClick}
                 onEventClick={handleEventClick}
                 onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
+                onEventDrop={handleEventDrop}
               />
             </div>
           </div>
@@ -196,6 +269,12 @@ export default function CalendarPage() {
         onClose={handleCloseDialog}
         onEventClick={handleDialogEventClick}
         getEventDuration={getEventDuration}
+      />
+
+      {/* 生日名單對話框 */}
+      <BirthdayListDialog
+        open={birthdayDialogOpen}
+        onClose={() => setBirthdayDialogOpen(false)}
       />
 
       <CalendarStyles />

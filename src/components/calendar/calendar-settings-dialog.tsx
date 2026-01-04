@@ -84,25 +84,10 @@ export function CalendarSettingsDialog() {
               <p className="text-sm text-muted-foreground">自動顯示旅遊團出發與返回日期</p>
             </div>
           </div>
-
-          {/* 生日提醒 */}
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="show-birthdays"
-              checked={settings.showBirthdays}
-              onCheckedChange={checked => updateSettings({ showBirthdays: checked as boolean })}
-            />
-            <div className="space-y-0.5">
-              <Label htmlFor="show-birthdays" className="text-base cursor-pointer">
-                生日提醒
-              </Label>
-              <p className="text-sm text-muted-foreground">自動顯示團員生日</p>
-            </div>
-          </div>
         </div>
 
         <div className="text-xs text-muted-foreground border-t pt-4">
-          💡 提示：可以同時顯示多種類型，用不同顏色區分
+          生日名單請點擊標題列的「生日」按鈕查看
         </div>
       </DialogContent>
     </Dialog>

@@ -5,6 +5,7 @@
 'use client'
 
 import React from 'react'
+import { formatDateTW } from '@/lib/utils/format-date'
 
 interface QuotationInfoProps {
   quoteName: string
@@ -23,9 +24,9 @@ export const QuotationInfo: React.FC<QuotationInfoProps> = ({
 }) => {
   const formatValidUntil = () => {
     if (validUntil) {
-      return new Date(validUntil).toLocaleDateString('zh-TW')
+      return formatDateTW(validUntil)
     }
-    return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-TW')
+    return formatDateTW(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000))
   }
 
   return (

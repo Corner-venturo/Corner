@@ -272,6 +272,127 @@ export function CalendarStyles() {
         border-radius: 0 4px 4px 0;
         margin-left: 0;
       }
+
+      /* ===== 週視圖 / 日視圖樣式 ===== */
+
+      /* 時間軸樣式 */
+      .fc .fc-timegrid-slot {
+        height: 40px;
+        border-color: #E8E4E0;
+      }
+
+      .fc .fc-timegrid-slot-label {
+        font-size: 11px;
+        color: rgba(51, 51, 51, 0.5);
+        font-weight: 500;
+        padding: 0 8px;
+      }
+
+      .fc .fc-timegrid-slot-lane {
+        border-color: #E8E4E0;
+      }
+
+      /* 時間軸事件 */
+      .fc .fc-timegrid-event {
+        border-radius: 4px;
+        border: none;
+        border-left: 3px solid currentColor;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 11px;
+        padding: 2px 4px;
+      }
+
+      .fc .fc-timegrid-event .fc-event-main {
+        padding: 2px 4px;
+      }
+
+      .fc .fc-timegrid-event .fc-event-time {
+        font-size: 10px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      .fc .fc-timegrid-event .fc-event-title {
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      /* 全天事件區塊 */
+      .fc .fc-timegrid-divider {
+        padding: 0;
+        border-color: #E8E4E0;
+      }
+
+      .fc .fc-daygrid-body {
+        border-color: #E8E4E0;
+      }
+
+      /* 現在時間指示線 */
+      .fc .fc-timegrid-now-indicator-line {
+        border-color: #B8A99A;
+        border-width: 2px;
+      }
+
+      .fc .fc-timegrid-now-indicator-arrow {
+        border-color: #B8A99A;
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+      }
+
+      /* 週視圖日期標題 */
+      .fc .fc-timegrid-axis {
+        border-color: #E8E4E0;
+        background-color: rgba(249, 248, 246, 0.4);
+      }
+
+      /* 週/日視圖：今天不需要特殊背景，表頭已經很清楚 */
+      .fc-timeGridWeek-view .fc-day-today,
+      .fc-timeGridDay-view .fc-day-today {
+        background-color: transparent !important;
+      }
+
+      /* 週/日視圖：隱藏全天區塊的日期數字（表頭已經有了） */
+      .fc-timeGridWeek-view .fc-daygrid-day-number,
+      .fc-timeGridDay-view .fc-daygrid-day-number {
+        display: none !important;
+      }
+
+      /* 週/日視圖：今天的表頭用金色文字標記 */
+      .fc-timeGridWeek-view .fc-col-header-cell.fc-day-today a,
+      .fc-timeGridDay-view .fc-col-header-cell.fc-day-today a {
+        color: #B8A99A;
+        font-weight: 700;
+      }
+
+      /* 拖曳時的樣式 */
+      .fc-event.fc-event-dragging {
+        opacity: 0.8;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1.02);
+      }
+
+      /* 拖曳佔位符 */
+      .fc-event.fc-event-mirror {
+        opacity: 0.5;
+        background-color: #B8A99A !important;
+      }
+
+      /* 可拖曳事件的游標 */
+      .fc-event[data-event-type='personal'],
+      .fc-event[data-event-type='company'] {
+        cursor: grab;
+      }
+
+      .fc-event[data-event-type='personal']:active,
+      .fc-event[data-event-type='company']:active {
+        cursor: grabbing;
+      }
+
+      /* 不可拖曳的事件 */
+      .fc-event[data-event-type='tour'],
+      .fc-event[data-event-type='birthday'] {
+        cursor: pointer;
+      }
     `}</style>
   )
 }

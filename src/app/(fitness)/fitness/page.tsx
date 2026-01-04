@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { formatDateCompactPadded } from '@/lib/utils/format-date'
 
 interface WorkoutSet {
   setNumber: number
@@ -113,10 +114,7 @@ export default function FitnessPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Corner Fitness</h1>
           <div className="text-sm text-muted-foreground">
-            {new Date().toLocaleDateString('zh-TW', {
-              month: '2-digit',
-              day: '2-digit',
-            })}
+            {formatDateCompactPadded(new Date())}
           </div>
         </div>
       </div>

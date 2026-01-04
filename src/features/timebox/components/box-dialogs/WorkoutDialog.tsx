@@ -25,6 +25,7 @@ import {
 } from '../../hooks/useTimeboxData'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { useAuthStore } from '@/stores/auth-store'
+import { logger } from '@/lib/utils/logger'
 
 interface WorkoutDialogProps {
   scheduledBox: TimeboxScheduledBox
@@ -95,7 +96,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
         setIsAdding(false)
       }, 300)
     } catch (error) {
-      console.error('[WorkoutDialog] 新增運動失敗:', error)
+      logger.error('[WorkoutDialog] 新增運動失敗:', error)
       alert(error instanceof Error ? error.message : '新增失敗，請稍後再試')
       setIsAdding(false)
     }
@@ -133,7 +134,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
         setIsAdding(false)
       }, 300)
     } catch (error) {
-      console.error('[WorkoutDialog] 更新運動失敗:', error)
+      logger.error('[WorkoutDialog] 更新運動失敗:', error)
       alert(error instanceof Error ? error.message : '更新失敗，請稍後再試')
       setIsAdding(false)
     }
@@ -152,7 +153,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
         data: { exercises: updatedExercises },
       })
     } catch (error) {
-      console.error('[WorkoutDialog] 刪除動作失敗:', error)
+      logger.error('[WorkoutDialog] 刪除動作失敗:', error)
       alert(error instanceof Error ? error.message : '刪除失敗，請稍後再試')
     }
   }
@@ -192,7 +193,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
         }
       }, 100)
     } catch (error) {
-      console.error('[WorkoutDialog] 更新組數狀態失敗:', error)
+      logger.error('[WorkoutDialog] 更新組數狀態失敗:', error)
     }
   }
 
@@ -207,7 +208,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
       await deleteScheduledBox(scheduledBox.id)
       onClose()
     } catch (error) {
-      console.error('[WorkoutDialog] 刪除排程失敗:', error)
+      logger.error('[WorkoutDialog] 刪除排程失敗:', error)
       alert(error instanceof Error ? error.message : '刪除失敗，請稍後再試')
     }
   }
@@ -249,7 +250,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
       setTemplateName('')
       setShowSaveTemplate(false)
     } catch (error) {
-      console.error('[WorkoutDialog] 儲存模板失敗:', error)
+      logger.error('[WorkoutDialog] 儲存模板失敗:', error)
       alert(error instanceof Error ? error.message : '儲存模板失敗，請稍後再試')
     }
   }

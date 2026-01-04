@@ -104,7 +104,7 @@ export function TourHandoverPrint({
                 <td className="border border-morandi-gold/30 px-2 py-1">{index + 1}</td>
                 <td className="border border-morandi-gold/30 px-2 py-1">{member.chinese_name || '-'}</td>
                 <td className="border border-morandi-gold/30 px-2 py-1">{member.passport_name || '-'}</td>
-                <td className="border border-morandi-gold/30 px-2 py-1">{member.birth_date || '-'}</td>
+                <td className="border border-morandi-gold/30 px-2 py-1">{member.birthday || member.birth_date || '-'}</td>
                 <td className="border border-morandi-gold/30 px-2 py-1 text-center">
                   {member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : '-'}
                 </td>

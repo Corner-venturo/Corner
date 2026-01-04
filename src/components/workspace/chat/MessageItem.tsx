@@ -8,6 +8,7 @@ import { formatMessageTime, formatFileSize, resolveAttachmentUrl } from './utils
 import { QUICK_REACTIONS } from './constants'
 import { downloadFile } from '@/lib/files'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 // 將文字中的網址轉換成可點擊的連結
 function renderMessageContent(content: string) {
@@ -57,7 +58,7 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
     try {
       await downloadFile(targetUrl, fileName)
     } catch (error) {
-      console.error('[MessageItem] 下載檔案失敗:', error)
+      logger.error('[MessageItem] 下載檔案失敗:', error)
       void alert('下載失敗，請稍後再試', 'error')
     }
   }

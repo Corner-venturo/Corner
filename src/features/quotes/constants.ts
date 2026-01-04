@@ -24,12 +24,16 @@ export const TYPE_FILTERS = [
 ] as const
 
 /**
- * 報價單狀態顏色對應
+ * 報價單狀態顏色對應（與 status-config.ts 保持一致）
  */
 export const STATUS_COLORS: Record<string, string> = {
+  draft: 'text-morandi-secondary',
   proposed: 'text-morandi-gold',
+  revised: 'text-status-info',
   '進行中': 'text-status-info',
-  approved: 'text-status-success',
+  approved: 'text-morandi-green',
+  converted: 'text-morandi-primary',
+  rejected: 'text-morandi-red',
 }
 
 /**

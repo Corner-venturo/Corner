@@ -18,6 +18,9 @@ export interface BrochureCoverData {
     scale: number
   }
 
+  // 總攬頁圖片
+  overviewImage?: string     // 總攬頁背景圖片 URL
+
   // 公司資訊
   companyName: string        // 公司名稱
   companyLogo?: string       // 公司 Logo

@@ -13,6 +13,13 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { Tour, PaymentRequest } from '@/stores/types'
+
+// jspdf-autotable 擴展類型
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable: {
+    finalY: number
+  }
+}
 import { formatDate } from '@/lib/utils'
 import { loadChineseFonts } from './pdf-fonts'
 
@@ -107,7 +114,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  yPos = (doc as any).lastAutoTable.finalY + 8
+  yPos = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 8
 
   // ========== 訂單收入明細 ==========
   doc.setFontSize(11)
@@ -154,7 +161,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     },
   })
 
-  yPos = (doc as any).lastAutoTable.finalY + 8
+  yPos = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 8
 
   // ========== 支出/成本明細 ==========
   doc.setFontSize(11)
@@ -203,7 +210,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  yPos = (doc as any).lastAutoTable.finalY + 8
+  yPos = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 8
 
   // ========== 獎金明細 ==========
   doc.setFontSize(11)
@@ -247,7 +254,7 @@ export async function generateTourClosingPDF(data: TourClosingPDFData): Promise<
     margin: { left: 15, right: 15 },
   })
 
-  yPos = (doc as any).lastAutoTable.finalY + 8
+  yPos = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 8
 
   // ========== 損益摘要 ==========
   doc.setFontSize(11)

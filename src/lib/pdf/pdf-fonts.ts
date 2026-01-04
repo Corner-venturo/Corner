@@ -6,6 +6,7 @@
  */
 
 import type jsPDF from 'jspdf'
+import { logger } from '@/lib/utils/logger'
 
 // 字體快取
 let fontLoaded = false
@@ -46,7 +47,7 @@ export async function loadChineseFonts(doc: jsPDF): Promise<void> {
     ])
 
     if (!normalResponse.ok || !boldResponse.ok) {
-      console.warn('無法載入中文字體，將使用預設字體')
+      logger.warn('無法載入中文字體，將使用預設字體')
       return
     }
 
@@ -62,7 +63,7 @@ export async function loadChineseFonts(doc: jsPDF): Promise<void> {
 
     addFontsToDoc(doc, normalFontBase64, boldFontBase64)
   } catch (error) {
-    console.warn('載入中文字體失敗:', error)
+    logger.warn('載入中文字體失敗:', error)
   }
 }
 

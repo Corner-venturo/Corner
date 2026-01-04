@@ -1,5 +1,6 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { Tour } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 import { useTourStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
@@ -269,7 +270,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       }
     } catch (error) {
       // Supabase 查詢失敗，繼續嘗試本地 Store
-      console.warn('[TourService] getOrCreateVisaTour Supabase 查詢失敗，使用備用邏輯:', error)
+      logger.warn('[TourService] getOrCreateVisaTour Supabase 查詢失敗，使用備用邏輯:', error)
     }
 
     // 檢查本地 Store 是否有（未刪除的）
@@ -351,7 +352,7 @@ class TourService extends BaseService<Tour & BaseEntity> {
       }
     } catch (error) {
       // Supabase 查詢失敗，繼續嘗試本地 Store
-      console.warn('[TourService] getOrCreateEsimTour Supabase 查詢失敗，使用備用邏輯:', error)
+      logger.warn('[TourService] getOrCreateEsimTour Supabase 查詢失敗，使用備用邏輯:', error)
     }
 
     // 檢查本地 Store 是否有（未刪除的）

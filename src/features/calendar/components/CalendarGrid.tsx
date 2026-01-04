@@ -3,32 +3,39 @@
 import { RefObject } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import { EventClickArg, MoreLinkAction } from '@fullcalendar/core'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin, { EventDragStopArg } from '@fullcalendar/interaction'
+import { EventClickArg, MoreLinkAction, EventDropArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 import { FullCalendarEvent } from '../types'
 
 interface CalendarGridProps {
   calendarRef: RefObject<FullCalendar | null>
   events: FullCalendarEvent[]
+  currentView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'
   onDateClick: (info: DateClickArg) => void
   onEventClick: (info: EventClickArg) => void
   onMoreLinkClick: MoreLinkAction
+  onEventDrop?: (info: EventDropArg) => void
+  onEventDragStop?: (info: EventDragStopArg) => void
 }
 
 export function CalendarGrid({
   calendarRef,
   events,
+  currentView,
   onDateClick,
   onEventClick,
   onMoreLinkClick,
+  onEventDrop,
+  onEventDragStop,
 }: CalendarGridProps) {
   return (
     <div className="calendar-container h-full">
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        initialView={currentView}
         headerToolbar={false}
         events={events}
         dateClick={onDateClick}
@@ -49,7 +56,7 @@ export function CalendarGrid({
           const eventType = info.event.extendedProps.type
           info.el.setAttribute('data-event-type', eventType)
         }}
-        displayEventTime={false}
+        displayEventTime={currentView !== 'dayGridMonth'}
         eventOrder="start,-duration,title"
         buttonText={{
           today: '今天',
@@ -57,6 +64,39 @@ export function CalendarGrid({
           week: '週',
           day: '日',
         }}
+        // 拖曳功能
+        editable={true}
+        droppable={true}
+        eventDrop={onEventDrop}
+        eventDragStop={onEventDragStop}
+        // 限制只有 personal 和 company 事件可以拖曳
+        eventStartEditable={true}
+        eventDurationEditable={true}
+        // 週/日視圖設定
+        slotMinTime="06:00:00"
+        slotMaxTime="22:00:00"
+        slotDuration="00:30:00"
+        slotLabelInterval="01:00:00"
+        slotLabelFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }}
+        eventTimeFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }}
+        allDaySlot={true}
+        allDayText="全天"
+        nowIndicator={true}
+        // 自動滾動到現在時間（往前 1 小時，讓現在時間線在畫面中間偏上）
+        scrollTime={(() => {
+          const now = new Date()
+          const hour = Math.max(6, now.getHours() - 1) // 至少從 06:00 開始
+          return `${String(hour).padStart(2, '0')}:00:00`
+        })()}
+        scrollTimeReset={false}
       />
     </div>
   )

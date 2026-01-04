@@ -5,6 +5,7 @@
 'use client'
 
 import React from 'react'
+import { formatDateTW } from '@/lib/utils/format-date'
 import { MORANDI_COLORS } from '../shared/print-styles'
 
 interface QuotationTermsProps {
@@ -14,9 +15,9 @@ interface QuotationTermsProps {
 export const QuotationTerms: React.FC<QuotationTermsProps> = ({ validUntil }) => {
   const formatValidUntil = () => {
     if (validUntil) {
-      return new Date(validUntil).toLocaleDateString('zh-TW')
+      return formatDateTW(validUntil)
     }
-    return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('zh-TW')
+    return formatDateTW(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000))
   }
 
   return (

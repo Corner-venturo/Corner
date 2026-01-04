@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
+import { formatMonthShort } from '@/lib/utils/format-date'
 
 // Collage 配色 (Pop Art)
 const POP = {
@@ -48,7 +49,7 @@ function formatDateShort(dateStr: string | undefined | null): string {
     }
     const date = new Date(dateStr)
     if (!isNaN(date.getTime())) {
-      const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+      const month = formatMonthShort(date)
       const day = date.getDate()
       return `${month} ${day}`
     }

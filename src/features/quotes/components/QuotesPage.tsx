@@ -13,6 +13,7 @@ import { DocumentVersionPicker } from '@/components/documents'
 import { useTourStore, useQuoteStore } from '@/stores'
 import type { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 
 // 狀態篩選（只顯示有報價單的團）
 const STATUS_TABS = [
@@ -110,11 +111,7 @@ export const QuotesPage: React.FC = () => {
       render: (_: unknown, row: Tour) => (
         <div className="flex items-center gap-1 text-sm text-morandi-secondary">
           <Calendar size={14} />
-          <span>
-            {row.departure_date
-              ? new Date(row.departure_date).toLocaleDateString('zh-TW')
-              : '-'}
-          </span>
+          <span>{formatDateTW(row.departure_date) || '-'}</span>
         </div>
       ),
     },

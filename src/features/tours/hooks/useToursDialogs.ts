@@ -18,7 +18,8 @@ interface ContractDialogState {
 export interface UseToursDialogsReturn {
   // Quote Dialog
   quoteDialogTour: Tour | null
-  openQuoteDialog: (tour: Tour) => void
+  quoteDialogMode: 'manage' | 'confirm'
+  openQuoteDialog: (tour: Tour, mode?: 'manage' | 'confirm') => void
   closeQuoteDialog: () => void
 
   // Itinerary Dialog
@@ -66,6 +67,7 @@ export interface UseToursDialogsReturn {
 export function useToursDialogs(): UseToursDialogsReturn {
   // Quote Dialog
   const [quoteDialogTour, setQuoteDialogTour] = useState<Tour | null>(null)
+  const [quoteDialogMode, setQuoteDialogMode] = useState<'manage' | 'confirm'>('manage')
 
   // Itinerary Dialog
   const [itineraryDialogTour, setItineraryDialogTour] = useState<Tour | null>(null)
@@ -99,8 +101,14 @@ export function useToursDialogs(): UseToursDialogsReturn {
   })
 
   // Handlers
-  const openQuoteDialog = useCallback((tour: Tour) => setQuoteDialogTour(tour), [])
-  const closeQuoteDialog = useCallback(() => setQuoteDialogTour(null), [])
+  const openQuoteDialog = useCallback((tour: Tour, mode: 'manage' | 'confirm' = 'manage') => {
+    setQuoteDialogTour(tour)
+    setQuoteDialogMode(mode)
+  }, [])
+  const closeQuoteDialog = useCallback(() => {
+    setQuoteDialogTour(null)
+    setQuoteDialogMode('manage')
+  }, [])
 
   const openItineraryDialog = useCallback((tour: Tour) => setItineraryDialogTour(tour), [])
   const closeItineraryDialog = useCallback(() => setItineraryDialogTour(null), [])
@@ -147,6 +155,7 @@ export function useToursDialogs(): UseToursDialogsReturn {
 
   return {
     quoteDialogTour,
+    quoteDialogMode,
     openQuoteDialog,
     closeQuoteDialog,
     itineraryDialogTour,

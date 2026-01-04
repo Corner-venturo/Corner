@@ -86,12 +86,7 @@ export const BrochureTableOfContents = forwardRef<HTMLDivElement, BrochureTableO
     return (
       <div
         ref={ref}
-        className="relative bg-white overflow-hidden flex flex-col"
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          aspectRatio: '1 / 1.414',
-        }}
+        className="relative bg-white overflow-hidden flex flex-col w-full h-full"
       >
         {/* 背景點點圖案 */}
         <div
@@ -107,30 +102,30 @@ export const BrochureTableOfContents = forwardRef<HTMLDivElement, BrochureTableO
         <div className="absolute top-0 right-6 w-12 h-16 bg-cyan-400/10 rounded-b-full z-0" />
 
         {/* 主要內容區 */}
-        <div className="relative z-10 flex flex-col flex-grow p-6 sm:p-8">
+        <div className="relative z-10 flex flex-col flex-grow p-4">
           {/* Header */}
-          <header className="flex justify-between items-start mb-6 border-b-2 border-slate-100 pb-4">
-            <div className="flex flex-col gap-1.5">
+          <header className="flex justify-between items-start mb-3 border-b-2 border-slate-100 pb-2">
+            <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="bg-cyan-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                <span className="bg-cyan-400 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
                   Guidebook
                 </span>
-                <span className="text-slate-400 text-[10px] font-medium tracking-widest">
+                <span className="text-slate-400 text-[9px] font-medium tracking-widest">
                   VOL. 01
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 CONTENTS
               </h1>
-              <p className="text-cyan-500 font-medium text-[10px] sm:text-xs tracking-widest uppercase mt-0.5">
+              <p className="text-cyan-500 font-medium text-[10px] tracking-widest uppercase">
                 {displayTitle}
               </p>
             </div>
 
             {/* 日文裝飾 */}
-            <div className="hidden sm:flex h-16 items-center justify-center">
+            <div className="flex h-14 items-center justify-center">
               <h2
-                className="text-xl font-bold text-slate-200 select-none tracking-widest leading-none"
+                className="text-lg font-bold text-slate-200 select-none tracking-widest leading-none"
                 style={{ writingMode: 'vertical-rl' }}
               >
                 目 録
@@ -139,16 +134,16 @@ export const BrochureTableOfContents = forwardRef<HTMLDivElement, BrochureTableO
           </header>
 
           {/* 章節網格 */}
-          <div className="grid grid-cols-2 gap-3 flex-grow">
+          <div className="grid grid-cols-2 gap-2 flex-grow">
             {dynamicChapters.map((chapter) => {
               const IconComponent = chapter.icon
               return (
                 <div
                   key={chapter.number}
-                  className="relative flex flex-col justify-between p-3 sm:p-4 bg-white border border-slate-100 rounded-lg"
+                  className="relative flex flex-col justify-between p-2.5 bg-white border border-slate-100 rounded-lg"
                 >
                   <div className="flex justify-between items-start">
-                    <span className="text-xl sm:text-2xl font-black text-slate-100">
+                    <span className="text-2xl font-black text-slate-100">
                       {chapter.number}
                     </span>
                     <div className="p-1.5 bg-slate-50 rounded-full text-slate-500">
@@ -172,22 +167,22 @@ export const BrochureTableOfContents = forwardRef<HTMLDivElement, BrochureTableO
           </div>
 
           {/* Footer */}
-          <footer className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+          <footer className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 flex-shrink-0">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-                <span className="text-[8px] font-bold text-slate-400">
+              <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+                <span className="text-[9px] font-bold text-slate-400">
                   {data.airportCode || '---'}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-xs text-slate-400 font-medium">
                 {data.city}, {data.country}
               </span>
             </div>
             <div className="flex flex-col items-end">
-              <p className="text-[10px] text-cyan-500 font-bold tracking-widest uppercase">
+              <p className="text-xs text-cyan-500 font-bold tracking-widest uppercase">
                 Bon Voyage
               </p>
-              <p className="text-[8px] text-slate-400 font-medium mt-0.5">Page 02</p>
+              <p className="text-[10px] text-slate-400 font-medium">Page 02</p>
             </div>
           </footer>
         </div>

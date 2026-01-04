@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { isHtmlString, cleanTiptapHtml } from '@/lib/utils/rich-text'
+import { formatMonthShort } from '@/lib/utils/format-date'
 
 // 渲染可能包含 HTML 的文字
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
@@ -84,7 +85,7 @@ function formatDateShort(dateStr: string): string {
   if (!dateStr) return ''
   try {
     const date = new Date(dateStr.replace(/\//g, '-'))
-    const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+    const month = formatMonthShort(date)
     const day = date.getDate()
     return `${month} ${day}`
   } catch {

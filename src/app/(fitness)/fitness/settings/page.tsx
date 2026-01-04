@@ -55,39 +55,39 @@ export default function FitnessSettingsPage() {
   return (
     <FitnessLayout activeTab="settings">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#FFFFFF] border-b border-[#E8E4E0] px-4 py-4">
-        <h1 className="text-xl font-bold text-[#333333]">設定</h1>
+      <div className="sticky top-0 z-10 bg-card border-b border-border px-4 py-4">
+        <h1 className="text-xl font-bold text-foreground">設定</h1>
       </div>
 
       <div className="px-4 pt-6 space-y-6">
         {/* 使用者資訊 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl p-4 shadow-[0_2px_8px_rgba(61,41,20,0.08)]">
+        <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-[#B8A99A] rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-morandi-gold rounded-full flex items-center justify-center">
               <User className="w-6 h-6 text-white" />
             </div>
             <div>
-              <div className="font-medium text-[#333333]">
+              <div className="font-medium text-foreground">
                 {user?.display_name || user?.chinese_name || '使用者'}
               </div>
-              <div className="text-sm text-[#8C8C8C]">{user?.personal_info?.email}</div>
+              <div className="text-sm text-muted-foreground">{user?.personal_info?.email}</div>
             </div>
           </div>
         </div>
 
         {/* 設定選項 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl overflow-hidden">
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
           {/* 清除本地資料 */}
           <button
             onClick={handleClearData}
-            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-[#F9F8F6] transition-colors border-b border-[#E8E4E0]"
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/50 transition-colors border-b border-border"
           >
-            <div className="w-10 h-10 bg-[#FFF3E0] rounded-full flex items-center justify-center">
-              <Trash2 className="w-5 h-5 text-[#B8A99A]" />
+            <div className="w-10 h-10 bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-morandi-gold" />
             </div>
             <div className="flex-1 text-left">
-              <div className="font-medium text-[#333333]">清除本地資料</div>
-              <div className="text-xs text-[#8C8C8C]">
+              <div className="font-medium text-foreground">清除本地資料</div>
+              <div className="text-xs text-muted-foreground">
                 清除所有健身記錄和設定
               </div>
             </div>
@@ -96,14 +96,14 @@ export default function FitnessSettingsPage() {
           {/* 登出 */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-[#F9F8F6] transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/50 transition-colors"
           >
-            <div className="w-10 h-10 bg-[#FFE5E5] rounded-full flex items-center justify-center">
-              <LogOut className="w-5 h-5 text-[#C94961]" />
+            <div className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+              <LogOut className="w-5 h-5 text-morandi-red" />
             </div>
             <div className="flex-1 text-left">
-              <div className="font-medium text-[#333333]">登出</div>
-              <div className="text-xs text-[#8C8C8C]">
+              <div className="font-medium text-foreground">登出</div>
+              <div className="text-xs text-muted-foreground">
                 登出 Corner Fitness
               </div>
             </div>
@@ -111,26 +111,26 @@ export default function FitnessSettingsPage() {
         </div>
 
         {/* 關於 */}
-        <div className="bg-[#FFFFFF] border border-[#E8E4E0] rounded-xl p-4">
+        <div className="bg-card border border-border rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-[#E8F4F8] rounded-full flex items-center justify-center flex-shrink-0">
-              <Info className="w-5 h-5 text-[#61A9C9]" />
+            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Info className="w-5 h-5 text-blue-500" />
             </div>
             <div className="flex-1">
-              <div className="font-medium text-[#333333] mb-2">
+              <div className="font-medium text-foreground mb-2">
                 關於 Corner Fitness
               </div>
-              <div className="text-sm text-[#8C8C8C] space-y-1">
+              <div className="text-sm text-muted-foreground space-y-1">
                 <p>版本：1.0.0</p>
                 <p>
                   簡潔優雅的健身記錄工具，專為 Corner
                   團隊設計。
                 </p>
-                <p className="mt-3 pt-3 border-t border-[#E8E4E0] space-y-1">
-                  <div>• 支援 134+ 訓練動作</div>
-                  <div>• 訓練容量自動計算</div>
-                  <div>• PWA 離線使用</div>
-                  <div>• 多裝置同步（開發中）</div>
+                <p className="mt-3 pt-3 border-t border-border space-y-1">
+                  <span className="block">• 支援 134+ 訓練動作</span>
+                  <span className="block">• 訓練容量自動計算</span>
+                  <span className="block">• PWA 離線使用</span>
+                  <span className="block">• 多裝置同步（開發中）</span>
                 </p>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function FitnessSettingsPage() {
         {/* 返回主系統 */}
         <button
           onClick={() => router.push('/')}
-          className="w-full py-3 text-sm text-[#8C8C8C] border border-[#E8E4E0] rounded-xl hover:bg-[#F9F8F6] transition-colors"
+          className="w-full py-3 text-sm text-muted-foreground border border-border rounded-xl hover:bg-muted/50 transition-colors"
         >
           ← 返回 Corner 主系統
         </button>

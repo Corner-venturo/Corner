@@ -10,6 +10,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { Printer, ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useItineraryStore, useTourStore, useAuthStore } from '@/stores'
+import { formatDateTW } from '@/lib/utils/format-date'
 import type { Itinerary, Tour } from '@/stores/types'
 
 function ItineraryPrintContent() {
@@ -209,7 +210,7 @@ function ItineraryPrintContent() {
 
           {/* 頁尾 */}
           <div className="mt-8 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
-            <p>本行程表由 {companyName} 提供 | 列印日期：{new Date().toLocaleDateString('zh-TW')}</p>
+            <p>本行程表由 {companyName} 提供 | 列印日期：{formatDateTW(new Date())}</p>
           </div>
         </div>
       </div>

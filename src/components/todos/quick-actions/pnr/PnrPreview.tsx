@@ -6,6 +6,7 @@ import {
   Plane, Calendar, AlertCircle, Clock,
   Utensils, Crown, Phone, Heart, Shield, Info
 } from 'lucide-react'
+import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
 import {
   formatSegment,
   isUrgent,
@@ -90,12 +91,7 @@ export function PnrPreview({
                 ? 'text-morandi-alert font-semibold'
                 : 'text-morandi-secondary'
             }>
-              {parsedData.ticketingDeadline.toLocaleDateString('zh-TW', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'short'
-              })}
+              {formatDateChineseWithWeekday(parsedData.ticketingDeadline)}
               {isUrgent(parsedData.ticketingDeadline) && (
                 <span className="ml-2 text-xs bg-morandi-alert/10 text-morandi-alert px-1 py-0.5 rounded">緊急</span>
               )}

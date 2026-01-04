@@ -7,7 +7,10 @@ import type { Quote } from '@/stores/types'
 
 type QuoteStatus = Quote['status']
 
-// 報價單狀態對照
+/**
+ * 報價單狀態對照
+ * 注意：此檔案與 status-config.ts 和 status-maps.ts 保持同步
+ */
 export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   draft: '草稿',
   proposed: '提案',
@@ -18,7 +21,7 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   rejected: '已拒絕',
 }
 
-// 報價單狀態顏色
+// 報價單狀態顏色（與 status-config.ts 保持一致）
 export const QUOTE_STATUS_COLORS: Record<QuoteStatus, string> = {
   draft: 'bg-morandi-secondary text-white',
   proposed: 'bg-morandi-gold text-white',

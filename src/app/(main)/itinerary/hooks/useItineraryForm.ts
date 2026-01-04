@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { alertError } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { formatDateCompact, formatWeekday, formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { Itinerary } from '@/stores/types'
 
 interface FlightInfo {
@@ -22,6 +23,7 @@ interface DailyData {
   lunch: string
   dinner: string
   accommodation: string
+  isSameAccommodation?: boolean // 續住（與前一天相同住宿）
 }
 
 interface UseItineraryFormProps {
@@ -148,8 +150,8 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
       for (let i = 1; i <= days; i++) {
         const date = new Date(newItineraryDepartureDate)
         date.setDate(date.getDate() + i - 1)
-        const dateStr = date.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })
-        const weekday = date.toLocaleDateString('zh-TW', { weekday: 'short' })
+        const dateStr = formatDateCompact(date)
+        const weekday = formatWeekday(date)
 
         const dayData = newItineraryDailyData[i - 1]
 
@@ -173,8 +175,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
 
       // Format date for display
       const formatDateForDisplay = (dateStr: string) => {
-        const date = new Date(dateStr)
-        return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/')
+        return formatDateTW(dateStr)
       }
 
       const newItinerary = {
@@ -202,7 +203,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
           flightNumber: '',
           departureAirport: 'TPE',
           departureTime: '',
-          departureDate: new Date(newItineraryDepartureDate).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }).replace(/\//g, '/'),
+          departureDate: formatDateCompactPadded(newItineraryDepartureDate),
           arrivalAirport: '',
           arrivalTime: '',
           duration: '',
@@ -221,7 +222,7 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
           flightNumber: '',
           departureAirport: '',
           departureTime: '',
-          departureDate: returnDate.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }).replace(/\//g, '/'),
+          departureDate: formatDateCompactPadded(returnDate),
           arrivalAirport: 'TPE',
           arrivalTime: '',
           duration: '',

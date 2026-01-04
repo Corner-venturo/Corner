@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { Heart, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 
 interface Wish {
   id: string
@@ -101,7 +102,7 @@ function WishCard({ wish, index }: { wish: Wish; index: number }) {
 
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
         <span className="text-xs text-morandi-secondary">
-          {new Date(wish.created_at).toLocaleDateString('zh-TW')}
+          {formatDateTW(wish.created_at)}
         </span>
         <button
           className="text-morandi-secondary hover:text-morandi-gold transition-colors"

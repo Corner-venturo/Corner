@@ -1716,6 +1716,8 @@ export type Database = {
           region_id: string | null
           timezone: string | null
           updated_at: string | null
+          usage_count: number | null
+          workspace_id: string | null
         }
         Insert: {
           airport_code?: string | null
@@ -1735,6 +1737,8 @@ export type Database = {
           region_id?: string | null
           timezone?: string | null
           updated_at?: string | null
+          usage_count?: number | null
+          workspace_id?: string | null
         }
         Update: {
           airport_code?: string | null
@@ -1754,6 +1758,8 @@ export type Database = {
           region_id?: string | null
           timezone?: string | null
           updated_at?: string | null
+          usage_count?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -1775,6 +1781,13 @@ export type Database = {
             columns: ["region_id"]
             isOneToOne: false
             referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cities_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -2297,6 +2310,8 @@ export type Database = {
           name_en: string
           region: string | null
           updated_at: string | null
+          usage_count: number | null
+          workspace_id: string | null
         }
         Insert: {
           code?: string | null
@@ -2310,6 +2325,8 @@ export type Database = {
           name_en: string
           region?: string | null
           updated_at?: string | null
+          usage_count?: number | null
+          workspace_id?: string | null
         }
         Update: {
           code?: string | null
@@ -2323,8 +2340,18 @@ export type Database = {
           name_en?: string
           region?: string | null
           updated_at?: string | null
+          usage_count?: number | null
+          workspace_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "countries_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cover_templates: {
         Row: {
@@ -5167,6 +5194,7 @@ export type Database = {
           selling_price: number | null
           special_meal: string | null
           ticket_number: string | null
+          ticketing_deadline: string | null
           total_payable: number | null
           transport_cost: number | null
           updated_by: string | null
@@ -5208,6 +5236,7 @@ export type Database = {
           selling_price?: number | null
           special_meal?: string | null
           ticket_number?: string | null
+          ticketing_deadline?: string | null
           total_payable?: number | null
           transport_cost?: number | null
           updated_by?: string | null
@@ -5249,6 +5278,7 @@ export type Database = {
           selling_price?: number | null
           special_meal?: string | null
           ticket_number?: string | null
+          ticketing_deadline?: string | null
           total_payable?: number | null
           transport_cost?: number | null
           updated_by?: string | null
@@ -7946,6 +7976,7 @@ export type Database = {
           name_en: string | null
           name_zh: string | null
           timezone: string | null
+          workspace_id: string | null
         }
         Insert: {
           city_code?: string | null
@@ -7960,6 +7991,7 @@ export type Database = {
           name_en?: string | null
           name_zh?: string | null
           timezone?: string | null
+          workspace_id?: string | null
         }
         Update: {
           city_code?: string | null
@@ -7974,8 +8006,17 @@ export type Database = {
           name_en?: string | null
           name_zh?: string | null
           timezone?: string | null
+          workspace_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ref_airports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ref_booking_classes: {
         Row: {
@@ -8095,6 +8136,7 @@ export type Database = {
           name: string
           name_en: string | null
           updated_at: string | null
+          workspace_id: string | null
         }
         Insert: {
           country_id: string
@@ -8106,6 +8148,7 @@ export type Database = {
           name: string
           name_en?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Update: {
           country_id?: string
@@ -8117,6 +8160,7 @@ export type Database = {
           name?: string
           name_en?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -8124,6 +8168,13 @@ export type Database = {
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "regions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -9834,6 +9885,76 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_documents: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          name: string
+          public_url: string
+          tour_id: string
+          updated_at: string | null
+          uploaded_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          public_url: string
+          tour_id: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          public_url?: string
+          tour_id?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_documents_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Tour_Expenses: {
         Row: {
           actual_amount: number
@@ -10871,71 +10992,6 @@ export type Database = {
           },
           {
             foreignKeyName: "tours_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      // === 手動添加：tour_documents (2026-01-02) ===
-      // Note: tour_id is text (not uuid) to match tours.id type
-      tour_documents: {
-        Row: {
-          id: string
-          tour_id: string // text type to match tours.id
-          workspace_id: string
-          name: string
-          description: string | null
-          file_path: string
-          public_url: string
-          file_name: string
-          file_size: number | null
-          mime_type: string | null
-          uploaded_by: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          tour_id: string
-          workspace_id: string
-          name: string
-          description?: string | null
-          file_path: string
-          public_url: string
-          file_name: string
-          file_size?: number | null
-          mime_type?: string | null
-          uploaded_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          tour_id?: string
-          workspace_id?: string
-          name?: string
-          description?: string | null
-          file_path?: string
-          public_url?: string
-          file_name?: string
-          file_size?: number | null
-          mime_type?: string | null
-          uploaded_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_documents_tour_id_fkey"
-            columns: ["tour_id"]
-            isOneToOne: false
-            referencedRelation: "tours"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tour_documents_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

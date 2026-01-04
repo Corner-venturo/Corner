@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 export const MANIFESTATION_LAST_DATE_KEY = 'manifestation_last_date'
 export const MANIFESTATION_STREAK_KEY = 'manifestation_streak'
@@ -33,7 +34,7 @@ const parseHistory = (raw: string | null): string[] => {
       return parsed.filter(item => typeof item === 'string')
     }
   } catch (error) {
-    console.error('[Manifestation] 解析歷史記錄失敗:', error)
+    logger.error('[Manifestation] 解析歷史記錄失敗:', error)
   }
   return []
 }
@@ -98,7 +99,7 @@ export const loadManifestationFromSupabase = async (
       history,
     }
   } catch (error) {
-    console.error('[Manifestation] 從 Supabase 載入失敗:', error)
+    logger.error('[Manifestation] 從 Supabase 載入失敗:', error)
     return null
   }
 }
@@ -128,7 +129,7 @@ export const saveManifestationToSupabase = async (
 
     return true
   } catch (error) {
-    console.error('[Manifestation] 保存到 Supabase 失敗:', error)
+    logger.error('[Manifestation] 保存到 Supabase 失敗:', error)
     return false
   }
 }

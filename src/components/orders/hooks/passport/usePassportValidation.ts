@@ -12,6 +12,7 @@ import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useCustomerStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
+import type { CreateCustomerData } from '@/types/customer.types'
 
 interface CustomerData {
   name?: string
@@ -185,28 +186,29 @@ export function usePassportValidation(): UsePassportValidationReturn {
 
           matchedCustomer = true
         } else {
-          // 護照辨識自動建立客戶，使用 type assertion 避免完整欄位驗證
+          // 護照辨識自動建立客戶
           const customerStore = useCustomerStore.getState()
-          const customerInput = {
+          // 使用 Partial 類型，讓 store 處理必填欄位的預設值
+          const customerInput: Partial<CreateCustomerData> & { name: string; phone: string } = {
             name: customerData.name || '',
             english_name: customerData.english_name || '',
             passport_number: passportNumber,
             passport_romanization: customerData.passport_romanization || '',
-            passport_expiry_date: customerData.passport_expiry_date || null,
+            passport_expiry_date: customerData.passport_expiry_date || undefined,
             passport_image_url: passportImageUrl,
             national_id: idNumber,
-            date_of_birth: birthDate,
-            gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
+            date_of_birth: birthDate || undefined,
+            gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : undefined,
             phone: '',
             member_type: 'potential', // 護照建立的客戶預設為潛在客戶
             is_vip: false,
+            is_active: true,
             total_spent: 0,
             total_orders: 0,
             verification_status: 'unverified',
-            // 其他欄位由資料庫預設值或 store 自動填入
           }
-           
-          const createdCustomer = await customerStore.create(customerInput as any)
+          // Store 的 create 方法會自動填入 workspace_id 等必填欄位
+          const createdCustomer = await customerStore.create(customerInput as Parameters<typeof customerStore.create>[0])
 
           if (createdCustomer) {
             await supabase

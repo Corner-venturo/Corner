@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { logger } from '@/lib/utils/logger'
+import { formatDateChinese } from '@/lib/utils/format-date'
 
 interface QuoteInfo {
   code: string
@@ -128,11 +129,7 @@ export default function QuoteConfirmPage() {
   function formatDate(dateStr: string | null) {
     if (!dateStr) return '-'
     try {
-      return new Date(dateStr).toLocaleDateString('zh-TW', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+      return formatDateChinese(dateStr)
     } catch {
       return dateStr
     }

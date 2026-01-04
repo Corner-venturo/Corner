@@ -1,7 +1,19 @@
 /**
- * Stores 統一匯出
- * 使用工廠函數建立所有 Store
- * 支援 Supabase 雲端同步 + IndexedDB 本地快取
+ * Stores 統一匯出（Zustand-based）
+ *
+ * ⚠️ 架構說明：
+ * - 此檔案使用 Zustand Store（舊架構，向後相容）
+ * - 新功能請優先使用 @/hooks/cloud-hooks（SWR-based）
+ *
+ * 兩套系統對照：
+ * | Zustand (此處)      | SWR (cloud-hooks)  |
+ * |---------------------|-------------------|
+ * | useTourStore        | useTours          |
+ * | useOrderStore       | useOrders         |
+ * | useCustomerStore    | useCustomers      |
+ * | ...                 | ...               |
+ *
+ * 遷移狀態：73 個檔案仍使用 Zustand，8 個使用 SWR
  */
 
 import { createStore } from './core/create-store'
@@ -172,8 +184,12 @@ export const useTourAddOnStore = createStore<import('./types').TourAddOn>({
 /**
  * 員工 Store
  * 使用員工編號（employee_number），不是 code
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
  */
-export const useEmployeeStore = createStore<Employee>('employees')
+export const useEmployeeStore = createStore<Employee>({
+  tableName: 'employees',
+  workspaceScoped: false,
+})
 
 // ============================================
 // 待補充的 Stores（根據需要啟用）
@@ -194,18 +210,35 @@ export const useVisaStore = createStore<Visa>({
   workspaceScoped: true,
 })
 
-// 代辦商成本 Store（記住代辦商+簽證類型的成本）
-// ⚠️ 不啟用 Workspace 隔離（全局共享）
-export const useVendorCostStore = createStore<import('./types').VendorCost>('vendor_costs')
+/**
+ * 代辦商成本 Store
+ * 記住代辦商+簽證類型的成本
+ * ⚠️ 不啟用 Workspace 隔離（全局共享）
+ */
+export const useVendorCostStore = createStore<import('./types').VendorCost>({
+  tableName: 'vendor_costs',
+  workspaceScoped: false,
+})
 
-// 供應商 Store
-export const useSupplierStore = createStore<Supplier>('suppliers', 'S')
+/**
+ * 供應商 Store
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ */
+export const useSupplierStore = createStore<Supplier>({
+  tableName: 'suppliers',
+  codePrefix: 'S',
+  workspaceScoped: false,
+})
 
-// 領隊資料 Store（基礎資料，不需要 workspace 隔離）
-export const useTourLeaderStore = createStore<import('@/types/tour-leader.types').TourLeader>(
-  'tour_leaders',
-  'TL'
-)
+/**
+ * 領隊資料 Store
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ */
+export const useTourLeaderStore = createStore<import('@/types/tour-leader.types').TourLeader>({
+  tableName: 'tour_leaders',
+  codePrefix: 'TL',
+  workspaceScoped: false,
+})
 
 // 供應商類別 Store
 export { useSupplierCategoryStore } from './supplier-category-store'
@@ -213,14 +246,32 @@ export { useSupplierCategoryStore } from './supplier-category-store'
 // 成本模板 Store
 export { useCostTemplateStore } from './cost-template-store'
 
-// 企業客戶 Store
-export const useCompanyStore = createStore<import('./types').Company>('companies')
+/**
+ * 企業客戶 Store
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ */
+export const useCompanyStore = createStore<import('./types').Company>({
+  tableName: 'companies',
+  workspaceScoped: false,
+})
 
-// 企業聯絡人 Store
-export const useCompanyContactStore = createStore<import('./types').CompanyContact>('company_contacts')
+/**
+ * 企業聯絡人 Store
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ */
+export const useCompanyContactStore = createStore<import('./types').CompanyContact>({
+  tableName: 'company_contacts',
+  workspaceScoped: false,
+})
 
-// 地區 Store（舊版，保留向後相容）
-export const useRegionStore = createStore<import('./region-store').Region>('regions')
+/**
+ * 地區 Store（舊版，保留向後相容）
+ * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ */
+export const useRegionStore = createStore<import('./region-store').Region>({
+  tableName: 'regions',
+  workspaceScoped: false,
+})
 
 // 地區 Store（新版，三層架構）
 // 支援 Countries > Regions > Cities 三層架構

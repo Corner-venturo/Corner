@@ -85,8 +85,9 @@ export type PaymentStatusValue = (typeof PAYMENT_STATUS_MAP)[PaymentStatusKey]
 
 export const QUOTE_STATUS_MAP = {
   draft: '草稿',
-  proposed: '提案中',
-  revised: '已修訂',
+  proposed: '提案',
+  revised: '修改中',
+  '進行中': '進行中',
   approved: '已核准',
   converted: '已轉單',
   rejected: '已拒絕',
@@ -94,8 +95,9 @@ export const QUOTE_STATUS_MAP = {
 
 export const QUOTE_STATUS_REVERSE_MAP = {
   草稿: 'draft',
-  提案中: 'proposed',
-  已修訂: 'revised',
+  提案: 'proposed',
+  修改中: 'revised',
+  進行中: '進行中',
   已核准: 'approved',
   已轉單: 'converted',
   已拒絕: 'rejected',

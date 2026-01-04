@@ -6,6 +6,7 @@ import { Search, X, MapPin, User, Clock, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDateCompact } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface SearchResult {
   type: 'tour' | 'member'
@@ -122,7 +123,7 @@ export function GlobalSearch({ autoFocus, onResultClick, className }: GlobalSear
 
       setResults(searchResults)
     } catch (error) {
-      console.error('Search error:', error)
+      logger.error('Search error:', error)
       setResults([])
     } finally {
       setIsLoading(false)

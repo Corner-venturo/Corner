@@ -14,12 +14,6 @@ export interface QuickActionTabConfig {
   icon: React.ComponentType<{ size?: number; className?: string }>
 }
 
-export interface SubTasksSectionProps {
-  todo: Todo
-  onUpdate: (updates: Partial<Todo>) => void
-  readOnly?: boolean
-}
-
 export interface NotesSectionProps {
   todo: Todo
   onUpdate: (updates: Partial<Todo>) => void

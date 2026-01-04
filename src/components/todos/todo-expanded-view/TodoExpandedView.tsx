@@ -13,7 +13,6 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Check, Calendar, Eye } from 'lucide-react'
 import { TodoExpandedViewProps } from './types'
 import { useTodoExpandedView } from './useTodoExpandedView'
-import { SubTasksSection } from './SubTasksSection'
 import { NotesSection } from './NotesSection'
 import { AssignmentSection } from './AssignmentSection'
 import { QuickActionsSection, QuickActionContent } from './QuickActionsSection'
@@ -38,7 +37,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
   return (
     <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-[900px] lg:max-w-[1200px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[1000px] lg:max-w-[1400px] max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0">
         <VisuallyHidden>
           <DialogTitle>{todo.title || '待辦事項詳情'}</DialogTitle>
         </VisuallyHidden>
@@ -86,9 +85,6 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
             {/* 基本資訊 */}
             <AssignmentSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
-
-            {/* 子任務清單 */}
-            <SubTasksSection todo={todo} onUpdate={canEdit ? onUpdate : readOnlyUpdate} readOnly={!canEdit} />
 
             {/* 備註區 - 即使唯讀也可以留言 */}
             <NotesSection todo={todo} onUpdate={onUpdate} />

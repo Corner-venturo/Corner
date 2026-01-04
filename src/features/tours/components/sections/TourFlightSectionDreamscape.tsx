@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Plane } from 'lucide-react'
+import { formatMonthShort } from '@/lib/utils/format-date'
 
 // Dreamscape 配色
 const DREAM = {
@@ -51,7 +52,7 @@ function formatDateShort(dateStr: string | undefined | null): string {
     // 嘗試 ISO 格式
     const date = new Date(dateStr)
     if (!isNaN(date.getTime())) {
-      const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+      const month = formatMonthShort(date)
       const day = date.getDate()
       return `${month} ${day}`
     }

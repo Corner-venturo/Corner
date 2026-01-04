@@ -11,8 +11,8 @@ import { DateCell, CurrencyCell, TextCell, ActionCell } from '@/components/table
 import { X, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
-  STATUS_LABELS,
-  STATUS_COLORS,
+  PAYMENT_REQUEST_STATUS_LABELS,
+  PAYMENT_REQUEST_STATUS_COLORS,
   DISBURSEMENT_STATUS_LABELS,
   DISBURSEMENT_STATUS_COLORS,
 } from '../constants'
@@ -88,8 +88,8 @@ export function usePendingColumns({ selectedRequests, onSelectRequest }: UsePend
         key: 'status',
         label: '狀態',
         render: (value: unknown) => (
-          <Badge className={cn('text-white', STATUS_COLORS[value as keyof typeof STATUS_COLORS])}>
-            {STATUS_LABELS[value as keyof typeof STATUS_LABELS]}
+          <Badge className={cn('text-white', PAYMENT_REQUEST_STATUS_COLORS[value as keyof typeof PAYMENT_REQUEST_STATUS_COLORS])}>
+            {PAYMENT_REQUEST_STATUS_LABELS[value as keyof typeof PAYMENT_REQUEST_STATUS_LABELS]}
           </Badge>
         ),
       },

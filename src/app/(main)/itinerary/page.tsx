@@ -480,6 +480,71 @@ interface DailyItineraryPreviewProps {
 }
 
 function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
+  // 取得實際住宿（處理續住邏輯）
+  const getEffectiveAccommodation = (dayIndex: number): string => {
+    const dayData = formState.newItineraryDailyData[dayIndex]
+    if (!dayData) return ''
+
+    // 如果不是續住，直接返回當天住宿
+    if (!dayData.isSameAccommodation) {
+      return dayData.accommodation || ''
+    }
+
+    // 續住：往前找到最近的非續住住宿
+    for (let i = dayIndex - 1; i >= 0; i--) {
+      const prevDay = formState.newItineraryDailyData[i]
+      if (!prevDay?.isSameAccommodation) {
+        return prevDay?.accommodation || ''
+      }
+    }
+    return ''
+  }
+
+  // 處理續住勾選
+  const handleSameAccommodationChange = (dayIndex: number, checked: boolean) => {
+    formState.setNewItineraryDailyData(prev => {
+      const updated = [...prev]
+      if (checked) {
+        // 勾選續住：複製前一天的住宿
+        const prevAccommodation = getEffectiveAccommodation(dayIndex - 1)
+        updated[dayIndex] = {
+          ...updated[dayIndex],
+          isSameAccommodation: true,
+          accommodation: prevAccommodation,
+        }
+      } else {
+        // 取消續住：清空住宿讓用戶重新填寫
+        updated[dayIndex] = {
+          ...updated[dayIndex],
+          isSameAccommodation: false,
+          accommodation: '',
+        }
+      }
+      return updated
+    })
+  }
+
+  // 當住宿變更時，更新所有續住的後續天數
+  const updateDayData = (dayIndex: number, field: string, value: string) => {
+    formState.setNewItineraryDailyData(prev => {
+      const updated = [...prev]
+      updated[dayIndex] = { ...updated[dayIndex], [field]: value }
+
+      // 如果修改的是住宿，更新後續所有續住的天數
+      if (field === 'accommodation') {
+        for (let i = dayIndex + 1; i < updated.length; i++) {
+          if (updated[i]?.isSameAccommodation) {
+            updated[i] = { ...updated[i], accommodation: value }
+          } else {
+            break // 遇到非續住的就停止
+          }
+        }
+      }
+
+      return updated
+    })
+  }
+
   return (
     <div className="w-1/2 p-6 overflow-y-auto">
       <h3 className="text-sm font-bold text-morandi-primary mb-4">每日行程</h3>
@@ -495,14 +560,9 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
               date.setDate(date.getDate() + i)
               dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
             }
-            const dayData = formState.newItineraryDailyData[i] || { title: '', breakfast: '', lunch: '', dinner: '', accommodation: '' }
-            const updateDayData = (field: string, value: string) => {
-              formState.setNewItineraryDailyData(prev => {
-                const updated = [...prev]
-                updated[i] = { ...updated[i], [field]: value }
-                return updated
-              })
-            }
+            const dayData = formState.newItineraryDailyData[i] || { title: '', breakfast: '', lunch: '', dinner: '', accommodation: '', isSameAccommodation: false }
+            const effectiveAccommodation = getEffectiveAccommodation(i)
+
             return (
               <div key={dayNum} className="p-3 rounded-lg border border-morandi-muted/30">
                 <div className="flex items-center gap-2 mb-2">
@@ -515,35 +575,57 @@ function DailyItineraryPreview({ formState }: DailyItineraryPreviewProps) {
                   placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '每日標題'}
                   className="h-8 text-sm mb-2"
                   value={dayData.title}
-                  onChange={e => updateDayData('title', e.target.value)}
+                  onChange={e => updateDayData(i, 'title', e.target.value)}
                 />
                 <div className="grid grid-cols-3 gap-2">
                   <Input
                     placeholder={isFirst ? '溫暖的家' : '早餐'}
                     className="h-8 text-xs"
                     value={dayData.breakfast}
-                    onChange={e => updateDayData('breakfast', e.target.value)}
+                    onChange={e => updateDayData(i, 'breakfast', e.target.value)}
                   />
                   <Input
                     placeholder="午餐"
                     className="h-8 text-xs"
                     value={dayData.lunch}
-                    onChange={e => updateDayData('lunch', e.target.value)}
+                    onChange={e => updateDayData(i, 'lunch', e.target.value)}
                   />
                   <Input
                     placeholder="晚餐"
                     className="h-8 text-xs"
                     value={dayData.dinner}
-                    onChange={e => updateDayData('dinner', e.target.value)}
+                    onChange={e => updateDayData(i, 'dinner', e.target.value)}
                   />
                 </div>
                 {!isLast && (
-                  <Input
-                    placeholder="住宿飯店"
-                    className="h-8 text-xs mt-2"
-                    value={dayData.accommodation}
-                    onChange={e => updateDayData('accommodation', e.target.value)}
-                  />
+                  <div className="mt-2 space-y-1">
+                    {/* 續住勾選（第二天以後才顯示） */}
+                    {!isFirst && (
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={dayData.isSameAccommodation || false}
+                          onChange={e => handleSameAccommodationChange(i, e.target.checked)}
+                          className="w-3.5 h-3.5 rounded border-morandi-muted text-morandi-gold focus:ring-morandi-gold"
+                        />
+                        <span className="text-xs text-morandi-secondary">
+                          續住
+                          {dayData.isSameAccommodation && effectiveAccommodation && (
+                            <span className="text-morandi-gold ml-1">（{effectiveAccommodation}）</span>
+                          )}
+                        </span>
+                      </label>
+                    )}
+                    {/* 住宿輸入欄位 */}
+                    {!dayData.isSameAccommodation && (
+                      <Input
+                        placeholder="住宿飯店"
+                        className="h-8 text-xs"
+                        value={dayData.accommodation}
+                        onChange={e => updateDayData(i, 'accommodation', e.target.value)}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
             )

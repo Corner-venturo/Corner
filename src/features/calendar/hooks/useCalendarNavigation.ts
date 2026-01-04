@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import FullCalendar from '@fullcalendar/react'
+import { formatYearMonth } from '@/lib/utils/format-date'
 
 export function useCalendarNavigation() {
   const calendarRef = useRef<FullCalendar>(null)
@@ -26,7 +27,7 @@ export function useCalendarNavigation() {
 
   // 格式化當前月份
   const getCurrentMonthYear = () => {
-    return currentDate.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' })
+    return formatYearMonth(currentDate)
   }
 
   return {

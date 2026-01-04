@@ -113,7 +113,7 @@ export function TourRequestDetailDialog({
         <div className="space-y-6 py-4">
           {/* 狀態與分類 */}
           <div className="flex items-center gap-4 flex-wrap">
-            <StatusCell type="todo" status={request.status || 'pending'} />
+            <StatusCell type="tour_request" status={request.status || 'pending'} />
             <BadgeCell
               text={CATEGORY_LABELS[request.category] || request.category}
               variant="info"

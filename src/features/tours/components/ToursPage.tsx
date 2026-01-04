@@ -67,7 +67,6 @@ export const ToursPage: React.FC = () => {
     setActiveStatusTab,
     searchQuery,
     setSearchQuery,
-    expandedRows,
     state,
     actions,
     handleSortChange,
@@ -75,6 +74,7 @@ export const ToursPage: React.FC = () => {
 
   const {
     quoteDialogTour,
+    quoteDialogMode,
     openQuoteDialog,
     closeQuoteDialog,
     itineraryDialogTour,
@@ -105,25 +105,14 @@ export const ToursPage: React.FC = () => {
   } = useToursDialogs()
 
   const {
-    activeTabs,
     submitting,
     setSubmitting,
     formError,
     setFormError,
-    triggerAddOnAdd,
-    setTriggerAddOnAdd,
-    triggerPaymentAdd,
-    setTriggerPaymentAdd,
-    triggerCostAdd,
-    setTriggerCostAdd,
-    tourExtraFields,
-    setTourExtraFields,
     newTour,
     setNewTour,
     newOrder,
     setNewOrder,
-    toggleRowExpand,
-    setActiveTab,
     getStatusColor,
     setSelectedTour,
   } = state
@@ -177,11 +166,7 @@ export const ToursPage: React.FC = () => {
     onOpenQuoteDialog: openQuoteDialog,
     onOpenItineraryDialog: openItineraryDialog,
     onOpenContractDialog: openContractDialog,
-    onViewDetails: (tour) => {
-      setSelectedTour(tour)
-      openDetailDialog(tour.id)
-    },
-    onConfirmTour: openConfirmWizard,
+    onConfirmTour: (tour: Tour) => openQuoteDialog(tour, 'confirm'),
     onUnlockLockedTour: openUnlockDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
@@ -238,22 +223,8 @@ export const ToursPage: React.FC = () => {
         <TourTable
           tours={filteredTours}
           loading={loading}
-          orders={orders}
-          expandedRows={expandedRows}
-          activeTabs={activeTabs}
-          tourExtraFields={tourExtraFields}
-          triggerAddOnAdd={triggerAddOnAdd}
-          triggerPaymentAdd={triggerPaymentAdd}
-          triggerCostAdd={triggerCostAdd}
           onSort={handleSortChange}
-          onExpand={toggleRowExpand}
           onRowClick={handleRowClick}
-          onActiveTabChange={setActiveTab}
-          onTourExtraFieldsChange={setTourExtraFields}
-          onTriggerAddOnAdd={setTriggerAddOnAdd}
-          onTriggerPaymentAdd={setTriggerPaymentAdd}
-          onTriggerCostAdd={setTriggerCostAdd}
-          openDialog={() => {}}
           renderActions={renderActions}
           getStatusColor={getStatusColor}
         />
@@ -294,6 +265,8 @@ export const ToursPage: React.FC = () => {
           isOpen={!!quoteDialogTour}
           onClose={closeQuoteDialog}
           tour={quoteDialogTour}
+          mode={quoteDialogMode}
+          onConfirmLock={() => operations.handleConfirmTour(quoteDialogTour)}
         />
       )}
 

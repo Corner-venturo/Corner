@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { EventClickArg } from '@fullcalendar/core'
+import { EventClickArg, EventDropArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 import { useCalendarEventStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
@@ -278,6 +278,97 @@ export function useEventOperations() {
     setAddEventDialog({ open: false, selectedDate: '' })
   }
 
+  // 處理拖曳事件
+  const handleEventDrop = async (info: EventDropArg) => {
+    const eventType = info.event.extendedProps.type
+
+    // 只允許 personal 和 company 事件被拖曳
+    if (eventType !== 'personal' && eventType !== 'company') {
+      info.revert() // 還原拖曳
+      logger.warn('只有個人和公司事項可以拖曳')
+      return
+    }
+
+    // 取得原始事件 ID（移除可能的前綴）
+    const eventId = info.event.id
+
+    // 從 store 找到原始事件
+    const originalEvent = calendarEvents.find(e => e.id === eventId)
+    if (!originalEvent) {
+      info.revert()
+      logger.error('找不到原始事件')
+      return
+    }
+
+    try {
+      const tzOffset = '+08:00'
+      const newStart = info.event.start
+      const newEnd = info.event.end
+
+      if (!newStart) {
+        info.revert()
+        return
+      }
+
+      // 判斷是否為全天事件
+      const isAllDay = info.event.allDay
+
+      let startDateTime: string
+      let endDateTime: string
+
+      if (isAllDay) {
+        // 全天事件：使用台北時區的日期
+        const startDate = newStart.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+        const endDate = newEnd
+          ? newEnd.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+          : startDate
+
+        startDateTime = `${startDate}T00:00:00${tzOffset}`
+        endDateTime = `${endDate}T00:00:00${tzOffset}`
+      } else {
+        // 有時間的事件：保留原始時間長度，只更新開始時間
+        const startDate = newStart.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+        const startTime = newStart.toLocaleTimeString('zh-TW', {
+          timeZone: 'Asia/Taipei',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
+
+        startDateTime = `${startDate}T${startTime}:00${tzOffset}`
+
+        if (newEnd) {
+          const endDate = newEnd.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+          const endTime = newEnd.toLocaleTimeString('zh-TW', {
+            timeZone: 'Asia/Taipei',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          })
+          endDateTime = `${endDate}T${endTime}:00${tzOffset}`
+        } else {
+          endDateTime = startDateTime
+        }
+      }
+
+      logger.log('[Calendar] 拖曳更新事件:', {
+        eventId,
+        newStart: startDateTime,
+        newEnd: endDateTime,
+        isAllDay,
+      })
+
+      await updateEvent(eventId, {
+        start: startDateTime,
+        end: endDateTime,
+        all_day: isAllDay,
+      })
+    } catch (error) {
+      info.revert() // 發生錯誤時還原
+      logger.error('拖曳更新事件失敗:', error)
+    }
+  }
+
   return {
     eventDetailDialog,
     setEventDetailDialog,
@@ -295,5 +386,6 @@ export function useEventOperations() {
     handleUpdateEvent,
     resetEditEventForm,
     resetAddEventForm,
+    handleEventDrop,
   }
 }

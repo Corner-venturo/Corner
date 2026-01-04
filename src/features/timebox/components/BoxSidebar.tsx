@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/auth-store'
 import { useTimeboxBoxes, morandiColors, type TimeboxBox } from '../hooks/useTimeboxData'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -52,7 +53,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
       setNewBoxColor(morandiColors[0].value)
       setShowQuickAdd(false)
     } catch (error) {
-      console.error('[BoxSidebar] 新增箱子失敗:', error)
+      logger.error('[BoxSidebar] 新增箱子失敗:', error)
       alert(error instanceof Error ? error.message : '新增失敗，請稍後再試')
     }
   }

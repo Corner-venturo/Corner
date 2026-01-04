@@ -18,8 +18,12 @@ type ChannelEntity = Channel & Pick<BaseEntity, 'updated_at'>
  * 表格: channels
  * 快取策略: 全量快取 (Workspace 核心功能)
  * 注意：channels 不使用 code 欄位
+ * 🔒 啟用 Workspace 隔離
  */
-export const useChannelStore = createStore<ChannelEntity>('channels', undefined, true)
+export const useChannelStore = createStore<ChannelEntity>({
+  tableName: 'channels',
+  workspaceScoped: true,
+})
 
 /**
  * Hook 型別（方便使用）

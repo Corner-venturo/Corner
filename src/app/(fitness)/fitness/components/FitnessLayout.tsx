@@ -30,10 +30,10 @@ export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayout
   // 載入中或未登入 → 顯示載入畫面
   if (!_hasHydrated || !user || !isClient) {
     return (
-      <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🏋️</div>
-          <div className="text-[#8C8C8C]">載入中...</div>
+          <div className="text-morandi-secondary">載入中...</div>
         </div>
       </div>
     )
@@ -47,12 +47,12 @@ export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayout
   ]
 
   return (
-    <div className="min-h-screen bg-[#F9F8F6] pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* 內容區域 */}
       <div className="pb-16">{children}</div>
 
       {/* 底部 Tab 導航 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#FFFFFF] border-t border-[#E8E4E0] safe-area-inset-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-area-inset-bottom">
         <div className="grid grid-cols-4 h-16">
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -64,8 +64,8 @@ export function FitnessLayout({ children, activeTab = 'workout' }: FitnessLayout
                 onClick={() => router.push(tab.path)}
                 className={`flex flex-col items-center justify-center gap-1 transition-colors ${
                   isActive
-                    ? 'text-[#B8A99A]'
-                    : 'text-[#8C8C8C] hover:text-[#8C8C8C]'
+                    ? 'text-morandi-gold'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
                 }`}
               >
                 <Icon className="w-5 h-5" />

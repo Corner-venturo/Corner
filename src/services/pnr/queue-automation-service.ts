@@ -10,6 +10,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { formatDateChinese } from '@/lib/utils/format-date'
 import type { Database } from '@/lib/supabase/types'
 import type {
   PNR,
@@ -606,11 +607,7 @@ function isTicketed(pnr: PNR): boolean {
 function formatDate(dateStr: string): string {
   try {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    })
+    return formatDateChinese(date)
   } catch {
     return dateStr
   }

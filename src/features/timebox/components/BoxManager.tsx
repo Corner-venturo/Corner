@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Dumbbell, MessageSquare, Package, Edit, Trash2 } from 'lucide-react'
-import { useTimeboxBoxes, morandiColors, type TimeboxBox } from '../hooks/useTimeboxData'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Plus, Dumbbell, MessageSquare, Package, Trash2, Save, X } from 'lucide-react'
+import { useTimeboxBoxes, morandiColors, type TimeboxBox, type ReminderData } from '../hooks/useTimeboxData'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { logger } from '@/lib/utils/logger'
 
 const typeIcons = {
   workout: Dumbbell,
@@ -16,9 +19,9 @@ const typeIcons = {
 }
 
 const typeLabels = {
-  workout: '重訓箱子',
-  reminder: '文字提示箱子',
-  basic: '普通箱子',
+  workout: '重訓',
+  reminder: '提醒',
+  basic: '一般',
 }
 
 export default function BoxManager() {
@@ -27,21 +30,50 @@ export default function BoxManager() {
 
   const { items: boxes, create: createBox, update: updateBox, delete: deleteBox } = useTimeboxBoxes()
 
-  const [editingBox, setEditingBox] = useState<string | null>(null)
-  const [showForm, setShowForm] = useState(false)
+  const [selectedBox, setSelectedBox] = useState<TimeboxBox | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
 
   // 表單狀態
   const [formData, setFormData] = useState({
     name: '',
     type: 'basic' as 'workout' | 'reminder' | 'basic',
     color: morandiColors[0].value,
-    default_duration: 60, // 預設 1 小時
+    default_duration: 60,
+    default_content: '' as string, // 文字提示的預設內容
   })
 
   // 使用者的箱子
   const userBoxes = boxes.filter(b => b.user_id === userId)
 
-  const handleSubmit = async () => {
+  const openEditDialog = (box: TimeboxBox) => {
+    const reminderText = box.type === 'reminder' && box.default_content
+      ? (box.default_content as unknown as ReminderData)?.text || ''
+      : ''
+
+    setFormData({
+      name: box.name,
+      type: (box.type || 'basic') as 'workout' | 'reminder' | 'basic',
+      color: box.color || morandiColors[0].value,
+      default_duration: box.default_duration || 60,
+      default_content: reminderText,
+    })
+    setSelectedBox(box)
+    setIsCreating(false)
+  }
+
+  const openCreateDialog = () => {
+    setFormData({
+      name: '',
+      type: 'basic',
+      color: morandiColors[0].value,
+      default_duration: 60,
+      default_content: '',
+    })
+    setSelectedBox(null)
+    setIsCreating(true)
+  }
+
+  const handleSave = async () => {
     if (!formData.name.trim()) {
       alert('請填寫名稱')
       return
@@ -52,124 +84,161 @@ export default function BoxManager() {
     }
 
     try {
-      if (editingBox) {
-        await updateBox(editingBox, {
+      // 準備 default_content（只有 reminder 類型才需要）
+      const defaultContent = formData.type === 'reminder' && formData.default_content.trim()
+        ? { text: formData.default_content, lastUpdated: new Date().toISOString() }
+        : null
+
+      if (selectedBox) {
+        // 編輯模式
+        await updateBox(selectedBox.id, {
           name: formData.name,
           type: formData.type,
           color: formData.color,
           default_duration: formData.default_duration,
+          default_content: defaultContent as unknown as Record<string, unknown> | null,
         })
-        setEditingBox(null)
       } else {
+        // 新增模式
         await createBox({
           name: formData.name,
           type: formData.type,
           color: formData.color,
           default_duration: formData.default_duration,
           user_id: userId,
-          default_content: null,
+          default_content: defaultContent as unknown as Record<string, unknown> | null,
         })
       }
 
-      resetForm()
+      closeDialog()
     } catch (error) {
-      console.error('[BoxManager] 儲存失敗:', error)
+      logger.error('[BoxManager] 儲存失敗:', error)
       alert(error instanceof Error ? error.message : '儲存失敗，請稍後再試')
     }
   }
 
-  const handleEdit = (box: TimeboxBox) => {
-    setFormData({
-      name: box.name,
-      type: (box.type || 'basic') as 'workout' | 'reminder' | 'basic',
-      color: box.color || morandiColors[0].value,
-      default_duration: box.default_duration || 60,
-    })
-    setEditingBox(box.id)
-    setShowForm(true)
-  }
+  const handleDelete = async () => {
+    if (!selectedBox) return
 
-  const handleDelete = async (id: string) => {
-    const confirmed = await confirm('確定要刪除這個箱子嗎？', {
+    const confirmed = await confirm(`確定要刪除「${selectedBox.name}」嗎？`, {
       title: '刪除箱子',
       type: 'warning',
     })
     if (confirmed) {
-      await deleteBox(id)
+      await deleteBox(selectedBox.id)
+      closeDialog()
     }
   }
 
-  const resetForm = () => {
-    setShowForm(false)
-    setEditingBox(null)
-    setFormData({
-      name: '',
-      type: 'basic',
-      color: morandiColors[0].value,
-      default_duration: 60,
-    })
+  const closeDialog = () => {
+    setSelectedBox(null)
+    setIsCreating(false)
   }
 
   return (
-    <div className="w-full flex flex-col gap-6 p-6">
-      {/* 標題與新增按鈕 */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-morandi-primary">我的箱子</h2>
-          <p className="text-sm text-morandi-secondary">建立箱子模板，用於排程到時間表中</p>
-        </div>
-        {!showForm && (
-          <Button
-            size="sm"
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            onClick={() => setShowForm(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            新增箱子
-          </Button>
+    <div className="space-y-4">
+      {/* 簡潔的箱子列表 */}
+      <div className="space-y-1">
+        {userBoxes.length === 0 ? (
+          <div className="text-center text-morandi-secondary py-8">
+            還沒有建立任何箱子
+          </div>
+        ) : (
+          userBoxes.map((box) => {
+            const boxType = (box.type || 'basic') as 'workout' | 'reminder' | 'basic'
+            const Icon = typeIcons[boxType] || Package
+            return (
+              <button
+                key={box.id}
+                onClick={() => openEditDialog(box)}
+                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-morandi-container/30 transition-colors text-left group"
+              >
+                {/* 顏色圓點 + 圖標 */}
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0"
+                  style={{ backgroundColor: box.color || '#D4D4D4' }}
+                >
+                  <Icon className="h-4 w-4" />
+                </div>
+
+                {/* 名稱與類型 */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-morandi-primary truncate">
+                    {box.name}
+                  </div>
+                  <div className="text-xs text-morandi-secondary">
+                    {typeLabels[boxType]} · {(box.default_duration || 60) >= 60 ? `${(box.default_duration || 60) / 60}小時` : `${box.default_duration || 60}分鐘`}
+                  </div>
+                </div>
+
+                {/* 提示有預設內容 */}
+                {boxType === 'reminder' && box.default_content && (
+                  <div className="text-xs text-morandi-gold">已設定</div>
+                )}
+              </button>
+            )
+          })
         )}
       </div>
 
-      {/* 新增/編輯表單 */}
-      {showForm && (
-        <div className="border border-border rounded-lg p-4 bg-morandi-container/10">
-          <h3 className="font-medium mb-4">{editingBox ? '編輯箱子' : '新增箱子'}</h3>
+      {/* 新增按鈕 */}
+      <Button
+        variant="outline"
+        className="w-full gap-2"
+        onClick={openCreateDialog}
+      >
+        <Plus className="h-4 w-4" />
+        新增箱子
+      </Button>
+
+      {/* 編輯/新增對話框 */}
+      <Dialog open={!!selectedBox || isCreating} onOpenChange={(open) => !open && closeDialog()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedBox ? '編輯箱子' : '新增箱子'}
+            </DialogTitle>
+          </DialogHeader>
+
           <div className="space-y-4">
+            {/* 名稱 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                箱子名稱 *
+                名稱
               </label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="請輸入箱子名稱"
+                placeholder="箱子名稱"
               />
             </div>
 
+            {/* 類型 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                箱子類型
+                類型
               </label>
               <Select
                 value={formData.type}
                 onValueChange={(value: 'workout' | 'reminder' | 'basic') =>
-                  setFormData({ ...formData, type: value })
+                  setFormData({ ...formData, type: value, default_content: value !== 'reminder' ? '' : formData.default_content })
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basic">普通箱子</SelectItem>
+                  <SelectItem value="basic">一般箱子</SelectItem>
                   <SelectItem value="workout">重訓箱子</SelectItem>
                   <SelectItem value="reminder">文字提示箱子</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            {/* 顏色 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
-                顏色選擇
+                顏色
               </label>
               <div className="flex flex-wrap gap-2">
                 {morandiColors.map((c) => (
@@ -177,7 +246,7 @@ export default function BoxManager() {
                     key={c.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, color: c.value })}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                    className={`w-7 h-7 rounded-full border-2 transition-all ${
                       formData.color === c.value
                         ? 'border-morandi-primary scale-110'
                         : 'border-transparent hover:scale-105'
@@ -189,6 +258,7 @@ export default function BoxManager() {
               </div>
             </div>
 
+            {/* 預設時長 */}
             <div>
               <label className="block text-sm font-medium text-morandi-primary mb-2">
                 預設時長
@@ -211,83 +281,57 @@ export default function BoxManager() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={resetForm}
-                className="text-morandi-secondary border-border"
-              >
-                取消
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!formData.name.trim()}
-                className="bg-morandi-gold hover:bg-morandi-gold-hover"
-              >
-                {editingBox ? '更新' : '建立'}
-              </Button>
+            {/* 文字提示內容（僅 reminder 類型） */}
+            {formData.type === 'reminder' && (
+              <div>
+                <label className="block text-sm font-medium text-morandi-primary mb-2">
+                  預設提示內容
+                </label>
+                <Textarea
+                  placeholder={`例如：保濕程序\n1. 卸妝\n2. 洗臉\n3. 化妝水...`}
+                  value={formData.default_content}
+                  onChange={(e) => setFormData({ ...formData, default_content: e.target.value })}
+                  rows={6}
+                  className="resize-none"
+                />
+                <p className="text-xs text-morandi-secondary mt-1">
+                  新增排程時會自動帶入此內容
+                </p>
+              </div>
+            )}
+
+            {/* 按鈕 */}
+            <div className="flex justify-between pt-4 border-t">
+              {selectedBox ? (
+                <Button
+                  variant="outline"
+                  onClick={handleDelete}
+                  className="text-status-danger border-morandi-red/30 hover:bg-status-danger-bg gap-1"
+                >
+                  <Trash2 size={16} />
+                  刪除
+                </Button>
+              ) : (
+                <div />
+              )}
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={closeDialog} className="gap-1">
+                  <X size={16} />
+                  取消
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={!formData.name.trim()}
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
+                >
+                  <Save size={16} />
+                  儲存
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* 箱子列表 */}
-      <div className="flex-1 overflow-y-auto">
-        {userBoxes.length === 0 ? (
-          <div className="text-center text-morandi-secondary/80 py-16">
-            還沒有建立任何箱子
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {userBoxes.map((box) => {
-              const boxType = (box.type || 'basic') as 'workout' | 'reminder' | 'basic'
-              const Icon = typeIcons[boxType] || Package
-              return (
-                <div
-                  key={box.id}
-                  className="group relative flex items-center gap-3 rounded-xl border border-border/60 bg-background/60 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-                  style={{ borderLeft: `4px solid ${box.color || '#D4D4D4'}` }}
-                >
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
-                    style={{ backgroundColor: box.color || '#D4D4D4' }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-morandi-primary truncate">
-                      {box.name}
-                    </div>
-                    <div className="text-sm text-morandi-secondary">
-                      {typeLabels[boxType]}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-morandi-secondary hover:text-morandi-primary"
-                      onClick={() => handleEdit(box)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-morandi-secondary hover:text-destructive"
-                      onClick={() => handleDelete(box.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

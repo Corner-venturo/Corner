@@ -31,6 +31,7 @@ import {
   Baby,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/utils/format-date'
 import {
   parseAmadeusPNR,
   type ParsedPNR,
@@ -527,7 +528,7 @@ export function TourPnrToolDialog({
                   )}>
                     <Clock size={14} />
                     出票期限：
-                    {parsedPNR.ticketingDeadline?.toLocaleDateString('zh-TW')}
+                    {parsedPNR.ticketingDeadline ? formatDateTW(parsedPNR.ticketingDeadline) : ''}
                     <span className="ml-1">({deadlineStatus.text})</span>
                     {deadlineStatus.urgent && <AlertTriangle size={14} className="ml-1" />}
                   </div>

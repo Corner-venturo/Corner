@@ -15,7 +15,6 @@ import {
   MessageSquare,
   LockOpen,
   Lock,
-  Eye,
   Calculator,
   FileText,
   CheckCircle2,
@@ -41,8 +40,6 @@ interface UseTourActionButtonsParams {
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
   onOpenContractDialog?: (tour: Tour) => void
-  // 新增：查看詳情用 Dialog
-  onViewDetails?: (tour: Tour) => void
   // V2.0：確認出團 & 解鎖
   onConfirmTour?: (tour: Tour) => void
   onUnlockLockedTour?: (tour: Tour) => void
@@ -69,7 +66,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenQuoteDialog,
     onOpenItineraryDialog,
     onOpenContractDialog,
-    onViewDetails,
     onConfirmTour,
     onUnlockLockedTour,
     onCloseTour,
@@ -85,22 +81,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
 
       return (
         <div className="flex items-center gap-1">
-          {/* 查看詳情 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              if (onViewDetails) {
-                onViewDetails(tour)
-              } else {
-                router.push(`/tours?highlight=${tour.id}`)
-              }
-            }}
-            className="p-1 text-morandi-primary/80 hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
-            title="查看詳情"
-          >
-            <Eye size={14} />
-          </button>
-
           {/* 確認出團（僅提案狀態可見） */}
           {tour.status === '提案' && onConfirmTour && (
             <button
@@ -108,10 +88,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 e.stopPropagation()
                 onConfirmTour(tour)
               }}
-              className="p-1 text-status-success hover:text-status-success hover:bg-status-success-bg rounded transition-colors"
+              className="px-1.5 py-0.5 text-status-success hover:text-status-success hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
               title="確認出團"
             >
               <CheckCircle2 size={14} />
+              <span>確認</span>
             </button>
           )}
 
@@ -123,14 +104,16 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   e.stopPropagation()
                   onUnlockLockedTour(tour)
                 }}
-                className="p-1 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors"
+                className="px-1.5 py-0.5 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors flex items-center gap-0.5 text-xs"
                 title="解鎖回提案"
               >
                 <LockOpen size={14} />
+                <span>解鎖</span>
               </button>
             ) : (
-              <span className="p-1 text-morandi-gold" title="行程已鎖定">
+              <span className="px-1.5 py-0.5 text-morandi-gold flex items-center gap-0.5 text-xs" title="行程已鎖定">
                 <Lock size={14} />
+                <span>鎖定</span>
               </span>
             )
           )}
@@ -142,10 +125,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 e.stopPropagation()
                 onCloseTour(tour)
               }}
-              className="p-1 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors"
+              className="px-1.5 py-0.5 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
               title="結案"
             >
               <FileCheck size={14} />
+              <span>結案</span>
             </button>
           )}
 
@@ -155,10 +139,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               openDialog('edit', tour)
             }}
-            className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="編輯"
           >
             <Edit2 size={14} />
+            <span>編輯</span>
           </button>
 
           {/* 建立工作空間頻道 */}
@@ -167,10 +152,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               handleCreateChannel(tour)
             }}
-            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/30 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="建立工作空間頻道"
           >
             <MessageSquare size={14} />
+            <span>頻道</span>
           </button>
 
           {/* 報價單 */}
@@ -186,10 +172,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/quotes?tour_id=${tour.id}`)
               }
             }}
-            className="p-1 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="報價單"
           >
             <Calculator size={14} />
+            <span>報價</span>
           </button>
 
           {/* 行程表 */}
@@ -203,10 +190,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/itinerary?tour_id=${tour.id}`)
               }
             }}
-            className="p-1 text-morandi-primary hover:text-morandi-primary/80 hover:bg-morandi-primary/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-primary hover:text-morandi-primary/80 hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="行程表"
           >
             <FileText size={14} />
+            <span>行程</span>
           </button>
 
           {/* 合約管理 */}
@@ -219,10 +207,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/contracts?tour_id=${tour.id}`)
               }
             }}
-            className="p-1 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="合約管理"
           >
             <FileSignature size={14} />
+            <span>合約</span>
           </button>
 
           {/* 需求單 */}
@@ -235,10 +224,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                 router.push(`/tour-requests?tour_id=${tour.id}`)
               }
             }}
-            className="p-1 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="需求單"
           >
             <ClipboardList size={14} />
+            <span>需求</span>
           </button>
 
           {/* 封存/解除封存 */}
@@ -257,7 +247,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className={cn(
-              'p-1 rounded transition-colors',
+              'px-1.5 py-0.5 rounded transition-colors flex items-center gap-0.5 text-xs',
               tour.archived
                 ? 'text-morandi-gold/60 hover:text-morandi-gold hover:bg-morandi-gold/10'
                 : 'text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container'
@@ -265,6 +255,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             title={tour.archived ? '解除封存' : '封存'}
           >
             {tour.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
+            <span>{tour.archived ? '解封' : '封存'}</span>
           </button>
 
           {/* 解鎖結團按鈕（僅封存分頁且管理員可見） */}
@@ -276,10 +267,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
                   e.stopPropagation()
                   handleUnlockTour(tour)
                 }}
-                className="p-1 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors"
+                className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
                 title="解鎖結團"
               >
                 <LockOpen size={14} />
+                <span>解鎖</span>
               </button>
             )}
 
@@ -289,10 +281,11 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               e.stopPropagation()
               setDeleteConfirm({ isOpen: true, tour })
             }}
-            className="p-1 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+            className="px-1.5 py-0.5 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="刪除"
           >
             <Trash2 size={14} />
+            <span>刪除</span>
           </button>
         </div>
       )
@@ -310,7 +303,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       handleUnlockTour,
       onOpenQuoteDialog,
       onOpenItineraryDialog,
-      onViewDetails,
       onConfirmTour,
       onUnlockLockedTour,
       onCloseTour,

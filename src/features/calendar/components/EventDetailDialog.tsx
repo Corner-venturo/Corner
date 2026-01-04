@@ -7,6 +7,7 @@ import { FullCalendarEvent } from '../types'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { useAuthStore } from '@/stores/auth-store'
+import { formatDateChineseWithWeekday } from '@/lib/utils/format-date'
 
 interface EventDetailDialogProps {
   open: boolean
@@ -91,24 +92,14 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                       <div className="flex items-center gap-2 text-sm">
                         <CalendarIcon size={16} className="text-morandi-secondary" />
                         <span className="text-morandi-primary">
-                          {start.toLocaleDateString('zh-TW', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            weekday: 'long',
-                          })}
+                          {formatDateChineseWithWeekday(start)}
                         </span>
                       </div>
                       {!isSameDay && actualEnd && (
                         <div className="flex items-center gap-2 text-sm">
                           <span className="text-morandi-secondary ml-6">至</span>
                           <span className="text-morandi-primary">
-                            {actualEnd.toLocaleDateString('zh-TW', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              weekday: 'long',
-                            })}
+                            {formatDateChineseWithWeekday(actualEnd)}
                           </span>
                         </div>
                       )}
@@ -124,13 +115,7 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                       <div className="flex items-center gap-2 text-sm">
                         <CalendarIcon size={16} className="text-morandi-secondary" />
                         <span className="text-morandi-primary">
-                          {start.toLocaleDateString('zh-TW', {
-                            timeZone: taipeiTZ,
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            weekday: 'long',
-                          })}
+                          {formatDateChineseWithWeekday(start)}
                         </span>
                       </div>
                       {end && (

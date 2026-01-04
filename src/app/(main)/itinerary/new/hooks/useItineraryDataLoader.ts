@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useTourStore, useRegionsStore, useQuoteStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { logger } from '@/lib/utils/logger'
+import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 import type { TierPricing } from '@/stores/types/quote.types'
@@ -278,7 +279,7 @@ export function useItineraryDataLoader({
         title: tour.name,
         subtitle: '精緻旅遊',
         description: tour.description || '',
-        departureDate: departureDate.toLocaleDateString('zh-TW'),
+        departureDate: formatDateTW(departureDate),
         tourCode: tour.code,
         coverImage:
           city?.background_image_url ||
@@ -293,10 +294,7 @@ export function useItineraryDataLoader({
           departureTime: tourOutboundFlight?.departureTime || '',
           departureDate:
             tourOutboundFlight?.departureDate ||
-            departureDate.toLocaleDateString('zh-TW', {
-              month: '2-digit',
-              day: '2-digit',
-            }),
+            formatDateCompactPadded(departureDate),
           arrivalAirport: tourOutboundFlight?.arrivalAirport || city?.airport_code || '',
           arrivalTime: tourOutboundFlight?.arrivalTime || '',
           duration: tourOutboundFlight?.duration || '',
@@ -308,10 +306,7 @@ export function useItineraryDataLoader({
           departureTime: tourReturnFlight?.departureTime || '',
           departureDate:
             tourReturnFlight?.departureDate ||
-            returnDate.toLocaleDateString('zh-TW', {
-              month: '2-digit',
-              day: '2-digit',
-            }),
+            formatDateCompactPadded(returnDate),
           arrivalAirport: tourReturnFlight?.arrivalAirport || 'TPE',
           arrivalTime: tourReturnFlight?.arrivalTime || '',
           duration: tourReturnFlight?.duration || '',
@@ -324,7 +319,7 @@ export function useItineraryDataLoader({
           overseasPhone: '',
         },
         meetingInfo: {
-          time: departureDate.toLocaleDateString('zh-TW') + ' 04:50',
+          time: formatDateTW(departureDate) + ' 04:50',
           location: '桃園機場第二航廈',
         },
         itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
