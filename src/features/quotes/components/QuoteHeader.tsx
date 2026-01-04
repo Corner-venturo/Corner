@@ -533,6 +533,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           isOpen={isVersionPickerOpen}
           onClose={() => setIsVersionPickerOpen(false)}
           tour={relatedTour as Tour & { id: string; code: string }}
+          currentQuoteId={quote?.id}
         />
       )}
     </>

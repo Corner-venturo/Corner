@@ -517,6 +517,15 @@ export function BrochureDesignerPage() {
     }
   }, [generatedBrochure])
 
+  // 當頁面索引變化時，同步更新 canvas 元素（確保編輯模式顯示正確的頁面）
+  useEffect(() => {
+    if (!generatedBrochure) return
+    const page = generatedBrochure.pages[currentPageIndex]
+    if (page) {
+      setCanvasElements(page.elements)
+    }
+  }, [currentPageIndex, generatedBrochure])
+
   // 圖層操作
   const handleLayerSelect = useCallback((id: string) => {
     setSelectedElementId(id)
@@ -847,6 +856,13 @@ export function BrochureDesignerPage() {
                       accommodations={accommodations}
                       pageNumber={currentPageIndex + 1}
                     />
+                  )}
+
+                  {/* Debug: 顯示當前頁面資訊 */}
+                  {!currentPage && (
+                    <div className="flex items-center justify-center w-full h-full text-slate-400">
+                      <p>載入中... (currentPageIndex: {currentPageIndex})</p>
+                    </div>
                   )}
                 </div>
               </div>

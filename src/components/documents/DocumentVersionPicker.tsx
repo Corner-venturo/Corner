@@ -13,6 +13,7 @@ import {
   Lock,
   Eye,
   Copy,
+  FilePlus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -61,6 +62,8 @@ interface DocumentVersionPickerProps {
   mode?: 'manage' | 'confirm'
   /** 確認鎖定回調（mode=confirm 時使用） */
   onConfirmLock?: () => void
+  /** 當前正在編輯的報價單 ID（用於「另存」功能） */
+  currentQuoteId?: string
 }
 
 export function DocumentVersionPicker({
@@ -69,6 +72,7 @@ export function DocumentVersionPicker({
   tour,
   mode = 'manage',
   onConfirmLock,
+  currentQuoteId,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
   const { items: quotes, fetchAll, create, update, loading } = useQuoteStore()
@@ -114,6 +118,41 @@ export function DocumentVersionPicker({
   })
   const standardQuotes = linkedQuotes.filter(q => q.quote_type !== 'quick')
   const quickQuotes = linkedQuotes.filter(q => q.quote_type === 'quick')
+
+  // 取得當前正在編輯的報價單
+  const currentQuote = currentQuoteId ? quotes.find(q => q.id === currentQuoteId) : null
+  const currentQuoteType = currentQuote?.quote_type
+
+  // 另存當前報價單為新版本
+  const [isSavingAs, setIsSavingAs] = useState(false)
+  const handleSaveAsNew = async (targetType: 'standard' | 'quick') => {
+    if (!currentQuote) return
+    try {
+      setIsSavingAs(true)
+      const code = generateCode('TP', { quoteType: targetType }, quotes)
+      const originalName = currentQuote.customer_name || currentQuote.name || '未命名'
+
+      const newQuote = await create({
+        code,
+        name: currentQuote.name,
+        customer_name: `${originalName} (副本)`,
+        quote_type: targetType,
+        status: 'draft',
+        tour_id: tour.id,
+        categories: currentQuote.categories,
+        group_size: currentQuote.group_size,
+      })
+
+      if (newQuote?.id) {
+        onClose()
+        router.push(`/quotes/${newQuote.id}`)
+      }
+    } catch (error) {
+      logger.error('另存報價單失敗:', error)
+    } finally {
+      setIsSavingAs(false)
+    }
+  }
 
   // 建立新標準報價單
   const handleCreateStandard = async () => {
@@ -533,18 +572,34 @@ export function DocumentVersionPicker({
                     確認出團
                   </button>
                 ) : (
-                  <button
-                    onClick={handleCreateStandard}
-                    disabled={isCreatingStandard}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {isCreatingStandard ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Plus size={16} />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleCreateStandard}
+                      disabled={isCreatingStandard}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {isCreatingStandard ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Plus size={16} />
+                      )}
+                      新增
+                    </button>
+                    {currentQuote && (
+                      <button
+                        onClick={() => handleSaveAsNew('standard')}
+                        disabled={isSavingAs}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-gold border border-morandi-gold hover:bg-morandi-gold/10 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {isSavingAs ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <FilePlus size={16} />
+                        )}
+                        另存
+                      </button>
                     )}
-                    新增團體報價單
-                  </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -586,21 +641,37 @@ export function DocumentVersionPicker({
               </div>
 
               <div className="flex-shrink-0 p-4">
-                <button
-                  onClick={handleCreateQuick}
-                  disabled={isCreatingQuick}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {isCreatingQuick ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <>
-                      <Zap size={16} />
-                      <Plus size={14} />
-                    </>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCreateQuick}
+                    disabled={isCreatingQuick}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {isCreatingQuick ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <>
+                        <Zap size={16} />
+                        <Plus size={14} />
+                      </>
+                    )}
+                    新增
+                  </button>
+                  {currentQuote && (
+                    <button
+                      onClick={() => handleSaveAsNew('quick')}
+                      disabled={isSavingAs}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-gold border border-morandi-gold hover:bg-morandi-gold/10 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {isSavingAs ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <FilePlus size={16} />
+                      )}
+                      另存
+                    </button>
                   )}
-                  新增快速報價單
-                </button>
+                </div>
               </div>
             </div>
           </div>
