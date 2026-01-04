@@ -125,9 +125,12 @@ export function getWeekEnd(date: Date): Date {
   return end
 }
 
-// 格式化日期為 YYYY-MM-DD
+// 格式化日期為 YYYY-MM-DD（使用本地時間，避免時區問題）
 export function formatDateString(date: Date): string {
-  return date.toISOString().split('T')[0]
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 // 格式化時間為 HH:mm

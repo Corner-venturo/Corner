@@ -7,7 +7,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Save, Printer, FilePlus } from 'lucide-react'
+import { Save, Printer, FilePlus, Edit2, X } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Quote } from '@/stores/types'
 import type { Quote as PrintableQuote } from '@/types/quote.types'
@@ -115,7 +115,8 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
                   <Printer className="h-4 w-4" />
                   列印
                 </Button>
-                <Button onClick={() => setIsEditing(true)} variant="outline">
+                <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2">
+                  <Edit2 size={16} />
                   編輯
                 </Button>
               </>
@@ -124,7 +125,8 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
             {/* 編輯模式 */}
             {isEditing && (
               <>
-                <Button onClick={() => setIsEditing(false)} variant="outline">
+                <Button onClick={() => setIsEditing(false)} variant="outline" className="gap-2">
+                  <X size={16} />
                   取消
                 </Button>
                 <Button

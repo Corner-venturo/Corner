@@ -170,7 +170,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
             <X className="h-4 w-4" />
             關閉
           </Button>
-          <Button onClick={onPrint} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover">
+          <Button onClick={onPrint} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Printer className="h-4 w-4" />
             列印
           </Button>

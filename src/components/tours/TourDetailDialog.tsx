@@ -611,12 +611,14 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
+                      className="gap-2"
                       onClick={() => setShowEntryCardDialog(false)}
                     >
+                      <X size={16} />
                       關閉
                     </Button>
-                    <Button onClick={() => window.print()}>
-                      <Printer size={16} className="mr-1" />
+                    <Button className="gap-2" onClick={() => window.print()}>
+                      <Printer size={16} />
                       列印
                     </Button>
                   </div>

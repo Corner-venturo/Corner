@@ -16,6 +16,7 @@ import {
   Clock,
   Plus,
   LucideIcon,
+  X,
 } from 'lucide-react'
 
 interface MockDocument {
@@ -245,7 +246,8 @@ export function TourDocuments({ orderFilter, showSummary = true }: TourDocuments
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)} className="gap-2">
+                <X size={16} />
                 取消
               </Button>
               <Button

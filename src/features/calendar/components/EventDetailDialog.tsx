@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar as CalendarIcon, Clock, Trash2 } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FullCalendarEvent } from '../types'
@@ -195,7 +195,8 @@ export function EventDetailDialog({ open, event, onClose, onEdit, onDelete }: Ev
                   </Button>
                 </>
               )}
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={onClose} className="gap-2">
+                <X size={16} />
                 關閉
               </Button>
             </div>

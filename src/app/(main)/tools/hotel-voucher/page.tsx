@@ -9,7 +9,7 @@ import React, { useState } from 'react'
 import { CornerHotelVoucher } from '@/features/accommodation/components/CornerHotelVoucher'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { X, Printer } from 'lucide-react'
+import { X, Printer, FileText } from 'lucide-react'
 
 // 預設資料（第一個 PDF - 赤阪城市酒店）
 const SAMPLE_DATA_1 = {
@@ -222,7 +222,10 @@ export default function HotelVoucherPage() {
   if (!isOpen) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted">
-        <Button onClick={() => setIsOpen(true)}>開啟入住憑證</Button>
+        <Button onClick={() => setIsOpen(true)} className="gap-2">
+          <FileText size={16} />
+          開啟入住憑證
+        </Button>
       </div>
     )
   }

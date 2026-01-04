@@ -23,6 +23,7 @@ import {
   Users,
   Building2,
   FileText,
+  X,
 } from 'lucide-react'
 import type { Database } from '@/lib/supabase/types'
 
@@ -232,7 +233,8 @@ export function TourRequestDetailDialog({
 
         {/* 操作按鈕 */}
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
             關閉
           </Button>
           <Button

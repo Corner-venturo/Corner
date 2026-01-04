@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Building2 } from 'lucide-react'
+import { Building2, X } from 'lucide-react'
 import { useEmployeeForm } from './useEmployeeForm'
 import { BasicInfoFields } from './BasicInfoFields'
 import { ContactFields } from './ContactFields'
@@ -107,7 +107,8 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
           >
             建立員工
           </Button>
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} className="gap-2">
+            <X size={16} />
             取消
           </Button>
         </div>

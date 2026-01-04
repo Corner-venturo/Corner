@@ -230,14 +230,36 @@ export function BrochureDesignerPage() {
     }
   }, [currentPageIndex])
 
-  // 載入行程表資料
+  // 載入行程表資料並自動生成手冊
   useEffect(() => {
     if (!itineraryId || isLoading) return
     const itinerary = itineraries.find((i) => i.id === itineraryId)
     if (itinerary) {
       setCoverData(itineraryToCoverData(itinerary))
+
+      // 自動生成手冊（如果有行程資料且尚未生成）
+      if (itinerary.daily_itinerary && itinerary.daily_itinerary.length > 0 && !generatedBrochure) {
+        try {
+          const options: GeneratorOptions = {
+            themeId: selectedThemeId || undefined,
+            companyName: '角落旅行社',
+          }
+          const brochure = generateBrochure(itinerary, options)
+          setGeneratedBrochure(brochure)
+
+          // 載入第一頁的元素
+          if (brochure.pages.length > 0) {
+            setCanvasElements(brochure.pages[0].elements)
+          }
+
+          // 自動切換到 canvas 模式顯示生成結果
+          setEditorMode('canvas')
+        } catch (error) {
+          logger.error('自動生成手冊失敗:', error)
+        }
+      }
     }
-  }, [itineraryId, itineraries, isLoading])
+  }, [itineraryId, itineraries, isLoading, generatedBrochure, selectedThemeId])
 
   // 更新封面資料
   const handleChange = useCallback((changes: Partial<BrochureCoverData>) => {

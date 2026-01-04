@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, FileText, ChevronDown, ChevronRight } from 'lucide-react'
+import { Calendar, FileText, ChevronDown, ChevronRight, Check, ArrowRight } from 'lucide-react'
 import { PaymentRequest, DisbursementOrder } from '../types'
 import { PaymentRequestItem } from '@/stores/types'
 import { usePendingColumns, useCurrentOrderColumns, useHistoryColumns } from './DisbursementColumns'
@@ -130,7 +130,8 @@ export function CurrentOrderList({
             列印 PDF
           </Button>
           {currentOrder.status === 'pending' && (
-            <Button onClick={onConfirm} className="bg-morandi-green hover:bg-morandi-green/90">
+            <Button onClick={onConfirm} className="bg-morandi-green hover:bg-morandi-green/90 gap-2">
+              <Check size={16} />
               確認出帳
             </Button>
           )}
@@ -159,8 +160,9 @@ export function EmptyCurrentOrder({ onNavigate }: EmptyCurrentOrderProps) {
       <Calendar className="h-16 w-16 text-morandi-secondary mx-auto mb-4 opacity-50" />
       <h3 className="text-lg font-medium text-morandi-primary mb-2">本週尚無出帳計劃</h3>
       <p className="text-morandi-secondary mb-4">請先到「待出帳」頁面勾選需要出帳的請款單</p>
-      <Button onClick={onNavigate} variant="outline">
+      <Button onClick={onNavigate} variant="outline" className="gap-2">
         前往選擇請款單
+        <ArrowRight size={16} />
       </Button>
     </div>
   )

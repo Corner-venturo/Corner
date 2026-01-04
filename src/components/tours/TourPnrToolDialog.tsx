@@ -682,9 +682,9 @@ export function TourPnrToolDialog({
 
         {/* 底部按鈕 */}
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={onClose}>
-            <X size={16} className="mr-1" />
-            取消
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
+            關閉
           </Button>
           <Button
             onClick={handleSave}

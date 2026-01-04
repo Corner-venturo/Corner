@@ -179,16 +179,16 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={printing}>
-            <X size={16} className="mr-2" />
+          <Button variant="outline" onClick={onClose} disabled={printing} className="gap-2">
+            <X size={16} />
             關閉
           </Button>
           <Button
             onClick={handlePrint}
             disabled={printing || loading}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
           >
-            <Printer size={16} className="mr-2" />
+            <Printer size={16} />
             {printing ? '列印中...' : '列印完整合約'}
           </Button>
         </DialogFooter>

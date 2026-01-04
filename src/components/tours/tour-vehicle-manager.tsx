@@ -491,10 +491,12 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                 />
               </div>
               <div className="flex justify-end gap-2 pt-3 border-t border-border">
-                <Button variant="outline" onClick={() => setShowAddVehicle(false)} className="btn-morandi-secondary">
+                <Button variant="outline" onClick={() => setShowAddVehicle(false)} className="btn-morandi-secondary gap-2">
+                  <X size={16} />
                   取消
                 </Button>
-                <Button onClick={handleAddVehicle} className="btn-morandi-primary">
+                <Button onClick={handleAddVehicle} className="btn-morandi-primary gap-2">
+                  <Plus size={16} />
                   新增車輛
                 </Button>
               </div>

@@ -14,7 +14,7 @@ import { useTodoStore } from '@/stores'
 import { useUserStore } from '@/stores/user-store'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { Send, CheckCircle2, AlertCircle, Search, X } from 'lucide-react'
+import { Send, CheckCircle2, AlertCircle, Search, X, Share2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { DateCell } from '@/components/table-cells'
@@ -270,15 +270,15 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
             <X size={16} />
             取消
           </Button>
-          <Button onClick={handleShare} disabled={!selectedTodo || isSubmitting}>
+          <Button onClick={handleShare} disabled={!selectedTodo || isSubmitting} className="gap-2">
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 分享中...
               </>
             ) : (
               <>
-                <Send className="w-4 h-4 mr-2" />
+                <Share2 size={16} />
                 分享到頻道
               </>
             )}

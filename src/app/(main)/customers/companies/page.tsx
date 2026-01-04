@@ -13,7 +13,6 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -21,17 +20,19 @@ import { Plus } from 'lucide-react'
 import { useCompanyStore, useAuthStore, type Company } from '@/stores'
 import { useCompanyColumns } from './components/CompanyTableColumns'
 import { CompanyFormDialog } from './components/CompanyFormDialog'
+import { CompanyDetailDialog } from './components/CompanyDetailDialog'
 import type { CreateCompanyData } from '@/types/company.types'
 import { alert } from '@/lib/ui/alert-dialog'
 
 export default function CompaniesPage() {
-  const router = useRouter()
   const { items: companies, fetchAll, create, update } = useCompanyStore()
   const { user } = useAuthStore()
   const workspaceId = user?.workspace_id || ''
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCompany, setEditingCompany] = useState<Company | undefined>(undefined)
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   // 載入企業客戶資料
   useEffect(() => {
@@ -42,7 +43,23 @@ export default function CompaniesPage() {
 
   // 查看企業詳情
   const handleViewDetail = (company: Company) => {
-    router.push(`/customers/companies/${company.id}`)
+    setSelectedCompany(company)
+    setIsDetailOpen(true)
+  }
+
+  // 更新企業客戶（從詳情對話框）
+  const handleUpdateFromDetail = async (data: CreateCompanyData) => {
+    if (!selectedCompany) return
+
+    try {
+      await update(selectedCompany.id, data)
+      // 更新 selectedCompany 以反映變更
+      setSelectedCompany({ ...selectedCompany, ...data } as Company)
+      await alert('企業客戶更新成功', 'success')
+    } catch (error) {
+      logger.error('更新企業客戶失敗:', error)
+      await alert('更新企業客戶失敗', 'error')
+    }
   }
 
   // 新增企業客戶
@@ -117,6 +134,14 @@ export default function CompaniesPage() {
         onSubmit={editingCompany ? handleEdit : handleCreate}
         workspaceId={workspaceId}
         company={editingCompany}
+      />
+
+      {/* 企業詳情 Dialog */}
+      <CompanyDetailDialog
+        company={selectedCompany}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        onUpdate={handleUpdateFromDetail}
       />
     </div>
   )

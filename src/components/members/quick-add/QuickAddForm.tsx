@@ -1,6 +1,6 @@
 'use client'
 
-import { Upload, UserPlus, Loader2 } from 'lucide-react'
+import { Upload, UserPlus, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PassportUploadZone } from '@/components/shared/passport-upload-zone'
@@ -76,7 +76,8 @@ export function QuickAddForm({
             <PassportUploadZone files={passportFiles} onFilesChange={onPassportFilesChange} maxFiles={10} />
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => onModeChange(null)} disabled={isUploading}>
+              <Button variant="outline" onClick={() => onModeChange(null)} disabled={isUploading} className="gap-2">
+                <X size={16} />
                 取消
               </Button>
               <Button onClick={onUploadPassports} disabled={isUploading || passportFiles.length === 0}>
@@ -122,7 +123,8 @@ export function QuickAddForm({
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => onModeChange(null)}>
+              <Button variant="outline" onClick={() => onModeChange(null)} className="gap-2">
+                <X size={16} />
                 取消
               </Button>
               <Button onClick={onSelectCustomerSubmit} disabled={!selectedCustomer}>

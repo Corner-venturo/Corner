@@ -180,7 +180,7 @@ export function TourUnlockDialog({
           <Button
             onClick={handleUnlock}
             disabled={submitting || !password}
-            className="bg-morandi-gold hover:bg-morandi-gold/90 gap-1"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
           >
             <Check size={16} className={submitting ? 'hidden' : ''} />
             <Loader2 className={submitting ? 'h-4 w-4 animate-spin' : 'hidden'} />

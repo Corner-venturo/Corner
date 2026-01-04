@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { BookOpen, TrendingUp, Target, Sparkles, Copy, Check, Save } from 'lucide-react'
+import { BookOpen, TrendingUp, Target, Sparkles, Copy, Check, Save, X } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   useTimeboxWeeks,
@@ -365,7 +365,8 @@ export default function WeekReviewDialog({ open, onOpenChange, selectedWeek }: W
 
           {/* 按鈕區 */}
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+              <X size={16} />
               關閉
             </Button>
             <Button

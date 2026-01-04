@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane, Contact } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane, Contact, X } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -586,10 +586,12 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>
+            <Button variant="outline" className="gap-2" onClick={() => setIsContactDialogOpen(false)}>
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={handleSaveContactInfo} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+            <Button onClick={handleSaveContactInfo} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2">
+              <Save size={16} />
               儲存
             </Button>
           </DialogFooter>

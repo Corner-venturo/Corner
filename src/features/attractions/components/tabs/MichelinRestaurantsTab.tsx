@@ -3,7 +3,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Star, Edit2, Power, Trash2 } from 'lucide-react'
+import { Star, Edit2, Power, Trash2, X, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
@@ -430,10 +430,12 @@ export default function MichelinRestaurantsTab({ selectedCountry }: MichelinRest
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseEdit}>
+            <Button variant="outline" onClick={handleCloseEdit} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => editingRestaurant && handleUpdate(editingRestaurant)}>
+            <Button onClick={() => editingRestaurant && handleUpdate(editingRestaurant)} className="gap-2">
+              <Save size={16} />
               儲存
             </Button>
           </DialogFooter>

@@ -245,20 +245,20 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4 mt-4">
-          <Button variant="outline" onClick={onClose} disabled={saving} className="gap-1">
+          <Button variant="outline" onClick={onClose} disabled={saving} className="gap-2">
             <X size={16} />
             取消
           </Button>
-          <Button onClick={onSave} disabled={saving || (mode === 'create' && !selectedTemplate)}>
-            <Save size={16} className="mr-2" />
+          <Button onClick={onSave} disabled={saving || (mode === 'create' && !selectedTemplate)} className="gap-2">
+            <Save size={16} />
             {saving ? '儲存中...' : mode === 'create' ? '建立合約' : '儲存'}
           </Button>
           <Button
             onClick={handlePrint}
             disabled={saving || !selectedTemplate}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover"
+            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
           >
-            <Printer size={16} className="mr-2" />
+            <Printer size={16} />
             列印合約
           </Button>
         </DialogFooter>

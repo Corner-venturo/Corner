@@ -28,7 +28,7 @@ export default function BoxManager() {
   const user = useAuthStore(state => state.user)
   const userId = user?.id
 
-  const { items: boxes, create: createBox, update: updateBox, delete: deleteBox } = useTimeboxBoxes()
+  const { items: boxes, create: createBox, update: updateBox, delete: deleteBox, isLoading } = useTimeboxBoxes()
 
   const [selectedBox, setSelectedBox] = useState<TimeboxBox | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -133,6 +133,15 @@ export default function BoxManager() {
   const closeDialog = () => {
     setSelectedBox(null)
     setIsCreating(false)
+  }
+
+  // 載入中或 user 未準備好
+  if (isLoading || !userId) {
+    return (
+      <div className="text-center text-morandi-secondary py-8">
+        {isLoading ? '載入中...' : '請先登入'}
+      </div>
+    )
   }
 
   return (

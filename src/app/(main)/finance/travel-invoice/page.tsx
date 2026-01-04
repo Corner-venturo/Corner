@@ -6,7 +6,6 @@
  */
 
 import { useEffect, useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { FileText, Eye } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn as Column } from '@/components/ui/enhanced-table'
@@ -14,6 +13,7 @@ import { ContentContainer } from '@/components/layout/content-container'
 import { useTravelInvoiceStore, TravelInvoice } from '@/stores/useTravelInvoiceStore'
 import { StatusCell, DateCell, CurrencyCell, ActionCell } from '@/components/table-cells'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
+import { TravelInvoiceDetailDialog } from './components/TravelInvoiceDetailDialog'
 
 // 狀態標籤定義
 const statusTabs = [
@@ -61,11 +61,12 @@ const getStatusLabel = (status: string): string => {
 }
 
 export default function TravelInvoicePage() {
-  const router = useRouter()
   const { invoices, isLoading, error, fetchInvoices } = useTravelInvoiceStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<TravelInvoice | null>(null)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   useEffect(() => {
     fetchInvoices()
@@ -138,6 +139,12 @@ export default function TravelInvoicePage() {
     },
   ]
 
+  // 開啟詳情 Dialog
+  const handleViewDetail = (invoice: TravelInvoice) => {
+    setSelectedInvoice(invoice)
+    setIsDetailOpen(true)
+  }
+
   // 操作按鈕
   const renderActions = (row: TravelInvoice) => (
     <ActionCell
@@ -145,15 +152,15 @@ export default function TravelInvoicePage() {
         {
           icon: Eye,
           label: '查看',
-          onClick: () => router.push(`/finance/travel-invoice/${row.id}`),
+          onClick: () => handleViewDetail(row),
         },
       ]}
     />
   )
 
-  // 點擊行跳轉
+  // 點擊行開啟詳情
   const handleRowClick = (row: TravelInvoice) => {
-    router.push(`/finance/travel-invoice/${row.id}`)
+    handleViewDetail(row)
   }
 
   // 新增發票 - 改用懸浮視窗
@@ -209,6 +216,13 @@ export default function TravelInvoicePage() {
       <InvoiceDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+      />
+
+      {/* 發票詳情 Dialog */}
+      <TravelInvoiceDetailDialog
+        invoice={selectedInvoice}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
       />
     </div>
   )

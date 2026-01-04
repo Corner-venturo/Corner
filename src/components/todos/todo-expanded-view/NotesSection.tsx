@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useEnterSubmitWithShift } from '@/hooks/useEnterSubmit'
-import { MessageSquare, Edit2, X } from 'lucide-react'
+import { MessageSquare, Edit2, X, Save, Plus } from 'lucide-react'
 import { NotesSectionProps } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -103,16 +103,18 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
                       onUpdate({ notes: newNotes })
                       setEditingNoteIndex(null)
                     }}
-                    className="bg-morandi-gold hover:bg-morandi-gold/90 h-7 text-xs"
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white h-7 text-xs gap-1.5"
                   >
+                    <Save size={12} />
                     儲存
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => setEditingNoteIndex(null)}
-                    className="h-7 text-xs"
+                    className="h-7 text-xs gap-1.5"
                   >
+                    <X size={12} />
                     取消
                   </Button>
                 </div>
@@ -172,8 +174,9 @@ export function NotesSection({ todo, onUpdate }: NotesSectionProps) {
         <Button
           size="sm"
           onClick={addNote}
-          className="bg-morandi-gold hover:bg-morandi-gold/90 shadow-sm"
+          className="bg-morandi-gold hover:bg-morandi-gold-hover text-white shadow-sm gap-1.5"
         >
+          <Plus size={14} />
           新增
         </Button>
       </div>

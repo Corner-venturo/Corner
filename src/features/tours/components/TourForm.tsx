@@ -3,7 +3,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, X } from 'lucide-react'
 import { NewTourData } from '../types'
 import type { OrderFormData } from '@/components/orders/add-order-form'
 import { useTourForm } from '../hooks/useTourForm'
@@ -138,7 +138,8 @@ export function TourForm({
 
         {/* Bottom buttons */}
         <div className="flex justify-end space-x-2 pt-6 border-t border-border mt-6">
-          <Button variant="outline" onClick={onClose} disabled={submitting}>
+          <Button variant="outline" onClick={onClose} disabled={submitting} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button

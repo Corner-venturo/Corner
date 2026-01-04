@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { RotateCcw, Search } from 'lucide-react'
 import { ESIM_STATUSES } from '@/types/esim.types'
 import type { EsimSearchFilters, EsimStatus } from '@/types/esim.types'
 
@@ -127,10 +128,14 @@ export function EsimSearchDialog({ open, onOpenChange, onSearch }: EsimSearchDia
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleReset}>
+          <Button variant="outline" onClick={handleReset} className="gap-2">
+            <RotateCcw size={16} />
             重置
           </Button>
-          <Button onClick={handleSearch}>搜尋</Button>
+          <Button onClick={handleSearch} className="gap-2">
+            <Search size={16} />
+            搜尋
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle, CheckCircle2, Database, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Database, Trash2, RefreshCw } from 'lucide-react'
 
 export default function ResetDBPage() {
   const [status, setStatus] = useState<'idle' | 'deleting' | 'success' | 'error'>('idle')
@@ -179,7 +179,8 @@ export default function ResetDBPage() {
           {/* 操作按鈕 */}
           <div className="flex gap-3">
             {status === 'success' ? (
-              <Button onClick={handleReload} className="w-full" size="lg">
+              <Button onClick={handleReload} className="w-full gap-2" size="lg">
+                <RefreshCw size={16} />
                 重新整理頁面
               </Button>
             ) : (

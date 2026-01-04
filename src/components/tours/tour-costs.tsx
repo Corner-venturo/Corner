@@ -22,7 +22,7 @@ interface PaymentRequestWithItems {
   items?: PaymentRequestItem[]
   [key: string]: unknown
 }
-import { Receipt, Plus, Truck, Hotel, Utensils, MapPin } from 'lucide-react'
+import { Receipt, Plus, Truck, Hotel, Utensils, MapPin, X } from 'lucide-react'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { useToast } from '@/components/ui/use-toast'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -494,7 +494,8 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="gap-2">
+                <X size={16} />
                 取消
               </Button>
               <Button

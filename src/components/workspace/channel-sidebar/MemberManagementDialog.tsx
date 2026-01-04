@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { X } from 'lucide-react'
+import { X, Trash2 } from 'lucide-react'
 import type { ChannelMember } from '@/services/workspace-members'
 import type { Channel, ChannelGroup } from '@/stores/workspace-store'
 
@@ -50,7 +50,8 @@ export function MemberManagementDialog({
             <X size={16} />
             取消
           </Button>
-          <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember}>
+          <Button variant="destructive" onClick={onRemove} disabled={isRemovingMember} className="gap-2">
+            <Trash2 size={16} />
             {isRemovingMember ? '移除中...' : '移除'}
           </Button>
         </DialogFooter>

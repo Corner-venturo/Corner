@@ -23,6 +23,9 @@ import {
   ChevronLeft,
   Loader2,
   AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
@@ -411,26 +414,27 @@ export function TourConfirmationWizard({
         <DialogFooter className="flex justify-between sm:justify-between">
           <div>
             {currentStep !== 'quote' && (
-              <Button variant="outline" onClick={handleBack} disabled={submitting}>
-                <ChevronLeft className="h-4 w-4 mr-1" />
+              <Button variant="outline" onClick={handleBack} disabled={submitting} className="gap-2">
+                <ArrowLeft size={16} />
                 上一步
               </Button>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             {currentStep !== 'confirm' ? (
-              <Button onClick={handleNext} disabled={loading}>
+              <Button onClick={handleNext} disabled={loading} className="gap-2">
                 下一步
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <ArrowRight size={16} />
               </Button>
             ) : (
               <Button
                 onClick={handleConfirm}
                 disabled={submitting}
-                className="bg-morandi-gold hover:bg-morandi-gold/90"
+                className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

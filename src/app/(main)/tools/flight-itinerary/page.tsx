@@ -9,7 +9,7 @@ import React, { useState } from 'react'
 import { CornerFlightItinerary } from '@/features/itinerary/components/CornerFlightItinerary'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Printer } from 'lucide-react'
+import { Printer, FileText } from 'lucide-react'
 
 // 預設資料（從 PDF 提取）
 const SAMPLE_DATA_1 = {
@@ -119,7 +119,10 @@ export default function FlightItineraryPage() {
   if (!isOpen) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted">
-        <Button onClick={() => setIsOpen(true)}>開啟機票行程單</Button>
+        <Button onClick={() => setIsOpen(true)} className="gap-2">
+          <FileText size={16} />
+          開啟機票行程單
+        </Button>
       </div>
     )
   }

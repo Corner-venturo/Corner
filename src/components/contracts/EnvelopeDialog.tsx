@@ -375,12 +375,12 @@ export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="gap-1">
+          <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
             取消
           </Button>
-          <Button onClick={handlePrint}>
-            <Printer size={16} className="mr-2" />
+          <Button onClick={handlePrint} className="gap-2">
+            <Printer size={16} />
             列印
           </Button>
         </DialogFooter>

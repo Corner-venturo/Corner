@@ -1,3 +1,7 @@
+// 從 tour-form 統一匯出風格類型，避免重複定義
+export type { FlightStyleType, CoverStyleType } from '@/components/editor/tour-form/types'
+
+// FlightInfo 用於顯示層，所有欄位都是可選的（不同於 tour-form 的輸入類型）
 export interface FlightInfo {
   airline?: string | null
   flightNumber?: string | null
@@ -14,8 +18,7 @@ export interface FlightInfo {
   hasMeal?: boolean | null // 是否提供機上餐食
 }
 
-// 航班卡片風格類型
-export type FlightStyleType = 'original' | 'chinese' | 'japanese' | 'luxury' | 'art' | 'none' | 'dreamscape' | 'collage'
+import type { FlightStyleType } from '@/components/editor/tour-form/types'
 
 export interface TourDisplayData {
   outboundFlight?: FlightInfo | null
@@ -23,8 +26,6 @@ export interface TourDisplayData {
   coverImage?: string | null // 用於日式風格的目的地圖片
   flightStyle?: FlightStyleType // 航班卡片風格
 }
-
-export type CoverStyleType = 'original' | 'gemini' | 'nature' | 'luxury' | 'art' | 'dreamscape' | 'collage'
 
 export interface FlightCardProps {
   flight: FlightInfo | null | undefined

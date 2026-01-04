@@ -1,5 +1,6 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { Customer } from '@/types/customer.types'
@@ -94,8 +95,9 @@ export function QuickAddPreview({
         </div>
 
         <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose}>
-            取消
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
+            關閉
           </Button>
         </div>
       </DialogContent>

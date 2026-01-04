@@ -1,3 +1,15 @@
+// 從 stores 統一匯入並匯出共用類型，避免重複定義
+import type {
+  LeaderInfo as LeaderInfoType,
+  DailyImage as DailyImageType,
+  HotelInfo as HotelInfoType,
+} from '@/stores/types/tour.types'
+
+// 本地類型別名（供此檔案內使用）
+export type LeaderInfo = LeaderInfoType
+export type DailyImage = DailyImageType
+export type HotelInfo = HotelInfoType
+
 export interface FlightInfo {
   airline: string
   flightNumber: string
@@ -46,11 +58,7 @@ export interface Meals {
   dinner: string
 }
 
-// 每日圖片（支援位置調整）
-export interface DailyImage {
-  url: string
-  position?: string // object-position 值，如 "center", "center top", "center 30%"
-}
+// DailyImage 已從 stores/types/tour.types.ts 統一匯出
 
 // 每日行程展示風格
 export type DayDisplayStyle = 'single-image' | 'multi-image' | 'card-grid' | 'timeline'
@@ -79,23 +87,14 @@ export interface DailyItinerary {
   dreamscapeLayout?: DreamscapeDayLayout // Dreamscape 模板專用：每日佈局風格
 }
 
-export interface LeaderInfo {
-  name: string
-  domesticPhone: string
-  overseasPhone: string
-}
+// LeaderInfo 已從 stores/types/tour.types.ts 統一匯出
 
 export interface MeetingPoint {
   time: string
   location: string
 }
 
-export interface HotelInfo {
-  name: string
-  description: string
-  image?: string // 舊版單張圖片（向後相容）
-  images?: string[] // 新版多張圖片（最多4張）
-}
+// HotelInfo 已從 stores/types/tour.types.ts 統一匯出
 
 // 費用包含/不含項目
 export interface PricingItem {

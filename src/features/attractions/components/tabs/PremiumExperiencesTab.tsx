@@ -3,7 +3,7 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Award, Users, Clock, Edit2, Power, Trash2 } from 'lucide-react'
+import { Sparkles, Award, Users, Clock, Edit2, Power, Trash2, X, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { toast } from 'sonner'
@@ -506,10 +506,12 @@ export default function PremiumExperiencesTab({ selectedCountry }: PremiumExperi
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseEdit}>
+            <Button variant="outline" onClick={handleCloseEdit} className="gap-2">
+              <X size={16} />
               取消
             </Button>
-            <Button onClick={() => editingExperience && handleUpdate(editingExperience)}>
+            <Button onClick={() => editingExperience && handleUpdate(editingExperience)} className="gap-2">
+              <Save size={16} />
               儲存
             </Button>
           </DialogFooter>

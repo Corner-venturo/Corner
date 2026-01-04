@@ -8,7 +8,7 @@ import { useManifestationStore } from '@/stores/manifestation-store'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Save, Check } from 'lucide-react'
 import { recordManifestationCompletion } from '@/lib/manifestation/reminder'
 
 interface ChapterContentProps {
@@ -267,23 +267,23 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
 
       {/* 操作按鈕 */}
       <div className="flex items-center justify-between pt-6 border-t">
-        <Button variant="outline" onClick={onPrevious} disabled={!onPrevious}>
-          <ChevronLeft className="mr-2" size={16} />
-          上一章
+        <Button variant="outline" onClick={onPrevious} disabled={!onPrevious} className="gap-2">
+          <ArrowLeft size={16} />
+          上一步
         </Button>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleSave(false)} disabled={isSaving}>
+          <Button variant="outline" onClick={() => handleSave(false)} disabled={isSaving} className="gap-2">
             {isSaving ? (
               '儲存中...'
             ) : saveSuccess ? (
               <>
-                <Check className="mr-2" size={16} />
+                <Check size={16} />
                 已儲存
               </>
             ) : (
               <>
-                <Save className="mr-2" size={16} />
+                <Save size={16} />
                 儲存
               </>
             )}
@@ -298,9 +298,9 @@ export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentPr
           </Button>
         </div>
 
-        <Button variant="outline" onClick={onNext} disabled={!onNext}>
-          下一章
-          <ChevronRight className="ml-2" size={16} />
+        <Button variant="outline" onClick={onNext} disabled={!onNext} className="gap-2">
+          下一步
+          <ArrowRight size={16} />
         </Button>
       </div>
     </div>

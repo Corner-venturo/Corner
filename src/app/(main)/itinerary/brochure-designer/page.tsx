@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { BrochureDesignerPage } from '@/features/itinerary/components/brochure-designer/BrochureDesignerPage'
+import { BrochureEditor } from '@/features/itinerary/components/brochure-designer/editor'
 import { Loader2 } from 'lucide-react'
 
 export default function Page() {
@@ -13,7 +13,7 @@ export default function Page() {
         </div>
       }
     >
-      <BrochureDesignerPage />
+      <BrochureEditor />
     </Suspense>
   )
 }

@@ -27,6 +27,7 @@ import {
   XCircle,
   Calendar,
   AlertCircle,
+  X,
 } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { DateCell } from '@/components/table-cells'
@@ -386,7 +387,8 @@ export default function ModulesManagementPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEnableDialog(false)} disabled={loading}>
+            <Button variant="outline" onClick={() => setShowEnableDialog(false)} disabled={loading} className="gap-2">
+              <X size={16} />
               取消
             </Button>
             <Button

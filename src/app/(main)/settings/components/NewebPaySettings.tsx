@@ -218,8 +218,8 @@ export function NewebPaySettings() {
             </div>
           )}
           {!message && <div />}
-          <Button onClick={handleSave} disabled={saving}>
-            <Save className="h-4 w-4 mr-2" />
+          <Button onClick={handleSave} disabled={saving} className="gap-2">
+            <Save size={16} />
             {saving ? '儲存中...' : '儲存設定'}
           </Button>
         </div>

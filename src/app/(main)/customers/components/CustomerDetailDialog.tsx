@@ -4,7 +4,7 @@
  */
 'use client'
 
-import { Check, AlertTriangle, Mail, Phone } from 'lucide-react'
+import { Check, AlertTriangle, Mail, Phone, X } from 'lucide-react'
 import { DateCell } from '@/components/table-cells'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -106,7 +106,8 @@ export function CustomerDetailDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
             關閉
           </Button>
           <Button

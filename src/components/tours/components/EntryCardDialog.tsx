@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Printer } from 'lucide-react'
+import { Printer, X } from 'lucide-react'
 import { JapanEntryCardPrint } from '../JapanEntryCardPrint'
 import type { EntryCardSettings } from '../hooks/useTourMemberEditor'
 
@@ -56,11 +56,12 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
             <DialogTitle>列印日本入境卡</DialogTitle>
           </DialogHeader>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="gap-2" onClick={() => onOpenChange(false)}>
+              <X size={16} />
               關閉
             </Button>
-            <Button onClick={() => window.print()}>
-              <Printer size={16} className="mr-1" />
+            <Button className="gap-2" onClick={() => window.print()}>
+              <Printer size={16} />
               列印
             </Button>
           </div>

@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react'
 import { Tour } from '@/stores/types'
 import { useTourStore, useOrderStore, useMemberStore } from '@/stores'
-import { Plus, FileText, Package, RefreshCw } from 'lucide-react'
+import { Plus, FileText, Package, RefreshCw, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -214,7 +214,8 @@ function TourOperationsAddDialog({
         </div>
 
         <div className="flex justify-end pt-4">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="gap-2">
+            <X size={16} />
             取消
           </Button>
         </div>

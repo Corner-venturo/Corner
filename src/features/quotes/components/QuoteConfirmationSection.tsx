@@ -359,8 +359,8 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowStaffConfirmDialog(false)}>
-              <X size={16} className="mr-1" />
+            <Button variant="outline" className="gap-2" onClick={() => setShowStaffConfirmDialog(false)}>
+              <X size={16} />
               取消
             </Button>
             <Button

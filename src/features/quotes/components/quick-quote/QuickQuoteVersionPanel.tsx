@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { History, ChevronDown, Trash2 } from 'lucide-react'
+import { History, ChevronDown, Trash2, X, Save } from 'lucide-react'
 import { QuoteVersion } from '@/stores/types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
@@ -170,7 +170,8 @@ export const QuickQuoteVersionPanel: React.FC<QuickQuoteVersionPanelProps> = ({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => onSetSaveVersionDialogOpen(false)}>
+            <Button variant="outline" className="gap-2" onClick={() => onSetSaveVersionDialogOpen(false)}>
+              <X size={16} />
               取消
             </Button>
             <Button

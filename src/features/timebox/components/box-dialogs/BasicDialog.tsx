@@ -173,7 +173,7 @@ export default function BasicDialog({ scheduledBox, box, onClose }: BasicDialogP
                   <X size={14} />
                   取消
                 </Button>
-                <Button size="sm" onClick={handleSaveEdit} className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1">
+                <Button size="sm" onClick={handleSaveEdit} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1">
                   <Save className="h-3 w-3" />
                   儲存
                 </Button>

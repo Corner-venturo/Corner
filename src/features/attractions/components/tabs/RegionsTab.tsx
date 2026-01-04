@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
@@ -234,7 +234,10 @@ export default function RegionsTab() {
             <div className="text-sm text-muted-foreground">
               已選 {countryCities.filter(c => c.is_major).length} 個主要城市
             </div>
-            <Button onClick={() => setIsCitiesDialogOpen(false)}>完成</Button>
+            <Button onClick={() => setIsCitiesDialogOpen(false)} className="gap-2">
+              <Check size={16} />
+              完成
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

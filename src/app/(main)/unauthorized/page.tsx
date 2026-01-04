@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ShieldX, ArrowLeft } from 'lucide-react'
+import { ShieldX, ArrowLeft, Home } from 'lucide-react'
 
 export default function UnauthorizedPage() {
   const router = useRouter()
@@ -21,12 +21,13 @@ export default function UnauthorizedPage() {
         </div>
 
         <div className="space-y-3">
-          <Button onClick={() => router.back()} variant="outline" className="w-full">
-            <ArrowLeft size={16} className="mr-2" />
+          <Button onClick={() => router.back()} variant="outline" className="w-full gap-2">
+            <ArrowLeft size={16} />
             返回上一頁
           </Button>
 
-          <Button onClick={() => router.push('/')} className="w-full">
+          <Button onClick={() => router.push('/')} className="w-full gap-2">
+            <Home size={16} />
             回到首頁
           </Button>
         </div>

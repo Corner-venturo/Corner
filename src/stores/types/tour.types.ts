@@ -133,7 +133,8 @@ export interface MeetingInfo {
 export interface HotelInfo {
   name: string
   description: string
-  image?: string
+  image?: string // 舊版單張圖片（向後相容）
+  images?: string[] // 新版多張圖片（最多4張）
 }
 
 export interface DailyActivity {

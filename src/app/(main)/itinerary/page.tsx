@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Building2, Plane, Search, CalendarDays, Loader2 } from 'lucide-react'
+import { Building2, Plane, Search, CalendarDays, Loader2, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -364,7 +364,9 @@ function CreateItineraryDialog({
                   variant="outline"
                   onClick={() => onOpenChange(false)}
                   disabled={formState.isCreatingItinerary}
+                  className="gap-2"
                 >
+                  <X size={16} />
                   取消
                 </Button>
                 <Button
@@ -672,10 +674,12 @@ function PasswordDialog({ isOpen, onOpenChange, passwordInput, onPasswordChange,
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
             取消
           </Button>
-          <Button onClick={onSubmit}>
+          <Button onClick={onSubmit} className="gap-2">
+            <Check size={16} />
             套用
           </Button>
         </DialogFooter>
@@ -750,13 +754,17 @@ function DuplicateDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isDuplicating}
+            className="gap-2"
           >
+            <X size={16} />
             取消
           </Button>
           <Button
             onClick={onSubmit}
             disabled={isDuplicating || !duplicateTourCode.trim() || !duplicateTitle.trim()}
+            className="gap-2"
           >
+            <Check size={16} />
             {isDuplicating ? '複製中...' : '確認複製'}
           </Button>
         </DialogFooter>

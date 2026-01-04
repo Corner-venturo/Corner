@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Lock, EyeOff, Eye, Camera, User, Loader2 } from 'lucide-react'
+import { Lock, EyeOff, Eye, Camera, User, Loader2, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
@@ -257,8 +257,9 @@ export function AccountSettings({
               <h3 className="font-medium mb-1">修改密碼</h3>
               <p className="text-sm text-morandi-secondary">定期更換密碼以保護您的帳號安全</p>
             </div>
-            <Button variant="outline" onClick={() => setShowPasswordSection(!showPasswordSection)}>
-              {showPasswordSection ? '取消' : '修改密碼'}
+            <Button variant="outline" onClick={() => setShowPasswordSection(!showPasswordSection)} className="gap-2">
+              {showPasswordSection ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {showPasswordSection ? '收合' : '修改密碼'}
             </Button>
           </div>
 
@@ -364,7 +365,9 @@ export function AccountSettings({
                       confirmPassword: '',
                     })
                   }}
+                  className="gap-2"
                 >
+                  <X size={16} />
                   取消
                 </Button>
               </div>

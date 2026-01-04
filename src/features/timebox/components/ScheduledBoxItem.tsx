@@ -59,8 +59,8 @@ function ScheduledBoxItem({
     },
   })
 
-  // 拖曳移動（同日內）
-  const { isDragging, previewTopOffset, hasConflict: dragConflict, handleDragStart } = useTimeboxDrag({
+  // 拖曳移動（支援跨天）
+  const { isDragging, previewTopOffset, previewDayOfWeek, hasConflict: dragConflict, handleDragStart } = useTimeboxDrag({
     scheduledBoxId: scheduledBox.id,
     dayOfWeek: scheduledBox.day_of_week,
     initialStartTime: scheduledBox.start_time,
@@ -69,8 +69,12 @@ function ScheduledBoxItem({
     slotMinutes,
     startHour,
     allScheduledBoxes,
-    onMove: async (newStartTime) => {
-      await updateScheduledBox(scheduledBox.id, { start_time: newStartTime })
+    onMove: async (newStartTime, newDayOfWeek) => {
+      const updates: Partial<TimeboxScheduledBox> = { start_time: newStartTime }
+      if (newDayOfWeek !== undefined) {
+        updates.day_of_week = newDayOfWeek
+      }
+      await updateScheduledBox(scheduledBox.id, updates)
     },
   })
 
@@ -81,6 +85,9 @@ function ScheduledBoxItem({
 
   // 計算顯示位置（drag 時使用預覽值）
   const displayTopOffset = isDragging ? previewTopOffset : topOffset
+
+  // 是否跨天拖曳中
+  const isCrossDayDragging = isDragging && previewDayOfWeek !== scheduledBox.day_of_week
 
   // 是否有任何衝突
   const hasConflict = resizeConflict || dragConflict
@@ -113,16 +120,18 @@ function ScheduledBoxItem({
   return (
     <>
       <div
-        className={`absolute inset-x-1 rounded-lg shadow-sm border-2 px-2 py-1 text-white transition-all duration-200 hover:shadow-md group ${
+        className={`absolute inset-x-1 rounded-lg shadow-sm border-2 px-2 py-1 text-white transition-all duration-100 hover:shadow-md group ${
           scheduledBox.completed ? 'opacity-75' : ''
         } ${isActive ? 'z-50 shadow-lg' : ''} ${hasConflict ? 'border-red-500' : 'border-border/40'} ${
           isDragging ? 'cursor-grabbing opacity-90' : 'cursor-grab'
-        }`}
+        } ${isCrossDayDragging ? 'ring-2 ring-morandi-gold ring-offset-2' : ''}`}
         style={{
           top: `${displayTopOffset}px`,
           height: `${Math.max(displayHeight - 2, 20)}px`,
           backgroundColor: hasConflict ? '#ef4444' : (box.color || '#D4D4D4'),
           borderLeft: `3px solid ${scheduledBox.completed ? 'var(--morandi-green, #4ade80)' : 'rgba(255,255,255,0.3)'}`,
+          // 拖曳時禁用過渡動畫，讓移動更即時
+          transition: isActive ? 'none' : undefined,
         }}
         onClick={() => !isActive && setShowDialog(true)}
         onPointerDown={(e) => {
@@ -172,6 +181,26 @@ function ScheduledBoxItem({
           title="拖曳調整時長"
         />
       </div>
+
+      {/* 跨天拖曳時的幽靈預覽 */}
+      {isCrossDayDragging && (
+        <div
+          className="fixed pointer-events-none z-[100] rounded-lg px-2 py-1 text-white opacity-50"
+          style={{
+            width: '120px',
+            height: `${Math.max(displayHeight - 2, 20)}px`,
+            backgroundColor: box.color || '#D4D4D4',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div className="flex h-full items-center gap-1.5">
+            <Icon className="h-3 w-3 flex-shrink-0 opacity-90" />
+            <div className="font-medium text-xs truncate">{box.name}</div>
+          </div>
+        </div>
+      )}
 
       {showDialog && (
         <>

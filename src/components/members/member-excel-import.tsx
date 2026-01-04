@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { FileSpreadsheet, Upload, X, Check, AlertCircle } from 'lucide-react'
+import { FileSpreadsheet, Upload, X, Check, AlertCircle, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -370,10 +370,12 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setStep('upload')}>
-                  上一步
+                <Button variant="outline" onClick={() => setStep('upload')} className="gap-2">
+                  <ArrowLeft size={16} />
+                  返回
                 </Button>
-                <Button onClick={handleImport} disabled={!requiredFieldsMapped}>
+                <Button onClick={handleImport} disabled={!requiredFieldsMapped} className="gap-2">
+                  <Upload size={16} />
                   開始匯入
                 </Button>
               </div>

@@ -12,7 +12,7 @@ import { PaymentRequest } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Check } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
 
@@ -445,11 +445,12 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
             {/* 按鈕 */}
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" className="gap-2" onClick={() => onOpenChange(false)}>
                 <X size={16} />
                 取消
               </Button>
-              <Button onClick={handleCloseTour} disabled={loading}>
+              <Button className="gap-2" onClick={handleCloseTour} disabled={loading}>
+                <Check size={16} />
                 {loading ? '處理中...' : '確認結團'}
               </Button>
             </div>

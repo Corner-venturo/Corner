@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
-import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy, Trash2 } from 'lucide-react'
+import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { RECEIPT_TYPE_LABELS, ReceiptType } from '@/types/receipt.types'
@@ -423,7 +423,8 @@ export function ReceiptDetailDialog({
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="gap-2">
+              <X size={16} />
               {isEditing ? '取消' : '關閉'}
             </Button>
 
