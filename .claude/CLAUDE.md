@@ -1,6 +1,6 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2025-12-31 (Stale Closure 防範規範)
+> **最後更新**: 2026-01-04 (全面性架構審查與新組件)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
@@ -283,6 +283,172 @@ import { Plus, Save, Check, X, Trash2, Edit2, Printer } from 'lucide-react'
 | 上傳 | `Upload` | `lucide-react` |
 | 搜尋 | `Search` | `lucide-react` |
 | 重設 | `RotateCcw` | `lucide-react` |
+
+---
+
+## 🆕 新增組件與工具 (2026-01-04 新增)
+
+> **背景**: 全面性架構審查後新增的標準組件與工具
+
+### 表單驗證組件
+
+#### FieldError - 欄位錯誤訊息
+```tsx
+import { FieldError } from '@/components/ui/field-error'
+
+// 單一錯誤
+<FieldError error="此欄位為必填" />
+
+// 多個錯誤
+<FieldError error={['格式錯誤', '長度不足']} />
+```
+
+#### FormField - 表單欄位包裝器
+```tsx
+import { FormField } from '@/components/ui/form-field'
+
+<FormField label="姓名" required error={errors.name}>
+  <Input value={name} onChange={...} />
+</FormField>
+```
+
+#### Label 必填標記
+```tsx
+import { Label } from '@/components/ui/label'
+
+<Label required>姓名</Label>  // 顯示紅色星號
+```
+
+### Dialog 組件
+
+#### DIALOG_SIZES - 標準尺寸
+```tsx
+import { DIALOG_SIZES } from '@/components/ui/dialog'
+
+// 可用尺寸: sm, md, lg, xl, 2xl, 4xl, full
+<DialogContent className={DIALOG_SIZES.lg}>
+  ...
+</DialogContent>
+```
+
+#### ManagedDialog - 有狀態管理的 Dialog
+```tsx
+import { ManagedDialog } from '@/components/dialog/managed-dialog'
+import { useManagedDialogState } from '@/hooks/useManagedDialogState'
+
+const { isDirty, markDirty, reset } = useManagedDialogState()
+
+<ManagedDialog
+  open={open}
+  onOpenChange={setOpen}
+  isDirty={isDirty}
+  confirmMessage="有未儲存的變更，確定要關閉嗎？"
+>
+  ...
+</ManagedDialog>
+```
+
+### 錯誤處理組件
+
+#### Error Boundary - 全域錯誤邊界
+```tsx
+import { ErrorBoundary } from '@/components/error-boundary'
+
+// 已在 layout 層級設置，無需手動添加
+// 錯誤時顯示重試按鈕
+```
+
+#### NotFoundState - 找不到資料狀態
+```tsx
+import { NotFoundState } from '@/components/ui/not-found-state'
+
+// 用於詳細頁找不到資料時
+if (!data) return <NotFoundState resourceName="訂單" />
+```
+
+### 導航組件
+
+#### useBreadcrumb - 自動麵包屑
+```tsx
+import { useBreadcrumb } from '@/hooks/useBreadcrumb'
+
+const breadcrumb = useBreadcrumb()
+// 根據 URL 自動生成麵包屑
+```
+
+#### ResponsiveHeader autoBreadcrumb
+```tsx
+<ResponsiveHeader
+  title="訂單管理"
+  autoBreadcrumb  // 自動生成麵包屑
+/>
+```
+
+### Store 同步系統
+
+#### 設置同步
+```tsx
+// 在 app layout 中設置
+import { StoreSyncProvider } from '@/stores/sync'
+
+<StoreSyncProvider>
+  {children}
+</StoreSyncProvider>
+```
+
+#### 發送同步事件
+```tsx
+import { withTourUpdate } from '@/stores/sync'
+
+// 更新 Tour 時自動同步相關 Orders
+const update = withTourUpdate(tourStore.update)
+await update(tourId, data)
+```
+
+### API 工具
+
+#### 統一 API 回應格式
+```tsx
+import { successResponse, errorResponse } from '@/lib/api/response'
+
+// API Route 內使用
+export async function POST(req: Request) {
+  try {
+    const data = await doSomething()
+    return successResponse(data)
+  } catch (error) {
+    return errorResponse('操作失敗', 500, 'OPERATION_FAILED')
+  }
+}
+
+// 回應格式: { success: boolean, data?, error?, code? }
+```
+
+#### Webhook 簽名驗證 (LinkPay)
+```tsx
+import { verifyWebhookSignature } from '@/lib/linkpay/signature'
+
+// 在 webhook route 中驗證
+if (!verifyWebhookSignature(payload, signature, secretKey)) {
+  return errorResponse('簽名驗證失敗', 401)
+}
+```
+
+### 新增檔案清單
+
+| 檔案 | 用途 |
+|------|------|
+| `src/components/ui/field-error.tsx` | 欄位錯誤訊息組件 |
+| `src/components/ui/form-field.tsx` | 表單欄位包裝器 |
+| `src/components/ui/not-found-state.tsx` | 找不到資料狀態 |
+| `src/components/dialog/managed-dialog.tsx` | 有狀態管理的 Dialog |
+| `src/components/error-boundary.tsx` | 全域錯誤邊界 |
+| `src/hooks/useBreadcrumb.ts` | 自動麵包屑 Hook |
+| `src/hooks/useManagedDialogState.ts` | Dialog 狀態管理 Hook |
+| `src/lib/api/response.ts` | API 回應格式工具 |
+| `src/lib/linkpay/signature.ts` | Webhook 簽名驗證 |
+| `src/lib/navigation/breadcrumb-config.ts` | 麵包屑路由配置 |
+| `src/stores/sync/` | Store 同步系統 (5 個檔案) |
 
 ---
 
