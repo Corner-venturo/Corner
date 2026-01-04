@@ -29,6 +29,8 @@ export interface ParsedPNR {
   validation: ValidationResult;
   // 2025-12-29: PNR Enhancement - Fare Monitoring
   fareData: ParsedFareData | null;
+  // 2026-01-04: 機票號碼
+  ticketNumbers: Array<{ number: string; passenger: string }>;
 }
 
 /**
@@ -298,7 +300,8 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     otherInfo: [],
     contactInfo: [],
     validation,
-    fareData: null
+    fareData: null,
+    ticketNumbers: [],
   };
 
   for (const line of lines) {
@@ -526,9 +529,20 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
       result.contactInfo.push(contactMatch[1].trim());
       continue;
     }
+
+    // 7. 解析機票號碼 FA 行 (e.g., "11 FA PAX 731-6328181969/ETMF/TWD44194/02JAN26/...")
+    const faMatch = line.match(/(?:^\d+\s+)?FA\s+PAX\s+(\d{3})-?(\d{10,})/i);
+    if (faMatch) {
+      result.ticketNumbers.push({
+        number: `${faMatch[1]}-${faMatch[2]}`,
+        passenger: '',
+      });
+      logger.log('    ✅ 找到機票號碼:', `${faMatch[1]}-${faMatch[2]}`);
+      continue;
+    }
   }
 
-  // 7. 解析票價資訊（在循環結束後處理）
+  // 8. 解析票價資訊（在循環結束後處理）
   result.fareData = parseFareFromTelegram(rawPNR);
 
   return result;

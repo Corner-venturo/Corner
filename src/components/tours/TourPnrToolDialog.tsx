@@ -68,6 +68,7 @@ interface PassengerMatch {
   baggage: string[]
   meal: string[]
   ticketPrice: number | null
+  ticketNumber: string | null  // 機票號碼
 }
 
 // 簡單的姓名比對（移除空格、轉大寫）
@@ -190,6 +191,18 @@ export function TourPnrToolDialog({
         const matchedMember = matchPassengerToMember(passenger.name, members)
         const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
 
+        // 嘗試匹配機票號碼：先按姓名匹配，再按順序匹配
+        let ticketNumber: string | null = null
+        const ticketByName = result.ticketNumbers.find(t =>
+          t.passenger && normalizeNameForMatch(t.passenger) === normalizeNameForMatch(passenger.name)
+        )
+        if (ticketByName) {
+          ticketNumber = ticketByName.number
+        } else if (result.ticketNumbers[index]) {
+          // 按順序匹配（FA 行通常按旅客順序排列）
+          ticketNumber = result.ticketNumbers[index].number
+        }
+
         return {
           pnrIndex: index,
           pnrName: passenger.name,
@@ -202,6 +215,7 @@ export function TourPnrToolDialog({
           baggage,
           meal,
           ticketPrice: matchedMember?.flight_cost || null,
+          ticketNumber,
         }
       })
 
@@ -341,6 +355,11 @@ export function TourPnrToolDialog({
             updateData.flight_cost = match.ticketPrice
           }
 
+          // 更新機票號碼（如果有）
+          if (match.ticketNumber) {
+            updateData.ticket_number = match.ticketNumber
+          }
+
           // 更新餐食（如果有）
           if (match.meal.length > 0) {
             updateData.special_meal = match.meal.join(', ')
@@ -403,6 +422,18 @@ export function TourPnrToolDialog({
                   const matches: PassengerMatch[] = result.passengers.map((passenger, index) => {
                     const matchedMember = matchPassengerToMember(passenger.name, members)
                     const { baggage, meal } = extractPassengerSSR(result.specialRequests, index)
+
+                    // 嘗試匹配機票號碼
+                    let ticketNumber: string | null = null
+                    const ticketByName = result.ticketNumbers.find(t =>
+                      t.passenger && normalizeNameForMatch(t.passenger) === normalizeNameForMatch(passenger.name)
+                    )
+                    if (ticketByName) {
+                      ticketNumber = ticketByName.number
+                    } else if (result.ticketNumbers[index]) {
+                      ticketNumber = result.ticketNumbers[index].number
+                    }
+
                     return {
                       pnrIndex: index,
                       pnrName: passenger.name,
@@ -415,6 +446,7 @@ export function TourPnrToolDialog({
                       baggage,
                       meal,
                       ticketPrice: matchedMember?.flight_cost || null,
+                      ticketNumber,
                     }
                   })
                   setPassengerMatches(matches)
@@ -564,25 +596,57 @@ export function TourPnrToolDialog({
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-morandi-secondary">航班資訊</h4>
                   <div className="grid gap-2">
-                    {parsedPNR.segments.map((seg, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2 bg-white border border-border rounded text-sm">
-                        <span className="font-medium">
-                          {getAirlineName(seg.airline) || seg.airline} {seg.flightNumber}
-                        </span>
-                        <span className="text-morandi-secondary">{seg.class}</span>
-                        <span>{seg.departureDate}</span>
-                        <div className="flex items-center gap-1">
-                          <span>{getAirportName(seg.origin) || seg.origin}</span>
-                          <ArrowRight size={12} className="text-morandi-secondary" />
-                          <span>{getAirportName(seg.destination) || seg.destination}</span>
-                        </div>
-                        {seg.departureTime && (
-                          <span className="text-morandi-secondary">
-                            {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}
+                    {parsedPNR.segments.map((seg, i) => {
+                      // 判斷問題狀態
+                      const isProblematicStatus = ['HX', 'XX', 'UC', 'UN', 'NO'].includes(seg.status)
+                      const statusLabel = {
+                        HK: '已確認',
+                        TK: '已開票',
+                        RR: '已確認',
+                        HX: '已取消',
+                        XX: '已取消',
+                        UC: '待確認',
+                        UN: '無法處理',
+                        NO: '無動作',
+                      }[seg.status] || seg.status
+
+                      return (
+                        <div key={i} className={cn(
+                          "flex items-center gap-3 p-2 border rounded text-sm",
+                          isProblematicStatus ? "bg-red-50 border-red-200" : "bg-white border-border"
+                        )}>
+                          <span className="font-medium">
+                            {getAirlineName(seg.airline) || seg.airline} {seg.flightNumber}
                           </span>
-                        )}
-                      </div>
-                    ))}
+                          <span className="text-morandi-secondary">{seg.class}</span>
+                          <span>{seg.departureDate}</span>
+                          <div className="flex items-center gap-1">
+                            <span>{getAirportName(seg.origin) || seg.origin}</span>
+                            <ArrowRight size={12} className="text-morandi-secondary" />
+                            <span>{getAirportName(seg.destination) || seg.destination}</span>
+                          </div>
+                          {seg.departureTime && (
+                            <span className="text-morandi-secondary">
+                              {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}
+                            </span>
+                          )}
+                          {/* 狀態標籤 */}
+                          <span className={cn(
+                            "px-2 py-0.5 text-xs rounded-full",
+                            isProblematicStatus
+                              ? "bg-red-100 text-red-700"
+                              : seg.status === 'HK' || seg.status === 'RR'
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                          )}>
+                            {statusLabel}
+                          </span>
+                          {isProblematicStatus && (
+                            <AlertTriangle size={14} className="text-red-500" />
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
@@ -607,6 +671,7 @@ export function TourPnrToolDialog({
                           餐食
                         </th>
                         <th className="px-3 py-2 text-left font-medium text-morandi-secondary">票價</th>
+                        <th className="px-3 py-2 text-left font-medium text-morandi-secondary">票號</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -674,6 +739,13 @@ export function TourPnrToolDialog({
                               placeholder="票價"
                               className="w-24 h-7 text-sm"
                             />
+                          </td>
+                          <td className="px-3 py-2">
+                            {match.ticketNumber ? (
+                              <span className="font-mono text-xs text-morandi-green">{match.ticketNumber}</span>
+                            ) : (
+                              <span className="text-morandi-muted">-</span>
+                            )}
                           </td>
                         </tr>
                       ))}
