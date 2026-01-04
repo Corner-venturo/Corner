@@ -9,6 +9,7 @@ import { QUICK_REACTIONS } from './constants'
 import { downloadFile } from '@/lib/files'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import { TicketStatusCard } from './TicketStatusCard'
 
 // 將文字中的網址轉換成可點擊的連結
 function renderMessageContent(content: string) {
@@ -85,10 +86,18 @@ export const MessageItem = memo(function MessageItem({ message, currentUserId, o
           )}
         </div>
 
-        {/* 訊息文字 */}
-        <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
-          {renderMessageContent(message.content)}
-        </div>
+        {/* 訊息文字或特殊卡片 */}
+        {message.metadata?.message_type === 'ticket_status_card' ? (
+          <TicketStatusCard
+            tours={message.metadata.tours || []}
+            summary={message.metadata.summary || { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 }}
+            generatedAt={message.metadata.generated_at}
+          />
+        ) : (
+          <div className="text-morandi-primary text-[15px] whitespace-pre-wrap leading-[1.46668] break-words">
+            {renderMessageContent(message.content)}
+          </div>
+        )}
 
         {/* 附件列表 */}
         {message.attachments && message.attachments.length > 0 && (

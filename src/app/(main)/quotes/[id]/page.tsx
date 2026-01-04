@@ -499,7 +499,6 @@ export default function QuoteDetailPage() {
         handleDeleteVersion={handleDeleteVersion}
         handleSyncToItinerary={handleSyncToItinerary}
         handleSyncAccommodationFromItinerary={syncOps.handleSyncAccommodationFromItinerary}
-        onSwitchToQuickQuote={() => setViewMode('quick')}
         onStatusChange={handleStatusChange}
         currentEditingVersion={currentEditingVersion}
         router={router}

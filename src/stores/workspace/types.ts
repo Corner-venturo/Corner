@@ -105,6 +105,12 @@ export interface Message {
     display_name: string
     avatar?: string
   }
+  // 訊息額外資料（機器人卡片等）
+  metadata?: {
+    message_type?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any
+  } | null
   _deleted?: boolean | null
   _needs_sync?: boolean | null
   _synced_at?: string | null

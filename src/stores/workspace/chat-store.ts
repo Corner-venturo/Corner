@@ -133,9 +133,13 @@ export const useChatStore = () => {
 
       try {
         // 🔥 效能優化：使用 Supabase 查詢只載入當前頻道的訊息
+        // 📌 同時 join author 資料以顯示發送者名稱
         const { data, error } = await supabase
           .from('messages')
-          .select('*')
+          .select(`
+            *,
+            author:employees!messages_author_id_fkey ( id, display_name, avatar )
+          `)
           .eq('channel_id', channelId)
           .order('created_at', { ascending: true })
 

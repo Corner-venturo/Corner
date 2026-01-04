@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Trash2, Map, RefreshCw, ArrowLeftRight, FilePlus, Plane, Contact, X } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Map, RefreshCw, FilePlus, Plane, Contact, X } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,6 +24,7 @@ import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import { stripHtml } from '@/lib/utils/string-utils'
 import type { Quote as StoreQuote } from '@/stores/types'
 import { Tour } from '@/types/tour.types'
+import { DocumentVersionPicker } from '@/components/documents'
 
 // 版本圖示
 function HistoryIcon({ size, className }: { size: number; className?: string }) {
@@ -92,7 +93,6 @@ interface QuoteHeaderProps {
   handleCreateItinerary?: () => void
   handleSyncToItinerary?: () => void
   handleSyncAccommodationFromItinerary?: () => void
-  onSwitchToQuickQuote?: () => void
   onStatusChange?: (status: 'proposed' | 'approved', showLinkDialog?: boolean) => void
   currentEditingVersion: number | null
   router: AppRouterInstance
@@ -128,7 +128,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
   handleCreateItinerary,
   handleSyncToItinerary,
   handleSyncAccommodationFromItinerary,
-  onSwitchToQuickQuote,
   onStatusChange,
   currentEditingVersion,
   router,
@@ -141,6 +140,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 }) => {
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
+  const [isVersionPickerOpen, setIsVersionPickerOpen] = useState(false)
   const [tempContactInfo, setTempContactInfo] = useState<ContactInfo>({
     contact_person: '',
     contact_phone: '',
@@ -392,76 +392,18 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             另存
           </Button>
 
-          {/* 版本 - SVG + 文字 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className="h-8 px-2.5 text-sm border border-[var(--morandi-container)] text-[var(--morandi-secondary)] hover:bg-[var(--morandi-container)] rounded-md flex items-center gap-1"
+          {/* 版本 - 開啟報價單管理對話框 */}
+          {relatedTour && (
+            <Button
+              onClick={() => setIsVersionPickerOpen(true)}
+              variant="outline"
+              title="報價單管理"
+              className="h-8 px-2.5 text-sm gap-1"
             >
               <HistoryIcon size={14} />
               版本
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64" align="end">
-              <div className="px-2 py-1 text-sm font-medium text-morandi-primary border-b border-border">
-                版本歷史
-              </div>
-
-              {/* 歷史版本：所有版本都在 versions[] 陣列中 */}
-              {quote?.versions && quote.versions.length > 0 ? (
-                <>
-                  {quote.versions
-                    .map((version: VersionRecord, originalIndex: number) => ({ version, originalIndex }))
-                    .sort((a, b) => b.version.version - a.version.version)
-                    .map(({ version, originalIndex }) => {
-                      const isCurrentEditing = currentEditingVersion === originalIndex ||
-                        (currentEditingVersion === null && quote.current_version_index === originalIndex)
-                      return (
-                        <DropdownMenuItem
-                          key={version.id}
-                          className="flex items-center justify-between py-2 cursor-pointer hover:bg-morandi-container/30 relative"
-                          onMouseEnter={() => setHoveredVersionIndex(originalIndex)}
-                          onMouseLeave={() => setHoveredVersionIndex(null)}
-                          onClick={() => handleLoadVersion(originalIndex, version)}
-                        >
-                          <div className="flex flex-col flex-1">
-                            <span className="font-medium">
-                              {stripHtml(version.name) || `版本 ${version.version}`}
-                            </span>
-                            <span className="text-xs text-morandi-secondary">
-                              {formatDateTime(version.created_at)}
-                              {version.note && ` - ${version.note}`}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-xs text-morandi-secondary">
-                              {version.mode === 'simple' ? '簡易模式' : `NT$ ${(version.total_cost || 0).toLocaleString()}`}
-                            </div>
-                            {isCurrentEditing && (
-                              <div className="text-xs bg-morandi-gold text-white px-2 py-1 rounded">當前</div>
-                            )}
-                            {!isReadOnly && hoveredVersionIndex === originalIndex && (
-                              <button
-                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                  e.stopPropagation()
-                                  handleDeleteVersion(originalIndex)
-                                }}
-                                className="p-1 hover:bg-status-danger-bg rounded transition-colors"
-                                title="刪除版本"
-                              >
-                                <Trash2 size={14} className="text-status-danger" />
-                              </button>
-                            )}
-                          </div>
-                        </DropdownMenuItem>
-                      )
-                    })}
-                </>
-              ) : (
-                <div className="px-2 py-3 text-sm text-morandi-secondary text-center">
-                  尚無版本，點擊「儲存」創建第一個版本
-                </div>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </Button>
+          )}
 
           {/* 行程表 - SVG + 文字 */}
           {handleCreateItinerary && (
@@ -502,19 +444,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-
-          {/* 切換 - SVG + 文字 */}
-          {onSwitchToQuickQuote && (
-            <Button
-              onClick={onSwitchToQuickQuote}
-              variant="outline"
-              title="切換到快速報價單"
-              className="h-8 px-2.5 text-sm gap-1"
-            >
-              <ArrowLeftRight size={14} />
-              切換
-            </Button>
           )}
 
           {/* 前往旅遊團 - 只有已核准且有關聯旅遊團時顯示 */}
@@ -597,6 +526,15 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 報價單管理對話框 */}
+      {relatedTour && (
+        <DocumentVersionPicker
+          isOpen={isVersionPickerOpen}
+          onClose={() => setIsVersionPickerOpen(false)}
+          tour={relatedTour as Tour & { id: string; code: string }}
+        />
+      )}
     </>
   )
 }

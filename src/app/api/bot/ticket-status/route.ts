@@ -418,18 +418,60 @@ export async function POST(request: NextRequest) {
           orders: tour.orders.filter(o => o.sales_person === salesName)
         })).filter(t => t.orders.length > 0)
 
-        const personalMessage = formatNotificationMessage(relevantTours)
+        // 計算總數
+        const totalStats = relevantTours.reduce((acc, t) => ({
+          ticketed: acc.ticketed + t.total_ticketed,
+          needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
+          no_record: acc.no_record + t.total_no_record,
+          self_arranged: acc.self_arranged + t.total_self_arranged,
+        }), { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 })
 
-        // 使用 bot-notification API 發送
+        // 簡短摘要（fallback 顯示）
+        const summaryMessage = `🎫 開票狀態提醒：${relevantTours.length} 個團需要處理`
+
+        // 使用 bot-notification API 發送（含結構化資料）
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               recipient_id: salesId,
-              message: personalMessage,
+              message: summaryMessage,
               type: 'info',
-              metadata: { type: 'ticket_status_personal', role: 'sales' },
+              metadata: {
+                message_type: 'ticket_status_card',
+                role: 'sales',
+                tours: relevantTours.map(t => ({
+                  tour_id: t.tour_id,
+                  tour_code: t.tour_code,
+                  tour_name: t.tour_name,
+                  departure_date: t.departure_date,
+                  earliest_deadline: t.earliest_deadline,
+                  stats: {
+                    total: t.total_ticketed + t.total_needs_ticketing + t.total_no_record + t.total_self_arranged,
+                    ticketed: t.total_ticketed,
+                    needs_ticketing: t.total_needs_ticketing,
+                    no_record: t.total_no_record,
+                    self_arranged: t.total_self_arranged,
+                  },
+                  orders: t.orders.map(o => ({
+                    order_id: o.order_id,
+                    order_code: o.order_code,
+                    contact_person: o.contact_person,
+                    earliest_deadline: o.earliest_deadline,
+                    members: o.members.map(m => ({
+                      id: m.id,
+                      name: m.chinese_name,
+                      status: categorizeMember(m),
+                      pnr: m.pnr,
+                      ticket_number: m.ticket_number,
+                      deadline: m.ticketing_deadline,
+                    })),
+                  })),
+                })),
+                summary: totalStats,
+                generated_at: new Date().toISOString(),
+              },
             }),
           })
           logger.info(`已發送開票提醒給業務: ${salesName}`)
@@ -457,18 +499,60 @@ export async function POST(request: NextRequest) {
           orders: tour.orders.filter(o => o.assistant === assistantName)
         })).filter(t => t.orders.length > 0)
 
-        const personalMessage = formatNotificationMessage(relevantTours)
+        // 計算總數
+        const totalStats = relevantTours.reduce((acc, t) => ({
+          ticketed: acc.ticketed + t.total_ticketed,
+          needs_ticketing: acc.needs_ticketing + t.total_needs_ticketing,
+          no_record: acc.no_record + t.total_no_record,
+          self_arranged: acc.self_arranged + t.total_self_arranged,
+        }), { ticketed: 0, needs_ticketing: 0, no_record: 0, self_arranged: 0 })
 
-        // 使用 bot-notification API 發送
+        // 簡短摘要（fallback 顯示）
+        const summaryMessage = `🎫 開票狀態提醒：${relevantTours.length} 個團需要處理`
+
+        // 使用 bot-notification API 發送（含結構化資料）
         try {
           await fetch(`${request.nextUrl.origin}/api/bot-notification`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               recipient_id: assistantId,
-              message: personalMessage,
+              message: summaryMessage,
               type: 'info',
-              metadata: { type: 'ticket_status_personal', role: 'assistant' },
+              metadata: {
+                message_type: 'ticket_status_card',
+                role: 'assistant',
+                tours: relevantTours.map(t => ({
+                  tour_id: t.tour_id,
+                  tour_code: t.tour_code,
+                  tour_name: t.tour_name,
+                  departure_date: t.departure_date,
+                  earliest_deadline: t.earliest_deadline,
+                  stats: {
+                    total: t.total_ticketed + t.total_needs_ticketing + t.total_no_record + t.total_self_arranged,
+                    ticketed: t.total_ticketed,
+                    needs_ticketing: t.total_needs_ticketing,
+                    no_record: t.total_no_record,
+                    self_arranged: t.total_self_arranged,
+                  },
+                  orders: t.orders.map(o => ({
+                    order_id: o.order_id,
+                    order_code: o.order_code,
+                    contact_person: o.contact_person,
+                    earliest_deadline: o.earliest_deadline,
+                    members: o.members.map(m => ({
+                      id: m.id,
+                      name: m.chinese_name,
+                      status: categorizeMember(m),
+                      pnr: m.pnr,
+                      ticket_number: m.ticket_number,
+                      deadline: m.ticketing_deadline,
+                    })),
+                  })),
+                })),
+                summary: totalStats,
+                generated_at: new Date().toISOString(),
+              },
             }),
           })
           logger.info(`已發送開票提醒給助理: ${assistantName}`)
