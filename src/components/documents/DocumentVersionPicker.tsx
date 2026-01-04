@@ -403,7 +403,8 @@ export function DocumentVersionPicker({
 
     const categories = previewQuote.categories as Array<{
       name: string
-      items?: Array<{ name: string; amount?: number; quantity?: number }>
+      total?: number
+      items?: Array<{ name: string; unit_price?: number; total?: number; quantity?: number }>
     }> | null
 
     return (
@@ -461,7 +462,7 @@ export function DocumentVersionPicker({
                         {(item.quantity || 1) > 1 && <span className="text-morandi-muted ml-1">x{item.quantity}</span>}
                       </td>
                       <td className="py-1.5 text-right">
-                        <CurrencyCell amount={(item.amount || 0) * (item.quantity || 1)} />
+                        <CurrencyCell amount={item.total || (item.unit_price || 0) * (item.quantity || 1)} />
                       </td>
                     </tr>
                   )) || []
@@ -473,8 +474,10 @@ export function DocumentVersionPicker({
                   <td className="py-2 text-right">
                     <CurrencyCell
                       amount={categories.reduce((sum, cat) => {
+                        // 如果分類有 total 就用，否則計算 items
+                        if (cat.total) return sum + cat.total
                         return sum + (cat.items?.reduce((catSum, item) => {
-                          return catSum + ((item.amount || 0) * (item.quantity || 1))
+                          return catSum + (item.total || (item.unit_price || 0) * (item.quantity || 1))
                         }, 0) || 0)
                       }, 0)}
                       className="font-bold text-morandi-gold"

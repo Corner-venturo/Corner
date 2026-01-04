@@ -78,6 +78,16 @@ export async function getServerAuth(): Promise<AuthResult> {
       employee = emp2
     }
 
+    // 如果還是找不到，用 email 查（最後的備用方案）
+    if (!employee && user.email) {
+      const { data: emp3 } = await adminClient
+        .from('employees')
+        .select('id, workspace_id')
+        .eq('personal_info->>email', user.email)
+        .single()
+      employee = emp3
+    }
+
     if (!employee) {
       return {
         success: false,
