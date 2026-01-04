@@ -175,6 +175,7 @@ export function BrochureDesignerPage() {
     overlaps,
     canvasWidth,
     canvasHeight,
+    isCanvasReady,
     setEditorState,
     addTextElement,
     addRectangle,
@@ -523,9 +524,10 @@ export function BrochureDesignerPage() {
   useEffect(() => {
     if (editorMode !== 'canvas') return
     if (!currentPage) return
+    if (!isCanvasReady) return // 等待 Canvas 準備好
 
     // 根據當前頁面類型生成對應的 Canvas 元素
-    const elements = pageToElements(currentPage.type, {
+    const generatedElements = pageToElements(currentPage.type, {
       coverData,
       itinerary: currentItinerary,
       dayIndex: currentPage.dayIndex,
@@ -533,15 +535,12 @@ export function BrochureDesignerPage() {
       accommodations,
     })
 
-    if (elements.length > 0) {
-      setCanvasElements(elements)
-      // 稍微延遲以確保 canvas 已初始化
-      const timer = setTimeout(() => {
-        loadElements(elements)
-      }, 150)
-      return () => clearTimeout(timer)
+    if (generatedElements.length > 0) {
+      setCanvasElements(generatedElements)
+      loadElements(generatedElements)
+      logger.log('[BrochureDesigner] 載入元素到 Canvas:', generatedElements.length)
     }
-  }, [editorMode, currentPage, currentPageIndex, coverData, currentItinerary, dailyItinerary, accommodations, loadElements])
+  }, [editorMode, currentPage, currentPageIndex, coverData, currentItinerary, dailyItinerary, accommodations, loadElements, isCanvasReady])
 
   // 圖層操作
   const handleLayerSelect = useCallback((id: string) => {

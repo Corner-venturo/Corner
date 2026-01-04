@@ -59,42 +59,28 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
   const [snapGuides, setSnapGuides] = useState<SnapGuide[]>([])
   const [overlaps, setOverlaps] = useState<OverlapInfo[]>([])
 
-  // 初始化畫布
+  // 追蹤容器是否已掛載
+  const [isContainerMounted, setIsContainerMounted] = useState(false)
+
+  // 監聽容器掛載狀態
   useEffect(() => {
-    if (!containerRef.current || canvasRef.current) return
-
-    const container = containerRef.current
-    const canvasEl = document.createElement('canvas')
-    canvasEl.id = 'brochure-canvas'
-    container.appendChild(canvasEl)
-
-    const canvas = new Canvas(canvasEl, {
-      width: A5_WIDTH_PX,
-      height: A5_HEIGHT_PX,
-      backgroundColor: '#ffffff',
-      selection: true,
-      preserveObjectStacking: true,
-      stopContextMenu: true,
-      fireRightClick: true,
-    })
-
-    canvasRef.current = canvas
-
-    // 設定事件監聽
-    setupCanvasEvents(canvas)
-
-    logger.log('[CanvasEditor] Canvas initialized', { width: A5_WIDTH_PX, height: A5_HEIGHT_PX })
-
-    return () => {
-      canvas.dispose()
-      canvasRef.current = null
-      if (container.contains(canvasEl)) {
-        container.removeChild(canvasEl)
+    const checkContainer = () => {
+      if (containerRef.current && !isContainerMounted) {
+        setIsContainerMounted(true)
+      } else if (!containerRef.current && isContainerMounted) {
+        setIsContainerMounted(false)
       }
     }
-  }, [containerRef])
 
-  // 設定畫布事件
+    // 立即檢查一次
+    checkContainer()
+
+    // 使用 MutationObserver 或定時器來監聽變化
+    const interval = setInterval(checkContainer, 100)
+    return () => clearInterval(interval)
+  }, [containerRef, isContainerMounted])
+
+  // 設定畫布事件（移到前面避免 hoisting 問題）
   const setupCanvasEvents = useCallback((canvas: Canvas) => {
     // 選取事件
     canvas.on('selection:created', (e) => {
@@ -171,6 +157,48 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
       setEditorState((prev) => ({ ...prev, hoveredId: null }))
     })
   }, [onElementSelect])
+
+  // 初始化畫布
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    // 如果已經有畫布，先清理
+    if (canvasRef.current) {
+      canvasRef.current.dispose()
+      canvasRef.current = null
+    }
+
+    const container = containerRef.current
+
+    // 清空容器
+    container.innerHTML = ''
+
+    const canvasEl = document.createElement('canvas')
+    canvasEl.id = 'brochure-canvas'
+    container.appendChild(canvasEl)
+
+    const canvas = new Canvas(canvasEl, {
+      width: A5_WIDTH_PX,
+      height: A5_HEIGHT_PX,
+      backgroundColor: '#ffffff',
+      selection: true,
+      preserveObjectStacking: true,
+      stopContextMenu: true,
+      fireRightClick: true,
+    })
+
+    canvasRef.current = canvas
+
+    // 設定事件監聽
+    setupCanvasEvents(canvas)
+
+    logger.log('[CanvasEditor] Canvas initialized', { width: A5_WIDTH_PX, height: A5_HEIGHT_PX })
+
+    return () => {
+      canvas.dispose()
+      canvasRef.current = null
+    }
+  }, [isContainerMounted, setupCanvasEvents])
 
   // 計算智慧參考線
   const calculateSnapGuides = useCallback((canvas: Canvas, movingObj: FabricObject): SnapGuide[] => {
@@ -813,6 +841,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     guides,
     snapGuides,
     overlaps,
+    isCanvasReady: isContainerMounted && canvasRef.current !== null,
 
     // Actions
     setEditorState,
