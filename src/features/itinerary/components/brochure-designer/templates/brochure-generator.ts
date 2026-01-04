@@ -257,7 +257,7 @@ function createShapeElement(
 
 // ============= 頁面生成函數 =============
 
-// 生成封面
+// 生成封面（日系風格 - 與 BrochureCoverPreview 一致）
 function generateCoverPage(
   itinerary: Itinerary,
   theme: BrochureTheme,
@@ -267,69 +267,403 @@ function generateCoverPage(
   const pageId = generateId('cover')
   const elements: CanvasElement[] = []
 
+  // 從 tagline 或 title 取得客戶名稱
+  const clientName = itinerary.tagline?.replace(/<[^>]*>/g, '').trim() ||
+                     itinerary.title?.replace(/<[^>]*>/g, '').trim() || ''
+
   const data = {
-    city: itinerary.city?.toUpperCase() || '目的地',
+    clientName,
+    city: itinerary.city?.toUpperCase() || 'CITY',
     country: itinerary.country?.toUpperCase() || '',
     travelDates: formatDateRange(itinerary.departure_date || '', itinerary.daily_itinerary?.length || 1),
     coverImage: itinerary.cover_image || '',
-    companyLogo: options.companyLogo || '',
+    companyName: options.companyName || '角落旅行社',
+    emergencyContact: itinerary.leader?.domesticPhone || '+886 2-2345-6789',
+    emergencyEmail: 'service@corner.travel',
   }
 
-  // 背景圖
+  // 1. 背景圖（全滿）
   if (data.coverImage) {
-    elements.push(createImageElement(
-      template.regions.find(r => r.id === 'bg-image')!,
-      data.coverImage,
-      pageId
-    ))
+    elements.push({
+      id: generateId(`bg-image-${pageId}`),
+      type: 'image',
+      name: 'bg-image',
+      x: 0,
+      y: 0,
+      width: A5_WIDTH,
+      height: A5_HEIGHT,
+      rotation: 0,
+      opacity: 1,
+      locked: true,
+      visible: true,
+      zIndex: 0,
+      src: data.coverImage,
+      cropX: 0,
+      cropY: 0,
+      cropWidth: 100,
+      cropHeight: 100,
+      filters: { brightness: 0, contrast: 0, saturation: 0, blur: 0 },
+      objectFit: 'cover',
+    } as ImageElement)
+  } else {
+    // 無圖片時顯示漸層背景
+    elements.push({
+      id: generateId(`bg-gradient-${pageId}`),
+      type: 'shape',
+      name: 'bg-gradient',
+      x: 0,
+      y: 0,
+      width: A5_WIDTH,
+      height: A5_HEIGHT,
+      rotation: 0,
+      opacity: 1,
+      locked: true,
+      visible: true,
+      zIndex: 0,
+      variant: 'rectangle',
+      fill: 'linear-gradient(135deg, #374151, #111827)',
+      stroke: 'transparent',
+      strokeWidth: 0,
+      cornerRadius: 0,
+    } as ShapeElement)
   }
 
-  // 漸層遮罩（用形狀模擬）
+  // 2. 漸層遮罩（from-black/60 via-black/20 to-black/80）
   elements.push({
     id: generateId(`overlay-${pageId}`),
     type: 'shape',
     name: 'overlay',
     x: 0,
-    y: A5_HEIGHT * 0.5,
+    y: 0,
     width: A5_WIDTH,
-    height: A5_HEIGHT * 0.5,
+    height: A5_HEIGHT,
     rotation: 0,
-    opacity: 0.7,
+    opacity: 1,
     locked: true,
     visible: true,
     zIndex: 1,
     variant: 'rectangle',
-    fill: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
+    fill: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.8) 100%)',
     stroke: 'transparent',
     strokeWidth: 0,
     cornerRadius: 0,
   } as ShapeElement)
 
-  // 城市名稱
-  elements.push(createTextElement(
-    { ...template.regions.find(r => r.id === 'destination')!, textVariant: 'title' },
-    data.city,
-    { ...theme, colors: { ...theme.colors, text: '#ffffff' } },
-    pageId
-  ))
+  // 3. 頂部：客戶名稱（左側有琥珀色邊線）
+  if (data.clientName) {
+    // 琥珀色左邊線
+    elements.push({
+      id: generateId(`client-border-${pageId}`),
+      type: 'shape',
+      name: 'client-border',
+      x: 20,
+      y: 30,
+      width: 2,
+      height: 14,
+      rotation: 0,
+      opacity: 0.9,
+      locked: false,
+      visible: true,
+      zIndex: 2,
+      variant: 'rectangle',
+      fill: '#f59e0b',
+      stroke: 'transparent',
+      strokeWidth: 0,
+      cornerRadius: 0,
+    } as ShapeElement)
 
-  // 國家
-  if (data.country) {
-    elements.push(createTextElement(
-      { ...template.regions.find(r => r.id === 'country')!, textVariant: 'subtitle' },
-      data.country,
-      { ...theme, colors: { ...theme.colors, text: '#ffffff', textMuted: 'rgba(255,255,255,0.8)' } },
-      pageId
-    ))
+    // 客戶名稱文字
+    elements.push({
+      id: generateId(`client-name-${pageId}`),
+      type: 'text',
+      name: 'client-name',
+      x: 28,
+      y: 28,
+      width: A5_WIDTH - 60,
+      height: 20,
+      rotation: 0,
+      opacity: 0.9,
+      locked: false,
+      visible: true,
+      zIndex: 2,
+      content: data.clientName.toUpperCase(),
+      style: {
+        fontFamily: theme.fonts.body,
+        fontSize: 9,
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+        textAlign: 'left',
+        lineHeight: 1.2,
+        letterSpacing: 2,
+        color: '#ffffff',
+        textDecoration: 'none',
+      },
+    } as TextElement)
   }
 
-  // 日期
-  elements.push(createTextElement(
-    { ...template.regions.find(r => r.id === 'dates')!, textVariant: 'caption' },
-    data.travelDates,
-    { ...theme, colors: { ...theme.colors, textMuted: 'rgba(255,255,255,0.9)' } },
-    pageId
-  ))
+  // 4. 中央：國家（小）
+  if (data.country) {
+    elements.push({
+      id: generateId(`country-${pageId}`),
+      type: 'text',
+      name: 'country',
+      x: 0,
+      y: A5_HEIGHT * 0.42,
+      width: A5_WIDTH,
+      height: 24,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      zIndex: 2,
+      content: data.country,
+      style: {
+        fontFamily: theme.fonts.title,
+        fontSize: 14,
+        fontWeight: '300',
+        fontStyle: 'normal',
+        textAlign: 'center',
+        lineHeight: 1,
+        letterSpacing: 6,
+        color: '#ffffff',
+        textDecoration: 'none',
+      },
+    } as TextElement)
+  }
+
+  // 5. 中央：城市名（大）
+  elements.push({
+    id: generateId(`city-${pageId}`),
+    type: 'text',
+    name: 'city',
+    x: 0,
+    y: A5_HEIGHT * 0.46,
+    width: A5_WIDTH,
+    height: 50,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    content: data.city,
+    style: {
+      fontFamily: theme.fonts.title,
+      fontSize: 36,
+      fontWeight: 'bold',
+      fontStyle: 'normal',
+      textAlign: 'center',
+      lineHeight: 0.9,
+      letterSpacing: 2,
+      color: '#ffffff',
+      textDecoration: 'none',
+    },
+  } as TextElement)
+
+  // 6. 旅遊日期（膠囊徽章）
+  if (data.travelDates) {
+    // 膠囊背景
+    elements.push({
+      id: generateId(`date-badge-${pageId}`),
+      type: 'shape',
+      name: 'date-badge',
+      x: (A5_WIDTH - 180) / 2,
+      y: A5_HEIGHT * 0.54,
+      width: 180,
+      height: 28,
+      rotation: 0,
+      opacity: 0.15,
+      locked: false,
+      visible: true,
+      zIndex: 2,
+      variant: 'rectangle',
+      fill: '#ffffff',
+      stroke: 'rgba(255,255,255,0.2)',
+      strokeWidth: 1,
+      cornerRadius: 14,
+    } as ShapeElement)
+
+    // ✈ 圖標
+    elements.push({
+      id: generateId(`plane-icon-${pageId}`),
+      type: 'text',
+      name: 'plane-icon',
+      x: (A5_WIDTH - 180) / 2 + 12,
+      y: A5_HEIGHT * 0.54 + 6,
+      width: 16,
+      height: 16,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      zIndex: 3,
+      content: '✈',
+      style: {
+        fontFamily: 'sans-serif',
+        fontSize: 12,
+        fontWeight: 'normal',
+        fontStyle: 'normal',
+        textAlign: 'center',
+        lineHeight: 1,
+        letterSpacing: 0,
+        color: '#ffffff',
+        textDecoration: 'none',
+      },
+    } as TextElement)
+
+    // 日期文字
+    elements.push({
+      id: generateId(`dates-${pageId}`),
+      type: 'text',
+      name: 'dates',
+      x: (A5_WIDTH - 180) / 2 + 32,
+      y: A5_HEIGHT * 0.54 + 7,
+      width: 140,
+      height: 16,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      zIndex: 3,
+      content: data.travelDates,
+      style: {
+        fontFamily: theme.fonts.body,
+        fontSize: 10,
+        fontWeight: '500',
+        fontStyle: 'normal',
+        textAlign: 'left',
+        lineHeight: 1,
+        letterSpacing: 1,
+        color: '#ffffff',
+        textDecoration: 'none',
+      },
+    } as TextElement)
+  }
+
+  // 7. 底部分隔線
+  elements.push({
+    id: generateId(`separator-${pageId}`),
+    type: 'shape',
+    name: 'separator',
+    x: 20,
+    y: A5_HEIGHT - 70,
+    width: A5_WIDTH - 40,
+    height: 1,
+    rotation: 0,
+    opacity: 0.5,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    variant: 'rectangle',
+    fill: 'linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent)',
+    stroke: 'transparent',
+    strokeWidth: 0,
+    cornerRadius: 0,
+  } as ShapeElement)
+
+  // 8. 底部左側：Logo
+  elements.push({
+    id: generateId(`logo-${pageId}`),
+    type: 'image',
+    name: 'logo',
+    x: 20,
+    y: A5_HEIGHT - 50,
+    width: 60,
+    height: 24,
+    rotation: 0,
+    opacity: 0.9,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    src: '/corner-logo.png',
+    cropX: 0,
+    cropY: 0,
+    cropWidth: 100,
+    cropHeight: 100,
+    filters: { brightness: 0, contrast: 0, saturation: 0, blur: 0 },
+    objectFit: 'contain',
+  } as ImageElement)
+
+  // 9. 底部右側：緊急聯絡資訊
+  elements.push({
+    id: generateId(`contact-label-${pageId}`),
+    type: 'text',
+    name: 'contact-label',
+    x: A5_WIDTH - 160,
+    y: A5_HEIGHT - 55,
+    width: 140,
+    height: 12,
+    rotation: 0,
+    opacity: 0.7,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    content: 'Emergency Contact',
+    style: {
+      fontFamily: theme.fonts.body,
+      fontSize: 7,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      textAlign: 'right',
+      lineHeight: 1,
+      letterSpacing: 0,
+      color: '#8b8680',
+      textDecoration: 'none',
+    },
+  } as TextElement)
+
+  elements.push({
+    id: generateId(`contact-phone-${pageId}`),
+    type: 'text',
+    name: 'contact-phone',
+    x: A5_WIDTH - 160,
+    y: A5_HEIGHT - 42,
+    width: 140,
+    height: 14,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    content: data.emergencyContact,
+    style: {
+      fontFamily: theme.fonts.body,
+      fontSize: 10,
+      fontWeight: '600',
+      fontStyle: 'normal',
+      textAlign: 'right',
+      lineHeight: 1,
+      letterSpacing: 0,
+      color: '#ffffff',
+      textDecoration: 'none',
+    },
+  } as TextElement)
+
+  elements.push({
+    id: generateId(`contact-email-${pageId}`),
+    type: 'text',
+    name: 'contact-email',
+    x: A5_WIDTH - 160,
+    y: A5_HEIGHT - 28,
+    width: 140,
+    height: 12,
+    rotation: 0,
+    opacity: 0.7,
+    locked: false,
+    visible: true,
+    zIndex: 2,
+    content: data.emergencyEmail,
+    style: {
+      fontFamily: theme.fonts.body,
+      fontSize: 8,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      textAlign: 'right',
+      lineHeight: 1,
+      letterSpacing: 0,
+      color: '#8b8680',
+      textDecoration: 'none',
+    },
+  } as TextElement)
 
   return {
     id: pageId,

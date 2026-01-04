@@ -763,7 +763,7 @@ export function BrochureDesignerPage() {
           <section className="flex-1 bg-white rounded-xl border-2 border-border flex flex-col overflow-hidden shadow-md">
             {/* 預覽/編輯區內容 */}
             {editorMode === 'template' ? (
-              // 模板模式 - 使用與編輯模式相同的生成元素（只是不可編輯）
+              // 模板模式 - 使用原有的 React 組件（日系風格模板）
               <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
                 <div
                   className="absolute inset-0 opacity-[0.02]"
@@ -773,112 +773,82 @@ export function BrochureDesignerPage() {
                   }}
                 />
 
-                {/* 如果有生成的手冊，顯示與編輯模式相同的內容 */}
-                {generatedBrochure && canvasElements.length > 0 ? (
-                  <div
-                    className="relative shadow-lg bg-white flex-shrink-0"
-                    style={{
-                      width: '559px',
-                      height: '794px',
-                      transform: 'scale(0.75)',
-                      transformOrigin: 'center center',
-                    }}
-                  >
-                    {/* 渲染生成的元素（與編輯模式相同，但不可編輯） */}
-                    {canvasElements.map((element) => {
-                      if (element.type === 'shape') {
-                        const shape = element as CanvasElement & { variant: string; fill: string; stroke: string; strokeWidth: number; cornerRadius: number }
-                        return (
-                          <div
-                            key={element.id}
-                            className="absolute"
-                            style={{
-                              left: element.x,
-                              top: element.y,
-                              width: element.width,
-                              height: element.height,
-                              backgroundColor: shape.fill?.startsWith('linear') ? undefined : shape.fill,
-                              background: shape.fill?.startsWith('linear') ? shape.fill : undefined,
-                              borderRadius: shape.cornerRadius,
-                              border: shape.stroke !== 'transparent' ? `${shape.strokeWidth}px solid ${shape.stroke}` : undefined,
-                              opacity: element.opacity,
-                              zIndex: element.zIndex,
-                            }}
-                          />
-                        )
-                      }
-                      if (element.type === 'text') {
-                        const text = element as CanvasElement & { content: string; style: { fontFamily: string; fontSize: number; fontWeight: string; textAlign: string; color: string; lineHeight: number; letterSpacing: number } }
-                        return (
-                          <div
-                            key={element.id}
-                            className="absolute overflow-hidden"
-                            style={{
-                              left: element.x,
-                              top: element.y,
-                              width: element.width,
-                              height: element.height,
-                              fontFamily: text.style.fontFamily,
-                              fontSize: text.style.fontSize,
-                              fontWeight: text.style.fontWeight,
-                              textAlign: text.style.textAlign as 'left' | 'center' | 'right',
-                              color: text.style.color,
-                              lineHeight: text.style.lineHeight,
-                              letterSpacing: text.style.letterSpacing,
-                              opacity: element.opacity,
-                              zIndex: element.zIndex,
-                            }}
-                          >
-                            {text.content}
-                          </div>
-                        )
-                      }
-                      if (element.type === 'image') {
-                        const img = element as CanvasElement & { src: string; objectFit: string }
-                        return (
-                          <div
-                            key={element.id}
-                            className="absolute overflow-hidden"
-                            style={{
-                              left: element.x,
-                              top: element.y,
-                              width: element.width,
-                              height: element.height,
-                              opacity: element.opacity,
-                              zIndex: element.zIndex,
-                              borderRadius: 8,
-                            }}
-                          >
-                            <img
-                              src={img.src}
-                              alt=""
-                              className="w-full h-full"
-                              style={{ objectFit: img.objectFit as 'cover' | 'contain' || 'cover' }}
-                            />
-                          </div>
-                        )
-                      }
-                      return null
-                    })}
-                  </div>
-                ) : (
-                  /* 尚未生成手冊時顯示提示 */
-                  <div
-                    className="relative shadow-lg bg-white flex-shrink-0 flex items-center justify-center"
-                    style={{
-                      width: '559px',
-                      height: '794px',
-                      transform: 'scale(0.75)',
-                      transformOrigin: 'center center',
-                    }}
-                  >
-                    <div className="text-center">
-                      <Sparkles size={48} className="mx-auto text-morandi-gold/30 mb-3" />
-                      <p className="text-morandi-secondary text-sm">請先生成手冊</p>
-                      <p className="text-morandi-secondary/60 text-xs mt-1">點擊左側「一鍵生成」按鈕</p>
+                <div
+                  className="relative shadow-lg bg-white flex-shrink-0 overflow-hidden"
+                  style={{
+                    width: '559px',
+                    height: '794px',
+                    transform: 'scale(0.75)',
+                    transformOrigin: 'center center',
+                  }}
+                >
+                  {/* 模板預覽 - 使用原有 React 組件 */}
+                  {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
+
+                  {currentPage?.type === 'blank' && (
+                    <div className="bg-white flex items-center justify-center w-full h-full">
+                      <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {currentPage?.type === 'contents' && (
+                    <BrochureTableOfContents
+                      ref={contentsRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                      tripTitle={`${coverData.country} ${coverData.city} Trip`}
+                    />
+                  )}
+
+                  {currentPage?.type === 'overview-left' && (
+                    <BrochureOverviewLeft
+                      ref={overviewLeftRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                      overviewImage={coverData.overviewImage}
+                    />
+                  )}
+
+                  {currentPage?.type === 'overview-right' && (
+                    <BrochureOverviewRight
+                      ref={overviewRightRef}
+                      data={coverData}
+                      itinerary={currentItinerary}
+                    />
+                  )}
+
+                  {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
+                    currentPage.side === 'left' ? (
+                      <BrochureDailyLeft
+                        dayIndex={currentPage.dayIndex}
+                        day={dailyItinerary[currentPage.dayIndex]}
+                        departureDate={currentItinerary?.departure_date}
+                        tripName={`${coverData.country} ${coverData.city}`}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    ) : (
+                      <BrochureDailyRight
+                        dayIndex={currentPage.dayIndex}
+                        day={dailyItinerary[currentPage.dayIndex]}
+                        pageNumber={currentPageIndex + 1}
+                      />
+                    )
+                  )}
+
+                  {currentPage?.type === 'accommodation-left' && (
+                    <BrochureAccommodationLeft
+                      accommodations={accommodations}
+                      pageNumber={currentPageIndex + 1}
+                    />
+                  )}
+
+                  {currentPage?.type === 'accommodation-right' && (
+                    <BrochureAccommodationRight
+                      accommodations={accommodations}
+                      pageNumber={currentPageIndex + 1}
+                    />
+                  )}
+                </div>
               </div>
             ) : (
               // Canvas 編輯模式 - 顯示生成的手冊

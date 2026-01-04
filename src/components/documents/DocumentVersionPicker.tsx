@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import {
   X,
   Plus,
-  Check,
   Pencil,
   Calculator,
   Loader2,
@@ -13,7 +12,7 @@ import {
   Zap,
   Lock,
   Eye,
-  LockOpen,
+  Copy,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -22,7 +21,6 @@ import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-import { confirm } from '@/lib/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -79,7 +77,6 @@ export function DocumentVersionPicker({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const [previewQuote, setPreviewQuote] = useState<Quote | null>(null)
-  const [lockingId, setLockingId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // 載入報價單資料
@@ -98,9 +95,23 @@ export function DocumentVersionPicker({
   }, [editingId])
 
   // 已關聯此旅遊團的報價單 - 分開標準和快速
-  const linkedQuotes = quotes.filter(
-    q => q.tour_id === tour.id && !(q as { _deleted?: boolean })._deleted
-  )
+  // 過濾掉沒有實際內容的報價單（沒有金額且沒有項目）
+  const linkedQuotes = quotes.filter(q => {
+    if (q.tour_id !== tour.id) return false
+    if ((q as { _deleted?: boolean })._deleted) return false
+
+    // 有金額就顯示
+    if (q.total_amount && q.total_amount > 0) return true
+
+    // 有分類項目就顯示
+    const categories = q.categories as Array<{ items?: unknown[] }> | null
+    if (categories && categories.some(cat => cat.items && cat.items.length > 0)) return true
+
+    // 已確認的報價單一定要顯示
+    if (q.confirmation_status || q.status === 'approved') return true
+
+    return false
+  })
   const standardQuotes = linkedQuotes.filter(q => q.quote_type !== 'quick')
   const quickQuotes = linkedQuotes.filter(q => q.quote_type === 'quick')
 
@@ -184,50 +195,34 @@ export function DocumentVersionPicker({
     setPreviewQuote(quote)
   }
 
-  // 鎖定/解鎖報價單
-  const handleToggleLock = async (e: React.MouseEvent, quote: Quote) => {
+  // 複製報價單（另存新檔）
+  const [copyingId, setCopyingId] = useState<string | null>(null)
+  const handleCopy = async (e: React.MouseEvent, quote: Quote) => {
     e.stopPropagation()
+    try {
+      setCopyingId(quote.id)
+      const code = generateCode('TP', { quoteType: quote.quote_type === 'quick' ? 'quick' : 'standard' }, quotes)
+      const originalName = quote.customer_name || quote.name || '未命名'
 
-    const isLocked = isConfirmedQuote(quote)
-
-    if (isLocked) {
-      // 解鎖
-      const confirmed = await confirm('確定要解除鎖定此報價單嗎？', {
-        title: '解除鎖定',
-        type: 'warning',
+      const newQuote = await create({
+        code,
+        name: quote.name,
+        customer_name: `${originalName} (副本)`,
+        quote_type: quote.quote_type,
+        status: 'draft',
+        tour_id: tour.id,
+        categories: quote.categories,
+        group_size: quote.group_size,
       })
-      if (!confirmed) return
 
-      try {
-        setLockingId(quote.id)
-        await update(quote.id, {
-          confirmation_status: undefined,
-          status: 'draft'
-        })
-      } catch (error) {
-        logger.error('解鎖失敗:', error)
-      } finally {
-        setLockingId(null)
+      if (newQuote?.id) {
+        onClose()
+        router.push(`/quotes/${newQuote.id}`)
       }
-    } else {
-      // 鎖定
-      const confirmed = await confirm('確定要鎖定此報價單嗎？鎖定後將標記為「內部已確認」。', {
-        title: '鎖定報價單',
-        type: 'info',
-      })
-      if (!confirmed) return
-
-      try {
-        setLockingId(quote.id)
-        await update(quote.id, {
-          confirmation_status: 'staff_confirmed',
-          status: 'approved'
-        })
-      } catch (error) {
-        logger.error('鎖定失敗:', error)
-      } finally {
-        setLockingId(null)
-      }
+    } catch (error) {
+      logger.error('複製報價單失敗:', error)
+    } finally {
+      setCopyingId(null)
     }
   }
 
@@ -266,7 +261,6 @@ export function DocumentVersionPicker({
   // 渲染報價單項目
   const renderQuoteItem = (quote: Quote, index: number) => {
     const isLocked = isConfirmedQuote(quote)
-    const isLocking = lockingId === quote.id
 
     return (
       <div
@@ -337,24 +331,17 @@ export function DocumentVersionPicker({
             <Pencil size={15} className="text-morandi-secondary" />
           </button>
 
-          {/* 鎖定/解鎖 */}
+          {/* 複製（另存新檔） */}
           <button
-            onClick={e => handleToggleLock(e, quote)}
-            disabled={isLocking}
-            className={cn(
-              'p-1.5 rounded-lg transition-colors',
-              isLocked
-                ? 'hover:bg-morandi-green/10 text-morandi-green'
-                : 'hover:bg-morandi-container text-morandi-secondary'
-            )}
-            title={isLocked ? '解除鎖定' : '鎖定確認'}
+            onClick={e => handleCopy(e, quote)}
+            disabled={copyingId === quote.id}
+            className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
+            title="複製為新版本"
           >
-            {isLocking ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : isLocked ? (
-              <Lock size={15} />
+            {copyingId === quote.id ? (
+              <Loader2 size={15} className="animate-spin text-morandi-secondary" />
             ) : (
-              <LockOpen size={15} />
+              <Copy size={15} className="text-morandi-secondary" />
             )}
           </button>
 
@@ -383,23 +370,21 @@ export function DocumentVersionPicker({
     return (
       <div className="space-y-4">
         {/* 基本資訊 */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-morandi-secondary">編號：</span>
-            <span className="text-morandi-primary font-medium ml-1">{previewQuote.code}</span>
-          </div>
-          <div>
-            <span className="text-morandi-secondary">狀態：</span>
-            <span className={cn(
-              'ml-1 font-medium',
-              isConfirmedQuote(previewQuote) ? 'text-morandi-green' : 'text-morandi-secondary'
-            )}>
-              {isConfirmedQuote(previewQuote) ? getConfirmStatusText(previewQuote) : '草稿'}
-            </span>
-          </div>
-          <div>
-            <span className="text-morandi-secondary">人數：</span>
-            <span className="text-morandi-primary ml-1">{previewQuote.group_size || '-'} 人</span>
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-4">
+            <div>
+              <span className="text-morandi-secondary">狀態：</span>
+              <span className={cn(
+                'ml-1 font-medium',
+                isConfirmedQuote(previewQuote) ? 'text-morandi-green' : 'text-morandi-secondary'
+              )}>
+                {isConfirmedQuote(previewQuote) ? getConfirmStatusText(previewQuote) : '草稿'}
+              </span>
+            </div>
+            <div>
+              <span className="text-morandi-secondary">人數：</span>
+              <span className="text-morandi-primary ml-1">{previewQuote.group_size || '-'} 人</span>
+            </div>
           </div>
           <div>
             <span className="text-morandi-secondary">總金額：</span>
@@ -416,32 +401,49 @@ export function DocumentVersionPicker({
           <div className="border-t border-border" />
         </div>
 
-        {/* 成本分類摘要 */}
+        {/* 成本細項表格 */}
         {previewQuote.quote_type !== 'quick' && categories && categories.length > 0 ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-morandi-primary">成本分類</h4>
-            <div className="space-y-1">
-              {categories.map((cat, idx) => {
-                const itemCount = cat.items?.length || 0
-                const categoryTotal = cat.items?.reduce((sum, item) => {
-                  const amount = item.amount || 0
-                  const qty = item.quantity || 1
-                  return sum + (amount * qty)
-                }, 0) || 0
-
-                return (
-                  <div key={idx} className="flex items-center justify-between text-sm py-1.5 px-3 bg-morandi-container/30 rounded-lg">
-                    <span className="text-morandi-primary">{cat.name}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-morandi-secondary">{itemCount} 項</span>
-                      {categoryTotal > 0 && (
-                        <CurrencyCell amount={categoryTotal} className="text-sm text-morandi-primary" />
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+          <div className="space-y-3">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-morandi-secondary">
+                  <th className="text-left py-1.5 font-medium">分類</th>
+                  <th className="text-left py-1.5 font-medium">項目</th>
+                  <th className="text-right py-1.5 font-medium">金額</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {categories.flatMap((cat, catIdx) =>
+                  cat.items?.map((item, itemIdx) => (
+                    <tr key={`${catIdx}-${itemIdx}`}>
+                      <td className="py-1.5 text-morandi-secondary">{itemIdx === 0 ? cat.name : ''}</td>
+                      <td className="py-1.5 text-morandi-primary">
+                        {item.name}
+                        {(item.quantity || 1) > 1 && <span className="text-morandi-muted ml-1">x{item.quantity}</span>}
+                      </td>
+                      <td className="py-1.5 text-right">
+                        <CurrencyCell amount={(item.amount || 0) * (item.quantity || 1)} />
+                      </td>
+                    </tr>
+                  )) || []
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-morandi-gold/30 bg-morandi-gold/5">
+                  <td colSpan={2} className="py-2 font-medium text-morandi-primary">總成本</td>
+                  <td className="py-2 text-right">
+                    <CurrencyCell
+                      amount={categories.reduce((sum, cat) => {
+                        return sum + (cat.items?.reduce((catSum, item) => {
+                          return catSum + ((item.amount || 0) * (item.quantity || 1))
+                        }, 0) || 0)
+                      }, 0)}
+                      className="font-bold text-morandi-gold"
+                    />
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         ) : previewQuote.quote_type === 'quick' ? (
           <div className="text-sm text-morandi-secondary text-center py-4">
@@ -460,35 +462,33 @@ export function DocumentVersionPicker({
     <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden p-0 [&>button]:hidden">
-          <DialogHeader className="flex-shrink-0 px-5 py-4">
-            <DialogTitle className="flex items-center gap-2">
+          {/* 標題區 */}
+          <div className="flex-shrink-0 flex items-center justify-between px-6 h-14">
+            <div className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-morandi-gold" />
               <span className="font-medium text-morandi-primary">報價單管理</span>
               <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
-            </DialogTitle>
+            </div>
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-4 top-4 p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
+              className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
             >
               <X size={18} className="text-morandi-secondary" />
             </button>
-          </DialogHeader>
-
-          {/* 分割線留白 */}
-          <div className="mx-5">
-            <div className="border-t border-border" />
           </div>
 
+          {/* 分割線 */}
+          <div className="border-t border-border/60 mx-6" />
+
           {/* 左右兩欄佈局 */}
-          <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6 p-5">
+          <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6 px-6 pt-4 pb-6">
             {/* 左邊：團體報價單 */}
             <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
                   <span className="text-sm font-medium text-morandi-primary">團體報價單</span>
-                  <span className="text-xs text-morandi-secondary">(Q 開頭)</span>
                 </div>
                 <p className="text-xs text-morandi-secondary mt-1">完整報價單，包含分類項目與成本明細</p>
               </div>
@@ -555,7 +555,6 @@ export function DocumentVersionPicker({
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-morandi-gold" />
                   <span className="text-sm font-medium text-morandi-primary">快速報價單</span>
-                  <span className="text-xs text-morandi-secondary">(X 開頭)</span>
                 </div>
                 <p className="text-xs text-morandi-secondary mt-1">簡易報價，快速產出客戶報價</p>
               </div>
