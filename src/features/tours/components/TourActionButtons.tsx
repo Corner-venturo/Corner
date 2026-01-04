@@ -31,7 +31,7 @@ interface UseTourActionButtonsParams {
   operations: {
     handleArchiveTour: (tour: Tour, reason?: string) => Promise<void>
   }
-  openDialog: (type: string, data?: Tour) => void
+  onEditTour: (tour: Tour) => void
   setSelectedTour: (tour: Tour) => void
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>
@@ -58,7 +58,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     activeStatusTab,
     user,
     operations,
-    openDialog,
+    onEditTour,
     setSelectedTour,
     setDeleteConfirm,
     handleCreateChannel,
@@ -137,7 +137,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              openDialog('edit', tour)
+              onEditTour(tour)
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="編輯"
@@ -295,7 +295,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       activeStatusTab,
       user,
       operations,
-      openDialog,
+      onEditTour,
       router,
       setSelectedTour,
       setDeleteConfirm,

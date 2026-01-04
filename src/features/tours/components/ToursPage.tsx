@@ -119,6 +119,7 @@ export const ToursPage: React.FC = () => {
 
   const {
     handleOpenCreateDialog,
+    handleOpenEditDialog,
     resetForm,
     handleEditDialogEffect,
     handleNavigationEffect,
@@ -158,7 +159,7 @@ export const ToursPage: React.FC = () => {
     activeStatusTab,
     user,
     operations,
-    openDialog: () => {},
+    onEditTour: handleOpenEditDialog,
     setSelectedTour,
     setDeleteConfirm: (state) => state.tour && openDeleteDialog(state.tour),
     handleCreateChannel,

@@ -10,6 +10,7 @@ import { useQuotesListSlim } from '@/hooks/useListSlim'
 
 interface UseToursFormReturn {
   handleOpenCreateDialog: (fromQuoteId?: string) => Promise<void>
+  handleOpenEditDialog: (tour: Tour) => Promise<void>
   resetForm: () => void
   handleEditDialogEffect: () => void
   handleNavigationEffect: () => void
@@ -85,6 +86,22 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     })
     setFormError(null)
   }, [setNewTour, setAvailableCities, setNewOrder, setFormError])
+
+  // 打開編輯對話框 - 先確保國家資料已載入
+  const handleOpenEditDialog = useCallback(
+    async (tour: Tour) => {
+      // 確保國家資料已載入
+      if (countries.length === 0) {
+        await fetchRegions()
+      }
+      if (employees.length === 0) {
+        await fetchEmployees()
+      }
+      // 打開對話框，handleEditDialogEffect 會處理資料填入
+      openDialog('edit', tour)
+    },
+    [countries.length, employees.length, fetchRegions, fetchEmployees, openDialog]
+  )
 
   // Handle edit mode: load tour data when dialog opens in edit mode
   const handleEditDialogEffect = useCallback(() => {
@@ -199,6 +216,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
 
   return {
     handleOpenCreateDialog,
+    handleOpenEditDialog,
     resetForm,
     handleEditDialogEffect,
     handleNavigationEffect,

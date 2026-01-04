@@ -837,12 +837,22 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
         } else if (el.type === 'image') {
           const imageEl = el as import('./types').ImageElement
           try {
-            const img = await FabricImage.fromURL(imageEl.src, { crossOrigin: 'anonymous' })
+            // 先預載圖片以取得正確尺寸
+            const htmlImg = new window.Image()
+            htmlImg.crossOrigin = 'anonymous'
+
+            await new Promise<void>((resolve, reject) => {
+              htmlImg.onload = () => resolve()
+              htmlImg.onerror = () => reject(new Error('Image load failed'))
+              htmlImg.src = imageEl.src
+            })
+
+            const img = new FabricImage(htmlImg)
             const imgWithData = img as FabricObjectWithData
 
             // 計算縮放比例，確保圖片填滿指定尺寸
-            const originalWidth = img.width || 1
-            const originalHeight = img.height || 1
+            const originalWidth = htmlImg.naturalWidth || htmlImg.width || 1
+            const originalHeight = htmlImg.naturalHeight || htmlImg.height || 1
             const scaleX = imageEl.width / originalWidth
             const scaleY = imageEl.height / originalHeight
 

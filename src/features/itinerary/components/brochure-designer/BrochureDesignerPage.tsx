@@ -51,7 +51,6 @@ import {
   type GeneratedPage,
   type GeneratorOptions,
 } from './templates/brochure-generator'
-import { pageToElements } from './utils/templateToElements'
 import { ALL_THEMES, type BrochureTheme } from './templates/themes'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
@@ -522,27 +521,6 @@ export function BrochureDesignerPage() {
     }
   }, [generatedBrochure])
 
-  // 當切換到編輯模式或頁面變更時，自動將模板轉換為 Canvas 元素
-  useEffect(() => {
-    if (editorMode !== 'canvas') return
-    if (!currentPage) return
-    if (!isCanvasReady) return // 等待 Canvas 準備好
-
-    // 根據當前頁面類型生成對應的 Canvas 元素
-    const generatedElements = pageToElements(currentPage.type, {
-      coverData,
-      itinerary: currentItinerary,
-      dayIndex: currentPage.dayIndex,
-      day: currentPage.dayIndex !== undefined ? dailyItinerary[currentPage.dayIndex] : undefined,
-      accommodations,
-    })
-
-    if (generatedElements.length > 0) {
-      setCanvasElements(generatedElements)
-      loadElements(generatedElements)
-      logger.log('[BrochureDesigner] 載入元素到 Canvas:', generatedElements.length)
-    }
-  }, [editorMode, currentPage, currentPageIndex, coverData, currentItinerary, dailyItinerary, accommodations, loadElements, isCanvasReady])
 
   // 圖層操作
   const handleLayerSelect = useCallback((id: string) => {
