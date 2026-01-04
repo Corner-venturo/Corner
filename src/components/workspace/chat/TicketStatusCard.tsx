@@ -259,7 +259,7 @@ function TourCard({ tour }: { tour: TourData }) {
                 {groupedMembers.self_arranged.map(m => (
                   <span
                     key={m.id}
-                    className="inline-flex items-center px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200"
+                    className="inline-flex items-center px-2 py-0.5 text-xs bg-morandi-container text-morandi-secondary rounded border border-border/60"
                   >
                     {m.name || '未知'}
                   </span>

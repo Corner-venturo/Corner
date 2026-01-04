@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, Luggage, Plane, type LucideIcon } from 'lucide-react'
+import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, Luggage, Plane, ListTodo, Ticket, Calendar, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface QuickAction {
@@ -138,4 +138,28 @@ export const createQuickActions = (handlers: {
     color: 'text-morandi-secondary',
     action: handlers.onBaggageInfo,
   }] : []),
+]
+
+/**
+ * 機器人專用快捷操作
+ * 用於與系統機器人的 DM 頻道
+ */
+export const createBotQuickActions = (handlers: {
+  onCheckTicketStatus: () => void
+  onTourReview: () => void
+}): QuickAction[] => [
+  {
+    id: 'check-ticket-status',
+    icon: Ticket,
+    label: '確認機票狀況',
+    color: 'text-morandi-gold',
+    action: handlers.onCheckTicketStatus,
+  },
+  {
+    id: 'tour-review',
+    icon: Calendar,
+    label: '復盤',
+    color: 'text-morandi-primary',
+    action: handlers.onTourReview,
+  },
 ]

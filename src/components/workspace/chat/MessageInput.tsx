@@ -6,7 +6,7 @@ import { Plus, Send, Smile } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { FilePreview } from './FilePreview'
 import { UploadProgress } from './UploadProgress'
-import { QuickActionMenu, createQuickActions, type QuickAction } from './QuickActionMenu'
+import { QuickActionMenu, createQuickActions, createBotQuickActions, type QuickAction } from './QuickActionMenu'
 import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
@@ -33,6 +33,9 @@ interface MessageInputProps {
   onShowNewReceipt: () => void
   onShowShareAdvance: () => void
   onShowNewTask: () => void
+  // 機器人專用 handlers
+  onCheckTicketStatus?: () => void
+  onTourReview?: () => void
 }
 
 // 全形轉半形
@@ -59,6 +62,8 @@ export function MessageInput({
   onShowNewReceipt,
   onShowShareAdvance,
   onShowNewTask,
+  onCheckTicketStatus,
+  onTourReview,
 }: MessageInputProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [showQuickMenu, setShowQuickMenu] = useState(false)
@@ -263,36 +268,61 @@ export function MessageInput({
     }
   }
 
-  const quickActions: QuickAction[] = createQuickActions({
-    onShareOrders: () => {
-      onShowShareOrders()
-      setShowQuickMenu(false)
-    },
-    onShareQuote: () => {
-      onShowShareQuote()
-      setShowQuickMenu(false)
-    },
-    onNewPayment: () => {
-      onShowNewPayment()
-      setShowQuickMenu(false)
-    },
-    onNewReceipt: () => {
-      onShowNewReceipt()
-      setShowQuickMenu(false)
-    },
-    onShareAdvance: () => {
-      onShowShareAdvance()
-      setShowQuickMenu(false)
-    },
-    onNewTask: () => {
-      onShowNewTask()
-      setShowQuickMenu(false)
-    },
-    onUploadFile: () => {
-      fileInputRef.current?.click()
-      setShowQuickMenu(false)
-    },
-  })
+  // 檢查是否為機器人 DM 頻道
+  const isBotDM = useMemo(() => {
+    if (channel.type === 'direct' || channelName.startsWith('dm:')) {
+      const parts = channelName.replace('dm:', '').split(':')
+      return parts.includes(SYSTEM_BOT_ID)
+    }
+    return false
+  }, [channel.type, channelName])
+
+  // 根據頻道類型選擇不同的快捷操作
+  const quickActions: QuickAction[] = useMemo(() => {
+    if (isBotDM && onCheckTicketStatus && onTourReview) {
+      return createBotQuickActions({
+        onCheckTicketStatus: () => {
+          onCheckTicketStatus()
+          setShowQuickMenu(false)
+        },
+        onTourReview: () => {
+          onTourReview()
+          setShowQuickMenu(false)
+        },
+      })
+    }
+
+    return createQuickActions({
+      onShareOrders: () => {
+        onShowShareOrders()
+        setShowQuickMenu(false)
+      },
+      onShareQuote: () => {
+        onShowShareQuote()
+        setShowQuickMenu(false)
+      },
+      onNewPayment: () => {
+        onShowNewPayment()
+        setShowQuickMenu(false)
+      },
+      onNewReceipt: () => {
+        onShowNewReceipt()
+        setShowQuickMenu(false)
+      },
+      onShareAdvance: () => {
+        onShowShareAdvance()
+        setShowQuickMenu(false)
+      },
+      onNewTask: () => {
+        onShowNewTask()
+        setShowQuickMenu(false)
+      },
+      onUploadFile: () => {
+        fileInputRef.current?.click()
+        setShowQuickMenu(false)
+      },
+    })
+  }, [isBotDM, onCheckTicketStatus, onTourReview, onShowShareOrders, onShowShareQuote, onShowNewPayment, onShowNewReceipt, onShowShareAdvance, onShowNewTask])
 
   // 🔥 阻止整個頁面的拖曳預設行為（防止圖片在新分頁打開）
   useEffect(() => {

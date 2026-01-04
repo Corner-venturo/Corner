@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2, X, Save, Share2, Plus } from 'lucide-react'
+import { Trash2, X, Save, Share2, Plus, Calendar, Ticket } from 'lucide-react'
 import { ShareAdvanceDialog } from '../ShareAdvanceDialog'
 import { ShareOrdersDialog } from '../ShareOrdersDialog'
 import { ShareTodoDialog } from '../ShareTodoDialog'
@@ -92,6 +92,13 @@ interface DialogsContainerProps {
   // New Task Dialog
   showNewTaskDialog: boolean
   setShowNewTaskDialog: (show: boolean) => void
+
+  // Bot-specific Dialogs
+  showCheckTicketStatusDialog?: boolean
+  setShowCheckTicketStatusDialog?: (show: boolean) => void
+  showTourReviewDialog?: boolean
+  setShowTourReviewDialog?: (show: boolean) => void
+  userId?: string
 }
 
 export function DialogsContainer({
@@ -131,6 +138,11 @@ export function DialogsContainer({
   setShowNewReceiptDialog,
   showNewTaskDialog,
   setShowNewTaskDialog,
+  showCheckTicketStatusDialog,
+  setShowCheckTicketStatusDialog,
+  showTourReviewDialog,
+  setShowTourReviewDialog,
+  userId,
 }: DialogsContainerProps) {
   return (
     <>
@@ -371,6 +383,78 @@ export function DialogsContainer({
             setShowNewTaskDialog(false)
           }}
         />
+      )}
+
+      {/* Bot: 確認機票狀況 Dialog */}
+      {showCheckTicketStatusDialog && setShowCheckTicketStatusDialog && (
+        <Dialog open={showCheckTicketStatusDialog} onOpenChange={setShowCheckTicketStatusDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Ticket size={20} className="text-morandi-gold" />
+                確認機票狀況
+              </DialogTitle>
+              <DialogDescription>查詢指定區間內未開票的旅客</DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1">1 個月</Button>
+                <Button variant="outline" size="sm" className="flex-1">3 個月</Button>
+                <Button variant="outline" size="sm" className="flex-1">6 個月</Button>
+              </div>
+              <div className="border border-morandi-container rounded-lg p-4">
+                <p className="text-sm text-morandi-secondary text-center">選擇區間後顯示未開票旅客...</p>
+                <p className="text-xs text-morandi-secondary text-center mt-1">
+                  包含旅客姓名、團號、開票期限 (DL)
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCheckTicketStatusDialog(false)} className="gap-2">
+                <X size={16} />
+                關閉
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Bot: 復盤 Dialog */}
+      {showTourReviewDialog && setShowTourReviewDialog && (
+        <Dialog open={showTourReviewDialog} onOpenChange={setShowTourReviewDialog}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Calendar size={20} className="text-morandi-primary" />
+                復盤
+              </DialogTitle>
+              <DialogDescription>團體進度、確認單/需求單狀況、收支概況</DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              {/* 團體進度 */}
+              <div className="border border-morandi-container rounded-lg p-4">
+                <h4 className="font-medium text-morandi-primary mb-2">團體進度</h4>
+                <p className="text-sm text-morandi-secondary">顯示目前進行中的團...</p>
+              </div>
+              {/* 確認單/需求單 */}
+              <div className="border border-morandi-container rounded-lg p-4">
+                <h4 className="font-medium text-morandi-primary mb-2">確認單 / 需求單</h4>
+                <p className="text-sm text-morandi-secondary">顯示待處理的確認單和需求單...</p>
+              </div>
+              {/* 收支狀況 */}
+              <div className="border border-morandi-container rounded-lg p-4">
+                <h4 className="font-medium text-morandi-primary mb-2">團體收支</h4>
+                <p className="text-sm text-morandi-secondary">顯示各團收支概況...</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowTourReviewDialog(false)} className="gap-2">
+                <X size={16} />
+                關閉
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   )

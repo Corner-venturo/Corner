@@ -58,6 +58,9 @@ interface ChannelChatMessagesProps {
   onShowNewReceipt: () => void
   onShowShareAdvance: () => void
   onShowNewTask: () => void
+  // 機器人專用 handlers
+  onCheckTicketStatus?: () => void
+  onTourReview?: () => void
 }
 
 export function ChatMessages({
@@ -91,6 +94,8 @@ export function ChatMessages({
   onShowNewReceipt,
   onShowShareAdvance,
   onShowNewTask,
+  onCheckTicketStatus,
+  onTourReview,
 }: ChannelChatMessagesProps) {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -272,6 +277,8 @@ export function ChatMessages({
         onShowNewReceipt={onShowNewReceipt}
         onShowShareAdvance={onShowShareAdvance}
         onShowNewTask={onShowNewTask}
+        onCheckTicketStatus={onCheckTicketStatus}
+        onTourReview={onTourReview}
       />
     </div>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Hash } from 'lucide-react'
 import { ChannelSidebar } from './ChannelSidebar'
 import { ChannelTabs } from './ChannelTabs'
@@ -103,6 +104,10 @@ export function ChannelChat() {
 
   // 旅伴模式 Hook
   const travelerMode = useTravelerMode(selectedChannel?.tour_id || null)
+
+  // 機器人快捷操作 Dialog 狀態
+  const [showCheckTicketStatusDialog, setShowCheckTicketStatusDialog] = useState(false)
+  const [showTourReviewDialog, setShowTourReviewDialog] = useState(false)
 
   if (loading && channels.length === 0) {
     return (
@@ -211,6 +216,9 @@ export function ChannelChat() {
                 onShowNewReceipt={() => setShowNewReceiptDialog(true)}
                 onShowShareAdvance={() => setShowShareAdvanceDialog(true)}
                 onShowNewTask={() => setShowNewTaskDialog(true)}
+                // 機器人專用 handlers
+                onCheckTicketStatus={() => setShowCheckTicketStatusDialog(true)}
+                onTourReview={() => setShowTourReviewDialog(true)}
               />
             )}
           </ChannelTabs>
@@ -286,6 +294,12 @@ export function ChannelChat() {
         setShowNewReceiptDialog={setShowNewReceiptDialog}
         showNewTaskDialog={showNewTaskDialog}
         setShowNewTaskDialog={setShowNewTaskDialog}
+        // Bot-specific dialogs
+        showCheckTicketStatusDialog={showCheckTicketStatusDialog}
+        setShowCheckTicketStatusDialog={setShowCheckTicketStatusDialog}
+        showTourReviewDialog={showTourReviewDialog}
+        setShowTourReviewDialog={setShowTourReviewDialog}
+        userId={user?.id}
       />
     </div>
   )
