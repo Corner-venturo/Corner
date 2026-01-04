@@ -346,6 +346,11 @@ export function TourPnrToolDialog({
             updateData.special_meal = match.meal.join(', ')
           }
 
+          // 更新開票期限（如果有）
+          if (parsedPNR.ticketingDeadline) {
+            updateData.ticketing_deadline = parsedPNR.ticketingDeadline.toISOString().split('T')[0]
+          }
+
           const { data, error } = await supabase
             .from('order_members')
             .update(updateData)

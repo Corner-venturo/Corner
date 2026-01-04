@@ -852,97 +852,102 @@ export function BrochureDesignerPage() {
                 </div>
               </div>
             ) : (
-              // 編輯模式 - 使用相同的 React 組件，加上出血線參考
-              <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
+              // 編輯模式 - 使用 Fabric.js Canvas 編輯器
+              <div
+                className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault()
+                    deleteSelected()
+                  }
+                }}
+              >
                 <div
                   className="relative shadow-lg bg-white flex-shrink-0"
                   style={{
-                    width: '559px',
-                    height: '794px',
-                    transform: 'scale(0.75)',
+                    width: `${canvasWidth}px`,
+                    height: `${canvasHeight}px`,
+                    transform: `scale(${editorState.zoom * 0.75})`,
                     transformOrigin: 'center center',
                     overflow: 'visible',
                   }}
                 >
-                  {/* 出血線和參考線 - 編輯模式專用 */}
+                  {/* Fabric.js Canvas 容器 */}
+                  <div
+                    ref={canvasContainerRef}
+                    className="absolute inset-0"
+                    style={{
+                      width: `${canvasWidth}px`,
+                      height: `${canvasHeight}px`,
+                    }}
+                  />
+
+                  {/* 出血線和參考線覆蓋層 */}
                   <BleedGuides
-                    width={559}
-                    height={794}
+                    width={canvasWidth}
+                    height={canvasHeight}
                     showBleed={showBleed}
                     showSafety={showSafety}
                     showCenter={showCenter}
                     zoom={1}
                   />
 
-                  {/* 內容容器 - 與模板模式相同 */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    {currentPage?.type === 'cover' && <BrochureCoverPreview ref={coverRef} data={coverData} />}
-
-                    {currentPage?.type === 'blank' && (
-                      <div className="bg-white flex items-center justify-center w-full h-full">
-                        <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
-                      </div>
-                    )}
-
-                    {currentPage?.type === 'contents' && (
-                      <BrochureTableOfContents
-                        ref={contentsRef}
-                        data={coverData}
-                        itinerary={currentItinerary}
-                        tripTitle={`${coverData.country} ${coverData.city} Trip`}
-                      />
-                    )}
-
-                    {currentPage?.type === 'overview-left' && (
-                      <BrochureOverviewLeft
-                        ref={overviewLeftRef}
-                        data={coverData}
-                        itinerary={currentItinerary}
-                        overviewImage={coverData.overviewImage}
-                      />
-                    )}
-
-                    {currentPage?.type === 'overview-right' && (
-                      <BrochureOverviewRight
-                        ref={overviewRightRef}
-                        data={coverData}
-                        itinerary={currentItinerary}
-                      />
-                    )}
-
-                    {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
-                      currentPage.side === 'left' ? (
-                        <BrochureDailyLeft
-                          dayIndex={currentPage.dayIndex}
-                          day={dailyItinerary[currentPage.dayIndex]}
-                          departureDate={currentItinerary?.departure_date}
-                          tripName={`${coverData.country} ${coverData.city}`}
-                          pageNumber={currentPageIndex + 1}
+                  {/* 智慧參考線 */}
+                  {editorState.showGuides && snapGuides.length > 0 && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      {snapGuides.map((guide, i) => (
+                        <div
+                          key={i}
+                          className="absolute bg-morandi-gold"
+                          style={
+                            guide.direction === 'vertical'
+                              ? { left: guide.position, top: 0, width: 1, height: '100%' }
+                              : { top: guide.position, left: 0, height: 1, width: '100%' }
+                          }
                         />
-                      ) : (
-                        <BrochureDailyRight
-                          dayIndex={currentPage.dayIndex}
-                          day={dailyItinerary[currentPage.dayIndex]}
-                          pageNumber={currentPageIndex + 1}
-                        />
-                      )
-                    )}
-
-                    {currentPage?.type === 'accommodation-left' && (
-                      <BrochureAccommodationLeft
-                        accommodations={accommodations}
-                        pageNumber={currentPageIndex + 1}
-                      />
-                    )}
-
-                    {currentPage?.type === 'accommodation-right' && (
-                      <BrochureAccommodationRight
-                        accommodations={accommodations}
-                        pageNumber={currentPageIndex + 1}
-                      />
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
+
+                {/* 縮放控制 */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-sm border border-border">
+                  <button
+                    className="text-xs hover:text-morandi-gold"
+                    onClick={() => setZoom(editorState.zoom - 0.1)}
+                  >
+                    −
+                  </button>
+                  <span className="text-xs font-mono text-morandi-secondary min-w-[3rem] text-center">
+                    {Math.round(editorState.zoom * 100)}%
+                  </span>
+                  <button
+                    className="text-xs hover:text-morandi-gold"
+                    onClick={() => setZoom(editorState.zoom + 0.1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* 選中元素提示 */}
+                {editorState.selectedIds.length > 0 && (
+                  <div className="absolute top-4 left-4 bg-morandi-gold/90 text-white rounded-lg px-3 py-1.5 shadow-sm">
+                    <span className="text-xs font-medium">
+                      已選取 {editorState.selectedIds.length} 個元素
+                    </span>
+                  </div>
+                )}
+
+                {/* 參考線控制 */}
+                <GuideControls
+                  showBleed={showBleed}
+                  showSafety={showSafety}
+                  showCenter={showCenter}
+                  onToggleBleed={() => setShowBleed(!showBleed)}
+                  onToggleSafety={() => setShowSafety(!showSafety)}
+                  onToggleCenter={() => setShowCenter(!showCenter)}
+                />
               </div>
             )}
           </section>

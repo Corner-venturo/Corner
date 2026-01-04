@@ -14,6 +14,7 @@ import {
   Eye,
   Copy,
   FilePlus,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -22,6 +23,7 @@ import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
+import { confirm } from '@/lib/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -75,7 +77,7 @@ export function DocumentVersionPicker({
   currentQuoteId,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
-  const { items: quotes, fetchAll, create, update, loading } = useQuoteStore()
+  const { items: quotes, fetchAll, create, update, delete: deleteQuote, loading } = useQuoteStore()
   const [isCreatingStandard, setIsCreatingStandard] = useState(false)
   const [isCreatingQuick, setIsCreatingQuick] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -121,7 +123,6 @@ export function DocumentVersionPicker({
 
   // 取得當前正在編輯的報價單
   const currentQuote = currentQuoteId ? quotes.find(q => q.id === currentQuoteId) : null
-  const currentQuoteType = currentQuote?.quote_type
 
   // 另存當前報價單為新版本
   const [isSavingAs, setIsSavingAs] = useState(false)
@@ -221,9 +222,8 @@ export function DocumentVersionPicker({
     }
   }
 
-  // 進入編輯頁面
-  const handleEdit = (e: React.MouseEvent, quote: Quote) => {
-    e.stopPropagation()
+  // 點擊項目跳轉
+  const handleItemClick = (quote: Quote) => {
     onClose()
     router.push(`/quotes/${quote.id}`)
   }
@@ -232,6 +232,26 @@ export function DocumentVersionPicker({
   const handlePreview = (e: React.MouseEvent, quote: Quote) => {
     e.stopPropagation()
     setPreviewQuote(quote)
+  }
+
+  // 刪除報價單
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const handleDelete = async (e: React.MouseEvent, quote: Quote) => {
+    e.stopPropagation()
+    const confirmed = await confirm(`確定要刪除「${getQuoteDisplayName(quote)}」嗎？`, {
+      title: '刪除報價單',
+      type: 'error',
+    })
+    if (!confirmed) return
+
+    try {
+      setDeletingId(quote.id)
+      await deleteQuote(quote.id)
+    } catch (error) {
+      logger.error('刪除報價單失敗:', error)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   // 複製報價單（另存新檔）
@@ -304,9 +324,10 @@ export function DocumentVersionPicker({
     return (
       <div
         key={quote.id}
+        onClick={() => handleItemClick(quote)}
         className={cn(
-          'group flex items-center justify-between p-3 rounded-lg transition-colors',
-          'border border-border/50',
+          'group flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer',
+          'border border-border/50 hover:border-morandi-gold/50 hover:bg-morandi-gold/5',
           isLocked && 'bg-morandi-green/5 border-morandi-green/30'
         )}
       >
@@ -384,13 +405,23 @@ export function DocumentVersionPicker({
             )}
           </button>
 
-          {/* 編輯（跳轉） */}
+          {/* 刪除 */}
           <button
-            onClick={e => handleEdit(e, quote)}
-            className="p-1.5 hover:bg-morandi-gold/10 rounded-lg transition-colors"
-            title="編輯報價單"
+            onClick={e => handleDelete(e, quote)}
+            disabled={deletingId === quote.id || isLocked}
+            className={cn(
+              'p-1.5 rounded-lg transition-colors',
+              isLocked
+                ? 'opacity-30 cursor-not-allowed'
+                : 'hover:bg-morandi-red/10'
+            )}
+            title={isLocked ? '已確認的報價單無法刪除' : '刪除報價單'}
           >
-            <ExternalLink size={15} className="text-morandi-gold" />
+            {deletingId === quote.id ? (
+              <Loader2 size={15} className="animate-spin text-morandi-red" />
+            ) : (
+              <Trash2 size={15} className="text-morandi-red" />
+            )}
           </button>
         </div>
       </div>
@@ -505,12 +536,12 @@ export function DocumentVersionPicker({
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
         <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden p-0 [&>button]:hidden">
           {/* 標題區 */}
-          <div className="flex-shrink-0 flex items-center justify-between px-6 h-14">
-            <div className="flex items-center gap-2">
+          <DialogHeader className="flex-shrink-0 flex items-center justify-between px-6 h-14 space-y-0">
+            <DialogTitle className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-morandi-gold" />
               <span className="font-medium text-morandi-primary">報價單管理</span>
               <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
-            </div>
+            </DialogTitle>
             <button
               type="button"
               onClick={onClose}
@@ -518,7 +549,7 @@ export function DocumentVersionPicker({
             >
               <X size={18} className="text-morandi-secondary" />
             </button>
-          </div>
+          </DialogHeader>
 
           {/* 分割線 */}
           <div className="border-t border-border/60 mx-6" />
