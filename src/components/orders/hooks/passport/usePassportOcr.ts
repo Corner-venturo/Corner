@@ -75,7 +75,20 @@ export function usePassportOcr(): UsePassportOcrReturn {
       throw new Error('OCR 辨識失敗')
     }
 
-    return await response.json()
+    const json = await response.json()
+
+    // API 使用 successResponse 包裝，實際資料在 data 欄位
+    if (json.success && json.data) {
+      return json.data
+    }
+
+    // 如果 API 返回錯誤
+    if (!json.success) {
+      throw new Error(json.error || 'OCR 辨識失敗')
+    }
+
+    // 向後相容：如果直接返回資料格式
+    return json
   }, [])
 
   // 檢查是否為重複成員
