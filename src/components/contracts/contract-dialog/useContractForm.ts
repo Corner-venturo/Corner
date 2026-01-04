@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Tour, ContractTemplate } from '@/types/tour.types'
 import { Order, Member } from '@/types/order.types'
-import { useTourStore, useOrderStore, useMemberStore, useItineraryStore, useQuoteStore } from '@/stores'
+import { useTourStore, useOrderStore, useItineraryStore, useQuoteStore } from '@/stores'
 import { prepareContractData, ContractData } from '@/lib/contract-utils'
+import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface UseContractFormProps {
   tour: Tour
@@ -10,10 +13,22 @@ interface UseContractFormProps {
   isOpen: boolean
 }
 
+// order_members 表的成員類型
+interface OrderMember {
+  id: string
+  order_id: string
+  chinese_name: string | null
+  id_number: string | null
+  passport_name: string | null
+  gender: string | null
+  birth_date: string | null
+  contract_created_at: string | null
+  name?: string // 兼容舊資料
+}
+
 export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
   const { update: updateTour } = useTourStore()
-  const { items: orders } = useOrderStore()
-  const { items: members } = useMemberStore()
+  const { items: orders, fetchAll: fetchOrders, loading: ordersLoading } = useOrderStore()
   const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
   const { items: quotes } = useQuoteStore()
 
@@ -24,27 +39,90 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
   const [saving, setSaving] = useState(false)
   const [contractData, setContractData] = useState<Partial<ContractData>>({})
   const [selectedOrderId, setSelectedOrderId] = useState<string>('')
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null)
+  const [isCorporateContract, setIsCorporateContract] = useState(false)
+
+  // 直接從 order_members 表載入的成員資料
+  const [orderMembers, setOrderMembers] = useState<OrderMember[]>([])
+  const [membersLoading, setMembersLoading] = useState(false)
 
   // 取得這個團的資料
   const tourOrders = orders.filter(o => o.tour_id === tour.id)
   const firstOrder = tourOrders[0]
   const selectedOrder = tourOrders.find(o => o.id === selectedOrderId) || firstOrder
-  const tourMembers = members.filter(m => m.tour_id === tour.id)
+  const tourMembers = orderMembers // 使用從 order_members 載入的資料
   const selectedOrderMembers = selectedOrder
-    ? members.filter(m => m.order_id === selectedOrder.id)
+    ? orderMembers.filter(m => m.order_id === selectedOrder.id)
     : []
   const itinerary = itineraries.find(i => i.tour_id === tour.id)
+
+  // 從 order_members 表載入成員資料
+  const loadOrderMembers = useCallback(async () => {
+    if (tourOrders.length === 0) return
+
+    setMembersLoading(true)
+    try {
+      const orderIds = tourOrders.map(o => o.id)
+      const { data, error } = await supabase
+        .from('order_members')
+        .select('id, order_id, chinese_name, id_number, passport_name, gender, birth_date, contract_created_at')
+        .in('order_id', orderIds)
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      setOrderMembers(data || [])
+    } catch (error) {
+      logger.error('載入訂單成員失敗:', error)
+    } finally {
+      setMembersLoading(false)
+    }
+  }, [tourOrders.length > 0 ? tourOrders.map(o => o.id).join(',') : ''])
+
+  // 計算尚未建立合約的成員（按訂單分組）
+  const membersWithoutContract = useMemo(() => {
+    return tourMembers.filter(m => !m.contract_created_at)
+  }, [tourMembers])
+
+  // 已建立合約的成員
+  const membersWithContract = useMemo(() => {
+    return tourMembers.filter(m => !!m.contract_created_at)
+  }, [tourMembers])
+
+  // 選中的成員
+  const selectedMember = useMemo(() => {
+    if (!selectedMemberId) return null
+    return tourMembers.find(m => m.id === selectedMemberId) || null
+  }, [tourMembers, selectedMemberId])
 
   // 取得關聯的報價單（用於帶入客戶聯絡資訊）
   const linkedQuote = quotes.find(q => q.tour_id === tour.id)
 
-  // 對話框開啟時載入行程表資料
+  // 當選擇成員時，更新合約資料（帶入選中成員的資訊）
+  useEffect(() => {
+    if (selectedMemberId && selectedMember) {
+      setContractData(prev => ({
+        ...prev,
+        travelerName: selectedMember.chinese_name || selectedMember.passport_name || prev.travelerName || '',
+        travelerIdNumber: selectedMember.id_number || prev.travelerIdNumber || '',
+      }))
+    }
+  }, [selectedMemberId, selectedMember])
+
+  // 對話框開啟時載入資料
   useEffect(() => {
     if (isOpen) {
       // 每次開啟都重新載入，確保資料最新
-      fetchItineraries()
+      void fetchOrders()
+      void fetchItineraries()
     }
-  }, [isOpen, fetchItineraries])
+  }, [isOpen, fetchOrders, fetchItineraries])
+
+  // 當訂單載入完成後，載入成員資料
+  useEffect(() => {
+    if (isOpen && tourOrders.length > 0) {
+      void loadOrderMembers()
+    }
+  }, [isOpen, tourOrders.length, loadOrderMembers])
 
   // 初始化選擇的訂單（預設第一個）
   useEffect(() => {
@@ -86,7 +164,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
             // 如果 contract_content 不是 JSON,就重新準備資料
             if (selectedOrder) {
               const firstMember = selectedOrderMembers[0]
-              const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
+              const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
               setContractData(autoData)
             } else if (linkedQuote) {
               // 沒有訂單，從報價單帶入
@@ -117,7 +195,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
           }
         } else if (selectedOrder) {
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
           setContractData(autoData)
         } else if (linkedQuote) {
           // 沒有訂單也沒有已存的合約資料，從報價單帶入
@@ -155,7 +233,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         if (selectedOrder) {
           // 有訂單資料，自動帶入
           const firstMember = selectedOrderMembers[0]
-          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as Member, itinerary)
+          const autoData = prepareContractData(tour, selectedOrder as Order, firstMember as unknown as Member, itinerary)
           setContractData(autoData)
         } else {
           // 沒有訂單資料，但可能有行程表的集合資訊
@@ -277,10 +355,13 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
     setContractData(prev => ({ ...prev, [field]: processedValue }))
   }
 
-  const handleSave = async () => {
-    if (mode === 'create' && !selectedTemplate) {
-      alert('請選擇合約範本')
-      return
+  const handleSave = async (memberIds?: string[]) => {
+    // 判斷是否已有合約（用於決定是建立還是更新）
+    const hasExistingContract = !!tour.contract_template
+
+    if (!hasExistingContract && !selectedTemplate) {
+      void alert('請選擇合約範本', 'warning')
+      return false
     }
 
     setSaving(true)
@@ -288,7 +369,8 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       // 將合約資料轉成 JSON 儲存
       const contractContentJson = JSON.stringify(contractData)
 
-      if (mode === 'create') {
+      if (!hasExistingContract) {
+        // 建立新合約
         await updateTour(tour.id, {
           contract_template: selectedTemplate as ContractTemplate,
           contract_content: contractContentJson,
@@ -297,19 +379,36 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
           contract_completed: contractCompleted,
           contract_archived_date: archivedDate || undefined,
         })
-        alert('合約建立成功!')
       } else {
+        // 更新現有合約
         await updateTour(tour.id, {
           contract_content: contractContentJson,
           contract_notes: contractNotes,
           contract_completed: contractCompleted,
           contract_archived_date: archivedDate || undefined,
         })
-        alert('合約更新成功!')
       }
+
+      // 如果有選擇成員，批量標記成員已建立合約
+      const idsToUpdate = memberIds && memberIds.length > 0 ? memberIds : (selectedMemberId ? [selectedMemberId] : [])
+      if (idsToUpdate.length > 0 && !isCorporateContract) {
+        const { error: memberError } = await supabase
+          .from('order_members')
+          .update({ contract_created_at: new Date().toISOString() })
+          .in('id', idsToUpdate)
+
+        if (memberError) {
+          logger.error('更新成員合約狀態失敗:', memberError)
+        }
+
+        // 重新載入成員資料
+        void loadOrderMembers()
+      }
+
+      void alertSuccess(hasExistingContract ? '合約更新成功!' : '合約建立成功!')
       return true
     } catch (error) {
-      alert('儲存合約失敗，請稍後再試')
+      void alertError('儲存合約失敗，請稍後再試')
       return false
     } finally {
       setSaving(false)
@@ -318,7 +417,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
 
   const handlePrint = async () => {
     if (!contractData || Object.keys(contractData).length === 0) {
-      alert('請先填寫合約資料')
+      void alert('請先填寫合約資料', 'warning')
       return
     }
 
@@ -358,7 +457,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       // 開啟新視窗並列印
       const printWindow = window.open('', '_blank')
       if (!printWindow) {
-        alert('請允許彈出視窗以進行列印')
+        void alert('請允許彈出視窗以進行列印', 'warning')
         return
       }
 
@@ -374,7 +473,7 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
         }
       }
     } catch (error) {
-      alert('列印合約時發生錯誤，請稍後再試')
+      void alertError('列印合約時發生錯誤，請稍後再試')
     } finally {
       setSaving(false)
     }
@@ -400,5 +499,14 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
     selectedOrderId,
     setSelectedOrderId,
     selectedOrder,
+    ordersLoading: ordersLoading || membersLoading, // 合併載入狀態
+    // 成員選擇相關
+    selectedMemberId,
+    setSelectedMemberId,
+    selectedMember,
+    membersWithoutContract,
+    membersWithContract,
+    isCorporateContract,
+    setIsCorporateContract,
   }
 }

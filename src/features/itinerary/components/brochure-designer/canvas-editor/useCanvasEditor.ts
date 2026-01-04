@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Canvas, Object as FabricObject, Text, Rect, Circle, Image as FabricImage, Line, Group } from 'fabric'
+import { Canvas, Object as FabricObject, Text, Textbox, Rect, Circle, Image as FabricImage, Line, Group, Gradient } from 'fabric'
 import type {
   CanvasElement,
   EditorState,
@@ -15,6 +15,7 @@ import type {
   GuideLine,
   SnapGuide,
   OverlapInfo,
+  GradientFill,
 } from './types'
 import { logger } from '@/lib/utils/logger'
 
@@ -180,7 +181,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     const canvas = new Canvas(canvasEl, {
       width: A5_WIDTH_PX,
       height: A5_HEIGHT_PX,
-      backgroundColor: 'transparent',
+      backgroundColor: '#ffffff',
       selection: true,
       preserveObjectStacking: true,
       stopContextMenu: true,
@@ -720,7 +721,7 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     if (!canvas) return
 
     canvas.clear()
-    canvas.backgroundColor = 'transparent'
+    canvas.backgroundColor = '#ffffff'
     canvas.renderAll()
     setElements([])
     setEditorState((prev) => ({ ...prev, selectedIds: [] }))
@@ -770,22 +771,42 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
 
     // 清除現有元素
     canvas.clear()
-    canvas.backgroundColor = 'transparent'
+    canvas.backgroundColor = '#ffffff'
 
     // 依序加入元素
     for (const el of elementsToLoad) {
       try {
         if (el.type === 'text') {
           const textEl = el as import('./types').TextElement
+          const textAlign = textEl.style?.textAlign || 'left'
+          const elementWidth = textEl.width || 200
+
+          // 根據對齊方式計算位置和原點
+          let originX: 'left' | 'center' | 'right' = 'left'
+          let actualX = textEl.x
+
+          if (textAlign === 'center') {
+            originX = 'center'
+            actualX = textEl.x + elementWidth / 2  // 移到元素中心點
+          } else if (textAlign === 'right') {
+            originX = 'right'
+            actualX = textEl.x + elementWidth  // 移到元素右邊界
+          }
+
+          // 建立文字物件
           const fabricText = new Text(textEl.content || '', {
-            left: textEl.x,
+            left: actualX,
             top: textEl.y,
+            originX,
+            originY: 'top',
             fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
             fontSize: textEl.style?.fontSize || 16,
             fill: textEl.style?.color || '#333333',
             fontWeight: textEl.style?.fontWeight || 'normal',
             fontStyle: textEl.style?.fontStyle || 'normal',
-            opacity: textEl.opacity,
+            lineHeight: textEl.style?.lineHeight || 1.2,
+            charSpacing: (textEl.style?.letterSpacing || 0) * 10,
+            opacity: textEl.opacity ?? 1,
             angle: textEl.rotation,
           }) as FabricObjectWithData
 
@@ -797,19 +818,54 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
         } else if (el.type === 'shape') {
           const shapeEl = el as import('./types').ShapeElement
           if (shapeEl.variant === 'rectangle') {
+            // 處理漸層或純色填充
+            let gradientFill: Gradient<'linear', 'linear'> | null = null
+
+            if (shapeEl.gradient) {
+              // 建立 Fabric.js 漸層
+              const g = shapeEl.gradient
+              const angleRad = ((g.angle || 180) - 90) * Math.PI / 180
+              const coords = {
+                x1: shapeEl.width / 2 - Math.cos(angleRad) * shapeEl.width / 2,
+                y1: shapeEl.height / 2 - Math.sin(angleRad) * shapeEl.height / 2,
+                x2: shapeEl.width / 2 + Math.cos(angleRad) * shapeEl.width / 2,
+                y2: shapeEl.height / 2 + Math.sin(angleRad) * shapeEl.height / 2,
+              }
+
+              gradientFill = new Gradient({
+                type: 'linear',
+                coords,
+                colorStops: g.colorStops.map(stop => ({
+                  offset: stop.offset,
+                  color: stop.color,
+                })),
+              })
+
+              logger.log('[CanvasEditor] Created gradient for shape:', {
+                name: el.name,
+                angle: g.angle,
+                colorStops: g.colorStops,
+              })
+            }
+
             const rect = new Rect({
               left: shapeEl.x,
               top: shapeEl.y,
               width: shapeEl.width,
               height: shapeEl.height,
               fill: shapeEl.fill || '#e8e5e0',
-              stroke: shapeEl.stroke || '#d4c4b0',
-              strokeWidth: shapeEl.strokeWidth || 1,
+              stroke: shapeEl.stroke === 'transparent' ? '' : (shapeEl.stroke || ''),
+              strokeWidth: shapeEl.strokeWidth ?? 0,
               rx: shapeEl.cornerRadius || 0,
               ry: shapeEl.cornerRadius || 0,
-              opacity: shapeEl.opacity,
+              opacity: shapeEl.opacity ?? 1,
               angle: shapeEl.rotation,
             }) as FabricObjectWithData
+
+            // 如果有漸層，在建立後設定（繞過 TypeScript 類型限制）
+            if (gradientFill) {
+              rect.set('fill', gradientFill)
+            }
 
             rect.data = {
               elementId: el.id,
@@ -822,9 +878,9 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
               top: shapeEl.y,
               radius: Math.min(shapeEl.width, shapeEl.height) / 2,
               fill: shapeEl.fill || '#c9aa7c',
-              stroke: shapeEl.stroke || '#b8996b',
-              strokeWidth: shapeEl.strokeWidth || 1,
-              opacity: shapeEl.opacity,
+              stroke: shapeEl.stroke === 'transparent' ? '' : (shapeEl.stroke || ''),
+              strokeWidth: shapeEl.strokeWidth ?? 0,
+              opacity: shapeEl.opacity ?? 1,
               angle: shapeEl.rotation,
             }) as FabricObjectWithData
 
@@ -837,6 +893,15 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
         } else if (el.type === 'image') {
           const imageEl = el as import('./types').ImageElement
           try {
+            logger.log('[CanvasEditor] Loading image element:', {
+              id: el.id,
+              name: el.name,
+              position: { x: imageEl.x, y: imageEl.y },
+              targetSize: { w: imageEl.width, h: imageEl.height },
+              objectFit: imageEl.objectFit,
+              src: imageEl.src?.substring(0, 100) + '...',
+            })
+
             // 先預載圖片以取得正確尺寸
             const htmlImg = new window.Image()
             htmlImg.crossOrigin = 'anonymous'
@@ -850,18 +915,67 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
             const img = new FabricImage(htmlImg)
             const imgWithData = img as FabricObjectWithData
 
-            // 計算縮放比例，確保圖片填滿指定尺寸
             const originalWidth = htmlImg.naturalWidth || htmlImg.width || 1
             const originalHeight = htmlImg.naturalHeight || htmlImg.height || 1
-            const scaleX = imageEl.width / originalWidth
-            const scaleY = imageEl.height / originalHeight
+            const targetWidth = imageEl.width
+            const targetHeight = imageEl.height
+            const objectFit = imageEl.objectFit || 'cover'
 
+            let scaleX: number
+            let scaleY: number
+            let offsetX = 0
+            let offsetY = 0
+
+            if (objectFit === 'cover') {
+              // Cover: 保持比例，完全覆蓋容器（可能裁剪）
+              const scale = Math.max(targetWidth / originalWidth, targetHeight / originalHeight)
+              scaleX = scale
+              scaleY = scale
+              // 置中裁剪
+              const scaledWidth = originalWidth * scale
+              const scaledHeight = originalHeight * scale
+              offsetX = (targetWidth - scaledWidth) / 2
+              offsetY = (targetHeight - scaledHeight) / 2
+            } else if (objectFit === 'contain') {
+              // Contain: 保持比例，完全顯示圖片（可能留白）
+              const scale = Math.min(targetWidth / originalWidth, targetHeight / originalHeight)
+              scaleX = scale
+              scaleY = scale
+              // 置中
+              const scaledWidth = originalWidth * scale
+              const scaledHeight = originalHeight * scale
+              offsetX = (targetWidth - scaledWidth) / 2
+              offsetY = (targetHeight - scaledHeight) / 2
+            } else {
+              // Fill: 拉伸填滿（可能變形）
+              scaleX = targetWidth / originalWidth
+              scaleY = targetHeight / originalHeight
+            }
+
+            // 計算中心點位置（用中心點定位避免負座標問題）
+            const centerX = imageEl.x + targetWidth / 2
+            const centerY = imageEl.y + targetHeight / 2
+
+            logger.log('[CanvasEditor] Image dimensions:', {
+              id: el.id,
+              name: el.name,
+              original: { w: originalWidth, h: originalHeight },
+              target: { w: targetWidth, h: targetHeight },
+              objectFit,
+              scale: { x: scaleX, y: scaleY },
+              center: { x: centerX, y: centerY },
+            })
+
+            // 使用中心點定位：這樣不管圖片多大，都會以目標區域的中心為基準
+            // 避免負座標在 Fabric.js 中可能的問題
             img.set({
-              left: imageEl.x,
-              top: imageEl.y,
+              left: centerX,
+              top: centerY,
+              originX: 'center',
+              originY: 'center',
               scaleX,
               scaleY,
-              opacity: imageEl.opacity,
+              opacity: imageEl.opacity ?? 1,
               angle: imageEl.rotation,
             })
 
@@ -870,12 +984,6 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
               elementType: 'image',
             }
             canvas.add(img)
-            logger.log('[CanvasEditor] Image loaded:', {
-              id: el.id,
-              originalSize: { w: originalWidth, h: originalHeight },
-              targetSize: { w: imageEl.width, h: imageEl.height },
-              scale: { x: scaleX, y: scaleY },
-            })
           } catch (error) {
             logger.error('[CanvasEditor] Failed to load image:', imageEl.src, error)
           }

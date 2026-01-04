@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import { FileSignature, Save, Printer, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { FileSignature, Save, Printer, X, Plus, ArrowLeft, Edit2, Loader2, Users, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateCell } from '@/components/table-cells'
 import {
@@ -34,6 +34,11 @@ const CONTRACT_TEMPLATE_LABELS: Record<ContractTemplate, string> = {
 }
 
 export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogProps) {
+  // 視圖狀態：'main' | 'form' | 'select-members'
+  const [viewMode, setViewMode] = useState<'main' | 'form' | 'select-members'>('main')
+  // 多選旅客的 IDs
+  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
+
   const {
     selectedTemplate,
     setSelectedTemplate,
@@ -54,214 +59,481 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
     selectedOrderId,
     setSelectedOrderId,
     selectedOrder,
+    ordersLoading,
+    membersWithoutContract,
+    membersWithContract,
+    setSelectedMemberId,
+    setIsCorporateContract,
   } = useContractForm({ tour, mode, isOpen })
 
-  const onSave = async () => {
-    const success = await handleSave()
-    if (success) {
-      onClose()
-    }
-  }
+  // 判斷是否已有合約
+  const hasContract = !!tour.contract_template
 
-  // 當對話框開啟時，重置捲動位置到頂部
+  // 當對話框開啟時，重置狀態
   useEffect(() => {
     if (isOpen) {
-      // 等待 DOM 更新後重置捲動
-      setTimeout(() => {
-        const dialogContent = document.querySelector('[role="dialog"]')
-        if (dialogContent) {
-          dialogContent.scrollTop = 0
-        }
-      }, 100)
+      setViewMode('main')
+      setSelectedMemberIds([])
     }
   }, [isOpen])
 
+  // 切換旅客選擇
+  const toggleMemberSelection = (memberId: string) => {
+    setSelectedMemberIds(prev =>
+      prev.includes(memberId)
+        ? prev.filter(id => id !== memberId)
+        : [...prev, memberId]
+    )
+  }
+
+  // 全選/取消全選
+  const toggleSelectAll = () => {
+    if (selectedMemberIds.length === membersWithoutContract.length) {
+      setSelectedMemberIds([])
+    } else {
+      setSelectedMemberIds(membersWithoutContract.map(m => m.id))
+    }
+  }
+
+  // 進入新增合約流程
+  const handleStartNewContract = () => {
+    if (membersWithoutContract.length > 0) {
+      setViewMode('select-members')
+    } else {
+      setIsCorporateContract(true)
+      setViewMode('form')
+    }
+  }
+
+  // 確認選擇旅客後進入表單
+  const handleConfirmMemberSelection = () => {
+    if (selectedMemberIds.length > 0) {
+      setSelectedMemberId(selectedMemberIds[0])
+      setIsCorporateContract(false)
+    } else {
+      setIsCorporateContract(true)
+    }
+    setViewMode('form')
+  }
+
+  // 儲存合約
+  const onSave = async () => {
+    const success = await handleSave(selectedMemberIds)
+    if (success) {
+      setViewMode('main')
+      setSelectedMemberIds([])
+    }
+  }
+
+  // 編輯現有合約
+  const handleEditContract = () => {
+    setViewMode('form')
+  }
+
+  // 返回主視圖
+  const handleBackToMain = () => {
+    setViewMode('main')
+    setSelectedMemberIds([])
+  }
+
+  // 按訂單分組的成員（用於選擇視圖）
+  const membersByOrder = tourOrders.map(order => ({
+    order,
+    members: membersWithoutContract.filter(m => m.order_id === order.id),
+  }))
+
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-hidden [&>button]:hidden">
-        <DialogHeader className="flex-shrink-0 relative">
-          <DialogTitle className="flex items-center gap-2">
-            <FileSignature size={20} />
-            {mode === 'create' ? '建立合約' : '編輯合約'}
-          </DialogTitle>
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-0 top-0 p-2 rounded-md hover:bg-muted transition-colors"
-          >
-            <X size={18} />
-            <span className="sr-only">關閉</span>
-          </button>
-        </DialogHeader>
-        <div className="flex-1 overflow-y-auto">
+      <DialogContent className={viewMode === 'form' ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
 
-        <div className="space-y-6 py-4">
-          {/* 旅遊團資訊 */}
-          <div className="bg-morandi-container/20 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅遊團資訊</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <div className="text-xs text-morandi-secondary">團號</div>
-                <div className="text-sm text-morandi-primary font-medium">{tour.code}</div>
-              </div>
-              <div>
-                <div className="text-xs text-morandi-secondary">團名</div>
-                <div className="text-sm text-morandi-primary font-medium">{tour.name}</div>
-              </div>
-              <div>
-                <div className="text-xs text-morandi-secondary">出發日期</div>
-                <div className="text-sm text-morandi-primary font-medium">
-                  <DateCell date={tour.departure_date} showIcon={false} />
+        {/* ==================== 主視圖 ==================== */}
+        {viewMode === 'main' && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileSignature className="w-5 h-5 text-morandi-gold" />
+                <span>合約管理</span>
+                <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            {/* 合約卡片 */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+              {/* 卡片標題 */}
+              <div className="flex-shrink-0 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <FileSignature className="w-4 h-4 text-morandi-primary" />
+                  <span className="text-sm font-medium text-morandi-primary">合約</span>
                 </div>
+                <p className="text-xs text-morandi-secondary mt-1">管理此旅遊團的合約</p>
               </div>
-              <div>
-                <div className="text-xs text-morandi-secondary">目的地</div>
-                <div className="text-sm text-morandi-primary font-medium">{tour.location}</div>
+
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
+
+              {/* 列表區域 */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {ordersLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
+                  </div>
+                ) : hasContract ? (
+                  // 已有合約：顯示合約資訊
+                  <div className="space-y-4">
+                    <button
+                      onClick={handleEditContract}
+                      className="w-full group flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="w-6 h-6 flex items-center justify-center rounded-full bg-morandi-container/50 text-xs text-morandi-secondary shrink-0">
+                          1
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-morandi-primary truncate">
+                            {tour.contract_template && CONTRACT_TEMPLATE_LABELS[tour.contract_template as ContractTemplate]}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-0.5">
+                            {membersWithContract.length > 0 && (
+                              <span>{membersWithContract.length} 位旅客</span>
+                            )}
+                            {tour.contract_created_at && (
+                              <DateCell date={tour.contract_created_at} format="short" showIcon={false} className="text-xs" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Edit2 className="w-4 h-4 text-morandi-secondary shrink-0" />
+                    </button>
+
+                    {/* 列印按鈕 */}
+                    <button
+                      onClick={handlePrint}
+                      className="w-full flex items-center justify-center gap-2 py-2 text-sm text-morandi-gold hover:bg-morandi-gold/5 rounded-lg transition-colors"
+                    >
+                      <Printer size={16} />
+                      列印合約
+                    </button>
+                  </div>
+                ) : (
+                  // 沒有合約
+                  <div className="text-center py-8 text-sm text-morandi-secondary">
+                    尚無合約
+                  </div>
+                )}
+              </div>
+
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
+
+              {/* 新增按鈕 */}
+              <div className="flex-shrink-0 p-4">
+                <button
+                  onClick={handleStartNewContract}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
+                >
+                  <Plus size={16} />
+                  {hasContract && membersWithoutContract.length > 0
+                    ? `新增旅客 (${membersWithoutContract.length} 人未加入)`
+                    : '新增'}
+                </button>
               </div>
             </div>
-          </div>
+          </>
+        )}
 
-          {/* 選擇訂單（如果有多個訂單） */}
-          {tourOrders.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">
-                選擇訂單（旅客資料來源）
-              </h3>
-              <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="選擇訂單" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tourOrders.map(order => (
-                    <SelectItem key={order.id} value={order.id}>
-                      {order.order_number} - {order.contact_person} ({order.contact_phone || '無電話'})
-                    </SelectItem>
+        {/* ==================== 選擇旅客視圖 ==================== */}
+        {viewMode === 'select-members' && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <button
+                  onClick={handleBackToMain}
+                  className="p-1 hover:bg-muted rounded transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+                <Users className="w-5 h-5 text-morandi-gold" />
+                <span>選擇旅客</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            {/* 旅客列表卡片 */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+              {/* 卡片標題 */}
+              <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-morandi-primary" />
+                    <span className="text-sm font-medium text-morandi-primary">旅客</span>
+                  </div>
+                  <p className="text-xs text-morandi-secondary mt-1">選擇要加入合約的旅客</p>
+                </div>
+                <button
+                  onClick={toggleSelectAll}
+                  className="text-xs text-morandi-gold hover:underline"
+                >
+                  {selectedMemberIds.length === membersWithoutContract.length ? '取消全選' : '全選'}
+                </button>
+              </div>
+
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
+
+              {/* 列表內容 */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-3">
+                  {membersByOrder.map(({ order, members }) => (
+                    members.length > 0 && (
+                      <div key={order.id}>
+                        <div className="text-xs text-morandi-secondary mb-2 px-1">
+                          {order.order_number} - {order.contact_person}
+                        </div>
+                        <div className="space-y-1">
+                          {members.map(member => {
+                            const memberData = member as unknown as { chinese_name?: string; passport_name?: string; id_number?: string }
+                            const displayName = memberData.chinese_name || memberData.passport_name || '未命名'
+                            const isSelected = selectedMemberIds.includes(member.id)
+
+                            return (
+                              <button
+                                key={member.id}
+                                onClick={() => toggleMemberSelection(member.id)}
+                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                                  isSelected
+                                    ? 'border-morandi-gold bg-morandi-gold/5'
+                                    : 'border-border/50 hover:border-morandi-gold/50'
+                                }`}
+                              >
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                  isSelected
+                                    ? 'bg-morandi-gold border-morandi-gold'
+                                    : 'border-border'
+                                }`}>
+                                  {isSelected && <Check size={14} className="text-white" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm text-morandi-primary truncate">
+                                    {displayName}
+                                  </div>
+                                  {memberData.id_number && (
+                                    <div className="text-xs text-morandi-secondary">
+                                      {memberData.id_number}
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
                   ))}
-                </SelectContent>
-              </Select>
-              {selectedOrder && (
-                <div className="mt-2 text-xs text-morandi-secondary bg-status-info-bg border border-status-info/30 rounded p-2">
-                  💡 合約的旅客資訊將自動帶入此訂單的聯絡人：{selectedOrder.contact_person}
                 </div>
-              )}
-            </div>
-          )}
+              </div>
 
-          {/* 選擇範本 (只在建立模式顯示) */}
-          {mode === 'create' && (
-            <div>
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">選擇合約範本</h3>
-              <div className="grid grid-cols-3 gap-4">
-                {CONTRACT_TEMPLATES.map(template => (
-                  <button
-                    key={template.value}
-                    onClick={() => setSelectedTemplate(template.value)}
-                    className={`p-3 border-2 rounded-lg transition-all ${
-                      selectedTemplate === template.value
-                        ? 'border-morandi-gold bg-morandi-gold/10'
-                        : 'border-border hover:border-morandi-gold/50'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <FileSignature className="mx-auto mb-1" size={24} />
-                      <div className="text-sm font-medium text-morandi-primary">
-                        {template.label}
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
+
+              {/* 確認按鈕 */}
+              <div className="flex-shrink-0 p-4">
+                <button
+                  onClick={handleConfirmMemberSelection}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
+                >
+                  <Check size={16} />
+                  確認 ({selectedMemberIds.length} 人)
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ==================== 表單視圖 ==================== */}
+        {viewMode === 'form' && (
+          <>
+            <DialogHeader className="flex-shrink-0">
+              <DialogTitle className="flex items-center gap-2">
+                <button
+                  onClick={handleBackToMain}
+                  className="p-1 hover:bg-muted rounded transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+                <FileSignature size={20} />
+                {hasContract ? '編輯合約' : '建立合約'}
+                {selectedMemberIds.length > 0 && (
+                  <span className="text-sm font-normal text-morandi-secondary">
+                    ({selectedMemberIds.length} 位旅客)
+                  </span>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-6 py-4">
+                {/* 旅遊團資訊 */}
+                <div className="border border-border rounded-lg overflow-hidden bg-card">
+                  <div className="bg-morandi-container/50 border-b border-border/60 px-4 py-2">
+                    <span className="text-sm font-medium text-morandi-primary">旅遊團資訊</span>
+                  </div>
+                  <div className="p-4 grid grid-cols-2 gap-3">
+                    <div>
+                      <div className="text-xs text-morandi-secondary">團號</div>
+                      <div className="text-sm text-morandi-primary font-medium">{tour.code}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-morandi-secondary">團名</div>
+                      <div className="text-sm text-morandi-primary font-medium">{tour.name}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-morandi-secondary">出發日期</div>
+                      <div className="text-sm text-morandi-primary font-medium">
+                        <DateCell date={tour.departure_date} showIcon={false} />
                       </div>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 合約資訊 (只在編輯模式顯示) */}
-          {mode === 'edit' && tour.contract_template && (
-            <div className="bg-morandi-container/20 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">合約資訊</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <div className="text-xs text-morandi-secondary">合約範本</div>
-                  <div className="text-sm text-morandi-primary font-medium">
-                    {tour.contract_template && CONTRACT_TEMPLATE_LABELS[tour.contract_template as ContractTemplate]}
+                    <div>
+                      <div className="text-xs text-morandi-secondary">目的地</div>
+                      <div className="text-sm text-morandi-primary font-medium">{tour.location}</div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-xs text-morandi-secondary">建立時間</div>
-                  <div className="text-sm text-morandi-primary font-medium">
-                    {tour.contract_created_at
-                      ? <DateCell date={tour.contract_created_at} format="time" showIcon={false} />
-                      : '-'}
+
+                {/* 選擇訂單 */}
+                {tourOrders.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                      選擇訂單（旅客資料來源）
+                    </label>
+                    <Select value={selectedOrderId} onValueChange={setSelectedOrderId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="選擇訂單" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tourOrders.map(order => (
+                          <SelectItem key={order.id} value={order.id}>
+                            {order.order_number} - {order.contact_person}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
+                )}
 
-          {/* 合約填寫欄位 */}
-          {(!firstOrder || tourMembers.length === 0) && (
-            <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3 text-sm text-status-info mb-4">
-              💡 提示：尚無訂單或團員資料，所有欄位可手動填寫
-            </div>
-          )}
+                {/* 選擇範本 */}
+                {!hasContract && (
+                  <div>
+                    <label className="text-sm font-medium text-morandi-primary mb-3 block">選擇合約範本</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {CONTRACT_TEMPLATES.map(template => (
+                        <button
+                          key={template.value}
+                          onClick={() => setSelectedTemplate(template.value)}
+                          className={`p-3 border-2 rounded-lg transition-all text-center ${
+                            selectedTemplate === template.value
+                              ? 'border-morandi-gold bg-morandi-gold/10'
+                              : 'border-border hover:border-morandi-gold/50'
+                          }`}
+                        >
+                          <FileSignature className="mx-auto mb-1" size={20} />
+                          <div className="text-xs font-medium text-morandi-primary">
+                            {template.label}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-          <ContractFormFields contractData={contractData} onFieldChange={handleFieldChange} />
-
-          {/* 備註 */}
-          <div>
-            <h3 className="text-sm font-semibold text-morandi-primary mb-3">備註</h3>
-            <textarea
-              value={contractNotes}
-              onChange={e => setContractNotes(e.target.value)}
-              placeholder="請輸入備註..."
-              className="w-full h-24 p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
-            />
-          </div>
-
-          {/* 完成合約與歸檔日期 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">完成狀態</h3>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={contractCompleted}
-                  onChange={e => setContractCompleted(e.target.checked)}
-                  className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold/50 rounded"
+                {/* 合約填寫欄位 */}
+                <ContractFormFields
+                  contractData={contractData}
+                  onFieldChange={handleFieldChange}
+                  members={tourMembers.map(m => ({
+                    id: m.id,
+                    name: (m as unknown as { chinese_name?: string; passport_name?: string }).chinese_name ||
+                          (m as unknown as { chinese_name?: string; passport_name?: string }).passport_name ||
+                          '未命名',
+                    idNumber: (m as unknown as { id_number?: string }).id_number || undefined,
+                    phone: (m as unknown as { phone?: string }).phone || undefined,
+                  }))}
+                  selectedMemberIds={selectedMemberIds}
+                  onSelectMembers={(memberIds) => {
+                    setSelectedMemberIds(memberIds)
+                    if (memberIds.length > 0) {
+                      setSelectedMemberId(memberIds[0])
+                      setIsCorporateContract(false)
+                    } else {
+                      setSelectedMemberId(null)
+                      setIsCorporateContract(true)
+                    }
+                  }}
                 />
-                <span className="text-sm text-morandi-primary">合約已完成</span>
-              </label>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-morandi-primary mb-3">歸檔日期</h3>
-              <DatePicker
-                value={archivedDate}
-                onChange={date => setArchivedDate(date)}
-                placeholder="選擇日期"
-                className="w-full"
-              />
-            </div>
-          </div>
-        </div>
-        </div>
 
-        <DialogFooter className="flex-shrink-0 border-t pt-4 mt-4">
-          <Button variant="outline" onClick={onClose} disabled={saving} className="gap-2">
-            <X size={16} />
-            取消
-          </Button>
-          <Button onClick={onSave} disabled={saving || (mode === 'create' && !selectedTemplate)} className="gap-2">
-            <Save size={16} />
-            {saving ? '儲存中...' : mode === 'create' ? '建立合約' : '儲存'}
-          </Button>
-          <Button
-            onClick={handlePrint}
-            disabled={saving || !selectedTemplate}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
-          >
-            <Printer size={16} />
-            列印合約
-          </Button>
-        </DialogFooter>
+                {/* 備註 */}
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary mb-2 block">備註</label>
+                  <textarea
+                    value={contractNotes}
+                    onChange={e => setContractNotes(e.target.value)}
+                    placeholder="請輸入備註..."
+                    className="w-full h-20 p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-morandi-gold/50 resize-none text-sm"
+                  />
+                </div>
+
+                {/* 完成狀態 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={contractCompleted}
+                        onChange={e => setContractCompleted(e.target.checked)}
+                        className="w-4 h-4 text-morandi-gold focus:ring-morandi-gold/50 rounded"
+                      />
+                      <span className="text-sm text-morandi-primary">合約已完成</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-morandi-primary mb-2 block">歸檔日期</label>
+                    <DatePicker
+                      value={archivedDate}
+                      onChange={date => setArchivedDate(date)}
+                      placeholder="選擇日期"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="flex-shrink-0 border-t pt-4">
+              <Button variant="outline" onClick={handleBackToMain} disabled={saving} className="gap-2">
+                <X size={16} />
+                取消
+              </Button>
+              <Button onClick={onSave} disabled={saving || (!hasContract && !selectedTemplate)} className="gap-2">
+                <Save size={16} />
+                {saving ? '儲存中...' : hasContract ? '儲存' : '建立合約'}
+              </Button>
+              <Button
+                onClick={handlePrint}
+                disabled={saving || (!hasContract && !selectedTemplate)}
+                className="bg-morandi-gold hover:bg-morandi-gold-hover gap-2"
+              >
+                <Printer size={16} />
+                列印
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

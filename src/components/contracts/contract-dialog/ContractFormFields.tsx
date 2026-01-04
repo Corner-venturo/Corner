@@ -1,20 +1,187 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { ContractData } from './types'
+import { Users, ChevronDown, Check } from 'lucide-react'
+
+interface MemberOption {
+  id: string
+  name: string
+  idNumber?: string
+  phone?: string
+}
 
 interface ContractFormFieldsProps {
   contractData: Partial<ContractData>
   onFieldChange: (field: keyof ContractData, value: string) => void
+  members?: MemberOption[]
+  onSelectMembers?: (memberIds: string[]) => void
+  selectedMemberIds?: string[]
 }
 
-export function ContractFormFields({ contractData, onFieldChange }: ContractFormFieldsProps) {
+export function ContractFormFields({
+  contractData,
+  onFieldChange,
+  members = [],
+  onSelectMembers,
+  selectedMemberIds = [],
+}: ContractFormFieldsProps) {
+  const [showMemberDropdown, setShowMemberDropdown] = useState(false)
+
+  // 切換成員選擇
+  const toggleMember = (memberId: string) => {
+    const newIds = selectedMemberIds.includes(memberId)
+      ? selectedMemberIds.filter(id => id !== memberId)
+      : [...selectedMemberIds, memberId]
+
+    if (onSelectMembers) {
+      onSelectMembers(newIds)
+    }
+
+    // 自動填入第一個選擇的成員資料
+    if (newIds.length > 0) {
+      const firstMember = members.find(m => m.id === newIds[0])
+      if (firstMember) {
+        onFieldChange('travelerName', firstMember.name)
+        if (firstMember.idNumber) onFieldChange('travelerIdNumber', firstMember.idNumber)
+        if (firstMember.phone) onFieldChange('travelerPhone', firstMember.phone)
+      }
+    }
+  }
+
+  // 全選/取消全選
+  const toggleAll = () => {
+    if (selectedMemberIds.length === members.length) {
+      // 取消全選
+      if (onSelectMembers) onSelectMembers([])
+    } else {
+      // 全選
+      const allIds = members.map(m => m.id)
+      if (onSelectMembers) onSelectMembers(allIds)
+
+      // 填入第一個成員資料
+      if (members.length > 0) {
+        onFieldChange('travelerName', members[0].name)
+        if (members[0].idNumber) onFieldChange('travelerIdNumber', members[0].idNumber)
+        if (members[0].phone) onFieldChange('travelerPhone', members[0].phone)
+      }
+    }
+  }
+
+  // 選擇公司代表（清空成員選擇）
+  const selectCorporate = () => {
+    if (onSelectMembers) onSelectMembers([])
+    setShowMemberDropdown(false)
+  }
+
+  // 取得顯示文字
+  const getButtonLabel = () => {
+    if (selectedMemberIds.length === 0) return '選擇成員'
+    if (selectedMemberIds.length === 1) {
+      const member = members.find(m => m.id === selectedMemberIds[0])
+      return member?.name || '1 人'
+    }
+    return `${selectedMemberIds.length} 人`
+  }
+
   return (
     <>
       {/* 旅客資訊 */}
       <div>
-        <h3 className="text-sm font-semibold text-morandi-primary mb-3">旅客資訊（甲方）</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-morandi-primary">旅客資訊（甲方）</h3>
+          {members.length > 0 && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMemberDropdown(!showMemberDropdown)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-morandi-gold border border-morandi-gold/50 rounded-lg hover:bg-morandi-gold/5 transition-colors"
+              >
+                <Users size={14} />
+                {getButtonLabel()}
+                <ChevronDown size={14} />
+              </button>
+
+              {showMemberDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-border rounded-lg shadow-lg z-50 max-h-72 overflow-hidden flex flex-col">
+                  {/* 標題列 */}
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-morandi-container/30">
+                    <span className="text-xs text-morandi-secondary">選擇簽約旅客</span>
+                    <button
+                      type="button"
+                      onClick={toggleAll}
+                      className="text-xs text-morandi-gold hover:underline"
+                    >
+                      {selectedMemberIds.length === members.length ? '取消全選' : '全選'}
+                    </button>
+                  </div>
+
+                  {/* 成員列表 */}
+                  <div className="flex-1 overflow-y-auto">
+                    {/* 公司代表選項 */}
+                    <button
+                      type="button"
+                      onClick={selectCorporate}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm hover:bg-morandi-gold/5 transition-colors border-b border-border/50 ${
+                        selectedMemberIds.length === 0 ? 'bg-morandi-gold/10' : ''
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                        selectedMemberIds.length === 0
+                          ? 'bg-morandi-gold border-morandi-gold'
+                          : 'border-border'
+                      }`}>
+                        {selectedMemberIds.length === 0 && <Check size={12} className="text-white" />}
+                      </div>
+                      <span className="text-morandi-primary">公司代表簽約</span>
+                    </button>
+
+                    {/* 成員列表 */}
+                    {members.map(member => {
+                      const isSelected = selectedMemberIds.includes(member.id)
+                      return (
+                        <button
+                          key={member.id}
+                          type="button"
+                          onClick={() => toggleMember(member.id)}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm hover:bg-morandi-gold/5 transition-colors ${
+                            isSelected ? 'bg-morandi-gold/10' : ''
+                          }`}
+                        >
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                            isSelected
+                              ? 'bg-morandi-gold border-morandi-gold'
+                              : 'border-border'
+                          }`}>
+                            {isSelected && <Check size={12} className="text-white" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate text-morandi-primary">{member.name}</div>
+                            {member.idNumber && (
+                              <div className="text-xs text-morandi-secondary truncate">{member.idNumber}</div>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* 確認按鈕 */}
+                  <div className="p-2 border-t border-border">
+                    <button
+                      type="button"
+                      onClick={() => setShowMemberDropdown(false)}
+                      className="w-full py-1.5 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded transition-colors"
+                    >
+                      確認
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-morandi-primary block mb-1">姓名</label>

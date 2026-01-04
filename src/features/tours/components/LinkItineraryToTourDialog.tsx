@@ -282,84 +282,98 @@ export function LinkItineraryToTourDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className={showForm ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-lg"}>
+      <DialogContent className={showForm ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
         {!showForm ? (
           <>
             <DialogHeader>
-              <DialogTitle>行程表</DialogTitle>
-              <DialogDescription>
-                為「{tour.name}」管理行程表
-              </DialogDescription>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-morandi-gold" />
+                <span>行程表管理</span>
+                <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
+              </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4 mt-4">
-              {/* 已關聯的行程表 - 優先顯示 */}
-              {linkedItineraries.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <FileText className="w-4 h-4 text-morandi-gold" />
-                    <span className="text-sm font-medium text-morandi-primary">已建立的行程表</span>
+            {/* 行程表卡片 */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+              {/* 卡片標題 */}
+              <div className="flex-shrink-0 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-morandi-primary" />
+                  <span className="text-sm font-medium text-morandi-primary">行程表</span>
+                </div>
+                <p className="text-xs text-morandi-secondary mt-1">管理此旅遊團的行程表</p>
+              </div>
+
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
+
+              {/* 列表區域 */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
                   </div>
+                ) : linkedItineraries.length === 0 ? (
+                  <div className="text-center py-8 text-sm text-morandi-secondary">
+                    尚無行程表
+                  </div>
+                ) : (
                   <div className="space-y-2">
-                    {linkedItineraries.map(itinerary => (
+                    {linkedItineraries.map((itinerary, index) => (
                       <button
                         key={itinerary.id}
                         onClick={() => handleViewItinerary(itinerary)}
-                        className="w-full flex items-center justify-between p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 transition-colors text-left"
+                        className="w-full group flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-colors text-left"
                       >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            {itinerary.tour_code && (
-                              <span className="font-mono text-sm text-morandi-gold">{itinerary.tour_code}</span>
-                            )}
-                            <span className="text-morandi-text truncate">{stripHtml(itinerary.title) || '未命名'}</span>
-                          </div>
-                          <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
-                            {itinerary.city && (
-                              <span className="flex items-center gap-1">
-                                <MapPin className="w-3 h-3" />
-                                {itinerary.city}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* 序號 */}
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-morandi-container/50 text-xs text-morandi-secondary shrink-0">
+                            {index + 1}
+                          </span>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-morandi-primary truncate">
+                                {stripHtml(itinerary.title) || '未命名'}
                               </span>
-                            )}
-                            {itinerary.departure_date && (
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {itinerary.departure_date}
-                              </span>
-                            )}
-                            {itinerary.daily_itinerary?.length > 0 && (
-                              <span>{itinerary.daily_itinerary.length} 天</span>
-                            )}
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-0.5">
+                              {itinerary.city && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {itinerary.city}
+                                </span>
+                              )}
+                              {itinerary.daily_itinerary?.length > 0 && (
+                                <span>{itinerary.daily_itinerary.length} 天</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <ExternalLink className="w-4 h-4 text-morandi-secondary shrink-0" />
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* 建立新行程表 */}
-              <button
-                onClick={handleOpenForm}
-                className="w-full flex items-center gap-3 p-4 rounded-lg border-2 border-dashed border-morandi-primary/30 bg-morandi-primary/5 hover:bg-morandi-primary/10 hover:border-morandi-primary/50 transition-colors text-left"
-              >
-                <div className="w-10 h-10 rounded-lg bg-morandi-primary/20 flex items-center justify-center shrink-0">
-                  <Plus className="w-5 h-5 text-morandi-primary" />
-                </div>
-                <div>
-                  <div className="font-medium text-morandi-primary">建立新行程表</div>
-                  <div className="text-sm text-morandi-secondary">填寫每日行程後建立</div>
-                </div>
-              </button>
+              {/* 分割線 */}
+              <div className="mx-4">
+                <div className="border-t border-border" />
+              </div>
 
-              {/* 載入中 */}
-              {loading && (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
-                  <span className="ml-2 text-sm text-morandi-secondary">載入中...</span>
-                </div>
-              )}
+              {/* 新增按鈕 */}
+              <div className="flex-shrink-0 p-4">
+                <button
+                  onClick={handleOpenForm}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
+                >
+                  <Plus size={16} />
+                  新增
+                </button>
+              </div>
             </div>
           </>
         ) : (

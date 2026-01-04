@@ -52,6 +52,8 @@ import {
   type GeneratorOptions,
 } from './templates/brochure-generator'
 import { ALL_THEMES, type BrochureTheme } from './templates/themes'
+import { templateToElements, type TemplatePageType } from './utils/templateToElements'
+import { extractFromTemplateRef } from './utils/extractElementsFromDOM'
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -165,6 +167,10 @@ export function BrochureDesignerPage() {
   const overviewLeftRef = useRef<HTMLDivElement>(null)
   const overviewRightRef = useRef<HTMLDivElement>(null)
   const tabsContainerRef = useRef<HTMLDivElement>(null)
+  const [templateLoaded, setTemplateLoaded] = useState(false)
+
+  // 通用模板 ref - 用於 DOM 座標提取
+  const currentTemplateRef = useRef<HTMLDivElement>(null)
 
   // Canvas Editor Hook
   const {
@@ -235,6 +241,153 @@ export function BrochureDesignerPage() {
   }, [dailyItinerary])
 
   const currentPage = allPages[currentPageIndex] || allPages[0]
+
+  // 從 DOM 提取模板元素座標，然後載入到 Canvas
+  const loadTemplateElementsFromDOM = useCallback(async () => {
+    if (!isCanvasReady || !currentTemplateRef.current) {
+      logger.warn('[BrochureDesigner] Cannot extract: canvas not ready or template ref null')
+      return
+    }
+
+    try {
+      // 從渲染好的 DOM 提取元素座標
+      const elements = extractFromTemplateRef(currentTemplateRef)
+
+      logger.log('[BrochureDesigner] Extracted elements from DOM:', elements.map(el => ({
+        id: el.id,
+        name: el.name,
+        type: el.type,
+        x: Math.round(el.x),
+        y: Math.round(el.y),
+        width: Math.round(el.width),
+        height: Math.round(el.height),
+      })))
+
+      if (elements.length > 0) {
+        // 載入元素到 canvas
+        await loadElements(elements)
+        setTemplateLoaded(true)
+        logger.log('[BrochureDesigner] Template elements loaded from DOM:', elements.length)
+      } else {
+        logger.warn('[BrochureDesigner] No elements extracted from DOM')
+        toast.error('無法提取模板元素，請確認模板已正確標記')
+      }
+    } catch (error) {
+      logger.error('[BrochureDesigner] Failed to extract template elements:', error)
+      toast.error('模板載入失敗')
+    }
+  }, [isCanvasReady, loadElements])
+
+  // 備用：使用手動計算的座標（當 DOM 提取失敗時）
+  const loadTemplateElementsFallback = useCallback(async () => {
+    if (!isCanvasReady || !currentPage) return
+
+    try {
+      // 取得當前頁面類型對應的元素
+      const pageType = currentPage.type as TemplatePageType
+      const elements = templateToElements(pageType, {
+        coverData,
+        itinerary: currentItinerary,
+        dayIndex: currentPage.dayIndex,
+        side: currentPage.side,
+        accommodations,
+        pageNumber: currentPageIndex + 1,
+      })
+
+      logger.log('[BrochureDesigner] Fallback: Generated elements for', pageType)
+
+      if (elements.length > 0) {
+        await loadElements(elements)
+        setTemplateLoaded(true)
+      }
+    } catch (error) {
+      logger.error('[BrochureDesigner] Fallback failed:', error)
+      toast.error('模板載入失敗')
+    }
+  }, [isCanvasReady, currentPage, coverData, currentItinerary, accommodations, currentPageIndex, loadElements])
+
+  // 提取模式狀態（用於從模板提取座標）
+  const [isExtracting, setIsExtracting] = useState(false)
+  // 暫存提取的元素，等 Canvas 準備好後再載入
+  const [pendingElements, setPendingElements] = useState<CanvasElement[] | null>(null)
+
+  // 切換到編輯模式（先提取 DOM 座標，再切換）
+  const handleSwitchToEditMode = useCallback(() => {
+    // 開始提取模式：保持模板渲染，準備提取座標
+    setIsExtracting(true)
+    setTemplateLoaded(false)
+    setPendingElements(null)
+  }, [])
+
+  // 處理提取流程：當進入提取模式時，等待模板渲染後提取座標
+  useEffect(() => {
+    if (!isExtracting) return
+
+    // 關鍵改進：提取時使用 scale(1)，這樣 getBoundingClientRect() 直接返回正確座標
+    // 不需要任何縮放計算，避免座標轉換錯誤
+    let cancelled = false
+
+    // 第一個 rAF：設定 scale(1) 並等待瀏覽器更新
+    const frameId = requestAnimationFrame(() => {
+      if (cancelled || !currentTemplateRef.current) {
+        if (!currentTemplateRef.current) {
+          logger.warn('[BrochureDesigner] No template ref, switching to canvas mode')
+          setEditorMode('canvas')
+          setIsExtracting(false)
+        }
+        return
+      }
+
+      // 暫時移除縮放，讓 DOM 以 1:1 比例渲染
+      const templateEl = currentTemplateRef.current
+      const originalTransform = templateEl.style.transform
+      templateEl.style.transform = 'scale(1)'
+
+      // 第二個 rAF：等待 layout 完成後提取
+      requestAnimationFrame(() => {
+        if (cancelled) {
+          templateEl.style.transform = originalTransform
+          return
+        }
+
+        // 提取時 scale = 1，直接得到正確座標
+        const elements = extractFromTemplateRef(currentTemplateRef, 1)
+
+        logger.log('[BrochureDesigner] Extraction complete (scale=1), found', elements.length, 'elements')
+
+        // 恢復原本的縮放
+        templateEl.style.transform = originalTransform
+
+        if (elements.length > 0) {
+          setPendingElements(elements)
+          setEditorMode('canvas')
+        } else {
+          logger.warn('[BrochureDesigner] No elements extracted, using fallback')
+          setEditorMode('canvas')
+        }
+
+        setIsExtracting(false)
+      })
+    })
+
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(frameId)
+    }
+  }, [isExtracting])
+
+  // 當 Canvas 準備好且有待載入的元素時，載入它們
+  useEffect(() => {
+    if (pendingElements && isCanvasReady && editorMode === 'canvas') {
+      const loadPending = async () => {
+        logger.log('[BrochureDesigner] Loading pending elements to canvas:', pendingElements.length)
+        await loadElements(pendingElements)
+        setTemplateLoaded(true)
+        setPendingElements(null)
+      }
+      loadPending()
+    }
+  }, [pendingElements, isCanvasReady, editorMode, loadElements])
 
   // 自動捲動 tabs 到當前選中的頁面
   useEffect(() => {
@@ -370,11 +523,33 @@ export function BrochureDesignerPage() {
 
   // 頁面切換
   const goToPrev = () => {
-    if (currentPageIndex > 0) setCurrentPageIndex(currentPageIndex - 1)
+    if (currentPageIndex > 0) {
+      setCurrentPageIndex(currentPageIndex - 1)
+      if (editorMode === 'canvas') {
+        setTemplateLoaded(false)
+      }
+    }
   }
   const goToNext = () => {
-    if (currentPageIndex < allPages.length - 1) setCurrentPageIndex(currentPageIndex + 1)
+    if (currentPageIndex < allPages.length - 1) {
+      setCurrentPageIndex(currentPageIndex + 1)
+      if (editorMode === 'canvas') {
+        setTemplateLoaded(false)
+      }
+    }
   }
+
+  // 當在編輯模式切換頁面時，使用備用方法載入模板元素
+  // （首次進入編輯模式會透過 isExtracting 流程處理，不需要 fallback）
+  useEffect(() => {
+    // 如果有 pendingElements，表示 DOM 提取正在進行，不要觸發 fallback
+    if (editorMode === 'canvas' && !templateLoaded && isCanvasReady && !isExtracting && !pendingElements) {
+      const timer = setTimeout(() => {
+        loadTemplateElementsFallback()
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [currentPageIndex, editorMode, templateLoaded, isCanvasReady, isExtracting, pendingElements, loadTemplateElementsFallback])
 
   // 判斷是否為每日行程頁面
   const isDailyPage = currentPage?.type?.startsWith('day-')
@@ -636,7 +811,12 @@ export function BrochureDesignerPage() {
                       <button
                         key={page.type}
                         data-index={index}
-                        onClick={() => setCurrentPageIndex(index)}
+                        onClick={() => {
+                          setCurrentPageIndex(index)
+                          if (editorMode === 'canvas') {
+                            setTemplateLoaded(false)
+                          }
+                        }}
                         className={cn(
                           'px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors whitespace-nowrap flex-shrink-0',
                           currentPageIndex === index
@@ -666,7 +846,10 @@ export function BrochureDesignerPage() {
                       ? 'bg-white text-morandi-primary shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   )}
-                  onClick={() => setEditorMode('template')}
+                  onClick={() => {
+                    setEditorMode('template')
+                    setTemplateLoaded(false)
+                  }}
                 >
                   <LayoutTemplate size={14} />
                   模板
@@ -678,7 +861,7 @@ export function BrochureDesignerPage() {
                       ? 'bg-white text-morandi-primary shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   )}
-                  onClick={() => setEditorMode('canvas')}
+                  onClick={handleSwitchToEditMode}
                 >
                   <Pencil size={14} />
                   編輯
@@ -742,10 +925,12 @@ export function BrochureDesignerPage() {
           {/* 中間預覽/編輯區 */}
           <section className="flex-1 bg-white rounded-xl border-2 border-border flex flex-col overflow-hidden shadow-md">
             {/* 預覽/編輯區內容 */}
-            {editorMode === 'template' ? (
+            {(editorMode === 'template' || isExtracting) ? (
               // 模板模式 - 使用原有的 React 組件（日系風格模板）
+              // isExtracting 時也渲染模板，用於提取 DOM 座標
               <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
                 <div
+                  ref={currentTemplateRef}
                   className="relative shadow-lg bg-white flex-shrink-0 overflow-hidden"
                   style={{
                     width: '559px',
@@ -821,6 +1006,16 @@ export function BrochureDesignerPage() {
                     />
                   )}
                 </div>
+
+                {/* 提取中顯示載入指示 */}
+                {isExtracting && (
+                  <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
+                    <div className="flex items-center gap-2 text-morandi-secondary">
+                      <Loader2 className="animate-spin" size={20} />
+                      <span className="text-sm">正在提取模板元素...</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               // 編輯模式 - 使用 Fabric.js Canvas 編輯器
@@ -844,73 +1039,7 @@ export function BrochureDesignerPage() {
                     overflow: 'visible',
                   }}
                 >
-                  {/* 底層：日系模板作為參考背景 */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {currentPage?.type === 'cover' && <BrochureCoverPreview data={coverData} />}
-
-                    {currentPage?.type === 'blank' && (
-                      <div className="bg-white flex items-center justify-center w-full h-full">
-                        <p className="text-slate-300 text-sm">空白頁（封面背面）</p>
-                      </div>
-                    )}
-
-                    {currentPage?.type === 'contents' && (
-                      <BrochureTableOfContents
-                        data={coverData}
-                        itinerary={currentItinerary}
-                        tripTitle={`${coverData.country} ${coverData.city} Trip`}
-                      />
-                    )}
-
-                    {currentPage?.type === 'overview-left' && (
-                      <BrochureOverviewLeft
-                        data={coverData}
-                        itinerary={currentItinerary}
-                        overviewImage={coverData.overviewImage}
-                      />
-                    )}
-
-                    {currentPage?.type === 'overview-right' && (
-                      <BrochureOverviewRight
-                        data={coverData}
-                        itinerary={currentItinerary}
-                      />
-                    )}
-
-                    {isDailyPage && currentPage?.dayIndex !== undefined && dailyItinerary[currentPage.dayIndex] && (
-                      currentPage.side === 'left' ? (
-                        <BrochureDailyLeft
-                          dayIndex={currentPage.dayIndex}
-                          day={dailyItinerary[currentPage.dayIndex]}
-                          departureDate={currentItinerary?.departure_date}
-                          tripName={`${coverData.country} ${coverData.city}`}
-                          pageNumber={currentPageIndex + 1}
-                        />
-                      ) : (
-                        <BrochureDailyRight
-                          dayIndex={currentPage.dayIndex}
-                          day={dailyItinerary[currentPage.dayIndex]}
-                          pageNumber={currentPageIndex + 1}
-                        />
-                      )
-                    )}
-
-                    {currentPage?.type === 'accommodation-left' && (
-                      <BrochureAccommodationLeft
-                        accommodations={accommodations}
-                        pageNumber={currentPageIndex + 1}
-                      />
-                    )}
-
-                    {currentPage?.type === 'accommodation-right' && (
-                      <BrochureAccommodationRight
-                        accommodations={accommodations}
-                        pageNumber={currentPageIndex + 1}
-                      />
-                    )}
-                  </div>
-
-                  {/* 上層：透明 Canvas 編輯層，可在模板上添加元素 */}
+                  {/* Canvas 編輯層 - 模板元素會直接載入到這裡 */}
                   <div
                     ref={canvasContainerRef}
                     className="absolute inset-0"

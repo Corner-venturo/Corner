@@ -76,7 +76,7 @@ export function TourForm({
       }}
     >
       <DialogContent
-        className="max-w-6xl w-[90vw] h-[80vh] overflow-hidden"
+        className={`${mode === 'edit' ? 'max-w-3xl' : 'max-w-6xl'} w-[90vw] h-[80vh] overflow-hidden`}
         aria-describedby={undefined}
         onInteractOutside={e => {
           const target = e.target as HTMLElement
@@ -101,7 +101,7 @@ export function TourForm({
 
         <div className="flex h-full overflow-hidden">
           {/* Left side - Tour info */}
-          <div className="flex-1 pr-6 border-r border-border">
+          <div className={`flex-1 ${mode === 'create' ? 'pr-6 border-r border-border' : ''}`}>
             <div className="h-full overflow-y-auto">
               <h3 className="text-lg font-medium text-morandi-primary mb-4">旅遊團資訊</h3>
               <div className="space-y-4">
@@ -128,12 +128,14 @@ export function TourForm({
             </div>
           </div>
 
-          {/* Right side - Order info */}
-          <div className="flex-1 pl-6">
-            <div className="h-full overflow-y-auto">
-              <TourOrderSection newOrder={newOrder} setNewOrder={setNewOrder} />
+          {/* Right side - Order info (只在新增模式顯示) */}
+          {mode === 'create' && (
+            <div className="flex-1 pl-6">
+              <div className="h-full overflow-y-auto">
+                <TourOrderSection newOrder={newOrder} setNewOrder={setNewOrder} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bottom buttons */}
@@ -149,11 +151,13 @@ export function TourForm({
             }
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
-            {submitting
-              ? '建立中...'
-              : newOrder.contact_person
-                ? '新增旅遊團 & 訂單'
-                : '新增旅遊團'}
+            {mode === 'edit'
+              ? (submitting ? '儲存中...' : '儲存變更')
+              : (submitting
+                  ? '建立中...'
+                  : newOrder.contact_person
+                    ? '新增旅遊團 & 訂單'
+                    : '新增旅遊團')}
           </Button>
         </div>
 

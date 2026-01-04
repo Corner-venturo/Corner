@@ -29,8 +29,7 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
 import { TourClosingDialog } from './TourClosingDialog'
-import { TourRequestDialog } from '@/app/(main)/tour-requests/components/TourRequestDialog'
-import { useTourRequests } from '@/stores/tour-request-store'
+import { TourConfirmationDialog } from './TourConfirmationDialog'
 
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
@@ -50,12 +49,11 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [tourRequestDialogTour, setTourRequestDialogTour] = useState<Tour | null>(null)
+  const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
-  const { items: tourRequests } = useTourRequests()
   const { dialog, closeDialog, openDialog } = useDialog()
 
   const {
@@ -171,16 +169,8 @@ export const ToursPage: React.FC = () => {
     onUnlockLockedTour: openUnlockDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
-    onOpenTourRequestDialog: (tour: Tour) => {
-      // 檢查該團是否有需求單
-      const hasRequests = tourRequests.some(r => r.tour_id === tour.id)
-      if (hasRequests) {
-        // 有需求單：跳轉到需求單列表頁
-        router.push(`/tour-requests?tour_id=${tour.id}`)
-      } else {
-        // 沒有需求單：打開新增對話框
-        setTourRequestDialogTour(tour)
-      }
+    onOpenTourConfirmationDialog: (tour: Tour) => {
+      setTourConfirmationDialogTour(tour)
     },
   })
 
@@ -322,11 +312,11 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
-      {/* 需求單對話框 */}
-      <TourRequestDialog
-        isOpen={!!tourRequestDialogTour}
-        onClose={() => setTourRequestDialogTour(null)}
-        defaultTourId={tourRequestDialogTour?.id}
+      {/* 團確單對話框 */}
+      <TourConfirmationDialog
+        open={!!tourConfirmationDialogTour}
+        tour={tourConfirmationDialogTour}
+        onClose={() => setTourConfirmationDialogTour(null)}
       />
     </div>
   )

@@ -47,8 +47,8 @@ interface UseTourActionButtonsParams {
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
   onOpenArchiveDialog?: (tour: Tour) => void
-  // 需求單對話框
-  onOpenTourRequestDialog?: (tour: Tour) => void
+  // 團確單對話框
+  onOpenTourConfirmationDialog?: (tour: Tour) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -70,7 +70,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onUnlockLockedTour,
     onCloseTour,
     onOpenArchiveDialog,
-    onOpenTourRequestDialog,
+    onOpenTourConfirmationDialog,
   } = params
 
   const renderActions = useCallback(
@@ -214,21 +214,19 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>合約</span>
           </button>
 
-          {/* 需求單 */}
+          {/* 團確單 */}
           <button
             onClick={e => {
               e.stopPropagation()
-              if (onOpenTourRequestDialog) {
-                onOpenTourRequestDialog(tour)
-              } else {
-                router.push(`/tour-requests?tour_id=${tour.id}`)
+              if (onOpenTourConfirmationDialog) {
+                onOpenTourConfirmationDialog(tour)
               }
             }}
             className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="需求單"
+            title="團確單管理"
           >
             <ClipboardList size={14} />
-            <span>需求</span>
+            <span>團確</span>
           </button>
 
           {/* 封存/解除封存 */}
@@ -307,7 +305,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onUnlockLockedTour,
       onCloseTour,
       onOpenArchiveDialog,
-      onOpenTourRequestDialog,
+      onOpenTourConfirmationDialog,
     ]
   )
 

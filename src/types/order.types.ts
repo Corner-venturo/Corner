@@ -63,6 +63,7 @@ export interface Member extends BaseEntity {
   add_ons?: string[] | null // 加購項目IDs
   refunds?: string[] | null // 退費項目IDs
   notes?: string | null // 備註
+  contract_created_at?: string | null // 合約建立時間
 }
 
 // ============================================

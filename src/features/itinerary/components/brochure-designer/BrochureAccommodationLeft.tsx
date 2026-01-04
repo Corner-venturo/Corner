@@ -3,7 +3,7 @@
 import React, { forwardRef } from 'react'
 import type { DailyItineraryDay } from '@/stores/types'
 
-interface AccommodationInfo {
+export interface AccommodationInfo {
   name: string
   image?: string
   days?: number[]

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  X,
   Plus,
   Pencil,
   Calculator,
@@ -534,28 +533,18 @@ export function DocumentVersionPicker({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden p-0 [&>button]:hidden">
+        <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
           {/* 標題區 */}
-          <DialogHeader className="flex-shrink-0 flex items-center justify-between px-6 h-14 space-y-0">
+          <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-morandi-gold" />
-              <span className="font-medium text-morandi-primary">報價單管理</span>
+              <span>報價單管理</span>
               <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
             </DialogTitle>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
-            >
-              <X size={18} className="text-morandi-secondary" />
-            </button>
           </DialogHeader>
 
-          {/* 分割線 */}
-          <div className="border-t border-border/60 mx-6" />
-
           {/* 左右兩欄佈局 */}
-          <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6 px-6 pt-4 pb-6">
+          <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6">
             {/* 左邊：團體報價單 */}
             <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
               <div className="flex-shrink-0 px-4 py-3">
@@ -714,37 +703,20 @@ export function DocumentVersionPicker({
 
       {/* 預覽 Dialog */}
       <Dialog open={!!previewQuote} onOpenChange={open => !open && setPreviewQuote(null)}>
-        <DialogContent className="max-w-md p-0 [&>button]:hidden">
-          <DialogHeader className="flex-shrink-0 px-5 py-4">
+        <DialogContent className="max-w-md">
+          <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-morandi-gold" />
-              <span className="font-medium text-morandi-primary">報價單預覽</span>
+              報價單預覽
             </DialogTitle>
-            <button
-              type="button"
-              onClick={() => setPreviewQuote(null)}
-              className="absolute right-4 top-4 p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
-            >
-              <X size={18} className="text-morandi-secondary" />
-            </button>
           </DialogHeader>
 
-          {/* 分割線留白 */}
-          <div className="mx-5">
-            <div className="border-t border-border" />
-          </div>
-
-          <div className="p-5">
+          <div>
             {renderPreviewContent()}
           </div>
 
-          {/* 分割線留白 */}
-          <div className="mx-5">
-            <div className="border-t border-border" />
-          </div>
-
           {/* 底部按鈕 */}
-          <div className="p-5 flex gap-3">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <button
               onClick={() => setPreviewQuote(null)}
               className="flex-1 py-2.5 text-sm font-medium text-morandi-secondary border border-border rounded-lg hover:bg-morandi-container/50 transition-colors"

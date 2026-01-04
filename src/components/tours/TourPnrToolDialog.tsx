@@ -374,14 +374,15 @@ export function TourPnrToolDialog({
             .from('order_members')
             .update(updateData)
             .eq('id', match.memberId)
-            .select('id, pnr, special_meal, flight_cost')
+            .select('id, pnr, special_meal, flight_cost, ticket_number')
 
           if (error) {
             errors.push(`${match.pnrName}: ${error.message}`)
           } else if (data && data.length > 0) {
             updateCount++
             // 顯示更新後的值確認
-            toast.info(`${match.pnrName} 已更新: pnr=${data[0].pnr}`)
+            const ticketInfo = data[0].ticket_number ? `, 票號=${data[0].ticket_number}` : ''
+            toast.info(`${match.pnrName} 已更新: pnr=${data[0].pnr}${ticketInfo}`)
           } else {
             errors.push(`${match.pnrName}: 找不到該團員(${match.memberId})`)
           }

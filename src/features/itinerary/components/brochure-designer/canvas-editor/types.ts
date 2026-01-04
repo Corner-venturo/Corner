@@ -84,6 +84,19 @@ export interface ImageElement extends BaseElementProps {
 
 export type ShapeVariant = 'rectangle' | 'circle' | 'ellipse' | 'line' | 'triangle' | 'polygon'
 
+// 漸層色標
+export interface GradientColorStop {
+  offset: number  // 0-1
+  color: string
+}
+
+// 漸層定義
+export interface GradientFill {
+  type: 'linear' | 'radial'
+  angle?: number  // linear gradient angle in degrees (0 = to bottom, 90 = to right)
+  colorStops: GradientColorStop[]
+}
+
 export interface ShapeElement extends BaseElementProps {
   type: 'shape'
   variant: ShapeVariant
@@ -92,6 +105,7 @@ export interface ShapeElement extends BaseElementProps {
   strokeWidth: number
   cornerRadius: number   // 圓角
   points?: number[]      // 多邊形頂點
+  gradient?: GradientFill  // 漸層填充（優先於 fill）
 }
 
 // ============= 裝飾元素 =============

@@ -11,6 +11,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { OrderMember, CustomCostField } from '../order-member.types'
 import type { ColumnVisibility } from '../OrderMembersExpandable'
@@ -236,12 +237,19 @@ export function MemberRow({
       {/* 團體模式：開票期限 */}
       {mode === 'tour' && cv.ticketing_deadline && (
         <td className="border border-morandi-gold/20 px-2 py-1 bg-orange-50/50">
-          <input
-            type="date"
-            value={member.ticketing_deadline || ''}
-            onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
+          {member.ticket_number ? (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+              <Check size={10} />
+              已開票
+            </span>
+          ) : (
+            <input
+              type="date"
+              value={member.ticketing_deadline || ''}
+              onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            />
+          )}
         </td>
       )}
 

@@ -4752,6 +4752,7 @@ export type Database = {
           birthday: string | null
           checked_in: boolean | null
           checked_in_at: string | null
+          contract_created_at: string | null
           created_at: string | null
           dietary_requirements: string | null
           email: string | null
@@ -4791,6 +4792,7 @@ export type Database = {
           birthday?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
+          contract_created_at?: string | null
           created_at?: string | null
           dietary_requirements?: string | null
           email?: string | null
@@ -4830,6 +4832,7 @@ export type Database = {
           birthday?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
+          contract_created_at?: string | null
           created_at?: string | null
           dietary_requirements?: string | null
           email?: string | null
@@ -5257,6 +5260,7 @@ export type Database = {
           balance_receipt_no: string | null
           birth_date: string | null
           chinese_name: string | null
+          contract_created_at: string | null
           cost_price: number | null
           created_at: string | null
           created_by: string | null
@@ -5300,6 +5304,7 @@ export type Database = {
           balance_receipt_no?: string | null
           birth_date?: string | null
           chinese_name?: string | null
+          contract_created_at?: string | null
           cost_price?: number | null
           created_at?: string | null
           created_by?: string | null
@@ -5343,6 +5348,7 @@ export type Database = {
           balance_receipt_no?: string | null
           birth_date?: string | null
           chinese_name?: string | null
+          contract_created_at?: string | null
           cost_price?: number | null
           created_at?: string | null
           created_by?: string | null
@@ -10877,6 +10883,199 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // === 手動添加的出團確認表類型 (2026-01-04) ===
+      tour_confirmation_items: {
+        Row: {
+          id: string
+          sheet_id: string
+          category: string
+          service_date: string
+          service_date_end: string | null
+          day_label: string | null
+          supplier_name: string
+          supplier_id: string | null
+          title: string
+          description: string | null
+          unit_price: number | null
+          currency: string
+          quantity: number | null
+          subtotal: number | null
+          expected_cost: number | null
+          actual_cost: number | null
+          contact_info: Json | null
+          booking_reference: string | null
+          booking_status: string
+          type_data: Json | null
+          sort_order: number
+          notes: string | null
+          workspace_id: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          sheet_id: string
+          category: string
+          service_date: string
+          service_date_end?: string | null
+          day_label?: string | null
+          supplier_name: string
+          supplier_id?: string | null
+          title: string
+          description?: string | null
+          unit_price?: number | null
+          currency?: string
+          quantity?: number | null
+          subtotal?: number | null
+          expected_cost?: number | null
+          actual_cost?: number | null
+          contact_info?: Json | null
+          booking_reference?: string | null
+          booking_status?: string
+          type_data?: Json | null
+          sort_order?: number
+          notes?: string | null
+          workspace_id: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          sheet_id?: string
+          category?: string
+          service_date?: string
+          service_date_end?: string | null
+          day_label?: string | null
+          supplier_name?: string
+          supplier_id?: string | null
+          title?: string
+          description?: string | null
+          unit_price?: number | null
+          currency?: string
+          quantity?: number | null
+          subtotal?: number | null
+          expected_cost?: number | null
+          actual_cost?: number | null
+          contact_info?: Json | null
+          booking_reference?: string | null
+          booking_status?: string
+          type_data?: Json | null
+          sort_order?: number
+          notes?: string | null
+          workspace_id?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_items_sheet_id_fkey"
+            columns: ["sheet_id"]
+            isOneToOne: false
+            referencedRelation: "tour_confirmation_sheets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_confirmation_sheets: {
+        Row: {
+          id: string
+          tour_id: string
+          tour_code: string
+          tour_name: string
+          departure_date: string | null
+          return_date: string | null
+          tour_leader_name: string | null
+          tour_leader_id: string | null
+          sales_person: string | null
+          assistant: string | null
+          pax: number | null
+          flight_info: string | null
+          status: string
+          total_expected_cost: number | null
+          total_actual_cost: number | null
+          itinerary_id: string | null
+          itinerary_version: number | null
+          notes: string | null
+          workspace_id: string
+          created_at: string | null
+          updated_at: string | null
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          tour_id: string
+          tour_code: string
+          tour_name: string
+          departure_date?: string | null
+          return_date?: string | null
+          tour_leader_name?: string | null
+          tour_leader_id?: string | null
+          sales_person?: string | null
+          assistant?: string | null
+          pax?: number | null
+          flight_info?: string | null
+          status?: string
+          total_expected_cost?: number | null
+          total_actual_cost?: number | null
+          itinerary_id?: string | null
+          itinerary_version?: number | null
+          notes?: string | null
+          workspace_id: string
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          tour_id?: string
+          tour_code?: string
+          tour_name?: string
+          departure_date?: string | null
+          return_date?: string | null
+          tour_leader_name?: string | null
+          tour_leader_id?: string | null
+          sales_person?: string | null
+          assistant?: string | null
+          pax?: number | null
+          flight_info?: string | null
+          status?: string
+          total_expected_cost?: number | null
+          total_actual_cost?: number | null
+          itinerary_id?: string | null
+          itinerary_version?: number | null
+          notes?: string | null
+          workspace_id?: string
+          created_at?: string | null
+          updated_at?: string | null
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_sheets_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_sheets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
