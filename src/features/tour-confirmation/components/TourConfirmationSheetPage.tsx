@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAuthStore } from '@/stores/auth-store'
 import { useTourConfirmationSheet } from '../hooks/useTourConfirmationSheet'
 import { ItemEditDialog } from './ItemEditDialog'
 import type { Tour } from '@/stores/types'
@@ -40,6 +41,9 @@ const CATEGORIES: { key: ConfirmationItemCategory; label: string }[] = [
 ]
 
 export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPageProps) {
+  const { user } = useAuthStore()
+  const workspaceId = tour.workspace_id || user?.workspace_id || ''
+
   const {
     sheet,
     groupedItems,
@@ -68,16 +72,16 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
 
   // 自動建立確認表（如果不存在）
   useEffect(() => {
-    if (!loading && !sheet && tour) {
+    if (!loading && !sheet && tour && workspaceId) {
       createSheet({
         tour_code: tour.code,
         tour_name: tour.name,
         departure_date: tour.departure_date || undefined,
         return_date: tour.return_date || undefined,
-        workspace_id: tour.workspace_id || '',
+        workspace_id: workspaceId,
       })
     }
-  }, [loading, sheet, tour, createSheet])
+  }, [loading, sheet, tour, workspaceId, createSheet])
 
   // 開啟新增對話框
   const handleAdd = (category: ConfirmationItemCategory) => {
@@ -143,6 +147,15 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
           <RefreshCw size={16} />
           重新載入
         </Button>
+      </div>
+    )
+  }
+
+  // 缺少 workspace_id
+  if (!workspaceId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-morandi-secondary">
+        <p>無法取得工作空間資訊，請重新登入</p>
       </div>
     )
   }
@@ -285,7 +298,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
         category={editDialog.category}
         item={editDialog.item}
         sheetId={sheet?.id || ''}
-        workspaceId={tour.workspace_id || ''}
+        workspaceId={workspaceId}
         onClose={() => setEditDialog({ open: false, category: 'transport', item: null })}
         onSave={handleSave}
       />

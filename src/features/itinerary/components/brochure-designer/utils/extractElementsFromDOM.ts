@@ -13,49 +13,58 @@ function parseGradient(backgroundImage: string): GradientFill | null {
   if (!backgroundImage || backgroundImage === 'none') return null
 
   // 檢測 linear-gradient
-  const linearMatch = backgroundImage.match(/linear-gradient\(([^)]+)\)/)
-  if (linearMatch) {
-    const content = linearMatch[1]
+  const linearMatch = backgroundImage.match(/linear-gradient\((.+)\)/)
+  if (!linearMatch) return null
 
-    // 解析方向
-    let angle = 180 // 預設 to bottom
-    const directionMatch = content.match(/^(to\s+\w+|[\d.]+deg)/)
-    if (directionMatch) {
-      const dir = directionMatch[1]
-      if (dir.includes('to bottom')) angle = 180
-      else if (dir.includes('to top')) angle = 0
-      else if (dir.includes('to right')) angle = 90
-      else if (dir.includes('to left')) angle = 270
-      else if (dir.endsWith('deg')) angle = parseFloat(dir)
+  const content = linearMatch[1]
+
+  // 解析方向
+  let angle = 180 // 預設 to bottom
+  const directionMatch = content.match(/^(to\s+\w+(?:\s+\w+)?|[\d.]+deg)/)
+  if (directionMatch) {
+    const dir = directionMatch[1]
+    if (dir.includes('to bottom')) angle = 180
+    else if (dir.includes('to top')) angle = 0
+    else if (dir.includes('to right')) angle = 90
+    else if (dir.includes('to left')) angle = 270
+    else if (dir.endsWith('deg')) angle = parseFloat(dir)
+  }
+
+  // 使用更精確的正規表達式匹配顏色和位置
+  // 匹配 rgba(r, g, b, a)、rgb(r, g, b)、#hex、或顏色名稱，後面可選跟著百分比
+  const colorStops: GradientColorStop[] = []
+  const colorRegex = /(rgba?\s*\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(?:,\s*[\d.]+\s*)?\)|#[a-fA-F0-9]{3,8}|[a-zA-Z]+)(?:\s+([\d.]+%))?/g
+
+  let match
+  while ((match = colorRegex.exec(content)) !== null) {
+    const color = match[1].trim()
+    const position = match[2]
+
+    // 跳過方向關鍵字
+    if (['to', 'top', 'bottom', 'left', 'right'].includes(color.toLowerCase())) {
+      continue
     }
 
-    // 解析色標
-    const colorStops: GradientColorStop[] = []
-    // 匹配顏色和位置，如 "rgba(0, 0, 0, 0.6) 0%" 或 "black 50%"
-    const colorRegex = /(rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}|\w+)\s*([\d.]+%)?/g
-    let match
-    let index = 0
-    const parts = content.split(',').slice(directionMatch ? 1 : 0) // 跳過方向部分
+    colorStops.push({
+      offset: position ? parseFloat(position) / 100 : -1, // -1 表示需要自動計算
+      color: color,
+    })
+  }
 
-    for (const part of parts) {
-      const colorMatch = part.trim().match(/(rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}|\w+)(?:\s*([\d.]+%))?/)
-      if (colorMatch) {
-        const color = colorMatch[1]
-        const position = colorMatch[2]
-        colorStops.push({
-          offset: position ? parseFloat(position) / 100 : index / Math.max(parts.length - 1, 1),
-          color: color,
-        })
-        index++
+  // 自動計算缺失的位置
+  if (colorStops.length >= 2) {
+    colorStops.forEach((stop, i) => {
+      if (stop.offset === -1) {
+        stop.offset = i / (colorStops.length - 1)
       }
-    }
+    })
 
-    if (colorStops.length >= 2) {
-      return {
-        type: 'linear',
-        angle,
-        colorStops,
-      }
+    console.log('[parseGradient] Parsed gradient:', { angle, colorStops })
+
+    return {
+      type: 'linear',
+      angle,
+      colorStops,
     }
   }
 

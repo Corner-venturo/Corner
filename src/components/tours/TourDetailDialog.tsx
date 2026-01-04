@@ -452,23 +452,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                   <Plane size={15} className="mr-1" />
                   PNR
                 </Button>
-                {/* PNR 開票狀態顯示 */}
-                {ticketStatus === 'all' ? (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">
-                    <Check size={12} />
-                    <span>已開票</span>
-                  </div>
-                ) : ticketStatus === 'partial' ? (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-500 text-white">
-                    <AlertTriangle size={12} />
-                    <span>部分已開票</span>
-                    {pnrTicketingDeadline && deadlineStatus && (
-                      <span className={cn("ml-1 px-1 rounded", deadlineStatus.urgent ? "bg-white/30" : "")}>
-                        {formatDateMonthDayChinese(pnrTicketingDeadline)}
-                      </span>
-                    )}
-                  </div>
-                ) : pnrTicketingDeadline && deadlineStatus ? (
+                {/* PNR 開票期限警告（只在未全部開票且有期限時顯示） */}
+                {ticketStatus !== 'all' && pnrTicketingDeadline && deadlineStatus && (
                   <div className={cn(
                     "flex items-center gap-1 px-2 py-1 rounded text-xs font-medium",
                     deadlineStatus.color,
@@ -481,7 +466,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                       ({deadlineStatus.text})
                     </span>
                   </div>
-                ) : null}
+                )}
                 <Button
                   variant="ghost"
                   size="sm"

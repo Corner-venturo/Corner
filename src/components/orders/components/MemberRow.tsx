@@ -238,7 +238,7 @@ export function MemberRow({
       {mode === 'tour' && cv.ticketing_deadline && (
         <td className="border border-morandi-gold/20 px-2 py-1 bg-orange-50/50">
           {member.ticket_number ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-morandi-green/20 text-morandi-green text-xs rounded-full font-medium">
               <Check size={10} />
               已開票
             </span>
