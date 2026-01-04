@@ -256,7 +256,7 @@ export function DocumentVersionPicker({
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden p-0 [&>button]:hidden">
-        <DialogHeader className="flex-shrink-0 px-5 py-3.5 border-b border-border bg-morandi-container/20">
+        <DialogHeader className="flex-shrink-0 px-5 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Calculator className="w-5 h-5 text-morandi-gold" />
             <span className="font-medium text-morandi-primary">報價單管理</span>
@@ -265,23 +265,33 @@ export function DocumentVersionPicker({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-3 p-1.5 hover:bg-morandi-container rounded transition-colors"
+            className="absolute right-4 top-4 p-1.5 hover:bg-morandi-container rounded-lg transition-colors"
           >
             <X size={18} className="text-morandi-secondary" />
           </button>
         </DialogHeader>
 
+        {/* 分割線留白 */}
+        <div className="mx-5">
+          <div className="border-t border-border" />
+        </div>
+
         {/* 左右兩欄佈局 */}
-        <div className="flex-1 overflow-hidden grid grid-cols-2 divide-x divide-border">
+        <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6 p-5">
           {/* 左邊：團體報價單 */}
-          <div className="flex flex-col min-h-0 overflow-hidden">
-            <div className="flex-shrink-0 px-4 py-3 border-b border-border/50 bg-morandi-primary/5">
+          <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+            <div className="flex-shrink-0 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Calculator className="w-4 h-4 text-morandi-primary" />
                 <span className="text-sm font-medium text-morandi-primary">團體報價單</span>
                 <span className="text-xs text-morandi-secondary">(Q 開頭)</span>
               </div>
               <p className="text-xs text-morandi-secondary mt-1">完整報價單，包含分類項目與成本明細</p>
+            </div>
+
+            {/* 分割線留白 */}
+            <div className="mx-4">
+              <div className="border-t border-border" />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
@@ -300,7 +310,12 @@ export function DocumentVersionPicker({
               )}
             </div>
 
-            <div className="flex-shrink-0 p-4 border-t border-border/50">
+            {/* 分割線留白 */}
+            <div className="mx-4">
+              <div className="border-t border-border" />
+            </div>
+
+            <div className="flex-shrink-0 p-4">
               {mode === 'confirm' ? (
                 <button
                   onClick={() => {
@@ -308,7 +323,7 @@ export function DocumentVersionPicker({
                     onClose()
                   }}
                   disabled={standardQuotes.length === 0}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-status-success hover:bg-status-success/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-green hover:bg-morandi-green/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Lock size={16} />
                   確認鎖定
@@ -317,7 +332,7 @@ export function DocumentVersionPicker({
                 <button
                   onClick={handleCreateStandard}
                   disabled={isCreatingStandard}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-morandi-primary hover:bg-morandi-primary/90 rounded-lg transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
                 >
                   {isCreatingStandard ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -331,14 +346,19 @@ export function DocumentVersionPicker({
           </div>
 
           {/* 右邊：快速報價單 */}
-          <div className="flex flex-col min-h-0 overflow-hidden">
-            <div className="flex-shrink-0 px-4 py-3 border-b border-border/50 bg-status-warning-bg/30">
+          <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+            <div className="flex-shrink-0 px-4 py-3">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-status-warning" />
+                <Zap className="w-4 h-4 text-morandi-gold" />
                 <span className="text-sm font-medium text-morandi-primary">快速報價單</span>
                 <span className="text-xs text-morandi-secondary">(X 開頭)</span>
               </div>
               <p className="text-xs text-morandi-secondary mt-1">簡易報價，快速產出客戶報價</p>
+            </div>
+
+            {/* 分割線留白 */}
+            <div className="mx-4">
+              <div className="border-t border-border" />
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
@@ -357,11 +377,16 @@ export function DocumentVersionPicker({
               )}
             </div>
 
-            <div className="flex-shrink-0 p-4 border-t border-border/50">
+            {/* 分割線留白 */}
+            <div className="mx-4">
+              <div className="border-t border-border" />
+            </div>
+
+            <div className="flex-shrink-0 p-4">
               <button
                 onClick={handleCreateQuick}
                 disabled={isCreatingQuick}
-                className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-white bg-status-warning hover:bg-status-warning/90 rounded-lg transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
               >
                 {isCreatingQuick ? (
                   <Loader2 size={16} className="animate-spin" />

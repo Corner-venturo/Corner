@@ -253,7 +253,7 @@ export function BrochureDesignerPage() {
     if (itinerary) {
       setCoverData(itineraryToCoverData(itinerary))
 
-      // 自動生成手冊（如果有行程資料且尚未生成）
+      // 預先生成手冊資料（但不自動切換模式，讓用戶先看到模板預覽）
       if (itinerary.daily_itinerary && itinerary.daily_itinerary.length > 0 && !generatedBrochure) {
         try {
           const options: GeneratorOptions = {
@@ -263,13 +263,11 @@ export function BrochureDesignerPage() {
           const brochure = generateBrochure(itinerary, options)
           setGeneratedBrochure(brochure)
 
-          // 載入第一頁的元素
+          // 載入第一頁的元素（供切換到 canvas 模式時使用）
           if (brochure.pages.length > 0) {
             setCanvasElements(brochure.pages[0].elements)
           }
-
-          // 自動切換到 canvas 模式顯示生成結果
-          setEditorMode('canvas')
+          // 不再自動切換到 canvas 模式，讓用戶先看到模板預覽
         } catch (error) {
           logger.error('自動生成手冊失敗:', error)
         }

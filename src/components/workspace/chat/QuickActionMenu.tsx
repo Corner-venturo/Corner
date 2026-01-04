@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, type LucideIcon } from 'lucide-react'
+import { Receipt, DollarSign, Wallet, CheckSquare, Paperclip, Luggage, Plane, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface QuickAction {
@@ -72,6 +72,8 @@ export const createQuickActions = (handlers: {
   onShareAdvance: () => void
   onNewTask: () => void
   onUploadFile: () => void
+  onBaggageInfo?: () => void
+  onTicketStatus?: () => void
 }): QuickAction[] => [
   {
     id: 'share-order',
@@ -122,4 +124,18 @@ export const createQuickActions = (handlers: {
     color: 'text-morandi-secondary',
     action: handlers.onUploadFile,
   },
+  ...(handlers.onTicketStatus ? [{
+    id: 'ticket-status',
+    icon: Plane,
+    label: '開票狀態',
+    color: 'text-morandi-gold',
+    action: handlers.onTicketStatus,
+  }] : []),
+  ...(handlers.onBaggageInfo ? [{
+    id: 'baggage-info',
+    icon: Luggage,
+    label: '行李資訊',
+    color: 'text-morandi-secondary',
+    action: handlers.onBaggageInfo,
+  }] : []),
 ]

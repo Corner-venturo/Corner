@@ -2532,6 +2532,96 @@ export type Database = {
           },
         ]
       }
+      customer_group_members: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          group_id: string
+          id: string
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          group_id: string
+          id?: string
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          group_id?: string
+          id?: string
+          role?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_group_members_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "customer_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_groups: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          name: string
+          note: string | null
+          type: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name: string
+          note?: string | null
+          type?: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name?: string
+          note?: string | null
+          type?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_travel_cards: {
         Row: {
           created_at: string | null
@@ -5171,6 +5261,7 @@ export type Database = {
           deposit_amount: number | null
           deposit_receipt_no: string | null
           flight_cost: number | null
+          flight_self_arranged: boolean | null
           gender: string | null
           hotel_1_checkin: string | null
           hotel_1_checkout: string | null
@@ -5213,6 +5304,7 @@ export type Database = {
           deposit_amount?: number | null
           deposit_receipt_no?: string | null
           flight_cost?: number | null
+          flight_self_arranged?: boolean | null
           gender?: string | null
           hotel_1_checkin?: string | null
           hotel_1_checkout?: string | null
@@ -5255,6 +5347,7 @@ export type Database = {
           deposit_amount?: number | null
           deposit_receipt_no?: string | null
           flight_cost?: number | null
+          flight_self_arranged?: boolean | null
           gender?: string | null
           hotel_1_checkin?: string | null
           hotel_1_checkout?: string | null

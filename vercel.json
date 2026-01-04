@@ -12,5 +12,11 @@
     "NEXT_PUBLIC_ENABLE_DEVTOOLS": "false",
     "NEXT_PUBLIC_DEV_MODE": "false",
     "NEXT_PUBLIC_SKIP_AUTH": "false"
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/ticket-status",
+      "schedule": "0 2 * * *"
+    }
+  ]
 }

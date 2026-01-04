@@ -46,6 +46,7 @@ export interface OrderMember {
   selling_price?: number | null
   profit?: number | null
   passport_image_url?: string | null
+  flight_self_arranged?: boolean | null
   // 關聯的顧客驗證狀態（從 join 查詢取得）
   customer_verification_status?: string | null
   // 團體模式額外欄位
