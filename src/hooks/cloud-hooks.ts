@@ -18,6 +18,8 @@ import type {
   Supplier,
   Itinerary,
   AirportImage,
+  CustomerGroup,
+  CustomerGroupMember,
 } from '@/stores/types'
 import type { QuoteItem } from '@/types/quote.types'
 
@@ -105,4 +107,16 @@ export const useQuoteItems = createCloudHook<QuoteItem>('quote_items')
 // 機場圖片（封面圖片庫）
 export const useAirportImages = createCloudHook<AirportImage>('airport_images', {
   orderBy: { column: 'display_order', ascending: true },
+})
+
+// ===== 客戶群組 =====
+
+// 客戶群組
+export const useCustomerGroups = createCloudHook<CustomerGroup>('customer_groups', {
+  orderBy: { column: 'created_at', ascending: false },
+})
+
+// 客戶群組成員
+export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>('customer_group_members', {
+  orderBy: { column: 'created_at', ascending: false },
 })

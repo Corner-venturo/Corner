@@ -86,6 +86,8 @@ const WORKSPACE_SCOPED_TABLES = [
   'pnr_ai_queries',
   // ✅ 2025-12-31: 機場圖片庫
   'airport_images',
+  // ✅ 2026-01-04: 客戶群組
+  'customer_groups',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）
