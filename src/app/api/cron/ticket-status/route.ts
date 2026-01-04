@@ -8,29 +8,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
-// 工作頻道 ID（需要在環境變數設定）
-const WORK_CHANNEL_ID = process.env.WORK_CHANNEL_ID
-
 export async function GET(request: NextRequest) {
   try {
-    // 驗證 Vercel Cron 請求（生產環境）
-    const authHeader = request.headers.get('authorization')
-    if (process.env.NODE_ENV === 'production') {
-      if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        logger.warn('Cron 請求驗證失敗')
-        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-      }
-    }
-
     logger.info('開始執行開票狀態檢查 Cron Job')
 
-    // 呼叫開票狀態 API
+    // 呼叫開票狀態 API，發送給各業務
     const baseUrl = request.nextUrl.origin
     const response = await fetch(`${baseUrl}/api/bot/ticket-status`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        channel_id: WORK_CHANNEL_ID,
         notify_sales: true,
       }),
     })
