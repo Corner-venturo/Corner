@@ -86,7 +86,6 @@ export function LinkItineraryToTourDialog({
         description: '',
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, tour.name])
 
   // 根據 country_id 和 main_city_id 查詢名稱

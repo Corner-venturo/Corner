@@ -65,7 +65,7 @@ export const BrochureOverviewPage = forwardRef<HTMLDivElement, BrochureOverviewP
         }}
       >
         {/* 左半頁：航班 + 集合 + 領隊 */}
-        <div className="w-1/2 flex flex-col border-r border-gray-200 relative bg-white h-full">
+        <div className="w-1/2 flex flex-col border-r border-border relative bg-white h-full">
           {/* 上方裝飾區 - 青色背景 */}
           <div className="h-[42%] bg-teal-600 relative overflow-hidden flex items-center justify-center p-6">
             {/* 波浪紋背景 */}

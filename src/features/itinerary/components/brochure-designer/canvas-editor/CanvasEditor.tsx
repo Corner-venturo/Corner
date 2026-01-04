@@ -131,7 +131,7 @@ export function CanvasEditor({
       >
         {/* 畫布陰影 */}
         <div
-          className="relative shadow-2xl"
+          className="relative shadow-lg"
           style={{
             width: canvasWidth,
             height: canvasHeight,

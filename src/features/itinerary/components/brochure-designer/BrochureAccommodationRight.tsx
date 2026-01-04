@@ -84,7 +84,7 @@ export const BrochureAccommodationRight = forwardRef<HTMLDivElement, BrochureAcc
                       className={`text-base font-bold text-slate-800 group-hover:${color.text} transition-colors duration-300`}
                       style={{ fontFamily: "'Noto Serif JP', serif" }}
                     >
-                      <span className={`text-[9px] font-sans ${color.text} opacity-60 mr-2 tracking-widest font-normal border ${color.border} px-1 py-px rounded-sm`}>
+                      <span className={`text-[9px] font-sans ${color.text} opacity-60 mr-2 tracking-widest font-normal border ${color.border} px-1 py-px rounded-md`}>
                         {String(index + 1).padStart(2, '0')}
                       </span>
                       {hotel.name}
@@ -139,13 +139,13 @@ export const BrochureAccommodationRight = forwardRef<HTMLDivElement, BrochureAcc
                     {hotel.amenities?.slice(0, 2).map((amenity, i) => (
                       <span
                         key={i}
-                        className={`px-1.5 py-0.5 ${color.bg} ${color.text} text-[9px] tracking-wider rounded-sm`}
+                        className={`px-1.5 py-0.5 ${color.bg} ${color.text} text-[9px] tracking-wider rounded-md`}
                       >
                         {amenity}
                       </span>
                     ))}
                     {!hotel.amenities?.length && (
-                      <span className={`px-1.5 py-0.5 ${color.bg} ${color.text} text-[9px] tracking-wider rounded-sm flex items-center gap-1`}>
+                      <span className={`px-1.5 py-0.5 ${color.bg} ${color.text} text-[9px] tracking-wider rounded-md flex items-center gap-1`}>
                         <Wifi size={10} />
                         Free Wi-Fi
                       </span>

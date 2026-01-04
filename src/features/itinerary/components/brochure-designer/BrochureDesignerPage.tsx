@@ -789,7 +789,7 @@ export function BrochureDesignerPage() {
                 />
 
                 <div
-                  className="relative shadow-2xl bg-white overflow-hidden flex-shrink-0"
+                  className="relative shadow-lg bg-white overflow-hidden flex-shrink-0"
                   style={{
                     width: 'min(420px, calc(100vh - 200px) / 1.414)',
                     aspectRatio: '1 / 1.414',
@@ -868,7 +868,7 @@ export function BrochureDesignerPage() {
                 {/* 生成的手冊預覽 */}
                 {generatedBrochure && canvasElements.length > 0 ? (
                   <div
-                    className="relative bg-white shadow-2xl overflow-hidden flex-shrink-0"
+                    className="relative bg-white shadow-lg overflow-hidden flex-shrink-0"
                     style={{
                       width: '559px',
                       height: '794px',

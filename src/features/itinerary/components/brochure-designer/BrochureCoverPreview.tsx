@@ -36,7 +36,7 @@ export const BrochureCoverPreview = forwardRef<HTMLDivElement, BrochureCoverPrev
     return (
       <div
         ref={ref}
-        className="relative bg-white shadow-2xl overflow-hidden flex flex-col w-full h-full"
+        className="relative bg-white shadow-lg overflow-hidden flex flex-col w-full h-full"
       >
         {/* 背景圖片 */}
         <div className="absolute inset-0 w-full h-full" style={imageStyle}>
@@ -69,7 +69,7 @@ export const BrochureCoverPreview = forwardRef<HTMLDivElement, BrochureCoverPrev
               </h3>
             )}
             <h1
-              className="text-3xl font-extrabold leading-[0.9] tracking-tight drop-shadow-2xl"
+              className="text-3xl font-extrabold leading-[0.9] tracking-tight drop-shadow-lg"
               style={{
                 background: 'linear-gradient(to bottom, white, rgba(255,255,255,0.85))',
                 WebkitBackgroundClip: 'text',
@@ -104,9 +104,9 @@ export const BrochureCoverPreview = forwardRef<HTMLDivElement, BrochureCoverPrev
                 />
               </div>
               <div className="text-right">
-                <p className="text-[7px] text-gray-300 mb-0.5">Emergency Contact</p>
+                <p className="text-[7px] text-morandi-secondary mb-0.5">Emergency Contact</p>
                 <p className="text-[10px] font-semibold">{emergencyContact}</p>
-                <p className="text-[8px] text-gray-300">{emergencyEmail}</p>
+                <p className="text-[8px] text-morandi-secondary">{emergencyEmail}</p>
               </div>
             </div>
           </div>

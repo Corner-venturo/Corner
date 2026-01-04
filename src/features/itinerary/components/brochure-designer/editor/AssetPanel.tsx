@@ -445,7 +445,7 @@ function getElementIcon(type: string) {
   const icons: Record<string, React.ReactNode> = {
     text: <span className="text-[10px] font-bold">T</span>,
     image: <Image size={12} />,
-    shape: <div className="w-3 h-3 bg-morandi-secondary rounded-sm" />,
+    shape: <div className="w-3 h-3 bg-morandi-secondary rounded-md" />,
     'attraction-card': <MapPin size={12} />,
     sticker: <Sticker size={12} />,
   }

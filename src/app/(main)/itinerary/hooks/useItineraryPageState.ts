@@ -115,7 +115,6 @@ export function useItineraryPageState() {
     getDuplicateTourCode,
     getDuplicateTitle,
     getIsDuplicating,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []) // 空依賴 - 物件只創建一次
 
   // 返回穩定 API + 當前狀態值（用於渲染）

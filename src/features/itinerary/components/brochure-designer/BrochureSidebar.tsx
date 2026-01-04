@@ -303,7 +303,7 @@ function OverviewLeftEditor({
           <p className="text-xs font-bold text-orange-600">去程</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">航空公司</Label>
+              <Label className="text-xs text-morandi-primary">航空公司</Label>
               <Input
                 value={outboundFlight.airline || ''}
                 onChange={(e) => updateOutboundFlight('airline', e.target.value)}
@@ -312,7 +312,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">航班號</Label>
+              <Label className="text-xs text-morandi-primary">航班號</Label>
               <Input
                 value={outboundFlight.flightNumber || ''}
                 onChange={(e) => updateOutboundFlight('flightNumber', e.target.value)}
@@ -321,7 +321,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">出發時間</Label>
+              <Label className="text-xs text-morandi-primary">出發時間</Label>
               <Input
                 value={outboundFlight.departureTime || ''}
                 onChange={(e) => updateOutboundFlight('departureTime', e.target.value)}
@@ -330,7 +330,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">抵達時間</Label>
+              <Label className="text-xs text-morandi-primary">抵達時間</Label>
               <Input
                 value={outboundFlight.arrivalTime || ''}
                 onChange={(e) => updateOutboundFlight('arrivalTime', e.target.value)}
@@ -339,7 +339,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">出發機場</Label>
+              <Label className="text-xs text-morandi-primary">出發機場</Label>
               <Combobox
                 value={outboundFlight.departureAirport || ''}
                 onChange={(value) => updateOutboundFlight('departureAirport', value)}
@@ -351,7 +351,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">抵達機場</Label>
+              <Label className="text-xs text-morandi-primary">抵達機場</Label>
               <Combobox
                 value={outboundFlight.arrivalAirport || ''}
                 onChange={(value) => updateOutboundFlight('arrivalAirport', value)}
@@ -370,7 +370,7 @@ function OverviewLeftEditor({
           <p className="text-xs font-bold text-teal-600">回程</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">航空公司</Label>
+              <Label className="text-xs text-morandi-primary">航空公司</Label>
               <Input
                 value={returnFlight.airline || ''}
                 onChange={(e) => updateReturnFlight('airline', e.target.value)}
@@ -379,7 +379,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">航班號</Label>
+              <Label className="text-xs text-morandi-primary">航班號</Label>
               <Input
                 value={returnFlight.flightNumber || ''}
                 onChange={(e) => updateReturnFlight('flightNumber', e.target.value)}
@@ -388,7 +388,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">出發時間</Label>
+              <Label className="text-xs text-morandi-primary">出發時間</Label>
               <Input
                 value={returnFlight.departureTime || ''}
                 onChange={(e) => updateReturnFlight('departureTime', e.target.value)}
@@ -397,7 +397,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">抵達時間</Label>
+              <Label className="text-xs text-morandi-primary">抵達時間</Label>
               <Input
                 value={returnFlight.arrivalTime || ''}
                 onChange={(e) => updateReturnFlight('arrivalTime', e.target.value)}
@@ -406,7 +406,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">出發機場</Label>
+              <Label className="text-xs text-morandi-primary">出發機場</Label>
               <Combobox
                 value={returnFlight.departureAirport || ''}
                 onChange={(value) => updateReturnFlight('departureAirport', value)}
@@ -418,7 +418,7 @@ function OverviewLeftEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">抵達機場</Label>
+              <Label className="text-xs text-morandi-primary">抵達機場</Label>
               <Combobox
                 value={returnFlight.arrivalAirport || ''}
                 onChange={(value) => updateReturnFlight('arrivalAirport', value)}
