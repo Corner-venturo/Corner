@@ -187,6 +187,8 @@ export function BrochureDesignerPage() {
     setZoom,
     clearCanvas,
     loadElements,
+    toggleElementVisibility,
+    toggleElementLock,
   } = useCanvasEditor({
     containerRef: canvasContainerRef,
     onElementSelect: setSelectedElementId,
@@ -552,16 +554,12 @@ export function BrochureDesignerPage() {
   }, [setEditorState])
 
   const handleToggleVisibility = useCallback((id: string) => {
-    setCanvasElements((prev) =>
-      prev.map((el) => (el.id === id ? { ...el, visible: !el.visible } : el))
-    )
-  }, [])
+    toggleElementVisibility(id)
+  }, [toggleElementVisibility])
 
   const handleToggleLock = useCallback((id: string) => {
-    setCanvasElements((prev) =>
-      prev.map((el) => (el.id === id ? { ...el, locked: !el.locked } : el))
-    )
-  }, [])
+    toggleElementLock(id)
+  }, [toggleElementLock])
 
   const handleDeleteElement = useCallback((id: string) => {
     deleteSelected()

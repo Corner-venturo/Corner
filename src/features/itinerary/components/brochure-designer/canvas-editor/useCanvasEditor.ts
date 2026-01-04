@@ -726,6 +726,43 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     setEditorState((prev) => ({ ...prev, selectedIds: [] }))
   }, [])
 
+  // 切換元素可見性
+  const toggleElementVisibility = useCallback((id: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const obj = canvas.getObjects().find(
+      (o) => (o as FabricObjectWithData).data?.elementId === id
+    )
+    if (obj) {
+      obj.visible = !obj.visible
+      canvas.renderAll()
+    }
+
+    setElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, visible: !el.visible } : el))
+    )
+  }, [])
+
+  // 切換元素鎖定狀態
+  const toggleElementLock = useCallback((id: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const obj = canvas.getObjects().find(
+      (o) => (o as FabricObjectWithData).data?.elementId === id
+    )
+    if (obj) {
+      obj.selectable = !obj.selectable
+      obj.evented = !obj.evented
+      canvas.renderAll()
+    }
+
+    setElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, locked: !el.locked } : el))
+    )
+  }, [])
+
   // 載入元素到畫布
   const loadElements = useCallback(async (elementsToLoad: CanvasElement[]) => {
     const canvas = canvasRef.current
@@ -803,11 +840,17 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
             const img = await FabricImage.fromURL(imageEl.src, { crossOrigin: 'anonymous' })
             const imgWithData = img as FabricObjectWithData
 
+            // 計算縮放比例，確保圖片填滿指定尺寸
+            const originalWidth = img.width || 1
+            const originalHeight = img.height || 1
+            const scaleX = imageEl.width / originalWidth
+            const scaleY = imageEl.height / originalHeight
+
             img.set({
               left: imageEl.x,
               top: imageEl.y,
-              scaleX: imageEl.width / (img.width || imageEl.width),
-              scaleY: imageEl.height / (img.height || imageEl.height),
+              scaleX,
+              scaleY,
               opacity: imageEl.opacity,
               angle: imageEl.rotation,
             })
@@ -817,6 +860,12 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
               elementType: 'image',
             }
             canvas.add(img)
+            logger.log('[CanvasEditor] Image loaded:', {
+              id: el.id,
+              originalSize: { w: originalWidth, h: originalHeight },
+              targetSize: { w: imageEl.width, h: imageEl.height },
+              scale: { x: scaleX, y: scaleY },
+            })
           } catch (error) {
             logger.error('[CanvasEditor] Failed to load image:', imageEl.src, error)
           }
@@ -855,6 +904,8 @@ export function useCanvasEditor(options: UseCanvasEditorOptions) {
     setZoom,
     clearCanvas,
     loadElements,
+    toggleElementVisibility,
+    toggleElementLock,
 
     // Constants
     canvasWidth: A5_WIDTH_PX,
