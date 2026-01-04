@@ -64,7 +64,7 @@ export async function getServerAuth(): Promise<AuthResult> {
     // 先用 supabase_user_id 查
     let { data: employee } = await adminClient
       .from('employees')
-      .select('id, workspace_id')
+      .select('id, workspace_id, supabase_user_id')
       .eq('supabase_user_id', user.id)
       .single()
 
@@ -72,7 +72,7 @@ export async function getServerAuth(): Promise<AuthResult> {
     if (!employee) {
       const { data: emp2 } = await adminClient
         .from('employees')
-        .select('id, workspace_id')
+        .select('id, workspace_id, supabase_user_id')
         .eq('id', user.id)
         .single()
       employee = emp2
@@ -82,13 +82,27 @@ export async function getServerAuth(): Promise<AuthResult> {
     if (!employee && user.email) {
       const { data: emp3 } = await adminClient
         .from('employees')
-        .select('id, workspace_id')
+        .select('id, workspace_id, supabase_user_id')
         .eq('personal_info->>email', user.email)
         .single()
-      employee = emp3
+
+      // 如果用 email 找到了，自動更新 supabase_user_id
+      if (emp3) {
+        await adminClient
+          .from('employees')
+          .update({ supabase_user_id: user.id })
+          .eq('id', emp3.id)
+        employee = emp3
+      }
     }
 
     if (!employee) {
+      // 記錄詳細資訊以便除錯
+      const { logger } = await import('@/lib/utils/logger')
+      logger.error('找不到員工資料', {
+        auth_uid: user.id,
+        auth_email: user.email,
+      })
       return {
         success: false,
         error: {
