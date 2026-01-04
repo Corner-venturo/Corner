@@ -938,6 +938,17 @@ export function parseHTMLConfirmation(html: string): ParsedHTMLConfirmation {
       continue;
     }
 
+    // 4b. 解析 GDS FA 行機票號碼 (e.g., "FA PAX 731-6328181969/ETMF/TWD44194/02JAN26/...")
+    // 也處理帶行號的格式 (e.g., "11 FA PAX 731-6328181969/...")
+    const faMatch = line.match(/(?:^\d+\s+)?FA\s+PAX\s+(\d{3})-?(\d{10,})/i);
+    if (faMatch) {
+      result.ticketNumbers.push({
+        number: `${faMatch[1]}-${faMatch[2]}`,
+        passenger: '', // FA 行通常不包含旅客名，需要從其他地方關聯
+      });
+      continue;
+    }
+
     // 5. 解析航空公司確認電話
     const contactMatch = line.match(/航空公司確認電話[:：]?\s*(.+)/i);
     if (contactMatch) {
