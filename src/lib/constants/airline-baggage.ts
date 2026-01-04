@@ -200,20 +200,38 @@ export const STARLUX: AirlineBaggagePolicy = {
   lastUpdated: '2024-12',
   routes: [
     {
-      routeType: 'all',
-      description: '所有航線',
+      routeType: 'short-haul',
+      description: '短程航線 (亞洲各航點與關島)',
       cabins: [
+        {
+          cabin: '頭等艙',
+          fareClasses: [
+            { fareClass: 'AF', fareName: '全額', allowance: { pieces: 3, weightKg: 32, weightLb: 70 } },
+          ]
+        },
         {
           cabin: '商務艙',
           fareClasses: [
-            { fareClass: 'C/J/D/I', fareName: '全艙等', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
+            { fareClass: 'J', fareName: '全額', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
+            { fareClass: 'C', fareName: '基本', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
+            { fareClass: 'D', fareName: '超值', allowance: { pieces: 2, weightKg: 32, weightLb: 70 } },
+          ]
+        },
+        {
+          cabin: '豪華經濟艙',
+          fareClasses: [
+            { fareClass: 'W', fareName: '全額', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'R', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'E', fareName: '超值', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
           ]
         },
         {
           cabin: '經濟艙',
           fareClasses: [
-            { fareClass: 'Y/B/M/H', fareName: '標準', allowance: { pieces: 1, weightKg: 30, weightLb: 66 } },
-            { fareClass: 'K/L/Q/V', fareName: '經濟', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'H/B/Y', fareName: '全額', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'L/M/K', fareName: '基本', allowance: { pieces: 2, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'N/S/V', fareName: '超值', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
+            { fareClass: 'Q', fareName: '限量', allowance: { pieces: 1, weightKg: 23, weightLb: 50 } },
           ]
         },
       ]

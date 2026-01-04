@@ -15,8 +15,6 @@ import {
   Pencil,
   Layers,
   Sparkles,
-  MousePointer2,
-  Eye,
 } from 'lucide-react'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { useAuthStore } from '@/stores/auth-store'
@@ -145,9 +143,6 @@ export function BrochureDesignerPage() {
   const [showBleed, setShowBleed] = useState(true)
   const [showSafety, setShowSafety] = useState(true)
   const [showCenter, setShowCenter] = useState(true)
-
-  // 畫布編輯模式（預覽 vs 可拖曳編輯）
-  const [isCanvasEditMode, setIsCanvasEditMode] = useState(false)
 
   const { items: itineraries, isLoading, update } = useItineraries()
   const [coverData, setCoverData] = useState<BrochureCoverData>(DEFAULT_COVER_DATA)
@@ -898,42 +893,10 @@ export function BrochureDesignerPage() {
                 </div>
               </div>
             ) : (
-              // Canvas 編輯模式
+              // Canvas 編輯模式 - 顯示生成的手冊
               <div className="flex-1 relative overflow-auto bg-slate-50 flex items-center justify-center p-6">
-                {/* 編輯模式切換按鈕 */}
-                {generatedBrochure && (
-                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm border border-border">
-                    <button
-                      className={cn(
-                        'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all',
-                        !isCanvasEditMode
-                          ? 'bg-morandi-gold text-white shadow-sm'
-                          : 'text-slate-500 hover:bg-slate-100'
-                      )}
-                      onClick={() => setIsCanvasEditMode(false)}
-                      title="預覽模式"
-                    >
-                      <Eye size={14} />
-                      預覽
-                    </button>
-                    <button
-                      className={cn(
-                        'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all',
-                        isCanvasEditMode
-                          ? 'bg-morandi-gold text-white shadow-sm'
-                          : 'text-slate-500 hover:bg-slate-100'
-                      )}
-                      onClick={() => setIsCanvasEditMode(true)}
-                      title="拖曳編輯模式 - 可使用智慧對齊參考線"
-                    >
-                      <MousePointer2 size={14} />
-                      編輯
-                    </button>
-                  </div>
-                )}
-
                 {/* 生成的手冊預覽 */}
-                {generatedBrochure && canvasElements.length > 0 && !isCanvasEditMode ? (
+                {generatedBrochure && canvasElements.length > 0 ? (
                   <div
                     className="relative bg-white shadow-lg flex-shrink-0"
                     style={{
@@ -1031,39 +994,14 @@ export function BrochureDesignerPage() {
                     })}
                   </div>
                 ) : (
-                  <>
-                    <CanvasEditor
-                      className="w-full h-full"
-                      onElementSelect={setSelectedElementId}
-                      onElementChange={(el) => {
-                        setCanvasElements((prev) =>
-                          prev.map((e) => (e.id === el.id ? el : e))
-                        )
-                        setHasChanges(true)
-                      }}
-                    />
-
-                    {/* Canvas 模式提示 */}
-                    {elements.length === 0 && !generatedBrochure && !isCanvasEditMode && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-center">
-                          <Sparkles size={48} className="mx-auto text-morandi-gold/30 mb-3" />
-                          <p className="text-morandi-secondary text-sm">點擊「一鍵生成」自動生成手冊</p>
-                          <p className="text-morandi-secondary/60 text-xs mt-1">或從左側元素庫手動添加元素</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 編輯模式提示 */}
-                    {isCanvasEditMode && (
-                      <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm border border-border">
-                        <p className="text-xs text-morandi-secondary">
-                          <MousePointer2 size={12} className="inline mr-1" />
-                          拖曳元素時會自動顯示對齊參考線
-                        </p>
-                      </div>
-                    )}
-                  </>
+                  /* 尚未生成手冊時顯示提示 */
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center">
+                      <Sparkles size={48} className="mx-auto text-morandi-gold/30 mb-3" />
+                      <p className="text-morandi-secondary text-sm">點擊「一鍵生成」自動生成手冊</p>
+                      <p className="text-morandi-secondary/60 text-xs mt-1">或切換到「模板」模式查看預覽</p>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
