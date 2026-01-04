@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { logger } from '@/lib/utils/logger'
+import { errorResponse, ErrorCode } from '@/lib/api/response'
 
 /**
  * 後端 API 代理下載圖片
  * 用於繞過瀏覽器的 CORS 限制
+ *
+ * 注意：此 API 成功時直接回傳圖片 binary，錯誤時使用統一格式
  */
 export async function POST(request: NextRequest) {
   try {
     const { url } = await request.json()
 
     if (!url || typeof url !== 'string') {
-      return NextResponse.json({ error: '缺少 URL 參數' }, { status: 400 })
+      return errorResponse('缺少 URL 參數', 400, ErrorCode.MISSING_FIELD)
     }
 
     // 驗證 URL 格式
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return NextResponse.json({ error: '無效的 URL' }, { status: 400 })
+      return errorResponse('無效的 URL', 400, ErrorCode.INVALID_FORMAT)
     }
 
     // 下載圖片
@@ -28,19 +31,19 @@ export async function POST(request: NextRequest) {
     })
 
     if (!response.ok) {
-      return NextResponse.json({ error: '無法下載圖片' }, { status: 502 })
+      return errorResponse('無法下載圖片', 502, ErrorCode.EXTERNAL_API_ERROR)
     }
 
     const contentType = response.headers.get('content-type') || 'image/jpeg'
 
     // 確認是圖片類型
     if (!contentType.startsWith('image/')) {
-      return NextResponse.json({ error: 'URL 不是圖片' }, { status: 400 })
+      return errorResponse('URL 不是圖片', 400, ErrorCode.INVALID_FORMAT)
     }
 
     const imageBuffer = await response.arrayBuffer()
 
-    // 回傳圖片資料
+    // 回傳圖片資料（這是特殊情況，成功時直接回傳 binary）
     return new NextResponse(imageBuffer, {
       headers: {
         'Content-Type': contentType,
@@ -49,6 +52,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('Fetch image error:', error)
-    return NextResponse.json({ error: '下載圖片失敗' }, { status: 500 })
+    return errorResponse('下載圖片失敗', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

@@ -70,7 +70,7 @@ export function CreateDisbursementDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-7xl h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent size="full" className="h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-xl">新增出納單</DialogTitle>
         </DialogHeader>

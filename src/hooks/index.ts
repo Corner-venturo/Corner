@@ -18,6 +18,23 @@ export { useDataFiltering } from './useDataFiltering'
 export { useDialogState } from './useDialogState'
 export { useListPageState } from './useListPageState'
 
+// Dialog 生命週期管理 Hooks
+export {
+  useManagedDialogState,
+  useSimpleDialogState,
+  type UseManagedDialogStateOptions,
+  type UseManagedDialogStateReturn,
+} from './useManagedDialogState'
+
 // 圖片編輯 & OCR 辨識 Hooks
 export { useImageEditor } from './useImageEditor'
 export { useOcrRecognition, type OcrParsedData } from './useOcrRecognition'
+
+// 導航 Hooks
+export {
+  useBreadcrumb,
+  getPageTitle,
+  getParentPath,
+  type BreadcrumbItem,
+  type UseBreadcrumbOptions,
+} from './useBreadcrumb'

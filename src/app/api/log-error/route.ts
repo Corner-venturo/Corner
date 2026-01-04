@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { writeFileSync, appendFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,13 +29,9 @@ export async function POST(request: NextRequest) {
       writeFileSync(logFile, logEntry)
     }
 
-    // 在開發模式下，也在控制台輸出
-    if (process.env.NODE_ENV === 'development') {
-    }
-
-    return NextResponse.json({ success: true })
+    return successResponse(null)
   } catch (error) {
     logger.error('Failed to log error:', error)
-    return NextResponse.json({ error: 'Failed to log error' }, { status: 500 })
+    return errorResponse('Failed to log error', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

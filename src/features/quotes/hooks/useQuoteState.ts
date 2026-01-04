@@ -249,13 +249,25 @@ export const useQuoteState = () => {
     return quoteWithTierPricings?.tier_pricings || []
   })
 
-  // 如果找不到報價單，返回列表頁（只有在資料已載入時才判斷）
+  // 檢查是否為 404 狀態（資料已載入但找不到對應的 quote）
+  const [notFound, setNotFound] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
+
   useEffect(() => {
-    // 只有當 quotes 陣列有資料（表示已載入）且找不到對應的 quote 時，才跳轉
-    if (quotes.length > 0 && !quote) {
-      router.push('/quotes')
+    // 當 quotes 已載入時設定 hasLoaded
+    if (quotes.length > 0) {
+      setHasLoaded(true)
     }
-  }, [quote, quotes.length, router])
+  }, [quotes.length])
+
+  useEffect(() => {
+    // 只有當資料已載入且找不到對應的 quote 時，才設定 notFound
+    if (hasLoaded && !quote) {
+      setNotFound(true)
+    } else if (quote) {
+      setNotFound(false)
+    }
+  }, [quote, hasLoaded])
 
   return {
     quote_id,
@@ -291,6 +303,9 @@ export const useQuoteState = () => {
     // 砍次表相關
     tierPricings,
     setTierPricings,
+    // 404 狀態
+    notFound,
+    hasLoaded,
     updateQuote,
     addTour,
     router,

@@ -4,6 +4,7 @@ import { logger } from '@/lib/utils/logger'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { NotFoundState } from '@/components/ui/not-found-state'
 import { EditorContainer } from '../components/EditorContainer'
 import { PreviewContainer } from '../components/PreviewContainer'
 import { PrintableConfirmation } from '../components/PrintableConfirmation'
@@ -44,6 +45,7 @@ export default function EditConfirmationPage() {
 
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
@@ -67,12 +69,12 @@ export default function EditConfirmationPage() {
           status: confirmation.status,
           notes: confirmation.notes,
         })
+        setNotFound(false)
       } else {
-        toast.error('找不到確認單')
-        router.push('/confirmations')
+        setNotFound(true)
       }
     }
-  }, [id, confirmations, isLoading, router])
+  }, [id, confirmations, isLoading])
 
   const handleTypeChange = (type: ConfirmationType) => {
     setFormData({
@@ -175,6 +177,30 @@ export default function EditConfirmationPage() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-morandi-secondary">載入中...</div>
+      </div>
+    )
+  }
+
+  if (notFound) {
+    return (
+      <div className="h-full flex flex-col">
+        <ResponsiveHeader
+          title="編輯確認單"
+          breadcrumb={[
+            { label: '首頁', href: '/' },
+            { label: '確認單管理', href: '/confirmations' },
+            { label: '編輯確認單', href: '#' },
+          ]}
+          showBackButton={true}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <NotFoundState
+            title="找不到該確認單"
+            description="您要找的確認單可能已被刪除或不存在"
+            backButtonLabel="返回確認單列表"
+            backHref="/confirmations"
+          />
+        </div>
       </div>
     )
   }

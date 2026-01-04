@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
 // Google Vision 每月免費額度限制（每個 Key 980 次）
 const GOOGLE_VISION_LIMIT_PER_KEY = 980
@@ -53,11 +54,11 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      return NextResponse.json({ error: '不支援的 Content-Type' }, { status: 400 })
+      return errorResponse('不支援的 Content-Type', 400, ErrorCode.INVALID_FORMAT)
     }
 
     if (base64Images.length === 0) {
-      return NextResponse.json({ error: '沒有上傳檔案' }, { status: 400 })
+      return errorResponse('沒有上傳檔案', 400, ErrorCode.MISSING_FIELD)
     }
 
     const ocrSpaceKey = process.env.OCR_SPACE_API_KEY
@@ -65,9 +66,11 @@ export async function POST(request: NextRequest) {
 
     // 至少需要一個 API Key
     if (!ocrSpaceKey && googleVisionKeys.length === 0) {
-      return NextResponse.json({
-        error: 'OCR API Key 未設定。請設定 OCR_SPACE_API_KEY 或 GOOGLE_VISION_API_KEYS 環境變數。'
-      }, { status: 500 })
+      return errorResponse(
+        'OCR API Key 未設定。請設定 OCR_SPACE_API_KEY 或 GOOGLE_VISION_API_KEYS 環境變數。',
+        500,
+        ErrorCode.INTERNAL_ERROR
+      )
     }
 
     // 檢查 Google Vision 使用量並取得可用的 Key
@@ -114,8 +117,7 @@ export async function POST(request: NextRequest) {
       await updateGoogleVisionUsage(base64Images.length, availableKey)
     }
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       results,
       total: base64Images.length,
       successful: results.filter(r => r.success).length,
@@ -130,9 +132,10 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     logger.error('護照辨識錯誤:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : '處理失敗' },
-      { status: 500 }
+    return errorResponse(
+      error instanceof Error ? error.message : '處理失敗',
+      500,
+      ErrorCode.INTERNAL_ERROR
     )
   }
 }

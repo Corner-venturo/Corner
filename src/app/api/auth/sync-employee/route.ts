@@ -9,19 +9,17 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
   try {
     const { employee_id, supabase_user_id, workspace_id, access_token } = await request.json()
 
     if (!employee_id || !supabase_user_id) {
-      return NextResponse.json(
-        { error: 'Missing employee_id or supabase_user_id' },
-        { status: 400 }
-      )
+      return errorResponse('Missing employee_id or supabase_user_id', 400, ErrorCode.MISSING_FIELD)
     }
 
     // 驗證請求者身份
@@ -33,23 +31,17 @@ export async function POST(request: NextRequest) {
       // 用 admin client 驗證 token 對應的用戶
       const { data: { user }, error } = await supabaseAdmin.auth.getUser(access_token)
       if (error || !user || user.id !== supabase_user_id) {
-        logger.error('❌ Token 驗證失敗:', error?.message || 'user mismatch')
-        return NextResponse.json(
-          { error: 'Unauthorized: invalid token' },
-          { status: 401 }
-        )
+        logger.error('Token 驗證失敗:', error?.message || 'user mismatch')
+        return errorResponse('Unauthorized: invalid token', 401, ErrorCode.UNAUTHORIZED)
       }
-      logger.log('✅ Token 驗證成功:', user.id)
+      logger.log('Token 驗證成功:', user.id)
     } else {
       // 備用：用 cookie session 驗證
       const supabase = await createSupabaseServerClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user || user.id !== supabase_user_id) {
-        return NextResponse.json(
-          { error: 'Unauthorized: user mismatch' },
-          { status: 401 }
-        )
+        return errorResponse('Unauthorized: user mismatch', 401, ErrorCode.UNAUTHORIZED)
       }
     }
 
@@ -60,14 +52,11 @@ export async function POST(request: NextRequest) {
       .eq('id', employee_id)
 
     if (updateError) {
-      logger.error('❌ 更新 supabase_user_id 失敗:', updateError)
-      return NextResponse.json(
-        { error: updateError.message },
-        { status: 400 }
-      )
+      logger.error('更新 supabase_user_id 失敗:', updateError)
+      return errorResponse(updateError.message, 400, ErrorCode.DATABASE_ERROR)
     }
 
-    logger.log('✅ 已更新 employees.supabase_user_id:', supabase_user_id)
+    logger.log('已更新 employees.supabase_user_id:', supabase_user_id)
 
     // 2. 更新 auth.users 的 metadata（使用 admin）
     if (workspace_id) {
@@ -82,19 +71,16 @@ export async function POST(request: NextRequest) {
       )
 
       if (metadataError) {
-        logger.warn('⚠️ 更新 user_metadata 失敗:', metadataError)
+        logger.warn('更新 user_metadata 失敗:', metadataError)
         // 不回傳錯誤，因為 supabase_user_id 已經設好了
       } else {
-        logger.log('✅ 已更新 user_metadata:', { workspace_id, employee_id })
+        logger.log('已更新 user_metadata:', { workspace_id, employee_id })
       }
     }
 
-    return NextResponse.json({ success: true })
+    return successResponse(null)
   } catch (error) {
-    logger.error('💥 sync-employee 錯誤:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    logger.error('sync-employee 錯誤:', error)
+    return errorResponse('Internal server error', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

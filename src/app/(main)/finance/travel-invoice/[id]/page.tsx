@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { FileText, FileX, X, Check } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { NotFoundState } from '@/components/ui/not-found-state'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Badge } from '@/components/ui/badge'
@@ -27,12 +28,26 @@ export default function InvoiceDetailPage() {
 
   const [showVoidDialog, setShowVoidDialog] = useState(false)
   const [voidReason, setVoidReason] = useState('')
+  const [notFound, setNotFound] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
 
   useEffect(() => {
-    if (params.id) {
-      fetchInvoiceById(params.id as string)
+    const loadInvoice = async () => {
+      if (params.id) {
+        await fetchInvoiceById(params.id as string)
+        setHasLoaded(true)
+      }
     }
+    loadInvoice()
   }, [params.id, fetchInvoiceById])
+
+  useEffect(() => {
+    if (hasLoaded && !isLoading && !currentInvoice) {
+      setNotFound(true)
+    } else if (currentInvoice) {
+      setNotFound(false)
+    }
+  }, [hasLoaded, isLoading, currentInvoice])
 
   const handleVoid = async () => {
     if (!currentInvoice) return
@@ -62,7 +77,7 @@ export default function InvoiceDetailPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
-  if (isLoading || !currentInvoice) {
+  if (isLoading && !hasLoaded) {
     return (
       <div className="h-full flex flex-col">
         <ResponsiveHeader
@@ -78,6 +93,31 @@ export default function InvoiceDetailPage() {
         </ContentContainer>
       </div>
     )
+  }
+
+  if (notFound) {
+    return (
+      <div className="h-full flex flex-col">
+        <ResponsiveHeader
+          title="發票詳情"
+          icon={FileText}
+          showBackButton={true}
+          onBack={() => router.push('/finance/travel-invoice')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <NotFoundState
+            title="找不到該發票"
+            description="您要找的發票可能已被刪除或不存在"
+            backButtonLabel="返回發票列表"
+            backHref="/finance/travel-invoice"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentInvoice) {
+    return null
   }
 
   return (

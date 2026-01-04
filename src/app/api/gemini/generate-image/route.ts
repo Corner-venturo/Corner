@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
 // 多 API Key 輪替機制
 const GEMINI_API_KEYS = [
@@ -49,11 +50,11 @@ export async function POST(request: NextRequest) {
     const { prompt, style, aspectRatio = '16:9' } = await request.json()
 
     if (!prompt) {
-      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 })
+      return errorResponse('Prompt is required', 400, ErrorCode.MISSING_FIELD)
     }
 
     if (GEMINI_API_KEYS.length === 0) {
-      return NextResponse.json({ error: 'No Gemini API keys configured' }, { status: 500 })
+      return errorResponse('No Gemini API keys configured', 500, ErrorCode.INTERNAL_ERROR)
     }
 
     // 構建完整的 prompt，加入風格指引
@@ -68,11 +69,7 @@ export async function POST(request: NextRequest) {
 
       if (!apiKey) {
         // 所有 key 都被封鎖，回傳錯誤
-        return NextResponse.json({
-          error: '所有 API 配額已用完，請稍後再試',
-          details: lastError,
-          allKeysBlocked: true,
-        }, { status: 429 })
+        return errorResponse('所有 API 配額已用完，請稍後再試', 429, ErrorCode.QUOTA_EXCEEDED)
       }
 
       triedKeys++
@@ -82,8 +79,7 @@ export async function POST(request: NextRequest) {
       const result = await tryGenerateWithKey(apiKey, fullPrompt)
 
       if (result.success) {
-        return NextResponse.json({
-          success: true,
+        return successResponse({
           image: result.image,
           prompt: fullPrompt,
           keyUsed: apiKey.slice(-6), // 只顯示最後 6 碼
@@ -98,19 +94,17 @@ export async function POST(request: NextRequest) {
       }
 
       // 其他錯誤直接回傳
-      return NextResponse.json({ error: result.error }, { status: 500 })
+      return errorResponse(result.error || 'Unknown error', 500, ErrorCode.EXTERNAL_API_ERROR)
     }
 
-    return NextResponse.json({
-      error: '所有 API Key 都失敗了',
-      details: lastError,
-    }, { status: 500 })
+    return errorResponse('所有 API Key 都失敗了', 500, ErrorCode.EXTERNAL_API_ERROR)
 
   } catch (error) {
     logger.error('Generate image error:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to generate image' },
-      { status: 500 }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Failed to generate image',
+      500,
+      ErrorCode.INTERNAL_ERROR
     )
   }
 }

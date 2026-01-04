@@ -6,6 +6,30 @@ import { X } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
+/**
+ * Dialog 標準寬度規格
+ *
+ * 使用指南：
+ * - sm:   確認對話框、簡單選擇（max-w-sm, ~384px）
+ * - md:   簡單表單，3-5 個欄位（max-w-md, ~448px）
+ * - lg:   中等表單，5-10 個欄位（max-w-lg, ~512px）
+ * - xl:   複雜表單，多區塊配置（max-w-xl, ~576px）
+ * - 2xl:  含預覽的表單、雙欄佈局（max-w-2xl, ~672px）
+ * - 4xl:  分頁式複雜表單、多功能面板（max-w-4xl, ~896px）
+ * - full: 編輯器類型、全螢幕操作（max-w-[95vw]）
+ */
+export const DIALOG_SIZES = {
+  sm: 'max-w-sm',       // 小型確認框
+  md: 'max-w-md',       // 標準表單
+  lg: 'max-w-lg',       // 大型表單
+  xl: 'max-w-xl',       // 複雜表單
+  '2xl': 'max-w-2xl',   // 多欄表單
+  '4xl': 'max-w-4xl',   // 全螢幕表單
+  full: 'max-w-[95vw]', // 幾乎全螢幕
+} as const
+
+export type DialogSize = keyof typeof DIALOG_SIZES
+
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger
@@ -31,10 +55,28 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+interface DialogContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  /**
+   * Dialog 寬度大小
+   * @default 'lg'
+   *
+   * 使用指南：
+   * - sm:   確認對話框、簡單選擇
+   * - md:   簡單表單（3-5 個欄位）
+   * - lg:   中等表單（5-10 個欄位）- 預設值
+   * - xl:   複雜表單（多區塊）
+   * - 2xl:  含預覽的表單
+   * - 4xl:  分頁式複雜表單
+   * - full: 編輯器類型
+   */
+  size?: DialogSize
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, size = 'lg', ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -45,7 +87,8 @@ const DialogContent = React.forwardRef<
       onPointerDownOutside={(e) => e.preventDefault()}
       aria-labelledby={undefined}
       className={cn(
-        'fixed left-[50%] top-[50%] z-[9999] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
+        'fixed left-[50%] top-[50%] z-[9999] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
+        DIALOG_SIZES[size],
         className
       )}
       {...props}
@@ -108,4 +151,6 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  // Types
+  type DialogContentProps,
 }

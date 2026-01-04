@@ -26,6 +26,7 @@ import {
   ImportMealsDialog,
   ImportActivitiesDialog,
 } from '@/features/quotes/components'
+import { NotFoundState } from '@/components/ui/not-found-state'
 import type { MealDiff } from '@/features/quotes/components'
 import type { CostItem } from '@/features/quotes/types'
 import type { Itinerary, CreateInput, Tour } from '@/stores/types'
@@ -73,6 +74,9 @@ export default function QuoteDetailPage() {
     // 砍次表相關
     tierPricings,
     setTierPricings,
+    // 404 狀態
+    notFound,
+    hasLoaded,
     updateQuote,
     addTour,
     router,
@@ -392,8 +396,8 @@ export default function QuoteDetailPage() {
     }
   }, [])
 
-  // 如果還在載入或報價單不存在，顯示載入中
-  if (!quote) {
+  // 如果還在載入，顯示載入中
+  if (!hasLoaded) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center">
@@ -402,6 +406,25 @@ export default function QuoteDetailPage() {
         </div>
       </div>
     )
+  }
+
+  // 如果資料已載入但找不到報價單，顯示 404 狀態
+  if (notFound) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <NotFoundState
+          title="找不到該報價單"
+          description="您要找的報價單可能已被刪除或不存在"
+          backButtonLabel="返回報價單列表"
+          backHref="/quotes"
+        />
+      </div>
+    )
+  }
+
+  // 最後的 null 檢查（理論上不應到達這裡）
+  if (!quote) {
+    return null
   }
 
   // ✅ 如果是簡易模式（快速報價單），顯示簡易介面

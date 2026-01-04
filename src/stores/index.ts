@@ -404,3 +404,38 @@ export type {
   LINKPAY_STATUS_LABELS,
   LINKPAY_STATUS_COLORS,
 } from '@/types/receipt.types'
+
+// ============================================
+// Store 同步系統
+// ============================================
+
+// 事件系統
+export {
+  storeEvents,
+  setupStoreSyncListeners,
+  STORE_SYNC_RELATIONS,
+  type StoreEventType,
+  type StoreSource,
+  type TourEventPayload,
+  type OrderEventPayload,
+  type MemberEventPayload,
+  type StoreSyncConfig,
+} from './sync'
+
+// 同步事件輔助函數
+export {
+  emitCreated,
+  emitUpdated,
+  emitDeleted,
+  TOUR_SYNC_CONFIG,
+  ORDER_SYNC_CONFIG,
+  MEMBER_SYNC_CONFIG,
+  ITINERARY_SYNC_CONFIG,
+  PAYMENT_REQUEST_SYNC_CONFIG,
+  RECEIPT_ORDER_SYNC_CONFIG,
+  type SyncEventConfig,
+  type SyncEntityType,
+} from './sync/with-sync-events'
+
+// 同步 Hook（在 Provider 中使用）
+export { useStoreSyncSetup } from './sync'

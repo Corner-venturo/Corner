@@ -1,14 +1,31 @@
 'use client'
 
 import { useState, memo } from 'react'
+import Link from 'next/link'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useBreadcrumb, type BreadcrumbItem } from '@/hooks/useBreadcrumb'
+import { ChevronRight } from 'lucide-react'
 
 interface ResponsiveHeaderProps {
   title: string
   icon?: unknown
-  breadcrumb?: { label: string; href: string }[]
+  /**
+   * 手動傳入的 breadcrumb 項目（向後兼容）
+   * 如果提供，將使用這些項目而不是自動生成
+   */
+  breadcrumb?: BreadcrumbItem[]
+  /**
+   * 是否啟用自動 breadcrumb 模式
+   * @default false（保持向後兼容）
+   */
+  autoBreadcrumb?: boolean
+  /**
+   * 自動 breadcrumb 時覆蓋最後一項的標籤
+   * 用於詳細頁顯示實際名稱（例如顯示報價單編號而非 "報價詳情"）
+   */
+  breadcrumbLastLabel?: string
   tabs?: {
     value: string
     label: string
@@ -48,6 +65,17 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
   const { sidebarCollapsed } = useAuthStore()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
+  // 自動生成的 breadcrumb（當 autoBreadcrumb 為 true 時使用）
+  const autoBreadcrumbItems = useBreadcrumb({
+    customItems: props.breadcrumb, // 如果有手動傳入，優先使用
+    lastItemLabel: props.breadcrumbLastLabel,
+  })
+
+  // 決定要顯示的 breadcrumb
+  // 優先級：手動傳入 > 自動生成（需啟用 autoBreadcrumb）
+  const breadcrumbItems = props.breadcrumb || (props.autoBreadcrumb ? autoBreadcrumbItems : [])
+  const showBreadcrumb = breadcrumbItems.length > 0
+
   return (
     <div
       className={cn(
@@ -67,7 +95,7 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
           height: '1px',
         }}
       ></div>
-      {/* 左側 - 返回按鈕和主標題 */}
+      {/* 左側 - 返回按鈕、Breadcrumb 和主標題 */}
       <div className="flex items-center gap-3 relative z-[300]">
         {props.showBackButton && (
           <button
@@ -89,10 +117,45 @@ export const ResponsiveHeader = memo(function ResponsiveHeader(props: Responsive
             </svg>
           </button>
         )}
-        <h1 className="text-base font-bold text-morandi-primary flex items-center">
-          {props.title}
-          {props.badge}
-        </h1>
+
+        {/* Breadcrumb 導航 */}
+        {showBreadcrumb ? (
+          <nav className="flex items-center" aria-label="Breadcrumb">
+            <ol className="flex items-center gap-1">
+              {breadcrumbItems.map((item, index) => {
+                const isLast = index === breadcrumbItems.length - 1
+                return (
+                  <li key={item.href} className="flex items-center">
+                    {index > 0 && (
+                      <ChevronRight
+                        size={14}
+                        className="mx-1 text-morandi-secondary/60 flex-shrink-0"
+                      />
+                    )}
+                    {isLast ? (
+                      <span className="text-base font-bold text-morandi-primary flex items-center">
+                        {item.label}
+                        {props.badge}
+                      </span>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className="text-sm text-morandi-secondary hover:text-morandi-primary transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
+        ) : (
+          <h1 className="text-base font-bold text-morandi-primary flex items-center">
+            {props.title}
+            {props.badge}
+          </h1>
+        )}
       </div>
 
       {/* 右側區域 - 功能、標籤頁和操作按鈕 - 統一無空白設計 */}
