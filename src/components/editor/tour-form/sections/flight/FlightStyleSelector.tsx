@@ -10,7 +10,7 @@ interface FlightStyleOption {
   label: string
   description: string
   color: string
-  previewImage: string | null
+  previewImage?: string
 }
 
 interface FlightStyleSelectorProps {

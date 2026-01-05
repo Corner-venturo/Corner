@@ -43,7 +43,7 @@ export function useCoverInfo({ data, onChange }: UseCoverInfoProps) {
 
   // 取得當前風格的顏色
   const currentStyleOption = coverStyleOptions.find(o => o.value === (data.coverStyle || 'original'))
-  const currentStyleColor = currentStyleOption?.color || getTemplateColor(data.coverStyle)
+  const currentStyleColor = currentStyleOption?.color || getTemplateColor(data.coverStyle || 'original')
 
   // 處理封面風格變更
   const handleCoverStyleChange = (style: CoverStyleType) => {

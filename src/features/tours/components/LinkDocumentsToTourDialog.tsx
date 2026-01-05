@@ -310,7 +310,7 @@ export function LinkDocumentsToTourDialog({
   const handleCreateQuote = async () => {
     try {
       setIsCreatingQuote(true)
-      const code = generateCode('TP', { quoteType: 'standard' }, quotes)
+      const code = generateCode('TP', {}, quotes)
 
       // Create quote with minimal required fields
       const newQuote = await createQuote({
