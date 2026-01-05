@@ -93,25 +93,22 @@ export function useToursPage(): UseToursPageReturn {
         (tour.status || '').toLowerCase().includes(searchLower) ||
         tour.description?.toLowerCase().includes(searchLower)
 
-      // 封存分頁：顯示已結團的 或 已封存的（不含特殊團）
+      // 封存分頁：顯示已封存的（archived = true）
       if (activeStatusTab === 'archived') {
-        const isClosed = tour.closing_status === 'closed'
-        const isArchived = tour.status === 'archived'
-        return (isClosed || isArchived) && tour.status !== '特殊團' && searchMatch
+        return tour.archived === true && searchMatch
       }
 
       // 特殊團分頁：只顯示特殊團
       if (activeStatusTab === '特殊團') {
-        return tour.status === '特殊團' && searchMatch
+        return tour.status === '特殊團' && !tour.archived && searchMatch
       }
 
-      // 其他分頁：排除已結團的、已封存的和特殊團
-      const notClosed = tour.closing_status !== 'closed'
-      const notArchived = tour.status !== 'archived'
+      // 其他分頁：排除已封存的和特殊團
+      const notArchived = tour.archived !== true
       const notSpecial = tour.status !== '特殊團'
       const statusMatch = activeStatusTab === 'all' || tour.status === activeStatusTab
 
-      return notClosed && notArchived && notSpecial && statusMatch && searchMatch
+      return notArchived && notSpecial && statusMatch && searchMatch
     })
   }, [tours, activeStatusTab, searchQuery])
 
