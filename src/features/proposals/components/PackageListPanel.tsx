@@ -138,7 +138,8 @@ export function PackageListPanel({
         onPackagesChange()
         router.push(`/quotes?highlight=${quoteId}`)
       } catch (error) {
-        await alert('建立報價單失敗', 'error')
+        const message = error instanceof Error ? error.message : '未知錯誤'
+        await alert(`建立報價單失敗: ${message}`, 'error')
       }
     },
     [user?.workspace_id, user?.id, onPackagesChange, router]
@@ -159,7 +160,8 @@ export function PackageListPanel({
         onPackagesChange()
         router.push(`/itinerary?highlight=${itineraryId}`)
       } catch (error) {
-        await alert('建立行程表失敗', 'error')
+        const message = error instanceof Error ? error.message : '未知錯誤'
+        await alert(`建立行程表失敗: ${message}`, 'error')
       }
     },
     [user?.workspace_id, user?.id, onPackagesChange, router]
