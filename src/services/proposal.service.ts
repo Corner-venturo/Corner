@@ -411,9 +411,9 @@ export async function createQuoteForPackage(
 ): Promise<string> {
   logger.log('createQuoteForPackage called with:', { packageId, workspaceId, userId })
 
-  // 取得套件資訊
+  // 取得套件資訊（明確指定外鍵關聯）
   const { data: pkgData, error: pkgError } = await packagesDb()
-    .select('*, proposal:proposals(*)')
+    .select('*, proposal:proposals!proposal_packages_proposal_id_fkey(*)')
     .eq('id', packageId)
     .single()
 
@@ -441,6 +441,7 @@ export async function createQuoteForPackage(
   // 建立報價單
   const { data: quote, error } = await quotesDb()
     .insert({
+      id: crypto.randomUUID(),
       code: quoteCode,
       name: pkg.proposal?.title || pkg.version_name,
       customer_name: pkg.proposal?.customer_name || '待填寫',
@@ -477,14 +478,18 @@ export async function createItineraryForPackage(
   workspaceId: string,
   userId: string
 ): Promise<string> {
-  // 取得套件資訊
-  const { data: pkgData } = await packagesDb()
-    .select('*, proposal:proposals(*)')
+  // 取得套件資訊（明確指定外鍵關聯）
+  const { data: pkgData, error: pkgError } = await packagesDb()
+    .select('*, proposal:proposals!proposal_packages_proposal_id_fkey(*)')
     .eq('id', packageId)
     .single()
 
+  if (pkgError) {
+    throw new Error(`查詢套件失敗: ${pkgError.message}`)
+  }
+
   if (!pkgData) {
-    throw new Error('找不到套件')
+    throw new Error(`找不到套件 (ID: ${packageId})`)
   }
 
   const pkg = pkgData as unknown as ProposalPackage & { proposal?: Proposal }
@@ -492,6 +497,7 @@ export async function createItineraryForPackage(
   // 建立行程表
   const { data: itinerary, error } = await itinerariesDb()
     .insert({
+      id: crypto.randomUUID(),
       title: pkg.proposal?.title || pkg.version_name,
       tour_code: '',  // 提案階段沒有團號
       status: '提案',
