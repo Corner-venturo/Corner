@@ -69,24 +69,6 @@ export function PackageDialog({
     }
   }, [mode, pkg, open, initialFormData])
 
-  // 計算天數和晚數
-  useEffect(() => {
-    if (formData.start_date && formData.end_date) {
-      const start = new Date(formData.start_date)
-      const end = new Date(formData.end_date)
-      const diffTime = end.getTime() - start.getTime()
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
-
-      if (diffDays > 0) {
-        setFormData(prev => ({
-          ...prev,
-          days: diffDays,
-          nights: diffDays - 1,
-        }))
-      }
-    }
-  }, [formData.start_date, formData.end_date])
-
   // 處理提交
   const handleSubmit = async () => {
     if (!formData.version_name.trim()) {
@@ -177,30 +159,22 @@ export function PackageDialog({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          {formData.days && formData.nights !== null && (
-            <div className="flex items-center gap-2 text-sm text-morandi-secondary">
-              <span className="font-medium">{formData.days} 天 {formData.nights} 夜</span>
-            </div>
-          )}
-
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              預計人數
-            </label>
-            <Input
-              type="number"
-              min={1}
-              value={formData.group_size || ''}
-              onChange={e =>
-                setFormData(prev => ({
-                  ...prev,
-                  group_size: e.target.value ? parseInt(e.target.value, 10) : null,
-                }))
-              }
-              placeholder="人數"
-            />
-          </div>
+        <div>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            預計人數
+          </label>
+          <Input
+            type="number"
+            min={1}
+            value={formData.group_size || ''}
+            onChange={e =>
+              setFormData(prev => ({
+                ...prev,
+                group_size: e.target.value ? parseInt(e.target.value, 10) : null,
+              }))
+            }
+            placeholder="人數"
+          />
         </div>
 
         <div>
