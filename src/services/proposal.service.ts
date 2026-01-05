@@ -372,12 +372,24 @@ export async function convertToTour(
   const depDate = new Date(pkg.start_date || departure_date)
   const returnDateValue = pkg.end_date || new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
+  // 查詢國家 UUID（country_id 可能存的是國家名稱，需要轉換為 UUID）
+  const countryName = pkg.country_id || proposal.country_id
+  let countryUuid: string | null = null
+  if (countryName) {
+    const { data: countryData } = await supabase
+      .from('countries')
+      .select('id')
+      .eq('name', countryName)
+      .single()
+    countryUuid = countryData?.id || null
+  }
+
   const tourData = {
     id: crypto.randomUUID(),
     code: tourCode,
     name: proposal.title,
     location: pkg.destination || proposal.destination,
-    country_id: pkg.country_id || proposal.country_id,
+    country_id: countryUuid,
     main_city_id: pkg.main_city_id || proposal.main_city_id,
     departure_date: pkg.start_date || departure_date,
     return_date: returnDateValue,
