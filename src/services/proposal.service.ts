@@ -372,37 +372,17 @@ export async function convertToTour(
   const depDate = new Date(pkg.start_date || departure_date)
   const returnDateValue = pkg.end_date || new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-  // 查詢國家 UUID（country_id 可能存的是國家名稱，需要轉換為 UUID）
-  const countryName = pkg.country_id || proposal.country_id
-  let countryUuid: string | null = null
-  if (countryName) {
-    const { data: countryData } = await supabase
-      .from('countries')
-      .select('id')
-      .eq('name', countryName)
-      .single()
-    countryUuid = countryData?.id || null
-  }
-
-  // 查詢城市 UUID（main_city_id 可能存的是機場代碼，需要轉換為 UUID）
-  const airportCode = pkg.main_city_id || proposal.main_city_id
-  let cityUuid: string | null = null
-  if (airportCode) {
-    const { data: cityData } = await supabase
-      .from('cities')
-      .select('id')
-      .eq('airport_code', airportCode)
-      .single()
-    cityUuid = cityData?.id || null
-  }
+  // 注意：proposal_packages 的 country_id 存的是國家名稱，main_city_id 存的是機場代碼
+  // 但 tours 表的 country_id/main_city_id 是 FK 到 countries/cities 表的 UUID
+  // 為了簡化，這裡先設為 null，旅遊團的目的地資訊改存在 location 欄位
 
   const tourData = {
     id: crypto.randomUUID(),
     code: tourCode,
     name: proposal.title,
-    location: pkg.destination || proposal.destination,
-    country_id: countryUuid,
-    main_city_id: cityUuid,
+    location: pkg.destination || proposal.destination || `${pkg.country_id || ''} ${pkg.main_city_id || ''}`.trim(),
+    country_id: null, // 暫不轉換，避免 FK 錯誤
+    main_city_id: null, // 暫不轉換，避免 FK 錯誤
     departure_date: pkg.start_date || departure_date,
     return_date: returnDateValue,
     status: '進行中',
