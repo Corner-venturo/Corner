@@ -1,44 +1,18 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { useAuthStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
 import { convertToTour } from '@/services/proposal.service'
+import { useTourDestinations } from '@/features/tours/hooks/useTourDestinations'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
-
-// 常用機場代碼 (IATA)
-const CITY_CODES = [
-  { value: 'CNX', label: 'CNX - 清邁' },
-  { value: 'BKK', label: 'BKK - 曼谷' },
-  { value: 'HKT', label: 'HKT - 普吉島' },
-  { value: 'DMK', label: 'DMK - 曼谷廊曼' },
-  { value: 'SGN', label: 'SGN - 胡志明市' },
-  { value: 'HAN', label: 'HAN - 河內' },
-  { value: 'DAD', label: 'DAD - 峴港' },
-  { value: 'REP', label: 'REP - 暹粒' },
-  { value: 'RGN', label: 'RGN - 仰光' },
-  { value: 'NRT', label: 'NRT - 東京成田' },
-  { value: 'HND', label: 'HND - 東京羽田' },
-  { value: 'KIX', label: 'KIX - 大阪關西' },
-  { value: 'NGO', label: 'NGO - 名古屋' },
-  { value: 'CTS', label: 'CTS - 札幌' },
-  { value: 'OKA', label: 'OKA - 沖繩' },
-  { value: 'FUK', label: 'FUK - 福岡' },
-  { value: 'ICN', label: 'ICN - 首爾仁川' },
-  { value: 'PVG', label: 'PVG - 上海浦東' },
-  { value: 'PEK', label: 'PEK - 北京' },
-  { value: 'HKG', label: 'HKG - 香港' },
-  { value: 'MFM', label: 'MFM - 澳門' },
-  { value: 'SIN', label: 'SIN - 新加坡' },
-  { value: 'KUL', label: 'KUL - 吉隆坡' },
-  { value: 'MNL', label: 'MNL - 馬尼拉' },
-  { value: 'SZX', label: 'SZX - 深圳' },
-]
 
 interface ConvertToTourDialogProps {
   open: boolean
@@ -58,16 +32,91 @@ export function ConvertToTourDialog({
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [cityCode, setCityCode] = useState('')
+  // 使用 tour_destinations 資料
+  const { destinations, countries, loading: destinationsLoading, addDestination } = useTourDestinations()
+
+  const [selectedCountry, setSelectedCountry] = useState('')
+  const [airportCode, setAirportCode] = useState('')
   const [departureDate, setDepartureDate] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [initialized, setInitialized] = useState(false)
 
-  // 初始化
+  // 新增機場代碼
+  const [showAddAirport, setShowAddAirport] = useState(false)
+  const [newCity, setNewCity] = useState('')
+  const [newAirportCode, setNewAirportCode] = useState('')
+
+  // 國家選項
+  const countryOptions = useMemo(() =>
+    countries.map(c => ({ value: c, label: c })),
+    [countries]
+  )
+
+  // 根據選擇的國家取得機場代碼選項
+  const airportOptions = useMemo(() => {
+    if (!selectedCountry) return []
+    return destinations
+      .filter(d => d.country === selectedCountry)
+      .map(d => ({
+        value: d.airport_code,
+        label: `${d.airport_code} - ${d.city}`,
+      }))
+  }, [selectedCountry, destinations])
+
+  // 初始化 - 從套件自動帶入資料
   useEffect(() => {
-    if (pkg) {
+    if (open && pkg && countries.length > 0 && !initialized) {
       setDepartureDate(pkg.start_date || proposal.expected_start_date || '')
+
+      // 從套件的 country_id (存放國家名稱) 自動選擇國家
+      if (pkg.country_id && countries.includes(pkg.country_id)) {
+        setSelectedCountry(pkg.country_id)
+        // 從套件的 main_city_id (存放機場代碼) 自動選擇
+        if (pkg.main_city_id) {
+          setAirportCode(pkg.main_city_id)
+        }
+      }
+      setInitialized(true)
     }
-  }, [pkg, proposal, open])
+    // 關閉對話框時重置初始化狀態
+    if (!open) {
+      setInitialized(false)
+    }
+  }, [pkg, proposal, open, countries, initialized])
+
+  // 當國家改變時（使用者手動選擇），清空機場代碼
+  const handleCountryChange = (country: string) => {
+    setSelectedCountry(country)
+    if (initialized) {
+      // 只有初始化後的使用者操作才清空
+      setAirportCode('')
+      setShowAddAirport(false)
+    }
+  }
+
+  // 新增機場代碼
+  const handleAddAirport = async () => {
+    if (!selectedCountry || !newCity.trim() || !newAirportCode.trim()) {
+      await alert('請填寫城市名稱和機場代碼', 'warning')
+      return
+    }
+
+    if (!/^[A-Z]{3}$/.test(newAirportCode.trim().toUpperCase())) {
+      await alert('機場代碼必須是 3 個大寫英文字母', 'warning')
+      return
+    }
+
+    const result = await addDestination(selectedCountry, newCity.trim(), newAirportCode.trim())
+    if (result.success) {
+      setAirportCode(newAirportCode.trim().toUpperCase())
+      setNewCity('')
+      setNewAirportCode('')
+      setShowAddAirport(false)
+      await alert('已新增機場代碼', 'success')
+    } else {
+      await alert(result.error || '新增失敗', 'error')
+    }
+  }
 
   const handleSubmit = async () => {
     if (!pkg || !user?.workspace_id || !user?.id) {
@@ -75,7 +124,7 @@ export function ConvertToTourDialog({
       return
     }
 
-    if (!cityCode) {
+    if (!airportCode) {
       await alert('請選擇機場代碼', 'warning')
       return
     }
@@ -91,7 +140,7 @@ export function ConvertToTourDialog({
         {
           proposal_id: proposal.id,
           package_id: pkg.id,
-          city_code: cityCode,
+          city_code: airportCode,
           departure_date: departureDate,
         },
         user.workspace_id,
@@ -132,21 +181,97 @@ export function ConvertToTourDialog({
           )}
         </div>
 
+        {/* 國家選擇 */}
+        <div>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            國家 <span className="text-morandi-red">*</span>
+          </label>
+          <Combobox
+            value={selectedCountry}
+            onChange={handleCountryChange}
+            options={countryOptions}
+            placeholder={destinationsLoading ? "載入中..." : "選擇國家..."}
+            showSearchIcon
+          />
+        </div>
+
+        {/* 機場代碼選擇 */}
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
             機場代碼 (IATA) <span className="text-morandi-red">*</span>
           </label>
           <Combobox
-            value={cityCode}
-            onChange={setCityCode}
-            options={CITY_CODES}
-            placeholder="選擇或搜尋機場代碼..."
+            value={airportCode}
+            onChange={setAirportCode}
+            options={airportOptions}
+            placeholder={selectedCountry ? "選擇機場代碼..." : "請先選擇國家"}
+            disabled={!selectedCountry}
             showSearchIcon
+            emptyMessage={selectedCountry ? "尚無機場代碼，請點擊下方新增" : "請先選擇國家"}
           />
           <p className="text-xs text-morandi-secondary mt-1">
             機場代碼將用於生成團號，例如：CNX250128A
           </p>
         </div>
+
+        {/* 新增機場代碼區塊 */}
+        {selectedCountry && (
+          <div className="border border-dashed border-border rounded-lg p-3">
+            {!showAddAirport ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAddAirport(true)}
+                className="w-full text-morandi-secondary hover:text-morandi-primary"
+              >
+                <Plus size={16} className="mr-1" />
+                新增 {selectedCountry} 的機場代碼
+              </Button>
+            ) : (
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-morandi-primary">
+                  新增 {selectedCountry} 的機場代碼
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    placeholder="城市名稱（如：金澤）"
+                    value={newCity}
+                    onChange={e => setNewCity(e.target.value)}
+                  />
+                  <Input
+                    placeholder="機場代碼（如：KMQ）"
+                    value={newAirportCode}
+                    onChange={e => setNewAirportCode(e.target.value.toUpperCase())}
+                    maxLength={3}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleAddAirport}
+                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  >
+                    確認新增
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowAddAirport(false)
+                      setNewCity('')
+                      setNewAirportCode('')
+                    }}
+                  >
+                    取消
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
