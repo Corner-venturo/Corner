@@ -18,6 +18,7 @@ import { useToursPage } from '../hooks/useToursPage'
 import { useToursDialogs } from '../hooks/useToursDialogs'
 import type { Tour } from '@/stores/types'
 import { useToursForm } from '../hooks/useToursForm'
+import { useCustomers } from '@/hooks/cloud-hooks'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
@@ -30,6 +31,10 @@ import { TourConfirmationWizard } from './TourConfirmationWizard'
 import { TourUnlockDialog } from './TourUnlockDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
+import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
+import { createProposal } from '@/services/proposal.service'
+import { alert } from '@/lib/ui/alert-dialog'
+import type { CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
 
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
@@ -50,7 +55,9 @@ export const ToursPage: React.FC = () => {
   const { user } = useAuthStore()
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
+  const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
 
+  const { items: customers } = useCustomers()
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
@@ -181,6 +188,26 @@ export const ToursPage: React.FC = () => {
     openDetailDialog(tour.id)
   }, [setSelectedTour, openDetailDialog])
 
+  // 新增提案
+  const handleCreateProposal = useCallback(
+    async (data: CreateProposalData | UpdateProposalData) => {
+      if (!user?.workspace_id || !user?.id) {
+        await alert('無法取得使用者資訊', 'error')
+        return
+      }
+
+      try {
+        await createProposal(data as CreateProposalData, user.workspace_id, user.id)
+        setProposalDialogOpen(false)
+        // 切換到提案 tab
+        setActiveStatusTab('提案')
+      } catch (error) {
+        await alert('建立提案失敗', 'error')
+      }
+    },
+    [user?.workspace_id, user?.id, setActiveStatusTab]
+  )
+
   useEffect(() => {
     handleNavigationEffect()
   }, [handleNavigationEffect])
@@ -207,7 +234,7 @@ export const ToursPage: React.FC = () => {
           setActiveStatusTab(tab)
           setCurrentPage(1)
         }}
-        onAdd={() => handleOpenCreateDialog()}
+        onAdd={() => setProposalDialogOpen(true)}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -317,6 +344,15 @@ export const ToursPage: React.FC = () => {
         open={!!tourConfirmationDialogTour}
         tour={tourConfirmationDialogTour}
         onClose={() => setTourConfirmationDialogTour(null)}
+      />
+
+      {/* 新增提案對話框 */}
+      <ProposalDialog
+        open={proposalDialogOpen}
+        onOpenChange={setProposalDialogOpen}
+        mode="create"
+        customers={customers}
+        onSubmit={handleCreateProposal}
       />
     </div>
   )

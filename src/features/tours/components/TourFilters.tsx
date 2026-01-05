@@ -40,7 +40,7 @@ export const TourFilters: React.FC<TourFiltersProps> = ({
       onSearchChange={onSearchChange}
       searchPlaceholder="搜尋旅遊團..."
       onAdd={onAdd}
-      addLabel="新增旅遊團"
+      addLabel="新增提案"
       tabs={[
         { value: 'all', label: '全部', icon: BarChart3 },
         { value: '提案', label: '提案', icon: FileText },

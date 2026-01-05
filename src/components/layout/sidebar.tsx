@@ -33,6 +33,7 @@ import {
   ClipboardList,
   MessageCircle,
   Archive,
+  FileBox,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
