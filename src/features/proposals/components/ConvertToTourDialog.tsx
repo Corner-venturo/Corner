@@ -148,6 +148,11 @@ export function ConvertToTourDialog({
       )
 
       await alert(`轉開團成功！團號：${result.tour_code}`, 'success')
+
+      // 關閉對話框
+      onOpenChange(false)
+
+      // 通知父元件成功
       onSuccess()
 
       // 導向旅遊團頁面
