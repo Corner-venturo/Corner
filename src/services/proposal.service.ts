@@ -396,9 +396,10 @@ export async function convertToTour(
     .single()
 
   if (tourError) {
-    logger.error('建立旅遊團失敗:', tourError)
-    logger.error('tourData:', tourData)
-    throw new Error(`建立旅遊團失敗: ${tourError.message || tourError.code || JSON.stringify(tourError)}`)
+    logger.error('建立旅遊團失敗:', JSON.stringify(tourError, null, 2))
+    logger.error('tourData:', JSON.stringify(tourData, null, 2))
+    const errorMsg = tourError.message || tourError.code || tourError.details || tourError.hint || JSON.stringify(tourError)
+    throw new Error(`建立旅遊團失敗: ${errorMsg}`)
   }
 
   // 5. 更新套件的報價單和行程表，關聯到新 Tour
