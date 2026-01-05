@@ -32,9 +32,11 @@ import { TourClosingDialog } from './TourClosingDialog'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
+import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
+import { ProposalsListSection } from '@/features/proposals/components/ProposalsListSection'
 import { createProposal } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'
-import type { CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
+import type { CreateProposalData, UpdateProposalData, Proposal } from '@/types/proposal.types'
 
 const TourDetailDialog = dynamic(
   () => import('@/components/tours/TourDetailDialog').then(m => m.TourDetailDialog),
@@ -56,6 +58,8 @@ export const ToursPage: React.FC = () => {
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
+  const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
@@ -236,18 +240,34 @@ export const ToursPage: React.FC = () => {
         onAdd={() => setProposalDialogOpen(true)}
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {activeStatusTab === '提案' ? (
-          <ProposalsTableContent searchQuery={searchQuery} />
+          <div className="flex-1 overflow-auto">
+            <ProposalsTableContent searchQuery={searchQuery} />
+          </div>
         ) : (
-          <TourTable
-            tours={filteredTours}
-            loading={loading}
-            onSort={handleSortChange}
-            onRowClick={handleRowClick}
-            renderActions={renderActions}
-            getStatusColor={getStatusColor}
-          />
+          <>
+            {/* 全部頁籤時顯示提案區塊 */}
+            {activeStatusTab === 'all' && (
+              <ProposalsListSection
+                searchQuery={searchQuery}
+                onProposalClick={(proposal) => {
+                  setSelectedProposal(proposal)
+                  setProposalDetailDialogOpen(true)
+                }}
+              />
+            )}
+            <div className="flex-1 overflow-auto">
+              <TourTable
+                tours={filteredTours}
+                loading={loading}
+                onSort={handleSortChange}
+                onRowClick={handleRowClick}
+                renderActions={renderActions}
+                getStatusColor={getStatusColor}
+              />
+            </div>
+          </>
         )}
       </div>
 
@@ -355,6 +375,16 @@ export const ToursPage: React.FC = () => {
         onOpenChange={setProposalDialogOpen}
         mode="create"
         onSubmit={handleCreateProposal}
+      />
+
+      {/* 提案詳細對話框 */}
+      <ProposalDetailDialog
+        open={proposalDetailDialogOpen}
+        onOpenChange={setProposalDetailDialogOpen}
+        proposal={selectedProposal}
+        onPackagesChange={() => {
+          // 刷新資料
+        }}
       />
     </div>
   )
