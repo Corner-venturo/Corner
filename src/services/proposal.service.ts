@@ -367,22 +367,25 @@ export async function convertToTour(
   const tourCode = generateTourCode('', city_code, departure_date, existingTours || [])
 
   // 4. 建立 Tour
+  // 計算回程日期：如果套件沒有 end_date，用 departure_date + days 計算
+  const daysCount = pkg.days || 1
+  const depDate = new Date(pkg.start_date || departure_date)
+  const returnDateValue = pkg.end_date || new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
   const tourData = {
+    id: crypto.randomUUID(),
     code: tourCode,
     name: proposal.title,
     location: pkg.destination || proposal.destination,
     country_id: pkg.country_id || proposal.country_id,
     main_city_id: pkg.main_city_id || proposal.main_city_id,
     departure_date: pkg.start_date || departure_date,
-    return_date: pkg.end_date,
+    return_date: returnDateValue,
     status: '進行中',
     max_participants: pkg.group_size || proposal.group_size,
     current_participants: 0,
     contract_status: 'pending',
     workspace_id: workspaceId,
-    proposal_id,
-    proposal_package_id: package_id,
-    converted_from_proposal: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }
@@ -394,7 +397,8 @@ export async function convertToTour(
 
   if (tourError) {
     logger.error('建立旅遊團失敗:', tourError)
-    throw new Error(`建立旅遊團失敗: ${tourError.message}`)
+    logger.error('tourData:', tourData)
+    throw new Error(`建立旅遊團失敗: ${tourError.message || tourError.code || JSON.stringify(tourError)}`)
   }
 
   // 5. 更新套件的報價單和行程表，關聯到新 Tour

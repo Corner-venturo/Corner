@@ -95,7 +95,7 @@ const DialogContent = React.forwardRef<
       className={cn(
         'fixed inset-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         nested
-          ? 'z-[10001] bg-black/30' // 巢狀：較淡遮罩，遮住底層 Dialog 但不會太黑
+          ? 'z-[10001] bg-black/50 backdrop-blur-sm' // 巢狀：遮罩 + 模糊效果
           : 'z-[9998] bg-black/60 backdrop-blur-sm'
       )}
     />

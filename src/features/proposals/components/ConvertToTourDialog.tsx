@@ -169,6 +169,7 @@ export function ConvertToTourDialog({
       submitLabel="確認開團"
       loading={submitting}
       maxWidth="md"
+      nested
     >
       <div className="space-y-4">
         <div className="p-4 bg-morandi-container/30 rounded-lg">
