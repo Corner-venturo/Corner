@@ -107,9 +107,6 @@ export function ProposalDialog({
 
   // 處理提交
   const handleSubmit = async () => {
-    if (!formData.customer_name.trim()) {
-      return
-    }
     if (!formData.title.trim()) {
       return
     }
@@ -118,7 +115,7 @@ export function ProposalDialog({
     try {
       const data: CreateProposalData | UpdateProposalData = {
         customer_id: formData.customer_id || undefined,
-        customer_name: formData.customer_name.trim(),
+        customer_name: formData.customer_name.trim() || undefined,
         customer_email: formData.customer_email.trim() || undefined,
         customer_phone: formData.customer_phone.trim() || undefined,
         title: formData.title.trim(),
@@ -147,80 +144,8 @@ export function ProposalDialog({
       maxWidth="lg"
     >
       <div className="space-y-6">
-        {/* 客戶資訊區塊 */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-morandi-primary border-b border-border pb-2">
-            客戶資訊
-          </h3>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                選擇現有客戶
-              </label>
-              <Combobox
-                value={formData.customer_id}
-                onChange={handleCustomerSelect}
-                options={customers.map(c => ({
-                  value: c.id,
-                  label: `${c.name}${c.phone ? ` (${c.phone})` : ''}`,
-                }))}
-                placeholder="搜尋客戶..."
-                showSearchIcon
-                emptyMessage="找不到客戶"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                客戶名稱 <span className="text-morandi-red">*</span>
-              </label>
-              <Input
-                value={formData.customer_name}
-                onChange={e =>
-                  setFormData(prev => ({ ...prev, customer_name: e.target.value }))
-                }
-                placeholder="輸入客戶名稱"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                Email
-              </label>
-              <Input
-                type="email"
-                value={formData.customer_email}
-                onChange={e =>
-                  setFormData(prev => ({ ...prev, customer_email: e.target.value }))
-                }
-                placeholder="customer@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-morandi-primary mb-2 block">
-                電話
-              </label>
-              <Input
-                value={formData.customer_phone}
-                onChange={e =>
-                  setFormData(prev => ({ ...prev, customer_phone: e.target.value }))
-                }
-                placeholder="0912-345-678"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* 提案資訊區塊 */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-morandi-primary border-b border-border pb-2">
-            提案資訊
-          </h3>
-
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
               提案名稱 <span className="text-morandi-red">*</span>
@@ -229,6 +154,7 @@ export function ProposalDialog({
               value={formData.title}
               onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="例如：2026 泰北清邁家族旅遊"
+              autoFocus
             />
           </div>
 
@@ -325,6 +251,45 @@ export function ProposalDialog({
               placeholder="內部備註（不會顯示給客戶）..."
               rows={2}
             />
+          </div>
+        </div>
+
+        {/* 客戶資訊區塊（選填） */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-morandi-secondary border-b border-border pb-2">
+            客戶資訊（選填）
+          </h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                選擇現有客戶
+              </label>
+              <Combobox
+                value={formData.customer_id}
+                onChange={handleCustomerSelect}
+                options={customers.map(c => ({
+                  value: c.id,
+                  label: `${c.name}${c.phone ? ` (${c.phone})` : ''}`,
+                }))}
+                placeholder="搜尋客戶..."
+                showSearchIcon
+                emptyMessage="找不到客戶"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-2 block">
+                或輸入客戶名稱
+              </label>
+              <Input
+                value={formData.customer_name}
+                onChange={e =>
+                  setFormData(prev => ({ ...prev, customer_name: e.target.value }))
+                }
+                placeholder="輸入客戶名稱"
+              />
+            </div>
           </div>
         </div>
       </div>

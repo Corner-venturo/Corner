@@ -31,9 +31,9 @@ export interface Proposal {
   id: string
   code: string                            // P000001
 
-  // 客戶資訊
+  // 客戶資訊（選填）
   customer_id?: string | null
-  customer_name: string
+  customer_name?: string | null
   customer_email?: string | null
   customer_phone?: string | null
 
@@ -152,7 +152,7 @@ export interface ProposalPackage {
 
 export interface CreateProposalData {
   customer_id?: string
-  customer_name: string
+  customer_name?: string
   customer_email?: string
   customer_phone?: string
   title: string
