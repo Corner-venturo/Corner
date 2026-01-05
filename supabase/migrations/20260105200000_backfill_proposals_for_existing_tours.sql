@@ -46,7 +46,8 @@ LEFT JOIN public.customers c ON c.id = (
   SELECT customer_id FROM public.orders WHERE tour_id = t.id LIMIT 1
 )
 WHERE t.proposal_id IS NULL
-  AND t.converted_from_proposal IS NOT TRUE;
+  AND t.converted_from_proposal IS NOT TRUE
+  AND t.workspace_id IS NOT NULL;
 
 -- 2. 為每個新建的提案建立套件
 INSERT INTO public.proposal_packages (
