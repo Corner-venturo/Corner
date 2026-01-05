@@ -386,9 +386,15 @@ export async function convertToTour(
     current_participants: 0,
     contract_status: 'pending',
     workspace_id: workspaceId,
+    // 財務欄位預設值
+    profit: 0,
+    total_cost: 0,
+    total_revenue: 0,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }
+
+  logger.log('準備建立旅遊團:', JSON.stringify(tourData, null, 2))
 
   const { data: newTour, error: tourError } = await toursDb()
     .insert(tourData)
