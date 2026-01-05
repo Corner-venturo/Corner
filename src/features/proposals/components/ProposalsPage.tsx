@@ -401,7 +401,6 @@ export function ProposalsPage() {
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         mode="create"
-        customers={customers}
         onSubmit={handleCreateProposal}
       />
 
@@ -411,7 +410,6 @@ export function ProposalsPage() {
         onOpenChange={setEditDialogOpen}
         mode="edit"
         proposal={selectedProposal}
-        customers={customers}
         onSubmit={handleUpdateProposal}
       />
 

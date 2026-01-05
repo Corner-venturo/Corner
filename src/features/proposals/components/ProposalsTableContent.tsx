@@ -374,7 +374,6 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         onOpenChange={setEditDialogOpen}
         mode="edit"
         proposal={selectedProposal}
-        customers={customers}
         onSubmit={handleUpdateProposal}
       />
 

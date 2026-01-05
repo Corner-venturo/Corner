@@ -18,7 +18,6 @@ import { useToursPage } from '../hooks/useToursPage'
 import { useToursDialogs } from '../hooks/useToursDialogs'
 import type { Tour } from '@/stores/types'
 import { useToursForm } from '../hooks/useToursForm'
-import { useCustomers } from '@/hooks/cloud-hooks'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
@@ -58,7 +57,6 @@ export const ToursPage: React.FC = () => {
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
 
-  const { items: customers } = useCustomers()
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
@@ -356,7 +354,6 @@ export const ToursPage: React.FC = () => {
         open={proposalDialogOpen}
         onOpenChange={setProposalDialogOpen}
         mode="create"
-        customers={customers}
         onSubmit={handleCreateProposal}
       />
     </div>
