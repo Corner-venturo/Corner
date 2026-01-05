@@ -134,10 +134,9 @@ export function PackageListPanel({
       }
 
       try {
-        console.log('Creating quote for package:', { packageId: pkg.id, workspaceId: user.workspace_id, userId: user.id })
-        const quoteId = await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
+        await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
         onPackagesChange()
-        router.push(`/quotes?highlight=${quoteId}`)
+        await alert('報價單已建立', 'success')
       } catch (error) {
         console.error('Quote creation failed:', error)
         const message = error instanceof Error ? error.message : '未知錯誤'
@@ -158,9 +157,9 @@ export function PackageListPanel({
       }
 
       try {
-        const itineraryId = await createItineraryForPackage(pkg.id, user.workspace_id, user.id)
+        await createItineraryForPackage(pkg.id, user.workspace_id, user.id)
         onPackagesChange()
-        router.push(`/itinerary?highlight=${itineraryId}`)
+        await alert('行程表已建立', 'success')
       } catch (error) {
         const message = error instanceof Error ? error.message : '未知錯誤'
         await alert(`建立行程表失敗: ${message}`, 'error')
