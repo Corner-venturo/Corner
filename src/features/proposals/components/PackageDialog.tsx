@@ -177,41 +177,12 @@ export function PackageDialog({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              天數
-            </label>
-            <Input
-              type="number"
-              min={1}
-              value={formData.days || ''}
-              onChange={e =>
-                setFormData(prev => ({
-                  ...prev,
-                  days: e.target.value ? parseInt(e.target.value, 10) : null,
-                  nights: e.target.value
-                    ? parseInt(e.target.value, 10) - 1
-                    : null,
-                }))
-              }
-              placeholder="天"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              晚數
-            </label>
-            <Input
-              type="number"
-              min={0}
-              value={formData.nights || ''}
-              readOnly
-              className="bg-morandi-container/30"
-              placeholder="晚"
-            />
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          {formData.days && formData.nights !== null && (
+            <div className="flex items-center gap-2 text-sm text-morandi-secondary">
+              <span className="font-medium">{formData.days} 天 {formData.nights} 夜</span>
+            </div>
+          )}
 
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">

@@ -191,35 +191,6 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const columns: TableColumn<Proposal>[] = useMemo(
     () => [
       {
-        key: 'expand',
-        label: '',
-        width: '40px',
-        render: (_, proposal) => {
-          const isExpanded = expandedProposals.includes(proposal.id)
-          const packageCount = getProposalPackages(proposal.id).length
-          return (
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                toggleExpand(proposal.id)
-              }}
-              className="p-1 hover:bg-morandi-container/50 rounded"
-            >
-              {isExpanded ? (
-                <ChevronDown size={16} className="text-morandi-secondary" />
-              ) : (
-                <ChevronRight
-                  size={16}
-                  className={
-                    packageCount === 0 ? 'text-morandi-muted' : 'text-morandi-secondary'
-                  }
-                />
-              )}
-            </button>
-          )
-        },
-      },
-      {
         key: 'code',
         label: '提案編號',
         sortable: true,
@@ -295,18 +266,26 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         render: (_, proposal) => <DateCell date={proposal.created_at} showIcon={false} />,
       },
     ],
-    [expandedProposals, getProposalPackages, getCustomerName, toggleExpand]
+    [getProposalPackages, getCustomerName]
   )
 
   // 渲染操作按鈕
   const renderActions = useCallback(
     (proposal: Proposal) => {
+      const isExpanded = expandedProposals.includes(proposal.id)
+      const packageCount = getProposalPackages(proposal.id).length
+
       const actions: Array<{
         icon: typeof Edit2
         label: string
         onClick: () => void
         variant?: 'default' | 'danger' | 'success' | 'warning'
       }> = [
+        {
+          icon: isExpanded ? ChevronDown : ChevronRight,
+          label: isExpanded ? '收合' : `展開 (${packageCount})`,
+          onClick: () => toggleExpand(proposal.id),
+        },
         {
           icon: Edit2,
           label: '編輯',
@@ -335,7 +314,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
 
       return <ActionCell actions={actions} />
     },
-    [openEditDialog, openArchiveDialog, handleDeleteProposal]
+    [openEditDialog, openArchiveDialog, handleDeleteProposal, expandedProposals, getProposalPackages, toggleExpand]
   )
 
   // 渲染展開內容（套件列表）
