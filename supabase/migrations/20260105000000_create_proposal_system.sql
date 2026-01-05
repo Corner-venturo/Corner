@@ -200,7 +200,12 @@ COMMENT ON COLUMN public.tours.converted_from_proposal IS '是否從提案轉換
 ALTER TABLE public.proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.proposal_packages ENABLE ROW LEVEL SECURITY;
 
--- proposals RLS 政策
+-- proposals RLS 政策（先刪除再建立，確保可重複執行）
+DROP POLICY IF EXISTS "proposals_select" ON public.proposals;
+DROP POLICY IF EXISTS "proposals_insert" ON public.proposals;
+DROP POLICY IF EXISTS "proposals_update" ON public.proposals;
+DROP POLICY IF EXISTS "proposals_delete" ON public.proposals;
+
 CREATE POLICY "proposals_select" ON public.proposals FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -213,7 +218,12 @@ USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 CREATE POLICY "proposals_delete" ON public.proposals FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
--- proposal_packages RLS 政策（透過 proposals 的 workspace 檢查）
+-- proposal_packages RLS 政策（先刪除再建立）
+DROP POLICY IF EXISTS "proposal_packages_select" ON public.proposal_packages;
+DROP POLICY IF EXISTS "proposal_packages_insert" ON public.proposal_packages;
+DROP POLICY IF EXISTS "proposal_packages_update" ON public.proposal_packages;
+DROP POLICY IF EXISTS "proposal_packages_delete" ON public.proposal_packages;
+
 CREATE POLICY "proposal_packages_select" ON public.proposal_packages FOR SELECT
 USING (
   EXISTS (

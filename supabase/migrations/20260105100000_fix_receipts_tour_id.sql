@@ -3,12 +3,13 @@
 
 BEGIN;
 
--- 方案 1: 從 order_id 反查 tour_id (receipts.order_id 是 uuid，orders.id 也是 uuid)
+-- 方案 1: 從 order_id 反查 tour_id (receipts.order_id 是 text，orders.id 是 uuid，需要轉型)
 UPDATE receipts r
 SET tour_id = o.tour_id
 FROM orders o
 WHERE r.order_id IS NOT NULL
-  AND r.order_id = o.id
+  AND r.order_id != ''
+  AND r.order_id::uuid = o.id
   AND r.tour_id IS NULL
   AND o.tour_id IS NOT NULL;
 
