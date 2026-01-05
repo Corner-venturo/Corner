@@ -7,25 +7,46 @@
  * 用於交接作業
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Plus,
   Loader2,
   RefreshCw,
   Edit2,
   Trash2,
+  Check,
+  X,
+  Download,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useAuthStore } from '@/stores/auth-store'
+import { supabase } from '@/lib/supabase/client'
 import { useTourConfirmationSheet } from '../hooks/useTourConfirmationSheet'
 import { ItemEditDialog } from './ItemEditDialog'
-import type { Tour } from '@/stores/types'
+import type { Tour, Itinerary, DailyItineraryDay } from '@/stores/types'
 import type {
   TourConfirmationItem,
   ConfirmationItemCategory,
   CreateConfirmationItem,
   CostSummary,
 } from '@/types/tour-confirmation-sheet.types'
+
+// 新行的初始狀態
+const EMPTY_NEW_ITEM = {
+  service_date: '',
+  service_date_end: '',
+  supplier_name: '',
+  title: '',
+  unit_price: '',
+  quantity: '',
+  expected_cost: '',
+  actual_cost: '',
+  notes: '',
+}
+
+// 交通子類型
+type TransportSubType = 'flight' | 'vehicle' | null
 
 interface TourConfirmationSheetPageProps {
   tour: Tour
@@ -59,7 +80,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     reload,
   } = useTourConfirmationSheet({ tourId: tour.id })
 
-  // 編輯對話框狀態
+  // 編輯對話框狀態（僅用於編輯現有項目）
   const [editDialog, setEditDialog] = useState<{
     open: boolean
     category: ConfirmationItemCategory
@@ -69,6 +90,54 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     category: 'transport',
     item: null,
   })
+
+  // Inline 新增狀態
+  const [addingCategory, setAddingCategory] = useState<ConfirmationItemCategory | null>(null)
+  const [newItemData, setNewItemData] = useState(EMPTY_NEW_ITEM)
+  const [savingNew, setSavingNew] = useState(false)
+  const firstInputRef = useRef<HTMLInputElement>(null)
+
+  // 交通類型選擇狀態
+  const [transportSubType, setTransportSubType] = useState<TransportSubType>(null)
+
+  // 手動填寫航班狀態
+  const [manualFlightMode, setManualFlightMode] = useState(false)
+  const [manualFlight, setManualFlight] = useState({
+    outbound: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
+    return: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
+  })
+
+  // 行程表資料（用於自動帶入）
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null)
+  const [itineraryLoading, setItineraryLoading] = useState(false)
+
+  // 載入行程表
+  useEffect(() => {
+    const loadItinerary = async () => {
+      if (!tour.id) return
+      setItineraryLoading(true)
+      try {
+        const { data } = await supabase
+          .from('itineraries')
+          .select('*')
+          .eq('tour_id', tour.id)
+          .maybeSingle()
+        if (data) {
+          setItinerary(data as unknown as Itinerary)
+        }
+      } finally {
+        setItineraryLoading(false)
+      }
+    }
+    loadItinerary()
+  }, [tour.id])
+
+  // 當開始新增時，聚焦到第一個輸入框
+  useEffect(() => {
+    if (addingCategory && firstInputRef.current) {
+      firstInputRef.current.focus()
+    }
+  }, [addingCategory])
 
   // 自動建立確認表（如果不存在）
   useEffect(() => {
@@ -83,9 +152,385 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }, [loading, sheet, tour, workspaceId, createSheet])
 
-  // 開啟新增對話框
+  // 開啟 inline 新增模式
   const handleAdd = (category: ConfirmationItemCategory) => {
-    setEditDialog({ open: true, category, item: null })
+    setAddingCategory(category)
+    setNewItemData(EMPTY_NEW_ITEM)
+    // 交通類別需要先選擇子類型
+    if (category === 'transport') {
+      setTransportSubType(null)
+    }
+  }
+
+  // 取消新增
+  const handleCancelAdd = () => {
+    setAddingCategory(null)
+    setNewItemData(EMPTY_NEW_ITEM)
+    setTransportSubType(null)
+  }
+
+  // 選擇交通子類型
+  const handleSelectTransportType = (type: TransportSubType) => {
+    setTransportSubType(type)
+    if (type === 'flight' && tour.outbound_flight) {
+      // 自動帶入航班資訊 - 會創建兩筆（去程+回程）
+      // 這裡先不自動填入，讓用戶確認後再創建
+    }
+  }
+
+  // 從航班資訊創建項目
+  const handleAddFlightItems = async () => {
+    if (!sheet?.id) return
+
+    setSavingNew(true)
+    try {
+      // 創建去程航班項目
+      if (tour.outbound_flight) {
+        const outbound = tour.outbound_flight
+        await addItem({
+          sheet_id: sheet.id,
+          category: 'transport',
+          service_date: tour.departure_date || '',
+          service_date_end: null,
+          day_label: null,
+          supplier_name: outbound.airline || '',
+          supplier_id: null,
+          title: `去程 ${outbound.flightNumber} ${outbound.departureAirport}→${outbound.arrivalAirport}`,
+          description: `${outbound.departureTime} - ${outbound.arrivalTime}`,
+          unit_price: null,
+          currency: 'TWD',
+          quantity: null,
+          subtotal: null,
+          expected_cost: null,
+          actual_cost: null,
+          contact_info: null,
+          booking_reference: null,
+          booking_status: 'pending',
+          type_data: null,
+          sort_order: 0,
+          notes: outbound.duration || null,
+          workspace_id: workspaceId,
+        })
+      }
+
+      // 創建回程航班項目
+      if (tour.return_flight) {
+        const returnFlight = tour.return_flight
+        await addItem({
+          sheet_id: sheet.id,
+          category: 'transport',
+          service_date: tour.return_date || '',
+          service_date_end: null,
+          day_label: null,
+          supplier_name: returnFlight.airline || '',
+          supplier_id: null,
+          title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
+          description: `${returnFlight.departureTime} - ${returnFlight.arrivalTime}`,
+          unit_price: null,
+          currency: 'TWD',
+          quantity: null,
+          subtotal: null,
+          expected_cost: null,
+          actual_cost: null,
+          contact_info: null,
+          booking_reference: null,
+          booking_status: 'pending',
+          type_data: null,
+          sort_order: 1,
+          notes: returnFlight.duration || null,
+          workspace_id: workspaceId,
+        })
+      }
+
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 儲存手動填寫的航班資訊並新增項目
+  const handleSaveManualFlight = async () => {
+    if (!sheet?.id) return
+
+    setSavingNew(true)
+    try {
+      // 準備航班資料
+      const outboundFlight = manualFlight.outbound.airline ? {
+        airline: manualFlight.outbound.airline,
+        flightNumber: manualFlight.outbound.flightNumber,
+        departureAirport: manualFlight.outbound.departureAirport,
+        arrivalAirport: manualFlight.outbound.arrivalAirport,
+      } : null
+
+      const returnFlight = manualFlight.return.airline ? {
+        airline: manualFlight.return.airline,
+        flightNumber: manualFlight.return.flightNumber,
+        departureAirport: manualFlight.return.departureAirport,
+        arrivalAirport: manualFlight.return.arrivalAirport,
+      } : null
+
+      // 更新 tour 的航班資訊
+      const { error: updateError } = await supabase
+        .from('tours')
+        .update({
+          outbound_flight: outboundFlight,
+          return_flight: returnFlight,
+        })
+        .eq('id', tour.id)
+
+      if (updateError) throw updateError
+
+      // 新增交通項目
+      if (outboundFlight) {
+        await addItem({
+          sheet_id: sheet.id,
+          category: 'transport',
+          service_date: tour.departure_date || '',
+          service_date_end: null,
+          day_label: null,
+          supplier_name: outboundFlight.airline,
+          supplier_id: null,
+          title: `去程 ${outboundFlight.flightNumber} ${outboundFlight.departureAirport}→${outboundFlight.arrivalAirport}`,
+          description: null,
+          unit_price: null,
+          currency: 'TWD',
+          quantity: null,
+          subtotal: null,
+          expected_cost: null,
+          actual_cost: null,
+          contact_info: null,
+          booking_reference: null,
+          booking_status: 'pending',
+          type_data: null,
+          sort_order: 0,
+          notes: null,
+          workspace_id: workspaceId,
+        })
+      }
+
+      if (returnFlight) {
+        await addItem({
+          sheet_id: sheet.id,
+          category: 'transport',
+          service_date: tour.return_date || '',
+          service_date_end: null,
+          day_label: null,
+          supplier_name: returnFlight.airline,
+          supplier_id: null,
+          title: `回程 ${returnFlight.flightNumber} ${returnFlight.departureAirport}→${returnFlight.arrivalAirport}`,
+          description: null,
+          unit_price: null,
+          currency: 'TWD',
+          quantity: null,
+          subtotal: null,
+          expected_cost: null,
+          actual_cost: null,
+          contact_info: null,
+          booking_reference: null,
+          booking_status: 'pending',
+          type_data: null,
+          sort_order: 1,
+          notes: null,
+          workspace_id: workspaceId,
+        })
+      }
+
+      // 重置狀態
+      setManualFlightMode(false)
+      setManualFlight({
+        outbound: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
+        return: { airline: '', flightNumber: '', departureAirport: '', arrivalAirport: '' },
+      })
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 從行程表帶入餐食
+  const handleImportMeals = async () => {
+    if (!sheet?.id || !itinerary?.daily_itinerary) return
+
+    setSavingNew(true)
+    try {
+      for (const day of itinerary.daily_itinerary) {
+        const meals = day.meals
+        const mealTypes = [
+          { key: 'breakfast', label: '早餐', value: meals?.breakfast },
+          { key: 'lunch', label: '午餐', value: meals?.lunch },
+          { key: 'dinner', label: '晚餐', value: meals?.dinner },
+        ]
+
+        for (const meal of mealTypes) {
+          if (meal.value && meal.value !== '敬請自理' && meal.value !== '機上') {
+            await addItem({
+              sheet_id: sheet.id,
+              category: 'meal',
+              service_date: day.date || '',
+              service_date_end: null,
+              day_label: day.dayLabel || null,
+              supplier_name: '',
+              supplier_id: null,
+              title: `${meal.label}：${meal.value}`,
+              description: null,
+              unit_price: null,
+              currency: 'TWD',
+              quantity: null,
+              subtotal: null,
+              expected_cost: null,
+              actual_cost: null,
+              contact_info: null,
+              booking_reference: null,
+              booking_status: 'pending',
+              type_data: null,
+              sort_order: 0,
+              notes: null,
+              workspace_id: workspaceId,
+            })
+          }
+        }
+      }
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 從行程表帶入住宿
+  const handleImportAccommodation = async () => {
+    if (!sheet?.id || !itinerary?.daily_itinerary) return
+
+    setSavingNew(true)
+    try {
+      for (const day of itinerary.daily_itinerary) {
+        if (day.accommodation && day.accommodation !== '溫暖的家') {
+          await addItem({
+            sheet_id: sheet.id,
+            category: 'accommodation',
+            service_date: day.date || '',
+            service_date_end: null,
+            day_label: day.dayLabel || null,
+            supplier_name: day.accommodation,
+            supplier_id: null,
+            title: day.accommodation,
+            description: null,
+            unit_price: null,
+            currency: 'TWD',
+            quantity: null,
+            subtotal: null,
+            expected_cost: null,
+            actual_cost: null,
+            contact_info: null,
+            booking_reference: null,
+            booking_status: 'pending',
+            type_data: null,
+            sort_order: 0,
+            notes: day.accommodationRating ? `${day.accommodationRating}星級` : null,
+            workspace_id: workspaceId,
+          })
+        }
+      }
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 從行程表帶入景點/活動
+  const handleImportActivities = async () => {
+    if (!sheet?.id || !itinerary?.daily_itinerary) return
+
+    setSavingNew(true)
+    try {
+      for (const day of itinerary.daily_itinerary) {
+        if (day.activities && day.activities.length > 0) {
+          for (const activity of day.activities) {
+            // 只帶入有標題的景點
+            if (activity.title) {
+              await addItem({
+                sheet_id: sheet.id,
+                category: 'activity',
+                service_date: day.date || '',
+                service_date_end: null,
+                day_label: day.dayLabel || null,
+                supplier_name: '',
+                supplier_id: null,
+                title: activity.title,
+                description: activity.description || null,
+                unit_price: null,
+                currency: 'TWD',
+                quantity: null,
+                subtotal: null,
+                expected_cost: null,
+                actual_cost: null,
+                contact_info: null,
+                booking_reference: null,
+                booking_status: 'pending',
+                type_data: null,
+                sort_order: 0,
+                notes: null,
+                workspace_id: workspaceId,
+              })
+            }
+          }
+        }
+      }
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 儲存新項目（inline）
+  const handleSaveNewItem = async () => {
+    if (!sheet?.id || !addingCategory) return
+
+    setSavingNew(true)
+    try {
+      // 計算標題（車子根據是否有結束日期判斷單日/區間）
+      let title = newItemData.title || '新項目'
+      const hasDateRange = newItemData.service_date_end && newItemData.service_date_end !== newItemData.service_date
+      if (addingCategory === 'transport' && transportSubType === 'vehicle') {
+        if (hasDateRange) {
+          title = title || '全程用車'
+        } else {
+          title = title || '單日用車'
+        }
+      }
+
+      await addItem({
+        sheet_id: sheet.id,
+        category: addingCategory,
+        service_date: newItemData.service_date || '',
+        service_date_end: hasDateRange ? newItemData.service_date_end : null,
+        day_label: null,
+        supplier_name: newItemData.supplier_name || '',
+        supplier_id: null,
+        title,
+        description: null,
+        unit_price: newItemData.unit_price ? parseFloat(newItemData.unit_price) : null,
+        currency: 'TWD',
+        quantity: newItemData.quantity ? parseInt(newItemData.quantity) : null,
+        subtotal: null,
+        expected_cost: newItemData.expected_cost ? parseFloat(newItemData.expected_cost) : null,
+        actual_cost: newItemData.actual_cost ? parseFloat(newItemData.actual_cost) : null,
+        contact_info: null,
+        booking_reference: null,
+        booking_status: 'pending',
+        type_data: null,
+        sort_order: 0,
+        notes: newItemData.notes || null,
+        workspace_id: workspaceId,
+      })
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 更新新行欄位
+  const handleNewItemChange = (field: keyof typeof EMPTY_NEW_ITEM, value: string) => {
+    setNewItemData(prev => ({ ...prev, [field]: value }))
   }
 
   // 開啟編輯對話框
@@ -97,12 +542,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     })
   }
 
-  // 儲存項目
+  // 儲存編輯的項目（Dialog 模式）
   const handleSave = async (data: CreateConfirmationItem) => {
     if (editDialog.item) {
       await updateItem(editDialog.item.id, data)
-    } else {
-      await addItem(data)
     }
     setEditDialog({ open: false, category: 'transport', item: null })
   }
@@ -188,6 +631,16 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                 actual: items.reduce((sum, i) => sum + (i.actual_cost || 0), 0),
               }
 
+              // 判斷是否可從行程表帶入
+              const canImport = itinerary?.daily_itinerary && itinerary.daily_itinerary.length > 0
+              const getImportHandler = () => {
+                if (cat.key === 'meal') return handleImportMeals
+                if (cat.key === 'accommodation') return handleImportAccommodation
+                if (cat.key === 'activity') return handleImportActivities
+                return null
+              }
+              const importHandler = getImportHandler()
+
               return (
                 <React.Fragment key={cat.key}>
                   {/* 分類標題行 */}
@@ -201,19 +654,35 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                       </div>
                     </td>
                     <td className="px-2 py-1.5 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleAdd(cat.key)}
-                        className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
-                      >
-                        <Plus size={12} className="mr-1" />
-                        新增
-                      </Button>
+                      <div className="flex items-center gap-1 justify-end">
+                        {/* 從行程表帶入按鈕 */}
+                        {canImport && importHandler && items.length === 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={importHandler}
+                            disabled={savingNew}
+                            className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            title="從行程表帶入"
+                          >
+                            <Download size={12} className="mr-1" />
+                            帶入
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleAdd(cat.key)}
+                          className="h-6 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover"
+                        >
+                          <Plus size={12} className="mr-1" />
+                          新增
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                   {/* 項目列表 */}
-                  {items.length === 0 ? (
+                  {items.length === 0 && addingCategory !== cat.key ? (
                     <tr className="border-t border-border/50">
                       <td colSpan={10} className="px-3 py-3 text-center text-morandi-secondary text-xs">
                         尚無{cat.label}項目
@@ -258,6 +727,370 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                         </td>
                       </tr>
                     ))
+                  )}
+
+                  {/* Inline 新增行 - 交通類別：下拉選單選類型 */}
+                  {addingCategory === cat.key && cat.key === 'transport' && (
+                    <tr className="border-t border-border/50 bg-morandi-gold/10">
+                      {/* 分類欄位：下拉選單 */}
+                      <td className="px-3 py-2 border-r border-border/30">
+                        <select
+                          value={transportSubType || ''}
+                          onChange={(e) => handleSelectTransportType(e.target.value as TransportSubType)}
+                          className="text-sm bg-transparent border-0 outline-none cursor-pointer -ml-1"
+                          style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', paddingRight: '16px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%238b8680\' stroke-width=\'2\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
+                        >
+                          <option value="">選擇</option>
+                          <option value="flight">航班</option>
+                          <option value="vehicle">車子</option>
+                        </select>
+                      </td>
+                      {/* 未選擇類型：只顯示取消按鈕 */}
+                      {!transportSubType && (
+                        <>
+                          <td colSpan={8} className="px-3 py-2"></td>
+                          <td className="px-2 py-2 text-right">
+                            <button
+                              onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
+                              className="text-morandi-red hover:underline text-xs"
+                            >
+                              取消
+                            </button>
+                          </td>
+                        </>
+                      )}
+                      {/* 航班：顯示帶入按鈕或手動填寫 */}
+                      {transportSubType === 'flight' && (
+                        <>
+                          <td colSpan={8} className="px-4 py-2">
+                            {tour.outbound_flight || tour.return_flight ? (
+                              // 有航班資訊：顯示並確認帶入
+                              <div className="flex items-center gap-4">
+                                <div className="text-sm space-x-4">
+                                  {tour.outbound_flight && (
+                                    <span>
+                                      <span className="text-morandi-green">去程</span> {tour.outbound_flight.airline} {tour.outbound_flight.flightNumber} {tour.outbound_flight.departureAirport}→{tour.outbound_flight.arrivalAirport}
+                                    </span>
+                                  )}
+                                  {tour.return_flight && (
+                                    <span>
+                                      <span className="text-blue-600">回程</span> {tour.return_flight.airline} {tour.return_flight.flightNumber} {tour.return_flight.departureAirport}→{tour.return_flight.arrivalAirport}
+                                    </span>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={handleAddFlightItems}
+                                  disabled={savingNew}
+                                  className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
+                                >
+                                  {savingNew ? '新增中...' : '確認帶入'}
+                                </button>
+                                <button
+                                  onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
+                                  className="text-morandi-red hover:underline text-xs"
+                                >
+                                  取消
+                                </button>
+                              </div>
+                            ) : manualFlightMode ? (
+                              // 手動填寫模式
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="text-morandi-green font-medium w-10">去程</span>
+                                  <input
+                                    placeholder="航空"
+                                    value={manualFlight.outbound.airline}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, airline: e.target.value } }))}
+                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <input
+                                    placeholder="航班"
+                                    value={manualFlight.outbound.flightNumber}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, flightNumber: e.target.value } }))}
+                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <input
+                                    placeholder="起飛"
+                                    value={manualFlight.outbound.departureAirport}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, departureAirport: e.target.value } }))}
+                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <span>→</span>
+                                  <input
+                                    placeholder="抵達"
+                                    value={manualFlight.outbound.arrivalAirport}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, outbound: { ...prev.outbound, arrivalAirport: e.target.value } }))}
+                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="text-blue-600 font-medium w-10">回程</span>
+                                  <input
+                                    placeholder="航空"
+                                    value={manualFlight.return.airline}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, airline: e.target.value } }))}
+                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <input
+                                    placeholder="航班"
+                                    value={manualFlight.return.flightNumber}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, flightNumber: e.target.value } }))}
+                                    className="w-20 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <input
+                                    placeholder="起飛"
+                                    value={manualFlight.return.departureAirport}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, departureAirport: e.target.value } }))}
+                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                  <span>→</span>
+                                  <input
+                                    placeholder="抵達"
+                                    value={manualFlight.return.arrivalAirport}
+                                    onChange={(e) => setManualFlight(prev => ({ ...prev, return: { ...prev.return, arrivalAirport: e.target.value } }))}
+                                    className="w-16 px-2 py-1 border border-border rounded text-sm"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2 pt-1">
+                                  <button
+                                    onClick={handleSaveManualFlight}
+                                    disabled={savingNew || (!manualFlight.outbound.airline && !manualFlight.return.airline)}
+                                    className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded disabled:opacity-50"
+                                  >
+                                    {savingNew ? '儲存中...' : '確認儲存'}
+                                  </button>
+                                  <button
+                                    onClick={() => { setManualFlightMode(false); setAddingCategory(null); setTransportSubType(null) }}
+                                    className="text-morandi-red hover:underline text-xs"
+                                  >
+                                    取消
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              // 無航班資訊：顯示手動填寫按鈕
+                              <div className="flex items-center gap-4">
+                                <span className="text-sm text-morandi-secondary">尚無航班資訊</span>
+                                <button
+                                  onClick={() => setManualFlightMode(true)}
+                                  className="px-3 py-1 text-xs font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded"
+                                >
+                                  手動填寫
+                                </button>
+                                <button
+                                  onClick={() => { setAddingCategory(null); setTransportSubType(null) }}
+                                  className="text-morandi-red hover:underline text-xs"
+                                >
+                                  取消
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </>
+                      )}
+                      {/* 車子：日期選擇（一個日期=單日，兩個日期=區間） */}
+                      {transportSubType === 'vehicle' && (
+                        <>
+                          <td className="p-1 border-r border-border/30">
+                            <div className="flex items-center gap-1">
+                              <DatePicker
+                                value={newItemData.service_date}
+                                onChange={(date) => handleNewItemChange('service_date', date)}
+                                placeholder="開始"
+                                buttonClassName="h-8 text-xs border-0 shadow-none"
+                              />
+                              <span className="text-morandi-secondary text-xs">~</span>
+                              <DatePicker
+                                value={newItemData.service_date_end}
+                                onChange={(date) => handleNewItemChange('service_date_end', date)}
+                                placeholder="結束(選填)"
+                                buttonClassName="h-8 text-xs border-0 shadow-none"
+                                clearable
+                              />
+                            </div>
+                          </td>
+                          <td className="p-0 border-r border-border/30" style={{ maxWidth: '100px' }}>
+                            <input
+                              value={newItemData.supplier_name}
+                              onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
+                              placeholder="車行..."
+                              className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              value={newItemData.title}
+                              onChange={(e) => handleNewItemChange('title', e.target.value)}
+                              placeholder={newItemData.service_date_end ? '全程用車' : '單日用車'}
+                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              type="number"
+                              value={newItemData.unit_price}
+                              onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
+                              placeholder="0"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              type="number"
+                              value={newItemData.quantity}
+                              onChange={(e) => handleNewItemChange('quantity', e.target.value)}
+                              placeholder="0"
+                              className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              type="number"
+                              value={newItemData.expected_cost}
+                              onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
+                              placeholder="0"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              type="number"
+                              value={newItemData.actual_cost}
+                              onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
+                              placeholder="0"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                          <td className="p-0 border-r border-border/30">
+                            <input
+                              value={newItemData.notes}
+                              onChange={(e) => handleNewItemChange('notes', e.target.value)}
+                              placeholder="備註..."
+                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                            />
+                          </td>
+                        </>
+                      )}
+                      {/* 車子模式的操作按鈕 */}
+                      {transportSubType === 'vehicle' && (
+                        <td className="px-2 py-2">
+                          <div className="flex items-center gap-1 justify-end">
+                            <button
+                              onClick={handleSaveNewItem}
+                              disabled={savingNew}
+                              className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
+                              title="儲存"
+                            >
+                              {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            </button>
+                            <button
+                              onClick={handleCancelAdd}
+                              disabled={savingNew}
+                              className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
+                              title="取消"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  )}
+
+                  {/* 其他類別：一般新增行 */}
+                  {addingCategory === cat.key && cat.key !== 'transport' && (
+                    <tr className="border-t border-border/50 bg-morandi-gold/10">
+                      <td className="px-3 py-2 text-morandi-secondary text-xs border-r border-border/30">{cat.label}</td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          ref={firstInputRef}
+                          type="date"
+                          value={newItemData.service_date}
+                          onChange={(e) => handleNewItemChange('service_date', e.target.value)}
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          value={newItemData.supplier_name}
+                          onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
+                          placeholder="輸入供應商..."
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          value={newItemData.title}
+                          onChange={(e) => handleNewItemChange('title', e.target.value)}
+                          placeholder="輸入項目說明..."
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          type="number"
+                          value={newItemData.unit_price}
+                          onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
+                          placeholder="0"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          type="number"
+                          value={newItemData.quantity}
+                          onChange={(e) => handleNewItemChange('quantity', e.target.value)}
+                          placeholder="0"
+                          className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          type="number"
+                          value={newItemData.expected_cost}
+                          onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
+                          placeholder="0"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          type="number"
+                          value={newItemData.actual_cost}
+                          onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
+                          placeholder="0"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="p-0 border-r border-border/30">
+                        <input
+                          value={newItemData.notes}
+                          onChange={(e) => handleNewItemChange('notes', e.target.value)}
+                          placeholder="輸入備註..."
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                        />
+                      </td>
+                      <td className="px-2 py-2">
+                        <div className="flex items-center gap-1 justify-end">
+                          <button
+                            onClick={handleSaveNewItem}
+                            disabled={savingNew}
+                            className="p-1.5 text-white bg-morandi-green hover:bg-morandi-green/80 rounded disabled:opacity-50"
+                            title="儲存"
+                          >
+                            {savingNew ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                          </button>
+                          <button
+                            onClick={handleCancelAdd}
+                            disabled={savingNew}
+                            className="p-1.5 text-white bg-morandi-red hover:bg-morandi-red/80 rounded disabled:opacity-50"
+                            title="取消"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   )}
                 </React.Fragment>
               )

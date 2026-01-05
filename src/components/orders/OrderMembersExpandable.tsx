@@ -45,6 +45,7 @@ import {
   CustomCostFieldsSection,
   MemberTableHeader,
 } from './components'
+import { TourPrintDialog } from '@/components/tours/TourPrintDialog'
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
 import type { EditFormData } from './components/member-edit/hooks/useMemberEdit'
 
@@ -66,7 +67,7 @@ export interface ColumnVisibility {
   ticketing_deadline: boolean
 }
 
-// 預設全部顯示
+// 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
 const defaultColumnVisibility: ColumnVisibility = {
   passport_name: true,
   birth_date: true,
@@ -75,9 +76,9 @@ const defaultColumnVisibility: ColumnVisibility = {
   passport_number: true,
   passport_expiry: true,
   special_meal: true,
-  total_payable: true,
-  deposit_amount: true,
-  balance: true,
+  total_payable: false,
+  deposit_amount: false,
+  balance: false,
   remarks: true,
   pnr: false,
   ticket_number: false,
@@ -110,6 +111,7 @@ export function OrderMembersExpandable({
   mode: propMode,
   embedded = false,
   forceShowPnr = false,
+  tour,
 }: OrderMembersExpandableProps) {
   const mode = propMode || (orderId ? 'order' : 'tour')
 
@@ -123,11 +125,12 @@ export function OrderMembersExpandable({
   const passportUpload = usePassportUpload({ orderId, workspaceId, onSuccess: membersData.loadMembers })
   const { isRecognizing, recognizePassport } = useOcrRecognition()
 
-  // 從 localStorage 讀取欄位顯示設定
+  // 從 localStorage 讀取欄位顯示設定（v2: 2026-01-05 重置預設值）
+  const COLUMN_VISIBILITY_KEY = 'memberListColumnVisibility_v2'
   const getInitialColumnVisibility = (): ColumnVisibility => {
     if (typeof window === 'undefined') return defaultColumnVisibility
     try {
-      const saved = localStorage.getItem('memberListColumnVisibility')
+      const saved = localStorage.getItem(COLUMN_VISIBILITY_KEY)
       if (saved) {
         const parsed = JSON.parse(saved)
         // 合併預設值，確保新增的欄位也有預設值
@@ -161,7 +164,7 @@ export function OrderMembersExpandable({
   // 儲存欄位顯示設定到 localStorage（跳過初次渲染）
   useEffect(() => {
     if (isInitialMount.current) return
-    localStorage.setItem('memberListColumnVisibility', JSON.stringify(columnVisibility))
+    localStorage.setItem(COLUMN_VISIBILITY_KEY, JSON.stringify(columnVisibility))
   }, [columnVisibility])
 
   // 儲存身份欄位顯示設定（跳過初次渲染）
@@ -480,14 +483,23 @@ export function OrderMembersExpandable({
         onSave={memberEdit.handleSaveEdit}
         onRecognize={(url) => recognizePassport(url, () => {})}
       />
-      <ExportDialog
-        isOpen={memberExport.isExportDialogOpen}
-        columns={memberExport.exportColumns as unknown as import('./order-member.types').ExportColumnsConfig}
-        members={membersData.members}
-        departureDate={membersData.departureDate}
-        onClose={() => memberExport.setIsExportDialogOpen(false)}
-        onColumnsChange={(cols) => memberExport.setExportColumns(cols as unknown as typeof memberExport.exportColumns)}
-      />
+      {tour ? (
+        <TourPrintDialog
+          isOpen={memberExport.isExportDialogOpen}
+          tour={tour}
+          members={membersData.members}
+          onClose={() => memberExport.setIsExportDialogOpen(false)}
+        />
+      ) : (
+        <ExportDialog
+          isOpen={memberExport.isExportDialogOpen}
+          columns={memberExport.exportColumns as unknown as import('./order-member.types').ExportColumnsConfig}
+          members={membersData.members}
+          departureDate={membersData.departureDate}
+          onClose={() => memberExport.setIsExportDialogOpen(false)}
+          onColumnsChange={(cols) => memberExport.setExportColumns(cols as unknown as typeof memberExport.exportColumns)}
+        />
+      )}
       <TourRoomManager
         tourId={tourId}
         tour={membersData.departureDate && membersData.returnDate ? {

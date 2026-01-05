@@ -31,6 +31,7 @@ import {
   Baby,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { confirm } from '@/lib/ui/alert-dialog'
 import { formatDateTW } from '@/lib/utils/format-date'
 import {
   parseAmadeusPNR,
@@ -43,8 +44,17 @@ import { usePNRStore } from '@/stores/pnrs-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import type { OrderMember } from '@/components/orders/order-member.types'
-import type { PNR } from '@/types/pnr.types'
+import type { PNR, PNRSegment } from '@/types/pnr.types'
 import type { Json } from '@/lib/supabase/types'
+
+// 航班擴充欄位編輯狀態
+interface SegmentEditData {
+  departureTerminal: string
+  arrivalTerminal: string
+  meal: string
+  isDirect: boolean
+  duration: string
+}
 
 interface TourPnrToolDialogProps {
   isOpen: boolean
@@ -54,6 +64,8 @@ interface TourPnrToolDialogProps {
   tourName: string
   members: OrderMember[]
   onSuccess?: () => void
+  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
+  nested?: boolean
 }
 
 interface PassengerMatch {
@@ -69,6 +81,7 @@ interface PassengerMatch {
   meal: string[]
   ticketPrice: number | null
   ticketNumber: string | null  // 機票號碼
+  existingPnr: string | null   // 團員現有的 PNR（用於檢測覆蓋）
 }
 
 // 簡單的姓名比對（移除空格、轉大寫）
@@ -141,12 +154,14 @@ export function TourPnrToolDialog({
   tourName,
   members,
   onSuccess,
+  nested = false,
 }: TourPnrToolDialogProps) {
   const [rawPNR, setRawPNR] = useState('')
   const [parsedPNR, setParsedPNR] = useState<ParsedPNR | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [passengerMatches, setPassengerMatches] = useState<PassengerMatch[]>([])
+  const [segmentEdits, setSegmentEdits] = useState<Record<number, SegmentEditData>>({})
 
   const { create: createPNR } = usePNRStore()
   const { user } = useAuthStore()
@@ -178,6 +193,7 @@ export function TourPnrToolDialog({
       setError('請貼上 PNR 電報內容')
       setParsedPNR(null)
       setPassengerMatches([])
+      setSegmentEdits({})
       return
     }
 
@@ -185,6 +201,19 @@ export function TourPnrToolDialog({
       const result = parseAmadeusPNR(rawPNR)
       setParsedPNR(result)
       setError(null)
+
+      // 初始化航班擴充欄位（從已解析的 segments 取得預設值）
+      const initialEdits: Record<number, SegmentEditData> = {}
+      result.segments.forEach((seg, index) => {
+        initialEdits[index] = {
+          departureTerminal: seg.departureTerminal || '',
+          arrivalTerminal: seg.arrivalTerminal || '',
+          meal: seg.meal || '',
+          isDirect: seg.isDirect || false,
+          duration: seg.duration || '',
+        }
+      })
+      setSegmentEdits(initialEdits)
 
       // 自動比對旅客（使用 passengers 陣列取得完整資訊）
       const matches: PassengerMatch[] = result.passengers.map((passenger, index) => {
@@ -216,6 +245,7 @@ export function TourPnrToolDialog({
           meal,
           ticketPrice: matchedMember?.flight_cost || null,
           ticketNumber,
+          existingPnr: matchedMember?.pnr || null,
         }
       })
 
@@ -255,6 +285,7 @@ export function TourPnrToolDialog({
     setParsedPNR(null)
     setError(null)
     setPassengerMatches([])
+    setSegmentEdits({})
   }, [storageKey])
 
   // 清除草稿（儲存成功後）
@@ -278,18 +309,65 @@ export function TourPnrToolDialog({
         memberName: member?.chinese_name || null,
         memberPassportName: member?.passport_name || null,
         ticketPrice: member?.flight_cost || match.ticketPrice,
+        existingPnr: member?.pnr || null,
       }
     }))
   }, [members])
+
+  // 更新航班擴充欄位
+  const handleSegmentEdit = useCallback((index: number, field: keyof SegmentEditData, value: string | boolean) => {
+    setSegmentEdits(prev => ({
+      ...prev,
+      [index]: {
+        ...(prev[index] || {
+          departureTerminal: '',
+          arrivalTerminal: '',
+          meal: '',
+          isDirect: false,
+          duration: '',
+        }),
+        [field]: value,
+      },
+    }))
+  }, [])
 
   // 儲存
   const handleSave = useCallback(async () => {
     if (!parsedPNR || !user?.workspace_id) return
 
+    // 檢查是否有 PNR 衝突，需要確認
+    const conflicts = passengerMatches.filter(m =>
+      m.memberId && m.existingPnr && m.existingPnr !== parsedPNR.recordLocator
+    )
+    if (conflicts.length > 0) {
+      const names = conflicts.map(m => m.memberName || m.pnrName).join('、')
+      const confirmed = await confirm(
+        `以下團員的 PNR 將被覆蓋：\n${names}\n\n確定要繼續嗎？`,
+        { title: 'PNR 覆蓋確認', type: 'warning' }
+      )
+      if (!confirmed) return
+    }
+
     setIsSaving(true)
     try {
       const { supabase } = await import('@/lib/supabase/client')
       const recordLocator = parsedPNR.recordLocator || 'UNKNWN'
+
+      // 合併 segmentEdits 到 segments
+      const mergedSegments: PNRSegment[] = parsedPNR.segments.map((seg, index) => {
+        const edits = segmentEdits[index]
+        if (edits) {
+          return {
+            ...seg,
+            departureTerminal: edits.departureTerminal || undefined,
+            arrivalTerminal: edits.arrivalTerminal || undefined,
+            meal: edits.meal || undefined,
+            isDirect: edits.isDirect || undefined,
+            duration: edits.duration || undefined,
+          }
+        }
+        return seg
+      })
 
       // 1. 檢查 PNR 是否已存在
       const { data: existingPNR } = await supabase
@@ -307,7 +385,7 @@ export function TourPnrToolDialog({
             raw_pnr: rawPNR,
             passenger_names: parsedPNR.passengerNames,
             ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
-            segments: parsedPNR.segments as unknown as Json,
+            segments: mergedSegments as unknown as Json,
             special_requests: parsedPNR.specialRequests as unknown as string[],
             other_info: parsedPNR.otherInfo as unknown as string[],
             tour_id: tourId,
@@ -325,7 +403,7 @@ export function TourPnrToolDialog({
           passenger_names: parsedPNR.passengerNames,
           ticketing_deadline: parsedPNR.ticketingDeadline?.toISOString() || null,
           cancellation_deadline: null,
-          segments: parsedPNR.segments,
+          segments: mergedSegments,
           special_requests: parsedPNR.specialRequests || null,
           other_info: parsedPNR.otherInfo || null,
           status: 'active',
@@ -402,7 +480,7 @@ export function TourPnrToolDialog({
     } finally {
       setIsSaving(false)
     }
-  }, [parsedPNR, rawPNR, user, tourId, tourCode, passengerMatches, createPNR, onSuccess, onClose])
+  }, [parsedPNR, rawPNR, user, tourId, segmentEdits, passengerMatches, createPNR, onSuccess, onClose, clearDraft])
 
   // 載入保存的草稿
   useEffect(() => {
@@ -448,6 +526,7 @@ export function TourPnrToolDialog({
                       meal,
                       ticketPrice: matchedMember?.flight_cost || null,
                       ticketNumber,
+                      existingPnr: matchedMember?.pnr || null,
                     }
                   })
                   setPassengerMatches(matches)
@@ -485,9 +564,18 @@ export function TourPnrToolDialog({
     return { matched, total, infantCount, childCount, allMatched: matched === total && total > 0 }
   }, [passengerMatches])
 
+  // 檢測是否有 PNR 衝突（團員已有不同的 PNR）
+  const pnrConflicts = useMemo(() => {
+    if (!parsedPNR?.recordLocator) return []
+    const newPnr = parsedPNR.recordLocator
+    return passengerMatches.filter(m =>
+      m.memberId && m.existingPnr && m.existingPnr !== newPnr
+    )
+  }, [passengerMatches, parsedPNR?.recordLocator])
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent nested={nested} className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />
@@ -549,6 +637,46 @@ export function TourPnrToolDialog({
             </div>
           )}
 
+          {/* PNR 衝突警告 */}
+          {pnrConflicts.length > 0 && (
+            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-700 text-sm">
+              <div className="flex items-center gap-2 font-medium mb-2">
+                <AlertTriangle size={16} />
+                以下團員已有不同的 PNR，儲存後將覆蓋：
+              </div>
+              <ul className="ml-6 space-y-1">
+                {pnrConflicts.map(m => (
+                  <li key={m.memberId}>
+                    <span className="font-medium">{m.memberName || m.pnrName}</span>
+                    <span className="mx-2">:</span>
+                    <span className="font-mono text-orange-600">{m.existingPnr}</span>
+                    <ArrowRight size={12} className="inline mx-1" />
+                    <span className="font-mono text-green-600">{parsedPNR?.recordLocator}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 未匹配乘客警告 */}
+          {parsedPNR && passengerMatches.some(m => !m.memberId) && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm">
+              <div className="flex items-center gap-2 font-medium mb-2">
+                <Users size={16} />
+                以下乘客未比對到團員（需手動選擇或新增團員）：
+              </div>
+              <ul className="ml-6 space-y-1">
+                {passengerMatches.filter(m => !m.memberId).map(m => (
+                  <li key={m.pnrIndex} className="font-mono">
+                    {m.pnrName}
+                    {m.passengerType === 'CHD' && <span className="ml-2 text-blue-600">(兒童)</span>}
+                    {m.infant && <span className="ml-2 text-pink-600">(+嬰兒)</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* 解析結果 */}
           {parsedPNR && (
             <div className="space-y-4">
@@ -596,7 +724,7 @@ export function TourPnrToolDialog({
               {parsedPNR.segments.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-morandi-secondary">航班資訊</h4>
-                  <div className="grid gap-2">
+                  <div className="grid gap-3">
                     {parsedPNR.segments.map((seg, i) => {
                       // 判斷問題狀態
                       const isProblematicStatus = ['HX', 'XX', 'UC', 'UN', 'NO'].includes(seg.status)
@@ -611,40 +739,102 @@ export function TourPnrToolDialog({
                         NO: '無動作',
                       }[seg.status] || seg.status
 
+                      const editData = segmentEdits[i] || {
+                        departureTerminal: '',
+                        arrivalTerminal: '',
+                        meal: '',
+                        isDirect: false,
+                        duration: '',
+                      }
+
                       return (
                         <div key={i} className={cn(
-                          "flex items-center gap-3 p-2 border rounded text-sm",
-                          isProblematicStatus ? "bg-red-50 border-red-200" : "bg-white border-border"
+                          "border rounded-lg overflow-hidden",
+                          isProblematicStatus ? "border-red-200" : "border-border"
                         )}>
-                          <span className="font-medium">
-                            {getAirlineName(seg.airline) || seg.airline} {seg.flightNumber}
-                          </span>
-                          <span className="text-morandi-secondary">{seg.class}</span>
-                          <span>{seg.departureDate}</span>
-                          <div className="flex items-center gap-1">
-                            <span>{getAirportName(seg.origin) || seg.origin}</span>
-                            <ArrowRight size={12} className="text-morandi-secondary" />
-                            <span>{getAirportName(seg.destination) || seg.destination}</span>
-                          </div>
-                          {seg.departureTime && (
-                            <span className="text-morandi-secondary">
-                              {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}
-                            </span>
-                          )}
-                          {/* 狀態標籤 */}
-                          <span className={cn(
-                            "px-2 py-0.5 text-xs rounded-full",
-                            isProblematicStatus
-                              ? "bg-red-100 text-red-700"
-                              : seg.status === 'HK' || seg.status === 'RR'
-                                ? "bg-green-100 text-green-700"
-                                : "bg-gray-100 text-gray-600"
+                          {/* 航班基本資訊 */}
+                          <div className={cn(
+                            "flex items-center gap-3 p-2 text-sm",
+                            isProblematicStatus ? "bg-red-50" : "bg-white"
                           )}>
-                            {statusLabel}
-                          </span>
-                          {isProblematicStatus && (
-                            <AlertTriangle size={14} className="text-red-500" />
-                          )}
+                            <span className="font-medium">
+                              {getAirlineName(seg.airline) || seg.airline} {seg.flightNumber}
+                            </span>
+                            <span className="text-morandi-secondary">{seg.class}</span>
+                            <span>{seg.departureDate}</span>
+                            <div className="flex items-center gap-1">
+                              <span>{getAirportName(seg.origin) || seg.origin}</span>
+                              <ArrowRight size={12} className="text-morandi-secondary" />
+                              <span>{getAirportName(seg.destination) || seg.destination}</span>
+                            </div>
+                            {seg.departureTime && (
+                              <span className="text-morandi-secondary">
+                                {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}
+                              </span>
+                            )}
+                            {/* 狀態標籤 */}
+                            <span className={cn(
+                              "px-2 py-0.5 text-xs rounded-full",
+                              isProblematicStatus
+                                ? "bg-red-100 text-red-700"
+                                : seg.status === 'HK' || seg.status === 'RR'
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-600"
+                            )}>
+                              {statusLabel}
+                            </span>
+                            {isProblematicStatus && (
+                              <AlertTriangle size={14} className="text-red-500" />
+                            )}
+                          </div>
+                          {/* 擴充欄位編輯 */}
+                          <div className="flex flex-wrap items-center gap-3 px-3 py-2 bg-morandi-container/20 border-t border-border/50 text-xs">
+                            <div className="flex items-center gap-1">
+                              <label className="text-morandi-secondary whitespace-nowrap">出發航站</label>
+                              <Input
+                                value={editData.departureTerminal}
+                                onChange={(e) => handleSegmentEdit(i, 'departureTerminal', e.target.value)}
+                                placeholder="T1"
+                                className="w-14 h-6 text-xs px-2"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <label className="text-morandi-secondary whitespace-nowrap">抵達航站</label>
+                              <Input
+                                value={editData.arrivalTerminal}
+                                onChange={(e) => handleSegmentEdit(i, 'arrivalTerminal', e.target.value)}
+                                placeholder="T2"
+                                className="w-14 h-6 text-xs px-2"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <label className="text-morandi-secondary whitespace-nowrap">餐食</label>
+                              <Input
+                                value={editData.meal}
+                                onChange={(e) => handleSegmentEdit(i, 'meal', e.target.value)}
+                                placeholder="午餐"
+                                className="w-16 h-6 text-xs px-2"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <label className="text-morandi-secondary whitespace-nowrap">飛行時間</label>
+                              <Input
+                                value={editData.duration}
+                                onChange={(e) => handleSegmentEdit(i, 'duration', e.target.value)}
+                                placeholder="1小時30分"
+                                className="w-20 h-6 text-xs px-2"
+                              />
+                            </div>
+                            <label className="flex items-center gap-1 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={editData.isDirect}
+                                onChange={(e) => handleSegmentEdit(i, 'isDirect', e.target.checked)}
+                                className="rounded border-morandi-border"
+                              />
+                              <span className="text-morandi-secondary">直飛</span>
+                            </label>
+                          </div>
                         </div>
                       )
                     })}
@@ -707,9 +897,20 @@ export function TourPnrToolDialog({
                           </td>
                           <td className="px-3 py-2">
                             {match.memberId ? (
-                              <div className="flex items-center gap-1">
-                                <Check size={14} className="text-green-600" />
-                                <span>{match.memberName || match.memberPassportName}</span>
+                              <div>
+                                <div className="flex items-center gap-1">
+                                  <Check size={14} className="text-green-600" />
+                                  <span>{match.memberName || match.memberPassportName}</span>
+                                </div>
+                                {/* 顯示將被覆蓋的現有 PNR */}
+                                {match.existingPnr && match.existingPnr !== parsedPNR?.recordLocator && (
+                                  <div className="flex items-center gap-1 mt-1 text-xs text-orange-600">
+                                    <AlertTriangle size={10} />
+                                    <span className="font-mono">{match.existingPnr}</span>
+                                    <ArrowRight size={10} />
+                                    <span className="font-mono text-green-600">{parsedPNR?.recordLocator}</span>
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <select

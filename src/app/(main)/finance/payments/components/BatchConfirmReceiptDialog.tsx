@@ -139,13 +139,10 @@ export function BatchConfirmReceiptDialog({
       const orderUpdates = new Map<string, number>()
 
       for (const item of selectedItems) {
-        // 更新收款單狀態
+        // 更新收款單狀態（保留原始備註不變）
         await updateReceipt(item.receipt.id, {
           actual_amount: item.actualAmount,
           status: '1', // 已確認
-          note: item.receipt.note
-            ? `${item.receipt.note}\n[會計批量確認] ${formatDate(new Date())}`
-            : `[會計批量確認] ${formatDate(new Date())}`,
         })
 
         // 累計每個訂單的確認金額

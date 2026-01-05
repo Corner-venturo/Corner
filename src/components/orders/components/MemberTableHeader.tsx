@@ -32,7 +32,7 @@ export function MemberTableHeader({
   customCostFields,
   columnVisibility,
 }: MemberTableHeaderProps) {
-  // 預設全部顯示
+  // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
     passport_name: true,
     birth_date: true,
@@ -41,9 +41,9 @@ export function MemberTableHeader({
     passport_number: true,
     passport_expiry: true,
     special_meal: true,
-    total_payable: true,
-    deposit_amount: true,
-    balance: true,
+    total_payable: false,
+    deposit_amount: false,
+    balance: false,
     remarks: true,
     pnr: false,
     ticket_number: false,
@@ -51,7 +51,7 @@ export function MemberTableHeader({
   }
 
   return (
-    <thead className="sticky top-0 z-10">
+    <thead className="sticky top-0 z-10 bg-[#f6f4f1]">
       <tr>
         {/* 凍結欄位：序號 */}
         <th className={`${thStickyClass} left-0 min-w-[40px]`}>序</th>

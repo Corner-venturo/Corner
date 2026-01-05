@@ -90,10 +90,15 @@ export function useTourPayments({
 
     return receipts
       .filter(receipt => {
+        // 排除已刪除的收款單
+        if (receipt.deleted_at) return false
+
         if (orderFilter) {
           return receipt.order_id === orderFilter
         }
-        return receipt.order_id && tourOrderIds.has(receipt.order_id)
+        // 包含: 訂單屬於此團 OR 收款單直接關聯此團
+        return (receipt.order_id && tourOrderIds.has(receipt.order_id)) ||
+               receipt.tour_id === tour.id
       })
       .map(receipt => ({
         id: receipt.id,
@@ -128,15 +133,27 @@ export function useTourPayments({
         .select('id')
         .eq('tour_id', tour.id)
 
-      if (!tourOrdersData || tourOrdersData.length === 0) return
-
-      const orderIds = tourOrdersData.map(o => o.id)
+      const orderIds = (tourOrdersData || []).map(o => o.id)
 
       // 計算總收款（已確認的收據）
-      const { data: receiptsData } = await supabase
+      // 包含：訂單關聯的收款 OR 直接關聯 tour 的收款
+      // 注意：必須過濾已刪除的收款單
+      let receiptsQuery = supabase
         .from('receipts')
-        .select('actual_amount, status')
-        .in('order_id', orderIds)
+        .select('actual_amount, receipt_amount, status')
+        .is('deleted_at', null) // 過濾已刪除的收款單
+
+      if (orderIds.length > 0) {
+        // 查詢：order_id 在訂單中 OR tour_id 直接等於此團
+        receiptsQuery = receiptsQuery.or(
+          `order_id.in.(${orderIds.join(',')}),tour_id.eq.${tour.id}`
+        )
+      } else {
+        // 沒有訂單時，只查詢直接關聯 tour 的收款
+        receiptsQuery = receiptsQuery.eq('tour_id', tour.id)
+      }
+
+      const { data: receiptsData } = await receiptsQuery
 
       const totalRevenue = (receiptsData || [])
         .filter(r => Number(r.status) === 1) // 已確認
@@ -194,6 +211,7 @@ export function useTourPayments({
 
       const receiptData: Partial<Receipt> = {
         order_id: data.order_id || null,
+        tour_id: tour.id,  // 設定 tour_id 以便計算總收入
         order_number: order?.order_number || null,
         tour_name: tour.name || null,
         receipt_date: new Date().toISOString(),

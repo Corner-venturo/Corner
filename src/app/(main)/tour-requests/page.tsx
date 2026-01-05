@@ -1,193 +1,99 @@
 'use client'
 
 /**
- * 需求管理頁面
- * 使用標準 ListPageLayout 佈局
+ * 需求確認單頁面
+ * 顯示旅遊團列表，點擊後開啟團確單管理介面
  */
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import {
   ClipboardList,
-  Plane,
-  Hotel,
-  Car,
-  Utensils,
-  Ticket,
-  User,
-  Map as MapIcon,
-  MoreHorizontal,
-  Edit2,
-  Trash2,
-  Eye,
+  MapPin,
+  Calendar,
+  Users,
 } from 'lucide-react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
-import { StatusCell, DateCell, ActionCell, BadgeCell } from '@/components/table-cells'
-import { useTourRequests } from '@/stores/tour-request-store'
-import { logger } from '@/lib/utils/logger'
-import type { Database } from '@/lib/supabase/types'
+import { StatusCell, DateCell, DateRangeCell, NumberCell } from '@/components/table-cells'
+import { useTours } from '@/hooks/cloud-hooks'
+import type { Tour } from '@/stores/types'
 import type { TableColumn } from '@/components/ui/enhanced-table'
-import { TourRequestDialog } from './components'
-import { TourRequestDetailDialog } from './components/TourRequestDetailDialog'
+import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
 
-type TourRequest = Database['public']['Tables']['tour_requests']['Row']
-
-// 類別標籤
-const CATEGORY_LABELS: Record<string, string> = {
-  flight: '機票',
-  hotel: '住宿',
-  transport: '交通',
-  restaurant: '餐廳',
-  ticket: '門票',
-  guide: '導遊',
-  itinerary: '行程',
-  other: '其他',
-}
-
-// 類別圖示對應
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  flight: Plane,
-  hotel: Hotel,
-  transport: Car,
-  restaurant: Utensils,
-  ticket: Ticket,
-  guide: User,
-  itinerary: MapIcon,
-  other: MoreHorizontal,
-}
-
-// 類別 Badge 顏色
-const CATEGORY_VARIANTS: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
-  flight: 'info',
-  hotel: 'success',
-  transport: 'warning',
-  restaurant: 'danger',
-  ticket: 'info',
-  guide: 'default',
-  itinerary: 'success',
-  other: 'default',
-}
-
-// 優先級標籤
-const PRIORITY_LABELS: Record<string, string> = {
-  urgent: '緊急',
-  high: '高',
-  normal: '一般',
-  low: '低',
-}
-
-// 優先級 Badge 顏色
-const PRIORITY_VARIANTS: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
-  urgent: 'danger',
-  high: 'warning',
-  normal: 'default',
-  low: 'info',
-}
-
-// 狀態 Tab 配置（與 status-config.ts tour_request 保持一致）
+// 狀態 Tab 配置
 const STATUS_TABS = [
   { value: 'all', label: '全部' },
-  { value: 'pending', label: '待處理' },
-  { value: 'in_progress', label: '處理中' },
-  { value: 'replied', label: '已回復' },
-  { value: 'confirmed', label: '已確認' },
-  { value: 'completed', label: '已完成' },
-  { value: 'cancelled', label: '已取消' },
+  { value: 'planning', label: '規劃中' },
+  { value: 'confirmed', label: '已成團' },
+  { value: 'in_progress', label: '出團中' },
+  { value: 'completed', label: '已結團' },
 ]
 
 export default function TourRequestsPage() {
-  const { items: tourRequests, isLoading: loading, delete: deleteRequest } = useTourRequests()
+  const { items: tours, isLoading: loading } = useTours()
 
   // Dialog 狀態
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [showDetailDialog, setShowDetailDialog] = useState(false)
-  const [selectedRequest, setSelectedRequest] = useState<TourRequest | null>(null)
+  const [selectedTour, setSelectedTour] = useState<Tour | null>(null)
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
 
-  // 點擊需求項目
-  const handleRowClick = useCallback((request: TourRequest) => {
-    setSelectedRequest(request)
-    setShowDetailDialog(true)
+  // 點擊旅遊團
+  const handleRowClick = useCallback((tour: Tour) => {
+    setSelectedTour(tour)
+    setShowConfirmationDialog(true)
   }, [])
 
-  // 編輯需求
-  const handleEdit = useCallback((request: TourRequest) => {
-    setSelectedRequest(request)
-    setShowCreateDialog(true)
+  // 關閉 Dialog
+  const handleCloseDialog = useCallback(() => {
+    setShowConfirmationDialog(false)
+    setSelectedTour(null)
   }, [])
 
-  // 刪除需求
-  const handleDelete = useCallback(async (request: TourRequest) => {
-    if (window.confirm(`確定要刪除需求「${request.title}」嗎？`)) {
-      try {
-        await deleteRequest(request.id)
-        logger.log('需求單已刪除')
-      } catch (error) {
-        logger.error('刪除失敗:', error)
-      }
-    }
-  }, [deleteRequest])
-
-
+  // 過濾已取消的團（只顯示進行中的團）
+  const activeTours = useMemo(() => {
+    return tours.filter(tour => tour.status !== 'cancelled')
+  }, [tours])
 
   // 表格欄位定義
-  const columns: TableColumn<TourRequest>[] = [
+  const columns: TableColumn<Tour>[] = [
     {
       key: 'code',
-      label: '編號',
+      label: '團號',
       width: '140px',
       render: (_, row) => (
-        <span className="font-mono text-sm text-morandi-primary">{row.code}</span>
+        <span className="font-mono text-sm font-medium text-morandi-primary">{row.code}</span>
       ),
     },
     {
-      key: 'title',
-      label: '需求名稱',
+      key: 'name',
+      label: '團名',
       width: '200px',
       render: (_, row) => (
         <div className="flex items-center gap-2">
-          {(() => {
-            const Icon = CATEGORY_ICONS[row.category] || MoreHorizontal
-            return <Icon size={16} className="text-morandi-secondary flex-shrink-0" />
-          })()}
-          <span className="font-medium text-morandi-primary truncate">{row.title}</span>
+          <MapPin size={16} className="text-morandi-secondary flex-shrink-0" />
+          <span className="font-medium text-morandi-primary truncate">{row.name}</span>
         </div>
       ),
     },
     {
-      key: 'category',
-      label: '類別',
-      width: '80px',
+      key: 'date_range',
+      label: '出團日期',
+      width: '180px',
       render: (_, row) => (
-        <BadgeCell
-          text={CATEGORY_LABELS[row.category] || row.category}
-          variant={CATEGORY_VARIANTS[row.category] || 'default'}
+        <DateRangeCell
+          start={row.departure_date}
+          end={row.return_date}
+          showDuration
         />
       ),
     },
     {
-      key: 'tour_code',
-      label: '團號',
-      width: '130px',
-      render: (_, row) => (
-        <span className="font-mono text-sm text-morandi-primary">
-          {row.tour_code || '-'}
-        </span>
-      ),
-    },
-    {
-      key: 'service_date',
-      label: '服務日期',
-      width: '120px',
-      render: (_, row) => <DateCell date={row.service_date} showIcon={false} />,
-    },
-    {
-      key: 'priority',
-      label: '優先級',
+      key: 'pax',
+      label: '人數',
       width: '80px',
       render: (_, row) => (
-        <BadgeCell
-          text={PRIORITY_LABELS[row.priority || 'normal'] || '一般'}
-          variant={PRIORITY_VARIANTS[row.priority || 'normal'] || 'default'}
-        />
+        <div className="flex items-center gap-1">
+          <Users size={14} className="text-morandi-secondary" />
+          <NumberCell value={row.current_participants || 0} />
+        </div>
       ),
     },
     {
@@ -195,44 +101,7 @@ export default function TourRequestsPage() {
       label: '狀態',
       width: '100px',
       render: (_, row) => (
-        <StatusCell type="tour_request" status={row.status || 'pending'} />
-      ),
-    },
-    {
-      key: 'handler_type',
-      label: '處理方式',
-      width: '100px',
-      render: (_, row) => (
-        <span className="text-sm text-morandi-secondary">
-          {row.handler_type === 'internal' ? '內部處理' : '外部供應商'}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      label: '',
-      width: '100px',
-      render: (_, row) => (
-        <ActionCell
-          actions={[
-            {
-              icon: Eye,
-              label: '檢視',
-              onClick: () => handleRowClick(row),
-            },
-            {
-              icon: Edit2,
-              label: '編輯',
-              onClick: () => handleEdit(row),
-            },
-            {
-              icon: Trash2,
-              label: '刪除',
-              onClick: () => handleDelete(row),
-              variant: 'danger',
-            },
-          ]}
-        />
+        <StatusCell type="tour" status={row.status || 'planning'} />
       ),
     },
   ]
@@ -240,44 +109,29 @@ export default function TourRequestsPage() {
   return (
     <>
       <ListPageLayout
-        title="需求管理"
+        title="需求確認單"
         icon={ClipboardList}
         breadcrumb={[
           { label: '首頁', href: '/' },
-          { label: '需求管理', href: '/tour-requests' },
+          { label: '需求確認單', href: '/tour-requests' },
         ]}
-        data={tourRequests}
+        data={activeTours}
         loading={loading}
         columns={columns}
         onRowClick={handleRowClick}
         searchable
-        searchPlaceholder="搜尋編號、需求名稱、團號..."
-        searchFields={['code', 'title', 'tour_code', 'tour_name']}
+        searchPlaceholder="搜尋團號、團名..."
+        searchFields={['code', 'name', 'location']}
         statusTabs={STATUS_TABS}
         statusField="status"
         defaultStatusTab="all"
       />
 
-      {/* 新增/編輯 Dialog */}
-      <TourRequestDialog
-        isOpen={showCreateDialog}
-        onClose={() => {
-          setShowCreateDialog(false)
-          setSelectedRequest(null)
-        }}
-        request={selectedRequest}
-        defaultTourId={null}
-      />
-
-      {/* 詳情 Dialog */}
-      <TourRequestDetailDialog
-        isOpen={showDetailDialog}
-        onClose={() => setShowDetailDialog(false)}
-        request={selectedRequest}
-        onEdit={() => {
-          setShowDetailDialog(false)
-          setShowCreateDialog(true)
-        }}
+      {/* 團確單 Dialog */}
+      <TourConfirmationDialog
+        open={showConfirmationDialog}
+        tour={selectedTour}
+        onClose={handleCloseDialog}
       />
     </>
   )

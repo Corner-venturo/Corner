@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -10,13 +11,131 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2, X, Save, Share2, Plus, Calendar, Ticket } from 'lucide-react'
+import { Trash2, X, Save, Share2, Plus, Calendar, Ticket, Loader2 } from 'lucide-react'
+import { logger } from '@/lib/utils/logger'
+import { cn } from '@/lib/utils'
 import { ShareAdvanceDialog } from '../ShareAdvanceDialog'
 import { ShareOrdersDialog } from '../ShareOrdersDialog'
 import { ShareTodoDialog } from '../ShareTodoDialog'
 import { CreateReceiptDialog } from '../CreateReceiptDialog'
 import { CreatePaymentRequestDialog } from '../CreatePaymentRequestDialog'
 import { PLACEHOLDER_TEXT } from './constants'
+
+// 機票狀態 Dialog 組件
+function TicketStatusDialog({
+  open,
+  onClose,
+  channelId,
+}: {
+  open: boolean
+  onClose: () => void
+  channelId?: string
+}) {
+  const [selectedDays, setSelectedDays] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSendQuery = useCallback(async (days: number) => {
+    if (!channelId) {
+      setError('無法取得頻道資訊')
+      return
+    }
+
+    setSelectedDays(days)
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/bot/ticket-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel_id: channelId,
+          days,
+          notify_sales: false, // 不發送給業務，只發到當前頻道
+        }),
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        // 成功發送，關閉 Dialog
+        onClose()
+      } else {
+        setError(data.message || '查詢失敗')
+      }
+    } catch (err) {
+      logger.error('查詢機票狀態失敗:', err)
+      setError('查詢失敗，請稍後再試')
+    } finally {
+      setLoading(false)
+      setSelectedDays(null)
+    }
+  }, [channelId, onClose])
+
+  const handleClose = useCallback(() => {
+    setSelectedDays(null)
+    setError(null)
+    onClose()
+  }, [onClose])
+
+  const periodOptions = [
+    { days: 30, label: '1 個月' },
+    { days: 90, label: '3 個月' },
+    { days: 180, label: '6 個月' },
+  ]
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Ticket size={20} className="text-morandi-gold" />
+            確認機票狀況
+          </DialogTitle>
+          <DialogDescription>選擇查詢區間，機器人會回傳未開票旅客清單</DialogDescription>
+        </DialogHeader>
+        <div className="py-4 space-y-4">
+          <div className="flex gap-2">
+            {periodOptions.map((option) => (
+              <Button
+                key={option.days}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  'flex-1',
+                  selectedDays === option.days && 'border-morandi-gold bg-morandi-gold/10 text-morandi-gold'
+                )}
+                onClick={() => handleSendQuery(option.days)}
+                disabled={loading}
+              >
+                {loading && selectedDays === option.days ? (
+                  <Loader2 size={14} className="animate-spin mr-1" />
+                ) : null}
+                {option.label}
+              </Button>
+            ))}
+          </div>
+
+          {error && (
+            <div className="border border-morandi-red/30 bg-morandi-red/5 rounded-lg p-4">
+              <p className="text-sm text-morandi-red text-center">{error}</p>
+            </div>
+          )}
+
+          <p className="text-xs text-morandi-secondary text-center">
+            點擊後機器人會在聊天室回覆查詢結果
+          </p>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} className="gap-2">
+            <X size={16} />
+            取消
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
 import type { Channel } from '@/stores/workspace/types'
 import type { AdvanceItem } from '@/stores/workspace/types'
 
@@ -387,36 +506,11 @@ export function DialogsContainer({
 
       {/* Bot: 確認機票狀況 Dialog */}
       {showCheckTicketStatusDialog && setShowCheckTicketStatusDialog && (
-        <Dialog open={showCheckTicketStatusDialog} onOpenChange={setShowCheckTicketStatusDialog}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Ticket size={20} className="text-morandi-gold" />
-                確認機票狀況
-              </DialogTitle>
-              <DialogDescription>查詢指定區間內未開票的旅客</DialogDescription>
-            </DialogHeader>
-            <div className="py-4 space-y-4">
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">1 個月</Button>
-                <Button variant="outline" size="sm" className="flex-1">3 個月</Button>
-                <Button variant="outline" size="sm" className="flex-1">6 個月</Button>
-              </div>
-              <div className="border border-morandi-container rounded-lg p-4">
-                <p className="text-sm text-morandi-secondary text-center">選擇區間後顯示未開票旅客...</p>
-                <p className="text-xs text-morandi-secondary text-center mt-1">
-                  包含旅客姓名、團號、開票期限 (DL)
-                </p>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowCheckTicketStatusDialog(false)} className="gap-2">
-                <X size={16} />
-                關閉
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <TicketStatusDialog
+          open={showCheckTicketStatusDialog}
+          onClose={() => setShowCheckTicketStatusDialog(false)}
+          channelId={selectedChannel?.id}
+        />
       )}
 
       {/* Bot: 復盤 Dialog */}

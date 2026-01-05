@@ -52,6 +52,12 @@ export interface PNRSegment {
   departureTime?: string; // HHMM
   arrivalTime?: string; // HHMM
   aircraft?: string; // 機型
+  // === 擴充欄位 (2026-01-04) - 列印時顯示 ===
+  departureTerminal?: string; // 出發航站 (e.g., "2", "T2")
+  arrivalTerminal?: string; // 抵達航站 (e.g., "3", "T3")
+  meal?: string; // 航班餐食 (e.g., "午餐", "晚餐", "無")
+  isDirect?: boolean; // 是否直飛
+  duration?: string; // 飛行時間 (e.g., "01小時45分")
 }
 
 export interface CreatePNRInput {

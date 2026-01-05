@@ -14,6 +14,8 @@ import type { Workspace, Channel, ChannelGroup } from './types'
 import type { BaseEntity } from '@/types'
 import { setCurrentWorkspaceFilter } from '@/lib/workspace-filter'
 import { useAuthStore } from '../auth-store'
+import { deleteAllFilesInFolder } from '@/services/storage'
+import { logger } from '@/lib/utils/logger'
 
 type WorkspaceEntity = Workspace & BaseEntity
 
@@ -199,7 +201,20 @@ export const useChannelsStore = () => {
     },
 
     deleteChannel: async (id: string) => {
+      // 先清理 Storage 中的頻道附件檔案
+      try {
+        const result = await deleteAllFilesInFolder(id)
+        if (result.deleted > 0) {
+          logger.log(`已清理頻道 ${id} 的 ${result.deleted} 個附件檔案`)
+        }
+      } catch (error) {
+        // Storage 清理失敗不應阻止頻道刪除，只記錄警告
+        logger.warn(`清理頻道 ${id} 附件檔案時發生錯誤:`, error)
+      }
+
+      // 刪除頻道（會級聯刪除 messages）
       await channelStore.delete(id)
+
       // 如果刪除的是當前選中的頻道，清除選擇
       if (uiStore.selectedChannel?.id === id) {
         uiStore.setSelectedChannel(null)
@@ -214,6 +229,25 @@ export const useChannelsStore = () => {
       if (!channel) return
 
       await channelStore.update(id, { is_favorite: !channel.is_favorite })
+    },
+
+    archiveChannel: async (id: string) => {
+      const now = new Date().toISOString()
+      await channelStore.update(id, {
+        is_archived: true,
+        archived_at: now,
+        updated_at: now,
+      })
+      logger.log(`頻道 ${id} 已封存`)
+    },
+
+    unarchiveChannel: async (id: string) => {
+      await channelStore.update(id, {
+        is_archived: false,
+        archived_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      logger.log(`頻道 ${id} 已解除封存`)
     },
 
     selectChannel: async (channel: Channel | null) => {

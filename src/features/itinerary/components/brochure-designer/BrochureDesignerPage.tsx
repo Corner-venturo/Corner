@@ -53,14 +53,14 @@ import {
 } from './templates/brochure-generator'
 import { ALL_THEMES, type BrochureTheme } from './templates/themes'
 import { templateToElements, type TemplatePageType } from './utils/templateToElements'
-import { extractFromTemplateRef } from './utils/extractElementsFromDOM'
+// DOM 提取已移除 - 現在直接使用 templateToElements 生成 Canvas 元素
 import { logger } from '@/lib/utils/logger'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { Itinerary } from '@/stores/types'
 
-// 編輯模式
-type EditorMode = 'template' | 'canvas'
+// 編輯模式：canvas (編輯) 或 preview (預覽)
+type EditorMode = 'canvas' | 'preview'
 
 // 頁面類型（基本頁面 + 動態每日頁面）
 type BasePageType = 'cover' | 'blank' | 'contents' | 'overview-left' | 'overview-right' | 'accommodation-left' | 'accommodation-right'
@@ -137,8 +137,8 @@ export function BrochureDesignerPage() {
   const { sidebarCollapsed } = useAuthStore()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-  // 編輯模式
-  const [editorMode, setEditorMode] = useState<EditorMode>('template')
+  // 編輯模式：預設為 canvas（編輯模式）
+  const [editorMode, setEditorMode] = useState<EditorMode>('canvas')
   const [showLayerPanel, setShowLayerPanel] = useState(true)
 
   // 參考線顯示狀態
@@ -242,152 +242,37 @@ export function BrochureDesignerPage() {
 
   const currentPage = allPages[currentPageIndex] || allPages[0]
 
-  // 從 DOM 提取模板元素座標，然後載入到 Canvas
-  const loadTemplateElementsFromDOM = useCallback(async () => {
-    if (!isCanvasReady || !currentTemplateRef.current) {
-      logger.warn('[BrochureDesigner] Cannot extract: canvas not ready or template ref null')
-      return
-    }
 
-    try {
-      // 從渲染好的 DOM 提取元素座標
-      const elements = extractFromTemplateRef(currentTemplateRef)
-
-      logger.log('[BrochureDesigner] Extracted elements from DOM:', elements.map(el => ({
-        id: el.id,
-        name: el.name,
-        type: el.type,
-        x: Math.round(el.x),
-        y: Math.round(el.y),
-        width: Math.round(el.width),
-        height: Math.round(el.height),
-      })))
-
-      if (elements.length > 0) {
-        // 載入元素到 canvas
-        await loadElements(elements)
-        setTemplateLoaded(true)
-        logger.log('[BrochureDesigner] Template elements loaded from DOM:', elements.length)
-      } else {
-        logger.warn('[BrochureDesigner] No elements extracted from DOM')
-        toast.error('無法提取模板元素，請確認模板已正確標記')
-      }
-    } catch (error) {
-      logger.error('[BrochureDesigner] Failed to extract template elements:', error)
-      toast.error('模板載入失敗')
-    }
-  }, [isCanvasReady, loadElements])
-
-  // 備用：使用手動計算的座標（當 DOM 提取失敗時）
-  const loadTemplateElementsFallback = useCallback(async () => {
-    if (!isCanvasReady || !currentPage) return
-
-    try {
-      // 取得當前頁面類型對應的元素
-      const pageType = currentPage.type as TemplatePageType
-      const elements = templateToElements(pageType, {
-        coverData,
-        itinerary: currentItinerary,
-        dayIndex: currentPage.dayIndex,
-        side: currentPage.side,
-        accommodations,
-        pageNumber: currentPageIndex + 1,
-      })
-
-      logger.log('[BrochureDesigner] Fallback: Generated elements for', pageType)
-
-      if (elements.length > 0) {
-        await loadElements(elements)
-        setTemplateLoaded(true)
-      }
-    } catch (error) {
-      logger.error('[BrochureDesigner] Fallback failed:', error)
-      toast.error('模板載入失敗')
-    }
-  }, [isCanvasReady, currentPage, coverData, currentItinerary, accommodations, currentPageIndex, loadElements])
-
-  // 提取模式狀態（用於從模板提取座標）
-  const [isExtracting, setIsExtracting] = useState(false)
-  // 暫存提取的元素，等 Canvas 準備好後再載入
-  const [pendingElements, setPendingElements] = useState<CanvasElement[] | null>(null)
-
-  // 切換到編輯模式（先提取 DOM 座標，再切換）
-  const handleSwitchToEditMode = useCallback(() => {
-    // 開始提取模式：保持模板渲染，準備提取座標
-    setIsExtracting(true)
-    setTemplateLoaded(false)
-    setPendingElements(null)
-  }, [])
-
-  // 處理提取流程：當進入提取模式時，等待模板渲染後提取座標
+  // 初始化載入：當 Canvas 準備好時，直接使用 templateToElements 生成元素
   useEffect(() => {
-    if (!isExtracting) return
+    if (!isCanvasReady || !currentPage || templateLoaded) return
 
-    // 關鍵改進：提取時使用 scale(1)，這樣 getBoundingClientRect() 直接返回正確座標
-    // 不需要任何縮放計算，避免座標轉換錯誤
-    let cancelled = false
+    const loadInitialElements = async () => {
+      try {
+        const pageType = currentPage.type as TemplatePageType
+        const elements = templateToElements(pageType, {
+          coverData,
+          itinerary: currentItinerary,
+          dayIndex: currentPage.dayIndex,
+          side: currentPage.side,
+          accommodations,
+          pageNumber: currentPageIndex + 1,
+        })
 
-    // 第一個 rAF：設定 scale(1) 並等待瀏覽器更新
-    const frameId = requestAnimationFrame(() => {
-      if (cancelled || !currentTemplateRef.current) {
-        if (!currentTemplateRef.current) {
-          logger.warn('[BrochureDesigner] No template ref, switching to canvas mode')
-          setEditorMode('canvas')
-          setIsExtracting(false)
-        }
-        return
-      }
-
-      // 暫時移除縮放，讓 DOM 以 1:1 比例渲染
-      const templateEl = currentTemplateRef.current
-      const originalTransform = templateEl.style.transform
-      templateEl.style.transform = 'scale(1)'
-
-      // 第二個 rAF：等待 layout 完成後提取
-      requestAnimationFrame(() => {
-        if (cancelled) {
-          templateEl.style.transform = originalTransform
-          return
-        }
-
-        // 提取時 scale = 1，直接得到正確座標
-        const elements = extractFromTemplateRef(currentTemplateRef, 1)
-
-        logger.log('[BrochureDesigner] Extraction complete (scale=1), found', elements.length, 'elements')
-
-        // 恢復原本的縮放
-        templateEl.style.transform = originalTransform
+        logger.log('[BrochureDesigner] Loading elements for', pageType, ':', elements.length, 'elements')
 
         if (elements.length > 0) {
-          setPendingElements(elements)
-          setEditorMode('canvas')
-        } else {
-          logger.warn('[BrochureDesigner] No elements extracted, using fallback')
-          setEditorMode('canvas')
+          await loadElements(elements)
+          setTemplateLoaded(true)
         }
-
-        setIsExtracting(false)
-      })
-    })
-
-    return () => {
-      cancelled = true
-      cancelAnimationFrame(frameId)
-    }
-  }, [isExtracting])
-
-  // 當 Canvas 準備好且有待載入的元素時，載入它們
-  useEffect(() => {
-    if (pendingElements && isCanvasReady && editorMode === 'canvas') {
-      const loadPending = async () => {
-        logger.log('[BrochureDesigner] Loading pending elements to canvas:', pendingElements.length)
-        await loadElements(pendingElements)
-        setTemplateLoaded(true)
-        setPendingElements(null)
+      } catch (error) {
+        logger.error('[BrochureDesigner] Failed to load elements:', error)
+        toast.error('模板載入失敗')
       }
-      loadPending()
     }
-  }, [pendingElements, isCanvasReady, editorMode, loadElements])
+
+    loadInitialElements()
+  }, [isCanvasReady, currentPage, templateLoaded, coverData, currentItinerary, accommodations, currentPageIndex, loadElements])
 
   // 自動捲動 tabs 到當前選中的頁面
   useEffect(() => {
@@ -538,18 +423,6 @@ export function BrochureDesignerPage() {
       }
     }
   }
-
-  // 當在編輯模式切換頁面時，使用備用方法載入模板元素
-  // （首次進入編輯模式會透過 isExtracting 流程處理，不需要 fallback）
-  useEffect(() => {
-    // 如果有 pendingElements，表示 DOM 提取正在進行，不要觸發 fallback
-    if (editorMode === 'canvas' && !templateLoaded && isCanvasReady && !isExtracting && !pendingElements) {
-      const timer = setTimeout(() => {
-        loadTemplateElementsFallback()
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [currentPageIndex, editorMode, templateLoaded, isCanvasReady, isExtracting, pendingElements, loadTemplateElementsFallback])
 
   // 判斷是否為每日行程頁面
   const isDailyPage = currentPage?.type?.startsWith('day-')
@@ -837,23 +710,8 @@ export function BrochureDesignerPage() {
 
             {/* 右側：操作按鈕 */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* 模式切換 */}
+              {/* 模式切換：編輯 / 預覽 */}
               <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 mr-2">
-                <button
-                  className={cn(
-                    'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                    editorMode === 'template'
-                      ? 'bg-white text-morandi-primary shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                  )}
-                  onClick={() => {
-                    setEditorMode('template')
-                    setTemplateLoaded(false)
-                  }}
-                >
-                  <LayoutTemplate size={14} />
-                  模板
-                </button>
                 <button
                   className={cn(
                     'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
@@ -861,10 +719,22 @@ export function BrochureDesignerPage() {
                       ? 'bg-white text-morandi-primary shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   )}
-                  onClick={handleSwitchToEditMode}
+                  onClick={() => setEditorMode('canvas')}
                 >
                   <Pencil size={14} />
                   編輯
+                </button>
+                <button
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
+                    editorMode === 'preview'
+                      ? 'bg-white text-morandi-primary shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  )}
+                  onClick={() => setEditorMode('preview')}
+                >
+                  <LayoutTemplate size={14} />
+                  預覽
                 </button>
               </div>
               <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
@@ -888,10 +758,11 @@ export function BrochureDesignerPage() {
         <div className="flex-1 flex gap-5 p-5 bg-morandi-background overflow-hidden">
           {/* 左側面板 */}
           <aside className="w-[280px] bg-white rounded-xl border border-border flex flex-col overflow-hidden shadow-sm">
-            {editorMode === 'template' ? (
+            {editorMode === 'preview' ? (
+              // 預覽模式 - 顯示資料編輯面板
               <>
                 <div className="px-5 py-4 bg-morandi-primary/90 text-white flex-shrink-0 rounded-t-xl">
-                  <h2 className="text-base font-semibold">編輯手冊</h2>
+                  <h2 className="text-base font-semibold">手冊設定</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto">
                   <BrochureSidebar
@@ -904,6 +775,7 @@ export function BrochureDesignerPage() {
                 </div>
               </>
             ) : (
+              // 編輯模式 - 顯示元素庫
               <ElementLibrary
                 onAddText={handleAddText}
                 onAddRectangle={handleAddRectangle}
@@ -925,9 +797,8 @@ export function BrochureDesignerPage() {
           {/* 中間預覽/編輯區 */}
           <section className="flex-1 bg-white rounded-xl border-2 border-border flex flex-col overflow-hidden shadow-md">
             {/* 預覽/編輯區內容 */}
-            {(editorMode === 'template' || isExtracting) ? (
-              // 模板模式 - 使用原有的 React 組件（日系風格模板）
-              // isExtracting 時也渲染模板，用於提取 DOM 座標
+            {editorMode === 'preview' ? (
+              // 預覽模式 - 使用原有的 React 組件渲染（靜態預覽）
               <div className="flex-1 flex items-center justify-center p-6 overflow-auto relative bg-slate-50">
                 <div
                   ref={currentTemplateRef}
@@ -1006,16 +877,6 @@ export function BrochureDesignerPage() {
                     />
                   )}
                 </div>
-
-                {/* 提取中顯示載入指示 */}
-                {isExtracting && (
-                  <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
-                    <div className="flex items-center gap-2 text-morandi-secondary">
-                      <Loader2 className="animate-spin" size={20} />
-                      <span className="text-sm">正在提取模板元素...</span>
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               // 編輯模式 - 使用 Fabric.js Canvas 編輯器

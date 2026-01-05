@@ -6,13 +6,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, X, AlertCircle } from 'lucide-react'
+import { Check, X, AlertCircle, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
+import { confirm } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { RECEIPT_TYPE_OPTIONS } from '../types'
+import { useAuthStore, useReceiptStore } from '@/stores'
 import type { Receipt } from '@/stores'
 
 interface ReceiptConfirmDialogProps {
@@ -31,11 +33,21 @@ export function ReceiptConfirmDialog({
   onSuccess,
 }: ReceiptConfirmDialogProps) {
   const { toast } = useToast()
+  const { user } = useAuthStore()
+  const { delete: deleteReceipt } = useReceiptStore()
   const [isConfirming, setIsConfirming] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [showAbnormalInput, setShowAbnormalInput] = useState(false)
   const [abnormalAmount, setAbnormalAmount] = useState('')
 
   if (!receipt) return null
+
+  // 檢查是否可以刪除：會計管理員或建立者
+  const isAccountant = user?.roles?.some(role =>
+    ['super_admin', 'admin', 'accountant'].includes(role)
+  )
+  const isCreator = user?.id === receipt.created_by
+  const canDelete = isAccountant || isCreator
 
   const receiptTypeLabel = RECEIPT_TYPE_OPTIONS.find(
     opt => opt.value === receipt.receipt_type
@@ -102,6 +114,35 @@ export function ReceiptConfirmDialog({
     setShowAbnormalInput(false)
     setAbnormalAmount('')
     onOpenChange(false)
+  }
+
+  // 刪除收款單
+  const handleDelete = async () => {
+    const confirmed = await confirm(
+      `確定要刪除收款單 ${receipt.receipt_number} 嗎？此操作無法復原。`,
+      { title: '刪除收款單', type: 'error' }
+    )
+
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    try {
+      await deleteReceipt(receipt.id)
+      toast({
+        title: '刪除成功',
+        description: `收款單 ${receipt.receipt_number} 已刪除`,
+      })
+      onSuccess?.()
+      onOpenChange(false)
+    } catch (error) {
+      toast({
+        title: '刪除失敗',
+        description: error instanceof Error ? error.message : '請稍後再試',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (
@@ -260,7 +301,20 @@ export function ReceiptConfirmDialog({
         )}
 
         {/* 底部按鈕 */}
-        <div className="flex justify-end pt-4 border-t border-border mt-4">
+        <div className="flex justify-between pt-4 border-t border-border mt-4">
+          <div>
+            {canDelete && (
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
+              >
+                <Trash2 size={16} />
+                {isDeleting ? '刪除中...' : '刪除'}
+              </Button>
+            )}
+          </div>
           <Button variant="outline" onClick={handleClose} className="gap-2">
             <X size={16} />
             關閉

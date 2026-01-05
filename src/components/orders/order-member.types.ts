@@ -89,10 +89,11 @@ export interface ExportColumnsConfig {
   passport_expiry: boolean
   special_meal: boolean
   hotel_confirmation: boolean
+  remarks: boolean
+  // 金額相關欄位放最後
   total_payable: boolean
   deposit_amount: boolean
   balance: boolean
-  remarks: boolean
 }
 
 export const DEFAULT_EXPORT_COLUMNS: ExportColumnsConfig = {
@@ -106,10 +107,11 @@ export const DEFAULT_EXPORT_COLUMNS: ExportColumnsConfig = {
   passport_expiry: true,
   special_meal: true,
   hotel_confirmation: false,
+  remarks: false,
+  // 金額相關欄位預設關閉（2026-01-05）
   total_payable: false,
   deposit_amount: false,
   balance: false,
-  remarks: false,
 }
 
 // ============================================
@@ -126,6 +128,8 @@ export interface OrderMembersExpandableProps {
   embedded?: boolean
   /** 強制顯示 PNR 欄位（PNR 配對後自動開啟） */
   forceShowPnr?: boolean
+  /** Tour 物件（用於列印功能） */
+  tour?: import('@/stores/types').Tour
 }
 
 export interface MemberRowProps {

@@ -59,7 +59,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
 }: InvoiceDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent nested className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText size={20} />
@@ -81,8 +81,9 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
             <div>
               <Label>關聯訂單</Label>
               <Select
-                value={invoiceOrderId}
-                onValueChange={orderId => {
+                value={invoiceOrderId || '__none__'}
+                onValueChange={value => {
+                  const orderId = value === '__none__' ? '' : value
                   onInvoiceOrderIdChange(orderId)
                   if (orderId) {
                     const order = tourOrders.find(o => o.id === orderId)
@@ -100,7 +101,7 @@ export const InvoiceDialog = React.memo(function InvoiceDialog({
                   <SelectValue placeholder="- 不關聯訂單 -" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">- 不關聯訂單 -</SelectItem>
+                  <SelectItem value="__none__">- 不關聯訂單 -</SelectItem>
                   {tourOrders.map(order => (
                     <SelectItem key={order.id} value={order.id}>
                       {order.order_number} - {order.contact_person}

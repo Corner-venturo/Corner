@@ -205,10 +205,12 @@ export function useItineraryTableColumns({
                 onClick={e => {
                   e.stopPropagation()
                   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-                  const shortId = itinerary.id.replace(/-/g, '').substring(0, 8)
-                  const shareUrl = itinerary.tour_code
-                    ? `${baseUrl}/view/${itinerary.tour_code}`
-                    : `${baseUrl}/view/${shortId}`
+                  // 優先使用關聯團的團號，其次用行程表自己的 tour_code
+                  const linkedTourCode = getLinkedTourCode(itinerary.tour_id)
+                  const tourCode = linkedTourCode || itinerary.tour_code
+                  const shareUrl = tourCode
+                    ? `${baseUrl}/view/${tourCode}`
+                    : `${baseUrl}/view/${itinerary.id}`
                   navigator.clipboard
                     .writeText(shareUrl)
                     .then(() => {

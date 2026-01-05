@@ -33,6 +33,11 @@
  * E{3位數}
  * 例如：E001, E002...E999
  * 注意：台北和台中員工都使用相同的編號範圍，入口需選擇公司
+ *
+ * === 提案編號格式 ===
+ * PR{6位數}
+ * 例如：PR000001, PR000002...
+ * 注意：提案無團號，永遠為草稿狀態。使用 PR 前綴避免與出納單 P{日期} 衝突
  */
 
 import { logger } from '@/lib/utils/logger'
@@ -385,4 +390,37 @@ export function generateDisbursementOrderCode(
   // 計算下一個字母
   const nextLetter = maxLetter ? String.fromCharCode(maxLetter.charCodeAt(0) + 1) : 'A'
   return `${datePrefix}${nextLetter}`
+}
+
+/**
+ * 生成提案編號
+ *
+ * @param existingProposals - 現有提案列表
+ * @returns 提案編號（如 PR000001）
+ *
+ * @example
+ * generateProposalCode(existingProposals)
+ * // => 'PR000001', 'PR000002'...
+ *
+ * 注意：使用 PR 前綴避免與出納單 P{日期} 格式衝突
+ */
+export function generateProposalCode(
+  existingProposals: { code?: string }[]
+): string {
+  let maxNumber = 0
+
+  existingProposals.forEach(proposal => {
+    const code = proposal.code
+    // 匹配格式：PR000001
+    if (code && /^PR\d{6}$/.test(code)) {
+      const numberPart = code.substring(2) // 移除 "PR"
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
+  return `PR${nextNumber}`
 }

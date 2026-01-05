@@ -173,20 +173,26 @@ export function PaymentItemRow({
           />
         </td>
 
-        {/* 付款人姓名 / 收款對象 */}
+        {/* 付款人姓名 / 帳號後五碼 / 收款對象 */}
         <td className="py-2 px-3 border-b border-r border-border">
           <input
             type="text"
             value={item.receipt_account || ''}
             onChange={e => {
-              // LinkPay 限制五字內
-              const value = item.receipt_type === RECEIPT_TYPES.LINK_PAY
+              // LinkPay 限制五字內，匯款限制五碼
+              const value = (item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER)
                 ? e.target.value.slice(0, 5)
                 : e.target.value
               onUpdate(item.id, { receipt_account: value })
             }}
-            placeholder={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? '收款對象(五字內)' : '輸入付款人'}
-            maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY ? 5 : undefined}
+            placeholder={
+              item.receipt_type === RECEIPT_TYPES.LINK_PAY
+                ? '收款對象(五字內)'
+                : item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER
+                  ? '帳號後五碼'
+                  : '輸入付款人'
+            }
+            maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER ? 5 : undefined}
             className="w-full bg-transparent outline-none text-sm"
           />
         </td>

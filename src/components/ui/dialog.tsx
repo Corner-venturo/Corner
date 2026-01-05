@@ -71,14 +71,34 @@ interface DialogContentProps
    * - full: 編輯器類型
    */
   size?: DialogSize
+  /**
+   * 巢狀 Dialog（用於從其他 Dialog 中打開時，使用更高的 z-index 層級）
+   * @default false
+   */
+  nested?: boolean
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, size = 'lg', ...props }, ref) => (
+>(({ className, children, size = 'lg', nested = false, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    {/*
+      巢狀 Dialog 遮罩設計：
+      - 普通 Dialog: bg-black/60 (60% 黑色) + 背景模糊
+      - 巢狀 Dialog: bg-black/30 (30% 黑色，較淡) - 遮住底層 Dialog 但不會讓總體太黑
+      這樣多層 Dialog 疊加時 (60% + 30%)，視覺上比之前 (60% + 40%) 更輕
+    */}
+    <DialogPrimitive.Overlay
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => e.preventDefault()}
+      className={cn(
+        'fixed inset-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+        nested
+          ? 'z-[10001] bg-black/30' // 巢狀：較淡遮罩，遮住底層 Dialog 但不會太黑
+          : 'z-[9998] bg-black/60 backdrop-blur-sm'
+      )}
+    />
     <DialogPrimitive.Content
       ref={ref}
       aria-describedby={undefined}
@@ -87,14 +107,18 @@ const DialogContent = React.forwardRef<
       onPointerDownOutside={(e) => e.preventDefault()}
       aria-labelledby={undefined}
       className={cn(
-        'fixed left-[50%] top-[50%] z-[9999] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
+        'fixed left-[50%] top-[50%] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
+        nested ? 'z-[10002]' : 'z-[9999]',
         DIALOG_SIZES[size],
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 z-[10000] rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer">
+      <DialogPrimitive.Close className={cn(
+        'absolute right-4 top-4 rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer',
+        nested ? 'z-[10003]' : 'z-[10000]'
+      )}>
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

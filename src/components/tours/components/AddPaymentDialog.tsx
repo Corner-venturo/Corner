@@ -36,19 +36,19 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
 }: AddPaymentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent nested className="max-w-md">
         <DialogHeader>
           <DialogTitle>新增收款紀錄</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary">關聯訂單 (選填)</label>
-            <Select value={selectedOrderId} onValueChange={onSelectedOrderIdChange}>
+            <Select value={selectedOrderId || '__none__'} onValueChange={(v) => onSelectedOrderIdChange(v === '__none__' ? '' : v)}>
               <SelectTrigger className="mt-1 w-full">
                 <SelectValue placeholder="- 不關聯特定訂單 -" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">- 不關聯特定訂單 -</SelectItem>
+                <SelectItem value="__none__">- 不關聯特定訂單 -</SelectItem>
                 {tourOrders.map(order => (
                   <SelectItem key={order.id} value={order.id}>
                     {order.order_number} - {order.contact_person}

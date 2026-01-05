@@ -72,7 +72,7 @@ export function MemberRow({
 }: MemberRowProps) {
   const [isComposing, setIsComposing] = useState(false)
 
-  // 預設全部顯示
+  // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
   const cv = columnVisibility || {
     passport_name: true,
     birth_date: true,
@@ -81,9 +81,9 @@ export function MemberRow({
     passport_number: true,
     passport_expiry: true,
     special_meal: true,
-    total_payable: true,
-    deposit_amount: true,
-    balance: true,
+    total_payable: false,
+    deposit_amount: false,
+    balance: false,
     remarks: true,
     pnr: false,
     ticket_number: false,

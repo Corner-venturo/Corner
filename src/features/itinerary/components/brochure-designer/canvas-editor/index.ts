@@ -5,6 +5,7 @@
 
 // 主要組件
 export { CanvasEditor } from './CanvasEditor'
+export { ReadOnlyCanvas } from './ReadOnlyCanvas'
 export { LayerPanel } from './LayerPanel'
 export { ElementLibrary } from './ElementLibrary'
 export { Toolbar } from './Toolbar'

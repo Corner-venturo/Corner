@@ -17,6 +17,7 @@ import { useTourStore, usePaymentRequestStore, useOrderStore } from '@/stores'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
+import { supabase } from '@/lib/supabase/client'
 
 interface TourClosingDialogProps {
   open: boolean
@@ -141,6 +142,27 @@ export function TourClosingDialog({
         closing_date: now,
         updated_at: now,
       })
+
+      // 4. 封存旅遊團頻道
+      try {
+        const { error: channelError } = await supabase
+          .from('channels')
+          .update({
+            is_archived: true,
+            archived_at: now,
+            updated_at: now,
+          })
+          .eq('tour_id', tour.id)
+
+        if (channelError) {
+          logger.warn('封存旅遊團頻道失敗:', channelError)
+        } else {
+          logger.log(`旅遊團 ${tour.code} 頻道已封存`)
+        }
+      } catch (error) {
+        // 封存頻道失敗不應阻止結案流程
+        logger.warn('封存頻道時發生錯誤:', error)
+      }
 
       toast.success('結案完成，獎金請款單已產生')
       onOpenChange(false)

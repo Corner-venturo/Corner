@@ -630,8 +630,8 @@ function AddTodoForm({
           指派給（可選）
         </label>
         <Select
-          value={formData.assignee}
-          onValueChange={value => setFormData({ ...formData, assignee: value })}
+          value={formData.assignee || '__none__'}
+          onValueChange={value => setFormData({ ...formData, assignee: value === '__none__' ? '' : value })}
           onOpenChange={open => open && handleAssigneeDropdownFocus()}
           disabled={isLoadingUsers}
         >
@@ -639,7 +639,7 @@ function AddTodoForm({
             <SelectValue placeholder={isLoadingUsers ? '載入員工資料中...' : '不指派（個人任務）'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">不指派（個人任務）</SelectItem>
+            <SelectItem value="__none__">不指派（個人任務）</SelectItem>
             {users &&
               users.map(user => (
                 <SelectItem key={user.id} value={user.id}>

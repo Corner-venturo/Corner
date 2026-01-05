@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useItineraryStore, useAuthStore } from '@/stores'
+import { useTours } from '@/hooks/cloud-hooks'
 import type { TourFormData } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -37,15 +38,28 @@ export function usePublish({
   const [copied, setCopied] = useState(false)
   const { create, update } = useItineraryStore()
   const { user } = useAuthStore()
+  const { items: tours } = useTours()
   const router = useRouter()
 
   const versionRecords = data.version_records || []
   const isEditMode = !!data.id
 
-  // 分享連結（優先使用團號，沒有則用 ID）
-  const shareUrl = data.id
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/view/${data.tourCode || data.id}`
-    : null
+  // 取得關聯團的團號（優先使用）
+  const linkedTourCode = useMemo(() => {
+    if (!data.tourId) return null
+    const linkedTour = tours.find(t => t.id === data.tourId)
+    return linkedTour?.code || null
+  }, [data.tourId, tours])
+
+  // 分享連結：優先使用關聯團的團號，其次用行程表的 tour_code，最後用 ID
+  const shareUrl = useMemo(() => {
+    if (!data.id) return null
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+    const tourCode = linkedTourCode || data.tourCode
+    return tourCode
+      ? `${baseUrl}/view/${tourCode}`
+      : `${baseUrl}/view/${data.id}`
+  }, [data.id, data.tourCode, linkedTourCode])
 
   // 轉換資料格式（camelCase → snake_case）
   const convertData = () => ({

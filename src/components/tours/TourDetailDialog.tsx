@@ -14,11 +14,10 @@ import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { TourDocuments } from '@/components/tours/tour-documents'
-import { TourRequests } from '@/components/tours/tour-requests'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
-import { TourDepartureDialog } from '@/components/tours/tour-departure-dialog'
+import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
-import { MessageSquare, FileText, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check } from 'lucide-react'
+import { MessageSquare, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check, ClipboardList } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
 import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
@@ -52,7 +51,6 @@ const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
-  { value: 'requests', label: '需求管理' },
   { value: 'confirmation', label: '團確單' },
 ]
 
@@ -73,7 +71,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
-  const [showDepartureDialog, setShowDepartureDialog] = useState(false)
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showPnrToolDialog, setShowPnrToolDialog] = useState(false)
   const [showQuotePicker, setShowQuotePicker] = useState(false)
@@ -373,9 +371,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
       case 'orders':
         return <TourOrders tour={tour} />
       case 'members':
-        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} />
-      case 'requests':
-        return <TourRequests tourId={tour.id} />
+        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} tour={tour} />
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
       default:
@@ -428,10 +424,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                   variant="ghost"
                   size="sm"
                   className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                  onClick={() => setShowDepartureDialog(true)}
+                  onClick={() => setShowConfirmationDialog(true)}
                 >
-                  <FileText size={15} className="mr-1" />
-                  出團資料表
+                  <ClipboardList size={15} className="mr-1" />
+                  團確單
                 </Button>
                 {!tour.archived && (
                   <Button
@@ -511,10 +507,11 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               onSuccess={handleSuccess}
             />
 
-            <TourDepartureDialog
+            <TourConfirmationDialog
               tour={tour}
-              open={showDepartureDialog}
-              onOpenChange={setShowDepartureDialog}
+              open={showConfirmationDialog}
+              onClose={() => setShowConfirmationDialog(false)}
+              nested
             />
 
             <CreateChannelDialog
@@ -538,24 +535,27 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               onSuccess={handleSuccess}
             />
 
-            {/* 報價單版本選擇器 */}
+            {/* 報價單版本選擇器（嵌套 Dialog） */}
             <DocumentVersionPicker
               isOpen={showQuotePicker}
               onClose={() => setShowQuotePicker(false)}
               tour={tour}
+              nested
             />
 
-            {/* 行程表版本選擇器 */}
+            {/* 行程表版本選擇器（嵌套 Dialog） */}
             <ItineraryVersionPicker
               isOpen={showItineraryPicker}
               onClose={() => setShowItineraryPicker(false)}
               tour={tour}
+              nested
             />
 
-            {/* PNR 電報工具 */}
+            {/* PNR 電報工具（嵌套 Dialog） */}
             <TourPnrToolDialog
               isOpen={showPnrToolDialog}
               onClose={() => setShowPnrToolDialog(false)}
+              nested
               tourId={tour.id}
               tourCode={tour.code || ''}
               tourName={tour.name}
@@ -571,9 +571,9 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               onSuccess={handleSuccess}
             />
 
-            {/* 入境卡列印對話框 */}
+            {/* 入境卡列印對話框（嵌套 Dialog） */}
             <EntryCardDialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
-              <EntryCardDialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
+              <EntryCardDialogContent nested className="max-w-[95vw] max-h-[95vh] overflow-auto">
                 <div className="no-print flex items-center justify-between mb-4">
                   <EntryCardDialogHeader>
                     <EntryCardDialogTitle>列印日本入境卡</EntryCardDialogTitle>

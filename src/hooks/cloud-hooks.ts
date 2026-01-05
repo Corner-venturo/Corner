@@ -20,6 +20,8 @@ import type {
   AirportImage,
   CustomerGroup,
   CustomerGroupMember,
+  Proposal,
+  ProposalPackage,
 } from '@/stores/types'
 import type { QuoteItem } from '@/types/quote.types'
 
@@ -119,4 +121,17 @@ export const useCustomerGroups = createCloudHook<CustomerGroup>('customer_groups
 // 客戶群組成員
 export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>('customer_group_members', {
   orderBy: { column: 'created_at', ascending: false },
+})
+
+// ===== 提案系統 =====
+// Note: Using type assertion until migration is applied and types are regenerated
+
+// 提案
+export const useProposals = createCloudHook<Proposal>('proposals' as 'notes', {
+  orderBy: { column: 'created_at', ascending: false },
+})
+
+// 團體套件
+export const useProposalPackages = createCloudHook<ProposalPackage>('proposal_packages' as 'notes', {
+  orderBy: { column: 'version_number', ascending: true },
 })

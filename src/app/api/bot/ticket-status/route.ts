@@ -323,11 +323,11 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseAdminClient()
     const body = await request.json()
-    const { workspace_id, channel_id, notify_sales = true } = body
+    const { workspace_id, channel_id, notify_sales = true, days = 14 } = body
 
     // 先取得狀態
     const statusUrl = new URL(request.url)
-    statusUrl.searchParams.set('days', '14')
+    statusUrl.searchParams.set('days', String(days))
     if (workspace_id) {
       statusUrl.searchParams.set('workspace_id', workspace_id)
     }
@@ -352,15 +352,53 @@ export async function POST(request: NextRequest) {
 
     // 發送到指定頻道
     if (channel_id) {
+      // 轉換資料格式為 TicketStatusCard 所需
+      const cardTours = (tours as TourStats[]).map(tour => ({
+        tour_id: tour.tour_id,
+        tour_code: tour.tour_code,
+        tour_name: tour.tour_name,
+        departure_date: tour.departure_date,
+        earliest_deadline: tour.earliest_deadline,
+        stats: {
+          total: tour.total_ticketed + tour.total_needs_ticketing + tour.total_no_record + tour.total_self_arranged,
+          ticketed: tour.total_ticketed,
+          needs_ticketing: tour.total_needs_ticketing,
+          no_record: tour.total_no_record,
+          self_arranged: tour.total_self_arranged,
+        },
+        orders: tour.orders.map(order => ({
+          order_id: order.order_id,
+          order_code: order.order_code,
+          contact_person: order.contact_person,
+          earliest_deadline: order.earliest_deadline,
+          members: order.members.map(m => ({
+            id: m.id,
+            name: m.chinese_name,
+            status: categorizeMember(m),
+            pnr: m.pnr,
+            ticket_number: m.ticket_number,
+            deadline: m.ticketing_deadline,
+          })),
+        })),
+      }))
+
       const { error: msgError } = await supabase
         .from('messages')
         .insert({
           channel_id,
-          content: message,
+          content: message, // 純文字 fallback
           author_id: SYSTEM_BOT_ID,
           metadata: {
-            type: 'ticket_status_check',
-            summary,
+            message_type: 'ticket_status_card',
+            tours: cardTours,
+            summary: {
+              total: summary.total_tours,
+              ticketed: 0,
+              needs_ticketing: summary.total_needs_ticketing,
+              no_record: summary.total_no_record,
+              self_arranged: summary.total_self_arranged,
+            },
+            generated_at: new Date().toISOString(),
           },
         })
 

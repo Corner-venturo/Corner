@@ -4,6 +4,7 @@
  */
 
 import type { CanvasElement, TextElement, ImageElement, ShapeElement, GradientFill, GradientColorStop } from '../canvas-editor/types'
+import { logger } from '@/lib/utils/logger'
 
 // 生成唯一 ID
 const generateId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -30,25 +31,82 @@ function parseGradient(backgroundImage: string): GradientFill | null {
     else if (dir.endsWith('deg')) angle = parseFloat(dir)
   }
 
-  // 使用更精確的正規表達式匹配顏色和位置
-  // 匹配 rgba(r, g, b, a)、rgb(r, g, b)、#hex、或顏色名稱，後面可選跟著百分比
+  // 解析顏色停止點
+  // 需要處理兩種 CSS 語法：
+  // 1. 傳統語法: rgba(0, 0, 0, 0.6) - 逗號分隔
+  // 2. 現代語法: rgb(0 0 0 / 0.6) - 空格分隔，斜線表示 alpha
   const colorStops: GradientColorStop[] = []
-  const colorRegex = /(rgba?\s*\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*(?:,\s*[\d.]+\s*)?\)|#[a-fA-F0-9]{3,8}|[a-zA-Z]+)(?:\s+([\d.]+%))?/g
 
-  let match
-  while ((match = colorRegex.exec(content)) !== null) {
-    const color = match[1].trim()
-    const position = match[2]
+  // 使用更複雜的策略：先分割顏色停止點，再解析每個
+  // 分割邏輯：以逗號分隔，但忽略括號內的逗號
+  const colorStopStrings: string[] = []
+  let depth = 0
+  let current = ''
 
-    // 跳過方向關鍵字
-    if (['to', 'top', 'bottom', 'left', 'right'].includes(color.toLowerCase())) {
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i]
+    if (char === '(') {
+      depth++
+      current += char
+    } else if (char === ')') {
+      depth--
+      current += char
+    } else if (char === ',' && depth === 0) {
+      const trimmed = current.trim()
+      if (trimmed) colorStopStrings.push(trimmed)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  // 加入最後一段
+  const trimmedLast = current.trim()
+  if (trimmedLast) colorStopStrings.push(trimmedLast)
+
+  // 過濾掉方向部分
+  const directionKeywords = ['to', 'top', 'bottom', 'left', 'right']
+
+  for (const stopStr of colorStopStrings) {
+    // 跳過方向關鍵字（如 "to bottom"）
+    const firstWord = stopStr.split(/\s+/)[0].toLowerCase()
+    if (directionKeywords.includes(firstWord)) {
       continue
     }
 
-    colorStops.push({
-      offset: position ? parseFloat(position) / 100 : -1, // -1 表示需要自動計算
-      color: color,
-    })
+    // 解析顏色和位置
+    // 格式可能是: "rgba(0, 0, 0, 0.6) 50%" 或 "rgb(0 0 0 / 0.6) 50%" 或 "#fff 50%" 或 "white 50%"
+    let color = ''
+    let position = ''
+
+    // 檢查是否有 rgb/rgba 函數
+    const funcMatch = stopStr.match(/^(rgba?\s*\([^)]+\))(.*)/)
+    if (funcMatch) {
+      color = funcMatch[1].trim()
+      const rest = funcMatch[2].trim()
+      // 檢查位置百分比
+      const posMatch = rest.match(/([\d.]+%?)/)
+      if (posMatch) {
+        position = posMatch[1]
+      }
+    } else {
+      // 沒有 rgb 函數，可能是 hex 或顏色名稱
+      const parts = stopStr.trim().split(/\s+/)
+      if (parts.length >= 1) {
+        color = parts[0]
+        if (parts.length >= 2 && parts[1].match(/[\d.]+%?/)) {
+          position = parts[1]
+        }
+      }
+    }
+
+    if (color) {
+      // 將現代 CSS 顏色格式轉換成 Canvas 支援的格式
+      const normalizedColor = normalizeColorForCanvas(color)
+      colorStops.push({
+        offset: position ? parseFloat(position) / 100 : -1,
+        color: normalizedColor,
+      })
+    }
   }
 
   // 自動計算缺失的位置
@@ -59,7 +117,7 @@ function parseGradient(backgroundImage: string): GradientFill | null {
       }
     })
 
-    console.log('[parseGradient] Parsed gradient:', { angle, colorStops })
+    logger.log('[parseGradient] Parsed gradient:', { angle, colorStops })
 
     return {
       type: 'linear',
@@ -71,12 +129,56 @@ function parseGradient(backgroundImage: string): GradientFill | null {
   return null
 }
 
+/**
+ * 將現代 CSS 顏色格式轉換成 Canvas 支援的格式
+ * 處理 oklab, oklch, lab, lch, color() 等新格式
+ */
+function normalizeColorForCanvas(color: string): string {
+  if (!color) return 'transparent'
+
+  // 處理 oklab/oklch/lab/lch 格式
+  // 例如: oklab(0 0 0 / 0) 表示透明
+  // 例如: oklab(1 0 0) 表示白色
+  const modernColorMatch = color.match(/^(oklab|oklch|lab|lch|color)\s*\(([^)]+)\)/)
+  if (modernColorMatch) {
+    const params = modernColorMatch[2].trim()
+
+    // 檢查是否有 alpha 值（用 / 分隔）
+    const alphaPart = params.split('/')
+    let alpha = 1
+    if (alphaPart.length > 1) {
+      alpha = parseFloat(alphaPart[1].trim()) || 1
+    }
+
+    // 如果完全透明，返回 transparent
+    if (alpha === 0 || alpha < 0.01) {
+      return 'rgba(0, 0, 0, 0)'
+    }
+
+    // 對於 oklab/oklch，提取 L 值（亮度）並轉換成灰階近似
+    // oklab(L a b) 或 oklab(L a b / alpha)
+    // L: 0 = 黑色, 1 = 白色
+    const values = alphaPart[0].trim().split(/\s+/)
+    if (values.length >= 1) {
+      const L = parseFloat(values[0]) || 0
+      // 簡單轉換：L 值 0-1 對應灰階 0-255
+      const gray = Math.round(L * 255)
+      return `rgba(${gray}, ${gray}, ${gray}, ${alpha})`
+    }
+
+    // 無法解析，返回黑色透明
+    return `rgba(0, 0, 0, ${alpha})`
+  }
+
+  return color
+}
+
 // 解析顏色（處理 rgba、rgb、hex）
 function parseColor(color: string): string {
   if (!color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)') {
     return 'transparent'
   }
-  return color
+  return normalizeColorForCanvas(color)
 }
 
 // 字體粗細類型
@@ -131,7 +233,7 @@ export function extractElementsFromDOM(
   const containerRect = container.getBoundingClientRect()
 
   // 調試：打印容器資訊
-  console.log('[extractDOM] Container:', {
+  logger.log('[extractDOM] Container:', {
     left: containerRect.left,
     top: containerRect.top,
     width: containerRect.width,
@@ -159,7 +261,7 @@ export function extractElementsFromDOM(
     const height = rect.height / scale
 
     // 調試：打印每個元素的座標
-    console.log(`[extractDOM] ${elementName}:`, {
+    logger.log(`[extractDOM] ${elementName}:`, {
       rawRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
       relativeRaw: { x: rect.left - containerRect.left, y: rect.top - containerRect.top },
       afterScale: { x, y, width, height },
@@ -315,7 +417,7 @@ export function extractElementsFromDOM(
         gradient: gradient || undefined,
       }
 
-      console.log(`[extractDOM] Shape "${elementName}":`, {
+      logger.log(`[extractDOM] Shape "${elementName}":`, {
         hasGradient: !!gradient,
         gradient,
         backgroundImage: computedStyle.backgroundImage?.substring(0, 100),

@@ -127,12 +127,7 @@ export function usePaymentForm() {
         }
       }
 
-      // 匯款專屬驗證
-      if (item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER) {
-        if (!item.account_info) {
-          errors.push(`收款項目 ${index + 1}: 匯款需要選擇匯入帳戶`)
-        }
-      }
+      // 匯款專屬驗證（已簡化，不需要額外欄位）
     })
 
     return errors

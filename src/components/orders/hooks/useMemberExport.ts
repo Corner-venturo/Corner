@@ -57,10 +57,11 @@ export const EXPORT_COLUMN_LABELS: Record<string, string> = {
   passport_expiry: '護照效期',
   special_meal: '飲食禁忌',
   hotel_confirmation: '訂房代號',
+  remarks: '備註',
+  // 金額相關欄位放最後
   total_payable: '應付金額',
   deposit_amount: '訂金',
   balance: '尾款',
-  remarks: '備註',
 }
 
 const DEFAULT_EXPORT_COLUMNS: ExportColumns = {
@@ -74,10 +75,11 @@ const DEFAULT_EXPORT_COLUMNS: ExportColumns = {
   passport_expiry: true,
   special_meal: true,
   hotel_confirmation: false,
+  remarks: false,
+  // 金額相關欄位預設關閉（2026-01-05）
   total_payable: false,
   deposit_amount: false,
   balance: false,
-  remarks: false,
 }
 
 export function useMemberExport(members: OrderMember[]) {

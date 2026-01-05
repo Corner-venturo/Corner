@@ -122,6 +122,12 @@ export interface FlightSegment {
   departureTime?: string; // HHMM
   arrivalTime?: string; // HHMM
   aircraft?: string;
+  // === 擴充欄位 (2026-01-04) - 列印時顯示 ===
+  departureTerminal?: string; // 出發航站
+  arrivalTerminal?: string; // 抵達航站
+  meal?: string; // 航班餐食
+  isDirect?: boolean; // 是否直飛
+  duration?: string; // 飛行時間
 }
 
 /**
@@ -279,10 +285,42 @@ function parseEnhancedOSI(line: string): EnhancedOSI | null {
 }
 
 /**
+ * 合併跨行的 PNR 行（以空格開頭的行是上一行的延續）
+ *
+ * 修復日期: 2026-01-04
+ * 問題: OPW/OPC 出票期限行可能跨行顯示，導致解析失敗
+ * 範例:
+ *   9 OPW-02JAN:1903/1C7/BR REQUIRES TICKET ON OR BEFORE
+ *         05JAN:1903 TPE TIME ZONE/TKT/S3-4
+ *
+ * 原本解析器逐行處理，第一行有 "ON OR BEFORE" 但日期 "05JAN" 在延續行
+ * 修復: 先將延續行（以 4+ 空格開頭）合併到上一行，再進行解析
+ */
+function mergeMultilineEntries(rawPNR: string): string[] {
+  const rawLines = rawPNR.split('\n');
+  const mergedLines: string[] = [];
+
+  for (const line of rawLines) {
+    // 判斷是否為延續行（以多個空格開頭）
+    const isContinuation = /^\s{4,}/.test(line) && mergedLines.length > 0;
+
+    if (isContinuation) {
+      // 將延續行內容附加到上一行
+      mergedLines[mergedLines.length - 1] += ' ' + line.trim();
+    } else if (line.trim()) {
+      mergedLines.push(line.trim());
+    }
+  }
+
+  return mergedLines;
+}
+
+/**
  * 解析 Amadeus PNR 電報
  */
 export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
-  const lines = rawPNR.split('\n').map(line => line.trim()).filter(Boolean);
+  // 先合併跨行的內容
+  const lines = mergeMultilineEntries(rawPNR);
 
   logger.log('📋 開始解析電報，共', lines.length, '行');
 

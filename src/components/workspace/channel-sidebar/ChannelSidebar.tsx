@@ -163,6 +163,8 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         toggleChannelFavorite={sidebarState.toggleChannelPin}
         onDelete={handleDeleteClick}
         onEdit={handleEditClick}
+        onArchive={sidebarState.archiveChannel}
+        onUnarchive={sidebarState.unarchiveChannel}
         onJoinChannel={sidebarState.handleJoinChannel}
         onLeaveChannel={sidebarState.handleLeaveChannel}
         checkIsMember={sidebarState.checkIsMember}

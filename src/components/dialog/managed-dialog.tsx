@@ -368,9 +368,9 @@ export function ManagedDialog({
         </DialogContent>
       </Dialog>
 
-      {/* 確認關閉對話框 */}
+      {/* 確認關閉對話框（嵌套 Dialog，使用透明遮罩避免背景過黑） */}
       <Dialog open={showConfirmClose} onOpenChange={setShowConfirmClose}>
-        <DialogContent className="max-w-md">
+        <DialogContent nested className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-status-warning">
               <AlertTriangle size={20} />

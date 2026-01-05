@@ -8,6 +8,7 @@ import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-ge
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { BaseEntity } from '@/core/types/common'
+import { supabase } from '@/lib/supabase/client'
 
 interface TourFinancialSummary {
   total_revenue: number
@@ -175,6 +176,33 @@ class TourService extends BaseService<Tour & BaseEntity> {
     }
   }
 
+  /**
+   * 封存旅遊團相關頻道
+   * 當旅遊團結案或取消時，自動封存其相關頻道
+   */
+  private async archiveTourChannel(tourId: string): Promise<void> {
+    try {
+      const now = new Date().toISOString()
+      const { error } = await supabase
+        .from('channels')
+        .update({
+          is_archived: true,
+          archived_at: now,
+          updated_at: now,
+        })
+        .eq('tour_id', tourId)
+
+      if (error) {
+        logger.warn(`封存旅遊團 ${tourId} 頻道失敗:`, error)
+      } else {
+        logger.log(`旅遊團 ${tourId} 頻道已封存`)
+      }
+    } catch (error) {
+      // 封存頻道失敗不應阻止狀態更新
+      logger.warn('封存頻道時發生錯誤:', error)
+    }
+  }
+
   // 更新團體狀態
   async updateTourStatus(
     tour_id: string,
@@ -213,11 +241,18 @@ class TourService extends BaseService<Tour & BaseEntity> {
         );
       }
 
-      return await this.update(tour_id, {
+      const result = await this.update(tour_id, {
         status: newStatus,
         // 可以在這裡記錄狀態變更的原因和時間
         updated_at: this.now(),
       })
+
+      // 當旅遊團結案或取消時，自動封存相關頻道
+      if (newStatus === '結案' || newStatus === '取消') {
+        await this.archiveTourChannel(tour_id)
+      }
+
+      return result
     } catch (error) {
       throw error
     }

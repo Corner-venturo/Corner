@@ -14,13 +14,16 @@ import { logger } from '@/lib/utils/logger'
 interface AddRequestDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
   /** 預設團 ID（從快速請款按鈕傳入） */
   defaultTourId?: string
   /** 預設訂單 ID（從快速請款按鈕傳入） */
   defaultOrderId?: string
+  /** 是否為巢狀 Dialog（用於從其他 Dialog 中打開時，使用更高的 z-index 層級） */
+  nested?: boolean
 }
 
-export function AddRequestDialog({ open, onOpenChange, defaultTourId, defaultOrderId }: AddRequestDialogProps) {
+export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false }: AddRequestDialogProps) {
   const {
     formData,
     setFormData,
@@ -100,6 +103,7 @@ export function AddRequestDialog({ open, onOpenChange, defaultTourId, defaultOrd
       )
       resetForm()
       onOpenChange(false)
+      onSuccess?.()
     } catch (error) {
       logger.error('新增請款單失敗:', error)
     }
@@ -107,7 +111,7 @@ export function AddRequestDialog({ open, onOpenChange, defaultTourId, defaultOrd
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden">
+      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden" nested={nested}>
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">

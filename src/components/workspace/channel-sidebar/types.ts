@@ -12,6 +12,8 @@ export interface SortableChannelItemProps {
   toggleChannelFavorite: (id: string) => void
   onDelete?: (id: string) => void
   onEdit?: (id: string) => void
+  onArchive?: (id: string) => void
+  onUnarchive?: (id: string) => void
   isAdmin?: boolean
   isMember?: boolean
   onJoinChannel?: (channelId: string) => void

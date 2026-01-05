@@ -223,7 +223,7 @@ function AlertDialogComponent() {
 
   return (
     <Dialog open={alert.isOpen} onOpenChange={open => !open && closeAlert()}>
-      <DialogContent className="max-w-md">
+      <DialogContent nested className="max-w-md !z-[10010]">
         <DialogHeader>
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
@@ -259,7 +259,8 @@ function ConfirmDialogComponent() {
 
   return (
     <Dialog open={confirm.isOpen} onOpenChange={open => !open && confirm.onCancel?.()}>
-      <DialogContent className={`${dialogWidth} z-[10001]`}>
+      {/* 使用最高層級的 z-index 確保全局對話框始終在最上層 */}
+      <DialogContent nested className={`${dialogWidth} !z-[10010]`}>
         <DialogHeader>
           <div className="flex items-start gap-3">
             <div className={`${config.bgColor} ${config.color} p-2 rounded-lg`}>{config.icon}</div>
@@ -320,7 +321,7 @@ function PromptDialogComponent() {
 
   return (
     <Dialog open={prompt.isOpen} onOpenChange={open => !open && prompt.onCancel?.()}>
-      <DialogContent className="max-w-md z-[10001]">
+      <DialogContent nested className="max-w-md !z-[10010]">
         <DialogHeader>
           <DialogTitle className={prompt.title ? "text-morandi-primary" : "sr-only"}>
             {prompt.title || '輸入'}

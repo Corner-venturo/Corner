@@ -88,6 +88,9 @@ const WORKSPACE_SCOPED_TABLES = [
   'airport_images',
   // ✅ 2026-01-04: 客戶群組
   'customer_groups',
+  // ✅ 2026-01-05: 提案系統
+  'proposals',
+  'proposal_packages',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）

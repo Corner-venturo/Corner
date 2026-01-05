@@ -16,6 +16,10 @@ interface SimpleOrderTableProps {
   tours?: Pick<Tour, 'id' | 'departure_date'>[] // 可選，由父層傳入避免重複 fetch
   showTourInfo?: boolean
   className?: string
+  /** 快速收款 callback（若提供則開對話框，否則跳轉頁面） */
+  onQuickReceipt?: (order: Order) => void
+  /** 快速請款 callback（若提供則開對話框，否則跳轉頁面） */
+  onQuickPaymentRequest?: (order: Order) => void
 }
 
 export const SimpleOrderTable = React.memo(function SimpleOrderTable({
@@ -23,6 +27,8 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   tours = [], // 由父層傳入，避免重複 fetch
   showTourInfo = false,
   className,
+  onQuickReceipt,
+  onQuickPaymentRequest,
 }: SimpleOrderTableProps) {
   const router = useRouter()
   const orderStore = useOrderStore()
@@ -178,9 +184,13 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                       variant="ghost"
                       onClick={e => {
                         e.stopPropagation()
-                        router.push(
-                          `/finance/payments?order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`
-                        )
+                        if (onQuickReceipt) {
+                          onQuickReceipt(order)
+                        } else {
+                          router.push(
+                            `/finance/payments?tour_code=${order.code}&order_id=${order.id}&order_number=${order.order_number}&contact_person=${order.contact_person}&amount=${order.remaining_amount}`
+                          )
+                        }
                       }}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-green hover:bg-morandi-green/10 font-bold text-base"
                       title="快速收款"
@@ -194,9 +204,13 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                       variant="ghost"
                       onClick={e => {
                         e.stopPropagation()
-                        router.push(
-                          `/finance/requests?tour_id=${order.tour_id}&order_id=${order.id}&order_number=${order.order_number}`
-                        )
+                        if (onQuickPaymentRequest) {
+                          onQuickPaymentRequest(order)
+                        } else {
+                          router.push(
+                            `/finance/requests?tour_id=${order.tour_id}&order_id=${order.id}&order_number=${order.order_number}`
+                          )
+                        }
                       }}
                       className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
                       title="快速請款"

@@ -165,7 +165,7 @@ export const ToursPage: React.FC = () => {
     onOpenQuoteDialog: openQuoteDialog,
     onOpenItineraryDialog: openItineraryDialog,
     onOpenContractDialog: openContractDialog,
-    onConfirmTour: (tour: Tour) => openQuoteDialog(tour, 'confirm'),
+    onConfirmTour: openConfirmWizard,
     onUnlockLockedTour: openUnlockDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,

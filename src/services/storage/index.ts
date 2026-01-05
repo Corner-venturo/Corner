@@ -122,3 +122,34 @@ export async function listFilesInStorage(folder?: string, bucket: string = DEFAU
 
   return data ?? []
 }
+
+/**
+ * 刪除資料夾內的所有檔案
+ * 用於刪除頻道時清理相關附件
+ */
+export async function deleteAllFilesInFolder(folder: string, bucket: string = DEFAULT_BUCKET) {
+  // 列出資料夾內所有檔案
+  const files = await listFilesInStorage(folder, bucket)
+
+  if (files.length === 0) {
+    return { deleted: 0 }
+  }
+
+  // 過濾掉資料夾（只保留檔案）
+  const filePaths = files
+    .filter(file => file.name && !file.name.endsWith('/'))
+    .map(file => `${folder}/${file.name}`)
+
+  if (filePaths.length === 0) {
+    return { deleted: 0 }
+  }
+
+  // 批量刪除
+  const { error } = await supabase.storage.from(bucket).remove(filePaths)
+
+  if (error) {
+    throw new Error(`批量刪除檔案失敗: ${error.message}`)
+  }
+
+  return { deleted: filePaths.length }
+}

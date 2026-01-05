@@ -128,6 +128,10 @@ export function useItineraryForm({ createItinerary, userId }: UseItineraryFormPr
 
   // Create itinerary
   const handleCreateItinerary = useCallback(async () => {
+    if (!userId) {
+      await alertError('無法取得使用者資訊，請重新整理頁面後再試')
+      return
+    }
     if (!newItineraryTitle.trim()) {
       await alertError('請填寫行程名稱')
       return

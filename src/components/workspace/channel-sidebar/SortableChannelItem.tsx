@@ -1,6 +1,6 @@
 'use client'
 
-import { Hash, Lock, Star, Trash2, UserPlus, Edit2, LogOut } from 'lucide-react'
+import { Hash, Lock, Star, Trash2, UserPlus, Edit2, LogOut, Archive, ArchiveRestore } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
@@ -15,6 +15,8 @@ export function SortableChannelItem({
   toggleChannelFavorite,
   onDelete,
   onEdit,
+  onArchive,
+  onUnarchive,
   isAdmin = false,
   isMember = true,
   onJoinChannel,
@@ -105,6 +107,34 @@ export function SortableChannelItem({
               >
                 <Edit2 size={12} />
               </button>
+            )}
+            {/* 封存/解除封存按鈕 */}
+            {channel.is_archived ? (
+              onUnarchive && (
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    onUnarchive(channel.id)
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-morandi-green/20 text-morandi-green transition-opacity"
+                  title="解除封存"
+                >
+                  <ArchiveRestore size={12} />
+                </button>
+              )
+            ) : (
+              onArchive && (
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    onArchive(channel.id)
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-status-warning-bg text-status-warning transition-opacity"
+                  title="封存頻道"
+                >
+                  <Archive size={12} />
+                </button>
+              )
             )}
             {/* 釘選按鈕 */}
             <button

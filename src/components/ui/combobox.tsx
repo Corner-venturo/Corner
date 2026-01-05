@@ -303,7 +303,7 @@ export function Combobox<T = unknown>({
       {isOpen && !disabled && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 bg-white border border-border rounded-lg shadow-lg overflow-hidden mt-1 w-full"
+          className="absolute z-[10010] bg-white border border-border rounded-lg shadow-lg overflow-hidden mt-1 w-full"
           style={{
             maxHeight,
           }}

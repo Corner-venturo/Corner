@@ -274,6 +274,9 @@ export function useItineraryDataLoader({
       const tourOutboundFlight = tourData.outbound_flight ?? null
       const tourReturnFlight = tourData.return_flight ?? null
 
+      // 台灣團預設使用國內模式（無航班）
+      const isTaiwan = country?.name === '台灣'
+
       setTourData({
         tagline: 'Corner Travel 2025',
         title: tour.name,
@@ -281,6 +284,7 @@ export function useItineraryDataLoader({
         description: tour.description || '',
         departureDate: formatDateTW(departureDate),
         tourCode: tour.code,
+        flightStyle: isTaiwan ? 'none' : undefined,
         coverImage:
           city?.background_image_url ||
           'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop',
@@ -319,8 +323,8 @@ export function useItineraryDataLoader({
           overseasPhone: '',
         },
         meetingInfo: {
-          time: formatDateTW(departureDate) + ' 04:50',
-          location: '桃園機場第二航廈',
+          time: isTaiwan ? formatDateTW(departureDate) + ' 08:00' : formatDateTW(departureDate) + ' 04:50',
+          location: isTaiwan ? '' : '桃園機場第二航廈',
         },
         itinerarySubtitle: `${days}天${days - 1}夜精彩旅程規劃`,
         dailyItinerary: [],

@@ -148,6 +148,49 @@ export function useChannelSidebarState() {
     }
   }
 
+  // 封存頻道
+  const archiveChannel = async (channelId: string) => {
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
+    if (!channel) return
+
+    const confirmed = await confirm(`確定要封存 #${channel.name} 頻道嗎？\n封存後頻道將移至「封存」區域。`, {
+      title: '封存頻道',
+      type: 'warning',
+    })
+    if (!confirmed) return
+
+    try {
+      const now = new Date().toISOString()
+      await useChannelStore.getState().update(channelId, {
+        is_archived: true,
+        archived_at: now,
+        updated_at: now,
+      })
+      logger.log(`頻道 ${channelId} 已封存`)
+    } catch (error) {
+      logger.error('Failed to archive channel:', error)
+      void alert('封存頻道失敗', 'error')
+    }
+  }
+
+  // 解除封存頻道
+  const unarchiveChannel = async (channelId: string) => {
+    const channel = channels.find((ch: Channel) => ch.id === channelId)
+    if (!channel) return
+
+    try {
+      await useChannelStore.getState().update(channelId, {
+        is_archived: false,
+        archived_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      logger.log(`頻道 ${channelId} 已解除封存`)
+    } catch (error) {
+      logger.error('Failed to unarchive channel:', error)
+      void alert('解除封存失敗', 'error')
+    }
+  }
+
   return {
     // State
     channels,
@@ -179,5 +222,7 @@ export function useChannelSidebarState() {
     handleJoinChannel,
     handleLeaveChannel,
     toggleChannelPin,
+    archiveChannel,
+    unarchiveChannel,
   }
 }

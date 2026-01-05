@@ -32,10 +32,11 @@ const COLUMN_LABELS: Record<keyof ExportColumnsConfig, string> = {
   passport_expiry: '護照效期',
   special_meal: '特殊餐食',
   hotel_confirmation: '訂房代號',
+  remarks: '備註',
+  // 金額相關欄位放最後
   total_payable: '應付金額',
   deposit_amount: '已付訂金',
   balance: '尾款',
-  remarks: '備註',
 }
 
 export function ExportDialog({

@@ -95,14 +95,11 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
     }
   }
 
-  // 進入新增合約流程
+  // 進入新增合約流程 - 直接進入表單，在表單內選擇成員
   const handleStartNewContract = () => {
-    if (membersWithoutContract.length > 0) {
-      setViewMode('select-members')
-    } else {
-      setIsCorporateContract(true)
-      setViewMode('form')
-    }
+    // 預設為公司代表簽約，用戶可在表單內選擇成員
+    setIsCorporateContract(true)
+    setViewMode('form')
   }
 
   // 確認選擇旅客後進入表單
@@ -174,7 +171,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
               </div>
 
               {/* 列表區域 */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4">
                 {ordersLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />

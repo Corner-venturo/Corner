@@ -15,6 +15,8 @@ interface ChannelListSectionProps {
   toggleChannelFavorite: (channelId: string) => void
   onDelete: (channelId: string) => void
   onEdit: (channelId: string) => void
+  onArchive: (channelId: string) => void
+  onUnarchive: (channelId: string) => void
   onJoinChannel: (channelId: string) => void
   onLeaveChannel: (channelId: string) => void
   isAdmin: boolean
@@ -34,6 +36,8 @@ export function ChannelListSection({
   toggleChannelFavorite,
   onDelete,
   onEdit,
+  onArchive,
+  onUnarchive,
   onJoinChannel,
   onLeaveChannel,
   isAdmin,
@@ -82,6 +86,8 @@ export function ChannelListSection({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               isAdmin={isAdmin}
               isMember={checkIsMember(channel.id)}
               onJoinChannel={onJoinChannel}
@@ -102,6 +108,8 @@ interface GroupedChannelListProps {
   toggleChannelFavorite: (channelId: string) => void
   onDelete: (channelId: string) => void
   onEdit: (channelId: string) => void
+  onArchive: (channelId: string) => void
+  onUnarchive: (channelId: string) => void
   onJoinChannel: (channelId: string) => void
   onLeaveChannel: (channelId: string) => void
   isAdmin: boolean
@@ -118,6 +126,8 @@ export function GroupedChannelList({
   toggleChannelFavorite,
   onDelete,
   onEdit,
+  onArchive,
+  onUnarchive,
   onJoinChannel,
   onLeaveChannel,
   isAdmin,
@@ -147,6 +157,8 @@ export function GroupedChannelList({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               isAdmin={isAdmin}
               isMember={checkIsMember(channel.id)}
               onJoinChannel={onJoinChannel}

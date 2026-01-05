@@ -65,6 +65,8 @@ interface DocumentVersionPickerProps {
   onConfirmLock?: () => void
   /** 當前正在編輯的報價單 ID（用於「另存」功能） */
   currentQuoteId?: string
+  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
+  nested?: boolean
 }
 
 export function DocumentVersionPicker({
@@ -74,6 +76,7 @@ export function DocumentVersionPicker({
   mode = 'manage',
   onConfirmLock,
   currentQuoteId,
+  nested = false,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
   const { items: quotes, fetchAll, create, update, delete: deleteQuote, loading } = useQuoteStore()
@@ -533,7 +536,7 @@ export function DocumentVersionPicker({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
+        <DialogContent nested={nested} className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
           {/* 標題區 */}
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -701,9 +704,9 @@ export function DocumentVersionPicker({
         </DialogContent>
       </Dialog>
 
-      {/* 預覽 Dialog */}
+      {/* 預覽 Dialog（第三層嵌套：TourDetailDialog → DocumentVersionPicker → Preview） */}
       <Dialog open={!!previewQuote} onOpenChange={open => !open && setPreviewQuote(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent nested className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-morandi-gold" />

@@ -53,14 +53,17 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   // 更新 tour 的成本財務欄位
   const updateTourCostFinancials = useCallback(async () => {
     try {
-      // 取得該團所有請款單的項目
+      // 取得該團已確認/已付款的請款單（只有確認付出去才計入成本）
+      // 注意：必須過濾已刪除的請款單
       const { data: requestsData } = await supabase
         .from('payment_requests')
         .select('id, status')
         .eq('tour_id', tour.id)
+        .is('deleted_at', null) // 過濾已刪除的請款單
+        .in('status', ['confirmed', 'paid']) // 只計算已確認或已付款的
 
       if (!requestsData || requestsData.length === 0) {
-        // 如果沒有請款單，設成本為 0
+        // 如果沒有已確認的請款單，設成本為 0
         const { data: currentTour } = await supabase
           .from('tours')
           .select('total_revenue')
@@ -84,7 +87,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
 
       const requestIds = requestsData.map(r => r.id)
 
-      // 取得所有請款項目
+      // 取得已確認請款單的所有項目
       const { data: itemsData } = await supabase
         .from('payment_request_items')
         .select('subtotal')
@@ -233,8 +236,11 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   const costPayments = React.useMemo(() => {
     const tourOrderIds = new Set(tourOrders.map(o => o.id))
 
-    return (paymentRequests as unknown as PaymentRequestWithItems[])
+    return (paymentRequests as unknown as (PaymentRequestWithItems & { deleted_at?: string | null })[])
       .filter(request => {
+        // 排除已刪除的請款單
+        if (request.deleted_at) return false
+
         // 如果有 orderFilter，只顯示該訂單的請款
         if (orderFilter) {
           return request.order_id === orderFilter

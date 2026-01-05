@@ -123,7 +123,7 @@ export function DatasheetCell({
         ? memberAssignedRoom
           ? `no-bed-${memberAssignedRoom}`
           : 'no-bed'
-        : String(memberAssignedRoom || '')
+        : (memberAssignedRoom || '__none__')
 
       return (
         <Select
@@ -139,7 +139,7 @@ export function DatasheetCell({
             <SelectValue placeholder="未分配" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">未分配</SelectItem>
+            <SelectItem value="__none__">未分配</SelectItem>
             <SelectItem value="no-bed">不佔床</SelectItem>
             {roomOptions.filter(roomOption => {
               const usage = getRoomUsage

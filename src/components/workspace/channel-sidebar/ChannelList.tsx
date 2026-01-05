@@ -41,6 +41,8 @@ interface ChannelListProps {
   toggleChannelFavorite: (id: string) => void
   onDelete: (id: string) => void
   onEdit: (id: string) => void
+  onArchive: (id: string) => void
+  onUnarchive: (id: string) => void
   onJoinChannel: (id: string) => void
   onLeaveChannel: (id: string) => void
   checkIsMember: (id: string) => boolean
@@ -69,6 +71,8 @@ export function ChannelList({
   toggleChannelFavorite,
   onDelete,
   onEdit,
+  onArchive,
+  onUnarchive,
   onJoinChannel,
   onLeaveChannel,
   checkIsMember,
@@ -132,6 +136,8 @@ export function ChannelList({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               onJoinChannel={onJoinChannel}
               onLeaveChannel={onLeaveChannel}
               isAdmin={isAdmin}
@@ -156,6 +162,8 @@ export function ChannelList({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               onJoinChannel={onJoinChannel}
               onLeaveChannel={onLeaveChannel}
               isAdmin={isAdmin}
@@ -180,6 +188,8 @@ export function ChannelList({
                   toggleChannelFavorite={toggleChannelFavorite}
                   onDelete={onDelete}
                   onEdit={onEdit}
+                  onArchive={onArchive}
+                  onUnarchive={onUnarchive}
                   onJoinChannel={onJoinChannel}
                   onLeaveChannel={onLeaveChannel}
                   isAdmin={isAdmin}
@@ -199,6 +209,8 @@ export function ChannelList({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               onJoinChannel={onJoinChannel}
               onLeaveChannel={onLeaveChannel}
               isAdmin={isAdmin}
@@ -229,6 +241,8 @@ export function ChannelList({
               toggleChannelFavorite={toggleChannelFavorite}
               onDelete={onDelete}
               onEdit={onEdit}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
               onJoinChannel={onJoinChannel}
               onLeaveChannel={onLeaveChannel}
               isAdmin={isAdmin}
@@ -251,6 +265,8 @@ export function ChannelList({
                 toggleChannelFavorite={toggleChannelFavorite}
                 onDelete={onDelete}
                 onEdit={onEdit}
+                onArchive={onArchive}
+                onUnarchive={onUnarchive}
                 onJoinChannel={onJoinChannel}
                 onLeaveChannel={onLeaveChannel}
                 isAdmin={isAdmin}
