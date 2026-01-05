@@ -409,14 +409,22 @@ export async function createQuoteForPackage(
   workspaceId: string,
   userId: string
 ): Promise<string> {
+  logger.log('createQuoteForPackage called with:', { packageId, workspaceId, userId })
+
   // 取得套件資訊
-  const { data: pkgData } = await packagesDb()
+  const { data: pkgData, error: pkgError } = await packagesDb()
     .select('*, proposal:proposals(*)')
     .eq('id', packageId)
     .single()
 
+  logger.log('Package query result:', { pkgData, pkgError })
+
+  if (pkgError) {
+    throw new Error(`查詢套件失敗: ${pkgError.message}`)
+  }
+
   if (!pkgData) {
-    throw new Error('找不到套件')
+    throw new Error(`找不到套件 (ID: ${packageId})`)
   }
 
   const pkg = pkgData as unknown as ProposalPackage & { proposal?: Proposal }

@@ -134,10 +134,12 @@ export function PackageListPanel({
       }
 
       try {
+        console.log('Creating quote for package:', { packageId: pkg.id, workspaceId: user.workspace_id, userId: user.id })
         const quoteId = await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
         onPackagesChange()
         router.push(`/quotes?highlight=${quoteId}`)
       } catch (error) {
+        console.error('Quote creation failed:', error)
         const message = error instanceof Error ? error.message : '未知錯誤'
         await alert(`建立報價單失敗: ${message}`, 'error')
       }
