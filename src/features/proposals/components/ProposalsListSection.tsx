@@ -1,21 +1,22 @@
 /**
- * ProposalsListSection - 提案列表區塊
- * 用於在旅遊團「全部」頁籤顯示提案
+ * ProposalsListSection - 提案列表
+ * 用於在旅遊團「全部」頁籤顯示提案（與旅遊團列表整合）
  */
 
 'use client'
 
 import React, { useMemo } from 'react'
-import { FileText, ChevronRight, Calendar, MapPin, Users } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { useProposals } from '@/hooks/cloud-hooks'
+import { DateCell } from '@/components/table-cells'
 import type { Proposal, ProposalStatus } from '@/types/proposal.types'
 
-// 狀態配色
+// 狀態配色（與旅遊團風格一致）
 const STATUS_COLORS: Record<ProposalStatus, string> = {
-  draft: 'text-morandi-secondary bg-morandi-container',
-  negotiating: 'text-status-info bg-status-info-bg',
-  converted: 'text-morandi-green bg-morandi-green/10',
-  archived: 'text-morandi-muted bg-morandi-muted/10',
+  draft: 'text-morandi-secondary',
+  negotiating: 'text-status-info',
+  converted: 'text-morandi-green',
+  archived: 'text-morandi-muted',
 }
 
 const STATUS_LABELS: Record<ProposalStatus, string> = {
@@ -56,81 +57,50 @@ export function ProposalsListSection({
   }, [proposals, searchQuery])
 
   if (filteredProposals.length === 0) {
-    return null // 沒有提案時不顯示區塊
+    return null
   }
 
   return (
-    <div className="border-b border-border bg-morandi-gold/5">
-      {/* 區塊標題 */}
-      <div className="px-4 py-2 flex items-center gap-2 border-b border-border/50">
-        <FileText className="w-4 h-4 text-morandi-gold" />
-        <span className="text-sm font-medium text-morandi-primary">提案</span>
-        <span className="text-xs text-morandi-secondary">({filteredProposals.length})</span>
-      </div>
+    <>
+      {filteredProposals.map(proposal => (
+        <tr
+          key={proposal.id}
+          onClick={() => onProposalClick(proposal)}
+          className="border-b border-border/60 hover:bg-morandi-gold/5 cursor-pointer transition-colors"
+        >
+          {/* 團號（提案編號） */}
+          <td className="px-4 py-3">
+            <span className="text-sm text-morandi-primary">{proposal.code}</span>
+          </td>
 
-      {/* 提案列表 */}
-      <div className="divide-y divide-border/30">
-        {filteredProposals.map(proposal => (
-          <button
-            key={proposal.id}
-            onClick={() => onProposalClick(proposal)}
-            className="w-full flex items-center gap-4 px-4 py-3 hover:bg-morandi-gold/10 transition-colors text-left"
-          >
-            {/* 提案編號 */}
-            <div className="w-24 shrink-0">
-              <span className="font-mono text-sm text-morandi-gold">{proposal.code}</span>
-            </div>
+          {/* 旅遊團名稱（提案名稱） */}
+          <td className="px-4 py-3">
+            <span className="text-sm text-morandi-primary">{proposal.title}</span>
+          </td>
 
-            {/* 提案名稱 */}
-            <div className="flex-1 min-w-0">
-              <div className="text-sm text-morandi-primary truncate">
-                {proposal.title}
-              </div>
-              {proposal.customer_name && (
-                <div className="text-xs text-morandi-secondary truncate">
-                  {proposal.customer_name}
-                </div>
-              )}
-            </div>
+          {/* 出發日期 */}
+          <td className="px-4 py-3">
+            <DateCell date={proposal.expected_start_date} showIcon={false} />
+          </td>
 
-            {/* 目的地 */}
-            {proposal.destination && (
-              <div className="hidden md:flex items-center gap-1 text-xs text-morandi-secondary w-24 shrink-0">
-                <MapPin className="w-3 h-3" />
-                <span className="truncate">{proposal.destination}</span>
-              </div>
-            )}
+          {/* 回程日期 */}
+          <td className="px-4 py-3">
+            <DateCell date={proposal.expected_end_date} fallback="-" showIcon={false} />
+          </td>
 
-            {/* 日期 */}
-            {proposal.expected_start_date && (
-              <div className="hidden lg:flex items-center gap-1 text-xs text-morandi-secondary w-32 shrink-0">
-                <Calendar className="w-3 h-3" />
-                <span>{proposal.expected_start_date}</span>
-              </div>
-            )}
+          {/* 狀態 */}
+          <td className="px-4 py-3">
+            <span className={`text-sm font-medium ${STATUS_COLORS[proposal.status]}`}>
+              {STATUS_LABELS[proposal.status]}
+            </span>
+          </td>
 
-            {/* 人數 */}
-            {proposal.group_size && (
-              <div className="hidden lg:flex items-center gap-1 text-xs text-morandi-secondary w-16 shrink-0">
-                <Users className="w-3 h-3" />
-                <span>{proposal.group_size}人</span>
-              </div>
-            )}
-
-            {/* 狀態 */}
-            <div className="w-20 shrink-0">
-              <span
-                className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
-              >
-                {STATUS_LABELS[proposal.status]}
-              </span>
-            </div>
-
-            {/* 箭頭 */}
-            <ChevronRight className="w-4 h-4 text-morandi-secondary shrink-0" />
-          </button>
-        ))}
-      </div>
-    </div>
+          {/* 操作欄（箭頭） */}
+          <td className="px-4 py-3">
+            <ChevronRight className="w-4 h-4 text-morandi-secondary" />
+          </td>
+        </tr>
+      ))}
+    </>
   )
 }

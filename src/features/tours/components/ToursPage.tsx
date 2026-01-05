@@ -246,28 +246,32 @@ export const ToursPage: React.FC = () => {
             <ProposalsTableContent searchQuery={searchQuery} />
           </div>
         ) : (
-          <>
-            {/* 全部頁籤時顯示提案區塊 */}
+          <div className="flex-1 overflow-auto">
+            {/* 全部頁籤時：提案行在表格最上方 */}
             {activeStatusTab === 'all' && (
-              <ProposalsListSection
-                searchQuery={searchQuery}
-                onProposalClick={(proposal) => {
-                  setSelectedProposal(proposal)
-                  setProposalDetailDialogOpen(true)
-                }}
-              />
+              <div className="hidden md:block">
+                <table className="w-full">
+                  <tbody>
+                    <ProposalsListSection
+                      searchQuery={searchQuery}
+                      onProposalClick={(proposal) => {
+                        setSelectedProposal(proposal)
+                        setProposalDetailDialogOpen(true)
+                      }}
+                    />
+                  </tbody>
+                </table>
+              </div>
             )}
-            <div className="flex-1 overflow-auto">
-              <TourTable
-                tours={filteredTours}
-                loading={loading}
-                onSort={handleSortChange}
-                onRowClick={handleRowClick}
-                renderActions={renderActions}
-                getStatusColor={getStatusColor}
-              />
-            </div>
-          </>
+            <TourTable
+              tours={filteredTours}
+              loading={loading}
+              onSort={handleSortChange}
+              onRowClick={handleRowClick}
+              renderActions={renderActions}
+              getStatusColor={getStatusColor}
+            />
+          </div>
         )}
       </div>
 
