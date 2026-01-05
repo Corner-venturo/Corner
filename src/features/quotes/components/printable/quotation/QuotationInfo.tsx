@@ -9,7 +9,6 @@ import { formatDateTW } from '@/lib/utils/format-date'
 
 interface QuotationInfoProps {
   quoteName: string
-  quoteCode?: string
   totalParticipants: number
   validUntil?: string
   tierLabel?: string
@@ -17,7 +16,6 @@ interface QuotationInfoProps {
 
 export const QuotationInfo: React.FC<QuotationInfoProps> = ({
   quoteName,
-  quoteCode,
   totalParticipants,
   validUntil,
   tierLabel,
@@ -45,10 +43,6 @@ export const QuotationInfo: React.FC<QuotationInfoProps> = ({
           <span className="flex-1 border-b border-border">
             {quoteName || '精選旅遊行程'}
           </span>
-        </div>
-        <div className="flex">
-          <span className="font-semibold w-32">報價單編號：</span>
-          <span className="flex-1 border-b border-border">{quoteCode || ''}</span>
         </div>
         <div className="flex">
           <span className="font-semibold w-32">總人數：</span>

@@ -155,13 +155,13 @@ export interface CreateProposalData {
   customer_name?: string
   customer_email?: string
   customer_phone?: string
-  title: string
+  title?: string                            // 選填，轉開團時補填
   description?: string
   notes?: string
   country_id?: string
   main_city_id?: string
   destination?: string
-  expected_start_date?: string
+  expected_start_date?: string              // 預計出發日期
   expected_end_date?: string
   flexible_dates?: boolean
   group_size?: number

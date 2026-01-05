@@ -2,7 +2,7 @@
  * Quotes feature constants
  */
 
-import { Calculator, FileText, Zap, Users } from 'lucide-react'
+import { Calculator, FileText } from 'lucide-react'
 
 /**
  * 報價單狀態篩選選項
@@ -12,15 +12,6 @@ export const STATUS_FILTERS = [
   { value: 'proposed', label: '提案', icon: FileText },
   { value: '進行中', label: '進行中', icon: FileText },
   { value: 'approved', label: '已核准', icon: FileText },
-] as const
-
-/**
- * 報價單類型篩選選項
- */
-export const TYPE_FILTERS = [
-  { value: 'all', label: '全部', icon: Calculator },
-  { value: 'quick', label: '快速', icon: Zap },
-  { value: 'group', label: '團體', icon: Users },
 ] as const
 
 /**

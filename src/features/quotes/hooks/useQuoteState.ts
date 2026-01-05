@@ -48,7 +48,10 @@ export const useQuoteState = () => {
 
 
   const [categories, setCategories] = useState<CostCategory[]>(() => {
-    const initialCategories = quote?.categories || costCategories
+    // 注意：空陣列 [] 是 truthy，所以要用 length 檢查
+    const initialCategories = (quote?.categories && quote.categories.length > 0)
+      ? quote.categories
+      : costCategories
     // 確保每個分類的總計都正確計算
     let processedCategories = initialCategories.map(cat => ({
       ...cat,
@@ -144,12 +147,38 @@ export const useQuoteState = () => {
   // 當 quote 載入後，更新所有狀態
   useEffect(() => {
     if (quote) {
-      if (quote.categories) {
+      // 空陣列 [] 是 truthy，所以要用 length 檢查
+      if (quote.categories && quote.categories.length > 0) {
         const loadedCategories = quote.categories.map(cat => ({
           ...cat,
           total: cat.items.reduce((sum, item) => sum + (item.total || 0), 0),
         }))
         setCategories(loadedCategories)
+      } else {
+        // 沒有 categories 或是空陣列，使用預設分類
+        // 同時根據 accommodation_days 初始化住宿項目
+        const initialCategories = costCategories.map(cat => ({ ...cat, items: [...cat.items] }))
+        const savedAccommodationDays = quote.accommodation_days || 0
+        if (savedAccommodationDays > 0) {
+          const accommodationCategory = initialCategories.find(cat => cat.id === 'accommodation')
+          if (accommodationCategory) {
+            const newItems = []
+            for (let day = 1; day <= savedAccommodationDays; day++) {
+              newItems.push({
+                id: `accommodation-day${day}-${Date.now()}-${day}`,
+                name: '',
+                quantity: 0,
+                unit_price: 0,
+                total: 0,
+                note: '',
+                day: day,
+                room_type: '',
+              })
+            }
+            accommodationCategory.items = newItems
+          }
+        }
+        setCategories(initialCategories)
       }
       if (quote.accommodation_days !== undefined) {
         setAccommodationDays(quote.accommodation_days)

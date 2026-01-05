@@ -26,7 +26,6 @@ import { DateCell } from '@/components/table-cells'
 
 interface QuoteConfirmationSectionProps {
   quoteId: string
-  quoteCode: string
   confirmationStatus?: QuoteConfirmationStatus
   confirmationToken?: string
   confirmationTokenExpiresAt?: string
@@ -50,7 +49,6 @@ const confirmationStatusConfig: Record<QuoteConfirmationStatus, { label: string;
 
 export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> = ({
   quoteId,
-  quoteCode,
   confirmationStatus = 'draft',
   confirmationToken,
   confirmationTokenExpiresAt,
@@ -335,7 +333,7 @@ export const QuoteConfirmationSection: React.FC<QuoteConfirmationSectionProps> =
               業務手動確認
             </DialogTitle>
             <DialogDescription>
-              確認報價單 {quoteCode}，此操作表示業務已與客戶確認同意此報價。
+              確認此報價單，此操作表示業務已與客戶確認同意此報價。
             </DialogDescription>
           </DialogHeader>
 

@@ -8,7 +8,6 @@ import {
   Calculator,
   Loader2,
   ExternalLink,
-  Zap,
   Lock,
   Eye,
   Copy,
@@ -32,9 +31,6 @@ import {
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {
-  if (quote.quote_type === 'quick') {
-    return quote.customer_name || '未命名客戶'
-  }
   return quote.customer_name || quote.name || '未命名報價單'
 }
 
@@ -81,7 +77,6 @@ export function DocumentVersionPicker({
   const router = useRouter()
   const { items: quotes, fetchAll, create, update, delete: deleteQuote, loading } = useQuoteStore()
   const [isCreatingStandard, setIsCreatingStandard] = useState(false)
-  const [isCreatingQuick, setIsCreatingQuick] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const [previewQuote, setPreviewQuote] = useState<Quote | null>(null)
@@ -120,26 +115,24 @@ export function DocumentVersionPicker({
 
     return false
   })
-  const standardQuotes = linkedQuotes.filter(q => q.quote_type !== 'quick')
-  const quickQuotes = linkedQuotes.filter(q => q.quote_type === 'quick')
 
   // 取得當前正在編輯的報價單
   const currentQuote = currentQuoteId ? quotes.find(q => q.id === currentQuoteId) : null
 
   // 另存當前報價單為新版本
   const [isSavingAs, setIsSavingAs] = useState(false)
-  const handleSaveAsNew = async (targetType: 'standard' | 'quick') => {
+  const handleSaveAsNew = async () => {
     if (!currentQuote) return
     try {
       setIsSavingAs(true)
-      const code = generateCode('TP', { quoteType: targetType }, quotes)
+      const code = generateCode('TP', {}, quotes)
       const originalName = currentQuote.customer_name || currentQuote.name || '未命名'
 
       const newQuote = await create({
         code,
         name: currentQuote.name,
         customer_name: `${originalName} (副本)`,
-        quote_type: targetType,
+        quote_type: 'standard',
         status: 'draft',
         tour_id: tour.id,
         categories: currentQuote.categories,
@@ -157,12 +150,12 @@ export function DocumentVersionPicker({
     }
   }
 
-  // 建立新標準報價單
+  // 建立新報價單
   const handleCreateStandard = async () => {
     try {
       setIsCreatingStandard(true)
 
-      const code = generateCode('TP', { quoteType: 'standard' }, quotes)
+      const code = generateCode('TP', {}, quotes)
 
       const newQuote = await create({
         code,
@@ -188,39 +181,6 @@ export function DocumentVersionPicker({
       alert(message)
     } finally {
       setIsCreatingStandard(false)
-    }
-  }
-
-  // 建立新快速報價單
-  const handleCreateQuick = async () => {
-    try {
-      setIsCreatingQuick(true)
-
-      const code = generateCode('TP', { quoteType: 'quick' }, quotes)
-
-      const newQuote = await create({
-        code,
-        name: '',
-        customer_name: '未命名客戶',
-        quote_type: 'quick',
-        status: 'draft',
-        tour_id: tour.id,
-        group_size: 1,
-      })
-
-      if (newQuote?.id) {
-        onClose()
-        router.push(`/quotes/${newQuote.id}`)
-      } else {
-        logger.error('建立快速報價單失敗: 未取得報價單 ID', newQuote)
-        alert('建立報價單失敗，請稍後再試')
-      }
-    } catch (error) {
-      logger.error('建立快速報價單失敗:', error)
-      const message = error instanceof Error ? error.message : '建立報價單失敗'
-      alert(message)
-    } finally {
-      setIsCreatingQuick(false)
     }
   }
 
@@ -262,14 +222,14 @@ export function DocumentVersionPicker({
     e.stopPropagation()
     try {
       setCopyingId(quote.id)
-      const code = generateCode('TP', { quoteType: quote.quote_type === 'quick' ? 'quick' : 'standard' }, quotes)
+      const code = generateCode('TP', {}, quotes)
       const originalName = quote.customer_name || quote.name || '未命名'
 
       const newQuote = await create({
         code,
         name: quote.name,
         customer_name: `${originalName} (副本)`,
-        quote_type: quote.quote_type,
+        quote_type: 'standard',
         status: 'draft',
         tour_id: tour.id,
         categories: quote.categories,
@@ -475,7 +435,7 @@ export function DocumentVersionPicker({
         </div>
 
         {/* 成本細項表格 */}
-        {previewQuote.quote_type !== 'quick' && categories && categories.length > 0 ? (
+        {categories && categories.length > 0 ? (
           <div className="space-y-3">
             <table className="w-full text-sm">
               <thead>
@@ -520,10 +480,6 @@ export function DocumentVersionPicker({
               </tfoot>
             </table>
           </div>
-        ) : previewQuote.quote_type === 'quick' ? (
-          <div className="text-sm text-morandi-secondary text-center py-4">
-            快速報價單，請點擊「編輯」查看詳細內容
-          </div>
         ) : (
           <div className="text-sm text-morandi-secondary text-center py-4">
             尚無成本項目
@@ -536,7 +492,7 @@ export function DocumentVersionPicker({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent nested={nested} className="max-w-[900px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
+        <DialogContent nested={nested} className="max-w-[500px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
           {/* 標題區 */}
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -546,14 +502,13 @@ export function DocumentVersionPicker({
             </DialogTitle>
           </DialogHeader>
 
-          {/* 左右兩欄佈局 */}
-          <div className="flex-1 overflow-hidden grid grid-cols-2 gap-6">
-            {/* 左邊：團體報價單 */}
-            <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
+          {/* 報價單列表 */}
+          <div className="flex-1 overflow-hidden">
+            <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full">
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">團體報價單</span>
+                  <span className="text-sm font-medium text-morandi-primary">報價單列表</span>
                 </div>
                 <p className="text-xs text-morandi-secondary mt-1">完整報價單，包含分類項目與成本明細</p>
               </div>
@@ -568,13 +523,13 @@ export function DocumentVersionPicker({
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
                   </div>
-                ) : standardQuotes.length === 0 ? (
+                ) : linkedQuotes.length === 0 ? (
                   <div className="text-center py-8 text-sm text-morandi-secondary">
-                    尚無團體報價單
+                    尚無報價單
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {standardQuotes.map((quote, index) => renderQuoteItem(quote, index))}
+                    {linkedQuotes.map((quote, index) => renderQuoteItem(quote, index))}
                   </div>
                 )}
               </div>
@@ -591,7 +546,7 @@ export function DocumentVersionPicker({
                       onConfirmLock?.()
                       onClose()
                     }}
-                    disabled={standardQuotes.length === 0}
+                    disabled={linkedQuotes.length === 0}
                     className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-green hover:bg-morandi-green/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Lock size={16} />
@@ -613,7 +568,7 @@ export function DocumentVersionPicker({
                     </button>
                     {currentQuote && (
                       <button
-                        onClick={() => handleSaveAsNew('standard')}
+                        onClick={() => handleSaveAsNew()}
                         disabled={isSavingAs}
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-gold border border-morandi-gold hover:bg-morandi-gold/10 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -627,77 +582,6 @@ export function DocumentVersionPicker({
                     )}
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* 右邊：快速報價單 */}
-            <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
-              <div className="flex-shrink-0 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-morandi-gold" />
-                  <span className="text-sm font-medium text-morandi-primary">快速報價單</span>
-                </div>
-                <p className="text-xs text-morandi-secondary mt-1">簡易報價，快速產出客戶報價</p>
-              </div>
-
-              {/* 分割線留白 */}
-              <div className="mx-4">
-                <div className="border-t border-border" />
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-4">
-                {loading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
-                  </div>
-                ) : quickQuotes.length === 0 ? (
-                  <div className="text-center py-8 text-sm text-morandi-secondary">
-                    尚無快速報價單
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {quickQuotes.map((quote, index) => renderQuoteItem(quote, index))}
-                  </div>
-                )}
-              </div>
-
-              {/* 分割線留白 */}
-              <div className="mx-4">
-                <div className="border-t border-border" />
-              </div>
-
-              <div className="flex-shrink-0 p-4">
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleCreateQuick}
-                    disabled={isCreatingQuick}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {isCreatingQuick ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <>
-                        <Zap size={16} />
-                        <Plus size={14} />
-                      </>
-                    )}
-                    新增
-                  </button>
-                  {currentQuote && (
-                    <button
-                      onClick={() => handleSaveAsNew('quick')}
-                      disabled={isSavingAs}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-gold border border-morandi-gold hover:bg-morandi-gold/10 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      {isSavingAs ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <FilePlus size={16} />
-                      )}
-                      另存
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
           </div>

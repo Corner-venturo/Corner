@@ -15,7 +15,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Plus, Calculator, Loader2, ExternalLink, Zap } from 'lucide-react'
+import { Plus, Calculator, Loader2, ExternalLink } from 'lucide-react'
 import { useQuoteStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
@@ -25,9 +25,6 @@ import { stripHtml } from '@/lib/utils/string-utils'
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {
-  if (quote.quote_type === 'quick') {
-    return quote.customer_name || '未命名客戶'
-  }
   return stripHtml(quote.name) || stripHtml(quote.destination) || '未命名'
 }
 
@@ -59,30 +56,22 @@ export function LinkQuoteToTourDialog({
   }, [quotes, tour.id])
 
   // 建立新報價單
-  const handleCreateNew = async (quoteType: 'standard' | 'quick') => {
+  const handleCreateNew = async () => {
     try {
       setIsCreating(true)
 
-      const code = generateCode('TP', { quoteType }, quotes)
+      const code = generateCode('TP', {}, quotes)
 
-      const baseData = {
+      const newQuote = await create({
         code,
         name: tour.name,
-        quote_type: quoteType,
+        quote_type: 'standard',
         status: 'draft' as const,
         tour_id: tour.id,
         customer_name: '',
-      }
-
-      const newQuote = await create(
-        quoteType === 'standard'
-          ? {
-              ...baseData,
-              categories: DEFAULT_CATEGORIES,
-              group_size: tour.max_participants || 20,
-            }
-          : baseData
-      )
+        categories: DEFAULT_CATEGORIES,
+        group_size: tour.max_participants || 20,
+      })
 
 
       if (newQuote?.id) {
@@ -113,59 +102,30 @@ export function LinkQuoteToTourDialog({
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
-          {/* 建立新報價單 - 兩個選項 */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* 團體報價單 */}
-            <div className="border-2 border-dashed border-morandi-primary/30 rounded-lg p-4 bg-morandi-primary/5">
-              <div className="flex flex-col items-center text-center mb-3">
-                <div className="w-12 h-12 rounded-lg bg-morandi-primary/20 flex items-center justify-center mb-2">
-                  <Calculator className="w-6 h-6 text-morandi-primary" />
-                </div>
-                <div className="font-medium text-morandi-primary">團體報價單</div>
-                <div className="text-xs text-morandi-secondary mt-1">完整行程報價</div>
+          {/* 建立新報價單 */}
+          <div className="border-2 border-dashed border-morandi-primary/30 rounded-lg p-4 bg-morandi-primary/5">
+            <div className="flex flex-col items-center text-center mb-3">
+              <div className="w-12 h-12 rounded-lg bg-morandi-primary/20 flex items-center justify-center mb-2">
+                <Calculator className="w-6 h-6 text-morandi-primary" />
               </div>
-              <Button
-                onClick={() => handleCreateNew('standard')}
-                disabled={isCreating}
-                variant="outline"
-                className="w-full"
-              >
-                {isCreating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-1" />
-                    建立
-                  </>
-                )}
-              </Button>
+              <div className="font-medium text-morandi-primary">報價單</div>
+              <div className="text-xs text-morandi-secondary mt-1">完整行程報價</div>
             </div>
-
-            {/* 快速報價單 */}
-            <div className="border-2 border-dashed border-amber-400/30 rounded-lg p-4 bg-amber-50">
-              <div className="flex flex-col items-center text-center mb-3">
-                <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center mb-2">
-                  <Zap className="w-6 h-6 text-amber-600" />
-                </div>
-                <div className="font-medium text-amber-700">快速報價單</div>
-                <div className="text-xs text-amber-600 mt-1">簡易項目報價</div>
-              </div>
-              <Button
-                onClick={() => handleCreateNew('quick')}
-                disabled={isCreating}
-                variant="outline"
-                className="w-full border-amber-400 text-amber-700 hover:bg-amber-100"
-              >
-                {isCreating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-1" />
-                    建立
-                  </>
-                )}
-              </Button>
-            </div>
+            <Button
+              onClick={handleCreateNew}
+              disabled={isCreating}
+              variant="outline"
+              className="w-full"
+            >
+              {isCreating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-1" />
+                  建立
+                </>
+              )}
+            </Button>
           </div>
 
           {/* 已關聯的報價單 */}
@@ -183,13 +143,6 @@ export function LinkQuoteToTourDialog({
                     className="w-full flex items-center justify-between p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 transition-colors text-left"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm text-morandi-gold">{quote.code}</span>
-                      {quote.quote_type === 'quick' && (
-                        <span className="flex items-center gap-0.5 text-xs bg-status-warning-bg text-status-warning px-1.5 py-0.5 rounded">
-                          <Zap className="w-3 h-3" />
-                          快速
-                        </span>
-                      )}
                       <span className="text-morandi-text">{getQuoteDisplayName(quote)}</span>
                       {quote.versions && quote.versions.length > 0 && (
                         <span className="text-xs bg-morandi-gold/20 text-morandi-gold px-1.5 py-0.5 rounded">

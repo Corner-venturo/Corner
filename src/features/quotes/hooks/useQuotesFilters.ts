@@ -12,7 +12,6 @@ interface UseQuotesFiltersParams {
   statusFilter: string
   searchTerm: string
   authorFilter?: string
-  typeFilter?: string
 }
 
 export const useQuotesFilters = ({
@@ -20,7 +19,6 @@ export const useQuotesFilters = ({
   statusFilter,
   searchTerm,
   authorFilter,
-  typeFilter,
 }: UseQuotesFiltersParams) => {
   const filteredQuotes = useMemo(() => {
     // 分離置頂和非置頂報價單
@@ -48,14 +46,7 @@ export const useQuotesFilters = ({
         ('created_by_name' in quote && quote.created_by_name === authorFilter) ||
         ('handler_name' in quote && quote.handler_name === authorFilter)
 
-      // 類型篩選（快速/團體報價單）
-      const matchesType =
-        !typeFilter ||
-        typeFilter === 'all' ||
-        (typeFilter === 'quick' && 'quote_type' in quote && quote.quote_type === 'quick') ||
-        (typeFilter === 'group' && (!('quote_type' in quote) || quote.quote_type !== 'quick'))
-
-      return matchesStatus && matchesSearch && matchesAuthor && matchesType
+      return matchesStatus && matchesSearch && matchesAuthor
     })
 
     // 排序非置頂報價單（按建立時間）
@@ -70,7 +61,7 @@ export const useQuotesFilters = ({
 
     // 置頂報價單永遠在最前面
     return [...sortedPinned, ...sortedUnpinned]
-  }, [quotes, statusFilter, searchTerm, authorFilter, typeFilter])
+  }, [quotes, statusFilter, searchTerm, authorFilter])
 
   return { filteredQuotes }
 }

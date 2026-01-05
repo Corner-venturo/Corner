@@ -4,11 +4,12 @@
 
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
+import { useRegionsStore } from '@/stores'
 import { useOrdersListSlim, useQuotesListSlim, useItinerariesListSlim } from '@/hooks/useListSlim'
 import { useDialog } from '@/hooks/useDialog'
 import { useTourOperations } from '../hooks/useTourOperations'
@@ -33,7 +34,7 @@ import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
-import { ProposalsListSection } from '@/features/proposals/components/ProposalsListSection'
+import { useProposals } from '@/hooks/cloud-hooks'
 import { createProposal } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { CreateProposalData, UpdateProposalData, Proposal } from '@/types/proposal.types'
@@ -64,7 +65,17 @@ export const ToursPage: React.FC = () => {
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
+  const { items: proposals } = useProposals()
+  const { countries, cities, fetchAll: fetchRegions } = useRegionsStore()
   const { dialog, closeDialog, openDialog } = useDialog()
+
+  // 載入地區資料（只在首次載入時執行）
+  useEffect(() => {
+    if (countries.length === 0) {
+      fetchRegions()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const {
     filteredTours,
@@ -182,14 +193,76 @@ export const ToursPage: React.FC = () => {
     onOpenTourConfirmationDialog: (tour: Tour) => {
       setTourConfirmationDialogTour(tour)
     },
+    onProposalClick: (proposal) => {
+      setSelectedProposal(proposal)
+      setProposalDetailDialogOpen(true)
+    },
   })
+
+  // 取得國家/城市名稱的輔助函數
+  const getDestinationName = useMemo(() => {
+    return (countryId?: string | null, cityId?: string | null) => {
+      const country = countries.find(c => c.id === countryId)
+      const city = cities.find(c => c.id === cityId)
+      if (city && country) return `${country.name} ${city.name}`
+      if (country) return country.name
+      return '-'
+    }
+  }, [countries, cities])
+
+  // 將提案轉換為 Tour 格式，用於「全部」頁籤整合顯示
+  const combinedTours = useMemo(() => {
+    if (activeStatusTab !== 'all') return filteredTours
+
+    // 篩選提案（排除已轉團、已封存）
+    const filteredProposals = proposals.filter(p => {
+      if (p.status === 'converted' || p.status === 'archived') return false
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase()
+        return (
+          p.code?.toLowerCase().includes(q) ||
+          p.title?.toLowerCase().includes(q) ||
+          p.customer_name?.toLowerCase().includes(q) ||
+          p.destination?.toLowerCase().includes(q)
+        )
+      }
+      return true
+    })
+
+    // 將提案轉換為 Tour 格式（帶有標記）
+    const proposalsAsTours = filteredProposals.map(p => ({
+      id: p.id,
+      code: p.code,
+      name: p.title || '-',
+      departure_date: p.expected_start_date || null,
+      return_date: null,
+      status: '提案',
+      // 目的地顯示（國家/城市）
+      destination: getDestinationName(p.country_id, p.main_city_id),
+      // 標記這是提案，用於 click handler 區分
+      __isProposal: true,
+      __originalProposal: p,
+    })) as unknown as Tour[]
+
+    // 提案置頂
+    return [...proposalsAsTours, ...filteredTours]
+  }, [activeStatusTab, filteredTours, proposals, searchQuery, getDestinationName])
 
   // 點擊整列打開詳情浮動視窗
   const handleRowClick = useCallback((row: unknown) => {
-    const tour = row as Tour
-    setSelectedTour(tour)
-    openDetailDialog(tour.id)
-  }, [setSelectedTour, openDetailDialog])
+    const item = row as Tour & { __isProposal?: boolean; __originalProposal?: Proposal }
+
+    // 如果是提案，打開提案詳細對話框
+    if (item.__isProposal && item.__originalProposal) {
+      setSelectedProposal(item.__originalProposal)
+      setProposalDetailDialogOpen(true)
+      return
+    }
+
+    // 否則是旅遊團，打開旅遊團詳情
+    setSelectedTour(item as Tour)
+    openDetailDialog(item.id)
+  }, [setSelectedTour, openDetailDialog, setSelectedProposal, setProposalDetailDialogOpen])
 
   // 新增提案
   const handleCreateProposal = useCallback(
@@ -247,24 +320,8 @@ export const ToursPage: React.FC = () => {
           </div>
         ) : (
           <div className="flex-1 overflow-auto">
-            {/* 全部頁籤時：提案行在表格最上方 */}
-            {activeStatusTab === 'all' && (
-              <div className="hidden md:block">
-                <table className="w-full">
-                  <tbody>
-                    <ProposalsListSection
-                      searchQuery={searchQuery}
-                      onProposalClick={(proposal) => {
-                        setSelectedProposal(proposal)
-                        setProposalDetailDialogOpen(true)
-                      }}
-                    />
-                  </tbody>
-                </table>
-              </div>
-            )}
             <TourTable
-              tours={filteredTours}
+              tours={combinedTours}
               loading={loading}
               onSort={handleSortChange}
               onRowClick={handleRowClick}

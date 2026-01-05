@@ -12,7 +12,6 @@ import {
   Users,
   CreditCard,
   Settings,
-  Calculator,
   Database,
   Building2,
   Wallet,
@@ -22,7 +21,6 @@ import {
   Calendar,
   TrendingDown,
   FileCheck,
-  Flag,
   FileSignature,
   FileText,
   CircleDot,
@@ -31,9 +29,7 @@ import {
   Bus,
   CheckSquare,
   ClipboardList,
-  MessageCircle,
   Archive,
-  FileBox,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -56,11 +52,9 @@ const menuItems: MenuItem[] = [
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
-  { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
   { href: '/tour-requests', label: '需求確認單', icon: ClipboardList, requiredPermission: 'tours' },
   { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
-  { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {
     href: '/finance',
     label: '財務系統',

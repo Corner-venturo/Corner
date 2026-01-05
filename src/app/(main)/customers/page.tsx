@@ -12,7 +12,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import { Search, X, Plus, AlertTriangle, Edit, Trash2 } from 'lucide-react'
+import { Search, X, Plus, AlertTriangle, Edit, Trash2, Users } from 'lucide-react'
 import { formatPassportExpiryWithStatus } from '@/lib/utils/passport-expiry'
 import { DateCell } from '@/components/table-cells'
 
@@ -298,6 +298,16 @@ export default function CustomersPage() {
     <div className="h-full flex flex-col">
       <ResponsiveHeader title="顧客管理">
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/customer-groups')}
+            className="gap-2"
+          >
+            <Users size={16} />
+            <span className="hidden sm:inline">群組</span>
+          </Button>
+
           <Button
             variant="outline"
             size="sm"

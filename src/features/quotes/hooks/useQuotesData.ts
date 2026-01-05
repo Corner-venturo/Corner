@@ -60,7 +60,7 @@ export const useQuotesData = () => {
 
     // 找到報價單資訊用於顯示
     const quote = quotes.find(q => q.id === quoteId)
-    const quoteName = quote ? `${quote.code} - ${quote.name}` : quoteId
+    const quoteName = quote?.name || '未命名報價單'
 
     // 需要輸入密碼確認
     const password = prompt(

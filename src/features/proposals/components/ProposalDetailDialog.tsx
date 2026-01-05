@@ -5,18 +5,14 @@
 
 'use client'
 
-import React, { useMemo } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import React, { useMemo, useState } from 'react'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
-import { Edit2, Archive, X } from 'lucide-react'
+import { Edit2, Archive, Plus } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { PackageListPanel } from './PackageListPanel'
-import type { Proposal, ProposalPackage, ProposalStatus } from '@/types/proposal.types'
+import type { Proposal, ProposalStatus } from '@/types/proposal.types'
 
 // 狀態配色
 const STATUS_COLORS: Record<ProposalStatus, string> = {
@@ -51,6 +47,7 @@ export function ProposalDetailDialog({
   onPackagesChange,
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
+  const [showAddDialog, setShowAddDialog] = useState(false)
 
   // 取得此提案的套件
   const packages = useMemo(() => {
@@ -69,84 +66,43 @@ export function ProposalDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-morandi-gold font-mono">{proposal.code}</span>
-              <span className="text-morandi-primary">{proposal.title}</span>
-              <span
-                className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
-              >
-                {STATUS_LABELS[proposal.status]}
-              </span>
-            </div>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+        <VisuallyHidden>
+          <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
+        </VisuallyHidden>
+        {/* 標題區 */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
+            <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
+            <span
+              className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
+            >
+              {STATUS_LABELS[proposal.status]}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
             {canEdit && (
-              <div className="flex items-center gap-2">
-                {onEdit && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => onEdit(proposal)}
-                  >
-                    <Edit2 size={14} />
-                    編輯
-                  </Button>
-                )}
-                {onArchive && proposal.status !== 'archived' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1 text-morandi-red border-morandi-red hover:bg-morandi-red/10"
-                    onClick={() => onArchive(proposal)}
-                  >
-                    <Archive size={14} />
-                    封存
-                  </Button>
-                )}
-              </div>
+              <Button
+                size="sm"
+                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                onClick={() => setShowAddDialog(true)}
+              >
+                <Plus size={14} />
+                新增版本
+              </Button>
             )}
-          </DialogTitle>
-        </DialogHeader>
-
-        {/* 基本資訊 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-container/20 rounded-lg">
-          {proposal.customer_name && (
-            <div>
-              <div className="text-xs text-morandi-secondary">客戶</div>
-              <div className="text-sm text-morandi-primary">{proposal.customer_name}</div>
-            </div>
-          )}
-          {proposal.destination && (
-            <div>
-              <div className="text-xs text-morandi-secondary">目的地</div>
-              <div className="text-sm text-morandi-primary">{proposal.destination}</div>
-            </div>
-          )}
-          {proposal.expected_start_date && (
-            <div>
-              <div className="text-xs text-morandi-secondary">預計日期</div>
-              <div className="text-sm text-morandi-primary">
-                {proposal.expected_start_date}
-                {proposal.expected_end_date && ` ~ ${proposal.expected_end_date}`}
-              </div>
-            </div>
-          )}
-          {proposal.group_size && (
-            <div>
-              <div className="text-xs text-morandi-secondary">預計人數</div>
-              <div className="text-sm text-morandi-primary">{proposal.group_size} 人</div>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* 套件列表 */}
-        <div className="flex-1 overflow-auto mt-4">
+        <div className="flex-1 overflow-auto">
           <PackageListPanel
             proposal={proposal}
             packages={packages}
             onPackagesChange={handlePackagesChange}
+            showAddDialog={showAddDialog}
+            onShowAddDialogChange={setShowAddDialog}
           />
         </div>
       </DialogContent>

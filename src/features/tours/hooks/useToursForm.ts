@@ -152,32 +152,10 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     })
   }, [dialog.type, dialog.data, destinations, destinationsLoading, setNewTour])
 
-  // Handle navigation from quote
+  // 旅遊團必須從提案建立，不再支援 URL 導航直接建團
   const handleNavigationEffect = useCallback(() => {
-    const fromQuoteId = searchParams.get('fromQuote')
-    const departure_date = searchParams.get('departure_date')
-    const shouldOpenDialog = searchParams.get('openDialog')
-
-    if (fromQuoteId) {
-      const sourceQuote = quotes.find(quote => quote.id === fromQuoteId)
-      if (sourceQuote) {
-        setNewTour(prev => ({
-          ...prev,
-          name: sourceQuote.name || prev.name,
-          price: Math.round((sourceQuote.total_cost ?? 0) / (sourceQuote.group_size ?? 1)),
-        }))
-        handleOpenCreateDialog(fromQuoteId)
-      }
-    }
-
-    if (departure_date && shouldOpenDialog === 'true') {
-      setNewTour(prev => ({
-        ...prev,
-        departure_date: departure_date,
-      }))
-      handleOpenCreateDialog()
-    }
-  }, [searchParams, quotes, handleOpenCreateDialog, setNewTour])
+    // 不執行任何操作 - 保留此函數以維持 API 相容性
+  }, [])
 
   return {
     handleOpenCreateDialog,

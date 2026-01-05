@@ -142,10 +142,9 @@ export interface QuoteItem extends BaseEntity {
 
 /**
  * QuoteType - 報價單類型
+ * 註：快速報價單已移除，僅保留標準報價單
  */
-export type QuoteType =
-  | 'standard' // 團體報價單（複雜的旅遊行程）
-  | 'quick' // 快速報價單（簡單收款用）
+export type QuoteType = 'standard' // 團體報價單（複雜的旅遊行程）
 
 /**
  * QuoteStatus - 報價狀態

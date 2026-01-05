@@ -39,12 +39,14 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         },
       },
       {
-        key: 'return_date',
-        label: '回程日期',
-        sortable: true,
+        key: 'destination',
+        label: '目的地',
+        sortable: false,
         render: (value, row) => {
-          const tour = row as Tour
-          return <DateCell date={tour.return_date} fallback="-" showIcon={false} />
+          const item = row as Tour & { destination?: string }
+          // 提案顯示 destination 欄位，旅遊團顯示 destination 欄位或 "-"
+          const destination = item.destination || '-'
+          return <span className="text-sm text-morandi-primary">{destination}</span>
         },
       },
       {

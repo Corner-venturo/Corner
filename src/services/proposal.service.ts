@@ -273,6 +273,49 @@ export async function duplicatePackage(
   return newPackage
 }
 
+/**
+ * 刪除套件（連同相關的報價單和行程表一起刪除）
+ */
+export async function deletePackage(id: string): Promise<void> {
+  logger.log('開始刪除套件:', id)
+
+  // 刪除關聯的報價單（用 proposal_package_id 關聯）
+  const { error: quoteError } = await supabase
+    .from('quotes')
+    .delete()
+    .eq('proposal_package_id', id)
+
+  if (quoteError) {
+    logger.warn('刪除關聯報價單時發生錯誤:', quoteError.message)
+  } else {
+    logger.log('已刪除關聯報價單')
+  }
+
+  // 刪除關聯的行程表（用 proposal_package_id 關聯）
+  const { error: itinError } = await supabase
+    .from('itineraries')
+    .delete()
+    .eq('proposal_package_id', id)
+
+  if (itinError) {
+    logger.warn('刪除關聯行程表時發生錯誤:', itinError.message)
+  } else {
+    logger.log('已刪除關聯行程表')
+  }
+
+  // 刪除套件
+  const { error } = await packagesDb()
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    logger.error('刪除套件失敗:', error.message)
+    throw new Error(`刪除套件失敗: ${error.message}`)
+  }
+
+  logger.log('套件刪除成功:', id)
+}
+
 // ============================================
 // 轉開團
 // ============================================

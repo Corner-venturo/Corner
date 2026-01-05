@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ArrowLeft, Save, Trash2, Map, RefreshCw, FilePlus, Plane, Contact, X } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Map, Plane, Contact, X } from 'lucide-react'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,12 +11,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, VersionRecord, CostCategory } from '../types'
 import { QuoteConfirmationSection } from './QuoteConfirmationSection'
@@ -194,23 +188,27 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         {/* 左區：內容標題區域 - 緊湊排列 */}
         <div className="flex items-center space-x-3 flex-shrink-0">
           <button
-            onClick={() => router.push('/quotes')}
+            onClick={() => {
+              if (relatedTour) {
+                router.push(`/tours?highlight=${relatedTour.id}`)
+              } else {
+                router.back()
+              }
+            }}
             className="p-2 hover:bg-morandi-container rounded-lg transition-colors"
-            title="返回報價單列表"
+            title={relatedTour ? '返回旅遊團' : '返回'}
           >
             <ArrowLeft size={20} className="text-morandi-secondary" />
           </button>
 
-          {/* 顯示編號 */}
-          <div className="text-sm font-mono text-morandi-secondary">
-            {relatedTour ? (
+          {/* 顯示旅遊團編號（如果有關聯） */}
+          {relatedTour && (
+            <div className="text-sm font-mono text-morandi-secondary">
               <span className="text-morandi-gold" title="旅遊團編號">
                 {relatedTour.code || '-'}
               </span>
-            ) : (
-              <span>{quote?.code || '-'}</span>
-            )}
-          </div>
+            </div>
+          )}
 
           <input
             type="text"
@@ -278,74 +276,10 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             <span className="text-sm text-morandi-secondary">人</span>
           </div>
 
-          <div className="h-4 w-px bg-morandi-container" />
-
-          <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-sm text-[var(--morandi-secondary)]">狀態</span>
-            {onStatusChange && !isReadOnly ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={cn(
-                    'inline-flex items-center h-8 px-3 rounded text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity',
-                    quote && quote.status === 'proposed'
-                      ? 'bg-[var(--morandi-gold)] text-white'
-                      : 'bg-[var(--morandi-green)] text-white'
-                  )}
-                >
-                  {quote?.status === 'proposed'
-                    ? '提案'
-                    : quote?.status === 'approved'
-                      ? '成交'
-                      : quote?.status || '提案'}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    onClick={() => onStatusChange('proposed')}
-                    className={cn(
-                      'cursor-pointer',
-                      quote?.status === 'proposed' && 'bg-[var(--morandi-gold)]/10'
-                    )}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-[var(--morandi-gold)] mr-2" />
-                    提案
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onStatusChange('approved', true)}
-                    className={cn(
-                      'cursor-pointer',
-                      quote?.status === 'approved' && 'bg-[var(--morandi-green)]/10'
-                    )}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-[var(--morandi-green)] mr-2" />
-                    成交
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <span
-                className={cn(
-                  'inline-flex items-center h-8 px-3 rounded text-sm font-medium',
-                  quote && quote.status === 'proposed'
-                    ? 'bg-[var(--morandi-gold)] text-white'
-                    : 'bg-[var(--morandi-green)] text-white'
-                )}
-              >
-                {quote?.status === 'proposed'
-                  ? '提案'
-                  : quote?.status === 'approved'
-                    ? '成交'
-                    : quote?.status || '提案'}
-              </span>
-            )}
-          </div>
-
-          <div className="h-4 w-px bg-morandi-container" />
-
           {/* 報價確認 */}
           {quote && staffId && staffName && (
             <QuoteConfirmationSection
               quoteId={quote.id}
-              quoteCode={quote.code || ''}
               confirmationStatus={quote.confirmation_status}
               confirmationToken={quote.confirmation_token}
               confirmationTokenExpiresAt={quote.confirmation_token_expires_at}
@@ -377,21 +311,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             <Save size={16} />
           </Button>
 
-          {/* 另存 - SVG + 文字 */}
-          <Button
-            onClick={() => setIsSaveDialogOpen(true)}
-            disabled={isReadOnly}
-            variant="outline"
-            title="另存新版本"
-            className={cn(
-              'h-8 px-2.5 text-sm gap-1',
-              isReadOnly && 'cursor-not-allowed opacity-60'
-            )}
-          >
-            <FilePlus size={14} />
-            另存
-          </Button>
-
           {/* 版本 - 開啟報價單管理對話框 */}
           {relatedTour && (
             <Button
@@ -416,34 +335,6 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
               <Map size={14} />
               行程表
             </Button>
-          )}
-
-          {/* 同步按鈕 - 只有當報價單已連結行程表時才顯示 */}
-          {quote?.itinerary_id && (handleSyncToItinerary || handleSyncAccommodationFromItinerary) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  title="同步資料"
-                  className="h-8 px-2.5 text-sm gap-1 border-[var(--morandi-gold)] text-[var(--morandi-gold)] hover:bg-[var(--morandi-gold)] hover:text-white"
-                >
-                  <RefreshCw size={14} />
-                  同步
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {handleSyncAccommodationFromItinerary && (
-                  <DropdownMenuItem onClick={handleSyncAccommodationFromItinerary}>
-                    從行程同步住宿
-                  </DropdownMenuItem>
-                )}
-                {handleSyncToItinerary && (
-                  <DropdownMenuItem onClick={handleSyncToItinerary}>
-                    同步餐飲到行程表
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           )}
 
           {/* 前往旅遊團 - 只有已核准且有關聯旅遊團時顯示 */}

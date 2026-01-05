@@ -67,7 +67,6 @@ export const PrintableQuotation: React.FC<PrintableQuotationProps> = ({
     >
       <QuotationInfo
         quoteName={quoteName}
-        quoteCode={quote?.code ?? undefined}
         totalParticipants={totalParticipants}
         validUntil={quote?.valid_until ?? undefined}
         tierLabel={tierLabel}

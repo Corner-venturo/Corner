@@ -23,6 +23,13 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
+import type { Proposal } from '@/types/proposal.types'
+
+// 擴展 Tour 類型，增加提案標記
+type TourOrProposal = Tour & {
+  __isProposal?: boolean
+  __originalProposal?: Proposal
+}
 
 interface UseTourActionButtonsParams {
   quotes: Quote[]
@@ -49,6 +56,8 @@ interface UseTourActionButtonsParams {
   onOpenArchiveDialog?: (tour: Tour) => void
   // 團確單對話框
   onOpenTourConfirmationDialog?: (tour: Tour) => void
+  // 提案點擊處理（查看版本）
+  onProposalClick?: (proposal: Proposal) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -71,11 +80,34 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onCloseTour,
     onOpenArchiveDialog,
     onOpenTourConfirmationDialog,
+    onProposalClick,
   } = params
 
   const renderActions = useCallback(
     (row: unknown) => {
-      const tour = row as Tour
+      const item = row as TourOrProposal
+
+      // 如果是提案，顯示提案專用操作
+      if (item.__isProposal && item.__originalProposal) {
+        return (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onProposalClick?.(item.__originalProposal!)
+              }}
+              className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+              title="查看版本"
+            >
+              <ClipboardList size={14} />
+              <span>版本</span>
+            </button>
+          </div>
+        )
+      }
+
+      // 旅遊團操作
+      const tour = item as Tour
       const tourQuote = quotes.find(q => q.tour_id === tour.id)
       const hasQuote = !!tourQuote
 
@@ -306,6 +338,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onCloseTour,
       onOpenArchiveDialog,
       onOpenTourConfirmationDialog,
+      onProposalClick,
     ]
   )
 

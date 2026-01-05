@@ -1,7 +1,5 @@
 'use client'
 
-import { getTodayString } from '@/lib/utils/format-date'
-
 import React, { useRef, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { ParticipantCounts, SellingPrices, VersionRecord } from '@/features/quotes/types'
@@ -21,7 +19,6 @@ import {
   SaveVersionDialog,
   SyncToItineraryDialog,
   PrintableQuotation,
-  QuickQuoteDetail,
   LinkTourDialog,
   ImportMealsDialog,
   ImportActivitiesDialog,
@@ -66,11 +63,6 @@ export default function QuoteDetailPage() {
     setCurrentEditingVersion,
     sellingPrices,
     setSellingPrices,
-    // 快速報價單相關
-    quickQuoteItems,
-    setQuickQuoteItems,
-    quickQuoteCustomerInfo,
-    setQuickQuoteCustomerInfo,
     // 砍次表相關
     tierPricings,
     setTierPricings,
@@ -154,17 +146,9 @@ export default function QuoteDetailPage() {
     currentEditingVersion,
     setSaveSuccess,
     setCategories,
-    quickQuoteItems,
-    quickQuoteCustomerInfo,
     tierPricings,
   })
   const { handleSave, handleSaveAsNewVersion, formatDateTime, handleFinalize, handleCreateTour, handleDeleteVersion } = actions
-
-  // 切換顯示模式：'standard' 團體報價單 | 'quick' 快速報價單
-  // 初始值根據 quote_type 設定（向後相容舊的快速報價單）
-  const [viewMode, setViewMode] = React.useState<'standard' | 'quick'>(() =>
-    quote?.quote_type === 'quick' ? 'quick' : 'standard'
-  )
 
   // 同步到行程表 - 狀態
   const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false)
@@ -202,44 +186,20 @@ export default function QuoteDetailPage() {
   // 載入特定版本
   const handleLoadVersion = useCallback(
     (versionIndex: number, versionData: VersionRecord) => {
-      // 根據版本模式切換視圖
-      const versionMode = versionData.mode || 'detailed'
-      setViewMode(versionMode === 'simple' ? 'quick' : 'standard')
-
-      if (versionMode === 'simple') {
-        // 載入簡易模式資料
-        if (versionData.quick_quote_items) {
-          setQuickQuoteItems(versionData.quick_quote_items)
-        }
-        if (versionData.customer_name !== undefined) {
-          setQuickQuoteCustomerInfo({
-            customer_name: versionData.customer_name || '',
-            contact_person: versionData.contact_person || '',
-            contact_phone: versionData.contact_phone || '',
-            contact_address: versionData.contact_address || '',
-            tour_code: versionData.name || '', // 使用版本名稱作為團號
-            handler_name: versionData.handler_name || 'William',
-            issue_date: versionData.issue_date || getTodayString(),
-            received_amount: versionData.received_amount || 0,
-            expense_description: versionData.expense_description || '',
-          })
-        }
-      } else {
-        // 載入詳細模式資料
-        setCategories(versionData.categories || [])
-        setAccommodationDays(versionData.accommodation_days || 0)
-        if (versionData.participant_counts) {
-          setParticipantCounts(versionData.participant_counts)
-        }
-        if (versionData.selling_prices) {
-          setSellingPrices(versionData.selling_prices)
-        }
+      // 載入版本資料
+      setCategories(versionData.categories || [])
+      setAccommodationDays(versionData.accommodation_days || 0)
+      if (versionData.participant_counts) {
+        setParticipantCounts(versionData.participant_counts)
+      }
+      if (versionData.selling_prices) {
+        setSellingPrices(versionData.selling_prices)
       }
 
       // 記錄當前編輯的版本索引（-1 表示主版本，null 表示初始狀態）
       setCurrentEditingVersion(versionIndex === -1 ? null : versionIndex)
     },
-    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion, setViewMode, setQuickQuoteItems, setQuickQuoteCustomerInfo]
+    [setCategories, setAccommodationDays, setParticipantCounts, setSellingPrices, setCurrentEditingVersion]
   )
 
 
@@ -427,48 +387,6 @@ export default function QuoteDetailPage() {
     return null
   }
 
-  // ✅ 如果是簡易模式（快速報價單），顯示簡易介面
-  if (viewMode === 'quick') {
-    return (
-      <QuickQuoteDetail
-        quote={{
-          ...quote,
-          // 合併快速報價單客戶資訊（團體報價的聯絡資訊會自動帶入）
-          // 優先順序：quickQuoteCustomerInfo > quote.customer_name > quoteName（團體名稱）
-          customer_name: quickQuoteCustomerInfo.customer_name || quote.customer_name || quoteName,
-          contact_person: quickQuoteCustomerInfo.contact_person || quote.contact_person,
-          contact_phone: quickQuoteCustomerInfo.contact_phone || quote.contact_phone,
-          contact_address: quickQuoteCustomerInfo.contact_address || quote.contact_address,
-          tour_code: quickQuoteCustomerInfo.tour_code || quote.tour_code,
-          handler_name: quickQuoteCustomerInfo.handler_name || quote.handler_name,
-          issue_date: quickQuoteCustomerInfo.issue_date || quote.issue_date,
-          received_amount: quickQuoteCustomerInfo.received_amount || quote.received_amount,
-          quick_quote_items: quickQuoteItems,
-        }}
-        onUpdate={async (data) => {
-          // 更新快速報價單資料到同一個報價單
-          await updateQuote(quote.id, data)
-          // 同步更新本地狀態
-          if (data.quick_quote_items) {
-            setQuickQuoteItems(data.quick_quote_items)
-          }
-          if (data.customer_name !== undefined) {
-            setQuickQuoteCustomerInfo(prev => ({ ...prev, ...data }))
-          }
-        }}
-        // 傳入切換按鈕
-        viewModeToggle={
-          <button
-            onClick={() => setViewMode('standard')}
-            className="px-3 py-1.5 text-sm bg-morandi-container hover:bg-morandi-container/80 rounded-md transition-colors"
-          >
-            切換到團體報價單
-          </button>
-        }
-      />
-    )
-  }
-
   return (
     <div className="w-full max-w-full space-y-6 pb-6">
       {/* 編輯衝突警告 */}
@@ -540,7 +458,7 @@ export default function QuoteDetailPage() {
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-70 table-divider">
                         項目
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-8 table-divider">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-16 table-divider">
                         數量
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider">

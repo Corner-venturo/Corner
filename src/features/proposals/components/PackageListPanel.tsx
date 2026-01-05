@@ -1,49 +1,70 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import {
-  Plus,
   Copy,
   Edit2,
   Trash2,
-  FileText,
-  Calendar,
-  ArrowRightCircle,
   Check,
+  FileText,
+  Book,
+  Globe,
+  DollarSign,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import {
   createPackage,
   updatePackage,
   duplicatePackage,
-  createQuoteForPackage,
+  deletePackage,
 } from '@/services/proposal.service'
 import { PackageDialog } from './PackageDialog'
 import { ConvertToTourDialog } from './ConvertToTourDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
+import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
   proposal: Proposal
   packages: ProposalPackage[]
   onPackagesChange: () => void
+  showAddDialog?: boolean
+  onShowAddDialogChange?: (show: boolean) => void
 }
 
 export function PackageListPanel({
   proposal,
   packages,
   onPackagesChange,
+  showAddDialog,
+  onShowAddDialogChange,
 }: PackageListPanelProps) {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  // 取得目的地顯示名稱（國家 + 機場代碼）
+  // 現在 country_id 存放國家名稱, main_city_id 存放機場代碼
+  const getLocationName = useCallback((country?: string | null, airportCode?: string | null) => {
+    if (country && airportCode) {
+      return `${country} (${airportCode})`
+    }
+    if (country) return country
+    if (airportCode) return airportCode
+    return '-'
+  }, [])
+
+  // 使用外部控制或內部狀態
+  const [internalAddDialogOpen, setInternalAddDialogOpen] = useState(false)
+  const addDialogOpen = showAddDialog ?? internalAddDialogOpen
+  const setAddDialogOpen = onShowAddDialogChange ?? setInternalAddDialogOpen
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [convertDialogOpen, setConvertDialogOpen] = useState(false)
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
+  const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 新增套件
@@ -109,12 +130,7 @@ export function PackageListPanel({
 
       if (confirmed) {
         try {
-          const { supabase } = await import('@/lib/supabase/client')
-          const { error } = await supabase
-            .from('proposal_packages' as 'notes')
-            .delete()
-            .eq('id', pkg.id)
-          if (error) throw error
+          await deletePackage(pkg.id)
           onPackagesChange()
         } catch (error) {
           await alert('刪除套件失敗', 'error')
@@ -122,29 +138,6 @@ export function PackageListPanel({
       }
     },
     [onPackagesChange]
-  )
-
-  // 建立報價單
-  const handleCreateQuote = useCallback(
-    async (pkg: ProposalPackage) => {
-      if (!user?.workspace_id || !user?.id) return
-
-      if (pkg.quote_id) {
-        router.push(`/quotes?highlight=${pkg.quote_id}`)
-        return
-      }
-
-      try {
-        const quoteId = await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
-        onPackagesChange()
-        router.push(`/quotes?highlight=${quoteId}`)
-      } catch (error) {
-        console.error('Quote creation failed:', error)
-        const message = error instanceof Error ? error.message : '未知錯誤'
-        await alert(`建立報價單失敗: ${message}`, 'error')
-      }
-    },
-    [user?.workspace_id, user?.id, onPackagesChange, router]
   )
 
   // 開啟行程表對話框
@@ -165,151 +158,346 @@ export function PackageListPanel({
     setConvertDialogOpen(true)
   }, [])
 
+  // 建立或開啟報價單
+  const handleQuoteClick = useCallback(
+    async (pkg: ProposalPackage) => {
+      if (pkg.quote_id) {
+        // 已有報價單，直接跳轉
+        router.push(`/quotes/${pkg.quote_id}`)
+        return
+      }
+
+      // 建立新報價單
+      try {
+        const destinationDisplay = pkg.country_id && pkg.main_city_id
+          ? `${pkg.country_id} (${pkg.main_city_id})`
+          : pkg.country_id || ''
+
+        // 計算住宿天數（總天數 - 1，最後一天不住宿）
+        let accommodationDays = 0
+        if (pkg.start_date && pkg.end_date) {
+          const start = new Date(pkg.start_date)
+          const end = new Date(pkg.end_date)
+          const diffTime = Math.abs(end.getTime() - start.getTime())
+          const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+          accommodationDays = Math.max(0, totalDays - 1)
+        }
+
+        // 從行程表帶入住宿和餐飲資料
+        let categories = null
+        if (pkg.itinerary_id) {
+          const { data: itinerary } = await supabase
+            .from('itineraries')
+            .select('daily_itinerary')
+            .eq('id', pkg.itinerary_id)
+            .single()
+
+          if (itinerary?.daily_itinerary && Array.isArray(itinerary.daily_itinerary)) {
+            const dailyData = itinerary.daily_itinerary as Array<{
+              accommodation?: string
+              meals?: { breakfast?: string; lunch?: string; dinner?: string }
+            }>
+
+            // 建立住宿項目
+            const accommodationItems = dailyData
+              .slice(0, -1) // 最後一天不住宿
+              .map((day, idx) => ({
+                id: `accommodation-day${idx + 1}-${Date.now()}-${idx}`,
+                name: day.accommodation || '',
+                quantity: 0,
+                unit_price: 0,
+                total: 0,
+                note: '',
+                day: idx + 1,
+                room_type: '',
+              }))
+
+            // 建立餐飲項目
+            const mealItems: Array<{
+              id: string
+              name: string
+              quantity: number
+              unit_price: number
+              total: number
+              note: string
+            }> = []
+            dailyData.forEach((day, idx) => {
+              const dayLabel = `Day${idx + 1}`
+              if (day.meals?.lunch && day.meals.lunch !== '自理') {
+                mealItems.push({
+                  id: `meal-lunch-day${idx + 1}-${Date.now()}`,
+                  name: `${dayLabel} 午餐：${day.meals.lunch}`,
+                  quantity: 0,
+                  unit_price: 0,
+                  total: 0,
+                  note: '',
+                })
+              }
+              if (day.meals?.dinner && day.meals.dinner !== '自理') {
+                mealItems.push({
+                  id: `meal-dinner-day${idx + 1}-${Date.now()}`,
+                  name: `${dayLabel} 晚餐：${day.meals.dinner}`,
+                  quantity: 0,
+                  unit_price: 0,
+                  total: 0,
+                  note: '',
+                })
+              }
+            })
+
+            // 建立完整的 categories
+            categories = [
+              { id: 'transport', name: '交通', items: [], total: 0 },
+              { id: 'group-transport', name: '團體分攤', items: [], total: 0 },
+              { id: 'accommodation', name: '住宿', items: accommodationItems, total: 0 },
+              { id: 'meals', name: '餐飲', items: mealItems, total: 0 },
+              { id: 'activities', name: '活動', items: [], total: 0 },
+              { id: 'others', name: '其他', items: [], total: 0 },
+              { id: 'guide', name: '領隊導遊', items: [], total: 0 },
+            ]
+
+            // 更新住宿天數
+            accommodationDays = accommodationItems.length
+          }
+        }
+
+        // 設定預設人數（全部算成人）
+        const groupSize = pkg.group_size || proposal.group_size || 0
+        const participantCounts = {
+          adult: groupSize,
+          child_with_bed: 0,
+          child_no_bed: 0,
+          single_room: 0,
+          infant: 0,
+        }
+
+        const { data: newQuote, error: quoteError } = await supabase
+          .from('quotes')
+          .insert({
+            id: crypto.randomUUID(),
+            name: proposal.title || pkg.version_name,
+            customer_name: proposal.customer_name || '待填寫',
+            quote_type: 'standard',
+            status: 'draft',
+            destination: destinationDisplay,
+            start_date: pkg.start_date || proposal.expected_start_date,
+            end_date: pkg.end_date || proposal.expected_end_date,
+            group_size: groupSize,
+            participant_counts: participantCounts,
+            proposal_package_id: pkg.id,
+            workspace_id: user?.workspace_id,
+            created_by: user?.id,
+            itinerary_id: pkg.itinerary_id || null,
+            accommodation_days: accommodationDays,
+            categories: categories,
+          })
+          .select()
+          .single()
+
+        if (quoteError) {
+          logger.error('建立報價單失敗:', quoteError.message)
+          await alert('建立報價單失敗', 'error')
+          return
+        }
+
+        if (newQuote) {
+          // 更新套件關聯報價單
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
+            .from('proposal_packages')
+            .update({ quote_id: newQuote.id })
+            .eq('id', pkg.id)
+
+          onPackagesChange()
+          router.push(`/quotes/${newQuote.id}`)
+        }
+      } catch (error) {
+        logger.error('建立報價單時發生錯誤:', error)
+        await alert('建立報價單失敗', 'error')
+      }
+    },
+    [router, proposal, user, onPackagesChange]
+  )
+
   // 已轉團的提案不能再操作
   const isConverted = proposal.status === 'converted'
   const isArchived = proposal.status === 'archived'
   const canEdit = !isConverted && !isArchived
 
   return (
-    <div className="p-4 bg-morandi-container/20">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-morandi-primary">團體套件</h4>
-        {canEdit && (
-          <Button
-            size="sm"
-            className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-            onClick={() => setAddDialogOpen(true)}
-          >
-            <Plus size={14} />
-            新增套件
-          </Button>
+    <div className="p-4 h-full flex flex-col">
+      <div className="flex-1 border border-border rounded-lg overflow-hidden min-h-[260px]">
+        {packages.length === 0 ? (
+          <div className="h-full flex items-center justify-center text-morandi-secondary">
+            尚無套件，請點擊「新增版本」開始建立
+          </div>
+        ) : (
+          <div className="h-full flex flex-col">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-morandi-container/40 border-b border-border/60">
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">版本</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">目的地</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">日期</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">人數</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">文件</th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packages.map(pkg => (
+                <tr
+                  key={pkg.id}
+                  className={`border-b border-border/60 hover:bg-morandi-gold/5 ${
+                    pkg.is_selected ? 'bg-morandi-gold/10' : ''
+                  }`}
+                >
+                  {/* 版本名稱 */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-morandi-primary">
+                        {pkg.version_name}
+                      </span>
+                      {pkg.is_selected && (
+                        <Check size={14} className="text-morandi-gold" />
+                      )}
+                    </div>
+                  </td>
+
+                  {/* 目的地 */}
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-morandi-primary">
+                      {getLocationName(pkg.country_id, pkg.main_city_id)}
+                    </span>
+                  </td>
+
+                  {/* 日期 */}
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-morandi-primary">
+                      {pkg.start_date || '-'}
+                    </span>
+                  </td>
+
+                  {/* 人數 */}
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-morandi-primary">
+                      {pkg.group_size ? `${pkg.group_size}人` : '-'}
+                    </span>
+                  </td>
+
+                  {/* 文件狀態 */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      {/* 行程表 */}
+                      <button
+                        onClick={() => openItineraryDialog(pkg)}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-green hover:bg-morandi-green/10'
+                            : 'text-morandi-secondary hover:bg-morandi-container/80'
+                        }`}
+                        title={pkg.itinerary_id ? '編輯行程表' : '新增行程表'}
+                      >
+                        <FileText size={16} />
+                      </button>
+                      {/* 手冊 */}
+                      <button
+                        onClick={() => {
+                          if (pkg.itinerary_id) {
+                            setSelectedPackage(pkg)
+                            setBrochureDialogOpen(true)
+                          } else {
+                            void alert('請先建立行程表', 'info')
+                          }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-primary hover:bg-morandi-container/80'
+                            : 'text-morandi-muted cursor-not-allowed'
+                        }`}
+                        title="手冊"
+                        disabled={!pkg.itinerary_id}
+                      >
+                        <Book size={16} />
+                      </button>
+                      {/* 網頁行程 */}
+                      <button
+                        onClick={() => {
+                          if (pkg.itinerary_id) {
+                            router.push(`/itinerary/new?itinerary_id=${pkg.itinerary_id}`)
+                          } else {
+                            void alert('請先建立行程表', 'info')
+                          }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-green hover:bg-morandi-green/10'
+                            : 'text-morandi-muted cursor-not-allowed'
+                        }`}
+                        title="網頁行程"
+                        disabled={!pkg.itinerary_id}
+                      >
+                        <Globe size={16} />
+                      </button>
+                      {/* 報價單 */}
+                      <button
+                        onClick={() => void handleQuoteClick(pkg)}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.quote_id
+                            ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                            : 'text-morandi-secondary hover:bg-morandi-container/80'
+                        }`}
+                        title={pkg.quote_id ? '查看報價單' : '建立報價單'}
+                      >
+                        <DollarSign size={16} />
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* 操作 */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      {canEdit && (
+                        <>
+                          <button
+                            onClick={() => handleDuplicatePackage(pkg)}
+                            className="p-1 text-morandi-secondary hover:text-morandi-primary"
+                            title="複製"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <button
+                            onClick={() => openEditDialog(pkg)}
+                            className="p-1 text-morandi-secondary hover:text-morandi-primary"
+                            title="編輯"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeletePackage(pkg)}
+                            className="p-1 text-morandi-red/60 hover:text-morandi-red"
+                            title="刪除"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => openConvertDialog(pkg)}
+                            className="ml-1 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
+                            title="轉開團"
+                          >
+                            轉開團
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
         )}
       </div>
-
-      {packages.length === 0 ? (
-        <div className="text-center py-8 text-morandi-secondary">
-          尚無套件，請點擊「新增套件」開始建立
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {packages.map(pkg => (
-            <div
-              key={pkg.id}
-              className={`
-                bg-white rounded-lg border p-4
-                ${pkg.is_selected ? 'border-morandi-gold ring-1 ring-morandi-gold/30' : 'border-border'}
-              `}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-morandi-primary">
-                      {pkg.version_name}
-                    </span>
-                    <span className="text-xs text-morandi-secondary">
-                      v{pkg.version_number}
-                    </span>
-                    {pkg.is_selected && (
-                      <span className="flex items-center gap-1 text-xs text-morandi-gold bg-morandi-gold/10 px-2 py-0.5 rounded">
-                        <Check size={12} />
-                        已選定
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-2 flex flex-wrap gap-4 text-sm text-morandi-secondary">
-                    {pkg.destination && (
-                      <span>目的地：{pkg.destination}</span>
-                    )}
-                    {pkg.start_date && (
-                      <span>
-                        日期：{pkg.start_date}
-                        {pkg.end_date && ` ~ ${pkg.end_date}`}
-                      </span>
-                    )}
-                    {pkg.group_size && (
-                      <span>人數：{pkg.group_size}人</span>
-                    )}
-                  </div>
-
-                  {/* 關聯文件狀態 - 先行程表、再報價單 */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      onClick={() => openItineraryDialog(pkg)}
-                      className={`
-                        flex items-center gap-1 px-2 py-1 rounded text-xs
-                        ${pkg.itinerary_id
-                          ? 'bg-morandi-green/10 text-morandi-green'
-                          : 'bg-morandi-container text-morandi-secondary hover:bg-morandi-container/80'
-                        }
-                      `}
-                    >
-                      <Calendar size={12} />
-                      {pkg.itinerary_id ? '查看行程表' : '建立行程表'}
-                    </button>
-
-                    <button
-                      onClick={() => handleCreateQuote(pkg)}
-                      className={`
-                        flex items-center gap-1 px-2 py-1 rounded text-xs
-                        ${pkg.quote_id
-                          ? 'bg-morandi-green/10 text-morandi-green'
-                          : 'bg-morandi-container text-morandi-secondary hover:bg-morandi-container/80'
-                        }
-                      `}
-                    >
-                      <FileText size={12} />
-                      {pkg.quote_id ? '查看報價單' : '建立報價單'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* 操作按鈕 */}
-                {canEdit && (
-                  <div className="flex items-center gap-1 ml-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => handleDuplicatePackage(pkg)}
-                      title="複製套件"
-                    >
-                      <Copy size={14} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => openEditDialog(pkg)}
-                      title="編輯套件"
-                    >
-                      <Edit2 size={14} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red"
-                      onClick={() => handleDeletePackage(pkg)}
-                      title="刪除套件"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="ml-2 gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                      onClick={() => openConvertDialog(pkg)}
-                      title="轉開團"
-                    >
-                      <ArrowRightCircle size={14} />
-                      轉開團
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* 新增套件對話框 */}
       <PackageDialog
@@ -357,6 +545,16 @@ export function PackageListPanel({
           onItineraryCreated={onPackagesChange}
         />
       )}
+
+      {/* 手冊預覽對話框 */}
+      <BrochurePreviewDialog
+        isOpen={brochureDialogOpen}
+        onClose={() => {
+          setBrochureDialogOpen(false)
+          setSelectedPackage(null)
+        }}
+        itineraryId={selectedPackage?.itinerary_id || null}
+      />
     </div>
   )
 }

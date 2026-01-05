@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { useRegionsStore } from '@/stores'
+import { useTourDestinations } from '@/features/tours/hooks/useTourDestinations'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageDialogProps {
@@ -21,9 +22,8 @@ interface PackageDialogProps {
 
 interface FormData {
   version_name: string
-  country_id: string
-  main_city_id: string
-  destination: string
+  country: string        // 國家名稱
+  airport_code: string   // 機場代碼
   start_date: string
   end_date: string
   days: number | null
@@ -41,8 +41,10 @@ export function PackageDialog({
   package: pkg,
   onSubmit,
 }: PackageDialogProps) {
-  // 載入地區資料
-  const { countries, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
+  // 國家用 useRegionsStore
+  const { countries, fetchAll: fetchRegions } = useRegionsStore()
+  // 機場代碼用 useTourDestinations
+  const { destinations, addDestination, loading: destinationsLoading } = useTourDestinations()
 
   useEffect(() => {
     if (open && countries.length === 0) {
@@ -50,11 +52,15 @@ export function PackageDialog({
     }
   }, [open, countries.length, fetchRegions])
 
+  // 新增機場代碼狀態
+  const [showAddNew, setShowAddNew] = useState(false)
+  const [newCity, setNewCity] = useState('')
+  const [newAirportCode, setNewAirportCode] = useState('')
+
   const initialFormData: FormData = useMemo(() => ({
     version_name: '',
-    country_id: proposal.country_id || '',
-    main_city_id: proposal.main_city_id || '',
-    destination: proposal.destination || '',
+    country: proposal.country_id || '',
+    airport_code: proposal.main_city_id || '',
     start_date: proposal.expected_start_date || '',
     end_date: proposal.expected_end_date || '',
     days: null,
@@ -66,35 +72,36 @@ export function PackageDialog({
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [submitting, setSubmitting] = useState(false)
 
-  // 取得啟用的國家列表
-  const activeCountries = useMemo(() =>
-    countries.filter(c => c.is_active).map(c => ({
-      value: c.id,
-      label: c.name,
-    })),
+  // 取得啟用的國家列表（從 useRegionsStore）
+  const countryOptions = useMemo(() =>
+    countries
+      .filter(c => c.is_active)
+      .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
+      .map(c => ({
+        value: c.name,  // 存國家名稱
+        label: c.name,
+      })),
     [countries]
   )
 
-  // 根據選中的國家取得城市列表
-  const availableCities = useMemo(() => {
-    if (!formData.country_id) return []
-    return getCitiesByCountry(formData.country_id)
-      .filter(c => c.is_active)
-      .map(c => ({
-        value: c.id,
-        label: `${c.name}${c.airport_code ? ` (${c.airport_code})` : ''}`,
-        code: c.airport_code || '',
+  // 根據選中的國家取得機場代碼列表（從 tour_destinations）
+  const availableAirports = useMemo(() => {
+    if (!formData.country) return []
+    return destinations
+      .filter(d => d.country === formData.country)
+      .map(d => ({
+        value: d.airport_code,
+        label: `${d.city} (${d.airport_code})`,
       }))
-  }, [formData.country_id, getCitiesByCountry])
+  }, [formData.country, destinations])
 
   // 初始化表單資料
   useEffect(() => {
     if (mode === 'edit' && pkg) {
       setFormData({
         version_name: pkg.version_name || '',
-        country_id: pkg.country_id || '',
-        main_city_id: pkg.main_city_id || '',
-        destination: pkg.destination || '',
+        country: pkg.country_id || '',    // 存放國家名稱
+        airport_code: pkg.main_city_id || '',  // 存放機場代碼
         start_date: pkg.start_date || '',
         end_date: pkg.end_date || '',
         days: pkg.days || null,
@@ -107,14 +114,36 @@ export function PackageDialog({
     }
   }, [mode, pkg, open, initialFormData])
 
-  // 當國家改變時，自動清空城市
-  const handleCountryChange = (countryId: string) => {
+  // 當國家改變時，清空機場代碼
+  const handleCountryChange = (country: string) => {
     setFormData(prev => ({
       ...prev,
-      country_id: countryId,
-      main_city_id: '', // 清空城市
+      country: country,
+      airport_code: '', // 清空機場代碼
     }))
   }
+
+  // 當機場代碼改變時
+  const handleAirportChange = (airportCode: string) => {
+    setFormData(prev => ({ ...prev, airport_code: airportCode }))
+  }
+
+  // 新增機場代碼
+  const handleAddAirport = useCallback(async () => {
+    if (!formData.country || !newCity.trim() || !newAirportCode.trim()) return
+
+    const result = await addDestination(formData.country, newCity, newAirportCode)
+    if (result.success) {
+      // 自動選擇新增的機場代碼
+      setFormData(prev => ({
+        ...prev,
+        airport_code: newAirportCode.trim().toUpperCase(),
+      }))
+      setShowAddNew(false)
+      setNewCity('')
+      setNewAirportCode('')
+    }
+  }, [formData.country, newCity, newAirportCode, addDestination])
 
   // 處理提交
   const handleSubmit = async () => {
@@ -127,9 +156,8 @@ export function PackageDialog({
       const data: CreatePackageData | Partial<CreatePackageData> = {
         proposal_id: proposalId,
         version_name: formData.version_name.trim(),
-        country_id: formData.country_id || undefined,
-        main_city_id: formData.main_city_id || undefined,
-        destination: formData.destination.trim() || undefined,
+        country_id: formData.country || undefined,     // 存放國家名稱
+        main_city_id: formData.airport_code || undefined, // 存放機場代碼
         start_date: formData.start_date || undefined,
         end_date: formData.end_date || undefined,
         days: formData.days || undefined,
@@ -152,6 +180,7 @@ export function PackageDialog({
       submitLabel={mode === 'create' ? '建立' : '儲存'}
       loading={submitting}
       maxWidth="md"
+      nested
     >
       <div className="space-y-4">
         <div>
@@ -167,47 +196,87 @@ export function PackageDialog({
           />
         </div>
 
-        {/* 國家/城市選擇 */}
+        {/* 國家/機場代碼選擇 */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
               國家
             </label>
             <Combobox
-              value={formData.country_id}
+              value={formData.country}
               onChange={handleCountryChange}
-              options={activeCountries}
+              options={countryOptions}
               placeholder="選擇國家..."
               emptyMessage="找不到符合的國家"
             />
           </div>
           <div>
             <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              城市
+              機場代碼
             </label>
             <Combobox
-              value={formData.main_city_id}
-              onChange={cityId => setFormData(prev => ({ ...prev, main_city_id: cityId }))}
-              options={availableCities}
-              placeholder="選擇城市..."
-              emptyMessage={formData.country_id ? "找不到符合的城市" : "請先選擇國家"}
-              disabled={!formData.country_id}
+              value={formData.airport_code}
+              onChange={handleAirportChange}
+              options={availableAirports}
+              placeholder={destinationsLoading ? "載入中..." : "選擇機場代碼..."}
+              emptyMessage={formData.country ? "尚無機場代碼，請點擊下方新增" : "請先選擇國家"}
+              disabled={!formData.country}
             />
           </div>
         </div>
 
-        <div>
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            目的地說明（選填）
-          </label>
-          <Input
-            value={formData.destination}
-            onChange={e =>
-              setFormData(prev => ({ ...prev, destination: e.target.value }))
-            }
-            placeholder="例如：清邁古城區"
-          />
-        </div>
+        {/* 新增機場代碼區塊 - 只有選了國家才能新增 */}
+        {formData.country && (
+          !showAddNew ? (
+            <button
+              type="button"
+              onClick={() => setShowAddNew(true)}
+              className="text-sm text-morandi-gold hover:text-morandi-gold-hover"
+            >
+              + 新增機場代碼
+            </button>
+          ) : (
+            <div className="border border-border rounded-lg p-3 space-y-3 bg-morandi-container/20">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-morandi-primary">
+                  新增 {formData.country} 的機場代碼
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddNew(false)
+                    setNewCity('')
+                    setNewAirportCode('')
+                  }}
+                  className="text-morandi-secondary hover:text-morandi-primary text-sm"
+                >
+                  取消
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  value={newCity}
+                  onChange={e => setNewCity(e.target.value)}
+                  placeholder="城市（如：東京）"
+                />
+                <Input
+                  value={newAirportCode}
+                  onChange={e => setNewAirportCode(e.target.value.toUpperCase())}
+                  placeholder="代碼（如：NRT）"
+                  maxLength={4}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddAirport}
+                disabled={!newCity.trim() || !newAirportCode.trim()}
+                className="w-full px-3 py-1.5 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                新增並選擇
+              </button>
+            </div>
+          )
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>

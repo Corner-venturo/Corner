@@ -14,7 +14,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useUserStore } from '@/stores/user-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { Receipt, FileText, Users, Plane, UserPlus } from 'lucide-react'
+import { Receipt, FileText, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
 import { alert } from '@/lib/ui/alert-dialog'
 // 使用懶加載避免打包問題
@@ -24,9 +24,6 @@ const QuickReceipt = lazy(() =>
 const QuickDisbursement = lazy(() =>
   import('../quick-actions/quick-disbursement').then(m => ({ default: m.QuickDisbursement }))
 )
-const QuickGroup = lazy(() =>
-  import('../quick-actions/quick-group').then(m => ({ default: m.QuickGroup }))
-)
 const QuickPNR = lazy(() =>
   import('../quick-actions/quick-pnr').then(m => ({ default: m.QuickPNR }))
 )
@@ -34,7 +31,6 @@ const QuickPNR = lazy(() =>
 const quickActionTabs: QuickActionTabConfig[] = [
   { key: 'receipt' as const, label: '收款', icon: Receipt },
   { key: 'invoice' as const, label: '請款', icon: FileText },
-  { key: 'group' as const, label: '開團', icon: Users },
   { key: 'pnr' as const, label: 'PNR', icon: Plane },
   { key: 'share' as const, label: '共享', icon: UserPlus },
 ]
@@ -184,13 +180,6 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
       return (
         <Suspense fallback={LoadingFallback}>
           <QuickDisbursement onSubmit={onClose} />
-        </Suspense>
-      )
-
-    case 'group':
-      return (
-        <Suspense fallback={LoadingFallback}>
-          <QuickGroup onSubmit={onClose} />
         </Suspense>
       )
 

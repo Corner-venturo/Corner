@@ -86,7 +86,7 @@ export function useTourPageState() {
   // Get status color
   const getStatusColor = useCallback((status: string) => {
     const colors: Record<string, string> = {
-      提案: 'text-morandi-secondary',
+      提案: 'text-morandi-gold font-medium',
       進行中: 'text-morandi-gold',
       結案: 'text-morandi-green',
       取消: 'text-morandi-red',

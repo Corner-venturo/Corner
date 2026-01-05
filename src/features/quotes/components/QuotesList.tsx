@@ -42,37 +42,19 @@ export const QuotesList: React.FC<QuotesListProps> = ({
   const tableColumns: TableColumn[] = useMemo(
     () => [
       {
-        key: 'quote_number',
-        label: '編號',
-        sortable: true,
-        render: (value, row) => {
-          const quote = row as Quote
-          // 簡化邏輯：直接顯示報價單自己的編號
-          const displayCode = quote.code || '-'
-          const codeColor = quote.code ? 'text-morandi-gold' : 'text-morandi-secondary'
-
-          return (
-            <div className="flex items-center gap-2">
-              {quote.is_pinned && <Pin size={14} className="text-morandi-gold" />}
-              <span className={cn('text-sm font-mono', codeColor)}>{displayCode}</span>
-            </div>
-          )
-        },
-      },
-      {
         key: 'name',
         label: '團體名稱',
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          // 快速報價單顯示 customer_name，團體報價單顯示 name
-          const displayName = quote.quote_type === 'quick' ? quote.customer_name : stripHtml(quote.name)
+          const displayName = stripHtml(quote.name)
           // 版本數量
           const versions = (quote as Quote & { versions?: Array<unknown> }).versions
           const versionCount = versions?.length || 0
           const extraVersions = versionCount > 1 ? versionCount - 1 : 0
           return (
             <div className="flex items-center gap-2">
+              {quote.is_pinned && <Pin size={14} className="text-morandi-gold" />}
               <span className="text-sm font-medium text-morandi-primary">{displayName || '-'}</span>
               {extraVersions > 0 && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-morandi-gold/10 text-morandi-gold font-medium">
@@ -80,27 +62,6 @@ export const QuotesList: React.FC<QuotesListProps> = ({
                 </span>
               )}
             </div>
-          )
-        },
-      },
-      {
-        key: 'quote_type',
-        label: '類型',
-        sortable: true,
-        render: (value, row) => {
-          const quote = row as Quote
-          const isQuick = quote.quote_type === 'quick'
-          return (
-            <span
-              className={cn(
-                'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
-                isQuick
-                  ? 'bg-morandi-green/10 text-morandi-green'
-                  : 'bg-morandi-gold/10 text-morandi-gold'
-              )}
-            >
-              {isQuick ? '快速報價單' : '團體報價單'}
-            </span>
           )
         },
       },
@@ -141,14 +102,10 @@ export const QuotesList: React.FC<QuotesListProps> = ({
         sortable: true,
         render: (value, row) => {
           const quote = row as Quote
-          // 快速報價單不顯示人數，顯示 -
-          if (quote.quote_type === 'quick') {
-            return <span className="text-sm text-morandi-secondary">-</span>
-          }
           return (
             <div className="flex items-center text-sm text-morandi-secondary">
               <Users size={14} className="mr-1" />
-              {quote.group_size}人
+              {quote.group_size || 0}人
             </div>
           )
         },

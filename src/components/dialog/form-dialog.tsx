@@ -62,6 +62,8 @@ export interface FormDialogProps {
   showFooter?: boolean
   /** 自定義 Footer 內容 */
   footer?: ReactNode
+  /** 巢狀 Dialog（從其他 Dialog 中打開時使用更高的 z-index） */
+  nested?: boolean
 }
 
 const maxWidthClasses = {
@@ -93,6 +95,7 @@ export function FormDialog({
   contentClassName = '',
   showFooter = true,
   footer,
+  nested = false,
 }: FormDialogProps) {
   const handleCancel = () => {
     if (onCancel) {
@@ -127,6 +130,7 @@ export function FormDialog({
         className={`${maxWidthClasses[maxWidth]} ${contentClassName}`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
+        nested={nested}
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
