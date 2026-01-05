@@ -11,7 +11,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import { convertToTour } from '@/services/proposal.service'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 
-// 常用城市代碼
+// 常用機場代碼 (IATA)
 const CITY_CODES = [
   { value: 'CNX', label: 'CNX - 清邁' },
   { value: 'BKK', label: 'BKK - 曼谷' },
@@ -76,7 +76,7 @@ export function ConvertToTourDialog({
     }
 
     if (!cityCode) {
-      await alert('請選擇城市代碼', 'warning')
+      await alert('請選擇機場代碼', 'warning')
       return
     }
 
@@ -134,17 +134,17 @@ export function ConvertToTourDialog({
 
         <div>
           <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            城市代碼 <span className="text-morandi-red">*</span>
+            機場代碼 (IATA) <span className="text-morandi-red">*</span>
           </label>
           <Combobox
             value={cityCode}
             onChange={setCityCode}
             options={CITY_CODES}
-            placeholder="選擇或搜尋城市代碼..."
+            placeholder="選擇或搜尋機場代碼..."
             showSearchIcon
           />
           <p className="text-xs text-morandi-secondary mt-1">
-            城市代碼將用於生成團號，例如：CNX250128A
+            機場代碼將用於生成團號，例如：CNX250128A
           </p>
         </div>
 
