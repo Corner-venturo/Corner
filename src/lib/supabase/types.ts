@@ -3917,6 +3917,7 @@ export type Database = {
           title: string | null
           tour_code: string | null
           tour_id: string | null
+          proposal_package_id: string | null
           updated_at: string
           updated_by: string | null
           version: number | null
@@ -3986,6 +3987,7 @@ export type Database = {
           title?: string | null
           tour_code?: string | null
           tour_id?: string | null
+          proposal_package_id?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number | null
@@ -4055,6 +4057,7 @@ export type Database = {
           title?: string | null
           tour_code?: string | null
           tour_id?: string | null
+          proposal_package_id?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number | null
@@ -7588,6 +7591,7 @@ export type Database = {
           number_of_people: number | null
           other_city_ids: string[] | null
           participant_counts: Json | null
+          proposal_package_id: string | null
           quick_quote_items: Json | null
           quote_type: string | null
           received_amount: number | null
@@ -7658,6 +7662,7 @@ export type Database = {
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
+          proposal_package_id?: string | null
           quick_quote_items?: Json | null
           quote_type?: string | null
           received_amount?: number | null
@@ -7728,6 +7733,7 @@ export type Database = {
           number_of_people?: number | null
           other_city_ids?: string[] | null
           participant_counts?: Json | null
+          proposal_package_id?: string | null
           quick_quote_items?: Json | null
           quote_type?: string | null
           received_amount?: number | null

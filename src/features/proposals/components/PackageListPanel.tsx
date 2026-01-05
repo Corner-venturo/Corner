@@ -239,11 +239,6 @@ export function PackageListPanel({
                         {pkg.end_date && ` ~ ${pkg.end_date}`}
                       </span>
                     )}
-                    {pkg.days && (
-                      <span>
-                        {pkg.days}天{pkg.nights}夜
-                      </span>
-                    )}
                     {pkg.group_size && (
                       <span>人數：{pkg.group_size}人</span>
                     )}
