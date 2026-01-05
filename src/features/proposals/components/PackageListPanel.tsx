@@ -20,10 +20,10 @@ import {
   updatePackage,
   duplicatePackage,
   createQuoteForPackage,
-  createItineraryForPackage,
 } from '@/services/proposal.service'
 import { PackageDialog } from './PackageDialog'
 import { ConvertToTourDialog } from './ConvertToTourDialog'
+import { PackageItineraryDialog } from './PackageItineraryDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
@@ -43,6 +43,7 @@ export function PackageListPanel({
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [convertDialogOpen, setConvertDialogOpen] = useState(false)
+  const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 新增套件
@@ -134,9 +135,9 @@ export function PackageListPanel({
       }
 
       try {
-        await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
+        const quoteId = await createQuoteForPackage(pkg.id, user.workspace_id, user.id)
         onPackagesChange()
-        await alert('報價單已建立', 'success')
+        router.push(`/quotes?highlight=${quoteId}`)
       } catch (error) {
         console.error('Quote creation failed:', error)
         const message = error instanceof Error ? error.message : '未知錯誤'
@@ -146,27 +147,11 @@ export function PackageListPanel({
     [user?.workspace_id, user?.id, onPackagesChange, router]
   )
 
-  // 建立行程表
-  const handleCreateItinerary = useCallback(
-    async (pkg: ProposalPackage) => {
-      if (!user?.workspace_id || !user?.id) return
-
-      if (pkg.itinerary_id) {
-        router.push(`/itinerary?highlight=${pkg.itinerary_id}`)
-        return
-      }
-
-      try {
-        await createItineraryForPackage(pkg.id, user.workspace_id, user.id)
-        onPackagesChange()
-        await alert('行程表已建立', 'success')
-      } catch (error) {
-        const message = error instanceof Error ? error.message : '未知錯誤'
-        await alert(`建立行程表失敗: ${message}`, 'error')
-      }
-    },
-    [user?.workspace_id, user?.id, onPackagesChange, router]
-  )
+  // 開啟行程表對話框
+  const openItineraryDialog = useCallback((pkg: ProposalPackage) => {
+    setSelectedPackage(pkg)
+    setItineraryDialogOpen(true)
+  }, [])
 
   // 開啟編輯對話框
   const openEditDialog = useCallback((pkg: ProposalPackage) => {
@@ -247,8 +232,22 @@ export function PackageListPanel({
                     )}
                   </div>
 
-                  {/* 關聯文件狀態 */}
+                  {/* 關聯文件狀態 - 先行程表、再報價單 */}
                   <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      onClick={() => openItineraryDialog(pkg)}
+                      className={`
+                        flex items-center gap-1 px-2 py-1 rounded text-xs
+                        ${pkg.itinerary_id
+                          ? 'bg-morandi-green/10 text-morandi-green'
+                          : 'bg-morandi-container text-morandi-secondary hover:bg-morandi-container/80'
+                        }
+                      `}
+                    >
+                      <Calendar size={12} />
+                      {pkg.itinerary_id ? '查看行程表' : '建立行程表'}
+                    </button>
+
                     <button
                       onClick={() => handleCreateQuote(pkg)}
                       className={`
@@ -261,20 +260,6 @@ export function PackageListPanel({
                     >
                       <FileText size={12} />
                       {pkg.quote_id ? '查看報價單' : '建立報價單'}
-                    </button>
-
-                    <button
-                      onClick={() => handleCreateItinerary(pkg)}
-                      className={`
-                        flex items-center gap-1 px-2 py-1 rounded text-xs
-                        ${pkg.itinerary_id
-                          ? 'bg-morandi-green/10 text-morandi-green'
-                          : 'bg-morandi-container text-morandi-secondary hover:bg-morandi-container/80'
-                        }
-                      `}
-                    >
-                      <Calendar size={12} />
-                      {pkg.itinerary_id ? '查看行程表' : '建立行程表'}
                     </button>
                   </div>
                 </div>
@@ -358,6 +343,20 @@ export function PackageListPanel({
           setConvertDialogOpen(false)
         }}
       />
+
+      {/* 行程表對話框 */}
+      {selectedPackage && (
+        <PackageItineraryDialog
+          isOpen={itineraryDialogOpen}
+          onClose={() => {
+            setItineraryDialogOpen(false)
+            setSelectedPackage(null)
+          }}
+          pkg={selectedPackage}
+          proposal={proposal}
+          onItineraryCreated={onPackagesChange}
+        />
+      )}
     </div>
   )
 }
