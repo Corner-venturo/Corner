@@ -1,6 +1,7 @@
 'use client'
 
 export { ProposalsPage } from './ProposalsPage'
+export { ProposalsTableContent } from './ProposalsTableContent'
 export { ProposalDialog } from './ProposalDialog'
 export { PackageDialog } from './PackageDialog'
 export { PackageListPanel } from './PackageListPanel'

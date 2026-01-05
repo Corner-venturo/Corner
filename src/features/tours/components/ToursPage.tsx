@@ -32,6 +32,7 @@ import { TourUnlockDialog } from './TourUnlockDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
+import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { createProposal } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
@@ -238,14 +239,18 @@ export const ToursPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-hidden">
-        <TourTable
-          tours={filteredTours}
-          loading={loading}
-          onSort={handleSortChange}
-          onRowClick={handleRowClick}
-          renderActions={renderActions}
-          getStatusColor={getStatusColor}
-        />
+        {activeStatusTab === '提案' ? (
+          <ProposalsTableContent searchQuery={searchQuery} />
+        ) : (
+          <TourTable
+            tours={filteredTours}
+            loading={loading}
+            onSort={handleSortChange}
+            onRowClick={handleRowClick}
+            renderActions={renderActions}
+            getStatusColor={getStatusColor}
+          />
+        )}
       </div>
 
       <TourForm
