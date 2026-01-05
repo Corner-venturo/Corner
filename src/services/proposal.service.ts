@@ -384,13 +384,25 @@ export async function convertToTour(
     countryUuid = countryData?.id || null
   }
 
+  // 查詢城市 UUID（main_city_id 可能存的是機場代碼，需要轉換為 UUID）
+  const airportCode = pkg.main_city_id || proposal.main_city_id
+  let cityUuid: string | null = null
+  if (airportCode) {
+    const { data: cityData } = await supabase
+      .from('cities')
+      .select('id')
+      .eq('airport_code', airportCode)
+      .single()
+    cityUuid = cityData?.id || null
+  }
+
   const tourData = {
     id: crypto.randomUUID(),
     code: tourCode,
     name: proposal.title,
     location: pkg.destination || proposal.destination,
     country_id: countryUuid,
-    main_city_id: pkg.main_city_id || proposal.main_city_id,
+    main_city_id: cityUuid,
     departure_date: pkg.start_date || departure_date,
     return_date: returnDateValue,
     status: '進行中',
