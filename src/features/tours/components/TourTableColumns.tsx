@@ -21,21 +21,21 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         key: 'code',
         label: '團號',
         sortable: true,
-        width: '60px',
+        width: '110px',
         render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {
         key: 'name',
         label: '旅遊團名稱',
         sortable: true,
-        width: '120px',
+        // 不設寬度，讓它填滿剩餘空間
         render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {
         key: 'departure_date',
         label: '出發日期',
         sortable: true,
-        width: '60px',
+        width: '100px',
         render: (value, row) => {
           const tour = row as Tour
           return <DateCell date={tour.departure_date} showIcon={false} />
@@ -45,7 +45,7 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         key: 'status',
         label: '狀態',
         sortable: true,
-        width: '60px',
+        width: '80px',
         render: (value, row) => {
           const tour = row as Tour
           const status = tour.status || ''
