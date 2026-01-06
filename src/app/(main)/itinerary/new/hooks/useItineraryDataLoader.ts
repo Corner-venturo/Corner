@@ -57,9 +57,12 @@ export function useItineraryDataLoader({
 
       // 優先從 itineraries 載入（編輯現有行程）
       if (itineraryId && !tourId) {
+        logger.log('[ItineraryDataLoader] 嘗試載入行程, itineraryId:', itineraryId)
+        logger.log('[ItineraryDataLoader] 可用行程數量:', itineraries.length)
         const itinerary = itineraries.find((i) => i.id === itineraryId)
         logger.log('[ItineraryDataLoader] 尋找行程:', itineraryId, '找到:', !!itinerary)
         if (itinerary) {
+          logger.log('[ItineraryDataLoader] 行程 daily_itinerary 長度:', (itinerary.daily_itinerary as unknown[] | null)?.length || 0)
           logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
           setTourData({
             tagline: itinerary.tagline || 'Corner Travel 2025',
