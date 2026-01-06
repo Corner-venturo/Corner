@@ -136,9 +136,9 @@ export function TableBody({
                 </td>
               ))}
 
-              {/* Actions column - 不設寬度，填滿剩餘空間 */}
+              {/* Actions column - 固定 50% 寬度 */}
               {actions && (
-                <td className="py-3 px-4">
+                <td className="py-3 px-4" style={{ width: '50%' }}>
                   <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row, actualRowIndex)}</div>
                 </td>
               )}

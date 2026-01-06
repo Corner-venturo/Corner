@@ -119,9 +119,9 @@ export function TableHeader({
           </th>
         ))}
 
-        {/* Actions column - 不設寬度，填滿剩餘空間 */}
+        {/* Actions column - 固定 50% 寬度 */}
         {actions && (
-          <th className="text-left py-2.5 px-4 text-xs relative">
+          <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: '50%' }}>
             <span className="font-medium text-morandi-secondary">操作</span>
           </th>
         )}
