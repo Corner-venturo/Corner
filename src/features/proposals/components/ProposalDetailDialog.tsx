@@ -9,7 +9,7 @@ import React, { useMemo, useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
-import { Edit2, Archive, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { PackageListPanel } from './PackageListPanel'
 import type { Proposal, ProposalStatus } from '@/types/proposal.types'
@@ -33,8 +33,6 @@ interface ProposalDetailDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   proposal: Proposal | null
-  onEdit?: (proposal: Proposal) => void
-  onArchive?: (proposal: Proposal) => void
   onPackagesChange?: () => void
 }
 
@@ -42,8 +40,6 @@ export function ProposalDetailDialog({
   open,
   onOpenChange,
   proposal,
-  onEdit,
-  onArchive,
   onPackagesChange,
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
@@ -57,7 +53,7 @@ export function ProposalDetailDialog({
 
   if (!proposal) return null
 
-  const canEdit = proposal.status !== 'converted' && proposal.status !== 'archived'
+  const canAddVersion = proposal.status !== 'converted' && proposal.status !== 'archived'
 
   const handlePackagesChange = () => {
     refreshPackages()
@@ -70,8 +66,8 @@ export function ProposalDetailDialog({
         <VisuallyHidden>
           <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
         </VisuallyHidden>
-        {/* 標題區 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        {/* 標題區 - pr-12 為關閉按鈕留空間 */}
+        <div className="flex items-center justify-between px-6 pr-12 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
             <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
@@ -81,18 +77,16 @@ export function ProposalDetailDialog({
               {STATUS_LABELS[proposal.status]}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {canEdit && (
-              <Button
-                size="sm"
-                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                onClick={() => setShowAddDialog(true)}
-              >
-                <Plus size={14} />
-                新增版本
-              </Button>
-            )}
-          </div>
+          {canAddVersion && (
+            <Button
+              size="sm"
+              className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+              onClick={() => setShowAddDialog(true)}
+            >
+              <Plus size={14} />
+              新增版本
+            </Button>
+          )}
         </div>
 
         {/* 套件列表 */}

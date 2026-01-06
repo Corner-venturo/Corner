@@ -17,6 +17,8 @@ interface PackageDialogProps {
   proposalId: string
   proposal: Proposal
   package?: ProposalPackage | null
+  /** 新增時用於預填資料的基底套件 */
+  basePackage?: ProposalPackage | null
   onSubmit: (data: CreatePackageData | Partial<CreatePackageData>) => Promise<void>
 }
 
@@ -39,6 +41,7 @@ export function PackageDialog({
   proposalId,
   proposal,
   package: pkg,
+  basePackage,
   onSubmit,
 }: PackageDialogProps) {
   // 國家用 useRegionsStore
@@ -57,17 +60,35 @@ export function PackageDialog({
   const [newCity, setNewCity] = useState('')
   const [newAirportCode, setNewAirportCode] = useState('')
 
-  const initialFormData: FormData = useMemo(() => ({
-    version_name: '',
-    country: proposal.country_id || '',
-    airport_code: proposal.main_city_id || '',
-    start_date: proposal.expected_start_date || '',
-    end_date: proposal.expected_end_date || '',
-    days: null,
-    nights: null,
-    group_size: proposal.group_size || null,
-    notes: '',
-  }), [proposal])
+  // 新增時優先使用 basePackage 的資料，否則使用 proposal 的資料
+  const initialFormData: FormData = useMemo(() => {
+    // 如果有 basePackage，用它的資料作為預設值
+    if (basePackage) {
+      return {
+        version_name: '', // 版本名稱需要使用者自己填
+        country: basePackage.country_id || proposal.country_id || '',
+        airport_code: basePackage.main_city_id || proposal.main_city_id || '',
+        start_date: basePackage.start_date || proposal.expected_start_date || '',
+        end_date: basePackage.end_date || proposal.expected_end_date || '',
+        days: basePackage.days || null,
+        nights: basePackage.nights || null,
+        group_size: basePackage.group_size || proposal.group_size || null,
+        notes: '', // 備註不繼承，避免混淆
+      }
+    }
+    // 沒有 basePackage 時，使用 proposal 的資料
+    return {
+      version_name: '',
+      country: proposal.country_id || '',
+      airport_code: proposal.main_city_id || '',
+      start_date: proposal.expected_start_date || '',
+      end_date: proposal.expected_end_date || '',
+      days: null,
+      nights: null,
+      group_size: proposal.group_size || null,
+      notes: '',
+    }
+  }, [proposal, basePackage])
 
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [submitting, setSubmitting] = useState(false)

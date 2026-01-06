@@ -216,6 +216,7 @@ export interface Itinerary {
   code?: string // 行程編號（如：I20240001）
   tour_id?: string // 關聯的團 ID（選填，因為可能只是草稿）
   quote_id?: string // 關聯的報價單 ID（選填）
+  proposal_package_id?: string // 關聯的提案套件 ID（選填）
 
   // 🔒 多租戶支援
   workspace_id?: string // Workspace ID（多租戶隔離）
@@ -242,6 +243,24 @@ export interface Itinerary {
   // 航班資訊
   outbound_flight?: FlightInfo
   return_flight?: FlightInfo
+  flight_info?: {
+    outbound?: {
+      flightNumber: string
+      airline: string
+      departureAirport: string
+      arrivalAirport: string
+      departureTime: string
+      arrivalTime: string
+    } | null
+    return?: {
+      flightNumber: string
+      airline: string
+      departureAirport: string
+      arrivalAirport: string
+      departureTime: string
+      arrivalTime: string
+    } | null
+  } | null
 
   // 行程特色
   features: ItineraryFeature[]

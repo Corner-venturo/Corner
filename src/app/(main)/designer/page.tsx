@@ -19,17 +19,10 @@ import {
 } from 'lucide-react'
 import { useCanvasPageState } from '@/features/designer/hooks/useCanvasPageState'
 import { useCanvasEditor } from '@/features/designer/hooks/useCanvasEditor'
-import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
-import {
-  SIDEBAR_WIDTH_EXPANDED_PX,
-  SIDEBAR_WIDTH_COLLAPSED_PX,
-  LAYOUT_TRANSITION_DURATION,
-} from '@/lib/constants/layout'
 
 export default function DesignerPage() {
   const router = useRouter()
-  const { sidebarCollapsed } = useAuthStore()
   const { page, updateElement, addElement, deleteElement } = useCanvasPageState()
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
 
@@ -90,17 +83,8 @@ export default function DesignerPage() {
     [page.elements, updateElement]
   )
 
-  const sidebarWidth = sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED_PX : SIDEBAR_WIDTH_EXPANDED_PX
-
   return (
-    <main
-      className="fixed top-0 right-0 bottom-0 overflow-hidden flex flex-col bg-background"
-      style={{
-        left: sidebarWidth,
-        transitionProperty: 'left',
-        transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
-      }}
-    >
+    <main className="h-screen flex flex-col bg-background lg:ml-16">
       {/* Header */}
       <header className="h-[56px] flex-shrink-0 bg-card border-b border-border flex items-center justify-between px-4 z-10">
         <div className="flex items-center gap-3">

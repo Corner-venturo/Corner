@@ -400,7 +400,7 @@ export function PackageListPanel({
                       >
                         <FileText size={16} />
                       </button>
-                      {/* 手冊 */}
+                      {/* 簡易行程表 */}
                       <button
                         onClick={() => {
                           if (pkg.itinerary_id) {
@@ -415,7 +415,7 @@ export function PackageListPanel({
                             ? 'text-morandi-primary hover:bg-morandi-container/80'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="手冊"
+                        title="簡易行程表"
                         disabled={!pkg.itinerary_id}
                       >
                         <Book size={16} />
@@ -499,13 +499,14 @@ export function PackageListPanel({
         )}
       </div>
 
-      {/* 新增套件對話框 */}
+      {/* 新增套件對話框 - 以最後一個套件為基底預填資料 */}
       <PackageDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         mode="create"
         proposalId={proposal.id}
         proposal={proposal}
+        basePackage={packages.length > 0 ? packages[packages.length - 1] : null}
         onSubmit={handleCreatePackage}
       />
 
@@ -546,7 +547,7 @@ export function PackageListPanel({
         />
       )}
 
-      {/* 手冊預覽對話框 */}
+      {/* 簡易行程表對話框 */}
       <BrochurePreviewDialog
         isOpen={brochureDialogOpen}
         onClose={() => {

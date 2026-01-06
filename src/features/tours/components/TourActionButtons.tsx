@@ -51,6 +51,10 @@ interface UseTourActionButtonsParams {
   onOpenTourConfirmationDialog?: (tour: Tour) => void
   // 提案點擊處理（查看版本）
   onProposalClick?: (proposal: Proposal) => void
+  // 提案操作
+  onProposalEdit?: (proposal: Proposal) => void
+  onProposalArchive?: (proposal: Proposal) => void
+  onProposalDelete?: (proposal: Proposal) => void
 }
 
 export function useTourActionButtons(params: UseTourActionButtonsParams) {
@@ -71,6 +75,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenArchiveDialog,
     onOpenTourConfirmationDialog,
     onProposalClick,
+    onProposalEdit,
+    onProposalArchive,
+    onProposalDelete,
   } = params
 
   const renderActions = useCallback(
@@ -79,12 +86,17 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
 
       // 如果是提案，顯示提案專用操作
       if (item.__isProposal && item.__originalProposal) {
+        const proposal = item.__originalProposal
+        const canEdit = proposal.status !== 'converted' && proposal.status !== 'archived'
+        const canDelete = proposal.status === 'draft' || proposal.status === 'negotiating'
+
         return (
           <div className="flex items-center gap-1">
+            {/* 查看版本 */}
             <button
               onClick={e => {
                 e.stopPropagation()
-                onProposalClick?.(item.__originalProposal!)
+                onProposalClick?.(proposal)
               }}
               className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
               title="查看版本"
@@ -92,6 +104,51 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               <ClipboardList size={14} />
               <span>版本</span>
             </button>
+
+            {/* 編輯 */}
+            {canEdit && (
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  onProposalEdit?.(proposal)
+                }}
+                className="px-1.5 py-0.5 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+                title="編輯"
+              >
+                <Edit2 size={14} />
+                <span>編輯</span>
+              </button>
+            )}
+
+            {/* 封存 */}
+            {canEdit && (
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  onProposalArchive?.(proposal)
+                }}
+                className="px-1.5 py-0.5 text-morandi-secondary/60 hover:text-morandi-secondary hover:bg-morandi-container rounded transition-colors flex items-center gap-0.5 text-xs"
+                title="封存"
+              >
+                <Archive size={14} />
+                <span>封存</span>
+              </button>
+            )}
+
+            {/* 刪除 */}
+            {canDelete && (
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  onProposalDelete?.(proposal)
+                }}
+                className="px-1.5 py-0.5 text-morandi-red/60 hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+                title="刪除"
+              >
+                <Trash2 size={14} />
+                <span>刪除</span>
+              </button>
+            )}
           </div>
         )
       }
@@ -272,6 +329,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onOpenArchiveDialog,
       onOpenTourConfirmationDialog,
       onProposalClick,
+      onProposalEdit,
+      onProposalArchive,
+      onProposalDelete,
     ]
   )
 

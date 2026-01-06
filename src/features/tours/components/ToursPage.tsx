@@ -32,8 +32,10 @@ import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
 import { useProposals } from '@/hooks/cloud-hooks'
-import { createProposal } from '@/services/proposal.service'
-import { alert } from '@/lib/ui/alert-dialog'
+import { createProposal, updateProposal, archiveProposal } from '@/services/proposal.service'
+import { alert, confirm } from '@/lib/ui/alert-dialog'
+import { ArchiveProposalDialog } from '@/features/proposals/components/ArchiveProposalDialog'
+import { useProposalPackages } from '@/hooks/cloud-hooks'
 import type { CreateProposalData, UpdateProposalData, Proposal } from '@/types/proposal.types'
 
 const TourDetailDialog = dynamic(
@@ -56,13 +58,16 @@ export const ToursPage: React.FC = () => {
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
+  const [proposalEditDialogOpen, setProposalEditDialogOpen] = useState(false)
+  const [proposalArchiveDialogOpen, setProposalArchiveDialogOpen] = useState(false)
   const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
 
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: quotes, update: updateQuote } = useQuotesListSlim()
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
-  const { items: proposals } = useProposals()
+  const { items: proposals, fetchAll: refreshProposals } = useProposals()
+  const { items: proposalPackages, fetchAll: refreshProposalPackages } = useProposalPackages()
   const { countries, cities, fetchAll: fetchRegions } = useRegionsStore()
   const { dialog, closeDialog, openDialog } = useDialog()
 
@@ -160,6 +165,60 @@ export const ToursPage: React.FC = () => {
     actions: actions as unknown as TourStoreActions
   })
 
+  // 編輯提案
+  const handleEditProposal = useCallback((proposal: Proposal) => {
+    setSelectedProposal(proposal)
+    setProposalDetailDialogOpen(false)
+    setProposalEditDialogOpen(true)
+  }, [])
+
+  // 開啟封存對話框
+  const handleOpenArchiveDialog = useCallback((proposal: Proposal) => {
+    setSelectedProposal(proposal)
+    setProposalDetailDialogOpen(false)
+    setProposalArchiveDialogOpen(true)
+  }, [])
+
+  // 刪除提案
+  const handleDeleteProposal = useCallback(
+    async (proposal: Proposal) => {
+      const packages = proposalPackages.filter(p => p.proposal_id === proposal.id)
+      const packageInfo = packages.length > 0 ? `\n\n注意：此提案有 ${packages.length} 個版本，將一併刪除` : ''
+
+      const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？${packageInfo}`, {
+        type: 'warning',
+        title: '刪除提案',
+      })
+
+      if (confirmed) {
+        try {
+          const { supabase } = await import('@/lib/supabase/client')
+
+          // 先刪除相關套件
+          if (packages.length > 0) {
+            const { error: pkgError } = await supabase
+              .from('proposal_packages' as 'notes')
+              .delete()
+              .eq('proposal_id', proposal.id)
+            if (pkgError) throw pkgError
+          }
+
+          // 再刪除提案
+          const { error } = await supabase.from('proposals' as 'notes').delete().eq('id', proposal.id)
+          if (error) throw error
+
+          refreshProposals()
+          refreshProposalPackages()
+          setProposalDetailDialogOpen(false)
+          setSelectedProposal(null)
+        } catch (error) {
+          await alert('刪除提案失敗', 'error')
+        }
+      }
+    },
+    [proposalPackages, refreshProposals, refreshProposalPackages]
+  )
+
   const { renderActions } = useTourActionButtons({
     quotes,
     activeStatusTab,
@@ -180,6 +239,9 @@ export const ToursPage: React.FC = () => {
       setSelectedProposal(proposal)
       setProposalDetailDialogOpen(true)
     },
+    onProposalEdit: handleEditProposal,
+    onProposalArchive: handleOpenArchiveDialog,
+    onProposalDelete: handleDeleteProposal,
   })
 
   // 取得國家/城市名稱的輔助函數
@@ -258,13 +320,50 @@ export const ToursPage: React.FC = () => {
       try {
         await createProposal(data as CreateProposalData, user.workspace_id, user.id)
         setProposalDialogOpen(false)
-        // 切換到提案 tab
-        setActiveStatusTab('提案')
+        // 不再自動切換 tab，避免意外的狀態變更
+        // 使用者可在「全部」tab 看到新提案，或手動切換到「提案」tab
       } catch (error) {
         await alert('建立提案失敗', 'error')
       }
     },
-    [user?.workspace_id, user?.id, setActiveStatusTab]
+    [user?.workspace_id, user?.id]
+  )
+
+  // 更新提案
+  const handleUpdateProposal = useCallback(
+    async (data: CreateProposalData | UpdateProposalData) => {
+      if (!selectedProposal || !user?.id) {
+        await alert('無法取得資訊', 'error')
+        return
+      }
+
+      try {
+        await updateProposal(selectedProposal.id, data, user.id)
+        refreshProposals()
+        setProposalEditDialogOpen(false)
+        setSelectedProposal(null)
+      } catch (error) {
+        await alert('更新提案失敗', 'error')
+      }
+    },
+    [selectedProposal, user?.id, refreshProposals]
+  )
+
+  // 封存提案
+  const handleArchiveProposal = useCallback(
+    async (reason: string) => {
+      if (!selectedProposal || !user?.id) return
+
+      try {
+        await archiveProposal(selectedProposal.id, reason, user.id)
+        refreshProposals()
+        setProposalArchiveDialogOpen(false)
+        setSelectedProposal(null)
+      } catch (error) {
+        await alert('封存提案失敗', 'error')
+      }
+    },
+    [selectedProposal, user?.id, refreshProposals]
   )
 
   useEffect(() => {
@@ -397,11 +496,41 @@ export const ToursPage: React.FC = () => {
       {/* 提案詳細對話框 */}
       <ProposalDetailDialog
         open={proposalDetailDialogOpen}
-        onOpenChange={setProposalDetailDialogOpen}
+        onOpenChange={(open) => {
+          setProposalDetailDialogOpen(open)
+          // 關閉時清除選擇，但不改變 tab 狀態
+          if (!open) {
+            setSelectedProposal(null)
+          }
+        }}
         proposal={selectedProposal}
         onPackagesChange={() => {
-          // 刷新資料
+          // 刷新提案資料
+          refreshProposals()
         }}
+      />
+
+      {/* 編輯提案對話框 */}
+      <ProposalDialog
+        open={proposalEditDialogOpen}
+        onOpenChange={(open) => {
+          setProposalEditDialogOpen(open)
+          if (!open) setSelectedProposal(null)
+        }}
+        mode="edit"
+        proposal={selectedProposal}
+        onSubmit={handleUpdateProposal}
+      />
+
+      {/* 封存提案對話框 */}
+      <ArchiveProposalDialog
+        open={proposalArchiveDialogOpen}
+        onOpenChange={(open) => {
+          setProposalArchiveDialogOpen(open)
+          if (!open) setSelectedProposal(null)
+        }}
+        proposal={selectedProposal}
+        onConfirm={handleArchiveProposal}
       />
     </div>
   )

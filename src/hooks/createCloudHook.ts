@@ -54,7 +54,7 @@ interface CloudHookReturn<T extends BaseEntity> {
   create: (data: Omit<T, 'id' | 'created_at' | 'updated_at'>) => Promise<T>
   update: (id: string, updates: Partial<T>) => Promise<void>
   delete: (id: string) => Promise<void>
-  fetchAll: () => void
+  fetchAll: () => Promise<T[] | undefined>
   getById: (id: string) => T | undefined
 }
 

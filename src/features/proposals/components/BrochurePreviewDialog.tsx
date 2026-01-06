@@ -144,7 +144,7 @@ export function BrochurePreviewDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 flex flex-row items-center justify-between">
           <DialogTitle className="flex items-center gap-2">
-            <span>手冊預覽</span>
+            <span>簡易行程表</span>
             {itinerary && (
               <span className="text-sm text-morandi-secondary font-normal">
                 - {itinerary.title}

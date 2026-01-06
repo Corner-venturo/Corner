@@ -5,8 +5,7 @@
 
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +16,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, FileText, Loader2, MapPin, Save, AlertCircle, X, ArrowLeft, Book, Globe, DollarSign, ExternalLink } from 'lucide-react'
+import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2 } from 'lucide-react'
+import { DatePicker } from '@/components/ui/date-picker'
+import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useAuthStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { supabase } from '@/lib/supabase/client'
@@ -26,13 +27,21 @@ import type { ProposalPackage, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
-import { hasFullFeatures } from '@/lib/feature-restrictions'
+
+interface FlightInfo {
+  flightNumber: string
+  airline: string
+  departureAirport: string
+  arrivalAirport: string
+  departureTime: string
+  arrivalTime: string
+}
 
 interface ItineraryFormData {
   title: string
-  tagline: string
-  subtitle: string
   description: string
+  outboundFlight: FlightInfo | null
+  returnFlight: FlightInfo | null
 }
 
 interface PackageItineraryDialogProps {
@@ -50,67 +59,70 @@ export function PackageItineraryDialog({
   proposal,
   onItineraryCreated,
 }: PackageItineraryDialogProps) {
-  const router = useRouter()
-  const { items: itineraries, fetchAll, create, isLoading: loading } = useItineraries()
+  const { items: itineraries, fetchAll, create } = useItineraries()
   const { user: currentUser } = useAuthStore()
 
-  // 判斷是否有完整功能
-  const hasFullEditor = useMemo(() => {
-    return hasFullFeatures(currentUser?.workspace_code)
-  }, [currentUser?.workspace_code])
-
-  // 根據權限決定行程表頁面路徑
-  const getItineraryUrl = (itineraryId: string) => {
-    if (hasFullEditor) {
-      return `/itinerary/new?itinerary_id=${itineraryId}`
-    }
-    return `/itinerary/print?itinerary_id=${itineraryId}`
-  }
-
   const [isCreating, setIsCreating] = useState(false)
-  const [showForm, setShowForm] = useState(false)
+  const [isDataLoading, setIsDataLoading] = useState(true)
   const [createError, setCreateError] = useState<string | null>(null)
   const [formData, setFormData] = useState<ItineraryFormData>({
     title: '',
-    tagline: 'Corner Travel 2025',
-    subtitle: '',
     description: '',
+    outboundFlight: null,
+    returnFlight: null,
   })
+  // 航班查詢狀態
+  const [outboundFlightNumber, setOutboundFlightNumber] = useState('')
+  const [outboundFlightDate, setOutboundFlightDate] = useState('')
+  const [returnFlightNumber, setReturnFlightNumber] = useState('')
+  const [returnFlightDate, setReturnFlightDate] = useState('')
+  const [searchingOutbound, setSearchingOutbound] = useState(false)
+  const [searchingReturn, setSearchingReturn] = useState(false)
+  const [flightSearchError, setFlightSearchError] = useState<{ outbound?: string; return?: string }>({})
 
   // 載入行程表資料
   useEffect(() => {
     if (isOpen) {
-      fetchAll()
+      // 先重置狀態，顯示載入中
+      setIsDataLoading(true)
       setCreateError(null)
       setFormData({
         title: proposal.title || pkg.version_name,
-        tagline: 'Corner Travel 2025',
-        subtitle: '',
         description: '',
+        outboundFlight: null,
+        returnFlight: null,
       })
-      // 直接進入行程表表單（不管有沒有已存在的行程）
-      setShowForm(true)
+      // 設定預設航班日期
+      setOutboundFlightDate(pkg.start_date || '')
+      setReturnFlightDate(pkg.end_date || '')
+      setOutboundFlightNumber('')
+      setReturnFlightNumber('')
+      setFlightSearchError({})
+
+      // 等待資料載入完成後顯示表單
+      fetchAll().then(() => {
+        setIsDataLoading(false)
+      })
     }
-  }, [isOpen, proposal.title, pkg.version_name, pkg.itinerary_id])
+  }, [isOpen, proposal.title, pkg.version_name, pkg.itinerary_id, pkg.start_date, pkg.end_date])
 
   // 已關聯此套件的行程表
   const linkedItineraries = useMemo(() => {
-    return itineraries.filter(i => {
-      const item = i as Itinerary & { _deleted?: boolean; proposal_package_id?: string }
-      return item.proposal_package_id === pkg.id && !item._deleted
-    })
-  }, [itineraries, pkg.id])
+    // Debug: 詳細追蹤行程表資料
+    logger.log(`[PackageItineraryDialog] pkg.id = ${pkg.id}, pkg.itinerary_id = ${pkg.itinerary_id}`)
+    logger.log(`[PackageItineraryDialog] 共 ${itineraries.length} 個行程表`)
 
-  // 開啟新增表單
-  const handleOpenForm = () => {
-    setFormData({
-      title: proposal.title || pkg.version_name,
-      tagline: 'Corner Travel 2025',
-      subtitle: '',
-      description: '',
+    // 同時用 proposal_package_id 和 pkg.itinerary_id 來找行程表
+    const filtered = itineraries.filter(i => {
+      if (i._deleted) return false
+      // 符合 proposal_package_id 或者符合 pkg.itinerary_id
+      return i.proposal_package_id === pkg.id || (pkg.itinerary_id && i.id === pkg.itinerary_id)
     })
-    setShowForm(true)
-  }
+
+    logger.log(`[PackageItineraryDialog] 篩選後找到 ${filtered.length} 個行程表`)
+
+    return filtered
+  }, [itineraries, pkg.id, pkg.itinerary_id])
 
   // 計算天數
   const calculateDays = () => {
@@ -144,11 +156,13 @@ export function PackageItineraryDialog({
     hotelBreakfast: boolean
   }>>([])
 
-  // 當打開表單時初始化每日行程（若已有行程表則載入現有資料）
+  // 當資料載入完成後初始化每日行程（若已有行程表則載入現有資料）
   useEffect(() => {
-    if (showForm) {
-      // 檢查是否有現有行程表
-      const itinerary = linkedItineraries.find(i => i.id === pkg.itinerary_id)
+    if (!isDataLoading && isOpen) {
+      // 檢查是否有現有行程表（優先用 pkg.itinerary_id，否則用 proposal_package_id 找）
+      const itinerary = linkedItineraries.find(i =>
+        i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id
+      )
       const dailyData = itinerary?.daily_itinerary
       if (itinerary && dailyData && dailyData.length > 0) {
         // 從現有行程表載入資料
@@ -173,18 +187,18 @@ export function PackageItineraryDialog({
           }
         })
         setDailySchedule(loadedSchedule)
-        // 更新表單標題
+        // 更新表單標題和航班資訊
         setFormData(prev => ({
           ...prev,
           title: stripHtml(itinerary.title) || prev.title,
-          tagline: itinerary.tagline || prev.tagline,
-          subtitle: itinerary.subtitle || prev.subtitle,
+          outboundFlight: itinerary.flight_info?.outbound || null,
+          returnFlight: itinerary.flight_info?.return || null,
         }))
       } else {
         setDailySchedule(initializeDailySchedule())
       }
     }
-  }, [showForm, pkg.start_date, pkg.end_date, pkg.itinerary_id, linkedItineraries])
+  }, [isDataLoading, isOpen, pkg.start_date, pkg.end_date, pkg.itinerary_id, linkedItineraries])
 
   // 更新每日行程
   const updateDaySchedule = (index: number, field: string, value: string | boolean) => {
@@ -205,6 +219,68 @@ export function PackageItineraryDialog({
     })
   }
 
+  // 查詢去程航班
+  const handleSearchOutboundFlight = useCallback(async () => {
+    if (!outboundFlightNumber.trim() || !outboundFlightDate) {
+      setFlightSearchError(prev => ({ ...prev, outbound: '請輸入航班號碼和日期' }))
+      return
+    }
+    setSearchingOutbound(true)
+    setFlightSearchError(prev => ({ ...prev, outbound: undefined }))
+    try {
+      const result = await searchFlightAction(outboundFlightNumber.trim(), outboundFlightDate)
+      if (result.error) {
+        setFlightSearchError(prev => ({ ...prev, outbound: result.error }))
+      } else if (result.data) {
+        setFormData(prev => ({
+          ...prev,
+          outboundFlight: {
+            flightNumber: result.data!.flightNumber,
+            airline: result.data!.airline,
+            departureAirport: result.data!.departure.iata,
+            arrivalAirport: result.data!.arrival.iata,
+            departureTime: result.data!.departure.time,
+            arrivalTime: result.data!.arrival.time,
+          },
+        }))
+        setOutboundFlightNumber('')
+      }
+    } finally {
+      setSearchingOutbound(false)
+    }
+  }, [outboundFlightNumber, outboundFlightDate])
+
+  // 查詢回程航班
+  const handleSearchReturnFlight = useCallback(async () => {
+    if (!returnFlightNumber.trim() || !returnFlightDate) {
+      setFlightSearchError(prev => ({ ...prev, return: '請輸入航班號碼和日期' }))
+      return
+    }
+    setSearchingReturn(true)
+    setFlightSearchError(prev => ({ ...prev, return: undefined }))
+    try {
+      const result = await searchFlightAction(returnFlightNumber.trim(), returnFlightDate)
+      if (result.error) {
+        setFlightSearchError(prev => ({ ...prev, return: result.error }))
+      } else if (result.data) {
+        setFormData(prev => ({
+          ...prev,
+          returnFlight: {
+            flightNumber: result.data!.flightNumber,
+            airline: result.data!.airline,
+            departureAirport: result.data!.departure.iata,
+            arrivalAirport: result.data!.arrival.iata,
+            departureTime: result.data!.departure.time,
+            arrivalTime: result.data!.arrival.time,
+          },
+        }))
+        setReturnFlightNumber('')
+      }
+    } finally {
+      setSearchingReturn(false)
+    }
+  }, [returnFlightNumber, returnFlightDate])
+
   // 取得前一天的住宿（用於續住顯示）
   const getPreviousAccommodation = (index: number): string => {
     if (index === 0) return ''
@@ -217,9 +293,13 @@ export function PackageItineraryDialog({
     return ''
   }
 
-  // 判斷是否為編輯模式
-  const isEditMode = Boolean(pkg.itinerary_id)
-  const existingItinerary = linkedItineraries.find(i => i.id === pkg.itinerary_id)
+  // 判斷是否為編輯模式（用 proposal_package_id 找已存在的行程表）
+  const existingItinerary = useMemo(() => {
+    return linkedItineraries.find(i =>
+      i.id === pkg.itinerary_id || i.proposal_package_id === pkg.id
+    )
+  }, [linkedItineraries, pkg.itinerary_id, pkg.id])
+  const isEditMode = Boolean(existingItinerary)
 
   // 建立或更新行程表
   const handleSubmit = async () => {
@@ -283,14 +363,19 @@ export function PackageItineraryDialog({
           title: formData.title,
         })
 
+        // 準備航班資訊
+        const flightInfo = (formData.outboundFlight || formData.returnFlight) ? {
+          outbound: formData.outboundFlight,
+          return: formData.returnFlight,
+        } : null
+
         const { error: updateError } = await supabase
           .from('itineraries')
           .update({
             title: formData.title,
             daily_itinerary: formattedDailyItinerary,
-            tagline: formData.tagline,
-            subtitle: formData.subtitle,
             city: destinationDisplay,
+            flight_info: flightInfo,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existingItinerary.id)
@@ -304,15 +389,7 @@ export function PackageItineraryDialog({
         onClose()
       } else {
         // 建立新行程表
-        logger.log('建立行程表資料:', {
-          title: formData.title,
-          proposal_package_id: pkg.id,
-          country: pkg.country_id,
-          airport_code: pkg.main_city_id,
-          departure_date: pkg.start_date,
-        })
-
-        const newItinerary = await create({
+        const createData = {
           title: formData.title,
           tour_id: null,
           tour_code: '',
@@ -321,18 +398,45 @@ export function PackageItineraryDialog({
           departure_date: pkg.start_date || '',
           city: destinationDisplay,
           daily_itinerary: formattedDailyItinerary,
-          tagline: formData.tagline,
-          subtitle: formData.subtitle,
           description: formData.description,
           cover_image: '',
           country: pkg.country_id || '',
           features: [],
           focus_cards: [],
           proposal_package_id: pkg.id,
-        } as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
+          flight_info: (formData.outboundFlight || formData.returnFlight) ? {
+            outbound: formData.outboundFlight,
+            return: formData.returnFlight,
+          } : null,
+        }
+
+        logger.log('建立行程表資料 (完整):', JSON.stringify(createData, null, 2))
+        logger.log('proposal_package_id 確認:', pkg.id)
+
+        const newItinerary = await create(createData as unknown as Omit<Itinerary, 'id' | 'created_at' | 'updated_at'>)
+
+        logger.log('建立結果:', newItinerary ? JSON.stringify({
+          id: newItinerary.id,
+          proposal_package_id: (newItinerary as Itinerary & { proposal_package_id?: string }).proposal_package_id,
+          title: newItinerary.title,
+        }) : 'null')
 
         if (newItinerary?.id) {
           logger.log('行程表建立成功:', newItinerary.id)
+
+          // 驗證資料庫中是否有 proposal_package_id
+          const { data: dbItinerary, error: fetchError } = await supabase
+            .from('itineraries')
+            .select('id, proposal_package_id, title')
+            .eq('id', newItinerary.id)
+            .single()
+
+          if (fetchError) {
+            logger.error('查詢剛建立的行程表失敗:', fetchError)
+          } else {
+            logger.log('資料庫中的行程表:', JSON.stringify(dbItinerary))
+            logger.log('資料庫 proposal_package_id:', dbItinerary?.proposal_package_id)
+          }
 
           // 更新套件關聯
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -357,150 +461,22 @@ export function PackageItineraryDialog({
     }
   }
 
-  // 查看已連結的行程表
-  const handleViewItinerary = (itinerary: Itinerary) => {
-    onClose()
-    router.push(getItineraryUrl(itinerary.id))
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className={showForm ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
-        {!showForm ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-morandi-gold" />
-                <span>行程表管理</span>
-                <span className="text-sm text-morandi-secondary font-normal">- {pkg.version_name}</span>
-              </DialogTitle>
-            </DialogHeader>
-
-            {/* 行程表卡片 */}
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg">
-              {/* 卡片標題 */}
-              <div className="flex-shrink-0 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-morandi-primary" />
-                  <span className="text-sm font-medium text-morandi-primary">行程表</span>
-                </div>
-                <p className="text-xs text-morandi-secondary mt-1">管理此套件的行程表</p>
-              </div>
-
-              {/* 分割線 */}
-              <div className="mx-4">
-                <div className="border-t border-border" />
-              </div>
-
-              {/* 內容區域 */}
-              <div className="flex-1 overflow-y-auto p-4">
-                {loading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
-                  </div>
-                ) : linkedItineraries.length === 0 ? (
-                  <div className="text-center py-8 text-sm text-morandi-secondary">
-                    尚無行程表
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* 行程表資訊 */}
-                    {linkedItineraries.map((itinerary) => (
-                      <div key={itinerary.id} className="p-4 rounded-lg border border-border/50 bg-morandi-container/20">
-                        <div className="flex items-center gap-2 mb-3">
-                          <FileText className="w-4 h-4 text-morandi-gold" />
-                          <span className="text-sm font-medium text-morandi-primary">
-                            {stripHtml(itinerary.title) || '未命名'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-morandi-secondary mb-4">
-                          {itinerary.city && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {itinerary.city}
-                            </span>
-                          )}
-                          {itinerary.daily_itinerary?.length > 0 && (
-                            <span>{itinerary.daily_itinerary.length} 天</span>
-                          )}
-                        </div>
-
-                        {/* 操作按鈕 */}
-                        <div className="grid grid-cols-3 gap-2">
-                          {/* 轉報價單 */}
-                          <button
-                            onClick={() => {
-                              onClose()
-                              if (pkg.quote_id) {
-                                router.push(`/quotes/${pkg.quote_id}`)
-                              } else {
-                                // 如果沒有報價單，可以提示或自動建立
-                                void alert('尚無報價單，請先建立行程表並點擊「建立行程與報價」', 'info')
-                              }
-                            }}
-                            className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-colors"
-                          >
-                            <DollarSign className="w-5 h-5 text-morandi-gold" />
-                            <span className="text-xs text-morandi-primary">報價單</span>
-                          </button>
-
-                          {/* 手冊 */}
-                          <button
-                            onClick={() => {
-                              onClose()
-                              router.push(`/itinerary/print?itinerary_id=${itinerary.id}`)
-                            }}
-                            className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-colors"
-                          >
-                            <Book className="w-5 h-5 text-morandi-primary" />
-                            <span className="text-xs text-morandi-primary">手冊</span>
-                          </button>
-
-                          {/* 網頁行程表 */}
-                          <button
-                            onClick={() => handleViewItinerary(itinerary)}
-                            className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border hover:border-morandi-gold/50 hover:bg-morandi-gold/5 transition-colors"
-                          >
-                            <Globe className="w-5 h-5 text-morandi-green" />
-                            <span className="text-xs text-morandi-primary">網頁行程</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* 分割線 */}
-              <div className="mx-4">
-                <div className="border-t border-border" />
-              </div>
-
-              {/* 新增按鈕 */}
-              <div className="flex-shrink-0 p-4">
-                <button
-                  onClick={handleOpenForm}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
-                >
-                  <Plus size={16} />
-                  新增
-                </button>
-              </div>
-            </div>
-          </>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        {/* 載入中 */}
+        {isDataLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
+          </div>
         ) : (
           <div className="flex h-full max-h-[80vh]">
             {/* 左側：基本資訊 */}
             <div className="w-1/2 pr-6 border-r border-border overflow-y-auto">
               <DialogHeader className="mb-4">
                 <DialogTitle className="flex items-center gap-2">
-                  <button
-                    onClick={() => setShowForm(false)}
-                    className="p-1 hover:bg-muted rounded transition-colors"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                  </button>
-                  建立行程表
+                  <FileText className="w-5 h-5 text-morandi-gold" />
+                  {isEditMode ? '編輯行程表' : '建立行程表'}
                 </DialogTitle>
                 <DialogDescription>
                   {pkg.version_name} - {proposal.title}
@@ -557,23 +533,140 @@ export function PackageItineraryDialog({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-xs text-morandi-primary">標語</Label>
-                  <Input
-                    value={formData.tagline}
-                    onChange={e => setFormData({ ...formData, tagline: e.target.value })}
-                    placeholder="Corner Travel 2025"
-                  />
-                </div>
+                {/* 航班資訊（選填） */}
+                <div className="space-y-3">
+                  <Label className="text-xs text-morandi-primary flex items-center gap-1">
+                    <Plane size={12} />
+                    航班資訊（選填）
+                  </Label>
 
-                <div className="space-y-2">
-                  <Label className="text-xs text-morandi-primary">副標題</Label>
-                  <textarea
-                    value={formData.subtitle}
-                    onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
-                    placeholder="詩意文案（可換行）"
-                    className="w-full text-sm border border-border rounded-md p-2 min-h-[60px]"
-                  />
+                  {/* 去程航班 */}
+                  <div className="border border-border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-morandi-secondary">去程航班</span>
+                      {formData.outboundFlight && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, outboundFlight: null }))}
+                          className="text-morandi-red hover:text-morandi-red/80 p-1"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
+                    {formData.outboundFlight ? (
+                      <div className="bg-morandi-container/50 rounded p-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-morandi-primary">
+                            {formData.outboundFlight.flightNumber}
+                          </span>
+                          <span className="text-xs text-morandi-secondary">
+                            {formData.outboundFlight.airline}
+                          </span>
+                        </div>
+                        <div className="text-xs text-morandi-secondary mt-1">
+                          {formData.outboundFlight.departureAirport} → {formData.outboundFlight.arrivalAirport}
+                          <span className="ml-2">
+                            {formData.outboundFlight.departureTime} - {formData.outboundFlight.arrivalTime}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex gap-2">
+                          <Input
+                            value={outboundFlightNumber}
+                            onChange={e => setOutboundFlightNumber(e.target.value.toUpperCase())}
+                            placeholder="航班號碼 (如 BR108)"
+                            className="h-8 text-xs flex-1"
+                            onKeyDown={e => e.key === 'Enter' && handleSearchOutboundFlight()}
+                          />
+                          <DatePicker
+                            value={outboundFlightDate}
+                            onChange={date => setOutboundFlightDate(date || '')}
+                            placeholder="日期"
+                            className="h-8 text-xs w-32"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleSearchOutboundFlight}
+                            disabled={searchingOutbound}
+                            className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                          >
+                            {searchingOutbound ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                          </Button>
+                        </div>
+                        {flightSearchError.outbound && (
+                          <p className="text-xs text-morandi-red">{flightSearchError.outbound}</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  {/* 回程航班 */}
+                  <div className="border border-border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-morandi-secondary">回程航班</span>
+                      {formData.returnFlight && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, returnFlight: null }))}
+                          className="text-morandi-red hover:text-morandi-red/80 p-1"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
+                    {formData.returnFlight ? (
+                      <div className="bg-morandi-container/50 rounded p-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-morandi-primary">
+                            {formData.returnFlight.flightNumber}
+                          </span>
+                          <span className="text-xs text-morandi-secondary">
+                            {formData.returnFlight.airline}
+                          </span>
+                        </div>
+                        <div className="text-xs text-morandi-secondary mt-1">
+                          {formData.returnFlight.departureAirport} → {formData.returnFlight.arrivalAirport}
+                          <span className="ml-2">
+                            {formData.returnFlight.departureTime} - {formData.returnFlight.arrivalTime}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex gap-2">
+                          <Input
+                            value={returnFlightNumber}
+                            onChange={e => setReturnFlightNumber(e.target.value.toUpperCase())}
+                            placeholder="航班號碼 (如 BR107)"
+                            className="h-8 text-xs flex-1"
+                            onKeyDown={e => e.key === 'Enter' && handleSearchReturnFlight()}
+                          />
+                          <DatePicker
+                            value={returnFlightDate}
+                            onChange={date => setReturnFlightDate(date || '')}
+                            placeholder="日期"
+                            className="h-8 text-xs w-32"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleSearchReturnFlight}
+                            disabled={searchingReturn}
+                            className="h-8 px-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                          >
+                            {searchingReturn ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                          </Button>
+                        </div>
+                        {flightSearchError.return && (
+                          <p className="text-xs text-morandi-red">{flightSearchError.return}</p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* 錯誤訊息 */}
@@ -648,7 +741,7 @@ export function PackageItineraryDialog({
                                 type="checkbox"
                                 checked={day.hotelBreakfast}
                                 onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
-                                className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                                className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
                               />
                               <span className="text-[10px] text-morandi-secondary">飯店早餐</span>
                             </label>
@@ -682,7 +775,7 @@ export function PackageItineraryDialog({
                                 type="checkbox"
                                 checked={day.sameAsPrevious}
                                 onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
-                                className="w-3 h-3 rounded border-gray-300 text-morandi-gold focus:ring-morandi-gold"
+                                className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
                               />
                               <span className="text-[10px] text-morandi-secondary">續住</span>
                             </label>
