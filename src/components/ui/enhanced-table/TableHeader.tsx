@@ -119,9 +119,9 @@ export function TableHeader({
           </th>
         ))}
 
-        {/* Actions column */}
+        {/* Actions column - 不設寬度，填滿剩餘空間 */}
         {actions && (
-          <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: '200px', minWidth: '200px' }}>
+          <th className="text-left py-2.5 px-4 text-xs relative">
             <span className="font-medium text-morandi-secondary">操作</span>
           </th>
         )}

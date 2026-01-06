@@ -136,9 +136,9 @@ export function TableBody({
                 </td>
               ))}
 
-              {/* Actions column */}
+              {/* Actions column - 不設寬度，填滿剩餘空間 */}
               {actions && (
-                <td className="py-3 px-4" style={{ width: '200px', minWidth: '200px' }}>
+                <td className="py-3 px-4">
                   <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>{actions(row, actualRowIndex)}</div>
                 </td>
               )}
