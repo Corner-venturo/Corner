@@ -26,6 +26,7 @@ interface Tour {
   id: string
   code: string
   name: string
+  archived?: boolean
 }
 
 export function useVisasDialog(tours: Tour[]) {
@@ -52,12 +53,14 @@ export function useVisasDialog(tours: Tour[]) {
     },
   ])
 
-  // 團號選項
+  // 團號選項（過濾掉已封存的）
   const tourOptions: ComboboxOption[] = useMemo(() => {
-    return tours.map(tour => ({
-      value: tour.id,
-      label: `${tour.code} - ${tour.name}`,
-    }))
+    return tours
+      .filter(tour => !tour.archived)
+      .map(tour => ({
+        value: tour.id,
+        label: `${tour.code} - ${tour.name}`,
+      }))
   }, [tours])
 
   // 計算下件時間

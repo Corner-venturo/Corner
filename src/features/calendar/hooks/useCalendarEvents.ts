@@ -156,11 +156,11 @@ export function useCalendarEvents() {
     return colors[type as keyof typeof colors] || { bg: '#B8B3AE', border: '#A7A29D' }
   }, [])
 
-  // 轉換旅遊團為日曆事件（過濾掉特殊團）
+  // 轉換旅遊團為日曆事件（過濾掉特殊團和已封存的）
   const tourEvents: FullCalendarEvent[] = useMemo(() => {
     logger.log('[Calendar] 轉換 tours，原始數量:', tours?.length || 0)
     return (tours || [])
-      .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
+      .filter(tour => tour.status !== '特殊團' && !tour.archived) // 過濾掉簽證專用團等特殊團，以及已封存的
       .map(tour => {
         const color = getEventColor('tour', tour.status || '提案')
         const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
