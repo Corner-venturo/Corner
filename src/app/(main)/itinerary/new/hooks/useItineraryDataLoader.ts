@@ -48,10 +48,15 @@ export function useItineraryDataLoader({
 
   useEffect(() => {
     const initializeTourData = () => {
+      logger.log('[ItineraryDataLoader] === 開始初始化 ===')
+      logger.log('[ItineraryDataLoader] URL 參數 - itineraryId:', itineraryId, 'tourId:', tourId)
+      logger.log('[ItineraryDataLoader] itineraries 數量:', itineraries.length)
+
       const currentId = itineraryId || tourId
 
       // 如果 ID 沒變，且已經初始化過，就不要重新載入
       if (hasInitializedRef.current && lastIdRef.current === currentId) {
+        logger.log('[ItineraryDataLoader] 已初始化過，跳過')
         return
       }
 
