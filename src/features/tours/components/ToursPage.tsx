@@ -195,7 +195,29 @@ export const ToursPage: React.FC = () => {
         try {
           const { supabase } = await import('@/lib/supabase/client')
 
-          // 先刪除相關套件
+          // 先解除旅遊團的提案關聯（避免外鍵衝突）
+          logger.log('[ToursPage] 解除旅遊團關聯...')
+          const { error: tourUnlinkError } = await supabase
+            .from('tours')
+            .update({ proposal_id: null, proposal_package_id: null } as Record<string, unknown>)
+            .eq('proposal_id' as string, proposal.id)
+          if (tourUnlinkError) {
+            logger.error('[ToursPage] 解除旅遊團關聯失敗:', tourUnlinkError)
+            throw new Error(`解除旅遊團關聯失敗: ${tourUnlinkError.message || tourUnlinkError.code || JSON.stringify(tourUnlinkError)}`)
+          }
+
+          // 清除提案的 selected_package_id（避免外鍵衝突）
+          logger.log('[ToursPage] 清除提案的 selected_package_id...')
+          const { error: clearSelectedError } = await supabase
+            .from('proposals' as 'notes')
+            .update({ selected_package_id: null } as Record<string, unknown>)
+            .eq('id', proposal.id)
+          if (clearSelectedError) {
+            logger.error('[ToursPage] 清除 selected_package_id 失敗:', clearSelectedError)
+            // 不拋錯，繼續嘗試刪除
+          }
+
+          // 刪除相關套件（其實有 ON DELETE CASCADE，但為了確保先手動刪）
           if (packages.length > 0) {
             logger.log('[ToursPage] 正在刪除套件...', packages.length)
             const { error: pkgError } = await supabase
