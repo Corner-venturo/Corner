@@ -120,7 +120,7 @@ export function TableHeader({
 
         {/* Actions column */}
         {actions && (
-          <th className="text-left py-2.5 px-4 text-xs relative">
+          <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: '140px', minWidth: '140px' }}>
             <span className="font-medium text-morandi-secondary">操作</span>
           </th>
         )}

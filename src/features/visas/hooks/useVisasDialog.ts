@@ -26,7 +26,7 @@ interface Tour {
   id: string
   code: string
   name: string
-  archived?: boolean
+  archived?: boolean | null
 }
 
 export function useVisasDialog(tours: Tour[]) {
