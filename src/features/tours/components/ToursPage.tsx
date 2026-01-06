@@ -197,25 +197,35 @@ export const ToursPage: React.FC = () => {
 
           // 先刪除相關套件
           if (packages.length > 0) {
+            logger.log('[ToursPage] 正在刪除套件...', packages.length)
             const { error: pkgError } = await supabase
               .from('proposal_packages' as 'notes')
               .delete()
               .eq('proposal_id', proposal.id)
-            if (pkgError) throw pkgError
+            if (pkgError) {
+              logger.error('[ToursPage] 刪除套件失敗:', pkgError)
+              throw new Error(`刪除套件失敗: ${pkgError.message || pkgError.code || JSON.stringify(pkgError)}`)
+            }
           }
 
           // 再刪除提案
+          logger.log('[ToursPage] 正在刪除提案...', proposal.id)
           const { error } = await supabase.from('proposals' as 'notes').delete().eq('id', proposal.id)
-          if (error) throw error
+          if (error) {
+            logger.error('[ToursPage] 刪除提案失敗:', error)
+            throw new Error(`刪除提案失敗: ${error.message || error.code || JSON.stringify(error)}`)
+          }
 
+          logger.log('[ToursPage] 刪除成功，重新整理列表...')
           refreshProposals()
           refreshProposalPackages()
           setProposalDetailDialogOpen(false)
           setSelectedProposal(null)
           await alert('提案已刪除', 'success')
         } catch (error) {
-          logger.error('[ToursPage] 刪除提案失敗:', error)
-          await alert(`刪除提案失敗: ${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
+          logger.error('[ToursPage] 刪除提案失敗:', JSON.stringify(error, null, 2))
+          const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
+          await alert(`刪除提案失敗: ${errorMessage}`, 'error')
         }
       }
     },
