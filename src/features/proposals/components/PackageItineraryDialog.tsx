@@ -432,11 +432,7 @@ export function PackageItineraryDialog({
           focus_cards: [],
           proposal_package_id: pkg.id,
           workspace_id: workspaceId,
-          flight_info: (formData.outboundFlight || formData.returnFlight) ? {
-            outbound: formData.outboundFlight,
-            return: formData.returnFlight,
-          } : null,
-          // 同時存到行程編輯器使用的格式
+          // 航班資訊存到 outbound_flight 和 return_flight 欄位
           outbound_flight: formData.outboundFlight ? {
             airline: formData.outboundFlight.airline,
             flightNumber: formData.outboundFlight.flightNumber,
