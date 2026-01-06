@@ -71,7 +71,7 @@ export function FlightInfoSection({
       label: template.name,
       description: template.description || '',
       color: getTemplateColor(template.id),
-      previewImage: template.preview_image_url,
+      previewImage: template.preview_image_url ?? undefined,
     }))
   }, [flightTemplates])
 
@@ -81,7 +81,7 @@ export function FlightInfoSection({
     label: '經典金色',
     description: '莫蘭迪金色風格',
     color: getTemplateColor('original'),
-    previewImage: null,
+    previewImage: undefined,
   }
 
   // 生成每日行程
