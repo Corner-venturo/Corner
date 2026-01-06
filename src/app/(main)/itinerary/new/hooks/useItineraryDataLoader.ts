@@ -80,7 +80,7 @@ export function useItineraryDataLoader({
             country: itinerary.country || '',
             city: itinerary.city || '',
             status: itinerary.status || '提案',
-            outboundFlight: itinerary.outbound_flight || {
+            outboundFlight: itinerary.outbound_flight || itinerary.flight_info?.outbound || {
               airline: '',
               flightNumber: '',
               departureAirport: 'TPE',
@@ -90,7 +90,7 @@ export function useItineraryDataLoader({
               arrivalTime: '',
               duration: '',
             },
-            returnFlight: itinerary.return_flight || {
+            returnFlight: itinerary.return_flight || itinerary.flight_info?.return || {
               airline: '',
               flightNumber: '',
               departureAirport: '',

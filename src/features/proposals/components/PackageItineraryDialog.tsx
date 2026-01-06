@@ -187,12 +187,12 @@ export function PackageItineraryDialog({
           }
         })
         setDailySchedule(loadedSchedule)
-        // 更新表單標題和航班資訊
+        // 更新表單標題和航班資訊（支援兩種格式）
         setFormData(prev => ({
           ...prev,
           title: stripHtml(itinerary.title) || prev.title,
-          outboundFlight: itinerary.flight_info?.outbound || null,
-          returnFlight: itinerary.flight_info?.return || null,
+          outboundFlight: itinerary.flight_info?.outbound || (itinerary as { outbound_flight?: FlightInfo }).outbound_flight || null,
+          returnFlight: itinerary.flight_info?.return || (itinerary as { return_flight?: FlightInfo }).return_flight || null,
         }))
       } else {
         setDailySchedule(initializeDailySchedule())
@@ -363,7 +363,7 @@ export function PackageItineraryDialog({
           title: formData.title,
         })
 
-        // 準備航班資訊
+        // 準備航班資訊（同時存到兩種格式以確保相容性）
         const flightInfo = (formData.outboundFlight || formData.returnFlight) ? {
           outbound: formData.outboundFlight,
           return: formData.returnFlight,
@@ -376,6 +376,27 @@ export function PackageItineraryDialog({
             daily_itinerary: formattedDailyItinerary,
             city: destinationDisplay,
             flight_info: flightInfo,
+            // 同時存到 outbound_flight 和 return_flight（行程編輯器使用的格式）
+            outbound_flight: formData.outboundFlight ? {
+              airline: formData.outboundFlight.airline,
+              flightNumber: formData.outboundFlight.flightNumber,
+              departureAirport: formData.outboundFlight.departureAirport,
+              departureTime: formData.outboundFlight.departureTime,
+              departureDate: '',
+              arrivalAirport: formData.outboundFlight.arrivalAirport,
+              arrivalTime: formData.outboundFlight.arrivalTime,
+              duration: '',
+            } : null,
+            return_flight: formData.returnFlight ? {
+              airline: formData.returnFlight.airline,
+              flightNumber: formData.returnFlight.flightNumber,
+              departureAirport: formData.returnFlight.departureAirport,
+              departureTime: formData.returnFlight.departureTime,
+              departureDate: '',
+              arrivalAirport: formData.returnFlight.arrivalAirport,
+              arrivalTime: formData.returnFlight.arrivalTime,
+              duration: '',
+            } : null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existingItinerary.id)
@@ -388,7 +409,7 @@ export function PackageItineraryDialog({
         onItineraryCreated?.()
         onClose()
       } else {
-        // 建立新行程表
+        // 建立新行程表（同時存到兩種航班格式以確保相容性）
         const createData = {
           title: formData.title,
           tour_id: null,
@@ -407,6 +428,27 @@ export function PackageItineraryDialog({
           flight_info: (formData.outboundFlight || formData.returnFlight) ? {
             outbound: formData.outboundFlight,
             return: formData.returnFlight,
+          } : null,
+          // 同時存到行程編輯器使用的格式
+          outbound_flight: formData.outboundFlight ? {
+            airline: formData.outboundFlight.airline,
+            flightNumber: formData.outboundFlight.flightNumber,
+            departureAirport: formData.outboundFlight.departureAirport,
+            departureTime: formData.outboundFlight.departureTime,
+            departureDate: '',
+            arrivalAirport: formData.outboundFlight.arrivalAirport,
+            arrivalTime: formData.outboundFlight.arrivalTime,
+            duration: '',
+          } : null,
+          return_flight: formData.returnFlight ? {
+            airline: formData.returnFlight.airline,
+            flightNumber: formData.returnFlight.flightNumber,
+            departureAirport: formData.returnFlight.departureAirport,
+            departureTime: formData.returnFlight.departureTime,
+            departureDate: '',
+            arrivalAirport: formData.returnFlight.arrivalAirport,
+            arrivalTime: formData.returnFlight.arrivalTime,
+            duration: '',
           } : null,
         }
 
