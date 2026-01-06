@@ -27,6 +27,7 @@ import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
+import { logger } from '@/lib/utils/logger'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
@@ -211,8 +212,10 @@ export const ToursPage: React.FC = () => {
           refreshProposalPackages()
           setProposalDetailDialogOpen(false)
           setSelectedProposal(null)
+          await alert('提案已刪除', 'success')
         } catch (error) {
-          await alert('刪除提案失敗', 'error')
+          logger.error('[ToursPage] 刪除提案失敗:', error)
+          await alert(`刪除提案失敗: ${error instanceof Error ? error.message : '未知錯誤'}`, 'error')
         }
       }
     },

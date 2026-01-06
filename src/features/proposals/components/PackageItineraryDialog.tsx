@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -509,6 +510,9 @@ export function PackageItineraryDialog({
         {/* 載入中 */}
         {isDataLoading ? (
           <div className="h-64 flex items-center justify-center">
+            <VisuallyHidden>
+              <DialogTitle>載入中...</DialogTitle>
+            </VisuallyHidden>
             <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
           </div>
         ) : (
