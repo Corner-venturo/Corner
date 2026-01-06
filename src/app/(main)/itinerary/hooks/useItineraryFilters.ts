@@ -28,13 +28,15 @@ export function useItineraryFilters({
 
     switch (statusFilter) {
       case '提案':
+        // 提案狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '提案' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '提案' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
       case '進行中':
+        // 進行中狀態不受出發日期影響，只檢查 closed_at
         filtered = filtered.filter(
-          item => item.status === '進行中' && !isItineraryClosed(item) && !item.archived_at && !item.is_template
+          item => item.status === '進行中' && !item.closed_at && !item.archived_at && !item.is_template
         )
         break
       case '公司範例':

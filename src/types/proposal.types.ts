@@ -206,6 +206,9 @@ export interface ConvertToTourData {
   package_id: string
   city_code: string                       // 用於生成團號
   departure_date: string                  // 確定的出發日期
+  tour_name?: string                      // 團名（選填，預設用提案標題）
+  contact_person?: string                 // 聯絡人
+  contact_phone?: string                  // 聯絡電話
 }
 
 export interface ConvertToTourResult {
@@ -213,6 +216,7 @@ export interface ConvertToTourResult {
   tour_code: string
   quote_id?: string
   itinerary_id?: string
+  order_id?: string
 }
 
 // ============================================

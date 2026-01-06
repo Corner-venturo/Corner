@@ -396,13 +396,11 @@ export function generateDisbursementOrderCode(
  * 生成提案編號
  *
  * @param existingProposals - 現有提案列表
- * @returns 提案編號（如 PR000001）
+ * @returns 提案編號（如 P000001）
  *
  * @example
  * generateProposalCode(existingProposals)
- * // => 'PR000001', 'PR000002'...
- *
- * 注意：使用 PR 前綴避免與出納單 P{日期} 格式衝突
+ * // => 'P000001', 'P000002'...
  */
 export function generateProposalCode(
   existingProposals: { code?: string }[]
@@ -411,9 +409,9 @@ export function generateProposalCode(
 
   existingProposals.forEach(proposal => {
     const code = proposal.code
-    // 匹配格式：PR000001
-    if (code && /^PR\d{6}$/.test(code)) {
-      const numberPart = code.substring(2) // 移除 "PR"
+    // 匹配格式：P000001（6位數字）
+    if (code && /^P\d{6}$/.test(code)) {
+      const numberPart = code.substring(1) // 移除 "P"
       const number = parseInt(numberPart, 10)
       if (!isNaN(number) && number > maxNumber) {
         maxNumber = number
@@ -422,5 +420,5 @@ export function generateProposalCode(
   })
 
   const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
-  return `PR${nextNumber}`
+  return `P${nextNumber}`
 }

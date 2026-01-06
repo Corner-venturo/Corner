@@ -3,7 +3,7 @@
  */
 
 // Components
-export { ProposalsPage } from './components'
+export { ProposalsTableContent, ProposalDialog, PackageDialog, PackageListPanel, ArchiveProposalDialog, ConvertToTourDialog } from './components'
 
 // Services (re-export from services folder)
 export {

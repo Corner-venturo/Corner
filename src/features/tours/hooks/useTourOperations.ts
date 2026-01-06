@@ -11,6 +11,7 @@ import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import type { Order } from '@/types'
 import type { Quote } from '@/stores/types'
 import { useRegionsStore } from '@/stores'
+import { supabase } from '@/lib/supabase/client'
 
 interface TourActions {
   create: (data: CreateInput<Tour>) => Promise<Tour>
@@ -245,40 +246,74 @@ export function useTourOperations(params: UseTourOperationsParams) {
       if (!tour) return
 
       try {
-        // 1. 斷開關聯的報價單
+        // 1. 刪除關聯的 PNRs
+        const { error: pnrError } = await supabase
+          .from('pnrs')
+          .delete()
+          .eq('tour_id', tour.id)
+        if (pnrError) {
+          logger.warn('刪除 PNRs 失敗:', JSON.stringify(pnrError))
+        }
+
+        // 2. 刪除關聯的請款單 (payment_requests)
+        const { error: prError } = await supabase
+          .from('payment_requests')
+          .delete()
+          .eq('tour_id', tour.id)
+        if (prError) {
+          logger.warn('刪除請款單失敗:', JSON.stringify(prError))
+        }
+
+        // 4. 刪除關聯的收款單 (receipt_orders)
+        const { error: roError } = await supabase
+          .from('receipt_orders')
+          .delete()
+          .eq('tour_id', tour.id)
+        if (roError) {
+          logger.warn('刪除收款單失敗:', JSON.stringify(roError))
+        }
+
+        // 5. 刪除關聯的團員 (order_members)
+        const { error: omError } = await supabase
+          .from('order_members')
+          .delete()
+          .eq('tour_id', tour.id)
+        if (omError) {
+          logger.warn('刪除團員失敗:', JSON.stringify(omError))
+        }
+
+        // 6. 刪除關聯的訂單 (orders)
+        const { error: ordError } = await supabase
+          .from('orders')
+          .delete()
+          .eq('tour_id', tour.id)
+        if (ordError) {
+          logger.warn('刪除訂單失敗:', JSON.stringify(ordError))
+        }
+
+        // 7. 斷開關聯的報價單
         const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
         for (const quote of linkedQuotes) {
           await updateQuote(quote.id, { tour_id: undefined, status: 'proposed' })
         }
 
-        // 2. 斷開關聯的行程表
+        // 8. 斷開關聯的行程表
         const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
         for (const itinerary of linkedItineraries) {
           await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined, status: '提案' })
         }
 
-        // 3. 刪除旅遊團
+        // 9. 刪除旅遊團
         await actions.delete(tour.id)
 
-        logger.info(`已刪除旅遊團 ${tour.code}，並斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
+        logger.info(`已刪除旅遊團 ${tour.code}，包含相關訂單、請款單、收款單，並斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
       } catch (err) {
-        logger.error('刪除旅遊團失敗:', err)
+        logger.error('刪除旅遊團失敗:', JSON.stringify(err, null, 2))
       }
     },
     [actions, quotes, itineraries, updateQuote, updateItinerary]
   )
 
-  const handleConfirmTour = useCallback(
-    async (tour: Tour) => {
-      try {
-        await tourService.lockTour(tour.id, {})
-        logger.info(`已確認鎖定旅遊團 ${tour.code}`)
-      } catch (err) {
-        logger.error('確認鎖定旅遊團失敗:', err)
-      }
-    },
-    []
-  )
 
   const handleArchiveTour = useCallback(
     async (tour: Tour, reason?: string) => {
@@ -316,7 +351,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
   return {
     handleAddTour,
     handleDeleteTour,
-    handleConfirmTour,
     handleArchiveTour,
   }
 }

@@ -9,7 +9,6 @@ import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm } from '@/lib/ui/alert-dialog'
-import { dynamicFrom } from '@/lib/supabase/typed-client'
 
 export interface TourStoreActions {
   fetchAll: () => Promise<void>
@@ -143,45 +142,7 @@ export function useTourChannelOperations({ actions }: UseTourChannelOperationsPa
     }
   }, [])
 
-  /**
-   * 解鎖結團（管理員專用）
-   */
-  const handleUnlockTour = useCallback(async (tour: Tour) => {
-    const { toast } = await import('sonner')
-    const { supabase } = await import('@/lib/supabase/client')
-
-    const confirmed = await confirm(`確定要解鎖「${tour.name}」嗎？\n\n解鎖後可以繼續編輯和修改此團體。`, {
-      title: '解鎖結團',
-      type: 'warning',
-    })
-    if (!confirmed) {
-      return
-    }
-
-    try {
-       
-      const { error } = await dynamicFrom('tours')
-        .update({
-          closing_status: 'open',
-        })
-        .eq('id', tour.id)
-
-      if (error) throw error
-
-      toast.success('已解鎖結團')
-      // 重新載入資料
-      if ('fetchAll' in actions && typeof actions.fetchAll === 'function') {
-        await actions.fetchAll()
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-      logger.error('解鎖失敗:', error)
-      toast.error(`解鎖失敗：${errorMessage}`)
-    }
-  }, [actions])
-
   return {
     handleCreateChannel,
-    handleUnlockTour,
   }
 }

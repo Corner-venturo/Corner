@@ -35,9 +35,12 @@ export function ConvertToTourDialog({
   // 使用 tour_destinations 資料
   const { destinations, countries, loading: destinationsLoading, addDestination } = useTourDestinations()
 
+  const [tourName, setTourName] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('')
   const [airportCode, setAirportCode] = useState('')
   const [departureDate, setDepartureDate] = useState('')
+  const [contactPerson, setContactPerson] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
@@ -66,7 +69,13 @@ export function ConvertToTourDialog({
   // 初始化 - 從套件自動帶入資料
   useEffect(() => {
     if (open && pkg && countries.length > 0 && !initialized) {
+      // 團名：優先用套件版本名稱，否則用提案標題
+      setTourName(pkg.version_name || proposal.title || '')
       setDepartureDate(pkg.start_date || proposal.expected_start_date || '')
+
+      // 聯絡人資訊：從提案帶入
+      setContactPerson(proposal.customer_name || '')
+      setContactPhone(proposal.customer_phone || '')
 
       // 從套件的 country_id (存放國家名稱) 自動選擇國家
       if (pkg.country_id && countries.includes(pkg.country_id)) {
@@ -81,6 +90,9 @@ export function ConvertToTourDialog({
     // 關閉對話框時重置初始化狀態
     if (!open) {
       setInitialized(false)
+      setTourName('')
+      setContactPerson('')
+      setContactPhone('')
     }
   }, [pkg, proposal, open, countries, initialized])
 
@@ -124,6 +136,11 @@ export function ConvertToTourDialog({
       return
     }
 
+    if (!tourName.trim()) {
+      await alert('請輸入團名', 'warning')
+      return
+    }
+
     if (!airportCode) {
       await alert('請選擇機場代碼', 'warning')
       return
@@ -131,6 +148,11 @@ export function ConvertToTourDialog({
 
     if (!departureDate) {
       await alert('請選擇出發日期', 'warning')
+      return
+    }
+
+    if (!contactPerson.trim()) {
+      await alert('請輸入聯絡人', 'warning')
       return
     }
 
@@ -142,6 +164,9 @@ export function ConvertToTourDialog({
           package_id: pkg.id,
           city_code: airportCode,
           departure_date: departureDate,
+          tour_name: tourName.trim(),
+          contact_person: contactPerson.trim(),
+          contact_phone: contactPhone.trim() || undefined,
         },
         user.workspace_id,
         user.id
@@ -185,6 +210,45 @@ export function ConvertToTourDialog({
               目的地：{pkg.destination}
             </div>
           )}
+        </div>
+
+        {/* 團名 */}
+        <div>
+          <label className="text-sm font-medium text-morandi-primary mb-2 block">
+            團名 <span className="text-morandi-red">*</span>
+          </label>
+          <Input
+            value={tourName}
+            onChange={e => setTourName(e.target.value)}
+            placeholder="輸入團名..."
+          />
+          <p className="text-xs text-morandi-secondary mt-1">
+            此名稱將顯示在旅遊團列表中
+          </p>
+        </div>
+
+        {/* 聯絡人資訊 */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              聯絡人 <span className="text-morandi-red">*</span>
+            </label>
+            <Input
+              value={contactPerson}
+              onChange={e => setContactPerson(e.target.value)}
+              placeholder="輸入聯絡人姓名..."
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-morandi-primary mb-2 block">
+              聯絡電話
+            </label>
+            <Input
+              value={contactPhone}
+              onChange={e => setContactPhone(e.target.value)}
+              placeholder="輸入聯絡電話..."
+            />
+          </div>
         </div>
 
         {/* 國家選擇 */}

@@ -4,8 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
-import { generateProposalCode } from '@/stores/utils/code-generator'
-import { generateTourCode } from '@/stores/utils/code-generator'
+import { generateProposalCode, generateTourCode, generateOrderCode } from '@/stores/utils/code-generator'
 import { logger } from '@/lib/utils/logger'
 import type {
   Proposal,
@@ -34,6 +33,8 @@ const toursDb = () => (supabase as any).from('tours')
 const quotesDb = () => (supabase as any).from('quotes')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const itinerariesDb = () => (supabase as any).from('itineraries')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ordersDb = () => (supabase as any).from('orders')
 
 /**
  * 建立提案
@@ -328,7 +329,7 @@ export async function convertToTour(
   workspaceId: string,
   userId: string
 ): Promise<ConvertToTourResult> {
-  const { proposal_id, package_id, city_code, departure_date } = data
+  const { proposal_id, package_id, city_code, departure_date, tour_name, contact_person, contact_phone } = data
 
   // 1. 取得提案
   const { data: proposalData, error: proposalError } = await proposalsDb()
@@ -379,7 +380,7 @@ export async function convertToTour(
   const tourData = {
     id: crypto.randomUUID(),
     code: tourCode,
-    name: proposal.title,
+    name: tour_name || proposal.title,
     location: pkg.destination || proposal.destination || `${pkg.country_id || ''} ${pkg.main_city_id || ''}`.trim(),
     country_id: null, // 暫不轉換，避免 FK 錯誤
     main_city_id: null, // 暫不轉換，避免 FK 錯誤
@@ -445,6 +446,43 @@ export async function convertToTour(
     .update({ is_selected: true })
     .eq('id', package_id)
 
+  // 8. 自動建立第一筆訂單
+  const orderCode = generateOrderCode(tourCode, [])
+  const orderData = {
+    id: crypto.randomUUID(),
+    order_number: orderCode,
+    code: tourCode,
+    tour_id: newTour.id,
+    tour_name: tour_name || proposal.title,
+    contact_person: contact_person || proposal.customer_name || '待填寫',
+    contact_phone: contact_phone || proposal.customer_phone || null,
+    customer_id: proposal.customer_id || null,
+    sales_person: null,
+    assistant: null,
+    member_count: pkg.group_size || proposal.group_size || 0,
+    payment_status: 'unpaid',
+    status: 'pending',
+    total_amount: 0,
+    paid_amount: 0,
+    remaining_amount: 0,
+    notes: `從提案 ${proposal.code} 轉開團自動建立`,
+    workspace_id: workspaceId,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+
+  const { data: newOrder, error: orderError } = await ordersDb()
+    .insert(orderData)
+    .select()
+    .single()
+
+  if (orderError) {
+    // 訂單建立失敗不阻斷流程，僅記錄警告
+    logger.warn('自動建立訂單失敗:', JSON.stringify(orderError, null, 2))
+  } else {
+    logger.log('自動建立訂單成功:', { orderCode: newOrder.order_number })
+  }
+
   logger.log('提案轉團成功:', { proposalId: proposal_id, tourCode })
 
   return {
@@ -452,6 +490,7 @@ export async function convertToTour(
     tour_code: tourCode,
     quote_id: pkg.quote_id || undefined,
     itinerary_id: pkg.itinerary_id || undefined,
+    order_id: newOrder?.id,
   }
 }
 

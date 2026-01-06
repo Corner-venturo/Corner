@@ -13,11 +13,8 @@ import {
   ArchiveRestore,
   FileSignature,
   MessageSquare,
-  LockOpen,
-  Lock,
   Calculator,
   FileText,
-  CheckCircle2,
   FileCheck,
   ClipboardList,
 } from 'lucide-react'
@@ -42,14 +39,10 @@ interface UseTourActionButtonsParams {
   setSelectedTour: (tour: Tour) => void
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>
-  handleUnlockTour: (tour: Tour) => Promise<void>
   // 新增：打開報價單/行程表/合約連結對話框
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
   onOpenContractDialog?: (tour: Tour) => void
-  // V2.0：確認出團 & 解鎖
-  onConfirmTour?: (tour: Tour) => void
-  onUnlockLockedTour?: (tour: Tour) => void
   // 結案
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
@@ -71,12 +64,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     setSelectedTour,
     setDeleteConfirm,
     handleCreateChannel,
-    handleUnlockTour,
     onOpenQuoteDialog,
     onOpenItineraryDialog,
     onOpenContractDialog,
-    onConfirmTour,
-    onUnlockLockedTour,
     onCloseTour,
     onOpenArchiveDialog,
     onOpenTourConfirmationDialog,
@@ -113,43 +103,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
 
       return (
         <div className="flex items-center gap-1">
-          {/* 確認出團（僅提案狀態可見） */}
-          {tour.status === '提案' && onConfirmTour && (
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                onConfirmTour(tour)
-              }}
-              className="px-1.5 py-0.5 text-status-success hover:text-status-success hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
-              title="確認出團"
-            >
-              <CheckCircle2 size={14} />
-              <span>確認</span>
-            </button>
-          )}
-
-          {/* 進行中狀態的解鎖 */}
-          {tour.status === '進行中' && (
-            onUnlockLockedTour ? (
-              <button
-                onClick={e => {
-                  e.stopPropagation()
-                  onUnlockLockedTour(tour)
-                }}
-                className="px-1.5 py-0.5 text-status-warning hover:text-status-warning hover:bg-status-warning-bg rounded transition-colors flex items-center gap-0.5 text-xs"
-                title="解鎖回提案"
-              >
-                <LockOpen size={14} />
-                <span>解鎖</span>
-              </button>
-            ) : (
-              <span className="px-1.5 py-0.5 text-morandi-gold flex items-center gap-0.5 text-xs" title="行程已鎖定">
-                <Lock size={14} />
-                <span>鎖定</span>
-              </span>
-            )
-          )}
-
           {/* 結案（僅進行中狀態可見） */}
           {tour.status === '進行中' && onCloseTour && (
             <button
@@ -288,23 +241,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>{tour.archived ? '解封' : '封存'}</span>
           </button>
 
-          {/* 解鎖結團按鈕（僅封存分頁且管理員可見） */}
-          {activeStatusTab === 'archived' &&
-            tour.closing_status === 'closed' &&
-            user?.permissions?.includes('super_admin') && (
-              <button
-                onClick={e => {
-                  e.stopPropagation()
-                  handleUnlockTour(tour)
-                }}
-                className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-                title="解鎖結團"
-              >
-                <LockOpen size={14} />
-                <span>解鎖</span>
-              </button>
-            )}
-
           {/* 刪除 */}
           <button
             onClick={e => {
@@ -330,11 +266,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       setSelectedTour,
       setDeleteConfirm,
       handleCreateChannel,
-      handleUnlockTour,
       onOpenQuoteDialog,
       onOpenItineraryDialog,
-      onConfirmTour,
-      onUnlockLockedTour,
       onCloseTour,
       onOpenArchiveDialog,
       onOpenTourConfirmationDialog,

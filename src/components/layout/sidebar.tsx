@@ -28,7 +28,6 @@ import {
   ImageIcon,
   Bus,
   CheckSquare,
-  ClipboardList,
   Archive,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -53,7 +52,6 @@ const menuItems: MenuItem[] = [
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
-  { href: '/tour-requests', label: '需求確認單', icon: ClipboardList, requiredPermission: 'tours' },
   { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
   {
     href: '/finance',

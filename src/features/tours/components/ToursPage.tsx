@@ -24,11 +24,8 @@ import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
-import { DocumentVersionPicker } from '@/components/documents'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
-import { TourConfirmationWizard } from './TourConfirmationWizard'
-import { TourUnlockDialog } from './TourUnlockDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
@@ -92,10 +89,6 @@ export const ToursPage: React.FC = () => {
   } = useToursPage()
 
   const {
-    quoteDialogTour,
-    quoteDialogMode,
-    openQuoteDialog,
-    closeQuoteDialog,
     itineraryDialogTour,
     openItineraryDialog,
     closeItineraryDialog,
@@ -109,12 +102,6 @@ export const ToursPage: React.FC = () => {
     openArchiveDialog,
     closeArchiveDialog,
     confirmArchive,
-    confirmWizardTour,
-    openConfirmWizard,
-    closeConfirmWizard,
-    unlockDialogTour,
-    openUnlockDialog,
-    closeUnlockDialog,
     closingDialogTour,
     openClosingDialog,
     closeClosingDialog,
@@ -169,7 +156,7 @@ export const ToursPage: React.FC = () => {
     closeDeleteDialog()
   }, [operations, deleteConfirm.tour, closeDeleteDialog])
 
-  const { handleCreateChannel, handleUnlockTour } = useTourChannelOperations({
+  const { handleCreateChannel } = useTourChannelOperations({
     actions: actions as unknown as TourStoreActions
   })
 
@@ -182,12 +169,8 @@ export const ToursPage: React.FC = () => {
     setSelectedTour,
     setDeleteConfirm: (state) => state.tour && openDeleteDialog(state.tour),
     handleCreateChannel,
-    handleUnlockTour,
-    onOpenQuoteDialog: openQuoteDialog,
     onOpenItineraryDialog: openItineraryDialog,
     onOpenContractDialog: openContractDialog,
-    onConfirmTour: openConfirmWizard,
-    onUnlockLockedTour: openUnlockDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
     onOpenTourConfirmationDialog: (tour: Tour) => {
@@ -362,16 +345,6 @@ export const ToursPage: React.FC = () => {
         onConfirm={(reason) => confirmArchive(reason, operations.handleArchiveTour)}
       />
 
-      {quoteDialogTour && (
-        <DocumentVersionPicker
-          isOpen={!!quoteDialogTour}
-          onClose={closeQuoteDialog}
-          tour={quoteDialogTour}
-          mode={quoteDialogMode}
-          onConfirmLock={() => operations.handleConfirmTour(quoteDialogTour)}
-        />
-      )}
-
       {itineraryDialogTour && (
         <LinkItineraryToTourDialog
           isOpen={!!itineraryDialogTour}
@@ -396,23 +369,6 @@ export const ToursPage: React.FC = () => {
         onDataChange={() => {}}
       />
 
-      {confirmWizardTour && (
-        <TourConfirmationWizard
-          tour={confirmWizardTour}
-          open={!!confirmWizardTour}
-          onOpenChange={(open) => !open && closeConfirmWizard()}
-          onConfirmed={closeConfirmWizard}
-        />
-      )}
-
-      {unlockDialogTour && (
-        <TourUnlockDialog
-          tour={unlockDialogTour}
-          open={!!unlockDialogTour}
-          onOpenChange={(open) => !open && closeUnlockDialog()}
-          onUnlocked={closeUnlockDialog}
-        />
-      )}
 
       {closingDialogTour && (
         <TourClosingDialog

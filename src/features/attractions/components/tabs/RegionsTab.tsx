@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Star, Check } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Checkbox } from '@/components/ui/checkbox'
-import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 
 interface Country {
@@ -37,7 +35,6 @@ interface City {
   name: string
   name_en: string | null
   is_active: boolean | null
-  is_major: boolean | null
 }
 
 export default function RegionsTab() {
@@ -77,22 +74,6 @@ export default function RegionsTab() {
   const handleOpenCitiesDialog = (country: Country) => {
     setSelectedCountry(country)
     setIsCitiesDialogOpen(true)
-  }
-
-  // 切換城市主要狀態
-  const handleToggleMajor = async (cityId: string, currentStatus: boolean) => {
-    const { error } = await supabase
-      .from('cities')
-      .update({ is_major: !currentStatus })
-      .eq('id', cityId)
-
-    if (error) {
-      logger.error('Error updating city:', error)
-      toast.error('更新失敗')
-      return
-    }
-
-    setCities(prev => prev.map(c => (c.id === cityId ? { ...c, is_major: !currentStatus } : c)))
   }
 
   // 取得選中國家的城市
@@ -162,7 +143,6 @@ export default function RegionsTab() {
         label: '城市',
         render: (_value, row) => {
           const cityCount = cities.filter(c => c.country_id === row.id).length
-          const majorCount = cities.filter(c => c.country_id === row.id && c.is_major).length
           return (
             <Button
               variant="ghost"
@@ -171,7 +151,6 @@ export default function RegionsTab() {
               className="h-8 px-3 text-xs"
             >
               {cityCount} 城市
-              {majorCount > 0 && <span className="ml-1 text-morandi-gold">({majorCount} 主要)</span>}
             </Button>
           )
         },
@@ -196,7 +175,7 @@ export default function RegionsTab() {
       <Dialog open={isCitiesDialogOpen} onOpenChange={setIsCitiesDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{selectedCountry?.name} - 主要城市設定</DialogTitle>
+            <DialogTitle>{selectedCountry?.name} - 城市列表</DialogTitle>
           </DialogHeader>
 
           {countryCities.length === 0 ? (
@@ -210,19 +189,12 @@ export default function RegionsTab() {
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {regionCities.map(city => (
-                      <label
+                      <div
                         key={city.id}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-muted/50 transition-colors"
+                        className="px-2 py-1.5 text-sm"
                       >
-                        <Checkbox
-                          checked={city.is_major ?? false}
-                          onCheckedChange={() => handleToggleMajor(city.id, city.is_major ?? false)}
-                        />
-                        <span className="text-sm">{city.name}</span>
-                        {city.is_major && (
-                          <Star size={12} className="text-morandi-gold fill-morandi-gold ml-auto" />
-                        )}
-                      </label>
+                        {city.name}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -230,13 +202,10 @@ export default function RegionsTab() {
             </div>
           )}
 
-          <div className="flex justify-between items-center pt-4 border-t">
-            <div className="text-sm text-muted-foreground">
-              已選 {countryCities.filter(c => c.is_major).length} 個主要城市
-            </div>
+          <div className="flex justify-end pt-4 border-t">
             <Button onClick={() => setIsCitiesDialogOpen(false)} className="gap-2">
               <Check size={16} />
-              完成
+              關閉
             </Button>
           </div>
         </DialogContent>

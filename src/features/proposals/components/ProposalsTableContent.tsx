@@ -131,15 +131,9 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
   const handleDeleteProposal = useCallback(
     async (proposal: Proposal) => {
       const packages = getProposalPackages(proposal.id)
-      if (packages.length > 0) {
-        await alert(
-          `此提案有 ${packages.length} 個套件，請先刪除所有套件後再刪除提案`,
-          'warning'
-        )
-        return
-      }
+      const packageInfo = packages.length > 0 ? `\n\n注意：此提案有 ${packages.length} 個套件，將一併刪除` : ''
 
-      const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？`, {
+      const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？${packageInfo}`, {
         type: 'warning',
         title: '刪除提案',
       })
@@ -147,15 +141,28 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       if (confirmed) {
         try {
           const { supabase } = await import('@/lib/supabase/client')
+
+          // 先刪除相關套件
+          if (packages.length > 0) {
+            const { error: pkgError } = await supabase
+              .from('proposal_packages' as 'notes')
+              .delete()
+              .eq('proposal_id', proposal.id)
+            if (pkgError) throw pkgError
+          }
+
+          // 再刪除提案
           const { error } = await supabase.from('proposals' as 'notes').delete().eq('id', proposal.id)
           if (error) throw error
+
           refreshProposals()
+          refreshPackages()
         } catch (error) {
           await alert('刪除提案失敗', 'error')
         }
       }
     },
-    [getProposalPackages, refreshProposals]
+    [getProposalPackages, refreshProposals, refreshPackages]
   )
 
   // 處理封存提案
@@ -194,9 +201,27 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         key: 'code',
         label: '提案編號',
         sortable: true,
-        width: '120px',
+        width: '110px',
         render: (_, proposal) => (
           <span className="font-mono text-sm text-morandi-gold">{proposal.code}</span>
+        ),
+      },
+      {
+        key: 'destination',
+        label: '目的地',
+        sortable: true,
+        width: '100px',
+        render: (_, proposal) => (
+          <span className="font-mono font-medium">{proposal.destination || '-'}</span>
+        ),
+      },
+      {
+        key: 'expected_start_date',
+        label: '出發日期',
+        sortable: true,
+        width: '110px',
+        render: (_, proposal) => (
+          <DateCell date={proposal.expected_start_date} showIcon={false} />
         ),
       },
       {
@@ -204,19 +229,14 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         label: '提案名稱',
         sortable: true,
         render: (_, proposal) => (
-          <div>
-            <div className="font-medium text-morandi-primary">{proposal.title}</div>
-            {proposal.destination && (
-              <div className="text-sm text-morandi-secondary">{proposal.destination}</div>
-            )}
-          </div>
+          <TextCell text={proposal.title || '-'} />
         ),
       },
       {
         key: 'customer_name',
         label: '客戶',
         sortable: true,
-        width: '150px',
+        width: '120px',
         render: (_, proposal) => (
           <TextCell
             text={
@@ -237,19 +257,10 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         },
       },
       {
-        key: 'expected_start_date',
-        label: '預計日期',
-        sortable: true,
-        width: '120px',
-        render: (_, proposal) => (
-          <DateCell date={proposal.expected_start_date} showIcon={false} />
-        ),
-      },
-      {
         key: 'status',
         label: '狀態',
         sortable: true,
-        width: '100px',
+        width: '90px',
         render: (_, proposal) => (
           <span
             className={`px-2 py-1 rounded text-sm font-medium ${STATUS_COLORS[proposal.status]}`}
@@ -257,13 +268,6 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
             {STATUS_LABELS[proposal.status]}
           </span>
         ),
-      },
-      {
-        key: 'created_at',
-        label: '建立日期',
-        sortable: true,
-        width: '120px',
-        render: (_, proposal) => <DateCell date={proposal.created_at} showIcon={false} />,
       },
     ],
     [getProposalPackages, getCustomerName]
@@ -302,8 +306,8 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         })
       }
 
-      // 只有草稿可以刪除
-      if (proposal.status === 'draft') {
+      // 草稿和洽談中都可以刪除（已轉團和已封存不行）
+      if (proposal.status === 'draft' || proposal.status === 'negotiating') {
         actions.push({
           icon: Trash2,
           label: '刪除',
