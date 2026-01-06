@@ -26,7 +26,7 @@ export function useCanvasPageState() {
   const updateElement = useCallback((elementId: string, updates: Partial<CanvasElement>) => {
     setPage((prevPage) => {
       const updatedElements = prevPage.elements.map((el) =>
-        el.id === elementId ? { ...el, ...updates } : el
+        el.id === elementId ? ({ ...el, ...updates } as CanvasElement) : el
       )
       return { ...prevPage, elements: updatedElements }
     })

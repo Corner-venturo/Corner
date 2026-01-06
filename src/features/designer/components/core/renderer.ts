@@ -78,7 +78,7 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         ry: el.cornerRadius,
         originX: 'left',
         originY: 'top',
-      }) as FabricObjectWithData
+      }) as unknown as FabricObjectWithData
 
     case 'circle':
       return new Circle({
@@ -91,7 +91,7 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         strokeWidth: el.strokeWidth,
         originX: 'left',
         originY: 'top',
-      }) as FabricObjectWithData
+      }) as unknown as FabricObjectWithData
 
     default:
       // Fallback for unknown variants
@@ -104,7 +104,7 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         fill: '#ff0000',
         originX: 'left',
         originY: 'top',
-      }) as FabricObjectWithData
+      }) as unknown as FabricObjectWithData
   }
 }
 
@@ -126,7 +126,7 @@ function renderTextElement(el: TextElement, options: RenderOptions): FabricObjec
     textAlign: el.style.textAlign,
     originX: 'left',
     originY: 'top',
-  }) as FabricObjectWithData
+  }) as unknown as FabricObjectWithData
 }
 
 async function renderImageElement(
@@ -200,7 +200,7 @@ async function renderImageElement(
       clipPath: clipRect,
     })
 
-    return fabricImg as FabricObjectWithData
+    return fabricImg as unknown as FabricObjectWithData
   } catch (error) {
     // 圖片載入失敗時顯示佔位符
     console.error('[Renderer] Failed to load image:', error)
@@ -215,7 +215,7 @@ async function renderImageElement(
       strokeWidth: 2,
       originX: 'left',
       originY: 'top',
-    }) as FabricObjectWithData
+    }) as unknown as FabricObjectWithData
   }
 }
 
