@@ -217,8 +217,33 @@ export const ToursPage: React.FC = () => {
             // 不拋錯，繼續嘗試刪除
           }
 
-          // 刪除相關套件（其實有 ON DELETE CASCADE，但為了確保先手動刪）
-          if (packages.length > 0) {
+          // 取得所有套件 ID
+          const packageIds = packages.map(p => p.id)
+
+          if (packageIds.length > 0) {
+            // 解除報價單的套件關聯
+            logger.log('[ToursPage] 解除報價單關聯...')
+            const { error: quoteUnlinkError } = await supabase
+              .from('quotes')
+              .update({ proposal_package_id: null } as Record<string, unknown>)
+              .in('proposal_package_id' as string, packageIds)
+            if (quoteUnlinkError) {
+              logger.error('[ToursPage] 解除報價單關聯失敗:', quoteUnlinkError)
+              // 不拋錯，繼續嘗試
+            }
+
+            // 解除行程表的套件關聯
+            logger.log('[ToursPage] 解除行程表關聯...')
+            const { error: itinUnlinkError } = await supabase
+              .from('itineraries')
+              .update({ proposal_package_id: null } as Record<string, unknown>)
+              .in('proposal_package_id' as string, packageIds)
+            if (itinUnlinkError) {
+              logger.error('[ToursPage] 解除行程表關聯失敗:', itinUnlinkError)
+              // 不拋錯，繼續嘗試
+            }
+
+            // 刪除相關套件
             logger.log('[ToursPage] 正在刪除套件...', packages.length)
             const { error: pkgError } = await supabase
               .from('proposal_packages' as 'notes')
