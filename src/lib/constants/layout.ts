@@ -24,4 +24,4 @@ export const NO_SIDEBAR_PAGES = [
 ]
 
 // Pages with custom layout (no padding, full height)
-export const CUSTOM_LAYOUT_PAGES = ['/editor', '/workspace', '/itinerary/brochure-designer']
+export const CUSTOM_LAYOUT_PAGES = ['/editor', '/workspace', '/itinerary/brochure-designer', '/designer']

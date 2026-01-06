@@ -28,7 +28,7 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         key: 'name',
         label: '旅遊團名稱',
         sortable: true,
-        // 不設寬度，讓它填滿剩餘空間
+        width: '180px',
         render: (value) => <span className="text-sm text-morandi-primary">{String(value || "")}</span>,
       },
       {

@@ -84,9 +84,9 @@ export default function DesignerPage() {
   )
 
   return (
-    <main className="fixed inset-0 overflow-hidden flex flex-col bg-slate-100">
+    <main className="fixed top-0 right-0 bottom-0 left-[var(--sidebar-width,16px)] overflow-hidden flex flex-col bg-background transition-[left] duration-300">
       {/* Header */}
-      <header className="h-[56px] flex-shrink-0 bg-white border-b border-border flex items-center justify-between px-4 z-10">
+      <header className="h-[56px] flex-shrink-0 bg-card border-b border-border flex items-center justify-between px-4 z-10">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft size={18} />
