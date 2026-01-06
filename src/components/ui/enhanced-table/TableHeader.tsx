@@ -80,6 +80,7 @@ export function TableHeader({
               'text-left py-2.5 px-4 text-xs relative align-middle',
               index === columns.length - 1 && 'border-r-0'
             )}
+            style={{ width: column.width }}
           >
             {index < columns.length - 1 && (
               <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
