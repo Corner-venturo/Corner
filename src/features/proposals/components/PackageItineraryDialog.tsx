@@ -411,6 +411,11 @@ export function PackageItineraryDialog({
         onClose()
       } else {
         // 建立新行程表（同時存到兩種航班格式以確保相容性）
+        const workspaceId = currentUser?.workspace_id
+        if (!workspaceId) {
+          throw new Error('無法取得 workspace_id，請重新登入')
+        }
+
         const createData = {
           title: formData.title,
           tour_id: null,
@@ -426,6 +431,7 @@ export function PackageItineraryDialog({
           features: [],
           focus_cards: [],
           proposal_package_id: pkg.id,
+          workspace_id: workspaceId,
           flight_info: (formData.outboundFlight || formData.returnFlight) ? {
             outbound: formData.outboundFlight,
             return: formData.returnFlight,
@@ -495,8 +501,15 @@ export function PackageItineraryDialog({
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '未知錯誤'
-      logger.error('建立行程表失敗:', error)
+      // 處理不同類型的錯誤
+      let errorMessage = '未知錯誤'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (error && typeof error === 'object') {
+        const supabaseError = error as { message?: string; code?: string; details?: string }
+        errorMessage = supabaseError.message || supabaseError.code || supabaseError.details || JSON.stringify(error)
+      }
+      logger.error('建立行程表失敗:', JSON.stringify(error, null, 2))
       setCreateError(errorMessage)
       void alert(`建立失敗: ${errorMessage}`, 'error')
     } finally {
