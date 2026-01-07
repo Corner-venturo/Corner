@@ -2920,9 +2920,9 @@ function DesignerPageContent() {
 
       {/* 列印預覽 Portal */}
       {showPrintPreview && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-50 bg-white overflow-auto print:overflow-visible">
+        <div id="designer-print-container" className="fixed inset-0 z-[99999] bg-white overflow-auto print:overflow-visible">
           {/* 螢幕上的控制列 */}
-          <div className="sticky top-0 z-10 bg-white border-b border-border p-4 flex items-center justify-between print:hidden">
+          <div className="sticky top-0 z-10 bg-white border-b border-border p-4 flex items-center justify-between no-print">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-morandi-primary">列印預覽</h2>
               <span className="text-sm text-morandi-secondary">共 {printImages.length} 頁</span>
@@ -2945,15 +2945,14 @@ function DesignerPageContent() {
           </div>
 
           {/* 頁面內容 */}
-          <div className="p-8 print:p-0 flex flex-col items-center gap-8 print:gap-0">
+          <div id="designer-print-pages" className="p-8 flex flex-col items-center gap-8">
             {printImages.map((imgSrc, idx) => (
               <div
                 key={idx}
-                className="print-page bg-white shadow-lg print:shadow-none"
+                className="designer-print-page bg-white shadow-lg"
                 style={{
                   width: '148mm',  // A5 寬度
                   height: '210mm', // A5 高度
-                  pageBreakAfter: idx < printImages.length - 1 ? 'always' : 'auto',
                 }}
               >
                 <img
@@ -2965,25 +2964,72 @@ function DesignerPageContent() {
             ))}
           </div>
 
-          {/* 列印樣式 */}
-          <style jsx global>{`
+          {/* 列印樣式 - 高優先級覆蓋全域設定 */}
+          <style>{`
             @media print {
+              /* 覆蓋全域 @page 設定 */
               @page {
-                size: A5 portrait;
-                margin: 0;
+                size: 148mm 210mm !important;
+                margin: 0 !important;
               }
-              body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+
+              /* 隱藏所有其他內容 */
+              body > *:not(#designer-print-container) {
+                display: none !important;
+                visibility: hidden !important;
               }
-              .print-page {
+
+              /* 顯示列印容器 */
+              #designer-print-container {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                background: white !important;
+                z-index: 999999 !important;
+              }
+
+              /* 隱藏控制列 */
+              #designer-print-container .no-print {
+                display: none !important;
+              }
+
+              /* 列印頁面容器 */
+              #designer-print-pages {
+                padding: 0 !important;
+                gap: 0 !important;
+                display: block !important;
+              }
+
+              /* 每一頁 */
+              .designer-print-page {
                 width: 148mm !important;
                 height: 210mm !important;
-                page-break-after: always;
-                page-break-inside: avoid;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                display: block !important;
               }
-              .print-page:last-child {
-                page-break-after: auto;
+
+              .designer-print-page:last-child {
+                page-break-after: auto !important;
+              }
+
+              .designer-print-page img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: contain !important;
+                display: block !important;
+              }
+
+              /* 確保顏色正確 */
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
               }
             }
           `}</style>
