@@ -102,6 +102,19 @@ function calculateTocItems(data: TemplateData): TocItem[] {
     currentPage += hotelCount
   }
 
+  // 景點介紹
+  const attractionCount = data.attractions?.filter(a => a.enabled !== false)?.length || 0
+  if (attractionCount > 0) {
+    const attractionPages = Math.ceil(attractionCount / 2) // 每頁 2 個景點
+    items.push({
+      number: String(items.length + 1).padStart(2, '0'),
+      title: '景點介紹',
+      description: `${attractionCount} 個精選景點的特色與資訊`,
+      pageNumber: currentPage,
+    })
+    currentPage += attractionPages
+  }
+
   // 備忘錄
   const memoEnabled = data.memoSettings?.items?.some(i => i.enabled)
   if (memoEnabled) {
@@ -116,13 +129,7 @@ function calculateTocItems(data: TemplateData): TocItem[] {
     currentPage += memoPages
   }
 
-  // 筆記頁（固定項目）
-  items.push({
-    number: String(items.length + 1).padStart(2, '0'),
-    title: '旅行筆記',
-    description: '記錄您的旅途回憶與心得',
-    pageNumber: currentPage,
-  })
+  // 注意：已移除「旅行筆記」固定項目，因為沒有對應的實際頁面
 
   return items
 }

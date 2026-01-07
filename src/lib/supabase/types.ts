@@ -2932,6 +2932,102 @@ export type Database = {
         }
         Relationships: []
       }
+      designer_drafts: {
+        Row: {
+          attractions: Json | null
+          country_code: string | null
+          created_at: string
+          edited_elements: Json | null
+          hotels: Json | null
+          id: string
+          itinerary_id: string | null
+          memo_settings: Json | null
+          name: string
+          proposal_id: string | null
+          style_id: string
+          template_data: Json
+          tour_id: string | null
+          trip_days: number
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          attractions?: Json | null
+          country_code?: string | null
+          created_at?: string
+          edited_elements?: Json | null
+          hotels?: Json | null
+          id?: string
+          itinerary_id?: string | null
+          memo_settings?: Json | null
+          name?: string
+          proposal_id?: string | null
+          style_id: string
+          template_data?: Json
+          tour_id?: string | null
+          trip_days?: number
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          attractions?: Json | null
+          country_code?: string | null
+          created_at?: string
+          edited_elements?: Json | null
+          hotels?: Json | null
+          id?: string
+          itinerary_id?: string | null
+          memo_settings?: Json | null
+          name?: string
+          proposal_id?: string | null
+          style_id?: string
+          template_data?: Json
+          tour_id?: string | null
+          trip_days?: number
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "designer_drafts_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "designer_drafts_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "designer_drafts_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "designer_drafts_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "designer_drafts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disbursement_orders: {
         Row: {
           amount: number
@@ -3901,6 +3997,7 @@ export type Database = {
           price_tiers: Json | null
           pricing_details: Json | null
           pricing_style: string | null
+          proposal_package_id: string | null
           return_flight: Json | null
           show_cancellation_policy: boolean | null
           show_faqs: boolean | null
@@ -3917,7 +4014,6 @@ export type Database = {
           title: string | null
           tour_code: string | null
           tour_id: string | null
-          proposal_package_id: string | null
           updated_at: string
           updated_by: string | null
           version: number | null
@@ -3971,6 +4067,7 @@ export type Database = {
           price_tiers?: Json | null
           pricing_details?: Json | null
           pricing_style?: string | null
+          proposal_package_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -3987,7 +4084,6 @@ export type Database = {
           title?: string | null
           tour_code?: string | null
           tour_id?: string | null
-          proposal_package_id?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number | null
@@ -4041,6 +4137,7 @@ export type Database = {
           price_tiers?: Json | null
           pricing_details?: Json | null
           pricing_style?: string | null
+          proposal_package_id?: string | null
           return_flight?: Json | null
           show_cancellation_policy?: boolean | null
           show_faqs?: boolean | null
@@ -4057,7 +4154,6 @@ export type Database = {
           title?: string | null
           tour_code?: string | null
           tour_id?: string | null
-          proposal_package_id?: string | null
           updated_at?: string
           updated_by?: string | null
           version?: number | null
@@ -4112,6 +4208,13 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itineraries_proposal_package_id_fkey"
+            columns: ["proposal_package_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {
@@ -4755,7 +4858,6 @@ export type Database = {
           birthday: string | null
           checked_in: boolean | null
           checked_in_at: string | null
-          contract_created_at: string | null
           created_at: string | null
           dietary_requirements: string | null
           email: string | null
@@ -4795,7 +4897,6 @@ export type Database = {
           birthday?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
-          contract_created_at?: string | null
           created_at?: string | null
           dietary_requirements?: string | null
           email?: string | null
@@ -4835,7 +4936,6 @@ export type Database = {
           birthday?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
-          contract_created_at?: string | null
           created_at?: string | null
           dietary_requirements?: string | null
           email?: string | null
@@ -7291,6 +7391,222 @@ export type Database = {
           },
         ]
       }
+      proposal_packages: {
+        Row: {
+          confirmed_requirements: Json | null
+          country_id: string | null
+          created_at: string
+          created_by: string | null
+          days: number | null
+          destination: string | null
+          end_date: string | null
+          group_size: number | null
+          handbook_id: string | null
+          id: string
+          is_active: boolean | null
+          is_selected: boolean | null
+          itinerary_id: string | null
+          main_city_id: string | null
+          nights: number | null
+          notes: string | null
+          participant_counts: Json | null
+          proposal_id: string
+          quote_id: string | null
+          start_date: string | null
+          updated_at: string
+          updated_by: string | null
+          version_name: string
+          version_number: number
+        }
+        Insert: {
+          confirmed_requirements?: Json | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          days?: number | null
+          destination?: string | null
+          end_date?: string | null
+          group_size?: number | null
+          handbook_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_selected?: boolean | null
+          itinerary_id?: string | null
+          main_city_id?: string | null
+          nights?: number | null
+          notes?: string | null
+          participant_counts?: Json | null
+          proposal_id: string
+          quote_id?: string | null
+          start_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version_name: string
+          version_number: number
+        }
+        Update: {
+          confirmed_requirements?: Json | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          days?: number | null
+          destination?: string | null
+          end_date?: string | null
+          group_size?: number | null
+          handbook_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_selected?: boolean | null
+          itinerary_id?: string | null
+          main_city_id?: string | null
+          nights?: number | null
+          notes?: string | null
+          participant_counts?: Json | null
+          proposal_id?: string
+          quote_id?: string | null
+          start_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version_name?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_packages_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          _deleted: boolean | null
+          _needs_sync: boolean | null
+          _synced_at: string | null
+          archive_reason: string | null
+          archived_at: string | null
+          code: string
+          converted_at: string | null
+          converted_by: string | null
+          converted_tour_id: string | null
+          country_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_id: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          description: string | null
+          destination: string | null
+          expected_end_date: string | null
+          expected_start_date: string | null
+          flexible_dates: boolean | null
+          group_size: number | null
+          id: string
+          main_city_id: string | null
+          notes: string | null
+          participant_counts: Json | null
+          selected_package_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+          archive_reason?: string | null
+          archived_at?: string | null
+          code: string
+          converted_at?: string | null
+          converted_by?: string | null
+          converted_tour_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          description?: string | null
+          destination?: string | null
+          expected_end_date?: string | null
+          expected_start_date?: string | null
+          flexible_dates?: boolean | null
+          group_size?: number | null
+          id?: string
+          main_city_id?: string | null
+          notes?: string | null
+          participant_counts?: Json | null
+          selected_package_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          _deleted?: boolean | null
+          _needs_sync?: boolean | null
+          _synced_at?: string | null
+          archive_reason?: string | null
+          archived_at?: string | null
+          code?: string
+          converted_at?: string | null
+          converted_by?: string | null
+          converted_tour_id?: string | null
+          country_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          description?: string | null
+          destination?: string | null
+          expected_end_date?: string | null
+          expected_start_date?: string | null
+          flexible_dates?: boolean | null
+          group_size?: number | null
+          id?: string
+          main_city_id?: string | null
+          notes?: string | null
+          participant_counts?: Json | null
+          selected_package_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_selected_package_fkey"
+            columns: ["selected_package_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_categories: {
         Row: {
           createdat: string | null
@@ -7766,6 +8082,13 @@ export type Database = {
             columns: ["main_city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_proposal_package_id_fkey"
+            columns: ["proposal_package_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {
@@ -9815,6 +10138,205 @@ export type Database = {
           },
         ]
       }
+      tour_confirmation_items: {
+        Row: {
+          actual_cost: number | null
+          booking_reference: string | null
+          booking_status: string | null
+          category: string
+          contact_info: Json | null
+          created_at: string | null
+          currency: string | null
+          day_label: string | null
+          description: string | null
+          expected_cost: number | null
+          id: string
+          notes: string | null
+          quantity: number | null
+          service_date: string
+          service_date_end: string | null
+          sheet_id: string
+          sort_order: number | null
+          subtotal: number | null
+          supplier_id: string | null
+          supplier_name: string
+          title: string
+          type_data: Json | null
+          unit_price: number | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          actual_cost?: number | null
+          booking_reference?: string | null
+          booking_status?: string | null
+          category: string
+          contact_info?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          day_label?: string | null
+          description?: string | null
+          expected_cost?: number | null
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          service_date: string
+          service_date_end?: string | null
+          sheet_id: string
+          sort_order?: number | null
+          subtotal?: number | null
+          supplier_id?: string | null
+          supplier_name: string
+          title: string
+          type_data?: Json | null
+          unit_price?: number | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          actual_cost?: number | null
+          booking_reference?: string | null
+          booking_status?: string | null
+          category?: string
+          contact_info?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          day_label?: string | null
+          description?: string | null
+          expected_cost?: number | null
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          service_date?: string
+          service_date_end?: string | null
+          sheet_id?: string
+          sort_order?: number | null
+          subtotal?: number | null
+          supplier_id?: string | null
+          supplier_name?: string
+          title?: string
+          type_data?: Json | null
+          unit_price?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_items_sheet_id_fkey"
+            columns: ["sheet_id"]
+            isOneToOne: false
+            referencedRelation: "tour_confirmation_sheets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_confirmation_sheets: {
+        Row: {
+          assistant: string | null
+          created_at: string | null
+          created_by: string | null
+          departure_date: string | null
+          flight_info: string | null
+          id: string
+          itinerary_id: string | null
+          itinerary_version: number | null
+          notes: string | null
+          pax: number | null
+          return_date: string | null
+          sales_person: string | null
+          status: string
+          total_actual_cost: number | null
+          total_expected_cost: number | null
+          tour_code: string
+          tour_id: string
+          tour_leader_id: string | null
+          tour_leader_name: string | null
+          tour_name: string
+          updated_at: string | null
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assistant?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          departure_date?: string | null
+          flight_info?: string | null
+          id?: string
+          itinerary_id?: string | null
+          itinerary_version?: number | null
+          notes?: string | null
+          pax?: number | null
+          return_date?: string | null
+          sales_person?: string | null
+          status?: string
+          total_actual_cost?: number | null
+          total_expected_cost?: number | null
+          tour_code: string
+          tour_id: string
+          tour_leader_id?: string | null
+          tour_leader_name?: string | null
+          tour_name: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assistant?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          departure_date?: string | null
+          flight_info?: string | null
+          id?: string
+          itinerary_id?: string | null
+          itinerary_version?: number | null
+          notes?: string | null
+          pax?: number | null
+          return_date?: string | null
+          sales_person?: string | null
+          status?: string
+          total_actual_cost?: number | null
+          total_expected_cost?: number | null
+          tour_code?: string
+          tour_id?: string
+          tour_leader_id?: string | null
+          tour_leader_name?: string | null
+          tour_name?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_sheets_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_sheets_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_confirmation_sheets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_custom_cost_fields: {
         Row: {
           created_at: string | null
@@ -10655,14 +11177,22 @@ export type Database = {
           target_workspace_id?: string | null
           title?: string
           tour_code?: string | null
-          tour_id?: string
+          tour_id?: string | null
           tour_name?: string | null
           updated_at?: string | null
           updated_by?: string | null
           updated_by_name?: string | null
           workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tour_requests_proposal_package_id_fkey"
+            columns: ["proposal_package_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tour_room_assignments: {
         Row: {
@@ -10899,199 +11429,6 @@ export type Database = {
           },
         ]
       }
-      // === 手動添加的出團確認表類型 (2026-01-04) ===
-      tour_confirmation_items: {
-        Row: {
-          id: string
-          sheet_id: string
-          category: string
-          service_date: string
-          service_date_end: string | null
-          day_label: string | null
-          supplier_name: string
-          supplier_id: string | null
-          title: string
-          description: string | null
-          unit_price: number | null
-          currency: string
-          quantity: number | null
-          subtotal: number | null
-          expected_cost: number | null
-          actual_cost: number | null
-          contact_info: Json | null
-          booking_reference: string | null
-          booking_status: string
-          type_data: Json | null
-          sort_order: number
-          notes: string | null
-          workspace_id: string
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          sheet_id: string
-          category: string
-          service_date: string
-          service_date_end?: string | null
-          day_label?: string | null
-          supplier_name: string
-          supplier_id?: string | null
-          title: string
-          description?: string | null
-          unit_price?: number | null
-          currency?: string
-          quantity?: number | null
-          subtotal?: number | null
-          expected_cost?: number | null
-          actual_cost?: number | null
-          contact_info?: Json | null
-          booking_reference?: string | null
-          booking_status?: string
-          type_data?: Json | null
-          sort_order?: number
-          notes?: string | null
-          workspace_id: string
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          sheet_id?: string
-          category?: string
-          service_date?: string
-          service_date_end?: string | null
-          day_label?: string | null
-          supplier_name?: string
-          supplier_id?: string | null
-          title?: string
-          description?: string | null
-          unit_price?: number | null
-          currency?: string
-          quantity?: number | null
-          subtotal?: number | null
-          expected_cost?: number | null
-          actual_cost?: number | null
-          contact_info?: Json | null
-          booking_reference?: string | null
-          booking_status?: string
-          type_data?: Json | null
-          sort_order?: number
-          notes?: string | null
-          workspace_id?: string
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_confirmation_items_sheet_id_fkey"
-            columns: ["sheet_id"]
-            isOneToOne: false
-            referencedRelation: "tour_confirmation_sheets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tour_confirmation_items_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tour_confirmation_sheets: {
-        Row: {
-          id: string
-          tour_id: string
-          tour_code: string
-          tour_name: string
-          departure_date: string | null
-          return_date: string | null
-          tour_leader_name: string | null
-          tour_leader_id: string | null
-          sales_person: string | null
-          assistant: string | null
-          pax: number | null
-          flight_info: string | null
-          status: string
-          total_expected_cost: number | null
-          total_actual_cost: number | null
-          itinerary_id: string | null
-          itinerary_version: number | null
-          notes: string | null
-          workspace_id: string
-          created_at: string | null
-          updated_at: string | null
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          tour_id: string
-          tour_code: string
-          tour_name: string
-          departure_date?: string | null
-          return_date?: string | null
-          tour_leader_name?: string | null
-          tour_leader_id?: string | null
-          sales_person?: string | null
-          assistant?: string | null
-          pax?: number | null
-          flight_info?: string | null
-          status?: string
-          total_expected_cost?: number | null
-          total_actual_cost?: number | null
-          itinerary_id?: string | null
-          itinerary_version?: number | null
-          notes?: string | null
-          workspace_id: string
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          tour_id?: string
-          tour_code?: string
-          tour_name?: string
-          departure_date?: string | null
-          return_date?: string | null
-          tour_leader_name?: string | null
-          tour_leader_id?: string | null
-          sales_person?: string | null
-          assistant?: string | null
-          pax?: number | null
-          flight_info?: string | null
-          status?: string
-          total_expected_cost?: number | null
-          total_actual_cost?: number | null
-          itinerary_id?: string | null
-          itinerary_version?: number | null
-          notes?: string | null
-          workspace_id?: string
-          created_at?: string | null
-          updated_at?: string | null
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tour_confirmation_sheets_tour_id_fkey"
-            columns: ["tour_id"]
-            isOneToOne: false
-            referencedRelation: "tours"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tour_confirmation_sheets_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tours: {
         Row: {
           _deleted: boolean | null
@@ -11111,6 +11448,7 @@ export type Database = {
           contract_notes: string | null
           contract_status: string
           contract_template: string | null
+          converted_from_proposal: boolean | null
           country_id: string | null
           created_at: string | null
           created_by: string | null
@@ -11138,6 +11476,8 @@ export type Database = {
           outbound_flight: Json | null
           price: number | null
           profit: number
+          proposal_id: string | null
+          proposal_package_id: string | null
           quote_cost_structure: Json | null
           quote_id: string | null
           return_date: string
@@ -11167,6 +11507,7 @@ export type Database = {
           contract_notes?: string | null
           contract_status?: string
           contract_template?: string | null
+          converted_from_proposal?: boolean | null
           country_id?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -11194,6 +11535,8 @@ export type Database = {
           outbound_flight?: Json | null
           price?: number | null
           profit?: number
+          proposal_id?: string | null
+          proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date: string
@@ -11223,6 +11566,7 @@ export type Database = {
           contract_notes?: string | null
           contract_status?: string
           contract_template?: string | null
+          converted_from_proposal?: boolean | null
           country_id?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -11250,6 +11594,8 @@ export type Database = {
           outbound_flight?: Json | null
           price?: number | null
           profit?: number
+          proposal_id?: string | null
+          proposal_package_id?: string | null
           quote_cost_structure?: Json | null
           quote_id?: string | null
           return_date?: string
@@ -11288,6 +11634,20 @@ export type Database = {
             columns: ["main_city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_proposal_package_id_fkey"
+            columns: ["proposal_package_id"]
+            isOneToOne: false
+            referencedRelation: "proposal_packages"
             referencedColumns: ["id"]
           },
           {

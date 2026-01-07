@@ -144,7 +144,7 @@ function generateItemPageElements(
       stroke: COLORS.border,
       strokeWidth: 1,
       cornerRadius: 8,
-      locked: true,
+      // locked: false - 允許使用者調整
     }
     elements.push(cardBg)
 
@@ -366,7 +366,7 @@ function generateWeatherPageElements(
       stroke: COLORS.border,
       strokeWidth: 1,
       cornerRadius: 8,
-      locked: true,
+      // locked: false - 允許使用者調整
     }
     elements.push(cardBg)
 

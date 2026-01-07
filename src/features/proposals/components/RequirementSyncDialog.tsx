@@ -655,14 +655,65 @@ export function RequirementSyncDialog({
     }
   }, [pkg, user, diffByCategory, toast, onSyncComplete])
 
-  // 列印取消單（新視窗）
-  const handlePrintCancellation = useCallback((supplierName: string, items: ConfirmedRequirementItem[]) => {
-    const printWindow = window.open('', '_blank', 'width=900,height=700')
-    if (!printWindow) {
-      toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
+  // 儲存取消單到 tour_documents
+  const saveCancellationToTourDocuments = useCallback(async (supplierName: string, htmlContent: string) => {
+    const tourId = proposal?.converted_tour_id
+    if (!tourId || !user?.workspace_id) {
+      logger.log('無法存檔取消單：尚未轉團或缺少 workspace_id')
       return
     }
 
+    try {
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '')
+      const fileName = `取消通知單_${supplierName}_${timestamp}.html`
+      const filePath = `${tourId}/${fileName}`
+
+      const blob = new Blob([htmlContent], { type: 'text/html' })
+
+      const { error: uploadError } = await supabase.storage
+        .from('tour-documents')
+        .upload(filePath, blob, {
+          contentType: 'text/html',
+          upsert: false,
+        })
+
+      if (uploadError) {
+        logger.warn('上傳取消單失敗:', uploadError)
+        return
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('tour-documents')
+        .getPublicUrl(filePath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insertError } = await (supabase as any)
+        .from('tour_documents')
+        .insert({
+          tour_id: tourId,
+          workspace_id: user.workspace_id,
+          name: `取消通知單 - ${supplierName}`,
+          description: `團號: ${proposal?.code || '-'}`,
+          file_path: filePath,
+          public_url: urlData?.publicUrl || '',
+          file_name: fileName,
+          file_size: blob.size,
+          mime_type: 'text/html',
+          uploaded_by: null,
+        })
+
+      if (insertError) {
+        logger.warn('記錄取消單失敗:', insertError)
+      } else {
+        toast({ title: '取消單已存檔' })
+      }
+    } catch (err) {
+      logger.error('存檔取消單失敗:', err)
+    }
+  }, [proposal, user, toast])
+
+  // 列印取消單（新視窗）
+  const handlePrintCancellation = useCallback((supplierName: string, items: ConfirmedRequirementItem[]) => {
     // 格式化日期
     const formatDateStr = (dateStr: string | null) => {
       if (!dateStr) return '-'
@@ -698,10 +749,19 @@ export function RequirementSyncDialog({
     th { background: #f6f4f1; color: #3a3633; font-weight: bold; }
     .cancelled { color: #c08374; text-decoration: line-through; }
     .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: #8b8680; }
-    @media print { body { padding: 0; } }
+    .print-controls { padding: 16px; border-bottom: 1px solid #eee; text-align: right; }
+    .print-controls button { padding: 8px 16px; margin-left: 8px; cursor: pointer; border-radius: 6px; }
+    .btn-outline { background: white; border: 1px solid #ddd; }
+    .btn-primary { background: #c9aa7c; color: white; border: none; }
+    @media print { .print-controls { display: none; } body { padding: 0; } }
   </style>
 </head>
 <body>
+  <div class="print-controls">
+    <button class="btn-outline" onclick="window.close()">關閉</button>
+    <button class="btn-primary" onclick="window.print()">列印</button>
+  </div>
+
   <div class="header">
     <h1>取消通知單</h1>
     <div class="subtitle">CANCELLATION NOTICE</div>
@@ -754,19 +814,23 @@ export function RequirementSyncDialog({
   <div class="footer">
     <p>如有任何疑問，請與我們聯繫。謝謝您的配合！</p>
   </div>
-
-  <script>
-    window.onload = function() {
-      window.print();
-    }
-  </script>
 </body>
 </html>
 `
 
+    // 儲存到文件管理（背景執行）
+    saveCancellationToTourDocuments(supplierName, printContent)
+
+    // 開啟新視窗列印
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
+    if (!printWindow) {
+      toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
+      return
+    }
+
     printWindow.document.write(printContent)
     printWindow.document.close()
-  }, [proposal, toast])
+  }, [proposal, toast, saveCancellationToTourDocuments])
 
   // 確認變更（更新快照）
   const handleConfirmChanges = useCallback(async () => {

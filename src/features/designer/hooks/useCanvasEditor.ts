@@ -62,8 +62,8 @@ export function useCanvasEditor({
     fabricCanvasRef.current = fabricCanvas
     setIsCanvasReady(true)
 
-    // 物件修改事件
-     
+    // 物件修改事件（位置、大小、旋轉）
+
     const handleObjectModified = (e: any) => {
       const target = e.target as FabricObjectWithData | undefined
       if (!target || !target.data) return
@@ -76,6 +76,22 @@ export function useCanvasEditor({
         height: (target.height || 0) * (target.scaleY || 1),
         rotation: target.angle || 0,
       })
+    }
+
+    // 文字編輯完成事件
+    const handleTextChanged = (e: any) => {
+      const target = e.target as FabricObjectWithData | undefined
+      if (!target || !target.data) return
+
+      const { elementId, elementType } = target.data
+      if (elementType === 'text') {
+        // 取得編輯後的文字內容
+        const textObj = target as any
+        const newContent = textObj.text || ''
+        onElementChange(elementId, {
+          content: newContent,
+        })
+      }
     }
 
     // 選取事件
@@ -107,6 +123,7 @@ export function useCanvasEditor({
     }
 
     fabricCanvas.on('object:modified', handleObjectModified)
+    fabricCanvas.on('text:editing:exited', handleTextChanged)
     fabricCanvas.on('selection:created', handleSelection)
     fabricCanvas.on('selection:updated', handleSelection)
     fabricCanvas.on('selection:cleared', handleSelectionCleared)

@@ -135,6 +135,18 @@ export interface HotelData {
 }
 
 /**
+ * 景點資料（用於景點介紹頁面）
+ */
+export interface AttractionData {
+  id: string // 唯一識別碼
+  nameZh: string // 中文名稱
+  nameEn?: string // 英文名稱
+  image?: string // 圖片 URL
+  description: string // 介紹文字
+  enabled?: boolean // 是否啟用
+}
+
+/**
  * 從行程表中傳入的數據
  */
 export interface TemplateData {
@@ -164,6 +176,12 @@ export interface TemplateData {
   // 飯店介紹頁專用
   hotels?: HotelData[] // 飯店列表
   currentHotelIndex?: number // 當前正在編輯的飯店索引（0-based）
+  currentHotelPageIndex?: number // 當前飯店頁索引（多飯店版本用，0-based）
+  // 景點介紹頁專用
+  attractions?: AttractionData[] // 景點列表
+  currentAttractionPageIndex?: number // 當前景點頁索引（0-based）
+  // 通用
+  currentPageNumber?: number // 當前頁碼
 }
 
 /**

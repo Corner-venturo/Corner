@@ -25,14 +25,14 @@ import { generatePageFromTemplate, itineraryToTemplateData, proposalToTemplateDa
 import { StaticCanvas } from 'fabric'
 import { renderPageOnCanvas } from '@/features/designer/components/core/renderer'
 import { createPortal } from 'react-dom'
-import type { TemplateData, DailyItinerary, MealIconType, DailyDetailData, TimelineItem, MemoSettings, MemoItem, CountryCode, HotelData } from '@/features/designer/templates/definitions/types'
+import type { TemplateData, DailyItinerary, MealIconType, DailyDetailData, TimelineItem, MemoSettings, MemoItem, CountryCode, HotelData, AttractionData } from '@/features/designer/templates/definitions/types'
 import { getMemoSettingsByCountry, calculateMemoPageCount, getMemoItemsForPage, countryNames } from '@/features/designer/templates/engine'
 import { useItineraries, useProposals, useProposalPackages } from '@/hooks/cloud-hooks'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import { BookOpen, FileImage, ChevronDown, ChevronUp, Plus, Minus, ClipboardList, Check, Globe, Hotel, PanelLeft, X, Home, List, Calendar, FileText } from 'lucide-react'
 
-// 頁面類型：cover, toc, itinerary, daily-0, daily-1..., memo-0, memo-1..., 或 hotel-0, hotel-1...
-type PageType = 'cover' | 'toc' | 'itinerary' | `daily-${number}` | `memo-${number}` | `hotel-${number}`
+// 頁面類型：cover, toc, itinerary, daily-0, daily-1..., memo-0, memo-1..., hotel-0, hotel-1..., 或 attraction-0, attraction-1...
+type PageType = 'cover' | 'toc' | 'itinerary' | `daily-${number}` | `memo-${number}` | `hotel-${number}` | `attraction-${number}`
 
 // 判斷是否為每日行程頁面
 function isDailyPage(pageType: PageType): boolean {
@@ -67,6 +67,17 @@ function getHotelIndex(pageType: PageType): number {
   return parseInt(pageType.replace('hotel-', ''), 10)
 }
 
+// 判斷是否為景點介紹頁面
+function isAttractionPage(pageType: PageType): boolean {
+  return pageType.startsWith('attraction-')
+}
+
+// 從 pageType 取得景點頁索引
+function getAttractionPageIndex(pageType: PageType): number {
+  if (!isAttractionPage(pageType)) return -1
+  return parseInt(pageType.replace('attraction-', ''), 10)
+}
+
 // 餐食圖標選項
 const MEAL_ICON_OPTIONS: Array<{ value: MealIconType; label: string }> = [
   { value: 'bakery_dining', label: '🥐 麵包' },
@@ -82,6 +93,8 @@ const MEAL_ICON_OPTIONS: Array<{ value: MealIconType; label: string }> = [
 ]
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
+import type { Json } from '@/lib/supabase/types'
+import { useAuthStore } from '@/stores/auth-store'
 import { alert } from '@/lib/ui/alert-dialog'
 
 function DesignerPageContent() {
@@ -90,6 +103,11 @@ function DesignerPageContent() {
   const tourId = searchParams.get('tour_id')
   const proposalId = searchParams.get('proposal_id')
   const itineraryId = searchParams.get('itinerary_id')
+
+  // 使用者資訊
+  const { user } = useAuthStore()
+  const workspaceId = user?.workspace_id
+  const userId = user?.id
 
   // 頁面狀態
   const [selectedStyleId, setSelectedStyleId] = useState<string | null>(null) // 選擇的風格系列
@@ -114,11 +132,19 @@ function DesignerPageContent() {
   const [hotels, setHotels] = useState<HotelData[]>([]) // 飯店列表
   const hotelCoverInputRef = useRef<HTMLInputElement>(null) // 飯店圖片上傳
   const [uploadingHotelIndex, setUploadingHotelIndex] = useState<number | null>(null)
+  // 景點介紹相關
+  const [attractions, setAttractions] = useState<AttractionData[]>([]) // 景點列表
+  const attractionImageInputRef = useRef<HTMLInputElement>(null) // 景點圖片上傳
+  const [uploadingAttractionIndex, setUploadingAttractionIndex] = useState<number | null>(null)
   // 頁面導航抽屜
   const [showPageDrawer, setShowPageDrawer] = useState(false)
   // 儲存草稿狀態
   const [isSavingDraft, setIsSavingDraft] = useState(false)
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
+  const [draftId, setDraftId] = useState<string | null>(null) // Supabase 草稿 ID
+  const [isLoadedFromDraft, setIsLoadedFromDraft] = useState(false) // 是否從草稿載入（防止被行程表資料覆蓋）
+  // 手動編輯的元素（格式: { "pageType:elementId": elementData }）
+  const [editedElements, setEditedElements] = useState<Record<string, CanvasElement>>({})
 
   // 取得當前頁面
   const page = pages[currentPageType]
@@ -159,6 +185,30 @@ function DesignerPageContent() {
       return Array(days).fill('')
     }
   }, [])
+
+  // 輔助函式：套用手動編輯的元素到生成的頁面
+  const applyEditedElements = useCallback((pageType: string, generatedPage: CanvasPage | null): CanvasPage | null => {
+    if (!generatedPage) return null
+
+    // 找出該頁面類型所有被編輯過的元素
+    const editedForThisPage = Object.entries(editedElements)
+      .filter(([key]) => key.startsWith(`${pageType}:`))
+      .map(([key, element]) => ({ elementId: key.split(':')[1], element }))
+
+    if (editedForThisPage.length === 0) return generatedPage
+
+    // 套用編輯過的元素（替換或保留位置/樣式等屬性）
+    const updatedElements = generatedPage.elements.map((el) => {
+      const edited = editedForThisPage.find((e) => e.elementId === el.id)
+      if (edited) {
+        // 保留編輯過的元素（完整替換）
+        return edited.element
+      }
+      return el
+    })
+
+    return { ...generatedPage, elements: updatedElements }
+  }, [editedElements])
 
   // 當選擇風格後，生成所有頁面
   const handleSelectStyle = useCallback((styleId: string) => {
@@ -283,7 +333,11 @@ function DesignerPageContent() {
   }, [itineraryId, itineraries, proposalId, proposals, proposalPackages, tripDays, calculateDailyDates])
 
   // 當資料載入後，自動更新已選擇的範本（修復資料載入時機問題）
+  // 注意：如果是從草稿載入，跳過此邏輯以保留草稿資料
   useEffect(() => {
+    // 如果從草稿載入，跳過從行程表重新生成頁面
+    if (isLoadedFromDraft) return
+
     // 如果已選擇風格且有指定行程表，當行程表資料載入後重新生成頁面
     if (selectedStyleId && itineraryId && itineraries.length > 0) {
       const itinerary = itineraries.find((i) => i.id === itineraryId)
@@ -334,7 +388,7 @@ function DesignerPageContent() {
         }
       }
     }
-  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates])  
+  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft])
 
   // 當天數變更時，重新生成每日行程頁面
   useEffect(() => {
@@ -416,7 +470,20 @@ function DesignerPageContent() {
       )
       return { ...prevPages, [currentPageType]: { ...currentPage, elements: updatedElements } }
     })
-  }, [currentPageType])
+
+    // 追蹤手動編輯的元素
+    setEditedElements((prev) => {
+      const key = `${currentPageType}:${elementId}`
+      // 取得目前頁面的該元素完整資料
+      const currentPage = pages[currentPageType]
+      if (!currentPage) return prev
+      const element = currentPage.elements.find((el) => el.id === elementId)
+      if (!element) return prev
+      // 合併更新後的完整元素
+      const updatedElement = { ...element, ...updates } as CanvasElement
+      return { ...prev, [key]: updatedElement }
+    })
+  }, [currentPageType, pages])
 
   const addElement = useCallback((newElement: CanvasElement) => {
     setPages((prevPages) => {
@@ -429,6 +496,17 @@ function DesignerPageContent() {
   }, [currentPageType])
 
   const deleteElement = useCallback((elementId: string) => {
+    // 追蹤刪除的元素（標記為 visible: false 以便重新生成時保持隱藏）
+    setEditedElements((prev) => {
+      const key = `${currentPageType}:${elementId}`
+      const currentPage = pages[currentPageType]
+      if (!currentPage) return prev
+      const element = currentPage.elements.find((el) => el.id === elementId)
+      if (!element) return prev
+      // 標記為隱藏而非刪除，這樣重新生成時也會保持隱藏
+      return { ...prev, [key]: { ...element, visible: false } as CanvasElement }
+    })
+
     setPages((prevPages) => {
       const currentPage = prevPages[currentPageType]
       if (!currentPage) return prevPages
@@ -441,7 +519,7 @@ function DesignerPageContent() {
       }
     })
     setSelectedElementId(null)
-  }, [currentPageType])
+  }, [currentPageType, pages])
 
   // 處理封面占位元素點擊（觸發檔案選擇）
   const handleCoverUpload = useCallback(() => {
@@ -625,116 +703,228 @@ function DesignerPageContent() {
     return 'designer-draft-new'
   }, [tourId, proposalId, itineraryId])
 
-  // 儲存草稿
+  // 儲存草稿到 Supabase
   const handleSaveDraft = useCallback(async () => {
     if (!templateData || !selectedStyleId) {
       await alert('請先選擇範本並填寫資料', 'warning', '無法儲存')
       return
     }
 
+    if (!workspaceId || !userId) {
+      await alert('請先登入', 'warning', '無法儲存')
+      return
+    }
+
     setIsSavingDraft(true)
     try {
-      const draftData = {
-        selectedStyleId,
-        templateData,
-        tripDays,
-        memoSettings,
-        hotels,
-        selectedCountryCode,
-        savedAt: new Date().toISOString(),
+      const draftPayload = {
+        workspace_id: workspaceId,
+        user_id: userId,
+        tour_id: tourId || null,
+        proposal_id: proposalId || null,
+        itinerary_id: itineraryId || null,
+        name: templateData.mainTitle || '未命名草稿',
+        style_id: selectedStyleId,
+        template_data: templateData as unknown as Json,
+        trip_days: tripDays,
+        memo_settings: memoSettings as unknown as Json,
+        hotels: hotels as unknown as Json,
+        attractions: attractions as unknown as Json,
+        country_code: selectedCountryCode,
+        edited_elements: editedElements as unknown as Json,
       }
-      localStorage.setItem(getDraftKey(), JSON.stringify(draftData))
+
+      if (draftId) {
+        // 更新現有草稿
+        const { error } = await supabase
+          .from('designer_drafts')
+          .update(draftPayload)
+          .eq('id', draftId)
+
+        if (error) throw error
+      } else {
+        // 建立新草稿（或更新已存在的）
+        const { data, error } = await supabase
+          .from('designer_drafts')
+          .upsert(draftPayload, {
+            onConflict: tourId ? 'tour_id' : proposalId ? 'proposal_id' : itineraryId ? 'itinerary_id' : undefined,
+          })
+          .select('id')
+          .single()
+
+        if (error) throw error
+        if (data) setDraftId(data.id)
+      }
+
       setLastSavedAt(new Date())
-      await alert('草稿已儲存到本機', 'success', '已儲存')
+      await alert('草稿已儲存', 'success', '已儲存')
     } catch (error) {
       console.error('儲存草稿失敗:', error)
       await alert('無法儲存草稿，請稍後再試', 'error', '儲存失敗')
     } finally {
       setIsSavingDraft(false)
     }
-  }, [templateData, selectedStyleId, tripDays, memoSettings, hotels, selectedCountryCode, getDraftKey])
+  }, [templateData, selectedStyleId, tripDays, memoSettings, hotels, attractions, selectedCountryCode, editedElements, workspaceId, userId, tourId, proposalId, itineraryId, draftId])
 
-  // 載入草稿
-  const loadDraft = useCallback(() => {
+  // 從 Supabase 載入草稿
+  const loadDraft = useCallback(async (draft: {
+    id: string
+    style_id: string
+    template_data: Json
+    trip_days: number
+    memo_settings: Json
+    hotels: Json
+    attractions: Json
+    country_code: string | null
+    edited_elements: Json
+    updated_at: string
+  }) => {
     try {
-      const savedDraft = localStorage.getItem(getDraftKey())
-      if (savedDraft) {
-        const draftData = JSON.parse(savedDraft)
-        const loadedStyleId = draftData.selectedStyleId
-        const loadedTemplateData = draftData.templateData
-        const loadedTripDays = draftData.tripDays || 3
-        const loadedMemoSettings = draftData.memoSettings
-        const loadedHotels = draftData.hotels || []
+      const loadedStyleId = draft.style_id
+      const loadedTemplateData = draft.template_data as unknown as TemplateData
+      const loadedTripDays = draft.trip_days || 3
+      const loadedMemoSettings = draft.memo_settings as unknown as MemoSettings | null
+      const loadedHotels = (draft.hotels as unknown as HotelData[]) || []
+      const loadedAttractions = (draft.attractions as unknown as AttractionData[]) || []
+      const loadedEditedElements = (draft.edited_elements as unknown as Record<string, CanvasElement>) || {}
 
-        // 設定基本狀態
-        if (loadedStyleId) setSelectedStyleId(loadedStyleId)
-        if (loadedTemplateData) setTemplateData(loadedTemplateData)
-        if (draftData.tripDays) setTripDays(loadedTripDays)
-        if (loadedMemoSettings) setMemoSettings(loadedMemoSettings)
-        if (loadedHotels) setHotels(loadedHotels)
-        if (draftData.selectedCountryCode) setSelectedCountryCode(draftData.selectedCountryCode)
-        if (draftData.savedAt) setLastSavedAt(new Date(draftData.savedAt))
+      // 設定草稿 ID 並標記從草稿載入
+      setDraftId(draft.id)
+      setIsLoadedFromDraft(true)
 
-        // 重新生成所有頁面
-        if (loadedStyleId && loadedTemplateData) {
-          const style = styleSeries.find((s) => s.id === loadedStyleId)
-          if (style) {
-            const newPages: Record<string, CanvasPage | null> = {
-              cover: generatePageFromTemplate(style.templates.cover, loadedTemplateData),
-              toc: generatePageFromTemplate(style.templates.toc, { ...loadedTemplateData, hotels: loadedHotels, memoSettings: loadedMemoSettings }),
-              itinerary: generatePageFromTemplate(style.templates.itinerary, loadedTemplateData),
+      // 設定基本狀態
+      if (loadedStyleId) setSelectedStyleId(loadedStyleId)
+      if (loadedTemplateData) setTemplateData(loadedTemplateData)
+      setTripDays(loadedTripDays)
+      if (loadedMemoSettings) setMemoSettings(loadedMemoSettings)
+      setHotels(loadedHotels)
+      setAttractions(loadedAttractions)
+      if (draft.country_code) setSelectedCountryCode(draft.country_code as CountryCode)
+      setEditedElements(loadedEditedElements)
+      setLastSavedAt(new Date(draft.updated_at))
+
+      // 重新生成所有頁面
+      if (loadedStyleId && loadedTemplateData) {
+        const style = styleSeries.find((s) => s.id === loadedStyleId)
+        if (style) {
+          const newPages: Record<string, CanvasPage | null> = {
+            cover: generatePageFromTemplate(style.templates.cover, loadedTemplateData),
+            toc: generatePageFromTemplate(style.templates.toc, { ...loadedTemplateData, hotels: loadedHotels, memoSettings: loadedMemoSettings ?? undefined }),
+            itinerary: generatePageFromTemplate(style.templates.itinerary, loadedTemplateData),
+          }
+
+          // 生成每日行程頁面
+          for (let i = 0; i < loadedTripDays; i++) {
+            const dailyData = { ...loadedTemplateData, currentDayIndex: i }
+            newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+          }
+
+          // 生成飯店頁面
+          loadedHotels.forEach((hotel: HotelData, i: number) => {
+            if (hotel.enabled !== false) {
+              const hotelData = { ...loadedTemplateData, currentHotelIndex: i, hotels: loadedHotels }
+              newPages[`hotel-${i}`] = generatePageFromTemplate(style.templates.hotel, hotelData)
+            }
+          })
+
+          // 生成備忘錄頁面
+          if (loadedMemoSettings) {
+            const pageCount = calculateMemoPageCount(loadedMemoSettings)
+            for (let i = 0; i < pageCount; i++) {
+              const memoData = { ...loadedTemplateData, memoSettings: loadedMemoSettings, currentMemoPageIndex: i }
+              newPages[`memo-${i}`] = generatePageFromTemplate(style.templates.memo, memoData)
+            }
+          }
+
+          // 生成景點頁面
+          if (loadedAttractions.length > 0) {
+            const attractionPageCount = Math.ceil(loadedAttractions.length / 2)
+            for (let i = 0; i < attractionPageCount; i++) {
+              const attractionData = { ...loadedTemplateData, attractions: loadedAttractions, currentAttractionPageIndex: i, currentPageNumber: 10 + i }
+              newPages[`attraction-${i}`] = generatePageFromTemplate(style.templates.attraction, attractionData)
+            }
+          }
+
+          // 套用手動編輯的元素（不直接修改，而是創建新的陣列）
+          const pagesWithEditedElements: Record<string, CanvasPage | null> = {}
+          Object.entries(newPages).forEach(([pageType, page]) => {
+            if (!page) {
+              pagesWithEditedElements[pageType] = null
+              return
             }
 
-            // 生成每日行程頁面
-            for (let i = 0; i < loadedTripDays; i++) {
-              const dailyData = { ...loadedTemplateData, currentDayIndex: i }
-              newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+            // 找出該頁面類型所有被編輯過的元素
+            const editedForThisPage = Object.entries(loadedEditedElements)
+              .filter(([key]) => key.startsWith(`${pageType}:`))
+              .map(([key, element]) => ({ elementId: key.split(':')[1], element }))
+
+            if (editedForThisPage.length === 0) {
+              pagesWithEditedElements[pageType] = page
+              return
             }
 
-            // 生成飯店頁面
-            loadedHotels.forEach((hotel: HotelData, i: number) => {
-              if (hotel.enabled !== false) {
-                const hotelData = { ...loadedTemplateData, currentHotelIndex: i, hotels: loadedHotels }
-                newPages[`hotel-${i}`] = generatePageFromTemplate(style.templates.hotel, hotelData)
+            // 套用編輯過的元素
+            const updatedElements = page.elements.map((el) => {
+              const edited = editedForThisPage.find((e) => e.elementId === el.id)
+              if (edited) {
+                return edited.element
               }
+              return el
             })
 
-            // 生成備忘錄頁面
-            if (loadedMemoSettings) {
-              const pageCount = calculateMemoPageCount(loadedMemoSettings)
-              for (let i = 0; i < pageCount; i++) {
-                const memoData = { ...loadedTemplateData, memoSettings: loadedMemoSettings, currentMemoPageIndex: i }
-                newPages[`memo-${i}`] = generatePageFromTemplate(style.templates.memo, memoData)
-              }
-            }
+            pagesWithEditedElements[pageType] = { ...page, elements: updatedElements }
+          })
 
-            setPages(newPages)
-            setCurrentPageType('cover')
-          }
+          setPages(pagesWithEditedElements)
+          setCurrentPageType('cover')
         }
-        return true
       }
+      return true
     } catch (error) {
       console.error('載入草稿失敗:', error)
     }
     return false
-  }, [getDraftKey])
+  }, [])
 
-  // 檢查是否有草稿並提示載入
+  // 檢查是否有 Supabase 草稿
   useEffect(() => {
-    const savedDraft = localStorage.getItem(getDraftKey())
-    if (savedDraft && !selectedStyleId) {
+    const checkForDraft = async () => {
+      if (!workspaceId || selectedStyleId) return
+
       try {
-        const draftData = JSON.parse(savedDraft)
-        const savedTime = draftData.savedAt ? new Date(draftData.savedAt).toLocaleString('zh-TW') : '未知時間'
-        if (window.confirm(`發現未完成的草稿（儲存於 ${savedTime}）\n\n是否要載入草稿繼續編輯？`)) {
-          loadDraft()
+        let query = supabase
+          .from('designer_drafts')
+          .select('*')
+          .eq('workspace_id', workspaceId)
+
+        if (tourId) {
+          query = query.eq('tour_id', tourId)
+        } else if (proposalId) {
+          query = query.eq('proposal_id', proposalId)
+        } else if (itineraryId) {
+          query = query.eq('itinerary_id', itineraryId)
+        } else {
+          return // 沒有關聯來源，不載入草稿
+        }
+
+        const { data: drafts, error } = await query.limit(1)
+
+        if (error) throw error
+
+        if (drafts && drafts.length > 0) {
+          const draft = drafts[0]
+          const savedTime = new Date(draft.updated_at).toLocaleString('zh-TW')
+          if (window.confirm(`發現未完成的草稿（儲存於 ${savedTime}）\n\n是否要載入草稿繼續編輯？`)) {
+            await loadDraft(draft)
+          }
         }
       } catch (error) {
-        console.error('解析草稿失敗:', error)
+        console.error('檢查草稿失敗:', error)
       }
     }
-  }, [getDraftKey, loadDraft, selectedStyleId])
+
+    checkForDraft()
+  }, [workspaceId, tourId, proposalId, itineraryId, selectedStyleId, loadDraft])
 
   const handleAddImageClick = useCallback(() => {
     const url = prompt('請輸入圖片網址：')
@@ -1043,6 +1233,11 @@ function DesignerPageContent() {
       for (let i = 0; i < hotels.length; i++) {
         pageOrder.push(`hotel-${i}`)
       }
+      // 加入景點介紹頁面
+      const attractionPageCount = Math.ceil(attractions.length / 2)
+      for (let i = 0; i < attractionPageCount; i++) {
+        pageOrder.push(`attraction-${i}`)
+      }
 
       const images: string[] = []
 
@@ -1189,20 +1384,23 @@ function DesignerPageContent() {
     setTemplateDataHistory((prev) => prev.slice(0, -1))
     setTemplateData(previousData)
 
-    // 重新生成當前頁面
+    // 重新生成當前頁面，並套用編輯過的元素
     const style = styleSeries.find((s) => s.id === selectedStyleId)
     if (style) {
       if (currentPageType === 'cover') {
-        setPages((prev) => ({ ...prev, cover: generatePageFromTemplate(style.templates.cover, previousData) }))
+        const newPage = generatePageFromTemplate(style.templates.cover, previousData)
+        setPages((prev) => ({ ...prev, cover: applyEditedElements('cover', newPage) }))
       } else if (currentPageType === 'itinerary') {
-        setPages((prev) => ({ ...prev, itinerary: generatePageFromTemplate(style.templates.itinerary, previousData) }))
+        const newPage = generatePageFromTemplate(style.templates.itinerary, previousData)
+        setPages((prev) => ({ ...prev, itinerary: applyEditedElements('itinerary', newPage) }))
       } else if (isDailyPage(currentPageType)) {
         const dayIdx = getDayIndex(currentPageType)
         const pageData = { ...previousData, currentDayIndex: dayIdx }
-        setPages((prev) => ({ ...prev, [currentPageType]: generatePageFromTemplate(style.templates.daily, pageData) }))
+        const newPage = generatePageFromTemplate(style.templates.daily, pageData)
+        setPages((prev) => ({ ...prev, [currentPageType]: applyEditedElements(currentPageType, newPage) }))
       }
     }
-  }, [templateDataHistory, selectedStyleId, currentPageType])
+  }, [templateDataHistory, selectedStyleId, currentPageType, applyEditedElements])
 
   // 新增備忘錄（根據國家載入預設）
   const handleAddMemo = useCallback((countryCode: CountryCode) => {
@@ -1498,6 +1696,137 @@ function DesignerPageContent() {
     }
   }, [handleUpdateHotel])
 
+  // 新增景點
+  const handleAddAttraction = useCallback(() => {
+    if (!selectedStyleId) return
+
+    const newAttraction: AttractionData = {
+      id: `attraction-${Date.now()}`,
+      nameZh: '',
+      nameEn: '',
+      description: '',
+      enabled: true,
+    }
+    const newAttractions = [...attractions, newAttraction]
+    setAttractions(newAttractions)
+
+    // 更新 templateData
+    const newData = { ...templateData, attractions: newAttractions }
+    setTemplateData(newData)
+
+    // 計算需要多少頁（每頁2個景點）
+    const pageIndex = Math.floor(attractions.length / 2)
+
+    // 生成或更新景點頁面
+    const style = styleSeries.find((s) => s.id === selectedStyleId)
+    if (style) {
+      const pageData = { ...newData, currentAttractionPageIndex: pageIndex, currentPageNumber: 10 + pageIndex }
+      setPages((prev) => ({
+        ...prev,
+        [`attraction-${pageIndex}`]: generatePageFromTemplate(style.templates.attraction, pageData),
+      }))
+    }
+
+    // 切換到該景點所在的頁面
+    setCurrentPageType(`attraction-${pageIndex}`)
+  }, [selectedStyleId, attractions, templateData])
+
+  // 刪除景點
+  const handleRemoveAttraction = useCallback((index: number) => {
+    const newAttractions = attractions.filter((_, i) => i !== index)
+    setAttractions(newAttractions)
+
+    // 更新 templateData
+    const newData = { ...templateData, attractions: newAttractions.length > 0 ? newAttractions : undefined }
+    setTemplateData(newData)
+
+    // 重新生成景點頁面
+    const style = styleSeries.find((s) => s.id === selectedStyleId)
+    if (style) {
+      setPages((prev) => {
+        const updated = { ...prev }
+        // 移除所有景點頁面
+        Object.keys(updated).forEach((key) => {
+          if (key.startsWith('attraction-')) delete updated[key]
+        })
+        // 重新生成頁面（每頁2個景點）
+        const pageCount = Math.ceil(newAttractions.length / 2)
+        for (let i = 0; i < pageCount; i++) {
+          const pageData = { ...newData, currentAttractionPageIndex: i, currentPageNumber: 10 + i }
+          updated[`attraction-${i}`] = generatePageFromTemplate(style.templates.attraction, pageData)
+        }
+        return updated
+      })
+    }
+
+    // 如果當前頁面是被刪除的景點所在頁面，切換到其他頁面
+    if (isAttractionPage(currentPageType)) {
+      const currentPageIdx = getAttractionPageIndex(currentPageType)
+      const newPageCount = Math.ceil(newAttractions.length / 2)
+      if (currentPageIdx >= newPageCount) {
+        if (newPageCount > 0) {
+          setCurrentPageType(`attraction-${newPageCount - 1}`)
+        } else {
+          setCurrentPageType('cover')
+        }
+      }
+    }
+  }, [attractions, templateData, selectedStyleId, currentPageType])
+
+  // 更新景點資料
+  const handleUpdateAttraction = useCallback((index: number, field: keyof AttractionData, value: string | undefined) => {
+    const newAttractions = attractions.map((a, i) =>
+      i === index ? { ...a, [field]: value } : a
+    )
+    setAttractions(newAttractions)
+
+    // 更新 templateData
+    const pageIndex = Math.floor(index / 2)
+    const newData = { ...templateData, attractions: newAttractions, currentAttractionPageIndex: pageIndex }
+    setTemplateData(newData)
+
+    // 重新生成該景點所在的頁面
+    const style = styleSeries.find((s) => s.id === selectedStyleId)
+    if (style) {
+      const pageData = { ...newData, currentAttractionPageIndex: pageIndex, currentPageNumber: 10 + pageIndex }
+      setPages((prev) => ({
+        ...prev,
+        [`attraction-${pageIndex}`]: generatePageFromTemplate(style.templates.attraction, pageData),
+      }))
+    }
+  }, [attractions, templateData, selectedStyleId])
+
+  // 景點圖片上傳
+  const handleAttractionImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, attractionIndex: number) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAttractionIndex(attractionIndex)
+    try {
+      // 上傳到 Supabase Storage
+      const fileName = `attraction-${Date.now()}-${file.name}`
+      const { data, error } = await supabase.storage
+        .from('designer-images')
+        .upload(fileName, file)
+
+      if (error) throw error
+
+      // 取得公開 URL
+      const { data: urlData } = supabase.storage
+        .from('designer-images')
+        .getPublicUrl(data.path)
+
+      handleUpdateAttraction(attractionIndex, 'image', urlData.publicUrl)
+    } catch (error) {
+      void alert('圖片上傳失敗', 'error')
+    } finally {
+      setUploadingAttractionIndex(null)
+      if (attractionImageInputRef.current) {
+        attractionImageInputRef.current.value = ''
+      }
+    }
+  }, [handleUpdateAttraction])
+
   // 鍵盤快捷鍵 (Ctrl+Z / Cmd+Z)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1653,9 +1982,10 @@ function DesignerPageContent() {
             {isDailyPage(currentPageType) && `Day ${getDayIndex(currentPageType) + 1}`}
             {isMemoPage(currentPageType) && (getMemoPageIndex(currentPageType) === memoPageCount - 1 && memoSettings?.seasons?.some(s => s.enabled) ? '天氣資訊' : `旅遊提醒 ${getMemoPageIndex(currentPageType) + 1}`)}
             {isHotelPage(currentPageType) && (hotels[getHotelIndex(currentPageType)]?.nameZh || `飯店 ${getHotelIndex(currentPageType) + 1}`)}
+            {isAttractionPage(currentPageType) && `景點 ${getAttractionPageIndex(currentPageType) * 2 + 1}-${Math.min(getAttractionPageIndex(currentPageType) * 2 + 2, attractions.length)}`}
           </span>
           <span className="text-xs text-morandi-muted">
-            (共 {1 + 1 + 1 + tripDays + memoPageCount + hotels.length} 頁)
+            (共 {1 + 1 + 1 + tripDays + memoPageCount + hotels.length + Math.ceil(attractions.length / 2)} 頁)
           </span>
         </div>
 
@@ -1877,6 +2207,49 @@ function DesignerPageContent() {
                 </button>
               </div>
 
+              {/* 景點介紹 */}
+              <div>
+                <h4 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider px-2 mb-2 flex items-center gap-2">
+                  <ImageIcon size={12} />
+                  景點介紹
+                  {attractions.length > 0 && <span className="ml-auto text-morandi-muted font-normal normal-case">{attractions.length} 個</span>}
+                </h4>
+                <div className="space-y-1">
+                  {attractions.length > 0 ? (
+                    <>
+                      {/* 按頁面分組顯示景點 */}
+                      {Array.from({ length: Math.ceil(attractions.length / 2) }, (_, pageIdx) => (
+                        <button
+                          key={`attraction-page-${pageIdx}`}
+                          onClick={() => { setCurrentPageType(`attraction-${pageIdx}`); setShowPageDrawer(false) }}
+                          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                            currentPageType === `attraction-${pageIdx}`
+                              ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
+                              : 'text-morandi-secondary hover:bg-morandi-container/50 hover:text-morandi-primary'
+                          }`}
+                        >
+                          <span className="w-6 h-6 rounded bg-morandi-container/70 flex items-center justify-center text-xs font-bold">
+                            {4 + tripDays + hotels.length + pageIdx}
+                          </span>
+                          <ImageIcon size={14} />
+                          景點 {pageIdx * 2 + 1}{attractions[pageIdx * 2 + 1] ? ` - ${pageIdx * 2 + 2}` : ''}
+                          {currentPageType === `attraction-${pageIdx}` && <Check size={14} className="ml-auto" />}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <p className="text-xs text-morandi-muted px-3 py-2">尚未新增景點</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => { handleAddAttraction(); setShowPageDrawer(false) }}
+                  className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 rounded-lg border border-dashed border-morandi-gold/50 text-xs text-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                >
+                  <Plus size={12} />
+                  新增景點
+                </button>
+              </div>
+
               {/* 備忘錄 */}
               <div>
                 <h4 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider px-2 mb-2 flex items-center gap-2">
@@ -1899,7 +2272,7 @@ function DesignerPageContent() {
                           )}
                         >
                           <span className="w-6 h-6 rounded bg-morandi-container/70 flex items-center justify-center text-xs font-bold">
-                            {4 + tripDays + hotels.length + i}
+                            {4 + tripDays + hotels.length + Math.ceil(attractions.length / 2) + i}
                           </span>
                           <ClipboardList size={14} />
                           {i === memoPageCount - 1 && memoSettings?.seasons?.some(s => s.enabled)
@@ -1961,6 +2334,7 @@ function DesignerPageContent() {
               {isDailyPage(currentPageType) && `Day ${getDayIndex(currentPageType) + 1} 設定`}
               {isMemoPage(currentPageType) && `備忘錄設定`}
               {isHotelPage(currentPageType) && `飯店介紹設定`}
+              {isAttractionPage(currentPageType) && `景點介紹設定`}
             </h2>
             <p className="text-sm text-morandi-secondary mt-1">
               編輯內容會即時更新到預覽中
@@ -2904,6 +3278,231 @@ function DesignerPageContent() {
                     刪除此飯店頁面
                   </button>
                 </div>
+              </>
+            )
+          })()}
+
+          {/* 景點介紹專屬欄位 */}
+          {isAttractionPage(currentPageType) && (() => {
+            const pageIndex = getAttractionPageIndex(currentPageType)
+            // 取得這一頁的兩個景點（每頁2個）
+            const attraction1Index = pageIndex * 2
+            const attraction2Index = pageIndex * 2 + 1
+            const attraction1 = attractions[attraction1Index]
+            const attraction2 = attractions[attraction2Index]
+
+            if (!attraction1) return null
+
+            return (
+              <>
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
+                    景點 {attraction1Index + 1}
+                  </h3>
+
+                  {/* 景點1圖片 */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-morandi-primary">圖片</label>
+                    {attraction1.image ? (
+                      <div className="relative group">
+                        <img
+                          src={attraction1.image}
+                          alt="景點圖片"
+                          className="w-full h-24 object-cover rounded-lg border border-border"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => attractionImageInputRef.current?.click()}
+                            className="px-2 py-1 bg-white rounded text-xs"
+                          >
+                            更換
+                          </button>
+                          <button
+                            onClick={() => handleUpdateAttraction(attraction1Index, 'image', undefined)}
+                            className="px-2 py-1 bg-morandi-red text-white rounded text-xs"
+                          >
+                            移除
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setUploadingAttractionIndex(attraction1Index)
+                          attractionImageInputRef.current?.click()
+                        }}
+                        className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-morandi-gold transition-colors"
+                      >
+                        {uploadingAttractionIndex === attraction1Index ? (
+                          <Loader2 size={24} className="animate-spin text-morandi-gold" />
+                        ) : (
+                          <>
+                            <ImageIcon size={24} className="text-morandi-secondary" />
+                            <span className="text-xs text-morandi-secondary mt-1">點擊上傳圖片</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* 景點1中文名稱 */}
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
+                    <input
+                      type="text"
+                      value={attraction1.nameZh || ''}
+                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameZh', e.target.value)}
+                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                      placeholder="例：金閣寺"
+                    />
+                  </label>
+
+                  {/* 景點1英文名稱 */}
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
+                    <input
+                      type="text"
+                      value={attraction1.nameEn || ''}
+                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameEn', e.target.value)}
+                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                      placeholder="例：Kinkaku-ji"
+                    />
+                  </label>
+
+                  {/* 景點1描述 */}
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-morandi-primary">介紹文字</span>
+                    <textarea
+                      value={attraction1.description || ''}
+                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'description', e.target.value)}
+                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
+                      rows={3}
+                      placeholder="輸入景點介紹..."
+                    />
+                  </label>
+
+                  {/* 刪除景點1按鈕 */}
+                  <button
+                    onClick={() => handleRemoveAttraction(attraction1Index)}
+                    className="w-full px-3 py-1.5 text-xs text-morandi-red border border-morandi-red rounded-lg hover:bg-morandi-red hover:text-white transition-colors"
+                  >
+                    刪除此景點
+                  </button>
+                </div>
+
+                {/* 景點2（如果存在） */}
+                {attraction2 && (
+                  <div className="space-y-4 mt-6 pt-6 border-t border-border">
+                    <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
+                      景點 {attraction2Index + 1}
+                    </h3>
+
+                    {/* 景點2圖片 */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-morandi-primary">圖片</label>
+                      {attraction2.image ? (
+                        <div className="relative group">
+                          <img
+                            src={attraction2.image}
+                            alt="景點圖片"
+                            className="w-full h-24 object-cover rounded-lg border border-border"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => {
+                                setUploadingAttractionIndex(attraction2Index)
+                                attractionImageInputRef.current?.click()
+                              }}
+                              className="px-2 py-1 bg-white rounded text-xs"
+                            >
+                              更換
+                            </button>
+                            <button
+                              onClick={() => handleUpdateAttraction(attraction2Index, 'image', undefined)}
+                              className="px-2 py-1 bg-morandi-red text-white rounded text-xs"
+                            >
+                              移除
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setUploadingAttractionIndex(attraction2Index)
+                            attractionImageInputRef.current?.click()
+                          }}
+                          className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-morandi-gold transition-colors"
+                        >
+                          {uploadingAttractionIndex === attraction2Index ? (
+                            <Loader2 size={24} className="animate-spin text-morandi-gold" />
+                          ) : (
+                            <>
+                              <ImageIcon size={24} className="text-morandi-secondary" />
+                              <span className="text-xs text-morandi-secondary mt-1">點擊上傳圖片</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* 景點2中文名稱 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
+                      <input
+                        type="text"
+                        value={attraction2.nameZh || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameZh', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="例：清水寺"
+                      />
+                    </label>
+
+                    {/* 景點2英文名稱 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
+                      <input
+                        type="text"
+                        value={attraction2.nameEn || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameEn', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="例：Kiyomizu-dera"
+                      />
+                    </label>
+
+                    {/* 景點2描述 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">介紹文字</span>
+                      <textarea
+                        value={attraction2.description || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'description', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
+                        rows={3}
+                        placeholder="輸入景點介紹..."
+                      />
+                    </label>
+
+                    {/* 刪除景點2按鈕 */}
+                    <button
+                      onClick={() => handleRemoveAttraction(attraction2Index)}
+                      className="w-full px-3 py-1.5 text-xs text-morandi-red border border-morandi-red rounded-lg hover:bg-morandi-red hover:text-white transition-colors"
+                    >
+                      刪除此景點
+                    </button>
+                  </div>
+                )}
+
+                {/* 景點圖片上傳 input */}
+                <input
+                  ref={attractionImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (uploadingAttractionIndex !== null) {
+                      handleAttractionImageUpload(e, uploadingAttractionIndex)
+                    }
+                  }}
+                />
               </>
             )
           })()}

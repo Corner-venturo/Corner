@@ -25,10 +25,15 @@ import {
   FileText,
   Plus,
   Trash2,
+  Loader2,
 } from 'lucide-react'
 import { SupplierSearchInput } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
 import { COMPANY } from '@/lib/constants/company'
+import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores'
+import { useToast } from '@/components/ui/use-toast'
+import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 
 // 供應商資料類型（從 SupplierSearchInput 選取）
@@ -101,6 +106,9 @@ export function TourRequestFormDialog({
   departureDate,
   pax,
 }: TourRequestFormDialogProps) {
+  const { user } = useAuthStore()
+  const { toast } = useToast()
+
   // 編輯狀態的項目
   const [items, setItems] = useState<RequestItem[]>(() =>
     initialItems.map((item, idx) => ({
@@ -120,6 +128,9 @@ export function TourRequestFormDialog({
     phone: '',
     fax: '',
   })
+
+  // 列印/儲存狀態
+  const [saving, setSaving] = useState(false)
 
   // 載入公司 Logo（用於新視窗列印）
   const logoUrl = usePrintLogo(isOpen)
@@ -187,16 +198,9 @@ export function TourRequestFormDialog({
 
   if (!pkg) return null
 
-  // 開啟新視窗列印（避免 Dialog z-index 問題）
-  const handlePrintInNewWindow = () => {
-    const printWindow = window.open('', '_blank', 'width=900,height=700')
-    if (!printWindow) {
-      alert('請允許彈出視窗以進行列印')
-      return
-    }
-
-    // 建立列印內容 HTML
-    const printContent = `
+  // 生成 HTML 內容（用於列印和儲存）
+  const generatePrintHtml = () => {
+    return `
       <!DOCTYPE html>
       <html>
       <head>
@@ -302,9 +306,96 @@ export function TourRequestFormDialog({
       </body>
       </html>
     `
+  }
 
-    printWindow.document.write(printContent)
-    printWindow.document.close()
+  // 儲存文件到 tour_documents
+  const saveToTourDocuments = async (htmlContent: string) => {
+    // 需要有團號才能存
+    const tourId = proposal?.converted_tour_id
+    if (!tourId || !user?.workspace_id) {
+      logger.log('無法存檔：尚未轉團或缺少 workspace_id')
+      return
+    }
+
+    try {
+      // 生成檔案名稱
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '')
+      const fileName = `需求單_${categoryName}_${supplierInfo.name}_${timestamp}.html`
+      const filePath = `${tourId}/${fileName}`
+
+      // 將 HTML 轉成 Blob
+      const blob = new Blob([htmlContent], { type: 'text/html' })
+
+      // 上傳到 Storage
+      const { error: uploadError } = await supabase.storage
+        .from('tour-documents')
+        .upload(filePath, blob, {
+          contentType: 'text/html',
+          upsert: false,
+        })
+
+      if (uploadError) {
+        // 如果 bucket 不存在，跳過（不中斷列印流程）
+        logger.warn('上傳文件失敗:', uploadError)
+        return
+      }
+
+      // 取得公開 URL
+      const { data: urlData } = supabase.storage
+        .from('tour-documents')
+        .getPublicUrl(filePath)
+
+      // 記錄到 tour_documents 表
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insertError } = await (supabase as any)
+        .from('tour_documents')
+        .insert({
+          tour_id: tourId,
+          workspace_id: user.workspace_id,
+          name: `${categoryName}需求單 - ${supplierInfo.name}`,
+          description: `團號: ${tourCode || '-'}, 出發日期: ${formatDate(departureDate || pkg?.start_date)}`,
+          file_path: filePath,
+          public_url: urlData?.publicUrl || '',
+          file_name: fileName,
+          file_size: blob.size,
+          mime_type: 'text/html',
+          // uploaded_by 需要 auth.users UUID，暫時留空
+          uploaded_by: null,
+        })
+
+      if (insertError) {
+        logger.warn('記錄文件失敗:', insertError)
+      } else {
+        toast({ title: '需求單已存檔' })
+      }
+    } catch (err) {
+      logger.error('存檔失敗:', err)
+    }
+  }
+
+  // 開啟新視窗列印（避免 Dialog z-index 問題）
+  const handlePrintInNewWindow = async () => {
+    setSaving(true)
+
+    try {
+      // 生成 HTML 內容
+      const printContent = generatePrintHtml()
+
+      // 儲存到文件管理（背景執行，不阻塞列印）
+      saveToTourDocuments(printContent)
+
+      // 開啟新視窗列印
+      const printWindow = window.open('', '_blank', 'width=900,height=700')
+      if (!printWindow) {
+        toast({ title: '請允許彈出視窗以進行列印', variant: 'destructive' })
+        return
+      }
+
+      printWindow.document.write(printContent)
+      printWindow.document.close()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -494,9 +585,10 @@ export function TourRequestFormDialog({
             </Button>
             <Button
               onClick={handlePrintInNewWindow}
+              disabled={saving}
               className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
             >
-              <Printer size={16} />
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}
               列印
             </Button>
           </div>

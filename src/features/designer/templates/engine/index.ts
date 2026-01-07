@@ -9,6 +9,8 @@ import { japaneseStyleV1Daily } from '../definitions/japanese-style-v1-daily'
 import { japaneseStyleV1Memo } from '../definitions/japanese-style-v1-memo'
 import { japaneseStyleV1Hotel } from '../definitions/japanese-style-v1-hotel'
 import { japaneseStyleV1Toc } from '../definitions/japanese-style-v1-toc'
+import { japaneseStyleV1Attraction } from '../definitions/japanese-style-v1-attraction'
+import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hotel-multi'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData } from '../definitions/types'
 import type { CanvasPage } from '@/features/designer/components/types'
 
@@ -34,6 +36,8 @@ const templateRegistry: Record<string, PageTemplate> = {
   [japaneseStyleV1Daily.id]: japaneseStyleV1Daily,
   [japaneseStyleV1Memo.id]: japaneseStyleV1Memo,
   [japaneseStyleV1Hotel.id]: japaneseStyleV1Hotel,
+  [japaneseStyleV1HotelMulti.id]: japaneseStyleV1HotelMulti,
+  [japaneseStyleV1Attraction.id]: japaneseStyleV1Attraction,
   // 未來可以在此處註冊更多範本
   // [modernStyleV1.id]: modernStyleV1,
   // [elegantStyleV1.id]: elegantStyleV1,
@@ -49,7 +53,9 @@ export interface StyleSeries {
     itinerary: string // 行程總覽範本 ID
     daily: string // 當日行程範本 ID
     memo: string // 備忘錄範本 ID
-    hotel: string // 飯店介紹範本 ID
+    hotel: string // 飯店介紹範本 ID（單一飯店）
+    hotelMulti: string // 飯店介紹範本 ID（多飯店）
+    attraction: string // 景點介紹範本 ID
   }
 }
 
@@ -64,6 +70,8 @@ export const styleSeries: StyleSeries[] = [
       daily: 'japanese-style-v1-daily',
       memo: 'japanese-style-v1-memo',
       hotel: 'japanese-style-v1-hotel',
+      hotelMulti: 'japanese-style-v1-hotel-multi',
+      attraction: 'japanese-style-v1-attraction',
     },
   },
 ]
