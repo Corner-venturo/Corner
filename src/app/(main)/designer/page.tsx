@@ -1090,10 +1090,96 @@ function DesignerPageContent() {
     }
   }, [pages, tripDays, memoPageCount, hotels])
 
-  // 執行列印
+  // 執行列印（使用 iframe 方式，最可靠）
   const handlePrint = useCallback(() => {
-    window.print()
-  }, [])
+    if (printImages.length === 0) return
+
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'absolute'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = 'none'
+    iframe.style.left = '-9999px'
+    document.body.appendChild(iframe)
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+    if (!iframeDoc) {
+      document.body.removeChild(iframe)
+      return
+    }
+
+    // 生成頁面 HTML
+    const pagesHtml = printImages.map((imgSrc, idx) => `
+      <div class="print-page" style="page-break-after: ${idx < printImages.length - 1 ? 'always' : 'auto'};">
+        <img src="${imgSrc}" alt="Page ${idx + 1}" />
+      </div>
+    `).join('')
+
+    // 寫入列印內容（A5 直向）
+    iframeDoc.open()
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>旅遊手冊</title>
+        <style>
+          @page {
+            size: 148mm 210mm;
+            margin: 0;
+          }
+
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+
+          html, body {
+            width: 148mm;
+            height: 210mm;
+            margin: 0;
+            padding: 0;
+            background: white;
+          }
+
+          body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+
+          .print-page {
+            width: 148mm;
+            height: 210mm;
+            margin: 0;
+            padding: 0;
+            page-break-inside: avoid;
+            overflow: hidden;
+          }
+
+          .print-page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+          }
+        </style>
+      </head>
+      <body>
+        ${pagesHtml}
+      </body>
+      </html>
+    `)
+    iframeDoc.close()
+
+    // 等待圖片載入後列印
+    setTimeout(() => {
+      iframe.contentWindow?.print()
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+      }, 1000)
+    }, 500)
+  }, [printImages])
 
   // 復原 (Undo)
   const handleUndo = useCallback(() => {
@@ -2920,9 +3006,9 @@ function DesignerPageContent() {
 
       {/* 列印預覽 Portal */}
       {showPrintPreview && typeof document !== 'undefined' && createPortal(
-        <div id="designer-print-container" className="fixed inset-0 z-[99999] bg-white overflow-auto print:overflow-visible">
+        <div className="fixed inset-0 z-[99999] bg-white overflow-auto">
           {/* 螢幕上的控制列 */}
-          <div className="sticky top-0 z-10 bg-white border-b border-border p-4 flex items-center justify-between no-print">
+          <div className="sticky top-0 z-10 bg-white border-b border-border p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-morandi-primary">列印預覽</h2>
               <span className="text-sm text-morandi-secondary">共 {printImages.length} 頁</span>
@@ -2944,12 +3030,12 @@ function DesignerPageContent() {
             </div>
           </div>
 
-          {/* 頁面內容 */}
-          <div id="designer-print-pages" className="p-8 flex flex-col items-center gap-8">
+          {/* 頁面內容預覽 */}
+          <div className="p-8 flex flex-col items-center gap-8 bg-gray-100 min-h-screen">
             {printImages.map((imgSrc, idx) => (
               <div
                 key={idx}
-                className="designer-print-page bg-white shadow-lg"
+                className="bg-white shadow-xl rounded-sm overflow-hidden"
                 style={{
                   width: '148mm',  // A5 寬度
                   height: '210mm', // A5 高度
@@ -2963,76 +3049,6 @@ function DesignerPageContent() {
               </div>
             ))}
           </div>
-
-          {/* 列印樣式 - 高優先級覆蓋全域設定 */}
-          <style>{`
-            @media print {
-              /* 覆蓋全域 @page 設定 */
-              @page {
-                size: 148mm 210mm !important;
-                margin: 0 !important;
-              }
-
-              /* 隱藏所有其他內容 */
-              body > *:not(#designer-print-container) {
-                display: none !important;
-                visibility: hidden !important;
-              }
-
-              /* 顯示列印容器 */
-              #designer-print-container {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                overflow: visible !important;
-                background: white !important;
-                z-index: 999999 !important;
-              }
-
-              /* 隱藏控制列 */
-              #designer-print-container .no-print {
-                display: none !important;
-              }
-
-              /* 列印頁面容器 */
-              #designer-print-pages {
-                padding: 0 !important;
-                gap: 0 !important;
-                display: block !important;
-              }
-
-              /* 每一頁 */
-              .designer-print-page {
-                width: 148mm !important;
-                height: 210mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                page-break-after: always !important;
-                page-break-inside: avoid !important;
-                display: block !important;
-              }
-
-              .designer-print-page:last-child {
-                page-break-after: auto !important;
-              }
-
-              .designer-print-page img {
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: contain !important;
-                display: block !important;
-              }
-
-              /* 確保顏色正確 */
-              * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-            }
-          `}</style>
         </div>,
         document.body
       )}
