@@ -5,6 +5,7 @@ import { ErrorLogger } from '@/components/ErrorLogger'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { AppInitializer } from '@/components/AppInitializer'
 import { GlobalDialogs } from '@/lib/ui/alert-dialog'
+import { SWRProvider } from '@/lib/swr'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
@@ -28,9 +29,11 @@ export default function RootLayout({
         <GlobalDialogs />
         <AppInitializer>
           <ErrorBoundary>
-            <ThemeProvider>
+            <SWRProvider>
+              <ThemeProvider>
                 {children}
-            </ThemeProvider>
+              </ThemeProvider>
+            </SWRProvider>
           </ErrorBoundary>
         </AppInitializer>
         <Analytics />

@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { getAllTodos } from '@/lib/data/todos'
+import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Todo } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
@@ -56,14 +57,11 @@ function getCurrentWorkspaceId(): string | null {
 // ===== 主要 Hook =====
 export function useTodos() {
   // 使用 DAL 的 getAllTodos 作為 SWR fetcher
+  // Todos 使用 REALTIME 策略（即時更新）
   const { data: todos = [], error, isLoading, isValidating } = useSWR<Todo[]>(
     TODOS_KEY,
     getAllTodos,
-    {
-      revalidateOnFocus: true,     // 視窗切回來時重新驗證
-      revalidateOnReconnect: true, // 網路恢復時重新驗證
-      dedupingInterval: 5000,      // 5秒內不重複請求
-    }
+    CACHE_STRATEGY.REALTIME
   )
 
   // Realtime 訂閱：當其他人新增/修改/刪除待辦時，自動更新

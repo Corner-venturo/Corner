@@ -13,6 +13,8 @@ import {
   DollarSign,
   ClipboardList,
   BookMarked,
+  Bus,
+  Clock,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -29,6 +31,8 @@ import { ConvertToTourDialog } from './ConvertToTourDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
+import { TourControlFormDialog } from './TourControlFormDialog'
+import { TimelineItineraryDialog } from './TimelineItineraryDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
@@ -69,6 +73,8 @@ export function PackageListPanel({
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
   const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
+  const [tourControlDialogOpen, setTourControlDialogOpen] = useState(false)
+  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 新增套件
@@ -475,6 +481,26 @@ export function PackageListPanel({
                       >
                         <ClipboardList size={16} />
                       </button>
+                      {/* 團控表 */}
+                      <button
+                        onClick={() => {
+                          if (pkg.itinerary_id) {
+                            setSelectedPackage(pkg)
+                            setTourControlDialogOpen(true)
+                          } else {
+                            void alert('請先建立行程表', 'info')
+                          }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                            : 'text-morandi-muted cursor-not-allowed'
+                        }`}
+                        title="團控表"
+                        disabled={!pkg.itinerary_id}
+                      >
+                        <Bus size={16} />
+                      </button>
                       {/* 手冊設計 */}
                       <button
                         onClick={() => {
@@ -493,6 +519,17 @@ export function PackageListPanel({
                         disabled={!pkg.itinerary_id}
                       >
                         <BookMarked size={16} />
+                      </button>
+                      {/* 時間軸編輯器 */}
+                      <button
+                        onClick={() => {
+                          setSelectedPackage(pkg)
+                          setTimelineDialogOpen(true)
+                        }}
+                        className="p-1.5 rounded transition-colors text-morandi-secondary hover:bg-morandi-container/80 hover:text-morandi-gold"
+                        title="時間軸編輯器"
+                      >
+                        <Clock size={16} />
                       </button>
                     </div>
                   </td>
@@ -610,6 +647,27 @@ export function PackageListPanel({
         pkg={selectedPackage}
         proposal={proposal}
         onSyncComplete={onPackagesChange}
+      />
+
+      {/* 團控表對話框 */}
+      <TourControlFormDialog
+        isOpen={tourControlDialogOpen}
+        onClose={() => {
+          setTourControlDialogOpen(false)
+          setSelectedPackage(null)
+        }}
+        pkg={selectedPackage}
+        proposal={proposal}
+      />
+
+      {/* 時間軸編輯器對話框 */}
+      <TimelineItineraryDialog
+        isOpen={timelineDialogOpen}
+        onClose={() => {
+          setTimelineDialogOpen(false)
+          setSelectedPackage(null)
+        }}
+        pkg={selectedPackage}
       />
     </div>
   )

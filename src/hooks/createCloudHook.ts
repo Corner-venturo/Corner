@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Database } from '@/lib/supabase/types'
 
 // 從 Database 類型提取所有表格名稱
@@ -106,6 +107,27 @@ const TABLE_CODE_PREFIX: Record<string, string> = {
   visas: 'V',
 }
 
+// 快取策略類型
+type CacheStrategyType = 'STATIC' | 'DYNAMIC' | 'REALTIME'
+
+// 根據表格名稱自動判斷快取策略
+const TABLE_CACHE_STRATEGY: Record<string, CacheStrategyType> = {
+  // 靜態資料：變動頻率低
+  tours: 'STATIC',
+  customers: 'STATIC',
+  quotes: 'STATIC',
+  itineraries: 'STATIC',
+  visas: 'STATIC',
+  // 動態資料：需要較頻繁更新
+  orders: 'DYNAMIC',
+  payment_requests: 'DYNAMIC',
+  disbursement_orders: 'DYNAMIC',
+  receipt_orders: 'DYNAMIC',
+  // 即時資料：需要即時更新
+  todos: 'REALTIME',
+  calendar_events: 'REALTIME',
+}
+
 // 建立雲端 Hook 的工廠函數
 export function createCloudHook<T extends BaseEntity>(
   tableName: TableName,
@@ -113,10 +135,15 @@ export function createCloudHook<T extends BaseEntity>(
     orderBy?: { column: string; ascending?: boolean }
     select?: string
     workspaceScoped?: boolean // 是否啟用 workspace 隔離（預設根據表格名稱自動判斷）
+    cacheStrategy?: CacheStrategyType // 快取策略（預設根據表格名稱自動判斷）
   }
 ) {
   // 自動判斷是否需要 workspace 過濾
   const isWorkspaceScoped = options?.workspaceScoped ?? WORKSPACE_SCOPED_TABLES.includes(tableName)
+
+  // 自動判斷快取策略
+  const cacheStrategy = options?.cacheStrategy ?? TABLE_CACHE_STRATEGY[tableName] ?? 'DYNAMIC'
+  const swrOptions = CACHE_STRATEGY[cacheStrategy]
 
   const SWR_KEY = tableName
 
@@ -164,11 +191,7 @@ export function createCloudHook<T extends BaseEntity>(
     const { data: items = [], error, isLoading, isValidating } = useSWR<T[]>(
       SWR_KEY,
       fetcher,
-      {
-        revalidateOnFocus: true,
-        revalidateOnReconnect: true,
-        dedupingInterval: 5000,
-      }
+      swrOptions // 使用分層快取策略
     )
 
     // 新增
