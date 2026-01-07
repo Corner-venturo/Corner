@@ -116,6 +116,9 @@ function DesignerPageContent() {
   const [uploadingHotelIndex, setUploadingHotelIndex] = useState<number | null>(null)
   // 頁面導航抽屜
   const [showPageDrawer, setShowPageDrawer] = useState(false)
+  // 儲存草稿狀態
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
 
   // 取得當前頁面
   const page = pages[currentPageType]
@@ -613,6 +616,125 @@ function DesignerPageContent() {
       router.back()
     }
   }
+
+  // 生成草稿儲存的 key
+  const getDraftKey = useCallback(() => {
+    if (tourId) return `designer-draft-tour-${tourId}`
+    if (proposalId) return `designer-draft-proposal-${proposalId}`
+    if (itineraryId) return `designer-draft-itinerary-${itineraryId}`
+    return 'designer-draft-new'
+  }, [tourId, proposalId, itineraryId])
+
+  // 儲存草稿
+  const handleSaveDraft = useCallback(async () => {
+    if (!templateData || !selectedStyleId) {
+      await alert('請先選擇範本並填寫資料', 'warning', '無法儲存')
+      return
+    }
+
+    setIsSavingDraft(true)
+    try {
+      const draftData = {
+        selectedStyleId,
+        templateData,
+        tripDays,
+        memoSettings,
+        hotels,
+        selectedCountryCode,
+        savedAt: new Date().toISOString(),
+      }
+      localStorage.setItem(getDraftKey(), JSON.stringify(draftData))
+      setLastSavedAt(new Date())
+      await alert('草稿已儲存到本機', 'success', '已儲存')
+    } catch (error) {
+      console.error('儲存草稿失敗:', error)
+      await alert('無法儲存草稿，請稍後再試', 'error', '儲存失敗')
+    } finally {
+      setIsSavingDraft(false)
+    }
+  }, [templateData, selectedStyleId, tripDays, memoSettings, hotels, selectedCountryCode, getDraftKey])
+
+  // 載入草稿
+  const loadDraft = useCallback(() => {
+    try {
+      const savedDraft = localStorage.getItem(getDraftKey())
+      if (savedDraft) {
+        const draftData = JSON.parse(savedDraft)
+        const loadedStyleId = draftData.selectedStyleId
+        const loadedTemplateData = draftData.templateData
+        const loadedTripDays = draftData.tripDays || 3
+        const loadedMemoSettings = draftData.memoSettings
+        const loadedHotels = draftData.hotels || []
+
+        // 設定基本狀態
+        if (loadedStyleId) setSelectedStyleId(loadedStyleId)
+        if (loadedTemplateData) setTemplateData(loadedTemplateData)
+        if (draftData.tripDays) setTripDays(loadedTripDays)
+        if (loadedMemoSettings) setMemoSettings(loadedMemoSettings)
+        if (loadedHotels) setHotels(loadedHotels)
+        if (draftData.selectedCountryCode) setSelectedCountryCode(draftData.selectedCountryCode)
+        if (draftData.savedAt) setLastSavedAt(new Date(draftData.savedAt))
+
+        // 重新生成所有頁面
+        if (loadedStyleId && loadedTemplateData) {
+          const style = styleSeries.find((s) => s.id === loadedStyleId)
+          if (style) {
+            const newPages: Record<string, CanvasPage | null> = {
+              cover: generatePageFromTemplate(style.templates.cover, loadedTemplateData),
+              toc: generatePageFromTemplate(style.templates.toc, { ...loadedTemplateData, hotels: loadedHotels, memoSettings: loadedMemoSettings }),
+              itinerary: generatePageFromTemplate(style.templates.itinerary, loadedTemplateData),
+            }
+
+            // 生成每日行程頁面
+            for (let i = 0; i < loadedTripDays; i++) {
+              const dailyData = { ...loadedTemplateData, currentDayIndex: i }
+              newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+            }
+
+            // 生成飯店頁面
+            loadedHotels.forEach((hotel: HotelData, i: number) => {
+              if (hotel.enabled !== false) {
+                const hotelData = { ...loadedTemplateData, currentHotelIndex: i, hotels: loadedHotels }
+                newPages[`hotel-${i}`] = generatePageFromTemplate(style.templates.hotel, hotelData)
+              }
+            })
+
+            // 生成備忘錄頁面
+            if (loadedMemoSettings) {
+              const pageCount = calculateMemoPageCount(loadedMemoSettings)
+              for (let i = 0; i < pageCount; i++) {
+                const memoData = { ...loadedTemplateData, memoSettings: loadedMemoSettings, currentMemoPageIndex: i }
+                newPages[`memo-${i}`] = generatePageFromTemplate(style.templates.memo, memoData)
+              }
+            }
+
+            setPages(newPages)
+            setCurrentPageType('cover')
+          }
+        }
+        return true
+      }
+    } catch (error) {
+      console.error('載入草稿失敗:', error)
+    }
+    return false
+  }, [getDraftKey])
+
+  // 檢查是否有草稿並提示載入
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(getDraftKey())
+    if (savedDraft && !selectedStyleId) {
+      try {
+        const draftData = JSON.parse(savedDraft)
+        const savedTime = draftData.savedAt ? new Date(draftData.savedAt).toLocaleString('zh-TW') : '未知時間'
+        if (window.confirm(`發現未完成的草稿（儲存於 ${savedTime}）\n\n是否要載入草稿繼續編輯？`)) {
+          loadDraft()
+        }
+      } catch (error) {
+        console.error('解析草稿失敗:', error)
+      }
+    }
+  }, [getDraftKey, loadDraft, selectedStyleId])
 
   const handleAddImageClick = useCallback(() => {
     const url = prompt('請輸入圖片網址：')
@@ -1467,8 +1589,24 @@ function DesignerPageContent() {
               <span className="text-xs text-morandi-muted">({templateDataHistory.length})</span>
             )}
           </Button>
-          <Button variant="outline" size="sm">
-            儲存草稿
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft}
+            className="gap-1.5"
+          >
+            {isSavingDraft ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <FileText size={14} />
+            )}
+            {isSavingDraft ? '儲存中...' : '儲存草稿'}
+            {lastSavedAt && !isSavingDraft && (
+              <span className="text-xs text-morandi-muted">
+                ({lastSavedAt.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })})
+              </span>
+            )}
           </Button>
           <Button
             size="sm"
