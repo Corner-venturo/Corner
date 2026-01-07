@@ -9,9 +9,12 @@ import {
   Rect,
   Textbox,
   Circle,
+  Ellipse,
   Image as FabricImage,
   Group,
   Object as FabricObject,
+  Path,
+  Gradient,
 } from 'fabric'
 import type {
   CanvasPage,
@@ -19,13 +22,46 @@ import type {
   ShapeElement,
   TextElement,
   ImageElement,
+  IconElement,
   FabricObjectWithData,
+  GradientFill,
 } from '../types'
+import { MATERIAL_ICON_PATHS, ICON_VIEWBOX_SIZE } from './icon-paths'
 
 interface RenderOptions {
   isEditable: boolean
   canvasWidth: number
   canvasHeight: number
+}
+
+/**
+ * 建立圓角矩形的 SVG Path 字串
+ * 支援四個角有不同的圓角半徑（用於圓拱形狀）
+ */
+function createRoundedRectPath(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  borderRadius: { topLeft?: number; topRight?: number; bottomLeft?: number; bottomRight?: number }
+): string {
+  const tl = Math.min(borderRadius.topLeft || 0, width / 2, height / 2)
+  const tr = Math.min(borderRadius.topRight || 0, width / 2, height / 2)
+  const br = Math.min(borderRadius.bottomRight || 0, width / 2, height / 2)
+  const bl = Math.min(borderRadius.bottomLeft || 0, width / 2, height / 2)
+
+  return `
+    M ${x + tl} ${y}
+    L ${x + width - tr} ${y}
+    Q ${x + width} ${y} ${x + width} ${y + tr}
+    L ${x + width} ${y + height - br}
+    Q ${x + width} ${y + height} ${x + width - br} ${y + height}
+    L ${x + bl} ${y + height}
+    Q ${x} ${y + height} ${x} ${y + height - bl}
+    L ${x} ${y + tl}
+    Q ${x} ${y} ${x + tl} ${y}
+    Z
+  `.trim()
 }
 
 function getCommonProps(
@@ -42,6 +78,47 @@ function getCommonProps(
       elementId: el.id,
       elementType: el.type,
     },
+  }
+}
+
+/**
+ * 建立 Fabric.js 漸層物件
+ */
+function createFabricGradient(gradient: GradientFill, width: number, height: number) {
+  const isVertical = gradient.direction === 'vertical'
+
+  if (gradient.type === 'linear') {
+    return new Gradient<'linear'>({
+      type: 'linear',
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: isVertical ? 0 : 1,
+        y2: isVertical ? 1 : 0,
+      },
+      colorStops: gradient.colorStops.map(stop => ({
+        offset: stop.offset,
+        color: stop.color,
+      })),
+    })
+  } else {
+    return new Gradient<'radial'>({
+      type: 'radial',
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0.5,
+        y1: 0.5,
+        x2: 0.5,
+        y2: 0.5,
+        r1: 0,
+        r2: 0.5,
+      },
+      colorStops: gradient.colorStops.map(stop => ({
+        offset: stop.offset,
+        color: stop.color,
+      })),
+    })
   }
 }
 
@@ -63,6 +140,11 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
 
   const commonProps = getCommonProps(el, isEditable)
 
+  // 決定填充：漸層優先於純色
+  const fill = el.gradient
+    ? createFabricGradient(el.gradient, el.width, el.height)
+    : (el.fill || '#e0e0e0')
+
   switch (el.variant) {
     case 'rectangle':
       return new Rect({
@@ -71,9 +153,10 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         top: y,
         width: el.width,
         height: el.height,
-        fill: el.fill || '#e0e0e0',
+        fill: fill,
         stroke: el.stroke,
         strokeWidth: el.strokeWidth,
+        strokeDashArray: el.strokeDashArray,
         rx: el.cornerRadius,
         ry: el.cornerRadius,
         originX: 'left',
@@ -86,9 +169,26 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
         left: x,
         top: y,
         radius: Math.min(el.width, el.height) / 2,
-        fill: el.fill || '#e0e0e0',
+        fill: fill,
         stroke: el.stroke,
         strokeWidth: el.strokeWidth,
+        strokeDashArray: el.strokeDashArray,
+        originX: 'left',
+        originY: 'top',
+      })
+
+    case 'ellipse':
+      // 橢圓：中間粗、兩端細的效果
+      return new Ellipse({
+        ...commonProps,
+        left: x,
+        top: y,
+        rx: el.width / 2,  // 水平半徑
+        ry: el.height / 2, // 垂直半徑
+        fill: fill,
+        stroke: el.stroke,
+        strokeWidth: el.strokeWidth,
+        strokeDashArray: el.strokeDashArray,
         originX: 'left',
         originY: 'top',
       })
@@ -176,16 +276,29 @@ async function renderImageElement(
     const offsetX = (targetWidth - scaledWidth) / 2
     const offsetY = (targetHeight - scaledHeight) / 2
 
-    // 建立裁切用的矩形（使用絕對定位）
-    const clipRect = new Rect({
-      left: el.x,
-      top: el.y,
-      width: targetWidth,
-      height: targetHeight,
-      originX: 'left',
-      originY: 'top',
-      absolutePositioned: true,
-    })
+    // 建立裁切用的形狀（支援自訂圓角）
+    let clipShape: Rect | Path
+
+    if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
+      // 使用自訂圓角 Path（圓拱形狀）
+      const pathData = createRoundedRectPath(el.x, el.y, targetWidth, targetHeight, el.borderRadius)
+      clipShape = new Path(pathData, {
+        originX: 'left',
+        originY: 'top',
+        absolutePositioned: true,
+      })
+    } else {
+      // 預設矩形裁切
+      clipShape = new Rect({
+        left: el.x,
+        top: el.y,
+        width: targetWidth,
+        height: targetHeight,
+        originX: 'left',
+        originY: 'top',
+        absolutePositioned: true,
+      })
+    }
 
     // 直接對圖片設定位置和裁切
     fabricImg.set({
@@ -196,7 +309,7 @@ async function renderImageElement(
       scaleY,
       originX: 'left',
       originY: 'top',
-      clipPath: clipRect,
+      clipPath: clipShape,
     })
 
     return fabricImg
@@ -219,6 +332,73 @@ async function renderImageElement(
 }
 
 /**
+ * 渲染圖標元素（使用 SVG Path）
+ */
+function renderIconElement(el: IconElement, options: RenderOptions): FabricObject {
+  const { isEditable } = options
+
+  const pathData = MATERIAL_ICON_PATHS[el.icon]
+  if (!pathData) {
+    // 圖標不存在時顯示佔位符
+    console.warn(`[Renderer] Icon "${el.icon}" not found, using placeholder`)
+    return new Rect({
+      ...getCommonProps(el, isEditable),
+      left: el.x,
+      top: el.y,
+      width: el.size,
+      height: el.size,
+      fill: el.color,
+      opacity: 0.3,
+      originX: 'left',
+      originY: 'top',
+    })
+  }
+
+  // 計算縮放比例（從 24x24 viewBox 縮放到目標尺寸）
+  const scale = el.size / ICON_VIEWBOX_SIZE
+
+  const path = new Path(pathData, {
+    ...getCommonProps(el, isEditable),
+    left: el.x,
+    top: el.y,
+    fill: el.color,
+    scaleX: scale,
+    scaleY: scale,
+    originX: 'left',
+    originY: 'top',
+  })
+
+  return path
+}
+
+/**
+ * 確保必要的字體已載入
+ */
+async function ensureFontsLoaded(): Promise<void> {
+  // 等待所有字體載入完成
+  if (typeof document !== 'undefined' && document.fonts) {
+    await document.fonts.ready
+
+    // 額外確保特定字體已載入
+    const requiredFonts = [
+      'Material Symbols Outlined',
+      'Zen Old Mincho',
+      'Noto Serif TC',
+      'Noto Sans TC',
+    ]
+
+    for (const fontName of requiredFonts) {
+      try {
+        // 嘗試載入字體
+        await document.fonts.load(`14px "${fontName}"`)
+      } catch {
+        // 忽略載入失敗
+      }
+    }
+  }
+}
+
+/**
  * 將頁面渲染到 Canvas 上
  */
 export async function renderPageOnCanvas(
@@ -226,6 +406,9 @@ export async function renderPageOnCanvas(
   page: CanvasPage,
   options: RenderOptions
 ): Promise<void> {
+  // 確保字體已載入
+  await ensureFontsLoaded()
+
   // 清除現有內容
   canvas.clear()
   canvas.backgroundColor = page.backgroundColor
@@ -242,6 +425,8 @@ export async function renderPageOnCanvas(
         return Promise.resolve(renderTextElement(el as TextElement, options))
       case 'image':
         return renderImageElement(el as ImageElement, options)
+      case 'icon':
+        return Promise.resolve(renderIconElement(el as IconElement, options))
       default:
         return Promise.resolve(null)
     }

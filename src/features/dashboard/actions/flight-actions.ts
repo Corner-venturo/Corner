@@ -254,13 +254,66 @@ function getAirlineChineseName(iataCode: string, englishName: string): string {
 }
 
 /**
+ * 將 API 回傳的單筆航班資料轉換為 FlightData 格式
+ */
+function transformFlightData(flight: ApiFlightData, flightDate: string, cleanFlightNumber: string): FlightData {
+  const dep = flight.departure || {}
+  const arr = flight.arrival || {}
+
+  // AeroDataBox 時間格式: scheduledTime.local = "2025-12-09 14:35+09:00"
+  const depScheduledTime = dep.scheduledTime?.local || dep.scheduledTime?.utc
+  const arrScheduledTime = arr.scheduledTime?.local || arr.scheduledTime?.utc
+  const depActualTime = dep.revisedTime?.local || dep.revisedTime?.utc
+  const arrActualTime = arr.revisedTime?.local || arr.revisedTime?.utc
+
+  const airlineCode = flight.airline?.iata || ''
+  const airlineName = getAirlineChineseName(airlineCode, flight.airline?.name || '')
+  const depIata = dep.airport?.iata || ''
+  const arrIata = arr.airport?.iata || ''
+
+  return {
+    flightNumber: flight.number || cleanFlightNumber,
+    airline: airlineName,
+    departure: {
+      airport: getAirportChineseName(depIata, dep.airport?.name || ''),
+      iata: depIata,
+      terminal: dep.terminal,
+      gate: dep.gate,
+      time: formatTime(depScheduledTime),
+      scheduledTime: formatTime(depScheduledTime),
+      actualTime: depActualTime ? formatTime(depActualTime) : undefined,
+    },
+    arrival: {
+      airport: getAirportChineseName(arrIata, arr.airport?.name || ''),
+      iata: arrIata,
+      terminal: arr.terminal,
+      gate: arr.gate,
+      time: formatTime(arrScheduledTime),
+      scheduledTime: formatTime(arrScheduledTime),
+      actualTime: arrActualTime ? formatTime(arrActualTime) : undefined,
+    },
+    status: flight.status || 'Unknown',
+    statusText: getStatusText(flight.status || 'Unknown'),
+    aircraft: (flight as ApiFlightData & { aircraft?: { model?: string } }).aircraft?.model,
+    date: flightDate,
+    duration: depScheduledTime && arrScheduledTime
+      ? calculateDuration(depScheduledTime, arrScheduledTime)
+      : undefined,
+  }
+}
+
+/**
  * 查詢單一航班
  * AeroDataBox API: /flights/number/{flightNumber}/{date}
+ *
+ * 注意：同一航班號可能有多個航段（如 TR874 有 SIN→TPE 和 TPE→NRT）
+ * - 單一航段時返回 { data: FlightData }
+ * - 多航段時返回 { segments: FlightData[] } 讓 UI 選擇
  */
 export async function searchFlightAction(
   flightNumber: string,
   flightDate: string
-): Promise<{ data?: FlightData; error?: string }> {
+): Promise<{ data?: FlightData; segments?: FlightData[]; error?: string }> {
   const apiKey = getApiKey()
 
   if (!apiKey) {
@@ -299,55 +352,19 @@ export async function searchFlightAction(
       return { error: '找不到該航班的資訊。' }
     }
 
-    // 取第一筆結果
-    const flight = apiData[0]
-    const dep = flight.departure || {}
-    const arr = flight.arrival || {}
-
-    // AeroDataBox 時間格式: scheduledTime.local = "2025-12-09 14:35+09:00"
-    const depScheduledTime = dep.scheduledTime?.local || dep.scheduledTime?.utc
-    const arrScheduledTime = arr.scheduledTime?.local || arr.scheduledTime?.utc
-    const depActualTime = dep.actualTime?.local || dep.actualTime?.utc
-    const arrActualTime = arr.actualTime?.local || arr.actualTime?.utc
-
-    const airlineCode = flight.airline?.iata || ''
-    const airlineName = getAirlineChineseName(airlineCode, flight.airline?.name || '')
-    const depIata = dep.airport?.iata || ''
-    const arrIata = arr.airport?.iata || ''
-
-    const transformedData: FlightData = {
-      flightNumber: flight.number || cleanFlightNumber,
-      airline: airlineName,
-      departure: {
-        airport: getAirportChineseName(depIata, dep.airport?.name || ''),
-        iata: depIata,
-        terminal: dep.terminal,
-        gate: dep.gate,
-        time: formatTime(depScheduledTime),
-        scheduledTime: formatTime(depScheduledTime),
-        actualTime: depActualTime ? formatTime(depActualTime) : undefined,
-        delay: dep.delay,
-      },
-      arrival: {
-        airport: getAirportChineseName(arrIata, arr.airport?.name || ''),
-        iata: arrIata,
-        terminal: arr.terminal,
-        gate: arr.gate,
-        time: formatTime(arrScheduledTime),
-        scheduledTime: formatTime(arrScheduledTime),
-        actualTime: arrActualTime ? formatTime(arrActualTime) : undefined,
-      },
-      status: flight.status || 'Unknown',
-      statusText: getStatusText(flight.status || 'Unknown'),
-      aircraft: flight.aircraft?.model,
-      date: flightDate,
-      duration: depScheduledTime && arrScheduledTime
-        ? calculateDuration(depScheduledTime, arrScheduledTime)
-        : undefined,
+    // 如果只有一筆結果，直接返回
+    if (apiData.length === 1) {
+      const transformedData = transformFlightData(apiData[0], flightDate, cleanFlightNumber)
+      logger.log(`✅ 航班查詢成功: ${cleanFlightNumber}`)
+      return { data: transformedData }
     }
 
-    logger.log(`✅ 航班查詢成功: ${cleanFlightNumber}`)
-    return { data: transformedData }
+    // 多航段：返回所有航段讓用戶選擇
+    const segments = apiData.map((flight: ApiFlightData) =>
+      transformFlightData(flight, flightDate, cleanFlightNumber)
+    )
+    logger.log(`✅ 航班查詢成功: ${cleanFlightNumber}，共 ${segments.length} 個航段`)
+    return { segments }
   } catch (error) {
     logger.error('Failed to fetch flight data:', error)
     return { error: '查詢航班時發生網路錯誤。' }

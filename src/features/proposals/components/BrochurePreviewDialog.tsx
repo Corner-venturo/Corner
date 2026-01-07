@@ -4,18 +4,25 @@
 
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Printer, Loader2, X } from 'lucide-react'
+import { Printer, Loader2, History, ChevronDown } from 'lucide-react'
 import { useItineraryStore, useAuthStore } from '@/stores'
 import { formatDateTW } from '@/lib/utils/format-date'
-import type { Itinerary } from '@/stores/types'
+import { supabase } from '@/lib/supabase/client'
+import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 
 interface BrochurePreviewDialogProps {
   isOpen: boolean
@@ -28,32 +35,71 @@ export function BrochurePreviewDialog({
   onClose,
   itineraryId,
 }: BrochurePreviewDialogProps) {
-  const { items: itineraries, fetchAll } = useItineraryStore()
+  const { fetchAll } = useItineraryStore()
   const { user } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
+  const [selectedVersionIndex, setSelectedVersionIndex] = useState(-1) // -1 = 主版本
+
+  // 版本記錄
+  const versionRecords = useMemo(() => {
+    return (itinerary?.version_records || []) as ItineraryVersionRecord[]
+  }, [itinerary])
+
+  // 根據選中的版本取得每日行程
+  const currentDailyItinerary = useMemo(() => {
+    if (!itinerary) return []
+    if (selectedVersionIndex === -1) {
+      // 主版本
+      return itinerary.daily_itinerary || []
+    }
+    // 特定版本
+    const version = versionRecords[selectedVersionIndex]
+    return version?.daily_itinerary || itinerary.daily_itinerary || []
+  }, [itinerary, selectedVersionIndex, versionRecords])
+
+  // 取得當前版本名稱
+  const getCurrentVersionName = () => {
+    if (selectedVersionIndex === -1) {
+      return '主版本'
+    }
+    const record = versionRecords[selectedVersionIndex]
+    return record?.note || `版本 ${record?.version || selectedVersionIndex + 1}`
+  }
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && itineraryId) {
       setLoading(true)
-      fetchAll().then(() => setLoading(false))
-    }
-  }, [isOpen, fetchAll])
+      setSelectedVersionIndex(-1) // 重置版本選擇
 
-  useEffect(() => {
-    if (!loading && itineraryId) {
-      const found = itineraries.find(i => i.id === itineraryId)
-      setItinerary(found || null)
+      // 直接從資料庫載入最新資料
+      const loadData = async () => {
+        const { data, error } = await supabase
+          .from('itineraries')
+          .select('*')
+          .eq('id', itineraryId)
+          .single()
+
+        if (!error && data) {
+          setItinerary(data as unknown as Itinerary)
+        } else {
+          setItinerary(null)
+        }
+        setLoading(false)
+      }
+
+      loadData()
+      fetchAll() // 同時更新 SWR 快取
     }
-  }, [loading, itineraryId, itineraries])
+  }, [isOpen, itineraryId, fetchAll])
 
   const handlePrint = () => {
     // 開新視窗列印
     const printWindow = window.open('', '_blank')
     if (!printWindow || !itinerary) return
 
-    const dailyItinerary = itinerary.daily_itinerary || []
+    const dailyItinerary = currentDailyItinerary
     const companyName = user?.workspace_code || '旅行社'
 
     const printContent = `
@@ -136,7 +182,6 @@ export function BrochurePreviewDialog({
     printWindow.print()
   }
 
-  const dailyItinerary = itinerary?.daily_itinerary || []
   const companyName = user?.workspace_code || '旅行社'
 
   return (
@@ -152,12 +197,42 @@ export function BrochurePreviewDialog({
             )}
           </DialogTitle>
           <div className="flex items-center gap-2">
+            {/* 版本選擇器 */}
+            {itinerary && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1">
+                    <History size={12} />
+                    {getCurrentVersionName()}
+                    <ChevronDown size={12} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => setSelectedVersionIndex(-1)}
+                    className={selectedVersionIndex === -1 ? 'bg-morandi-gold/10' : ''}
+                  >
+                    主版本
+                  </DropdownMenuItem>
+                  {versionRecords.map((record, idx) => (
+                    <DropdownMenuItem
+                      key={idx}
+                      onClick={() => setSelectedVersionIndex(idx)}
+                      className={selectedVersionIndex === idx ? 'bg-morandi-gold/10' : ''}
+                    >
+                      {record.note || `版本 ${record.version}`}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button
               onClick={handlePrint}
               disabled={!itinerary}
-              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+              size="sm"
+              className="h-7 text-[11px] bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
             >
-              <Printer size={16} />
+              <Printer size={12} />
               列印
             </Button>
           </div>
@@ -205,7 +280,7 @@ export function BrochurePreviewDialog({
                   </div>
                   <div className="flex gap-2">
                     <span className="text-morandi-secondary">行程天數：</span>
-                    <span className="font-medium">{dailyItinerary.length} 天</span>
+                    <span className="font-medium">{currentDailyItinerary.length} 天</span>
                   </div>
                 </div>
               </div>
@@ -223,7 +298,7 @@ export function BrochurePreviewDialog({
                   </tr>
                 </thead>
                 <tbody>
-                  {dailyItinerary.map((day, index) => (
+                  {currentDailyItinerary.map((day, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-morandi-container/20'}>
                       <td className="border border-morandi-container px-3 py-2">
                         <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>

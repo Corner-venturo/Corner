@@ -1,0 +1,506 @@
+/**
+ * TourRequestFormDialog - 正式需求單
+ *
+ * 功能：
+ * 1. 顯示單一供應商的需求明細
+ * 2. 可編輯項目
+ * 3. 開新視窗列印（避免 Dialog z-index 問題）
+ */
+
+'use client'
+
+import React, { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DIALOG_SIZES,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  X,
+  Printer,
+  FileText,
+  Plus,
+  Trash2,
+} from 'lucide-react'
+import { SupplierSearchInput } from './SupplierSearchInput'
+import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
+import { COMPANY } from '@/lib/constants/company'
+import type { Proposal, ProposalPackage } from '@/types/proposal.types'
+
+// 供應商資料類型（從 SupplierSearchInput 選取）
+interface SelectedSupplier {
+  id: string
+  name: string
+  contact_person?: string
+  phone?: string
+}
+
+// 需求項目類型
+interface RequestItem {
+  id: string
+  date: string
+  title: string      // 餐別/房型/項目
+  quantity: number
+  unitPrice: number
+  note: string
+}
+
+// 分類對應的欄位標題
+const CATEGORY_COLUMNS: Record<string, { dateLabel: string; titleLabel: string; qtyLabel: string }> = {
+  hotel: { dateLabel: '日期', titleLabel: '房型', qtyLabel: '間數' },
+  restaurant: { dateLabel: '日期', titleLabel: '餐別', qtyLabel: '人數' },
+  transport: { dateLabel: '日期', titleLabel: '路線/車型', qtyLabel: '台數' },
+  activity: { dateLabel: '日期', titleLabel: '項目', qtyLabel: '人數' },
+  other: { dateLabel: '日期', titleLabel: '項目', qtyLabel: '數量' },
+}
+
+// 分類中文名
+const CATEGORY_NAMES: Record<string, string> = {
+  hotel: '住宿',
+  restaurant: '餐飲',
+  transport: '交通',
+  activity: '門票/活動',
+  other: '其他',
+}
+
+interface TourRequestFormDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  pkg: ProposalPackage | null
+  proposal: Proposal | null
+  // 從需求確認單傳入的資料
+  category: string
+  supplierName: string
+  items: {
+    id?: string
+    serviceDate: string | null
+    title: string
+    quantity: number
+    note?: string
+  }[]
+  tourCode?: string
+  tourName?: string
+  departureDate?: string
+  pax?: number
+}
+
+export function TourRequestFormDialog({
+  isOpen,
+  onClose,
+  pkg,
+  proposal,
+  category,
+  supplierName,
+  items: initialItems,
+  tourCode,
+  tourName,
+  departureDate,
+  pax,
+}: TourRequestFormDialogProps) {
+  // 編輯狀態的項目
+  const [items, setItems] = useState<RequestItem[]>(() =>
+    initialItems.map((item, idx) => ({
+      id: item.id || `new-${idx}`,
+      date: item.serviceDate || '',
+      title: item.title,
+      quantity: item.quantity,
+      unitPrice: 0,
+      note: item.note || '',
+    }))
+  )
+
+  // 供應商資訊（可編輯）
+  const [supplierInfo, setSupplierInfo] = useState({
+    name: supplierName,
+    contactPerson: '',
+    phone: '',
+    fax: '',
+  })
+
+  // 載入公司 Logo（用於新視窗列印）
+  const logoUrl = usePrintLogo(isOpen)
+
+  // 選擇供應商時自動帶入資訊
+  const handleSupplierSelect = (supplier: SelectedSupplier) => {
+    setSupplierInfo({
+      name: supplier.name,
+      contactPerson: supplier.contact_person || '',
+      phone: supplier.phone || '',
+      fax: '',
+    })
+  }
+
+  // 我方資訊（TODO: 之後從 workspace settings 讀取）
+  const companyInfo = {
+    name: '角落旅行社',
+    contactPerson: '',
+    phone: '',
+    fax: '',
+  }
+
+  // 取得欄位設定
+  const columns = CATEGORY_COLUMNS[category] || CATEGORY_COLUMNS.other
+  const categoryName = CATEGORY_NAMES[category] || '需求'
+
+  // 更新項目
+  const updateItem = (id: string, field: keyof RequestItem, value: string | number) => {
+    setItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    )
+  }
+
+  // 新增項目
+  const addItem = () => {
+    setItems(prev => [
+      ...prev,
+      {
+        id: `new-${Date.now()}`,
+        date: '',
+        title: '',
+        quantity: 1,
+        unitPrice: 0,
+        note: '',
+      },
+    ])
+  }
+
+  // 刪除項目
+  const removeItem = (id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id))
+  }
+
+  // 格式化日期
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return ''
+    return new Date(dateStr).toLocaleDateString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+  }
+
+  if (!pkg) return null
+
+  // 開啟新視窗列印（避免 Dialog z-index 問題）
+  const handlePrintInNewWindow = () => {
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
+    if (!printWindow) {
+      alert('請允許彈出視窗以進行列印')
+      return
+    }
+
+    // 建立列印內容 HTML
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${categoryName}需求單</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 40px;
+            max-width: 794px;
+            margin: 0 auto;
+          }
+          .header {
+            position: relative;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #B8A99A;
+          }
+          .logo { position: absolute; left: 0; top: 0; width: 120px; height: 40px; object-fit: contain; }
+          .title-area { text-align: center; padding: 8px 0; }
+          .subtitle { font-size: 14px; letter-spacing: 2px; color: #B8A99A; margin-bottom: 4px; }
+          .title { font-size: 20px; font-weight: bold; color: #333; }
+          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px; }
+          .info-section { }
+          .info-title { font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 8px; }
+          .info-row { font-size: 14px; margin-bottom: 4px; }
+          .tour-info { background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+          .tour-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; font-size: 14px; }
+          table { width: 100%; border-collapse: collapse; font-size: 14px; }
+          th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+          th { background: #f5f5f5; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; text-align: center; font-size: 12px; color: #B8B2AA; font-style: italic; }
+          .print-controls { padding: 16px; border-bottom: 1px solid #eee; text-align: right; }
+          .print-controls button { padding: 8px 16px; margin-left: 8px; cursor: pointer; border-radius: 6px; }
+          .btn-outline { background: white; border: 1px solid #ddd; }
+          .btn-primary { background: #c9aa7c; color: white; border: none; }
+          @media print { .print-controls { display: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="print-controls">
+          <button class="btn-outline" onclick="window.close()">關閉</button>
+          <button class="btn-primary" onclick="window.print()">列印</button>
+        </div>
+
+        <div class="header">
+          ${logoUrl ? `<img src="${logoUrl}" class="logo" alt="Logo" />` : '<div style="position:absolute;left:0;top:0;font-size:12px;color:#999;">角落旅行社</div>'}
+          <div class="title-area">
+            <div class="subtitle">REQUEST FORM</div>
+            <div class="title">${categoryName}需求單</div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-section">
+            <div class="info-title">我方資訊</div>
+            <div class="info-row">公司：${companyInfo.name}</div>
+            ${companyInfo.phone ? `<div class="info-row">電話：${companyInfo.phone}</div>` : ''}
+          </div>
+          <div class="info-section">
+            <div class="info-title">廠商資訊</div>
+            <div class="info-row">廠商：${supplierInfo.name}</div>
+            ${supplierInfo.contactPerson ? `<div class="info-row">聯絡人：${supplierInfo.contactPerson}</div>` : ''}
+            ${supplierInfo.phone ? `<div class="info-row">電話：${supplierInfo.phone}</div>` : ''}
+          </div>
+        </div>
+
+        <div class="tour-info">
+          <div class="tour-grid">
+            <div>團號：${tourCode || '-'}</div>
+            <div>團名：${tourName || proposal?.title || '-'}</div>
+            <div>出發日期：${formatDate(departureDate || pkg?.start_date)}</div>
+            <div>人數：${pax || proposal?.group_size || '-'} 人</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>${columns.dateLabel}</th>
+              <th>${columns.titleLabel}</th>
+              <th class="text-center">${columns.qtyLabel}</th>
+              <th class="text-right">單價</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td>${formatDate(item.date)}</td>
+                <td>${item.title}</td>
+                <td class="text-center">${item.quantity}</td>
+                <td class="text-right">${item.unitPrice > 0 ? '$' + item.unitPrice.toLocaleString() : '-'}</td>
+                <td>${item.note || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="footer">${COMPANY.subtitle}</div>
+      </body>
+      </html>
+    `
+
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
+      <DialogContent nested className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText size={18} className="text-morandi-gold" />
+              {categoryName}需求單 - {supplierInfo.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            {/* 雙欄資訊區 */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* 我方資訊 */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
+                  我方資訊
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary w-16">公司：</span>
+                    <span>{companyInfo.name}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary w-16">電話：</span>
+                    <span>{companyInfo.phone}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary w-16">傳真：</span>
+                    <span>{companyInfo.fax}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 廠商資訊 */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
+                  廠商資訊
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex gap-2 items-center">
+                    <span className="text-morandi-secondary w-16">廠商：</span>
+                    <SupplierSearchInput
+                      value={supplierInfo.name}
+                      onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val }))}
+                      onSupplierSelect={handleSupplierSelect}
+                      className="flex-1"
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-morandi-secondary w-16">聯絡人：</span>
+                    <Input
+                      value={supplierInfo.contactPerson}
+                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
+                      className="h-7 text-sm"
+                      placeholder="輸入聯絡人"
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-morandi-secondary w-16">電話：</span>
+                    <Input
+                      value={supplierInfo.phone}
+                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      className="h-7 text-sm"
+                      placeholder="輸入電話"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 團體資訊 */}
+            <div className="bg-morandi-container/30 rounded-lg p-4">
+              <div className="grid grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="text-morandi-secondary">團號：</span>
+                  <span className="font-medium ml-1">{tourCode || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">團名：</span>
+                  <span className="font-medium ml-1">{tourName || proposal?.title || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">出發日期：</span>
+                  <span className="font-medium ml-1">{formatDate(departureDate || pkg.start_date)}</span>
+                </div>
+                <div>
+                  <span className="text-morandi-secondary">人數：</span>
+                  <span className="font-medium ml-1">{pax || proposal?.group_size || '-'} 人</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 需求明細表格 */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-morandi-container/50 border-b border-border">
+                    <th className="px-3 py-2 text-left font-medium w-[100px]">{columns.dateLabel}</th>
+                    <th className="px-3 py-2 text-left font-medium">{columns.titleLabel}</th>
+                    <th className="px-3 py-2 text-center font-medium w-[80px]">{columns.qtyLabel}</th>
+                    <th className="px-3 py-2 text-center font-medium w-[100px]">單價</th>
+                    <th className="px-3 py-2 text-left font-medium w-[150px]">備註</th>
+                    <th className="px-3 py-2 text-center font-medium w-[60px]">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id} className="border-t border-border/50">
+                      <td className="px-2 py-1">
+                        <Input
+                          type="date"
+                          value={item.date}
+                          onChange={(e) => updateItem(item.id, 'date', e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input
+                          value={item.title}
+                          onChange={(e) => updateItem(item.id, 'title', e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
+                          className="h-8 text-sm text-center"
+                        />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input
+                          type="number"
+                          value={item.unitPrice}
+                          onChange={(e) => updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)}
+                          className="h-8 text-sm text-right"
+                          placeholder="0"
+                        />
+                      </td>
+                      <td className="px-2 py-1">
+                        <Input
+                          value={item.note}
+                          onChange={(e) => updateItem(item.id, 'note', e.target.value)}
+                          className="h-8 text-sm"
+                          placeholder="備註"
+                        />
+                      </td>
+                      <td className="px-2 py-1 text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeItem(item.id)}
+                          className="h-7 w-7 p-0 text-morandi-red hover:bg-red-50"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* 新增按鈕 */}
+              <div className="p-2 border-t border-border/50">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={addItem}
+                  className="gap-1 text-morandi-gold hover:text-morandi-gold-hover"
+                >
+                  <Plus size={14} />
+                  新增項目
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* 底部按鈕 */}
+          <div className="flex justify-end gap-2 pt-4 border-t border-border">
+            <Button variant="outline" onClick={onClose} className="gap-2">
+              <X size={16} />
+              關閉
+            </Button>
+            <Button
+              onClick={handlePrintInNewWindow}
+              className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+            >
+              <Printer size={16} />
+              列印
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+  )
+}

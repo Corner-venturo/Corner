@@ -77,7 +77,7 @@ export const ToursPage: React.FC = () => {
     if (countries.length === 0) {
       fetchRegions()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   const {

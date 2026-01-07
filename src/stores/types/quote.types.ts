@@ -42,6 +42,7 @@ export interface Quote {
   // rejected: 已拒絕
   tour_id?: string // 關聯的旅遊團ID
   itinerary_id?: string // 關聯的行程表ID
+  proposal_package_id?: string // 關聯的提案套件ID
   converted_to_tour?: boolean // 是否已轉成旅遊團
   is_pinned?: boolean // 是否置頂（範本報價單）
   regions?: QuoteRegion[] // 多地區支援（新）

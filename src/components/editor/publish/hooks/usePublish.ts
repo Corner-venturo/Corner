@@ -10,6 +10,7 @@ import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
+import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
 
 interface PublishButtonData extends Partial<TourFormData> {
   id?: string
@@ -17,6 +18,7 @@ interface PublishButtonData extends Partial<TourFormData> {
   tourId?: string
   meetingInfo?: unknown
   version_records?: ItineraryVersionRecord[]
+  proposalPackageId?: string // 提案套件 ID（用於關聯報價單）
 }
 
 interface UsePublishProps {
@@ -155,6 +157,11 @@ export function usePublish({
           await update(data.id, { version_records: updatedRecords })
           onVersionRecordsChange?.(updatedRecords)
         }
+
+        // 同步餐食/住宿資料到關聯的報價單
+        if (data.dailyItinerary && data.dailyItinerary.length > 0) {
+          await syncItineraryToQuote(data.id, data.dailyItinerary)
+        }
       } else {
         const firstVersion: ItineraryVersionRecord = {
           id: generateUUID(),
@@ -199,7 +206,7 @@ export function usePublish({
       const newVersion: ItineraryVersionRecord = {
         id: generateUUID(),
         version: versionRecords.length + 1,
-        note: versionNote || `版本 ${versionRecords.length + 1}`,
+        note: versionNote || stripHtml(data.title) || `版本 ${versionRecords.length + 1}`,
         daily_itinerary: data.dailyItinerary || [],
         features: data.features,
         focus_cards: data.focusCards,
@@ -212,6 +219,11 @@ export function usePublish({
       const updatedRecords = [...versionRecords, newVersion]
       await update(data.id, { version_records: updatedRecords })
       onVersionRecordsChange?.(updatedRecords)
+
+      // 同步餐食/住宿資料到關聯的報價單
+      if (data.dailyItinerary && data.dailyItinerary.length > 0) {
+        await syncItineraryToQuote(data.id, data.dailyItinerary)
+      }
 
       setVersionNote('')
       onVersionChange(updatedRecords.length - 1, newVersion)

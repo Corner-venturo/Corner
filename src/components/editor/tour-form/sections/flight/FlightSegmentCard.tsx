@@ -4,6 +4,7 @@ import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, Loader2, List } from 'lucide-react'
+import type { FlightSegment } from './FlightSearchDialog'
 
 interface FlightSegmentCardProps {
   title: string
@@ -22,6 +23,10 @@ interface FlightSegmentCardProps {
   onSearch: () => void
   onRouteSearch: () => void
   isLoading: boolean
+  // 多航段選擇
+  segments?: FlightSegment[]
+  onSelectSegment?: (segment: FlightSegment) => void
+  onClearSegments?: () => void
 }
 
 export function FlightSegmentCard({
@@ -31,6 +36,9 @@ export function FlightSegmentCard({
   onSearch,
   onRouteSearch,
   isLoading,
+  segments,
+  onSelectSegment,
+  onClearSegments,
 }: FlightSegmentCardProps) {
   return (
     <div className="bg-[#F9F8F6] p-4 rounded-lg space-y-3 border border-[#E8E4E0]">
@@ -73,6 +81,44 @@ export function FlightSegmentCard({
           </Button>
         </div>
       </div>
+
+      {/* 多航段選擇器 */}
+      {segments && segments.length > 0 && onSelectSegment && (
+        <div className="bg-white p-3 rounded-lg border border-morandi-gold/30 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-morandi-secondary">此航班有多個航段，請選擇：</p>
+            {onClearSegments && (
+              <button
+                type="button"
+                onClick={onClearSegments}
+                className="text-xs text-morandi-secondary hover:text-morandi-primary"
+              >
+                取消
+              </button>
+            )}
+          </div>
+          <div className="space-y-1">
+            {segments.map((seg, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onSelectSegment(seg)}
+                className="w-full text-left p-2 rounded border border-border hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-sm text-morandi-primary">
+                    {seg.departureAirport} → {seg.arrivalAirport}
+                  </span>
+                  <span className="text-xs text-morandi-secondary">
+                    {seg.departureTime} - {seg.arrivalTime}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 gap-2">
         <div>
           <label className="block text-[10px] font-medium text-morandi-primary mb-0.5">

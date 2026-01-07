@@ -17,6 +17,7 @@ import {
   FileText,
   FileCheck,
   ClipboardList,
+  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -103,6 +104,19 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             >
               <ClipboardList size={14} />
               <span>版本</span>
+            </button>
+
+            {/* 手冊編輯器 */}
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                router.push(`/designer?proposal_id=${proposal.id}`)
+              }}
+              className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+              title="製作旅遊手冊"
+            >
+              <BookOpen size={14} />
+              <span>手冊</span>
             </button>
 
             {/* 編輯 */}
@@ -237,6 +251,19 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           >
             <FileText size={14} />
             <span>行程</span>
+          </button>
+
+          {/* 手冊編輯器 */}
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              router.push(`/designer?tour_id=${tour.id}`)
+            }}
+            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            title="製作旅遊手冊"
+          >
+            <BookOpen size={14} />
+            <span>手冊</span>
           </button>
 
           {/* 合約管理 */}

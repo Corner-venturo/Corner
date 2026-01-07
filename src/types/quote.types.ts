@@ -42,6 +42,7 @@ export interface Quote extends BaseEntity {
   converted_to_tour?: boolean // 是否已轉成旅遊團
   tour_id?: string // 轉換後的旅遊團 ID
   itinerary_id?: string // 連結的行程表 ID
+  proposal_package_id?: string // 提案套件 ID（用於關聯提案）
   is_pinned?: boolean // 是否置頂（範本報價單）
 
   // 快速報價單專用欄位

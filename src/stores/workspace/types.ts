@@ -108,7 +108,7 @@ export interface Message {
   // 訊息額外資料（機器人卡片等）
   metadata?: {
     message_type?: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     [key: string]: any
   } | null
   _deleted?: boolean | null

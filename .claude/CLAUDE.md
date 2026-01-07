@@ -521,6 +521,77 @@ setItems(prev => [...prev, newItem])
 
 ---
 
+## 🎯 單一遮罩規範 (Single Overlay Pattern) - 2026-01-07 新增
+
+> **指令名稱**: `修復多重遮罩` 或 `fix-overlay`
+> **當你說這個指令時，我會知道要檢查並修復巢狀 Dialog 的遮罩問題**
+
+### 問題說明
+
+當 Dialog A 內部開啟 Dialog B 時，會出現多層遮罩疊加，導致：
+- 背景越來越暗
+- 視覺混亂
+- 關閉邏輯複雜
+
+### ✅ 正確做法：單一遮罩模式
+
+```tsx
+// 父 Dialog 在子 Dialog 開啟時隱藏
+export function ParentDialog({ open, onOpenChange }) {
+  const [childDialogOpen, setChildDialogOpen] = useState(false)
+
+  return (
+    <>
+      {/* 父 Dialog：子 Dialog 開啟時隱藏 */}
+      <Dialog
+        open={open && !childDialogOpen}
+        onOpenChange={(v) => !childDialogOpen && onOpenChange(v)}
+      >
+        <DialogContent>
+          {/* ... 內容 ... */}
+          <Button onClick={() => setChildDialogOpen(true)}>
+            開啟子視窗
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* 子 Dialog：放在父 Dialog 外面 */}
+      <ChildDialog
+        open={childDialogOpen}
+        onOpenChange={setChildDialogOpen}
+      />
+    </>
+  )
+}
+```
+
+### 關鍵規則
+
+1. **子 Dialog 放在父 Dialog 的 JSX 外面**（使用 Fragment `<>` 包裹）
+2. **父 Dialog 的 open 加上 `&& !childDialogOpen`**
+3. **父 Dialog 的 onOpenChange 加上 `!childDialogOpen &&` 判斷**
+
+### 已修復的案例
+
+| 父 Dialog | 子 Dialog | 檔案 |
+|-----------|-----------|------|
+| RequirementSyncDialog | TourRequestFormDialog | `proposals/components/` |
+| TourRequestFormDialog | PrintPreview (Portal) | `proposals/components/` |
+| ReceiptDetailDialog | CreateLinkPayDialog | `finance/payments/components/` |
+| CompanyDetailDialog | CompanyFormDialog | `customers/companies/components/` |
+| DisbursementDetailDialog | DisbursementPrintDialog | `disbursement/components/` |
+| RoomManagerDialog | AddRoomDialog | `components/tours/room-manager/` |
+| TourRoomManager | AddRoomDialog | `components/tours/tour-room-manager.tsx` |
+
+### 檢查指令
+
+當用戶說「修復多重遮罩」或「fix-overlay」時：
+1. 搜尋 `Dialog.*open=` 和巢狀的 Dialog 組件
+2. 檢查是否有 Dialog 內部 render 另一個 Dialog
+3. 套用上述單一遮罩模式修復
+
+---
+
 ## 🚨🚨🚨 絕對禁止規則 (Zero Tolerance) 🚨🚨🚨
 
 ### ❌ 五大禁令 - 違反立即停止

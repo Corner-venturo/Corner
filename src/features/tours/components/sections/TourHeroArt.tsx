@@ -17,8 +17,8 @@ function RichText({ html, className }: { html: string | null | undefined; classN
 // Brutalist 陰影
 const brutalistShadow = '6px 6px 0px 0px rgba(28,28,28,1)'
 
-// 預設封面圖片
-const DEFAULT_COVER = 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=80&auto=format&fit=crop'
+// 預設封面圖片（當城市沒有設定圖片時顯示空白）
+const DEFAULT_COVER = ''
 
 interface TourHeroArtProps {
   data: {

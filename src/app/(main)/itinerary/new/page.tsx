@@ -191,7 +191,7 @@ function NewItineraryPageContent() {
             { label: '新增紙本行程表', href: '#' },
           ]}
           showBackButton={true}
-          onBack={() => router.push('/itinerary')}
+          onBack={() => router.back()}
           actions={
             <Button
               onClick={() => window.print()}
@@ -241,7 +241,7 @@ function NewItineraryPageContent() {
         onVersionRecordsChange={(versionRecords) => {
           setTourData((prev) => ({ ...prev, version_records: versionRecords }))
         }}
-        onBack={() => router.push('/itinerary')}
+        onBack={() => router.back()}
         onPrintA5={() => router.push(`/itinerary/brochure-designer?id=${currentItineraryId}`)}
       />
 

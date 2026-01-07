@@ -23,17 +23,17 @@ import type {
 
 // Helper functions to bypass type checking for tables not yet in generated types
 // These tables exist in the database but TypeScript types haven't been regenerated yet
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const proposalsDb = () => (supabase as any).from('proposals')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const packagesDb = () => (supabase as any).from('proposal_packages')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const toursDb = () => (supabase as any).from('tours')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const quotesDb = () => (supabase as any).from('quotes')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const itinerariesDb = () => (supabase as any).from('itineraries')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ordersDb = () => (supabase as any).from('orders')
 
 /**
@@ -428,6 +428,18 @@ export async function convertToTour(
       .eq('id', pkg.itinerary_id)
   }
 
+  // 5.1 更新套件的需求單，關聯到新 Tour（提案階段建立的需求單帶入開團後）
+  await supabase
+    .from('tour_requests')
+    .update({
+      tour_id: newTour.id,
+      tour_code: tourCode,
+      tour_name: tour_name || proposal.title,
+    })
+    .eq('proposal_package_id', package_id)
+
+  logger.log('已將需求單關聯到旅遊團:', { tourId: newTour.id, packageId: package_id })
+
   // 6. 更新提案狀態
   await proposalsDb()
     .update({
@@ -549,6 +561,7 @@ export async function createQuoteForPackage(
       end_date: pkg.end_date || pkg.proposal?.expected_end_date,
       group_size: pkg.group_size || pkg.proposal?.group_size,
       proposal_package_id: packageId,
+      itinerary_id: pkg.itinerary_id || null, // 關聯行程表（用於載入航班資訊）
       workspace_id: workspaceId,
       created_by: userId,
     })

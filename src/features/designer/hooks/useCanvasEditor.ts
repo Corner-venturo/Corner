@@ -16,6 +16,7 @@ export interface UseCanvasEditorOptions {
   onSelect: (elementId: string | null) => void
   onElementAdd: (element: CanvasElement) => void
   onElementDelete: (elementId: string) => void
+  onPlaceholderClick?: (elementId: string) => void // 點擊占位元素時觸發
 }
 
 export function useCanvasEditor({
@@ -24,6 +25,7 @@ export function useCanvasEditor({
   onSelect,
   onElementAdd,
   onElementDelete,
+  onPlaceholderClick,
 }: UseCanvasEditorOptions) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fabricCanvasRef = useRef<Canvas | null>(null)
@@ -43,19 +45,25 @@ export function useCanvasEditor({
   useEffect(() => {
     if (!canvasRef.current || !page) return
 
+    // 如果已經有 canvas，先清除
+    if (fabricCanvasRef.current) {
+      fabricCanvasRef.current.dispose()
+    }
+
     const fabricCanvas = new Canvas(canvasRef.current, {
       width: page.width,
       height: page.height,
       backgroundColor: page.backgroundColor,
-      renderOnAddRemove: false,
+      renderOnAddRemove: true,
       preserveObjectStacking: true,
+      selection: true,
     })
 
     fabricCanvasRef.current = fabricCanvas
     setIsCanvasReady(true)
 
     // 物件修改事件
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const handleObjectModified = (e: any) => {
       const target = e.target as FabricObjectWithData | undefined
       if (!target || !target.data) return
@@ -71,7 +79,7 @@ export function useCanvasEditor({
     }
 
     // 選取事件
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const handleSelection = (e: any) => {
       const selected = e.selected as FabricObjectWithData[] | undefined
       if (selected && selected.length === 1 && selected[0].data) {
@@ -85,17 +93,31 @@ export function useCanvasEditor({
       onSelect(null)
     }
 
+    // 雙擊事件（用於觸發占位元素的上傳功能）
+     
+    const handleDoubleClick = (e: any) => {
+      const target = e.target as FabricObjectWithData | undefined
+      if (!target || !target.data) return
+
+      const { elementId } = target.data
+      // 檢查是否為占位元素（以 placeholder 或 hint 結尾）
+      if (elementId.includes('placeholder') || elementId.includes('hint')) {
+        onPlaceholderClick?.(elementId)
+      }
+    }
+
     fabricCanvas.on('object:modified', handleObjectModified)
     fabricCanvas.on('selection:created', handleSelection)
     fabricCanvas.on('selection:updated', handleSelection)
     fabricCanvas.on('selection:cleared', handleSelectionCleared)
+    fabricCanvas.on('mouse:dblclick', handleDoubleClick)
 
     return () => {
       fabricCanvas.dispose()
       fabricCanvasRef.current = null
       setIsCanvasReady(false)
     }
-  }, []) // 只在初始化時執行一次
+  }, [page?.width, page?.height, page?.backgroundColor, onElementChange, onSelect, onPlaceholderClick])
 
   // 當 page 變更時重新渲染
   useEffect(() => {
@@ -143,12 +165,15 @@ export function useCanvasEditor({
   // 新增矩形
   const addRectangle = useCallback(() => {
     if (!page) return
+    // 初始位置置中
+    const x = (page.width - 150) / 2
+    const y = (page.height - 100) / 2
     const newElement: ShapeElement = {
       id: `rect-${Date.now()}`,
       type: 'shape',
       name: '矩形',
-      x: 0,
-      y: 0,
+      x,
+      y,
       width: 150,
       height: 100,
       rotation: 0,
@@ -161,7 +186,6 @@ export function useCanvasEditor({
       stroke: '#d4c4b0',
       strokeWidth: 1,
       cornerRadius: 8,
-      align: { horizontal: 'center', vertical: 'center' },
     }
     onElementAdd(newElement)
   }, [page, onElementAdd])
@@ -169,12 +193,15 @@ export function useCanvasEditor({
   // 新增圓形
   const addCircle = useCallback(() => {
     if (!page) return
+    // 初始位置置中
+    const x = (page.width - 100) / 2
+    const y = (page.height - 100) / 2
     const newElement: ShapeElement = {
       id: `circle-${Date.now()}`,
       type: 'shape',
       name: '圓形',
-      x: 0,
-      y: 0,
+      x,
+      y,
       width: 100,
       height: 100,
       rotation: 0,
@@ -186,7 +213,6 @@ export function useCanvasEditor({
       fill: '#c9aa7c',
       stroke: '#b8996b',
       strokeWidth: 1,
-      align: { horizontal: 'center', vertical: 'center' },
     }
     onElementAdd(newElement)
   }, [page, onElementAdd])
@@ -227,6 +253,26 @@ export function useCanvasEditor({
     })
     fabricCanvas.discardActiveObject()
   }, [onElementDelete])
+
+  // 鍵盤事件監聽（Delete / Backspace 刪除選取元素）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 如果焦點在輸入框內，不處理
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return
+      }
+
+      // Delete 或 Backspace 鍵刪除選取元素
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault()
+        deleteSelectedElements()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [deleteSelectedElements])
 
   return {
     canvasRef,

@@ -61,7 +61,14 @@ export function FlightInfoSection({
     loadingOutbound,
     loadingReturn,
     handleSearchOutbound,
-    handleSearchReturn
+    handleSearchReturn,
+    // 多航段相關
+    outboundSegments,
+    returnSegments,
+    handleSelectOutboundSegment,
+    handleSelectReturnSegment,
+    clearOutboundSegments,
+    clearReturnSegments,
   } = useFlightSearch({ data, updateFlightField, updateFlightFields })
 
   // 從資料庫載入的航班風格選項
@@ -254,6 +261,9 @@ export function FlightInfoSection({
                   onSearch={handleSearchOutbound}
                   onRouteSearch={() => setShowRouteSearchOutbound(true)}
                   isLoading={loadingOutbound}
+                  segments={outboundSegments}
+                  onSelectSegment={handleSelectOutboundSegment}
+                  onClearSegments={clearOutboundSegments}
                 />
 
                 {/* 回程航班 */}
@@ -264,6 +274,9 @@ export function FlightInfoSection({
                   onSearch={handleSearchReturn}
                   onRouteSearch={() => setShowRouteSearchReturn(true)}
                   isLoading={loadingReturn}
+                  segments={returnSegments}
+                  onSelectSegment={handleSelectReturnSegment}
+                  onClearSegments={clearReturnSegments}
                 />
               </div>
             </div>

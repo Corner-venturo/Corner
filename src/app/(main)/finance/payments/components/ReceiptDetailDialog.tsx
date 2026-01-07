@@ -188,7 +188,8 @@ export function ReceiptDetailDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+    <Dialog open={open && !showLinkPayDialog} onOpenChange={(v) => !showLinkPayDialog && onOpenChange(v)}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -451,19 +452,20 @@ export function ReceiptDetailDialog({
           </div>
         </DialogFooter>
       </DialogContent>
-
-      {/* LinkPay 建立對話框 */}
-      {isLinkPay && (
-        <CreateLinkPayDialog
-          isOpen={showLinkPayDialog}
-          onClose={() => setShowLinkPayDialog(false)}
-          receipt={receipt}
-          onSuccess={() => {
-            fetchLinkPayLogs()
-            onSuccess?.()
-          }}
-        />
-      )}
     </Dialog>
+
+    {/* LinkPay 建立對話框 - 放在外層避免多重遮罩 */}
+    {isLinkPay && (
+      <CreateLinkPayDialog
+        isOpen={showLinkPayDialog}
+        onClose={() => setShowLinkPayDialog(false)}
+        receipt={receipt}
+        onSuccess={() => {
+          fetchLinkPayLogs()
+          onSuccess?.()
+        }}
+      />
+    )}
+    </>
   )
 }

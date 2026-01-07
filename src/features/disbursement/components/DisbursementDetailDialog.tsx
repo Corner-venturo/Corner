@@ -190,7 +190,8 @@ export function DisbursementDetailDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+    <Dialog open={open && !isPrintDialogOpen} onOpenChange={(v) => !isPrintDialogOpen && onOpenChange(v)}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -413,14 +414,15 @@ export function DisbursementDetailDialog({
           </div>
         </div>
       </DialogContent>
-
-      {/* 列印預覽對話框 */}
-      <DisbursementPrintDialog
-        order={order}
-        open={isPrintDialogOpen}
-        onOpenChange={setIsPrintDialogOpen}
-      />
     </Dialog>
+
+    {/* 列印預覽對話框 - 放在外層避免多重遮罩 */}
+    <DisbursementPrintDialog
+      order={order}
+      open={isPrintDialogOpen}
+      onOpenChange={setIsPrintDialogOpen}
+    />
+    </>
   )
 }
 

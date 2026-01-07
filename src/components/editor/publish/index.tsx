@@ -146,7 +146,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               <DropdownMenuItem
                 className="flex items-center gap-2 py-2 cursor-pointer"
                 onClick={() => {
-                  setNewFileName(`${stripHtml(data.title) || '行程表'} (複本)`)
+                  setNewFileName(`${stripHtml(data.title) || '行程表'} 副本`)
                   setShowSaveAsNewDialog(true)
                 }}
               >
@@ -244,7 +244,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
           setShowSaveDialog(false)
         }}
         saving={saving}
-        placeholder={`版本 ${versionRecords.length + 1}`}
+        placeholder={stripHtml(data.title) || '行程表'}
         versionCount={versionRecords.length}
       />
 
@@ -260,7 +260,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
           setShowSaveAsNewDialog(false)
         }}
         saving={saving}
-        placeholder={`${stripHtml(data.title) || '行程表'} (複本)`}
+        placeholder={`${stripHtml(data.title) || '行程表'} 副本`}
       />
     </>
   )

@@ -1,14 +1,16 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTourStore, useRegionsStore, useQuoteStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
+import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
 import type { LocalTourData } from './useItineraryEditor'
 import type { DailyItinerary, HotelInfo, FlightInfo } from '@/components/editor/tour-form/types'
 import type { TierPricing } from '@/stores/types/quote.types'
+import type { Itinerary } from '@/stores/types'
 
 interface UseItineraryDataLoaderProps {
   setTourData: (data: LocalTourData) => void
@@ -29,7 +31,6 @@ export function useItineraryDataLoader({
 
   // 從報價單匯入參數
   const isFromQuote = searchParams.get('from_quote') === 'true'
-  const quoteId = searchParams.get('quote_id')
   const quoteName = searchParams.get('quote_name')
   const daysFromQuote = parseInt(searchParams.get('days') || '0')
   const mealsFromQuote = searchParams.get('meals') ? JSON.parse(searchParams.get('meals') || '[]') : []
@@ -39,15 +40,144 @@ export function useItineraryDataLoader({
     : []
 
   const { items: tours } = useTourStore()
-  const { items: itineraries } = useItineraries()
+  const { items: itineraries, fetchAll: refetchItineraries } = useItineraries()
   const { items: quotes } = useQuoteStore()
   const { countries, cities } = useRegionsStore()
 
   const hasInitializedRef = useRef(false)
   const lastIdRef = useRef<string | null>(null)
+  const isFetchingRef = useRef(false)
+
+  // 載入行程表資料的輔助函數
+  const loadItineraryData = useCallback((itinerary: Itinerary) => {
+    logger.log('[ItineraryDataLoader] 載入行程表資料:', itinerary.id)
+    logger.log('[ItineraryDataLoader] 行程 daily_itinerary 長度:', (itinerary.daily_itinerary as unknown[] | null)?.length || 0)
+    logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
+
+    setTourData({
+      tagline: itinerary.tagline || 'Corner Travel 2025',
+      title: itinerary.title || '',
+      subtitle: itinerary.subtitle || '',
+      description: itinerary.description || '',
+      departureDate: itinerary.departure_date || '',
+      tourCode: itinerary.tour_code || '',
+      coverImage: itinerary.cover_image || '',
+      coverStyle: itinerary.cover_style || 'original',
+      flightStyle:
+        ((itinerary as { flight_style?: string }).flight_style || 'original') as LocalTourData['flightStyle'],
+      itineraryStyle:
+        ((itinerary as { itinerary_style?: string }).itinerary_style ||
+          'original') as LocalTourData['itineraryStyle'],
+      price: itinerary.price || '',
+      priceNote: itinerary.price_note || '',
+      country: itinerary.country || '',
+      city: itinerary.city || '',
+      status: itinerary.status || '提案',
+      outboundFlight: itinerary.outbound_flight || itinerary.flight_info?.outbound || {
+        airline: '',
+        flightNumber: '',
+        departureAirport: 'TPE',
+        departureTime: '',
+        departureDate: '',
+        arrivalAirport: '',
+        arrivalTime: '',
+        duration: '',
+      },
+      returnFlight: itinerary.return_flight || itinerary.flight_info?.return || {
+        airline: '',
+        flightNumber: '',
+        departureAirport: '',
+        departureTime: '',
+        departureDate: '',
+        arrivalAirport: 'TPE',
+        arrivalTime: '',
+        duration: '',
+      },
+      features: (() => {
+        const f = itinerary.features || []
+        logger.log('[ItineraryDataLoader] 載入 features:', Array.isArray(f) ? f.length : 'not array', f)
+        return f
+      })(),
+      showFeatures: itinerary.show_features !== false,
+      focusCards: itinerary.focus_cards || [],
+      leader: itinerary.leader || {
+        name: '',
+        domesticPhone: '',
+        overseasPhone: '',
+      },
+      showLeaderMeeting: itinerary.show_leader_meeting !== false,
+      meetingInfo: itinerary.meeting_info || {
+        time: '',
+        location: '',
+      },
+      hotels: (itinerary.hotels as HotelInfo[]) || [],
+      showHotels: itinerary.show_hotels || false,
+      itinerarySubtitle: itinerary.itinerary_subtitle || '',
+      dailyItinerary: (itinerary.daily_itinerary || []).map((day) => {
+        const d = day as DailyItinerary
+        return {
+          ...d,
+          activities: Array.isArray(d.activities) ? d.activities : [],
+          recommendations: Array.isArray(d.recommendations) ? d.recommendations : [],
+          images: Array.isArray(d.images) ? d.images : [],
+          meals: d.meals || { breakfast: '', lunch: '', dinner: '' },
+        }
+      }),
+      showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
+      pricingDetails: itinerary.pricing_details || {
+        show_pricing_details: false,
+        insurance_amount: '500',
+        included_items: [
+          { text: '行程表所列之交通費用', included: true },
+          { text: '行程表所列之住宿費用', included: true },
+          { text: '行程表所列之餐食費用', included: true },
+          { text: '行程表所列之門票費用', included: true },
+          { text: '專業導遊服務', included: true },
+          { text: '旅遊責任險 500 萬元', included: true },
+        ],
+        excluded_items: [
+          { text: '個人護照及簽證費用', included: false },
+          { text: '行程外之自費行程', included: false },
+          { text: '個人消費及小費', included: false },
+          { text: '行李超重費用', included: false },
+          { text: '單人房差價', included: false },
+        ],
+        notes: [
+          '本報價單有效期限至 2026/1/6，逾期請重新報價。',
+          '最終價格以確認訂單時之匯率及費用為準。',
+          '如遇旺季或特殊節日，價格可能會有調整。',
+          '出發前 30 天內取消，需支付團費 30% 作為取消費。',
+          '出發前 14 天內取消，需支付團費 50% 作為取消費。',
+          '出發前 7 天內取消，需支付團費 100% 作為取消費。',
+        ],
+      },
+      priceTiers: itinerary.price_tiers || [],
+      showPriceTiers: itinerary.show_price_tiers || false,
+      faqs: itinerary.faqs || [],
+      showFaqs: itinerary.show_faqs || false,
+      notices: itinerary.notices || [],
+      showNotices: itinerary.show_notices || false,
+      cancellationPolicy: itinerary.cancellation_policy || [],
+      showCancellationPolicy: itinerary.show_cancellation_policy || false,
+      version_records: itinerary.version_records || [],
+    })
+    setCurrentVersionIndex(-1)
+
+    // 載入關聯報價單的砍次表
+    if (setQuoteTierPricings && itinerary.quote_id) {
+      const quote = quotes.find(q => q.id === itinerary.quote_id)
+      if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
+        setQuoteTierPricings(quote.tier_pricings as TierPricing[])
+      }
+    }
+
+    setLoading(false)
+    hasInitializedRef.current = true
+    lastIdRef.current = itinerary.id
+  }, [setTourData, setCurrentVersionIndex, setQuoteTierPricings, setLoading, quotes])
 
   useEffect(() => {
-    const initializeTourData = () => {
+    const initializeTourData = async () => {
       logger.log('[ItineraryDataLoader] === 開始初始化 ===')
       logger.log('[ItineraryDataLoader] URL 參數 - itineraryId:', itineraryId, 'tourId:', tourId)
       logger.log('[ItineraryDataLoader] itineraries 數量:', itineraries.length)
@@ -63,137 +193,42 @@ export function useItineraryDataLoader({
       // 優先從 itineraries 載入（編輯現有行程）
       if (itineraryId && !tourId) {
         logger.log('[ItineraryDataLoader] 嘗試載入行程, itineraryId:', itineraryId)
-        logger.log('[ItineraryDataLoader] 可用行程數量:', itineraries.length)
-        const itinerary = itineraries.find((i) => i.id === itineraryId)
-        logger.log('[ItineraryDataLoader] 尋找行程:', itineraryId, '找到:', !!itinerary)
-        if (itinerary) {
-          logger.log('[ItineraryDataLoader] 行程 daily_itinerary 長度:', (itinerary.daily_itinerary as unknown[] | null)?.length || 0)
-          logger.log('[ItineraryDataLoader] 行程資料 - features:', itinerary.features, 'daily_itinerary:', (itinerary.daily_itinerary as unknown[])?.length || 0)
-          setTourData({
-            tagline: itinerary.tagline || 'Corner Travel 2025',
-            title: itinerary.title || '',
-            subtitle: itinerary.subtitle || '',
-            description: itinerary.description || '',
-            departureDate: itinerary.departure_date || '',
-            tourCode: itinerary.tour_code || '',
-            coverImage: itinerary.cover_image || '',
-            coverStyle: itinerary.cover_style || 'original',
-            flightStyle:
-              ((itinerary as { flight_style?: string }).flight_style || 'original') as LocalTourData['flightStyle'],
-            itineraryStyle:
-              ((itinerary as { itinerary_style?: string }).itinerary_style ||
-                'original') as LocalTourData['itineraryStyle'],
-            price: itinerary.price || '',
-            priceNote: itinerary.price_note || '',
-            country: itinerary.country || '',
-            city: itinerary.city || '',
-            status: itinerary.status || '提案',
-            outboundFlight: itinerary.outbound_flight || itinerary.flight_info?.outbound || {
-              airline: '',
-              flightNumber: '',
-              departureAirport: 'TPE',
-              departureTime: '',
-              departureDate: '',
-              arrivalAirport: '',
-              arrivalTime: '',
-              duration: '',
-            },
-            returnFlight: itinerary.return_flight || itinerary.flight_info?.return || {
-              airline: '',
-              flightNumber: '',
-              departureAirport: '',
-              departureTime: '',
-              departureDate: '',
-              arrivalAirport: 'TPE',
-              arrivalTime: '',
-              duration: '',
-            },
-            features: (() => {
-              const f = itinerary.features || []
-              logger.log('[ItineraryDataLoader] 載入 features:', Array.isArray(f) ? f.length : 'not array', f)
-              return f
-            })(),
-            showFeatures: itinerary.show_features !== false,
-            focusCards: itinerary.focus_cards || [],
-            leader: itinerary.leader || {
-              name: '',
-              domesticPhone: '',
-              overseasPhone: '',
-            },
-            showLeaderMeeting: itinerary.show_leader_meeting !== false,
-            meetingInfo: itinerary.meeting_info || {
-              time: '',
-              location: '',
-            },
-            hotels: (itinerary.hotels as HotelInfo[]) || [],
-            showHotels: itinerary.show_hotels || false,
-            itinerarySubtitle: itinerary.itinerary_subtitle || '',
-            dailyItinerary: (itinerary.daily_itinerary || []).map((day) => {
-              const d = day as DailyItinerary
-              return {
-                ...d,
-                activities: Array.isArray(d.activities) ? d.activities : [],
-                recommendations: Array.isArray(d.recommendations) ? d.recommendations : [],
-                images: Array.isArray(d.images) ? d.images : [],
-                meals: d.meals || { breakfast: '', lunch: '', dinner: '' },
-              }
-            }),
-            showPricingDetails: itinerary.pricing_details?.show_pricing_details || false,
-            pricingDetails: itinerary.pricing_details || {
-              show_pricing_details: false,
-              insurance_amount: '500',
-              included_items: [
-                { text: '行程表所列之交通費用', included: true },
-                { text: '行程表所列之住宿費用', included: true },
-                { text: '行程表所列之餐食費用', included: true },
-                { text: '行程表所列之門票費用', included: true },
-                { text: '專業導遊服務', included: true },
-                { text: '旅遊責任險 500 萬元', included: true },
-              ],
-              excluded_items: [
-                { text: '個人護照及簽證費用', included: false },
-                { text: '行程外之自費行程', included: false },
-                { text: '個人消費及小費', included: false },
-                { text: '行李超重費用', included: false },
-                { text: '單人房差價', included: false },
-              ],
-              notes: [
-                '本報價單有效期限至 2026/1/6，逾期請重新報價。',
-                '最終價格以確認訂單時之匯率及費用為準。',
-                '如遇旺季或特殊節日，價格可能會有調整。',
-                '出發前 30 天內取消，需支付團費 30% 作為取消費。',
-                '出發前 14 天內取消，需支付團費 50% 作為取消費。',
-                '出發前 7 天內取消，需支付團費 100% 作為取消費。',
-              ],
-            },
-            priceTiers: itinerary.price_tiers || [],
-            showPriceTiers: itinerary.show_price_tiers || false,
-            faqs: itinerary.faqs || [],
-            showFaqs: itinerary.show_faqs || false,
-            notices: itinerary.notices || [],
-            showNotices: itinerary.show_notices || false,
-            cancellationPolicy: itinerary.cancellation_policy || [],
-            showCancellationPolicy: itinerary.show_cancellation_policy || false,
-            version_records: itinerary.version_records || [],
-          })
-          setCurrentVersionIndex(-1)
 
-          // 載入關聯報價單的砍次表
-          if (setQuoteTierPricings && itinerary.quote_id) {
-            const quote = quotes.find(q => q.id === itinerary.quote_id)
-            if (quote?.tier_pricings && quote.tier_pricings.length > 0) {
-              setQuoteTierPricings(quote.tier_pricings as TierPricing[])
+        // 總是從資料庫載入最新資料（避免 SWR 快取過期問題）
+        if (!isFetchingRef.current) {
+          isFetchingRef.current = true
+          logger.log('[ItineraryDataLoader] 直接從資料庫載入最新資料...')
+
+          try {
+            const { data, error } = await supabase
+              .from('itineraries')
+              .select('*')
+              .eq('id', itineraryId)
+              .single()
+
+            if (error) {
+              logger.error('[ItineraryDataLoader] 從資料庫載入失敗:', error)
+              setLoading(false)
+            } else if (data) {
+              logger.log('[ItineraryDataLoader] 從資料庫載入成功')
+              logger.log('[ItineraryDataLoader] daily_itinerary 長度:', (data.daily_itinerary as unknown[])?.length || 0)
+              logger.log('[ItineraryDataLoader] country:', data.country, 'city:', data.city)
+              const itinerary = data as unknown as Itinerary
+              loadItineraryData(itinerary)
+              // 重新整理 SWR 快取
+              refetchItineraries()
+            } else {
+              logger.warn('[ItineraryDataLoader] 找不到行程表:', itineraryId)
+              setLoading(false)
             }
+          } catch (err) {
+            logger.error('[ItineraryDataLoader] 載入錯誤:', err)
+            setLoading(false)
+          } finally {
+            isFetchingRef.current = false
           }
-
-          setLoading(false)
-          hasInitializedRef.current = true
-          lastIdRef.current = currentId
-          return
-        } else {
-          // 有 itineraryId 但找不到資料，繼續等待
-          return
         }
+        return
       }
 
       if (!tourId) {
@@ -293,9 +328,7 @@ export function useItineraryDataLoader({
         departureDate: formatDateTW(departureDate),
         tourCode: tour.code,
         flightStyle: isTaiwan ? 'none' : undefined,
-        coverImage:
-          city?.background_image_url ||
-          'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=75&auto=format&fit=crop',
+        coverImage: '', // 封面圖片由 AirportImageLibrary 從 airport_images 表選擇
         country: country?.name || tour.location || '',
         city: city?.name || tour.location || '',
         status: '提案',
@@ -354,10 +387,10 @@ export function useItineraryDataLoader({
     cities,
     isFromQuote,
     daysFromQuote,
+    loadItineraryData,
+    refetchItineraries,
     setTourData,
     setLoading,
-    setCurrentVersionIndex,
-    setQuoteTierPricings,
   ])
 }
 

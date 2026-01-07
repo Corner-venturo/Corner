@@ -25,8 +25,8 @@ const POP = {
   dark: '#121212',
 }
 
-// 預設封面圖片
-const DEFAULT_COVER = 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=80&auto=format&fit=crop'
+// 預設封面圖片（當城市沒有設定圖片時顯示空白）
+const DEFAULT_COVER = ''
 
 interface TourHeroCollageProps {
   data: {

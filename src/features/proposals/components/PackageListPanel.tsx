@@ -11,6 +11,8 @@ import {
   Book,
   Globe,
   DollarSign,
+  ClipboardList,
+  BookMarked,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -26,6 +28,7 @@ import { PackageDialog } from './PackageDialog'
 import { ConvertToTourDialog } from './ConvertToTourDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
+import { RequirementSyncDialog } from './RequirementSyncDialog'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
@@ -65,6 +68,7 @@ export function PackageListPanel({
   const [convertDialogOpen, setConvertDialogOpen] = useState(false)
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
+  const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 新增套件
@@ -302,7 +306,7 @@ export function PackageListPanel({
 
         if (newQuote) {
           // 更新套件關聯報價單
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           await (supabase as any)
             .from('proposal_packages')
             .update({ quote_id: newQuote.id })
@@ -451,6 +455,45 @@ export function PackageListPanel({
                       >
                         <DollarSign size={16} />
                       </button>
+                      {/* 需求確認單 */}
+                      <button
+                        onClick={() => {
+                          if (pkg.quote_id) {
+                            setSelectedPackage(pkg)
+                            setRequirementDialogOpen(true)
+                          } else {
+                            void alert('請先建立報價單', 'info')
+                          }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.quote_id
+                            ? 'text-morandi-green hover:bg-morandi-green/10'
+                            : 'text-morandi-muted cursor-not-allowed'
+                        }`}
+                        title="需求確認單"
+                        disabled={!pkg.quote_id}
+                      >
+                        <ClipboardList size={16} />
+                      </button>
+                      {/* 手冊設計 */}
+                      <button
+                        onClick={() => {
+                          if (pkg.itinerary_id) {
+                            router.push(`/designer?itinerary_id=${pkg.itinerary_id}`)
+                          } else {
+                            void alert('請先建立行程表', 'info')
+                          }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-primary hover:bg-morandi-container/80'
+                            : 'text-morandi-muted cursor-not-allowed'
+                        }`}
+                        title="手冊設計"
+                        disabled={!pkg.itinerary_id}
+                      >
+                        <BookMarked size={16} />
+                      </button>
                     </div>
                   </td>
 
@@ -555,6 +598,18 @@ export function PackageListPanel({
           setSelectedPackage(null)
         }}
         itineraryId={selectedPackage?.itinerary_id || null}
+      />
+
+      {/* 需求確認單對話框 */}
+      <RequirementSyncDialog
+        isOpen={requirementDialogOpen}
+        onClose={() => {
+          setRequirementDialogOpen(false)
+          setSelectedPackage(null)
+        }}
+        pkg={selectedPackage}
+        proposal={proposal}
+        onSyncComplete={onPackagesChange}
       />
     </div>
   )

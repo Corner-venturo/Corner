@@ -128,7 +128,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
 
               {/* 主圖 */}
               <img
-                src={data.coverImage || 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1200&q=75&auto=format&fit=crop'}
+                src={data.coverImage || ''}
                 alt={data.title}
                 className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105"
               />

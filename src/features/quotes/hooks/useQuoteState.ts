@@ -1,11 +1,12 @@
 import { getTodayString } from '@/lib/utils/format-date'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTourStore, useOrderStore } from '@/stores'
+import { useTourStore, useOrderStore, useItineraryStore } from '@/stores'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing } from '../types'
+import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing, CostItem } from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
+import type { FlightInfo } from '@/stores/types/tour.types'
 
 export const useQuoteState = () => {
   const params = useParams()
@@ -14,6 +15,7 @@ export const useQuoteState = () => {
   const { items: tours, create: addTour } = useTourStore()
   const { items: orders } = useOrderStore()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
+  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
@@ -46,6 +48,53 @@ export const useQuoteState = () => {
     return tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
   }, [relatedTour, orders])
 
+  // 載入行程表（如果報價單有 itinerary_id）
+  useEffect(() => {
+    if (itineraries.length === 0) {
+      fetchItineraries()
+    }
+  }, [])
+
+  // 找到關聯的行程表（優先用 itinerary_id，備援用 proposal_package_id）
+  const linkedItinerary = useMemo(() => {
+    // 1. 優先用 itinerary_id 直接關聯
+    if (quote?.itinerary_id) {
+      const itinerary = itineraries.find(i => i.id === quote.itinerary_id)
+      if (itinerary) return itinerary
+    }
+    // 2. 備援：用 proposal_package_id 找關聯的行程表
+    if (quote?.proposal_package_id) {
+      const itinerary = itineraries.find(i => i.proposal_package_id === quote.proposal_package_id)
+      if (itinerary) return itinerary
+    }
+    return null
+  }, [quote?.itinerary_id, quote?.proposal_package_id, itineraries])
+
+  // 格式化航班資訊
+  const formatFlightInfo = useCallback((flight: FlightInfo | null, type: '去程' | '回程'): string => {
+    if (!flight) return ''
+    const parts: string[] = []
+    if (flight.flightNumber) parts.push(flight.flightNumber)
+    if (flight.departureAirport && flight.arrivalAirport) {
+      parts.push(`${flight.departureAirport}→${flight.arrivalAirport}`)
+    }
+    if (flight.departureTime && flight.arrivalTime) {
+      parts.push(`${flight.departureTime}-${flight.arrivalTime}`)
+    }
+    return parts.length > 0 ? `【${type}】${parts.join(' ')}` : ''
+  }, [])
+
+  // 追蹤是否已添加過航班資訊，避免重複添加
+  const hasAddedFlightInfo = useRef(false)
+  const lastQuoteId = useRef<string | null>(null)
+
+  // 當 quote.id 改變時，重置航班添加狀態
+  useEffect(() => {
+    if (quote_id !== lastQuoteId.current) {
+      hasAddedFlightInfo.current = false
+      lastQuoteId.current = quote_id
+    }
+  }, [quote_id])
 
   const [categories, setCategories] = useState<CostCategory[]>(() => {
     // 注意：空陣列 [] 是 truthy，所以要用 length 檢查
@@ -219,6 +268,68 @@ export const useQuoteState = () => {
       }
     }
   }, [quote?.id, relatedTour?.code]) // 只在 quote.id 改變時執行
+
+  // 當行程表載入後，自動添加航班資訊到交通類別
+  useEffect(() => {
+    // 只在以下條件成立時添加航班項目：
+    // 1. 有關聯的行程表
+    // 2. 行程表有航班資訊
+    // 3. 還沒添加過（避免重複）
+    // 4. 報價單的交通類別還沒有「機票成人」項目（避免覆蓋用戶已編輯的資料）
+    if (!linkedItinerary || hasAddedFlightInfo.current) return
+
+    const outboundFlight = linkedItinerary.outbound_flight as FlightInfo | null
+    const returnFlight = linkedItinerary.return_flight as FlightInfo | null
+
+    // 沒有航班資訊，不需要添加
+    if (!outboundFlight && !returnFlight) return
+
+    // 檢查交通類別是否已有「機票成人」
+    const transportCategory = categories.find(cat => cat.id === 'transport')
+    const hasExistingFlightItem = transportCategory?.items.some(
+      item => item.name === '機票成人'
+    )
+
+    // 如果已有航班項目，不重複添加
+    if (hasExistingFlightItem) {
+      hasAddedFlightInfo.current = true
+      return
+    }
+
+    // 格式化航班備註
+    const flightNotes: string[] = []
+    const outboundNote = formatFlightInfo(outboundFlight, '去程')
+    const returnNote = formatFlightInfo(returnFlight, '回程')
+    if (outboundNote) flightNotes.push(outboundNote)
+    if (returnNote) flightNotes.push(returnNote)
+
+    if (flightNotes.length === 0) return
+
+    // 創建航班項目
+    const flightItem: CostItem = {
+      id: `flight-adult-${Date.now()}`,
+      name: '機票成人',
+      quantity: 0, // 不填數量
+      unit_price: 0, // 不填金額
+      total: 0,
+      note: flightNotes.join('\n'),
+    }
+
+    // 添加到交通類別
+    setCategories(prevCategories => {
+      return prevCategories.map(cat => {
+        if (cat.id === 'transport') {
+          return {
+            ...cat,
+            items: [flightItem, ...cat.items],
+          }
+        }
+        return cat
+      })
+    })
+
+    hasAddedFlightInfo.current = true
+  }, [linkedItinerary, categories, formatFlightInfo])
 
   // 總人數：優先使用旅遊團訂單的預計人數，其次用 max_participants，最後從參與人數加總
   const groupSize =

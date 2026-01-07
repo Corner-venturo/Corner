@@ -62,7 +62,7 @@ export function CompanyDetailDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open && !isEditDialogOpen} onOpenChange={(v) => !isEditDialogOpen && onOpenChange(v)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

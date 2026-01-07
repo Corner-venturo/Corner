@@ -1,7 +1,6 @@
 import { TourFormData, Activity } from '../types'
-import { cityImages, timezoneOffset } from '../constants'
+import { timezoneOffset } from '../constants'
 import { calculateFlightDuration } from '../utils'
-import { useRegionsStore } from '@/stores'
 import { logger } from '@/lib/utils/logger'
 
 export function useTourFormHandlers(
@@ -9,7 +8,6 @@ export function useTourFormHandlers(
   onChange: (data: TourFormData) => void,
   selectedCountry: string
 ) {
-  const { cities } = useRegionsStore()
 
   const updateField = (field: string, value: unknown) => {
     logger.log('[useTourFormHandlers] updateField:', { field, value, currentCoverImage: data.coverImage })
@@ -18,37 +16,13 @@ export function useTourFormHandlers(
     onChange(newData)
   }
 
-  // 更新城市時自動設定封面圖片（從 Supabase 取得）
+  // 更新城市
+  // 封面圖片由 AirportImageLibrary 組件管理，用機場代碼查找 airport_images 表
   const updateCity = (city: string) => {
-    // 從資料庫找城市資料
-    const cityData = cities.find((c) => c.name === city)
-
-    // 預設為空，讓系統從城市資料庫抓取
-    let coverImage = ''
-
-    if (cityData) {
-      // 如果有主要圖片（primary_image = 1 用 background_image_url，= 2 用 background_image_url_2）
-      if (cityData.primary_image === 2 && cityData.background_image_url_2) {
-        coverImage = cityData.background_image_url_2
-      } else if (cityData.background_image_url) {
-        coverImage = cityData.background_image_url
-      }
-    }
-
-    // 如果資料庫沒有圖片，退回到 cityImages 常數
-    if (!coverImage && cityImages[city]) {
-      coverImage = cityImages[city]
-    }
-
-    // 如果城市沒有圖片，保留現有圖片
-    if (!coverImage) {
-      coverImage = data.coverImage || ''
-    }
-
     onChange({
       ...data,
       city,
-      coverImage,
+      // 不自動設定 coverImage，讓使用者從 AirportImageLibrary 選擇
     })
   }
 

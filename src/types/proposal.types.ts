@@ -91,6 +91,23 @@ export interface Proposal {
 // 團體套件 (ProposalPackage)
 // ============================================
 
+// 已確認需求快照
+export interface ConfirmedRequirementsSnapshot {
+  snapshot: ConfirmedRequirementItem[]
+  confirmed_at: string
+  confirmed_by?: string
+}
+
+export interface ConfirmedRequirementItem {
+  id: string
+  category: string           // hotel, restaurant, transport, activity, other
+  supplier_name: string
+  service_date: string | null
+  title: string
+  quantity: number
+  note?: string
+}
+
 export interface ProposalPackage {
   id: string
   proposal_id: string
@@ -118,6 +135,9 @@ export interface ProposalPackage {
   quote_id?: string | null                // 關聯報價單
   itinerary_id?: string | null            // 關聯行程表
   handbook_id?: string | null             // 關聯手冊（未來）
+
+  // 需求確認追蹤
+  confirmed_requirements?: ConfirmedRequirementsSnapshot | null
 
   // 狀態
   is_selected: boolean

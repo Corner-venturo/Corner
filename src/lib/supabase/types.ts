@@ -10529,8 +10529,10 @@ export type Database = {
           id: string
           member_data: Json | null
           member_ids: string[] | null
+          note: string | null
           order_id: string | null
           priority: string | null
+          proposal_package_id: string | null
           quantity: number | null
           quoted_cost: number | null
           replied_at: string | null
@@ -10551,7 +10553,7 @@ export type Database = {
           target_workspace_id: string | null
           title: string
           tour_code: string | null
-          tour_id: string
+          tour_id: string | null
           tour_name: string | null
           updated_at: string | null
           updated_by: string | null
@@ -10578,8 +10580,10 @@ export type Database = {
           id?: string
           member_data?: Json | null
           member_ids?: string[] | null
+          note?: string | null
           order_id?: string | null
           priority?: string | null
+          proposal_package_id?: string | null
           quantity?: number | null
           quoted_cost?: number | null
           replied_at?: string | null
@@ -10600,7 +10604,7 @@ export type Database = {
           target_workspace_id?: string | null
           title: string
           tour_code?: string | null
-          tour_id: string
+          tour_id?: string | null
           tour_name?: string | null
           updated_at?: string | null
           updated_by?: string | null
@@ -10627,8 +10631,10 @@ export type Database = {
           id?: string
           member_data?: Json | null
           member_ids?: string[] | null
+          note?: string | null
           order_id?: string | null
           priority?: string | null
+          proposal_package_id?: string | null
           quantity?: number | null
           quoted_cost?: number | null
           replied_at?: string | null

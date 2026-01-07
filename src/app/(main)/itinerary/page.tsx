@@ -432,6 +432,38 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               查詢
             </Button>
           </div>
+          {/* 多航段選擇器 */}
+          {flightSearch.outboundSegments.length > 0 && (
+            <div className="bg-white p-2 rounded border border-morandi-gold/30 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
+                <button
+                  type="button"
+                  onClick={flightSearch.clearOutboundSegments}
+                  className="text-[10px] text-morandi-secondary hover:text-morandi-primary"
+                >
+                  取消
+                </button>
+              </div>
+              {flightSearch.outboundSegments.map((seg, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => flightSearch.handleSelectOutboundSegment(seg)}
+                  className="w-full text-left p-1.5 rounded border border-border hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-xs text-morandi-primary">
+                      {seg.departureAirport} → {seg.arrivalAirport}
+                    </span>
+                    <span className="text-[10px] text-morandi-secondary">
+                      {seg.departureTime} - {seg.arrivalTime}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="grid grid-cols-6 gap-1">
             <Input placeholder="航班" value={formState.newItineraryOutboundFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
             <Input placeholder="航空" value={formState.newItineraryOutboundFlight?.airline || ''} onChange={e => formState.setNewItineraryOutboundFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || 'TPE', arrivalAirport: prev?.arrivalAirport || '', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
@@ -463,6 +495,38 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
               查詢
             </Button>
           </div>
+          {/* 多航段選擇器 */}
+          {flightSearch.returnSegments.length > 0 && (
+            <div className="bg-white p-2 rounded border border-morandi-gold/30 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
+                <button
+                  type="button"
+                  onClick={flightSearch.clearReturnSegments}
+                  className="text-[10px] text-morandi-secondary hover:text-morandi-primary"
+                >
+                  取消
+                </button>
+              </div>
+              {flightSearch.returnSegments.map((seg, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => flightSearch.handleSelectReturnSegment(seg)}
+                  className="w-full text-left p-1.5 rounded border border-border hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-xs text-morandi-primary">
+                      {seg.departureAirport} → {seg.arrivalAirport}
+                    </span>
+                    <span className="text-[10px] text-morandi-secondary">
+                      {seg.departureTime} - {seg.arrivalTime}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="grid grid-cols-6 gap-1">
             <Input placeholder="航班" value={formState.newItineraryReturnFlight?.flightNumber || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, flightNumber: e.target.value, airline: prev?.airline || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
             <Input placeholder="航空" value={formState.newItineraryReturnFlight?.airline || ''} onChange={e => formState.setNewItineraryReturnFlight(prev => ({ ...prev, airline: e.target.value, flightNumber: prev?.flightNumber || '', departureAirport: prev?.departureAirport || '', arrivalAirport: prev?.arrivalAirport || 'TPE', departureTime: prev?.departureTime || '', arrivalTime: prev?.arrivalTime || '', departureDate: prev?.departureDate || '' }))} className="text-[10px] h-7" />
