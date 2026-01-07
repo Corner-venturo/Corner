@@ -165,7 +165,7 @@ export function CoverInfoForm({
             <Combobox
               value={data.city || ''}
               onChange={value => updateCity(value)}
-              options={availableCities.map(city => ({ value: city.name, label: city.name }))}
+              options={availableCities.map(city => ({ value: city.code, label: city.name }))}
               placeholder="搜尋或選擇城市..."
               showSearchIcon
               showClearButton

@@ -106,19 +106,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               <span>版本</span>
             </button>
 
-            {/* 手冊編輯器 */}
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                router.push(`/designer?proposal_id=${proposal.id}`)
-              }}
-              className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-              title="製作旅遊手冊"
-            >
-              <BookOpen size={14} />
-              <span>手冊</span>
-            </button>
-
             {/* 編輯 */}
             {canEdit && (
               <button

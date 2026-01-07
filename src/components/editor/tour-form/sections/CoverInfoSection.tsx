@@ -59,9 +59,15 @@ export function CoverInfoSection({
     handleCoverStyleChange,
   } = useCoverInfo({ data, onChange })
 
-  // 從城市名稱取得機場代碼
+  // 取得機場代碼（data.city 現在直接存城市代碼）
+  // 向後兼容：如果是舊資料存城市名稱，嘗試反向查找
   const airportCode = useMemo(() => {
     if (!data.city) return ''
+    // 如果 data.city 是城市代碼格式（2-4個大寫字母），直接使用
+    if (/^[A-Z]{2,4}$/.test(data.city)) {
+      return data.city
+    }
+    // 否則嘗試從城市名稱反向查找（向後兼容舊資料）
     const city = availableCities.find(c => c.name === data.city)
     return city?.code || ''
   }, [data.city, availableCities])
