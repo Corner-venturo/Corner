@@ -156,6 +156,58 @@ export function TourControlFormDialog({
               meals,
             })
           }
+        } else if (pkg.itinerary_type === 'timeline' && pkg.timeline_data) {
+          // 從時間軸行程表載入資料
+          const timelineData = pkg.timeline_data as {
+            title?: string
+            days?: Array<{
+              date: string
+              title?: string
+              meals?: {
+                lunch?: boolean
+                dinner?: boolean
+                lunchMenu?: string
+                dinnerMenu?: string
+              }
+              attractions?: Array<{
+                name: string
+                mealType?: string
+                menu?: string
+              }>
+            }>
+            startDate?: string
+          }
+
+          const timelineDays = timelineData.days || []
+
+          // 從時間軸資料產生餐食列表
+          const meals: TourControlMeal[] = timelineDays
+            .filter((day) => day.meals && (day.meals.lunch || day.meals.dinner))
+            .map((day) => ({
+              date: day.date,
+              lunch: day.meals?.lunch ? (day.meals.lunchMenu || '含午餐') : '',
+              dinner: day.meals?.dinner ? (day.meals.dinnerMenu || '含晚餐') : '',
+              dailyItinerary: day.title || '',
+            }))
+            .filter((meal) => meal.lunch || meal.dinner)
+
+          setFormData({
+            date: timelineData.startDate || pkg.start_date || '',
+            tourCode: proposal?.code || '',
+            tourName: timelineData.title || proposal?.title || '',
+            bidContact: { name: '', phone: '' },
+            itineraryContact: { name: '', phone: '' },
+            pax: {
+              total: pkg.group_size || proposal?.group_size || 0,
+              business: 0,
+              leader: 0,
+              nurse: 0,
+              tourLeader: 0,
+            },
+            busCompanies: [{ name: '', contact: '', confirmTime: '' }],
+            hotels: [],
+            meals,
+          })
         } else {
           // 沒有行程表，使用預設值
           setFormData({
