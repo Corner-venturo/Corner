@@ -44,6 +44,8 @@ export function ProposalDetailDialog({
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
+  // 追蹤子 Dialog 是否開啟（用於單一遮罩模式）
+  const [childDialogOpen, setChildDialogOpen] = useState(false)
 
   // 取得此提案的套件
   const packages = useMemo(() => {
@@ -61,7 +63,10 @@ export function ProposalDetailDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open && !childDialogOpen}
+      onOpenChange={(v) => !childDialogOpen && onOpenChange(v)}
+    >
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
         <VisuallyHidden>
           <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
@@ -97,6 +102,7 @@ export function ProposalDetailDialog({
             onPackagesChange={handlePackagesChange}
             showAddDialog={showAddDialog}
             onShowAddDialogChange={setShowAddDialog}
+            onChildDialogChange={setChildDialogOpen}
           />
         </div>
       </DialogContent>
