@@ -105,51 +105,50 @@ export function ProposalDetailDialog({
 
   return (
     <>
-      {/* 主對話框：時間軸對話框開啟時隱藏（單一遮罩模式） */}
-      <Dialog
-        open={open && !timelineDialogOpen}
-        onOpenChange={(v) => !timelineDialogOpen && onOpenChange(v)}
-      >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
-          <VisuallyHidden>
-            <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
-          </VisuallyHidden>
-          {/* 標題區 - pr-8 為關閉按鈕留空間 */}
-          <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
-            <div className="flex items-center gap-3">
-              <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
-              <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
-              <span
-                className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
-              >
-                {STATUS_LABELS[proposal.status]}
-              </span>
+      {/* 主對話框：時間軸對話框開啟時完全不渲染，避免多重遮罩 */}
+      {!timelineDialogOpen && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
+            <VisuallyHidden>
+              <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
+            </VisuallyHidden>
+            {/* 標題區 - pr-8 為關閉按鈕留空間 */}
+            <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
+                <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
+                <span
+                  className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
+                >
+                  {STATUS_LABELS[proposal.status]}
+                </span>
+              </div>
+              {canAddVersion && (
+                <Button
+                  size="sm"
+                  className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                  onClick={() => setShowAddDialog(true)}
+                >
+                  <Plus size={14} />
+                  新增版本
+                </Button>
+              )}
             </div>
-            {canAddVersion && (
-              <Button
-                size="sm"
-                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                onClick={() => setShowAddDialog(true)}
-              >
-                <Plus size={14} />
-                新增版本
-              </Button>
-            )}
-          </div>
 
-          {/* 套件列表 */}
-          <div className="flex-1 overflow-auto">
-            <PackageListPanel
-              proposal={proposal}
-              packages={packages}
-              onPackagesChange={handlePackagesChange}
-              showAddDialog={showAddDialog}
-              onShowAddDialogChange={setShowAddDialog}
-              onOpenTimelineDialog={handleOpenTimelineDialog}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+            {/* 套件列表 */}
+            <div className="flex-1 overflow-auto">
+              <PackageListPanel
+                proposal={proposal}
+                packages={packages}
+                onPackagesChange={handlePackagesChange}
+                showAddDialog={showAddDialog}
+                onShowAddDialogChange={setShowAddDialog}
+                onOpenTimelineDialog={handleOpenTimelineDialog}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* 時間軸行程表對話框：放在主對話框外面（單一遮罩模式） */}
       <TimelineItineraryDialog
