@@ -313,14 +313,14 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
         <span style="font-family:標楷體;">${data.tourName || ''}</span>
       </td>
       <td style="padding:1pt 3pt;">
-        <span style="font-family:標楷體;">飯店</span>
+        <span style="font-family:標楷體;">平安</span>
       </td>
       <td colspan="2" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;"></span>
       </td>
     </tr>
 
-    <!-- 第二行：團號、餐點 -->
+    <!-- 第二行：團號、責任 -->
     <tr style="height:16pt;">
       <td nowrap style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">團號</span>
@@ -329,7 +329,7 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
         <span style="font-family:標楷體;">${data.tourCode || ''}</span>
       </td>
       <td style="padding:1pt 3pt;">
-        <span style="font-family:標楷體;">餐點</span>
+        <span style="font-family:標楷體;">責任</span>
       </td>
       <td colspan="2" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;"></span>
