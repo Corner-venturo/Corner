@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { Plus, Printer, Hotel, Bus, Coins, Settings } from 'lucide-react'
+import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -265,6 +265,16 @@ export function OrderMembersExpandable({
               </Button>
             </>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`h-8 px-2 gap-1 ${isAllEditMode ? 'bg-morandi-gold/10 text-morandi-gold' : ''}`}
+            onClick={() => setIsAllEditMode(!isAllEditMode)}
+            title={isAllEditMode ? '關閉全部編輯模式' : '開啟全部編輯模式'}
+          >
+            <Pencil size={14} />
+            {isAllEditMode ? '關閉編輯' : '全部編輯'}
+          </Button>
           <Button variant="ghost" size="sm" className={`h-8 px-2 ${showIdentityColumn ? 'text-morandi-gold' : ''}`} onClick={() => setShowIdentityColumn(!showIdentityColumn)}>
             身份
           </Button>
@@ -433,6 +443,15 @@ export function OrderMembersExpandable({
                 onPnrChange={(id, val) => setPnrValues({ ...pnrValues, [id]: val })}
                 onCustomCostChange={(fId, mId, val) => setCustomCostFields(customCostFields.map(f => f.id === fId ? { ...f, values: { ...f.values, [mId]: val } } : f))}
                 onKeyDown={handleKeyDown}
+                onNameSearch={(memberId, value) => {
+                  const memberIndex = membersData.members.findIndex(m => m.id === memberId)
+                  if (memberIndex >= 0) {
+                    customerMatch.checkCustomerMatchByName(value, memberIndex, membersData.members[memberIndex])
+                  }
+                }}
+                onIdNumberSearch={(memberId, value, memberIndex) => {
+                  customerMatch.checkCustomerMatchByIdNumber(value, memberIndex, membersData.members[memberIndex])
+                }}
               />
             ))}
           </tbody>
