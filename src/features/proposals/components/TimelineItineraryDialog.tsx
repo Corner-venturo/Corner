@@ -828,12 +828,17 @@ function generatePrintHtml(data: TimelineItineraryData): string {
         ? `<div class="menu-row"><span class="menu-text" ${colorStyle}>${attr.menu}</span></div>`
         : ''
 
+      const descriptionRow = attr.description
+        ? `<div class="description-row"><span class="description-text" ${colorStyle}>${attr.description}</span></div>`
+        : ''
+
       return `
         <div class="attraction-item">
           <div class="attraction-row">
             <span class="time">${timeStr}</span>
             <span class="name" ${colorStyle}>${attr.name || ''}</span>
           </div>
+          ${descriptionRow}
           ${menuRow}
           ${imagesHtml}
         </div>
@@ -933,6 +938,10 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       min-width: 90px;
     }
     .attraction-row .name { font-size: 11pt; font-weight: 500; color: #3a3633; flex: 1; }
+    .description-row {
+      padding: 2px 12px 2px 114px;
+    }
+    .description-row .description-text { font-size: 10pt; color: #666; line-height: 1.4; }
     .menu-row {
       display: flex;
       align-items: center;
