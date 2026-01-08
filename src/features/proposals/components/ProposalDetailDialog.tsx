@@ -13,6 +13,7 @@ import { Plus } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { PackageListPanel } from './PackageListPanel'
 import { TimelineItineraryDialog } from './TimelineItineraryDialog'
+import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalStatus, ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
@@ -48,6 +49,10 @@ export function ProposalDetailDialog({
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
 
+  // 快速行程表對話框狀態（用於單一遮罩模式）
+  const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
+  const [itineraryPackage, setItineraryPackage] = useState<ProposalPackage | null>(null)
+
   // 時間軸行程表對話框狀態（用於單一遮罩模式）
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [timelinePackage, setTimelinePackage] = useState<ProposalPackage | null>(null)
@@ -64,6 +69,18 @@ export function ProposalDetailDialog({
     refreshPackages()
     onPackagesChange?.()
   }, [refreshPackages, onPackagesChange])
+
+  // 開啟快速行程表對話框（由 PackageListPanel 呼叫）
+  const handleOpenItineraryDialog = useCallback((pkg: ProposalPackage) => {
+    setItineraryPackage(pkg)
+    setItineraryDialogOpen(true)
+  }, [])
+
+  // 關閉快速行程表對話框
+  const handleCloseItineraryDialog = useCallback(() => {
+    setItineraryDialogOpen(false)
+    setItineraryPackage(null)
+  }, [])
 
   // 開啟時間軸行程表對話框（由 PackageListPanel 呼叫）
   const handleOpenTimelineDialog = useCallback((pkg: ProposalPackage) => {
@@ -103,10 +120,13 @@ export function ProposalDetailDialog({
 
   if (!proposal) return null
 
+  // 任何子 Dialog 開啟時，主 Dialog 完全不渲染（避免多重遮罩）
+  const hasChildDialogOpen = itineraryDialogOpen || timelineDialogOpen
+
   return (
     <>
-      {/* 主對話框：時間軸對話框開啟時完全不渲染，避免多重遮罩 */}
-      {!timelineDialogOpen && (
+      {/* 主對話框：子對話框開啟時完全不渲染，避免多重遮罩 */}
+      {!hasChildDialogOpen && (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
             <VisuallyHidden>
@@ -143,11 +163,23 @@ export function ProposalDetailDialog({
                 onPackagesChange={handlePackagesChange}
                 showAddDialog={showAddDialog}
                 onShowAddDialogChange={setShowAddDialog}
+                onOpenItineraryDialog={handleOpenItineraryDialog}
                 onOpenTimelineDialog={handleOpenTimelineDialog}
               />
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* 快速行程表對話框：放在主對話框外面（單一遮罩模式） */}
+      {itineraryPackage && (
+        <PackageItineraryDialog
+          isOpen={itineraryDialogOpen}
+          onClose={handleCloseItineraryDialog}
+          pkg={itineraryPackage}
+          proposal={proposal}
+          onItineraryCreated={handlePackagesChange}
+        />
       )}
 
       {/* 時間軸行程表對話框：放在主對話框外面（單一遮罩模式） */}

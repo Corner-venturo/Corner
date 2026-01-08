@@ -49,6 +49,8 @@ interface PackageListPanelProps {
   onShowAddDialogChange?: (show: boolean) => void
   /** 當任何子 Dialog 開啟/關閉時回調（用於單一遮罩模式） */
   onChildDialogChange?: (isOpen: boolean) => void
+  /** 開啟快速行程表對話框（由父組件管理，用於單一遮罩模式） */
+  onOpenItineraryDialog?: (pkg: ProposalPackage) => void
   /** 開啟時間軸行程表對話框（由父組件管理，用於單一遮罩模式） */
   onOpenTimelineDialog?: (pkg: ProposalPackage) => void
 }
@@ -60,6 +62,7 @@ export function PackageListPanel({
   showAddDialog,
   onShowAddDialogChange,
   onChildDialogChange,
+  onOpenItineraryDialog,
   onOpenTimelineDialog,
 }: PackageListPanelProps) {
   const router = useRouter()
@@ -472,7 +475,12 @@ export function PackageListPanel({
                                 void alert('已使用時間軸行程表，無法切換', 'info')
                                 return
                               }
-                              openItineraryDialog(pkg)
+                              // 使用父組件的回調（單一遮罩模式）或內部狀態
+                              if (onOpenItineraryDialog) {
+                                onOpenItineraryDialog(pkg)
+                              } else {
+                                openItineraryDialog(pkg)
+                              }
                             }}
                             className={`gap-2 cursor-pointer ${
                               pkg.itinerary_type === 'timeline' ? 'opacity-50' : ''
@@ -697,8 +705,8 @@ export function PackageListPanel({
         onSubmit={handleUpdatePackage}
       />
 
-      {/* 行程表對話框 */}
-      {selectedPackage && (
+      {/* 行程表對話框（僅在未使用父組件回調時渲染） */}
+      {!onOpenItineraryDialog && selectedPackage && (
         <PackageItineraryDialog
           isOpen={itineraryDialogOpen}
           onClose={() => {
