@@ -81,6 +81,7 @@ export function TimelineItineraryDialog({
   const [uploadTarget, setUploadTarget] = useState<{ dayId: string; attractionId: string } | null>(null)
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
+  const [colorPickerOpen, setColorPickerOpen] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
 
   // 計算日期的輔助函數（提前定義）
@@ -638,28 +639,34 @@ export function TimelineItineraryDialog({
                     </div>
                   </td>
                   <td className="py-0.5 w-10">
-                    <div className="relative group">
+                    <div className="relative">
                       <button
+                        onClick={() => setColorPickerOpen(colorPickerOpen === rowIndex ? null : rowIndex)}
                         className="p-1.5 rounded transition-colors hover:bg-morandi-container"
                         style={{ color: attraction.color || '#3a3633' }}
                         title="選擇顏色"
                       >
                         <Palette size={14} />
                       </button>
-                      <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg p-1 hidden group-hover:flex gap-1 z-10">
-                        {COLOR_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.value}
-                            onClick={() => updateAttractionField(rowIndex, 'color', opt.value)}
-                            className={cn(
-                              'w-5 h-5 rounded-full border-2 transition-transform hover:scale-110',
-                              attraction.color === opt.value ? 'border-morandi-gold' : 'border-transparent'
-                            )}
-                            style={{ backgroundColor: opt.color }}
-                            title={opt.label}
-                          />
-                        ))}
-                      </div>
+                      {colorPickerOpen === rowIndex && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg p-1 flex gap-1 z-10">
+                          {COLOR_OPTIONS.map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => {
+                                updateAttractionField(rowIndex, 'color', opt.value)
+                                setColorPickerOpen(null)
+                              }}
+                              className={cn(
+                                'w-5 h-5 rounded-full border-2 transition-transform hover:scale-110',
+                                attraction.color === opt.value ? 'border-morandi-gold' : 'border-transparent'
+                              )}
+                              style={{ backgroundColor: opt.color }}
+                              title={opt.label}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="py-0.5 w-10">
