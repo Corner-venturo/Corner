@@ -580,7 +580,8 @@ export function PackageListPanel({
                       {/* 團控表 */}
                       <button
                         onClick={() => {
-                          if (pkg.itinerary_id) {
+                          // 支援快速行程表 (itinerary_id) 或時間軸行程表 (timeline_data)
+                          if (pkg.itinerary_id || pkg.itinerary_type === 'timeline') {
                             setSelectedPackage(pkg)
                             setTourControlDialogOpen(true)
                           } else {
@@ -588,12 +589,12 @@ export function PackageListPanel({
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
+                          pkg.itinerary_id || pkg.itinerary_type === 'timeline'
                             ? 'text-morandi-gold hover:bg-morandi-gold/10'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
                         title="團控表"
-                        disabled={!pkg.itinerary_id}
+                        disabled={!pkg.itinerary_id && pkg.itinerary_type !== 'timeline'}
                       >
                         <Bus size={16} />
                       </button>
