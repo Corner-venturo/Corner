@@ -230,6 +230,7 @@ function generateAttractionRows(attractions: TourControlAttraction[] = []): stri
 
 /**
  * 產生餐食列 - 每天佔2行（午餐+晚餐），日期在左邊 rowspan
+ * 本日行程在第一行對齊上方景點欄位
  */
 function generateMealRows(meals: TourControlMeal[] = []): string {
   if (meals.length === 0) return ''
@@ -242,24 +243,18 @@ function generateMealRows(meals: TourControlMeal[] = []): string {
     const dateRowspan = isFirst ? ` rowspan="${totalRows}"` : ''
     const showMainLabel = isFirst ? `<td width="41" nowrap${dateRowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">餐食</span></td>` : ''
 
-    // 午餐行（含日期 rowspan=2）
+    // 午餐行（含日期 rowspan=2、本日行程）
     rows.push(`
       <tr style="height:16pt;">
         ${showMainLabel}
         <td colspan="2" rowspan="2" style="padding:2pt 4pt;vertical-align:middle;background:#fafafa;">
           <span style="font-family:標楷體;">${formatDateShort(meal.date)}</span>
         </td>
-        <td colspan="2" style="padding:2pt 4pt;background:#f8f8f8;">
-          <span style="font-family:標楷體;">午餐</span>
+        <td colspan="6" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;">午餐：${meal.lunch || ''}</span>
         </td>
-        <td colspan="8" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${meal.lunch || ''}</span>
-        </td>
-        <td colspan="3" style="padding:2pt 4pt;background:#f8f8f8;">
-          <span style="font-family:標楷體;">本日行程:</span>
-        </td>
-        <td colspan="9" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${meal.dailyItinerary || ''}</span>
+        <td colspan="16" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;">本日行程：${meal.dailyItinerary || ''}</span>
         </td>
       </tr>
     `)
@@ -267,11 +262,8 @@ function generateMealRows(meals: TourControlMeal[] = []): string {
     // 晚餐行
     rows.push(`
       <tr style="height:16pt;">
-        <td colspan="2" style="padding:2pt 4pt;background:#f8f8f8;">
-          <span style="font-family:標楷體;">晚餐</span>
-        </td>
-        <td colspan="20" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${meal.dinner || ''}</span>
+        <td colspan="22" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;">晚餐：${meal.dinner || ''}</span>
         </td>
       </tr>
     `)
