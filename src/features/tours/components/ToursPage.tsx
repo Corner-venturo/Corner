@@ -22,7 +22,6 @@ import { useToursForm } from '../hooks/useToursForm'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
-import { CreateTourSourceDialog } from './CreateTourSourceDialog'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
@@ -60,7 +59,6 @@ export const ToursPage: React.FC = () => {
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
-  const [tourSourceDialogOpen, setTourSourceDialogOpen] = useState(false)
   const [proposalEditDialogOpen, setProposalEditDialogOpen] = useState(false)
   const [proposalArchiveDialogOpen, setProposalArchiveDialogOpen] = useState(false)
   const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
@@ -460,7 +458,7 @@ export const ToursPage: React.FC = () => {
           setCurrentPage(1)
         }}
         onAddProposal={() => setProposalDialogOpen(true)}
-        onAddTour={() => setTourSourceDialogOpen(true)}
+        onAddTour={() => openDialog('create')}
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">
@@ -481,37 +479,6 @@ export const ToursPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* 選擇開團來源對話框 */}
-      <CreateTourSourceDialog
-        isOpen={tourSourceDialogOpen}
-        onClose={() => setTourSourceDialogOpen(false)}
-        onSelectBlank={() => {
-          setTourSourceDialogOpen(false)
-          openDialog('create')
-        }}
-        onSelectItinerary={(itinerary) => {
-          setTourSourceDialogOpen(false)
-          // 從行程表帶入資料
-          setNewTour(prev => ({
-            ...prev,
-            name: itinerary.title || '',
-            location: itinerary.city || '',
-            departure_date: itinerary.departure_date || '',
-          }))
-          openDialog('create')
-        }}
-        onSelectQuote={(quote) => {
-          setTourSourceDialogOpen(false)
-          // 從報價單帶入資料
-          setNewTour(prev => ({
-            ...prev,
-            name: quote.name || quote.destination || '',
-            location: quote.destination || '',
-          }))
-          openDialog('create')
-        }}
-      />
 
       <TourForm
         isOpen={dialog.isOpen}

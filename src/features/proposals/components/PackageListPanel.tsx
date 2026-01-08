@@ -41,6 +41,8 @@ interface PackageListPanelProps {
   onPackagesChange: () => void
   showAddDialog?: boolean
   onShowAddDialogChange?: (show: boolean) => void
+  /** 當任何子 Dialog 開啟/關閉時回調（用於單一遮罩模式） */
+  onChildDialogChange?: (isOpen: boolean) => void
 }
 
 export function PackageListPanel({
@@ -49,6 +51,7 @@ export function PackageListPanel({
   onPackagesChange,
   showAddDialog,
   onShowAddDialogChange,
+  onChildDialogChange,
 }: PackageListPanelProps) {
   const router = useRouter()
   const { user } = useAuthStore()
@@ -76,6 +79,16 @@ export function PackageListPanel({
   const [tourControlDialogOpen, setTourControlDialogOpen] = useState(false)
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
+
+  // 追蹤是否有任何子 Dialog 開啟（用於單一遮罩模式）
+  const hasAnyDialogOpen = addDialogOpen || editDialogOpen || convertDialogOpen ||
+    itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen ||
+    tourControlDialogOpen || timelineDialogOpen
+
+  // 通知父組件子 Dialog 狀態變化
+  React.useEffect(() => {
+    onChildDialogChange?.(hasAnyDialogOpen)
+  }, [hasAnyDialogOpen, onChildDialogChange])
 
   // 新增套件
   const handleCreatePackage = useCallback(

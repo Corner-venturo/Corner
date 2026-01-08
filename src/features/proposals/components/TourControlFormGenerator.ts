@@ -34,27 +34,27 @@ function generateHotelRows(hotels: TourControlHotel[] = []): string {
     const hotel = hotels[i]
     const isFirst = i === 0
     const rowspan = isFirst ? ` rowspan="${maxRows}"` : ''
-    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;border:solid windowtext 1.0pt;padding:2pt 4pt;vertical-align:middle;"><span style="font-family:標楷體;">飯店</span></td>` : ''
+    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">飯店</span></td>` : ''
 
     rows.push(`
       <tr style="height:16pt;">
         ${showLabel}
-        <td colspan="6" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="6" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${isFirst ? '飯店確認：' : ''}${i + 1}. ${hotel?.hotelName || ''}</span>
         </td>
-        <td colspan="4" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="4" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">聯絡人：${hotel?.contact || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">訂金：${hotel?.deposit || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">協議：${hotel?.agreement || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">確認時間</span>
         </td>
-        <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="5" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${hotel?.confirmTime || ''}</span>
         </td>
       </tr>
@@ -75,21 +75,21 @@ function generateBusRows(busCompanies: TourControlBusCompany[] = []): string {
     const bus = busCompanies[i]
     const isFirst = i === 0
     const rowspan = isFirst ? ` rowspan="${maxRows}"` : ''
-    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;border:solid windowtext 1.0pt;padding:2pt 4pt;vertical-align:middle;"><span style="font-family:標楷體;">車隊</span></td>` : ''
+    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">車隊</span></td>` : ''
 
     rows.push(`
-      <tr style="height:14pt;">
+      <tr style="height:16pt;">
         ${showLabel}
-        <td colspan="6" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="6" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${isFirst ? '遊覽車公司：' : ''}${i + 1}. ${bus?.name || ''}</span>
         </td>
-        <td colspan="10" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="10" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">聯絡人：${bus?.contact || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">確認時間</span>
         </td>
-        <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="5" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${bus?.confirmTime || ''}</span>
         </td>
       </tr>
@@ -109,31 +109,31 @@ function generateAttractionRows(attractions: TourControlAttraction[] = []): stri
 
   // 標題行
   rows.push(`
-    <tr style="height:14pt;">
-      <td width="41" nowrap rowspan="${maxRows + 1}" style="width:30.85pt;border:solid windowtext 1.0pt;padding:1pt 3pt;vertical-align:middle;">
+    <tr style="height:16pt;">
+      <td width="41" nowrap rowspan="${maxRows + 1}" style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;">
         <span style="font-family:標楷體;">預約</span><br/>
         <span style="font-family:標楷體;">景點</span><br/>
         <span style="font-family:標楷體;">門票</span>
       </td>
-      <td colspan="2" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="2" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">日期</span>
       </td>
-      <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="5" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">名稱</span>
       </td>
-      <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="3" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">電話</span>
       </td>
-      <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="3" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">連絡人</span>
       </td>
-      <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="3" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">預約狀況</span>
       </td>
-      <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="3" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">價格/協議</span>
       </td>
-      <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;background:#f0f0f0;">
+      <td colspan="5" style="padding:2pt 4pt;background:#e8e8e8;text-align:center;">
         <span style="font-family:標楷體;">備註</span>
       </td>
     </tr>
@@ -143,26 +143,26 @@ function generateAttractionRows(attractions: TourControlAttraction[] = []): stri
   for (let i = 0; i < maxRows; i++) {
     const attraction = attractions[i]
     rows.push(`
-      <tr style="height:14pt;">
-        <td colspan="2" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+      <tr style="height:16pt;">
+        <td colspan="2" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction ? formatDateShort(attraction.date) : ''}</span>
         </td>
-        <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="5" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.name || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.phone || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.contact || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.status || ''}</span>
         </td>
-        <td colspan="3" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="3" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.price || ''}${attraction?.agreement ? '/' + attraction.agreement : ''}</span>
         </td>
-        <td colspan="5" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="5" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${attraction?.remarks || ''}</span>
         </td>
       </tr>
@@ -183,21 +183,21 @@ function generateMealRows(meals: TourControlMeal[] = []): string {
 
   meals.forEach((meal, i) => {
     const isFirst = i === 0
-    const showLabel = isFirst ? `<td width="41" nowrap rowspan="${rowspan}" style="width:30.85pt;border:solid windowtext 1.0pt;padding:2pt 4pt;vertical-align:middle;"><span style="font-family:標楷體;">餐食</span></td>` : ''
+    const showLabel = isFirst ? `<td width="41" nowrap rowspan="${rowspan}" style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">餐食</span></td>` : ''
 
     rows.push(`
-      <tr style="height:14pt;">
+      <tr style="height:16pt;">
         ${showLabel}
-        <td colspan="2" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="2" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${formatDateShort(meal.date)}</span>
         </td>
-        <td colspan="6" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="6" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">午餐：${meal.lunch || ''}</span>
         </td>
-        <td colspan="6" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="6" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">晚餐：${meal.dinner || ''}</span>
         </td>
-        <td colspan="10" style="border:solid windowtext 1.0pt;border-left:none;padding:1pt 3pt;">
+        <td colspan="10" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">本日行程：${meal.dailyItinerary || ''}</span>
         </td>
       </tr>
@@ -222,7 +222,7 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
   <style>
     @page {
       size: A4 portrait;
-      margin: 5mm;
+      margin: 3mm;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -231,9 +231,9 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
     }
     body {
       font-family: "標楷體", "Microsoft JhengHei", sans-serif;
-      font-size: 11pt;
-      line-height: 1.3;
-      padding: 5px;
+      font-size: 10pt;
+      line-height: 1.2;
+      padding: 3px;
       display: flex;
       flex-direction: column;
     }
@@ -246,15 +246,22 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
       border-collapse: collapse;
       width: 100%;
       table-layout: fixed;
-      font-size: 11pt;
+      font-size: 10pt;
       flex: 1;
+      border: 2px solid #000;
     }
     td, th {
-      border: 1px solid #000;
-      padding: 3pt 4pt;
+      border: 1.5px solid #000;
+      padding: 2pt 3pt;
       vertical-align: middle;
       word-wrap: break-word;
       overflow: hidden;
+    }
+    /* 標籤欄位背景色 */
+    .label-cell {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      text-align: center;
     }
     .print-controls {
       padding: 12px;
@@ -299,49 +306,49 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
   <div class="table-container">
   <table>
     <!-- 第一行：日期、車條名稱、平安 -->
-    <tr style="height:16pt;">
-      <td width="41" nowrap style="width:30.85pt;padding:1pt 3pt;">
+    <tr style="height:18pt;">
+      <td width="41" nowrap class="label-cell" style="width:30.85pt;padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">日期</span>
       </td>
-      <td colspan="7" style="padding:1pt 3pt;">
+      <td colspan="7" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">${formatDateFull(data.date)}</span>
       </td>
-      <td nowrap style="padding:1pt 3pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">車條</span>
       </td>
-      <td colspan="12" style="padding:1pt 3pt;">
+      <td colspan="12" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">${data.tourName || ''}</span>
       </td>
-      <td nowrap style="padding:1pt 3pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">平安</span>
       </td>
-      <td colspan="3" style="padding:1pt 3pt;">
+      <td colspan="3" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;"></span>
       </td>
     </tr>
 
     <!-- 第二行：團號、責任 -->
-    <tr style="height:16pt;">
-      <td nowrap style="padding:1pt 3pt;">
+    <tr style="height:18pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">團號</span>
       </td>
-      <td colspan="7" style="padding:1pt 3pt;">
+      <td colspan="7" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">${data.tourCode || ''}</span>
       </td>
-      <td colspan="13" style="padding:1pt 3pt;">
+      <td colspan="13" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;"></span>
       </td>
-      <td nowrap style="padding:1pt 3pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">責任</span>
       </td>
-      <td colspan="3" style="padding:1pt 3pt;">
+      <td colspan="3" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;"></span>
       </td>
     </tr>
 
     <!-- 第三行：聯絡窗口 -->
-    <tr style="height:14pt;">
-      <td nowrap rowspan="2" style="padding:1pt 3pt;vertical-align:middle;">
+    <tr style="height:16pt;">
+      <td nowrap rowspan="2" class="label-cell" style="padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;">
         <span style="font-family:標楷體;">聯絡</span><br/>
         <span style="font-family:標楷體;">窗口</span>
       </td>
@@ -362,11 +369,11 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
     </tr>
 
     <!-- 第四行：人數 -->
-    <tr style="height:14pt;">
-      <td nowrap style="padding:1pt 3pt;">
+    <tr style="height:16pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">人數</span>
       </td>
-      <td colspan="24" style="padding:1pt 3pt;">
+      <td colspan="24" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">
           遊覽車領隊&nbsp;&nbsp;${pax.total || ''}人 = &nbsp;公司業務：${pax.business || ''}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           總領：${pax.leader || ''}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -377,11 +384,11 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
     </tr>
 
     <!-- 第五行：去程 -->
-    <tr style="height:14pt;">
-      <td nowrap style="padding:1pt 3pt;">
+    <tr style="height:16pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">去程</span>
       </td>
-      <td colspan="24" style="padding:1pt 3pt;">
+      <td colspan="24" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">
           ${data.outboundFlight?.flightNumber || ''}&nbsp;&nbsp;
           ${data.outboundFlight?.departure || ''} → ${data.outboundFlight?.arrival || ''}&nbsp;&nbsp;
@@ -391,11 +398,11 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
     </tr>
 
     <!-- 第六行：回程 -->
-    <tr style="height:14pt;">
-      <td nowrap style="padding:1pt 3pt;">
+    <tr style="height:16pt;">
+      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
         <span style="font-family:標楷體;">回程</span>
       </td>
-      <td colspan="24" style="padding:1pt 3pt;">
+      <td colspan="24" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">
           ${data.returnFlight?.flightNumber || ''}&nbsp;&nbsp;
           ${data.returnFlight?.departure || ''} → ${data.returnFlight?.arrival || ''}&nbsp;&nbsp;
@@ -418,10 +425,10 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
 
     <!-- 注意事項 -->
     <tr style="height:30pt;">
-      <td nowrap style="padding:1pt 3pt;vertical-align:top;">
+      <td nowrap style="padding:2pt 4pt;vertical-align:top;background:#f0f0f0;">
         <span style="font-family:標楷體;">備註</span>
       </td>
-      <td colspan="24" style="padding:1pt 3pt;vertical-align:top;">
+      <td colspan="24" style="padding:2pt 4pt;vertical-align:top;">
         <span style="font-family:標楷體;">${data.remarks || ''}</span>
       </td>
     </tr>
