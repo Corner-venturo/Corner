@@ -776,15 +776,18 @@ function generatePrintHtml(data: TimelineItineraryData): string {
         ? `<div class="images">${attr.images.map(img => `<img src="${img.url}" alt="" />`).join('')}</div>`
         : ''
 
+      // 套用自訂顏色
+      const colorStyle = attr.color ? `style="color: ${attr.color}"` : ''
+
       const menuRow = attr.menu
-        ? `<div class="menu-row"><span class="menu-text">${attr.menu}</span></div>`
+        ? `<div class="menu-row"><span class="menu-text" ${colorStyle}>${attr.menu}</span></div>`
         : ''
 
       return `
         <div class="attraction-item">
           <div class="attraction-row">
             <span class="time">${timeStr}</span>
-            <span class="name">${attr.name || ''}</span>
+            <span class="name" ${colorStyle}>${attr.name || ''}</span>
           </div>
           ${menuRow}
           ${imagesHtml}
