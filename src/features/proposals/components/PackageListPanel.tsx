@@ -34,7 +34,6 @@ import {
   deletePackage,
 } from '@/services/proposal.service'
 import { PackageDialog } from './PackageDialog'
-import { ConvertToTourDialog } from './ConvertToTourDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
@@ -79,7 +78,6 @@ export function PackageListPanel({
   const addDialogOpen = showAddDialog ?? internalAddDialogOpen
   const setAddDialogOpen = onShowAddDialogChange ?? setInternalAddDialogOpen
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [convertDialogOpen, setConvertDialogOpen] = useState(false)
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
   const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
@@ -88,7 +86,7 @@ export function PackageListPanel({
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 追蹤是否有任何子 Dialog 開啟（用於單一遮罩模式）
-  const hasAnyDialogOpen = addDialogOpen || editDialogOpen || convertDialogOpen ||
+  const hasAnyDialogOpen = addDialogOpen || editDialogOpen ||
     itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen ||
     tourControlDialogOpen || timelineDialogOpen
 
@@ -182,11 +180,16 @@ export function PackageListPanel({
     setEditDialogOpen(true)
   }, [])
 
-  // 開啟轉團對話框
-  const openConvertDialog = useCallback((pkg: ProposalPackage) => {
-    setSelectedPackage(pkg)
-    setConvertDialogOpen(true)
-  }, [])
+  // 轉開團 - 導向旅遊團頁面（使用跟直接開團一樣的表單）
+  const handleConvertToTour = useCallback((pkg: ProposalPackage) => {
+    // 帶上 proposal 和 package 資訊到 /tours 頁面
+    const params = new URLSearchParams({
+      action: 'create',
+      fromProposal: proposal.id,
+      packageId: pkg.id,
+    })
+    router.push(`/tours?${params.toString()}`)
+  }, [proposal.id, router])
 
   // 建立或開啟報價單
   const handleQuoteClick = useCallback(
@@ -647,7 +650,7 @@ export function PackageListPanel({
                             <Trash2 size={14} />
                           </button>
                           <button
-                            onClick={() => openConvertDialog(pkg)}
+                            onClick={() => handleConvertToTour(pkg)}
                             className="ml-1 px-2 py-1 text-xs bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
                             title="轉開團"
                           >
@@ -685,18 +688,6 @@ export function PackageListPanel({
         proposal={proposal}
         package={selectedPackage}
         onSubmit={handleUpdatePackage}
-      />
-
-      {/* 轉開團對話框 */}
-      <ConvertToTourDialog
-        open={convertDialogOpen}
-        onOpenChange={setConvertDialogOpen}
-        proposal={proposal}
-        package={selectedPackage}
-        onSuccess={() => {
-          onPackagesChange()
-          setConvertDialogOpen(false)
-        }}
       />
 
       {/* 行程表對話框 */}

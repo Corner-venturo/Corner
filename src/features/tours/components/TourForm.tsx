@@ -26,6 +26,8 @@ interface TourFormProps {
   submitting: boolean
   formError: string | null
   onSubmit: () => void
+  /** 是否為從提案轉開團（會顯示不同標題） */
+  isFromProposal?: boolean
 }
 
 export function TourForm({
@@ -39,6 +41,7 @@ export function TourForm({
   submitting,
   formError,
   onSubmit,
+  isFromProposal,
 }: TourFormProps) {
   // 使用自定義 hook 處理所有表單邏輯
   const {
@@ -86,7 +89,13 @@ export function TourForm({
         }}
       >
         <DialogHeader>
-          <DialogTitle>{mode === 'edit' ? '編輯旅遊團' : '新增旅遊團 & 訂單'}</DialogTitle>
+          <DialogTitle>
+            {mode === 'edit'
+              ? '編輯旅遊團'
+              : isFromProposal
+                ? '提案轉開團'
+                : '新增旅遊團 & 訂單'}
+          </DialogTitle>
         </DialogHeader>
 
         {/* Error message */}
@@ -153,11 +162,17 @@ export function TourForm({
           >
             {mode === 'edit'
               ? (submitting ? '儲存中...' : '儲存變更')
-              : (submitting
-                  ? '建立中...'
-                  : newOrder.contact_person
-                    ? '新增旅遊團 & 訂單'
-                    : '新增旅遊團')}
+              : isFromProposal
+                ? (submitting
+                    ? '轉開團中...'
+                    : newOrder.contact_person
+                      ? '確認轉開團並建立訂單'
+                      : '確認轉開團')
+                : (submitting
+                    ? '建立中...'
+                    : newOrder.contact_person
+                      ? '新增旅遊團 & 訂單'
+                      : '新增旅遊團')}
           </Button>
         </div>
 

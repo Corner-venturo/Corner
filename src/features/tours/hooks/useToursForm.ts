@@ -1,12 +1,15 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Tour } from '@/stores/types'
 import { useTourPageState } from './useTourPageState'
 import { useEmployees } from '@/hooks/cloud-hooks'
 import { useQuotesListSlim } from '@/hooks/useListSlim'
 import { useTourDestinations } from './useTourDestinations'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
+import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 
 interface UseToursFormReturn {
   handleOpenCreateDialog: (fromQuoteId?: string) => Promise<void>
@@ -14,6 +17,9 @@ interface UseToursFormReturn {
   resetForm: () => void
   handleEditDialogEffect: () => void
   handleNavigationEffect: () => void
+  /** 從提案轉開團的資料 */
+  proposalConvertData: { proposal: Proposal; package: ProposalPackage } | null
+  clearProposalConvertData: () => void
 }
 
 interface UseToursFormParams {
@@ -24,9 +30,13 @@ interface UseToursFormParams {
 
 export function useToursForm({ state, openDialog, dialog }: UseToursFormParams): UseToursFormReturn {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { items: quotes } = useQuotesListSlim()
   const { destinations, loading: destinationsLoading } = useTourDestinations()
+
+  // 從提案轉開團的資料
+  const [proposalConvertData, setProposalConvertData] = useState<{ proposal: Proposal; package: ProposalPackage } | null>(null)
 
   const {
     setNewTour,
@@ -34,6 +44,12 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     setNewOrder,
     setFormError,
   } = state
+
+  const clearProposalConvertData = useCallback(() => {
+    setProposalConvertData(null)
+    // 清除 URL 參數
+    router.replace('/tours', { scroll: false })
+  }, [router])
 
   // Lazy load: only load employees when opening create dialog
   const handleOpenCreateDialog = useCallback(
@@ -152,10 +168,87 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     })
   }, [dialog.type, dialog.data, destinations, destinationsLoading, setNewTour])
 
-  // 旅遊團必須從提案建立，不再支援 URL 導航直接建團
-  const handleNavigationEffect = useCallback(() => {
-    // 不執行任何操作 - 保留此函數以維持 API 相容性
-  }, [])
+  // 處理從提案轉開團的 URL 參數
+  const handleNavigationEffect = useCallback(async () => {
+    const action = searchParams.get('action')
+    const fromProposal = searchParams.get('fromProposal')
+    const packageId = searchParams.get('packageId')
+
+    // 從提案轉開團
+    if (action === 'create' && fromProposal && packageId) {
+      try {
+        // 取得提案、套件和行程表資料
+        const [proposalRes, packageRes, itineraryRes] = await Promise.all([
+          supabase.from('proposals').select('*').eq('id', fromProposal).single(),
+          supabase.from('proposal_packages').select('*').eq('id', packageId).single(),
+          // 查詢關聯的行程表（取最新的一筆）
+          supabase.from('itineraries').select('outbound_flight, return_flight').eq('proposal_package_id', packageId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+        ])
+
+        if (proposalRes.error) throw proposalRes.error
+        if (packageRes.error) throw packageRes.error
+
+        const proposal = proposalRes.data as Proposal
+        const pkg = packageRes.data as ProposalPackage
+
+        // 儲存轉開團資料
+        setProposalConvertData({ proposal, package: pkg })
+
+        // 確保員工資料已載入
+        if (employees.length === 0) {
+          await fetchEmployees()
+        }
+
+        // 解析行程表的航班資訊
+        type FlightData = { airline?: string; flightNumber?: string; departureTime?: string; arrivalTime?: string } | null
+        const outboundFlight = itineraryRes.data?.outbound_flight as FlightData
+        const returnFlight = itineraryRes.data?.return_flight as FlightData
+
+        // 預填表單資料（包含航班）
+        const isTaiwan = pkg.country_id === '台灣'
+        setNewTour({
+          name: pkg.version_name || proposal.title || '',
+          countryCode: pkg.country_id || '',
+          cityCode: isTaiwan ? 'TW' : (pkg.main_city_id || ''),
+          cityName: isTaiwan ? '台灣' : '',
+          departure_date: pkg.start_date || proposal.expected_start_date || '',
+          return_date: pkg.end_date || proposal.expected_end_date || '',
+          price: 0,
+          status: '提案',
+          isSpecial: false,
+          max_participants: pkg.group_size || 20,
+          description: '',
+          // 帶入行程表的航班資訊
+          outbound_flight_number: outboundFlight?.flightNumber || '',
+          outbound_flight_text: outboundFlight
+            ? `${outboundFlight.airline || ''} ${outboundFlight.flightNumber || ''} ${outboundFlight.departureTime || ''}-${outboundFlight.arrivalTime || ''}`.trim()
+            : '',
+          return_flight_number: returnFlight?.flightNumber || '',
+          return_flight_text: returnFlight
+            ? `${returnFlight.airline || ''} ${returnFlight.flightNumber || ''} ${returnFlight.departureTime || ''}-${returnFlight.arrivalTime || ''}`.trim()
+            : '',
+        })
+
+        // 預填訂單聯絡人資料
+        setNewOrder({
+          contact_person: proposal.customer_name || '',
+          sales_person: '',
+          assistant: '',
+          member_count: pkg.group_size || 1,
+          total_amount: 0,
+        })
+
+        // 開啟建立對話框
+        openDialog('create')
+
+        logger.info('從提案轉開團', { proposalId: fromProposal, packageId, hasItinerary: !!itineraryRes.data })
+      } catch (error) {
+        logger.error('載入提案資料失敗', error)
+        // 清除 URL 參數
+        router.replace('/tours', { scroll: false })
+      }
+    }
+  }, [searchParams, employees.length, fetchEmployees, setNewTour, setNewOrder, openDialog, router])
 
   return {
     handleOpenCreateDialog,
@@ -163,5 +256,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
     resetForm,
     handleEditDialogEffect,
     handleNavigationEffect,
+    proposalConvertData,
+    clearProposalConvertData,
   }
 }

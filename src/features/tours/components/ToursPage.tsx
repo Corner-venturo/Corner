@@ -33,7 +33,7 @@ import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
 import { useProposals } from '@/hooks/cloud-hooks'
-import { createProposal, updateProposal, archiveProposal } from '@/services/proposal.service'
+import { createProposal, updateProposal, archiveProposal, convertToTour } from '@/services/proposal.service'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { ArchiveProposalDialog } from '@/features/proposals/components/ArchiveProposalDialog'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
@@ -135,6 +135,8 @@ export const ToursPage: React.FC = () => {
     resetForm,
     handleEditDialogEffect,
     handleNavigationEffect,
+    proposalConvertData,
+    clearProposalConvertData,
   } = useToursForm({ state, openDialog, dialog })
 
   const operations = useTourOperations({
@@ -152,10 +154,55 @@ export const ToursPage: React.FC = () => {
     dialogData: (dialog.data && Object.keys(dialog.data).length > 0 ? dialog.data : null) as Tour | null,
   })
 
-  const handleAddTour = useCallback(() => {
+  const handleAddTour = useCallback(async () => {
+    // 如果是從提案轉開團，使用 convertToTour API
+    if (proposalConvertData) {
+      if (!user?.workspace_id || !user?.id) {
+        await alert('無法取得使用者資訊', 'error')
+        return
+      }
+
+      setSubmitting(true)
+      try {
+        const result = await convertToTour(
+          {
+            proposal_id: proposalConvertData.proposal.id,
+            package_id: proposalConvertData.package.id,
+            city_code: newTour.cityCode || '',
+            departure_date: newTour.departure_date,
+            tour_name: newTour.name,
+            contact_person: newOrder.contact_person || undefined,
+            contact_phone: proposalConvertData.proposal.customer_phone || undefined,
+          },
+          user.workspace_id,
+          user.id
+        )
+
+        await alert(`轉開團成功！團號：${result.tour_code}`, 'success')
+
+        // 清除提案轉開團資料和 URL 參數
+        clearProposalConvertData()
+        resetForm()
+        closeDialog()
+
+        // 刷新提案列表
+        refreshProposals()
+
+        // 高亮顯示新建的旅遊團
+        router.push(`/tours?highlight=${result.tour_id}`)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '轉開團失敗'
+        await alert(message, 'error')
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
+
+    // 一般開團流程
     const fromQuoteId = searchParams.get('fromQuote')
     operations.handleAddTour(newTour, newOrder, fromQuoteId ?? undefined)
-  }, [operations, newTour, newOrder, searchParams])
+  }, [operations, newTour, newOrder, searchParams, proposalConvertData, user, clearProposalConvertData, resetForm, closeDialog, refreshProposals, router, setSubmitting])
 
   const handleDeleteTour = useCallback(async () => {
     await operations.handleDeleteTour(deleteConfirm.tour)
@@ -485,6 +532,10 @@ export const ToursPage: React.FC = () => {
         onClose={() => {
           resetForm()
           closeDialog()
+          // 如果是從提案轉開團，關閉時也要清除資料
+          if (proposalConvertData) {
+            clearProposalConvertData()
+          }
         }}
         mode={dialog.type === 'edit' ? 'edit' : 'create'}
         newTour={newTour}
@@ -494,6 +545,7 @@ export const ToursPage: React.FC = () => {
         submitting={submitting}
         formError={formError}
         onSubmit={handleAddTour}
+        isFromProposal={!!proposalConvertData}
       />
 
       <DeleteConfirmDialog
