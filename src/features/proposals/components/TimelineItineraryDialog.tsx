@@ -490,7 +490,9 @@ export function TimelineItineraryDialog({
 
   return (
     <>
-    <Dialog open={isOpen && !attractionSelectorOpen} onOpenChange={(open) => !open && !attractionSelectorOpen && onClose()}>
+    {/* 父 Dialog：子 Dialog 開啟時完全不渲染，避免多重遮罩 */}
+    {!attractionSelectorOpen && (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className={DIALOG_SIZES['4xl']}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -786,8 +788,9 @@ export function TimelineItineraryDialog({
         </div>
       </DialogContent>
     </Dialog>
+    )}
 
-    {/* 景點選擇器 */}
+    {/* 景點選擇器（放在父 Dialog 外面） */}
     <AttractionSelector
       isOpen={attractionSelectorOpen}
       onClose={() => setAttractionSelectorOpen(false)}
