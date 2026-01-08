@@ -20,7 +20,8 @@ interface MemberTableHeaderProps {
 
 const thClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-morandi-gold/10"
 // 凍結欄位必須使用實色背景，避免滾動時內容穿透
-const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-[#f0ebe3] sticky z-20"
+// z-30: 比資料列凍結欄位(z-10)高，這樣向下滾動時表頭會在上面
+const thStickyClass = "border border-morandi-gold/20 px-2 py-2 text-left text-xs font-medium text-morandi-primary bg-[#f0ebe3] sticky z-30"
 
 export function MemberTableHeader({
   mode,
@@ -51,7 +52,7 @@ export function MemberTableHeader({
   }
 
   return (
-    <thead className="sticky top-0 z-10 bg-[#f6f4f1]">
+    <thead className="sticky top-0 z-20 bg-[#f6f4f1]">
       <tr>
         {/* 凍結欄位：序號 */}
         <th className={`${thStickyClass} left-0 min-w-[40px]`}>序</th>

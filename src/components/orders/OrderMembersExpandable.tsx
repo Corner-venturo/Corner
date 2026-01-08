@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
@@ -149,6 +150,7 @@ export function OrderMembersExpandable({
   })
   const [isAllEditMode, setIsAllEditMode] = useState(false)
   const [isComposing, setIsComposing] = useState(false)
+  const [previewMember, setPreviewMember] = useState<OrderMember | null>(null)
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(getInitialColumnVisibility)
@@ -439,7 +441,7 @@ export function OrderMembersExpandable({
                 onUpdateField={handleUpdateField}
                 onDelete={membersData.handleDeleteMember}
                 onEdit={memberEdit.openEditDialog}
-                onPreview={() => {}}
+                onPreview={(member) => setPreviewMember(member)}
                 onPnrChange={(id, val) => setPnrValues({ ...pnrValues, [id]: val })}
                 onCustomCostChange={(fId, mId, val) => setCustomCostFields(customCostFields.map(f => f.id === fId ? { ...f, values: { ...f.values, [mId]: val } } : f))}
                 onKeyDown={handleKeyDown}
@@ -459,6 +461,26 @@ export function OrderMembersExpandable({
       </div>
 
       {/* Dialogs */}
+      {/* 護照照片預覽 */}
+      <Dialog open={!!previewMember} onOpenChange={(open) => !open && setPreviewMember(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {previewMember?.chinese_name || previewMember?.passport_name || '護照照片'}
+            </DialogTitle>
+          </DialogHeader>
+          {previewMember?.passport_image_url && (
+            <div className="flex justify-center">
+              <img
+                src={previewMember.passport_image_url}
+                alt="護照照片"
+                className="max-w-full max-h-[70vh] object-contain rounded-lg"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <AddMemberDialog
         isOpen={membersData.isAddDialogOpen}
         memberCount={membersData.memberCountToAdd}

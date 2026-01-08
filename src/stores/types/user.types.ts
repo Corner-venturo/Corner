@@ -43,7 +43,7 @@ export interface User {
     }[]
   }
   permissions: string[]
-  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[] // 附加身份標籤（不影響權限），支援多重身份
+  roles?: ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'controller' | 'super_admin')[] // 附加身份標籤（不影響權限），支援多重身份
   attendance: {
     leave_records: {
       id: string

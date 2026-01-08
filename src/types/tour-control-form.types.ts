@@ -16,6 +16,14 @@ export interface TourControlContact {
 }
 
 /**
+ * 計劃窗口資訊
+ */
+export interface TourControlPlanningContact {
+  name?: string
+  address?: string
+}
+
+/**
  * 遊覽車公司資訊
  */
 export interface TourControlBusCompany {
@@ -125,8 +133,12 @@ export interface TourControlFormData {
   date: string                          // 日期
   tourCode: string                      // 團號
   tourName?: string                     // 車條名稱/團名
+  confirmed?: string                    // 確定
+  deposit?: string                      // 訂金
+  balance?: string                      // 尾款
 
   // 聯絡人
+  planningContact?: TourControlPlanningContact // 計劃窗口
   bidContact?: TourControlContact       // 標案聯絡人
   itineraryContact?: TourControlContact // 行程聯絡人
 
@@ -143,6 +155,10 @@ export interface TourControlFormData {
 
   // 遊覽車
   busCompanies?: TourControlBusCompany[]
+  busContact?: string                   // 遊覽車聯繫
+
+  // 外團
+  externalTour?: string                 // 外團資訊
 
   // 活動廠商
   activityVendor?: string

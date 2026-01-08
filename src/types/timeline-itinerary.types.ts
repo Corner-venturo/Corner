@@ -29,6 +29,7 @@ export interface TimelineAttraction {
   mealType?: MealType  // 餐食類型（無/早餐/午餐/晚餐）
   menu?: string        // 菜色（當 mealType 不是 none 時使用）
   images: TimelineImage[]
+  color?: string       // 文字顏色（如：#3b82f6 藍色）
 }
 
 /**

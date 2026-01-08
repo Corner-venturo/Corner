@@ -77,7 +77,7 @@ export function MemberPassportInfo({
               onKeyDown={e => onKeyDown(e, index, 'passport_number')}
               data-member={member.id}
               data-field="passport_number"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.passport_number || '-'}</span>
@@ -96,7 +96,7 @@ export function MemberPassportInfo({
               onKeyDown={e => onKeyDown(e, index, 'passport_expiry')}
               data-member={member.id}
               data-field="passport_expiry"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
               placeholder="YYYYMMDD"
             />
           ) : (

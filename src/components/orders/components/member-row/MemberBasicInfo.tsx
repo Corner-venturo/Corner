@@ -101,8 +101,10 @@ export function MemberBasicInfo({
               }, 0)
             }}
             onKeyDown={e => {
+              // 輸入法組字中，不處理任何鍵盤事件
+              if (isComposing) return
               // 按 Enter 時觸發搜尋（避免輸入新客戶時被打斷）
-              if (e.key === 'Enter' && !isComposing) {
+              if (e.key === 'Enter') {
                 e.preventDefault()
                 onNameSearch?.(member.id, member.chinese_name || '')
               } else {
@@ -111,9 +113,8 @@ export function MemberBasicInfo({
             }}
             data-member={member.id}
             data-field="chinese_name"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="輸入姓名，按 Enter 搜尋"
-          />
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+                      />
         ) : (
           <div className="flex items-center gap-1">
             <span
@@ -178,10 +179,13 @@ export function MemberBasicInfo({
                 setIsComposing(false)
                 setTimeout(() => onUpdateField(member.id, 'passport_name', e.currentTarget.value), 0)
               }}
-              onKeyDown={e => onKeyDown(e, index, 'passport_name')}
+              onKeyDown={e => {
+                if (isComposing) return
+                onKeyDown(e, index, 'passport_name')
+              }}
               data-member={member.id}
               data-field="passport_name"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.passport_name || '-'}</span>
@@ -200,7 +204,7 @@ export function MemberBasicInfo({
               onKeyDown={e => onKeyDown(e, index, 'birth_date')}
               data-member={member.id}
               data-field="birth_date"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
               placeholder="YYYYMMDD"
             />
           ) : (
@@ -253,9 +257,8 @@ export function MemberBasicInfo({
               }}
               data-member={member.id}
               data-field="id_number"
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-              placeholder="按 Enter 搜尋"
-            />
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+                          />
           ) : (
             <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
           )}

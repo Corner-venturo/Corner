@@ -14,6 +14,7 @@ export type UserRole =
   | 'sales'          // 業務
   | 'accountant'     // 會計
   | 'assistant'      // 助理
+  | 'controller'     // 團控
   | 'staff'          // 一般員工
 
 export interface RoleConfig {
@@ -136,6 +137,26 @@ export const ROLES: Record<UserRole, RoleConfig> = {
       'calendar',        // 行事曆
       'workspace',       // 工作空間
       'todos',           // 待辦事項
+    ],
+    canManageWorkspace: false,
+    canCrossWorkspace: false,
+  },
+
+  controller: {
+    id: 'controller',
+    label: '團控',
+    description: '負責開團、管理旅遊團資訊',
+    color: 'text-morandi-green bg-morandi-green/10 border-morandi-green/20',
+    permissions: [
+      'calendar',        // 行事曆
+      'workspace',       // 工作空間
+      'todos',           // 待辦事項
+      'tours',           // 旅遊團管理（核心）
+      'itinerary',       // 行程管理
+      'orders',          // 查看訂單
+      'customers',       // 客戶管理
+      'requests',        // 需求單管理
+      'confirmations',   // 確認單管理
     ],
     canManageWorkspace: false,
     canCrossWorkspace: false,

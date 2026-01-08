@@ -122,6 +122,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
             max_participants: newTour.max_participants,
             description: newTour.description,
             enable_checkin: newTour.enable_checkin || false,
+            controller_id: newTour.controller_id || null,
           }
 
           await actions.update(dialogData.id, tourData)
@@ -163,6 +164,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
           current_participants: 0,
           quote_id: fromQuoteId || undefined,
           enable_checkin: newTour.enable_checkin || false,
+          controller_id: newTour.controller_id || undefined,
           outbound_flight: parseFlightText(newTour.outbound_flight_text),
           return_flight: parseFlightText(newTour.return_flight_text),
         }

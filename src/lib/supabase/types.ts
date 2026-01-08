@@ -11495,6 +11495,7 @@ export type Database = {
           closing_date: string | null
           closing_status: string | null
           code: string
+          controller_id: string | null
           contract_archived_date: string | null
           contract_completed: boolean | null
           contract_content: string | null
@@ -11554,6 +11555,7 @@ export type Database = {
           closing_date?: string | null
           closing_status?: string | null
           code: string
+          controller_id?: string | null
           contract_archived_date?: string | null
           contract_completed?: boolean | null
           contract_content?: string | null
@@ -11613,6 +11615,7 @@ export type Database = {
           closing_date?: string | null
           closing_status?: string | null
           code?: string
+          controller_id?: string | null
           contract_archived_date?: string | null
           contract_completed?: boolean | null
           contract_content?: string | null

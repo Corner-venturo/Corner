@@ -59,7 +59,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
     bg || (isAllEditMode ? "bg-white" : "bg-muted")
   )
 
-  const inputClass = "w-full bg-transparent text-xs border-none outline-none shadow-none"
+  const inputClass = "w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
 
   return (
     <tr className="group relative hover:bg-morandi-container/20 transition-colors">

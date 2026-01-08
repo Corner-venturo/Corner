@@ -2,22 +2,20 @@
  * TourControlFormDialog - 團控表對話框
  *
  * 從行程表讀取資料，產生團控表預覽並可列印
+ * 版面配置參考原始 Word 團控表格式
  */
 
 'use client'
 
-import { useEffect, useState, useCallback, Fragment } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DIALOG_SIZES,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Loader2, Bus, Printer, X, Plus, Trash2, Save } from 'lucide-react'
+import { Loader2, Printer, X, Plus, Trash2, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useToast } from '@/components/ui/use-toast'
@@ -318,6 +316,22 @@ export function TourControlFormDialog({
     })
   }, [])
 
+  // 新增飯店
+  const addHotel = useCallback(() => {
+    setFormData((prev) => ({
+      ...prev,
+      hotels: [...(prev.hotels || []), { date: '', hotelName: '', phone: '', contact: '', confirmTime: '' }],
+    }))
+  }, [])
+
+  // 移除飯店
+  const removeHotel = useCallback((index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      hotels: (prev.hotels || []).filter((_, i) => i !== index),
+    }))
+  }, [])
+
   // 更新景點門票資料
   const updateAttraction = useCallback((index: number, field: keyof TourControlAttraction, value: string) => {
     setFormData((prev) => {
@@ -343,6 +357,31 @@ export function TourControlFormDialog({
     }))
   }, [])
 
+  // 更新餐食資料
+  const updateMeal = useCallback((index: number, field: keyof TourControlMeal, value: string) => {
+    setFormData((prev) => {
+      const meals = [...(prev.meals || [])]
+      meals[index] = { ...meals[index], [field]: value }
+      return { ...prev, meals }
+    })
+  }, [])
+
+  // 新增餐食
+  const addMeal = useCallback(() => {
+    setFormData((prev) => ({
+      ...prev,
+      meals: [...(prev.meals || []), { date: '', lunch: '', dinner: '' }],
+    }))
+  }, [])
+
+  // 移除餐食
+  const removeMeal = useCallback((index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      meals: (prev.meals || []).filter((_, i) => i !== index),
+    }))
+  }, [])
+
   // 列印團控表
   const handlePrint = useCallback(() => {
     try {
@@ -357,630 +396,474 @@ export function TourControlFormDialog({
 
   if (!pkg) return null
 
+  // 樣式類
+  const labelClass = "border border-black bg-gray-100 px-2 py-1.5 font-medium text-center text-sm whitespace-nowrap"
+  const valueClass = "border border-black px-1 py-0.5 bg-white"
+  const headerClass = "border border-black bg-gray-50 px-2 py-1.5 text-center font-medium text-sm"
+  const inputClass = "h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
+  const sectionLabelClass = "border border-black bg-gray-200 px-2 py-1.5 font-bold text-center text-sm align-middle whitespace-nowrap"
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className={DIALOG_SIZES.full} nested>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Bus size={18} className="text-morandi-gold" />
-            團控表
-          </DialogTitle>
-        </DialogHeader>
+        {/* 標題區 */}
+        <div className="text-center pb-3 border-b-2 border-black mb-3">
+          <h2 className="text-lg font-bold tracking-widest">勁揚國際／原昇旅行社有限公司</h2>
+          <h3 className="text-base font-bold mt-1 tracking-[0.5em]">團 控 表</h3>
+        </div>
 
         {loading ? (
           <div className="h-48 flex items-center justify-center">
             <Loader2 className="animate-spin text-morandi-gold" size={24} />
           </div>
         ) : (
-          <div className="max-h-[70vh] overflow-y-auto">
-            {/* Excel 風格表格 */}
-            <table className="w-full border-collapse text-sm">
+          <div className="max-h-[65vh] overflow-y-auto space-y-2">
+            {/* 第一區：日期/團號/車條名稱 + 確定/尾款 */}
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '6%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '6%' }} />
+                <col style={{ width: '6%' }} />
+              </colgroup>
               <tbody>
-                {/* 基本資訊 */}
                 <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24">日期</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.date}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-                      type="date"
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
+                  <td className={labelClass}>日期</td>
+                  <td className={valueClass}>
+                    <Input type="date" value={formData.date} onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))} className={inputClass} />
                   </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24">團號</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.tourCode}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, tourCode: e.target.value }))}
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
+                  <td className={labelClass}>車條名稱</td>
+                  <td className={valueClass}>
+                    <Input value={formData.tourName || ''} onChange={(e) => setFormData((prev) => ({ ...prev, tourName: e.target.value }))} className={inputClass} placeholder="車條/團名" />
                   </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24">車條名稱</td>
-                  <td className="border border-border px-1 py-1" colSpan={3}>
-                    <Input
-                      value={formData.tourName}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, tourName: e.target.value }))}
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
+                  <td className={labelClass}>確定</td>
+                  <td className={valueClass}>
+                    <Input value={formData.confirmed || ''} onChange={(e) => setFormData((prev) => ({ ...prev, confirmed: e.target.value }))} className={inputClass} />
+                  </td>
+                  <td className={labelClass} rowSpan={2}>尾款</td>
+                  <td className={valueClass} rowSpan={2}>
+                    <Input value={formData.balance || ''} onChange={(e) => setFormData((prev) => ({ ...prev, balance: e.target.value }))} className={inputClass} />
                   </td>
                 </tr>
+                <tr>
+                  <td className={labelClass}>團號</td>
+                  <td className={valueClass} colSpan={3}>
+                    <Input value={formData.tourCode} onChange={(e) => setFormData((prev) => ({ ...prev, tourCode: e.target.value }))} className={inputClass} placeholder="團號" />
+                  </td>
+                  <td className={labelClass}>訂金</td>
+                  <td className={valueClass}>
+                    <Input value={formData.deposit || ''} onChange={(e) => setFormData((prev) => ({ ...prev, deposit: e.target.value }))} className={inputClass} />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-                {/* 聯絡人 */}
+            {/* 第二區：計劃窗口 + 聯絡人 */}
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '65%' }} />
+              </colgroup>
+              <tbody>
                 <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">標案聯絡人</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.bidContact?.name || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          bidContact: { ...prev.bidContact, name: e.target.value },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
-                  </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">電話</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.bidContact?.phone || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          bidContact: { ...prev.bidContact, name: prev.bidContact?.name || '', phone: e.target.value },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
-                  </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">行程聯絡人</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.itineraryContact?.name || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          itineraryContact: { ...prev.itineraryContact, name: e.target.value },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
-                  </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">電話</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      value={formData.itineraryContact?.phone || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          itineraryContact: { ...prev.itineraryContact, name: prev.itineraryContact?.name || '', phone: e.target.value },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                    />
-                  </td>
-                </tr>
-
-                {/* 人數 - 每車領隊 */}
-                <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium" rowSpan={2}>人數</td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">每車領隊</td>
-                  <td className="border border-border px-1 py-1" colSpan={2}>
+                  <td className={labelClass} rowSpan={2}>計劃窗口</td>
+                  <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">人=</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.perBus?.total ?? formData.pax?.total ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              perBus: { ...prev.pax?.perBus, total: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-14 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
+                      <span className="text-xs text-gray-500 shrink-0">名稱:</span>
+                      <Input value={formData.planningContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, planningContact: { ...prev.planningContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="名稱" />
                     </div>
                   </td>
-                  <td className="border border-border px-1 py-1">
+                  <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">公司業務:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.perBus?.business ?? formData.pax?.business ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              perBus: { ...prev.pax?.perBus, business: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
-                    </div>
-                  </td>
-                  <td className="border border-border px-1 py-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">總領:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.perBus?.leader ?? formData.pax?.leader ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              perBus: { ...prev.pax?.perBus, leader: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
-                    </div>
-                  </td>
-                  <td className="border border-border px-1 py-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">護士:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.perBus?.nurse ?? formData.pax?.nurse ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              perBus: { ...prev.pax?.perBus, nurse: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
-                    </div>
-                  </td>
-                  <td className="border border-border px-1 py-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">領隊:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.perBus?.tourLeader ?? formData.pax?.tourLeader ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              perBus: { ...prev.pax?.perBus, tourLeader: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
+                      <span className="text-xs text-gray-500 shrink-0">地址:</span>
+                      <Input value={formData.planningContact?.address || ''} onChange={(e) => setFormData((prev) => ({ ...prev, planningContact: { ...prev.planningContact, address: e.target.value } }))} className={inputClass + " flex-1"} placeholder="地址" />
                     </div>
                   </td>
                 </tr>
-                {/* 人數 - 公司領團 */}
                 <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">公司領團</td>
-                  <td className="border border-border px-1 py-1" colSpan={2}></td>
-                  <td className="border border-border px-1 py-1"></td>
-                  <td className="border border-border px-1 py-1">
+                  <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">總領:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.company?.leader ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              company: { ...prev.pax?.company, leader: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
+                      <span className="text-xs text-gray-500 shrink-0">標案聯絡人:</span>
+                      <Input value={formData.bidContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, bidContact: { ...prev.bidContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="姓名" />
                     </div>
                   </td>
-                  <td className="border border-border px-1 py-1">
+                  <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">護士:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.company?.nurse ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              company: { ...prev.pax?.company, nurse: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
-                    </div>
-                  </td>
-                  <td className="border border-border px-1 py-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-morandi-secondary whitespace-nowrap">領隊:</span>
-                      <Input
-                        type="number"
-                        value={formData.pax?.company?.tourLeader ?? 0}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            pax: {
-                              ...prev.pax,
-                              total: prev.pax?.total || 0,
-                              company: { ...prev.pax?.company, tourLeader: parseInt(e.target.value) || 0 },
-                            },
-                          }))
-                        }
-                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                      />
+                      <span className="text-xs text-gray-500 shrink-0">行程聯絡人:</span>
+                      <Input value={formData.itineraryContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, itineraryContact: { ...prev.itineraryContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="姓名" />
+                      <Input value={formData.itineraryContact?.phone || ''} onChange={(e) => setFormData((prev) => ({ ...prev, itineraryContact: { ...prev.itineraryContact, name: prev.itineraryContact?.name || '', phone: e.target.value } }))} className={inputClass + " w-28"} placeholder="電話" />
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
 
-            {/* 交通 */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-morandi-primary">交通</span>
-                <Button variant="outline" size="sm" onClick={addBusCompany} className="h-7 text-sm gap-1">
-                  <Plus size={14} />
-                  新增遊覽車
-                </Button>
-              </div>
-              <table className="w-full border-collapse text-sm">
-                <tbody>
-                  {/* 遊覽車 */}
-                  <tr>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24" rowSpan={(formData.busCompanies || []).length + 1}>遊覽車</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">公司名稱</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-32">聯絡人</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-32">確認時間</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 w-10"></td>
-                  </tr>
-                  {(formData.busCompanies || []).map((bus, index) => (
-                    <tr key={`bus-${index}`}>
-                      <td className="border border-border px-1 py-1">
-                        <Input
-                          value={bus.name}
-                          onChange={(e) => updateBusCompany(index, 'name', e.target.value)}
-                          className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                        />
-                      </td>
-                      <td className="border border-border px-1 py-1">
-                        <Input
-                          value={bus.contact || ''}
-                          onChange={(e) => updateBusCompany(index, 'contact', e.target.value)}
-                          className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                        />
-                      </td>
-                      <td className="border border-border px-1 py-1">
-                        <Input
-                          value={bus.confirmTime || ''}
-                          onChange={(e) => updateBusCompany(index, 'confirmTime', e.target.value)}
-                          className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                        />
-                      </td>
-                      <td className="border border-border px-2 py-1 text-center">
-                        {(formData.busCompanies || []).length > 1 && (
-                          <button
-                            onClick={() => removeBusCompany(index)}
-                            className="text-morandi-red/60 hover:text-morandi-red p-1"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {/* 火車 */}
-                  <tr>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24" rowSpan={2}>火車</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">去程</td>
-                    <td className="border border-border px-1 py-1" colSpan={3}>
-                      <Input
-                        value={formData.train?.outbound || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            train: { ...prev.train, outbound: e.target.value },
-                          }))
-                        }
-                        className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                      />
+            {/* 第三區：人數配置 */}
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '92%' }} />
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td className={labelClass}>人數</td>
+                  <td className={valueClass}>
+                    <div className="flex items-center gap-2 text-sm flex-wrap py-0.5">
+                      <span className="font-medium">每車領隊</span>
+                      <div className="flex items-center gap-1">
+                        <Input type="number" value={formData.pax?.perBus?.total ?? formData.pax?.total ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, total: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-12 border border-gray-300 bg-white text-center rounded text-sm" />
+                        <span className="text-gray-500 text-xs">人 =</span>
+                      </div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">公司業務:</span><Input type="number" value={formData.pax?.perBus?.business ?? formData.pax?.business ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, business: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">總領:</span><Input type="number" value={formData.pax?.perBus?.leader ?? formData.pax?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">護士:</span><Input type="number" value={formData.pax?.perBus?.nurse ?? formData.pax?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">領隊:</span><Input type="number" value={formData.pax?.perBus?.tourLeader ?? formData.pax?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className={labelClass}>領隊</td>
+                  <td className={valueClass}>
+                    <div className="flex items-center gap-2 text-sm flex-wrap py-0.5">
+                      <span className="font-medium">公司領團:</span>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">總領:</span><Input type="number" value={formData.pax?.company?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">護士:</span><Input type="number" value={formData.pax?.company?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">領隊:</span><Input type="number" value={formData.pax?.company?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* 第四區：車輛（遊覽車+航班） */}
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '16%' }} />
+                <col style={{ width: '5%' }} />
+              </colgroup>
+              <tbody>
+                {/* 遊覽車 */}
+                {(formData.busCompanies || []).map((bus, index) => (
+                  <tr key={`bus-${index}`}>
+                    {index === 0 && (
+                      <td className={sectionLabelClass} rowSpan={(formData.busCompanies?.length || 1) + 2}>車輛</td>
+                    )}
+                    <td className={valueClass} colSpan={2}>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-500 shrink-0">遊覽車{index + 1}:</span>
+                        <Input value={bus.name} onChange={(e) => updateBusCompany(index, 'name', e.target.value)} className={inputClass + " flex-1"} placeholder="車行名稱" />
+                      </div>
+                    </td>
+                    <td className={valueClass}>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-500 shrink-0">聯絡人:</span>
+                        <Input value={bus.contact || ''} onChange={(e) => updateBusCompany(index, 'contact', e.target.value)} className={inputClass + " flex-1"} />
+                      </div>
+                    </td>
+                    <td className={valueClass}>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-500 shrink-0">確認時間:</span>
+                        <Input value={bus.confirmTime || ''} onChange={(e) => updateBusCompany(index, 'confirmTime', e.target.value)} className={inputClass + " flex-1"} />
+                      </div>
+                    </td>
+                    <td className={valueClass}>
+                      <Button variant="ghost" size="sm" onClick={addBusCompany} className="h-6 text-xs gap-1 text-morandi-gold hover:text-morandi-gold-hover">
+                        <Plus size={12} />新增
+                      </Button>
+                    </td>
+                    <td className="border border-black text-center bg-white">
+                      {(formData.busCompanies || []).length > 1 && (
+                        <button onClick={() => removeBusCompany(index)} className="text-red-400 hover:text-red-600 p-0.5">
+                          <Trash2 size={12} />
+                        </button>
+                      )}
                     </td>
                   </tr>
-                  <tr>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">回程</td>
-                    <td className="border border-border px-1 py-1" colSpan={3}>
-                      <Input
-                        value={formData.train?.return || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            train: { ...prev.train, return: e.target.value },
-                          }))
-                        }
-                        className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                      />
-                    </td>
-                  </tr>
-                  {/* 交通船 */}
-                  <tr>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium w-24" rowSpan={2}>交通船</td>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">去程</td>
-                    <td className="border border-border px-1 py-1" colSpan={3}>
-                      <Input
-                        value={formData.ship?.outbound || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            ship: { ...prev.ship, outbound: e.target.value },
-                          }))
-                        }
-                        className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">回程</td>
-                    <td className="border border-border px-1 py-1" colSpan={3}>
-                      <Input
-                        value={formData.ship?.return || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            ship: { ...prev.ship, return: e.target.value },
-                          }))
-                        }
-                        className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                ))}
+                {/* 航班 */}
+                <tr>
+                  <td className={valueClass} colSpan={6}>
+                    <div className="flex items-center gap-2 py-0.5">
+                      <span className="text-xs text-gray-500 shrink-0">航班:</span>
+                      <span className="text-xs shrink-0">去</span>
+                      <Input value={formData.outboundFlight?.flightNumber || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, flightNumber: e.target.value } }))} className={inputClass + " w-16"} placeholder="航班" />
+                      <span className="text-xs">/</span>
+                      <Input value={formData.outboundFlight?.departureTime || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, departureTime: e.target.value } }))} className={inputClass + " w-14"} placeholder="起飛" />
+                      <span className="text-xs">=</span>
+                      <span className="text-xs">抵</span>
+                      <Input value={formData.outboundFlight?.arrivalTime || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, arrivalTime: e.target.value } }))} className={inputClass + " w-14"} placeholder="抵達" />
+                      <span className="text-xs">:</span>
+                      <Input value={formData.outboundFlight?.departure || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, departure: e.target.value } }))} className={inputClass + " w-20"} placeholder="出發地" />
+                      <span className="text-gray-400">/</span>
+                      <Input value={formData.outboundFlight?.arrival || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, arrival: e.target.value } }))} className={inputClass + " w-20"} placeholder="目的地" />
+                      <span className="text-gray-400 mx-1">|</span>
+                      <span className="text-xs shrink-0">回</span>
+                      <Input value={formData.returnFlight?.flightNumber || ''} onChange={(e) => setFormData((prev) => ({ ...prev, returnFlight: { ...prev.returnFlight, flightNumber: e.target.value } }))} className={inputClass + " w-16"} placeholder="航班" />
+                      <span className="text-xs">/</span>
+                      <Input value={formData.returnFlight?.departureTime || ''} onChange={(e) => setFormData((prev) => ({ ...prev, returnFlight: { ...prev.returnFlight, departureTime: e.target.value } }))} className={inputClass + " w-14"} placeholder="起飛" />
+                      <span className="text-xs">=</span>
+                      <span className="text-xs">抵</span>
+                      <Input value={formData.returnFlight?.arrivalTime || ''} onChange={(e) => setFormData((prev) => ({ ...prev, returnFlight: { ...prev.returnFlight, arrivalTime: e.target.value } }))} className={inputClass + " w-14"} placeholder="抵達" />
+                    </div>
+                  </td>
+                </tr>
+                {/* 外團遊覽車聯繫 */}
+                <tr>
+                  <td className={valueClass} colSpan={2}>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-gray-500 shrink-0">外團:</span>
+                      <Input value={formData.externalTour || ''} onChange={(e) => setFormData((prev) => ({ ...prev, externalTour: e.target.value }))} className={inputClass + " flex-1"} placeholder="外團資訊" />
+                    </div>
+                  </td>
+                  <td className={valueClass} colSpan={4}>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-gray-500 shrink-0">遊覽車聯繫:</span>
+                      <Input value={formData.busContact || ''} onChange={(e) => setFormData((prev) => ({ ...prev, busContact: e.target.value }))} className={inputClass + " flex-1"} placeholder="聯繫資訊" />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* 第五區：飯店確認 */}
+            <div className="flex items-center justify-between mt-2">
+              <span className="font-medium text-sm">飯店確認</span>
+              <Button variant="outline" size="sm" onClick={addHotel} className="h-6 text-xs gap-1">
+                <Plus size={12} />新增飯店
+              </Button>
             </div>
-
-            {/* 飯店明細 */}
-            {(formData.hotels || []).length > 0 && (
-              <div className="mt-4">
-                <span className="font-medium text-morandi-primary">飯店確認明細</span>
-                <table className="w-full border-collapse text-sm mt-2">
-                  <thead>
-                    <tr>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">日期</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">飯店名稱</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-32">聯絡人</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(formData.hotels || []).map((hotel, index) => (
-                      <Fragment key={index}>
-                        {/* 第一行：日期/名稱/聯絡人 */}
-                        <tr>
-                          <td className="border border-border px-3 py-1 text-morandi-secondary">
-                            {hotel.date ? new Date(hotel.date).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }) : '-'}
-                          </td>
-                          <td className="border border-border px-1 py-1">
-                            <Input
-                              value={hotel.hotelName}
-                              onChange={(e) => updateHotel(index, 'hotelName', e.target.value)}
-                              className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                            />
-                          </td>
-                          <td className="border border-border px-1 py-1">
-                            <Input
-                              value={hotel.contact || ''}
-                              onChange={(e) => updateHotel(index, 'contact', e.target.value)}
-                              className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                            />
-                          </td>
-                        </tr>
-                        {/* 第二行：訂金/確認時間/說明資料 */}
-                        <tr className="bg-morandi-container/20">
-                          <td className="border border-border px-1 py-1">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-morandi-secondary whitespace-nowrap">訂金:</span>
-                              <Input
-                                value={hotel.deposit || ''}
-                                onChange={(e) => updateHotel(index, 'deposit', e.target.value)}
-                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
-                              />
-                            </div>
-                          </td>
-                          <td className="border border-border px-1 py-1">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-morandi-secondary whitespace-nowrap">確認時間:</span>
-                              <Input
-                                value={hotel.confirmTime || ''}
-                                onChange={(e) => updateHotel(index, 'confirmTime', e.target.value)}
-                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
-                              />
-                            </div>
-                          </td>
-                          <td className="border border-border px-1 py-1">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-morandi-secondary whitespace-nowrap">說明:</span>
-                              <Input
-                                value={hotel.remarks || ''}
-                                onChange={(e) => updateHotel(index, 'remarks', e.target.value)}
-                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      </Fragment>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* 預約景點門票 */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-morandi-primary">預約景點門票</span>
-                <Button variant="outline" size="sm" onClick={addAttraction} className="h-7 text-sm gap-1">
-                  <Plus size={14} />
-                  新增
-                </Button>
-              </div>
-              <table className="w-full border-collapse text-sm">
-                <thead>
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '25%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '5%' }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th className={headerClass}>日期</th>
+                  <th className={headerClass}>名稱</th>
+                  <th className={headerClass}>電話</th>
+                  <th className={headerClass}>聯絡人</th>
+                  <th className={headerClass}>確認時間</th>
+                  <th className={headerClass}>訂金</th>
+                  <th className={headerClass}>備註</th>
+                  <th className={headerClass}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(formData.hotels || []).length === 0 ? (
                   <tr>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">日期</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">名稱</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-24">電話</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">聯絡人</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">預約狀況</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">價格</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">協議</th>
-                    <th className="border border-border bg-morandi-container/50 px-3 py-2 w-10"></th>
+                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                      尚無飯店資料，請點擊「新增飯店」
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {(formData.attractions || []).length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="border border-border px-3 py-4 text-center text-morandi-secondary">
-                        尚無景點門票，點擊「新增」按鈕添加
+                ) : (
+                  (formData.hotels || []).map((hotel, index) => (
+                    <tr key={index}>
+                      <td className={valueClass}>
+                        <Input type="date" value={hotel.date} onChange={(e) => updateHotel(index, 'date', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.hotelName} onChange={(e) => updateHotel(index, 'hotelName', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.phone || ''} onChange={(e) => updateHotel(index, 'phone', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.contact || ''} onChange={(e) => updateHotel(index, 'contact', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.confirmTime || ''} onChange={(e) => updateHotel(index, 'confirmTime', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.deposit || ''} onChange={(e) => updateHotel(index, 'deposit', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={hotel.remarks || ''} onChange={(e) => updateHotel(index, 'remarks', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className="border border-black text-center bg-white">
+                        <button onClick={() => removeHotel(index)} className="text-red-400 hover:text-red-600 p-0.5">
+                          <Trash2 size={12} />
+                        </button>
                       </td>
                     </tr>
-                  ) : (
-                    (formData.attractions || []).map((attraction, index) => (
-                      <tr key={index}>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.date}
-                            onChange={(e) => updateAttraction(index, 'date', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.name}
-                            onChange={(e) => updateAttraction(index, 'name', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.phone || ''}
-                            onChange={(e) => updateAttraction(index, 'phone', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.contact || ''}
-                            onChange={(e) => updateAttraction(index, 'contact', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.status || ''}
-                            onChange={(e) => updateAttraction(index, 'status', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.price || ''}
-                            onChange={(e) => updateAttraction(index, 'price', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={attraction.agreement || ''}
-                            onChange={(e) => updateAttraction(index, 'agreement', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-2 py-1 text-center">
-                          <button
-                            onClick={() => removeAttraction(index)}
-                            className="text-morandi-red/60 hover:text-morandi-red p-1"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
 
-            {/* 餐食明細 */}
-            {(formData.meals || []).length > 0 && (
-              <div className="mt-4">
-                <span className="font-medium text-morandi-primary">餐食資訊</span>
-                <table className="w-full border-collapse text-sm mt-2">
-                  <thead>
-                    <tr>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">日期</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">午餐</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">晚餐</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">本日行程</th>
+            {/* 第六區：預約景點門票 */}
+            <div className="flex items-center justify-between mt-2">
+              <span className="font-medium text-sm">預約景點門票</span>
+              <Button variant="outline" size="sm" onClick={addAttraction} className="h-6 text-xs gap-1">
+                <Plus size={12} />新增景點
+              </Button>
+            </div>
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '5%' }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th className={headerClass}>日期</th>
+                  <th className={headerClass}>名稱</th>
+                  <th className={headerClass}>電話</th>
+                  <th className={headerClass}>聯絡人</th>
+                  <th className={headerClass}>預約狀況</th>
+                  <th className={headerClass}>價格</th>
+                  <th className={headerClass}>備註</th>
+                  <th className={headerClass}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(formData.attractions || []).length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                      尚無景點門票
+                    </td>
+                  </tr>
+                ) : (
+                  (formData.attractions || []).map((attraction, index) => (
+                    <tr key={index}>
+                      <td className={valueClass}>
+                        <Input value={attraction.date} onChange={(e) => updateAttraction(index, 'date', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.name} onChange={(e) => updateAttraction(index, 'name', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.phone || ''} onChange={(e) => updateAttraction(index, 'phone', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.contact || ''} onChange={(e) => updateAttraction(index, 'contact', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.status || ''} onChange={(e) => updateAttraction(index, 'status', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.price || ''} onChange={(e) => updateAttraction(index, 'price', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={attraction.remarks || ''} onChange={(e) => updateAttraction(index, 'remarks', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className="border border-black text-center bg-white">
+                        <button onClick={() => removeAttraction(index)} className="text-red-400 hover:text-red-600 p-0.5">
+                          <Trash2 size={12} />
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {(formData.meals || []).map((meal, index) => (
-                      <tr key={index}>
-                        <td className="border border-border px-3 py-2 text-morandi-secondary">
-                          {meal.date ? new Date(meal.date).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }) : '-'}
-                        </td>
-                        <td className="border border-border px-3 py-2">{meal.lunch || '-'}</td>
-                        <td className="border border-border px-3 py-2">{meal.dinner || '-'}</td>
-                        <td className="border border-border px-3 py-2">{meal.dailyItinerary || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                  ))
+                )}
+              </tbody>
+            </table>
+
+            {/* 第七區：餐食 */}
+            <div className="flex items-center justify-between mt-2">
+              <span className="font-medium text-sm">餐食</span>
+              <Button variant="outline" size="sm" onClick={addMeal} className="h-6 text-xs gap-1">
+                <Plus size={12} />新增餐食
+              </Button>
+            </div>
+            <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '30%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '28%' }} />
+                <col style={{ width: '5%' }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th className={headerClass}>日期</th>
+                  <th className={headerClass}>本日行程</th>
+                  <th className={headerClass}>午餐</th>
+                  <th className={headerClass}>晚餐</th>
+                  <th className={headerClass}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(formData.meals || []).length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                      尚無餐食資料
+                    </td>
+                  </tr>
+                ) : (
+                  (formData.meals || []).map((meal, index) => (
+                    <tr key={index}>
+                      <td className={valueClass}>
+                        <Input type="date" value={meal.date} onChange={(e) => updateMeal(index, 'date', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={meal.dailyItinerary || ''} onChange={(e) => updateMeal(index, 'dailyItinerary', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={meal.lunch || ''} onChange={(e) => updateMeal(index, 'lunch', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className={valueClass}>
+                        <Input value={meal.dinner || ''} onChange={(e) => updateMeal(index, 'dinner', e.target.value)} className={inputClass} />
+                      </td>
+                      <td className="border border-black text-center bg-white">
+                        <button onClick={() => removeMeal(index)} className="text-red-400 hover:text-red-600 p-0.5">
+                          <Trash2 size={12} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+
+            {/* 備註 */}
+            <table className="w-full border-collapse text-sm mt-2">
+              <tbody>
+                <tr>
+                  <td className={labelClass} style={{ width: '8%' }}>備註</td>
+                  <td className={valueClass}>
+                    <textarea
+                      value={formData.remarks || ''}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, remarks: e.target.value }))}
+                      className="w-full h-14 border-0 bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-morandi-gold resize-none p-1 text-sm"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         )}
 
         {/* 底部按鈕 */}
-        <div className="flex justify-end gap-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={onClose} className="gap-2">
-            <X size={16} />
-            關閉
+        <div className="flex justify-end gap-2 pt-3 border-t border-gray-300">
+          <Button variant="outline" onClick={onClose} className="gap-1.5 h-8 text-sm">
+            <X size={14} />關閉
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={loading || saving}
-            variant="outline"
-            className="gap-2"
-          >
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            儲存
+          <Button onClick={handleSave} disabled={loading || saving} variant="outline" className="gap-1.5 h-8 text-sm">
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}儲存
           </Button>
-          <Button
-            onClick={handlePrint}
-            disabled={loading}
-            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-          >
-            <Printer size={16} />
-            列印團控表
+          <Button onClick={handlePrint} disabled={loading} className="gap-1.5 h-8 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+            <Printer size={14} />列印團控表
           </Button>
         </div>
       </DialogContent>

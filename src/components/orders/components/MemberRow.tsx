@@ -126,21 +126,28 @@ export function MemberRow({
 
       {/* 飲食禁忌 */}
       {cv.special_meal && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-status-warning-bg">
-          <input
-            type="text"
-            value={member.special_meal || ''}
-            onChange={e => onUpdateField(member.id, 'special_meal', e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={e => {
-              setIsComposing(false)
-              setTimeout(() => onUpdateField(member.id, 'special_meal', e.currentTarget.value), 0)
-            }}
-            onKeyDown={e => onKeyDown(e, index, 'special_meal')}
-            data-member={member.id}
-            data-field="special_meal"
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-status-warning-bg")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.special_meal || ''}
+              onChange={e => onUpdateField(member.id, 'special_meal', e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={e => {
+                setIsComposing(false)
+                setTimeout(() => onUpdateField(member.id, 'special_meal', e.currentTarget.value), 0)
+              }}
+              onKeyDown={e => {
+                if (isComposing) return
+                onKeyDown(e, index, 'special_meal')
+              }}
+              data-member={member.id}
+              data-field="special_meal"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.special_meal || '-'}</span>
+          )}
         </td>
       )}
 
@@ -152,7 +159,7 @@ export function MemberRow({
             inputMode="numeric"
             value={member.total_payable || ''}
             onChange={e => handleNumberInput('total_payable', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
           />
         </td>
       )}
@@ -165,7 +172,7 @@ export function MemberRow({
             inputMode="numeric"
             value={member.deposit_amount || ''}
             onChange={e => handleNumberInput('deposit_amount', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
           />
         </td>
       )}
@@ -179,18 +186,28 @@ export function MemberRow({
 
       {/* 備註 */}
       {cv.remarks && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
-          <input
-            type="text"
-            value={member.remarks || ''}
-            onChange={e => onUpdateField(member.id, 'remarks', e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={e => {
-              setIsComposing(false)
-              setTimeout(() => onUpdateField(member.id, 'remarks', e.currentTarget.value), 0)
-            }}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-          />
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+          {isEditMode ? (
+            <input
+              type="text"
+              value={member.remarks || ''}
+              onChange={e => onUpdateField(member.id, 'remarks', e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={e => {
+                setIsComposing(false)
+                setTimeout(() => onUpdateField(member.id, 'remarks', e.currentTarget.value), 0)
+              }}
+              onKeyDown={e => {
+                if (isComposing) return
+                onKeyDown(e, index, 'remarks')
+              }}
+              data-member={member.id}
+              data-field="remarks"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+            />
+          ) : (
+            <span className="text-xs text-morandi-primary">{member.remarks || '-'}</span>
+          )}
         </td>
       )}
 
@@ -215,9 +232,8 @@ export function MemberRow({
             type="text"
             value={pnrValue || ''}
             onChange={e => onPnrChange(member.id, e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="輸入 PNR"
-          />
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+                      />
         </td>
       )}
 
@@ -228,9 +244,8 @@ export function MemberRow({
             type="text"
             value={member.ticket_number || ''}
             onChange={e => onUpdateField(member.id, 'ticket_number', e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="機票號碼"
-          />
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+                      />
         </td>
       )}
 
@@ -247,7 +262,7 @@ export function MemberRow({
               type="date"
               value={member.ticketing_deadline || ''}
               onChange={e => onUpdateField(member.id, 'ticketing_deadline', e.target.value || null)}
-              className="w-full bg-transparent text-xs border-none outline-none shadow-none"
+              className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           )}
         </td>
@@ -263,9 +278,8 @@ export function MemberRow({
             type="text"
             value={field.values[member.id] || ''}
             onChange={e => onCustomCostChange(field.id, member.id, e.target.value)}
-            className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-            placeholder="輸入金額"
-          />
+            className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
+                      />
         </td>
       ))}
 

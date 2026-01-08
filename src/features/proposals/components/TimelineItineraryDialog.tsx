@@ -31,7 +31,18 @@ import {
   Coffee,
   UtensilsCrossed,
   Moon,
+  Palette,
 } from 'lucide-react'
+
+// 預設顏色選項
+const COLOR_OPTIONS = [
+  { value: '', label: '預設', color: '#3a3633' },
+  { value: '#3b82f6', label: '藍色', color: '#3b82f6' },
+  { value: '#ef4444', label: '紅色', color: '#ef4444' },
+  { value: '#22c55e', label: '綠色', color: '#22c55e' },
+  { value: '#f59e0b', label: '橙色', color: '#f59e0b' },
+  { value: '#8b5cf6', label: '紫色', color: '#8b5cf6' },
+]
 import type { ProposalPackage } from '@/types/proposal.types'
 import type {
   TimelineAttraction,
@@ -72,17 +83,33 @@ export function TimelineItineraryDialog({
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [saving, setSaving] = useState(false)
 
+  // 計算日期的輔助函數（提前定義）
+  const calcDate = (dayNumber: number, startDate?: string): string => {
+    if (!startDate) return ''
+    const date = new Date(startDate)
+    date.setDate(date.getDate() + dayNumber - 1)
+    return date.toISOString().split('T')[0]
+  }
+
   // 初始化資料
   const [data, setData] = useState<TimelineItineraryData>(() => {
     if (pkg?.timeline_data) {
       return pkg.timeline_data
     }
     const startDate = pkg?.start_date || ''
+    const totalDays = pkg?.days || 1
+
+    // 根據套餐天數自動生成對應的 Day
+    const days = Array.from({ length: totalDays }, (_, index) => {
+      const dayNumber = index + 1
+      return createEmptyDay(dayNumber, calcDate(dayNumber, startDate))
+    })
+
     return {
       title: pkg?.version_name || '行程表',
       subtitle: '',
       startDate,
-      days: [createEmptyDay(1, startDate)],
+      days,
     }
   })
 
@@ -410,6 +437,11 @@ export function TimelineItineraryDialog({
       )
     }
 
+    // 對於 name 和 menu 欄位，套用自訂顏色
+    const textColor = (field === 'name' || field === 'menu') && attraction.color && value
+      ? { color: attraction.color }
+      : {}
+
     return (
       <div
         className={cn(
@@ -418,6 +450,7 @@ export function TimelineItineraryDialog({
           !value && 'text-morandi-muted/40',
           width
         )}
+        style={textColor}
         onClick={() => handleCellClick(rowIndex, field)}
       >
         {value || placeholder}
@@ -496,9 +529,9 @@ export function TimelineItineraryDialog({
         </div>
 
         {/* 當日內容 */}
-        <div className="max-h-[50vh] overflow-y-auto">
+        <div className="flex flex-col">
           {/* 每日標題 */}
-          <div className="flex items-center gap-3 py-3 border-b border-border/50">
+          <div className="flex items-center gap-3 py-3 border-b border-border/50 shrink-0">
             <Label className="text-xs text-morandi-secondary shrink-0">今日主題</Label>
             <Input
               value={activeDay.title || ''}
@@ -519,6 +552,8 @@ export function TimelineItineraryDialog({
             )}
           </div>
 
+          {/* 景點表格區域（固定高度可捲動） */}
+          <div className="h-[280px] overflow-y-auto">
           {/* 景點表格（無格線） */}
           <table className="w-full text-sm">
             <thead>
@@ -529,6 +564,7 @@ export function TimelineItineraryDialog({
                 <th className="py-2 px-2 text-left font-medium w-40">菜色</th>
                 <th className="py-2 px-2 text-center font-medium w-24">餐食</th>
                 <th className="py-2 px-2 text-center font-medium w-16">照片</th>
+                <th className="py-2 px-2 text-center font-medium w-10">色</th>
                 <th className="py-2 px-2 text-center font-medium w-10"></th>
               </tr>
             </thead>
@@ -602,6 +638,31 @@ export function TimelineItineraryDialog({
                     </div>
                   </td>
                   <td className="py-0.5 w-10">
+                    <div className="relative group">
+                      <button
+                        className="p-1.5 rounded transition-colors hover:bg-morandi-container"
+                        style={{ color: attraction.color || '#3a3633' }}
+                        title="選擇顏色"
+                      >
+                        <Palette size={14} />
+                      </button>
+                      <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg p-1 hidden group-hover:flex gap-1 z-10">
+                        {COLOR_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => updateAttractionField(rowIndex, 'color', opt.value)}
+                            className={cn(
+                              'w-5 h-5 rounded-full border-2 transition-transform hover:scale-110',
+                              attraction.color === opt.value ? 'border-morandi-gold' : 'border-transparent'
+                            )}
+                            style={{ backgroundColor: opt.color }}
+                            title={opt.label}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-0.5 w-10">
                     {activeDay.attractions.length > 1 && (
                       <button
                         onClick={() => removeAttraction(rowIndex)}
@@ -627,6 +688,7 @@ export function TimelineItineraryDialog({
               <Plus size={12} />
               新增景點
             </Button>
+          </div>
           </div>
 
           {/* 已上傳的照片預覽 */}
