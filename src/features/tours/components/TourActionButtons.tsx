@@ -244,7 +244,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              router.push(`/designer?tour_id=${tour.id}`)
+              router.push(`/brochure?tour_id=${tour.id}`)
             }}
             className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="製作旅遊手冊"

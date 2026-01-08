@@ -13,7 +13,6 @@ import {
   DollarSign,
   ClipboardList,
   BookMarked,
-  Bus,
   Clock,
   Zap,
 } from 'lucide-react'
@@ -37,7 +36,6 @@ import { PackageDialog } from './PackageDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
-import { TourControlFormDialog } from './TourControlFormDialog'
 import { TimelineItineraryDialog } from './TimelineItineraryDialog'
 import type { Proposal, ProposalPackage, CreatePackageData, TimelineItineraryData } from '@/types/proposal.types'
 
@@ -87,14 +85,13 @@ export function PackageListPanel({
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
   const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
-  const [tourControlDialogOpen, setTourControlDialogOpen] = useState(false)
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 追蹤是否有任何子 Dialog 開啟（用於單一遮罩模式）
   const hasAnyDialogOpen = addDialogOpen || editDialogOpen ||
     itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen ||
-    tourControlDialogOpen || timelineDialogOpen
+    timelineDialogOpen
 
   // 通知父組件子 Dialog 狀態變化
   React.useEffect(() => {
@@ -595,32 +592,11 @@ export function PackageListPanel({
                       >
                         <ClipboardList size={16} />
                       </button>
-                      {/* 團控表 */}
-                      <button
-                        onClick={() => {
-                          // 支援快速行程表 (itinerary_id) 或時間軸行程表 (timeline_data)
-                          if (pkg.itinerary_id || pkg.itinerary_type === 'timeline') {
-                            setSelectedPackage(pkg)
-                            setTourControlDialogOpen(true)
-                          } else {
-                            void alert('請先建立行程表', 'info')
-                          }
-                        }}
-                        className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id || pkg.itinerary_type === 'timeline'
-                            ? 'text-morandi-gold hover:bg-morandi-gold/10'
-                            : 'text-morandi-muted cursor-not-allowed'
-                        }`}
-                        title="團控表"
-                        disabled={!pkg.itinerary_id && pkg.itinerary_type !== 'timeline'}
-                      >
-                        <Bus size={16} />
-                      </button>
                       {/* 手冊設計 */}
                       <button
                         onClick={() => {
                           if (pkg.itinerary_id) {
-                            router.push(`/designer?itinerary_id=${pkg.itinerary_id}`)
+                            router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
                           } else {
                             void alert('請先建立行程表', 'info')
                           }
@@ -739,17 +715,6 @@ export function PackageListPanel({
         pkg={selectedPackage}
         proposal={proposal}
         onSyncComplete={onPackagesChange}
-      />
-
-      {/* 團控表對話框 */}
-      <TourControlFormDialog
-        isOpen={tourControlDialogOpen}
-        onClose={() => {
-          setTourControlDialogOpen(false)
-          setSelectedPackage(null)
-        }}
-        pkg={selectedPackage}
-        proposal={proposal}
       />
 
       {/* 時間軸編輯器對話框（僅在未使用父組件回調時渲染） */}
