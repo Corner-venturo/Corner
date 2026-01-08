@@ -5,14 +5,17 @@
 
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { PackageListPanel } from './PackageListPanel'
-import type { Proposal, ProposalStatus } from '@/types/proposal.types'
+import { TimelineItineraryDialog } from './TimelineItineraryDialog'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
+import type { Proposal, ProposalStatus, ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
 
 // 狀態配色
 const STATUS_COLORS: Record<ProposalStatus, string> = {
@@ -44,8 +47,10 @@ export function ProposalDetailDialog({
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
-  // 追蹤子 Dialog 是否開啟（用於單一遮罩模式）
-  const [childDialogOpen, setChildDialogOpen] = useState(false)
+
+  // 時間軸行程表對話框狀態（用於單一遮罩模式）
+  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
+  const [timelinePackage, setTimelinePackage] = useState<ProposalPackage | null>(null)
 
   // 取得此提案的套件
   const packages = useMemo(() => {
@@ -53,59 +58,106 @@ export function ProposalDetailDialog({
     return allPackages.filter(p => p.proposal_id === proposal.id)
   }, [allPackages, proposal])
 
-  if (!proposal) return null
+  const canAddVersion = proposal ? proposal.status !== 'converted' && proposal.status !== 'archived' : false
 
-  const canAddVersion = proposal.status !== 'converted' && proposal.status !== 'archived'
-
-  const handlePackagesChange = () => {
+  const handlePackagesChange = useCallback(() => {
     refreshPackages()
     onPackagesChange?.()
-  }
+  }, [refreshPackages, onPackagesChange])
+
+  // 開啟時間軸行程表對話框（由 PackageListPanel 呼叫）
+  const handleOpenTimelineDialog = useCallback((pkg: ProposalPackage) => {
+    setTimelinePackage(pkg)
+    setTimelineDialogOpen(true)
+  }, [])
+
+  // 關閉時間軸行程表對話框
+  const handleCloseTimelineDialog = useCallback(() => {
+    setTimelineDialogOpen(false)
+    setTimelinePackage(null)
+  }, [])
+
+  // 儲存時間軸資料
+  const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
+    if (!timelinePackage) return
+
+    try {
+      const jsonData = JSON.parse(JSON.stringify(timelineData))
+
+      const { error } = await supabase
+        .from('proposal_packages')
+        .update({
+          itinerary_type: 'timeline',
+          timeline_data: jsonData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', timelinePackage.id)
+
+      if (error) throw error
+      handlePackagesChange()
+    } catch (error) {
+      logger.error('儲存時間軸資料失敗:', error)
+      throw error
+    }
+  }, [timelinePackage, handlePackagesChange])
+
+  if (!proposal) return null
 
   return (
-    <Dialog
-      open={open && !childDialogOpen}
-      onOpenChange={(v) => !childDialogOpen && onOpenChange(v)}
-    >
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
-        <VisuallyHidden>
-          <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
-        </VisuallyHidden>
-        {/* 標題區 - pr-8 為關閉按鈕留空間 */}
-        <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
-            <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
-            <span
-              className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
-            >
-              {STATUS_LABELS[proposal.status]}
-            </span>
+    <>
+      {/* 主對話框：時間軸對話框開啟時隱藏（單一遮罩模式） */}
+      <Dialog
+        open={open && !timelineDialogOpen}
+        onOpenChange={(v) => !timelineDialogOpen && onOpenChange(v)}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
+          <VisuallyHidden>
+            <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
+          </VisuallyHidden>
+          {/* 標題區 - pr-8 為關閉按鈕留空間 */}
+          <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
+            <div className="flex items-center gap-3">
+              <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
+              <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
+              <span
+                className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[proposal.status]}`}
+              >
+                {STATUS_LABELS[proposal.status]}
+              </span>
+            </div>
+            {canAddVersion && (
+              <Button
+                size="sm"
+                className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                onClick={() => setShowAddDialog(true)}
+              >
+                <Plus size={14} />
+                新增版本
+              </Button>
+            )}
           </div>
-          {canAddVersion && (
-            <Button
-              size="sm"
-              className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-              onClick={() => setShowAddDialog(true)}
-            >
-              <Plus size={14} />
-              新增版本
-            </Button>
-          )}
-        </div>
 
-        {/* 套件列表 */}
-        <div className="flex-1 overflow-auto">
-          <PackageListPanel
-            proposal={proposal}
-            packages={packages}
-            onPackagesChange={handlePackagesChange}
-            showAddDialog={showAddDialog}
-            onShowAddDialogChange={setShowAddDialog}
-            onChildDialogChange={setChildDialogOpen}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* 套件列表 */}
+          <div className="flex-1 overflow-auto">
+            <PackageListPanel
+              proposal={proposal}
+              packages={packages}
+              onPackagesChange={handlePackagesChange}
+              showAddDialog={showAddDialog}
+              onShowAddDialogChange={setShowAddDialog}
+              onOpenTimelineDialog={handleOpenTimelineDialog}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 時間軸行程表對話框：放在主對話框外面（單一遮罩模式） */}
+      <TimelineItineraryDialog
+        isOpen={timelineDialogOpen}
+        onClose={handleCloseTimelineDialog}
+        pkg={timelinePackage}
+        onSave={handleSaveTimeline}
+      />
+    </>
   )
 }

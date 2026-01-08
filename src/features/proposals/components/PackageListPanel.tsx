@@ -49,6 +49,8 @@ interface PackageListPanelProps {
   onShowAddDialogChange?: (show: boolean) => void
   /** 當任何子 Dialog 開啟/關閉時回調（用於單一遮罩模式） */
   onChildDialogChange?: (isOpen: boolean) => void
+  /** 開啟時間軸行程表對話框（由父組件管理，用於單一遮罩模式） */
+  onOpenTimelineDialog?: (pkg: ProposalPackage) => void
 }
 
 export function PackageListPanel({
@@ -58,6 +60,7 @@ export function PackageListPanel({
   showAddDialog,
   onShowAddDialogChange,
   onChildDialogChange,
+  onOpenTimelineDialog,
 }: PackageListPanelProps) {
   const router = useRouter()
   const { user } = useAuthStore()
@@ -358,8 +361,7 @@ export function PackageListPanel({
       if (!selectedPackage) return
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const jsonData = JSON.parse(JSON.stringify(timelineData)) as any
+        const jsonData = JSON.parse(JSON.stringify(timelineData))
 
         const { error } = await supabase
           .from('proposal_packages')
@@ -488,8 +490,13 @@ export function PackageListPanel({
                                 void alert('已使用快速行程表，無法切換', 'info')
                                 return
                               }
-                              setSelectedPackage(pkg)
-                              setTimelineDialogOpen(true)
+                              // 使用父組件的回調（單一遮罩模式）或內部狀態
+                              if (onOpenTimelineDialog) {
+                                onOpenTimelineDialog(pkg)
+                              } else {
+                                setSelectedPackage(pkg)
+                                setTimelineDialogOpen(true)
+                              }
                             }}
                             className={`gap-2 cursor-pointer ${
                               pkg.itinerary_id && pkg.itinerary_type !== 'timeline' ? 'opacity-50' : ''
@@ -737,16 +744,18 @@ export function PackageListPanel({
         proposal={proposal}
       />
 
-      {/* 時間軸編輯器對話框 */}
-      <TimelineItineraryDialog
-        isOpen={timelineDialogOpen}
-        onClose={() => {
-          setTimelineDialogOpen(false)
-          setSelectedPackage(null)
-        }}
-        pkg={selectedPackage}
-        onSave={handleSaveTimeline}
-      />
+      {/* 時間軸編輯器對話框（僅在未使用父組件回調時渲染） */}
+      {!onOpenTimelineDialog && (
+        <TimelineItineraryDialog
+          isOpen={timelineDialogOpen}
+          onClose={() => {
+            setTimelineDialogOpen(false)
+            setSelectedPackage(null)
+          }}
+          pkg={selectedPackage}
+          onSave={handleSaveTimeline}
+        />
+      )}
     </div>
   )
 }
