@@ -335,7 +335,7 @@ export function PackageListPanel({
   const canEdit = !isConverted && !isArchived
 
   return (
-    <div className="p-4 h-full flex flex-col">
+    <div className="pt-4 h-full flex flex-col">
       <div className="flex-1 border border-border rounded-lg overflow-hidden min-h-[260px]">
         {packages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-morandi-secondary">

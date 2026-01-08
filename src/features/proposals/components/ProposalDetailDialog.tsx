@@ -62,12 +62,12 @@ export function ProposalDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
         <VisuallyHidden>
           <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
         </VisuallyHidden>
-        {/* 標題區 - pr-12 為關閉按鈕留空間 */}
-        <div className="flex items-center justify-between px-6 pr-12 py-4 border-b border-border">
+        {/* 標題區 - pr-8 為關閉按鈕留空間 */}
+        <div className="flex items-center justify-between pr-8 pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             <span className="text-morandi-gold font-mono text-lg">{proposal.code}</span>
             <span className="text-morandi-primary font-medium">{proposal.title || '(未命名)'}</span>
