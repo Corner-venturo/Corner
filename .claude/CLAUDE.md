@@ -536,24 +536,23 @@ setItems(prev => [...prev, newItem])
 ### ✅ 正確做法：單一遮罩模式
 
 ```tsx
-// 父 Dialog 在子 Dialog 開啟時隱藏
+// 父 Dialog 在子 Dialog 開啟時「完全不渲染」
 export function ParentDialog({ open, onOpenChange }) {
   const [childDialogOpen, setChildDialogOpen] = useState(false)
 
   return (
     <>
-      {/* 父 Dialog：子 Dialog 開啟時隱藏 */}
-      <Dialog
-        open={open && !childDialogOpen}
-        onOpenChange={(v) => !childDialogOpen && onOpenChange(v)}
-      >
-        <DialogContent>
-          {/* ... 內容 ... */}
-          <Button onClick={() => setChildDialogOpen(true)}>
-            開啟子視窗
-          </Button>
-        </DialogContent>
-      </Dialog>
+      {/* 父 Dialog：子 Dialog 開啟時完全不渲染（避免動畫過渡期間的遮罩疊加） */}
+      {!childDialogOpen && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent>
+            {/* ... 內容 ... */}
+            <Button onClick={() => setChildDialogOpen(true)}>
+              開啟子視窗
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* 子 Dialog：放在父 Dialog 外面 */}
       <ChildDialog
@@ -568,13 +567,16 @@ export function ParentDialog({ open, onOpenChange }) {
 ### 關鍵規則
 
 1. **子 Dialog 放在父 Dialog 的 JSX 外面**（使用 Fragment `<>` 包裹）
-2. **父 Dialog 的 open 加上 `&& !childDialogOpen`**
-3. **父 Dialog 的 onOpenChange 加上 `!childDialogOpen &&` 判斷**
+2. **父 Dialog 必須使用條件渲染 `{!childDialogOpen && <Dialog>}`**
+   - ❌ 錯誤：`<Dialog open={open && !childDialogOpen}>` - 這只是設置 open=false，Dialog 仍會淡出動畫，導致遮罩疊加
+   - ✅ 正確：`{!childDialogOpen && <Dialog open={open}>}` - 完全不渲染父 Dialog，立即清除遮罩
 
 ### 已修復的案例
 
 | 父 Dialog | 子 Dialog | 檔案 |
 |-----------|-----------|------|
+| ProposalDetailDialog | TimelineItineraryDialog | `proposals/components/` |
+| TimelineItineraryDialog | AttractionSelector | `proposals/components/` |
 | RequirementSyncDialog | TourRequestFormDialog | `proposals/components/` |
 | TourRequestFormDialog | PrintPreview (Portal) | `proposals/components/` |
 | ReceiptDetailDialog | CreateLinkPayDialog | `finance/payments/components/` |
