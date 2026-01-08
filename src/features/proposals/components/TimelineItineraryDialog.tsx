@@ -32,7 +32,9 @@ import {
   UtensilsCrossed,
   Moon,
   Palette,
+  Database,
 } from 'lucide-react'
+import { AttractionSelector } from '@/components/editor/AttractionSelector'
 
 // 預設顏色選項
 const COLOR_OPTIONS = [
@@ -82,6 +84,7 @@ export function TimelineItineraryDialog({
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<number | null>(null)
+  const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
   // 計算日期的輔助函數（提前定義）
@@ -175,6 +178,30 @@ export function TimelineItineraryDialog({
           : day
       ),
     }))
+  }, [activeDayIndex])
+
+  // 從景點庫選擇後新增
+  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; name_en?: string; description?: string; thumbnail?: string }[]) => {
+    setData((prev) => ({
+      ...prev,
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex
+          ? {
+              ...day,
+              attractions: [
+                ...day.attractions,
+                ...selectedAttractions.map((a) => ({
+                  id: generateId(),
+                  name: a.name,
+                  description: a.description || '',
+                  images: a.thumbnail ? [{ id: generateId(), url: a.thumbnail }] : [],
+                })),
+              ],
+            }
+          : day
+      ),
+    }))
+    setAttractionSelectorOpen(false)
   }, [activeDayIndex])
 
   // 刪除景點
@@ -462,7 +489,8 @@ export function TimelineItineraryDialog({
   if (!pkg) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <>
+    <Dialog open={isOpen && !attractionSelectorOpen} onOpenChange={(open) => !open && !attractionSelectorOpen && onClose()}>
       <DialogContent className={DIALOG_SIZES['4xl']}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -685,7 +713,16 @@ export function TimelineItineraryDialog({
           </table>
 
           {/* 新增景點 */}
-          <div className="py-2">
+          <div className="py-2 flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAttractionSelectorOpen(true)}
+              className="gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
+              title="從景點庫選擇"
+            >
+              <Database size={12} />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -749,6 +786,14 @@ export function TimelineItineraryDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* 景點選擇器 */}
+    <AttractionSelector
+      isOpen={attractionSelectorOpen}
+      onClose={() => setAttractionSelectorOpen(false)}
+      onSelect={handleAttractionSelect}
+    />
+    </>
   )
 }
 
