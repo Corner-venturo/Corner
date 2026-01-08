@@ -44,7 +44,6 @@ export function ProposalDetailDialog({
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
-  const [hasChildDialogOpen, setHasChildDialogOpen] = useState(false)
 
   // 取得此提案的套件
   const packages = useMemo(() => {
@@ -62,7 +61,7 @@ export function ProposalDetailDialog({
   }
 
   return (
-    <Dialog open={open && !hasChildDialogOpen} onOpenChange={(v) => !hasChildDialogOpen && onOpenChange(v)}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
         <VisuallyHidden>
           <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
@@ -98,7 +97,6 @@ export function ProposalDetailDialog({
             onPackagesChange={handlePackagesChange}
             showAddDialog={showAddDialog}
             onShowAddDialogChange={setShowAddDialog}
-            onChildDialogChange={setHasChildDialogOpen}
           />
         </div>
       </DialogContent>
