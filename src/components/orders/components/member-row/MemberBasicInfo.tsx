@@ -91,7 +91,6 @@ export function MemberBasicInfo({
             value={member.chinese_name || ''}
             onChange={e => {
               onUpdateField(member.id, 'chinese_name', e.target.value)
-              onNameSearch?.(member.id, e.target.value)
             }}
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={e => {
@@ -99,10 +98,17 @@ export function MemberBasicInfo({
               const value = e.currentTarget.value
               setTimeout(() => {
                 onUpdateField(member.id, 'chinese_name', value)
-                onNameSearch?.(member.id, value)
               }, 0)
             }}
-            onKeyDown={e => onKeyDown(e, index, 'chinese_name')}
+            onKeyDown={e => {
+              // 按 Enter 時觸發搜尋（避免輸入新客戶時被打斷）
+              if (e.key === 'Enter' && !isComposing) {
+                e.preventDefault()
+                onNameSearch?.(member.id, member.chinese_name || '')
+              } else {
+                onKeyDown(e, index, 'chinese_name')
+              }
+            }}
             data-member={member.id}
             data-field="chinese_name"
             className="w-full bg-transparent text-xs border-none outline-none shadow-none"
@@ -235,13 +241,20 @@ export function MemberBasicInfo({
               value={member.id_number || ''}
               onChange={e => {
                 onUpdateField(member.id, 'id_number', e.target.value)
-                onIdNumberSearch?.(member.id, e.target.value, index)
               }}
-              onKeyDown={e => onKeyDown(e, index, 'id_number')}
+              onKeyDown={e => {
+                // 按 Enter 時觸發搜尋（避免輸入新客戶時被打斷）
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  onIdNumberSearch?.(member.id, member.id_number || '', index)
+                } else {
+                  onKeyDown(e, index, 'id_number')
+                }
+              }}
               data-member={member.id}
               data-field="id_number"
               className="w-full bg-transparent text-xs border-none outline-none shadow-none"
-              placeholder="輸入身分證搜尋..."
+              placeholder="按 Enter 搜尋"
             />
           ) : (
             <span className="text-xs text-morandi-primary">{member.id_number || '-'}</span>
