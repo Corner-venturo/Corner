@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Fragment } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -359,7 +359,7 @@ export function TourControlFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className={DIALOG_SIZES.full}>
+      <DialogContent className={DIALOG_SIZES.full} nested>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bus size={18} className="text-morandi-gold" />
@@ -461,81 +461,176 @@ export function TourControlFormDialog({
                   </td>
                 </tr>
 
-                {/* 人數 */}
+                {/* 人數 - 每車領隊 */}
                 <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">總人數</td>
-                  <td className="border border-border px-1 py-1">
-                    <Input
-                      type="number"
-                      value={formData.pax?.total || 0}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pax: { ...prev.pax, total: parseInt(e.target.value) || 0 },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                    />
+                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium" rowSpan={2}>人數</td>
+                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">每車領隊</td>
+                  <td className="border border-border px-1 py-1" colSpan={2}>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">人=</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.perBus?.total ?? formData.pax?.total ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              perBus: { ...prev.pax?.perBus, total: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-14 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
                   </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">公司業務</td>
                   <td className="border border-border px-1 py-1">
-                    <Input
-                      type="number"
-                      value={formData.pax?.business || 0}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pax: { ...prev.pax, total: prev.pax?.total || 0, business: parseInt(e.target.value) || 0 },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                    />
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">公司業務:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.perBus?.business ?? formData.pax?.business ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              perBus: { ...prev.pax?.perBus, business: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
                   </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">總領</td>
                   <td className="border border-border px-1 py-1">
-                    <Input
-                      type="number"
-                      value={formData.pax?.leader || 0}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pax: { ...prev.pax, total: prev.pax?.total || 0, leader: parseInt(e.target.value) || 0 },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                    />
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">總領:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.perBus?.leader ?? formData.pax?.leader ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              perBus: { ...prev.pax?.perBus, leader: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
                   </td>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">護士</td>
                   <td className="border border-border px-1 py-1">
-                    <Input
-                      type="number"
-                      value={formData.pax?.nurse || 0}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pax: { ...prev.pax, total: prev.pax?.total || 0, nurse: parseInt(e.target.value) || 0 },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                    />
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">護士:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.perBus?.nurse ?? formData.pax?.nurse ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              perBus: { ...prev.pax?.perBus, nurse: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
+                  </td>
+                  <td className="border border-border px-1 py-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">領隊:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.perBus?.tourLeader ?? formData.pax?.tourLeader ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              perBus: { ...prev.pax?.perBus, tourLeader: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
                   </td>
                 </tr>
+                {/* 人數 - 公司領團 */}
                 <tr>
-                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">領隊</td>
+                  <td className="border border-border bg-morandi-container/50 px-3 py-2 font-medium">公司領團</td>
+                  <td className="border border-border px-1 py-1" colSpan={2}></td>
+                  <td className="border border-border px-1 py-1"></td>
                   <td className="border border-border px-1 py-1">
-                    <Input
-                      type="number"
-                      value={formData.pax?.tourLeader || 0}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pax: { ...prev.pax, total: prev.pax?.total || 0, tourLeader: parseInt(e.target.value) || 0 },
-                        }))
-                      }
-                      className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
-                    />
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">總領:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.company?.leader ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              company: { ...prev.pax?.company, leader: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
                   </td>
-                  <td colSpan={6}></td>
+                  <td className="border border-border px-1 py-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">護士:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.company?.nurse ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              company: { ...prev.pax?.company, nurse: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
+                  </td>
+                  <td className="border border-border px-1 py-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-morandi-secondary whitespace-nowrap">領隊:</span>
+                      <Input
+                        type="number"
+                        value={formData.pax?.company?.tourLeader ?? 0}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            pax: {
+                              ...prev.pax,
+                              total: prev.pax?.total || 0,
+                              company: { ...prev.pax?.company, tourLeader: parseInt(e.target.value) || 0 },
+                            },
+                          }))
+                        }
+                        className="h-8 w-12 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-center"
+                      />
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -671,54 +766,66 @@ export function TourControlFormDialog({
                     <tr>
                       <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-20">日期</th>
                       <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium">飯店名稱</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-24">聯絡人</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-24">訂金</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-24">協議</th>
-                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-28">確認時間</th>
+                      <th className="border border-border bg-morandi-container/50 px-3 py-2 text-left font-medium w-32">聯絡人</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(formData.hotels || []).map((hotel, index) => (
-                      <tr key={index}>
-                        <td className="border border-border px-3 py-1 text-morandi-secondary">
-                          {hotel.date ? new Date(hotel.date).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }) : '-'}
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={hotel.hotelName}
-                            onChange={(e) => updateHotel(index, 'hotelName', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={hotel.contact || ''}
-                            onChange={(e) => updateHotel(index, 'contact', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={hotel.deposit || ''}
-                            onChange={(e) => updateHotel(index, 'deposit', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={hotel.agreement || ''}
-                            onChange={(e) => updateHotel(index, 'agreement', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                        <td className="border border-border px-1 py-1">
-                          <Input
-                            value={hotel.confirmTime || ''}
-                            onChange={(e) => updateHotel(index, 'confirmTime', e.target.value)}
-                            className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
-                          />
-                        </td>
-                      </tr>
+                      <Fragment key={index}>
+                        {/* 第一行：日期/名稱/聯絡人 */}
+                        <tr>
+                          <td className="border border-border px-3 py-1 text-morandi-secondary">
+                            {hotel.date ? new Date(hotel.date).toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }) : '-'}
+                          </td>
+                          <td className="border border-border px-1 py-1">
+                            <Input
+                              value={hotel.hotelName}
+                              onChange={(e) => updateHotel(index, 'hotelName', e.target.value)}
+                              className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
+                            />
+                          </td>
+                          <td className="border border-border px-1 py-1">
+                            <Input
+                              value={hotel.contact || ''}
+                              onChange={(e) => updateHotel(index, 'contact', e.target.value)}
+                              className="h-8 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold"
+                            />
+                          </td>
+                        </tr>
+                        {/* 第二行：訂金/確認時間/說明資料 */}
+                        <tr className="bg-morandi-container/20">
+                          <td className="border border-border px-1 py-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-morandi-secondary whitespace-nowrap">訂金:</span>
+                              <Input
+                                value={hotel.deposit || ''}
+                                onChange={(e) => updateHotel(index, 'deposit', e.target.value)}
+                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
+                              />
+                            </div>
+                          </td>
+                          <td className="border border-border px-1 py-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-morandi-secondary whitespace-nowrap">確認時間:</span>
+                              <Input
+                                value={hotel.confirmTime || ''}
+                                onChange={(e) => updateHotel(index, 'confirmTime', e.target.value)}
+                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
+                              />
+                            </div>
+                          </td>
+                          <td className="border border-border px-1 py-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-morandi-secondary whitespace-nowrap">說明:</span>
+                              <Input
+                                value={hotel.remarks || ''}
+                                onChange={(e) => updateHotel(index, 'remarks', e.target.value)}
+                                className="h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>

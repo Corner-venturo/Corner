@@ -83,14 +83,38 @@ export interface TourControlTrain {
 }
 
 /**
- * 人數資訊
+ * 人數資訊 - 每車領隊配置
  */
-export interface TourControlPax {
-  total: number         // 總人數
+export interface TourControlPaxPerBus {
+  total?: number        // 總人數
   business?: number     // 公司業務
   leader?: number       // 總領
   nurse?: number        // 護士
   tourLeader?: number   // 領隊
+}
+
+/**
+ * 人數資訊 - 公司領團配置
+ */
+export interface TourControlPaxCompany {
+  leader?: number       // 總領
+  nurse?: number        // 護士
+  tourLeader?: number   // 領隊
+}
+
+/**
+ * 人數資訊
+ */
+export interface TourControlPax {
+  total: number         // 總人數（舊版相容）
+  business?: number     // 公司業務（舊版相容）
+  leader?: number       // 總領（舊版相容）
+  nurse?: number        // 護士（舊版相容）
+  tourLeader?: number   // 領隊（舊版相容）
+  // 新版：每車領隊配置
+  perBus?: TourControlPaxPerBus
+  // 新版：公司領團配置
+  company?: TourControlPaxCompany
 }
 
 /**

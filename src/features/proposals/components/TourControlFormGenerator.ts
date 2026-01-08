@@ -24,38 +24,45 @@ function formatDateFull(dateStr: string | null | undefined): string {
 }
 
 /**
- * 產生飯店列（最多 6 列）
+ * 產生飯店列（每間飯店兩列：日期/名稱/聯絡人 + 訂金/確認時間/說明）
  */
 function generateHotelRows(hotels: TourControlHotel[] = []): string {
   const rows: string[] = []
-  const maxRows = 6
+  const maxHotels = 6
+  const totalRows = maxHotels * 2
 
-  for (let i = 0; i < maxRows; i++) {
+  for (let i = 0; i < maxHotels; i++) {
     const hotel = hotels[i]
     const isFirst = i === 0
-    const rowspan = isFirst ? ` rowspan="${maxRows}"` : ''
+    const rowspan = isFirst ? ` rowspan="${totalRows}"` : ''
     const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">飯店</span></td>` : ''
 
+    // 第一行：日期/名稱/聯絡人
     rows.push(`
       <tr style="height:16pt;">
         ${showLabel}
-        <td colspan="6" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${isFirst ? '飯店確認：' : ''}${i + 1}. ${hotel?.hotelName || ''}</span>
+        <td colspan="3" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;">${hotel ? formatDateShort(hotel.date) : ''}</span>
         </td>
-        <td colspan="4" style="padding:2pt 4pt;">
+        <td colspan="12" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;">${hotel?.hotelName || ''}</span>
+        </td>
+        <td colspan="9" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">聯絡人：${hotel?.contact || ''}</span>
         </td>
-        <td colspan="3" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">訂金：${hotel?.deposit || ''}</span>
+      </tr>
+    `)
+    // 第二行：訂金/確認時間/說明
+    rows.push(`
+      <tr style="height:14pt;background:#fafafa;">
+        <td colspan="8" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;font-size:9pt;">訂金：${hotel?.deposit || ''}</span>
         </td>
-        <td colspan="3" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">協議：${hotel?.agreement || ''}</span>
+        <td colspan="8" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;font-size:9pt;">確認：${hotel?.confirmTime || ''}</span>
         </td>
-        <td colspan="3" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">確認時間</span>
-        </td>
-        <td colspan="5" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${hotel?.confirmTime || ''}</span>
+        <td colspan="8" style="padding:2pt 4pt;">
+          <span style="font-family:標楷體;font-size:9pt;">說明：${hotel?.remarks || ''}</span>
         </td>
       </tr>
     `)
@@ -65,29 +72,38 @@ function generateHotelRows(hotels: TourControlHotel[] = []): string {
 }
 
 /**
- * 產生遊覽車列（最多 3 列）
+ * 產生交通列（遊覽車 + 火車 + 交通船）
  */
-function generateBusRows(busCompanies: TourControlBusCompany[] = []): string {
+function generateTransportRows(
+  busCompanies: TourControlBusCompany[] = [],
+  train?: { outbound?: string; return?: string },
+  ship?: { outbound?: string; return?: string }
+): string {
   const rows: string[] = []
-  const maxRows = 3
+  const busRows = 3
+  const trainRows = 2
+  const shipRows = 2
+  const totalRows = busRows + trainRows + shipRows
 
-  for (let i = 0; i < maxRows; i++) {
+  // 遊覽車
+  for (let i = 0; i < busRows; i++) {
     const bus = busCompanies[i]
     const isFirst = i === 0
-    const rowspan = isFirst ? ` rowspan="${maxRows}"` : ''
-    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">車隊</span></td>` : ''
+    const rowspan = isFirst ? ` rowspan="${totalRows}"` : ''
+    const showLabel = isFirst ? `<td width="41" nowrap${rowspan} style="width:30.85pt;padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;"><span style="font-family:標楷體;">交通</span></td>` : ''
+    const subLabel = isFirst ? '遊覽車：' : ''
 
     rows.push(`
       <tr style="height:16pt;">
         ${showLabel}
         <td colspan="6" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">${isFirst ? '遊覽車公司：' : ''}${i + 1}. ${bus?.name || ''}</span>
+          <span style="font-family:標楷體;">${subLabel}${i + 1}. ${bus?.name || ''}</span>
         </td>
         <td colspan="10" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">聯絡人：${bus?.contact || ''}</span>
         </td>
         <td colspan="3" style="padding:2pt 4pt;">
-          <span style="font-family:標楷體;">確認時間</span>
+          <span style="font-family:標楷體;">確認</span>
         </td>
         <td colspan="5" style="padding:2pt 4pt;">
           <span style="font-family:標楷體;">${bus?.confirmTime || ''}</span>
@@ -95,6 +111,46 @@ function generateBusRows(busCompanies: TourControlBusCompany[] = []): string {
       </tr>
     `)
   }
+
+  // 火車
+  rows.push(`
+    <tr style="height:16pt;">
+      <td colspan="6" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">火車 去程：</span>
+      </td>
+      <td colspan="18" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">${train?.outbound || ''}</span>
+      </td>
+    </tr>
+    <tr style="height:16pt;">
+      <td colspan="6" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">火車 回程：</span>
+      </td>
+      <td colspan="18" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">${train?.return || ''}</span>
+      </td>
+    </tr>
+  `)
+
+  // 交通船
+  rows.push(`
+    <tr style="height:16pt;">
+      <td colspan="6" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">交通船 去程：</span>
+      </td>
+      <td colspan="18" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">${ship?.outbound || ''}</span>
+      </td>
+    </tr>
+    <tr style="height:16pt;">
+      <td colspan="6" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">交通船 回程：</span>
+      </td>
+      <td colspan="18" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">${ship?.return || ''}</span>
+      </td>
+    </tr>
+  `)
 
   return rows.join('')
 }
@@ -368,17 +424,29 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
       </td>
     </tr>
 
-    <!-- 第四行：人數 -->
+    <!-- 第四行：人數 - 每車領隊 -->
     <tr style="height:16pt;">
-      <td nowrap class="label-cell" style="padding:2pt 4pt;background:#f0f0f0;">
+      <td nowrap rowspan="2" class="label-cell" style="padding:2pt 4pt;vertical-align:middle;background:#f0f0f0;">
         <span style="font-family:標楷體;">人數</span>
       </td>
       <td colspan="24" style="padding:2pt 4pt;">
         <span style="font-family:標楷體;">
-          遊覽車領隊&nbsp;&nbsp;${pax.total || ''}人 = &nbsp;公司業務：${pax.business || ''}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          總領：${pax.leader || ''}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          護士：${pax.nurse || ''}&nbsp;&nbsp;&nbsp;
-          領隊：${pax.tourLeader || ''}
+          每車領隊&nbsp;&nbsp;${pax.perBus?.total ?? pax.total ?? ''}人 = &nbsp;
+          公司業務：${pax.perBus?.business ?? pax.business ?? ''}&nbsp;&nbsp;&nbsp;
+          總領：${pax.perBus?.leader ?? pax.leader ?? ''}&nbsp;&nbsp;&nbsp;
+          護士：${pax.perBus?.nurse ?? pax.nurse ?? ''}&nbsp;&nbsp;&nbsp;
+          領隊：${pax.perBus?.tourLeader ?? pax.tourLeader ?? ''}
+        </span>
+      </td>
+    </tr>
+    <!-- 人數 - 公司領團 -->
+    <tr style="height:16pt;">
+      <td colspan="24" style="padding:2pt 4pt;">
+        <span style="font-family:標楷體;">
+          公司領團&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          總領：${pax.company?.leader ?? ''}&nbsp;&nbsp;&nbsp;
+          護士：${pax.company?.nurse ?? ''}&nbsp;&nbsp;&nbsp;
+          領隊：${pax.company?.tourLeader ?? ''}
         </span>
       </td>
     </tr>
@@ -411,8 +479,8 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
       </td>
     </tr>
 
-    <!-- 遊覽車列 -->
-    ${generateBusRows(data.busCompanies)}
+    <!-- 交通列 -->
+    ${generateTransportRows(data.busCompanies, data.train, data.ship)}
 
     <!-- 飯店列 -->
     ${generateHotelRows(data.hotels)}
