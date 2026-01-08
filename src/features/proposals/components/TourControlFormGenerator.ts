@@ -298,24 +298,24 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
 
   <div class="table-container">
   <table>
-    <!-- 第一行：日期、車條名稱、飯店、餐點 -->
+    <!-- 第一行：日期、車條名稱、平安 -->
     <tr style="height:16pt;">
       <td width="41" nowrap style="width:30.85pt;padding:1pt 3pt;">
         <span style="font-family:標楷體;">日期</span>
       </td>
-      <td colspan="9" style="padding:1pt 3pt;">
+      <td colspan="7" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">${formatDateFull(data.date)}</span>
       </td>
-      <td nowrap rowspan="2" style="padding:1pt 3pt;">
-        <span style="font-family:標楷體;">車條名稱</span>
+      <td nowrap style="padding:1pt 3pt;">
+        <span style="font-family:標楷體;">車條</span>
       </td>
-      <td colspan="12" rowspan="2" style="padding:1pt 3pt;text-align:center;">
+      <td colspan="12" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">${data.tourName || ''}</span>
       </td>
-      <td style="padding:1pt 3pt;">
+      <td nowrap style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">平安</span>
       </td>
-      <td colspan="2" style="padding:1pt 3pt;">
+      <td colspan="3" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;"></span>
       </td>
     </tr>
@@ -325,13 +325,16 @@ export function generateTourControlFormHtml(data: TourControlFormData): string {
       <td nowrap style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">團號</span>
       </td>
-      <td colspan="9" style="padding:1pt 3pt;">
+      <td colspan="7" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">${data.tourCode || ''}</span>
       </td>
-      <td style="padding:1pt 3pt;">
+      <td colspan="13" style="padding:1pt 3pt;">
+        <span style="font-family:標楷體;"></span>
+      </td>
+      <td nowrap style="padding:1pt 3pt;">
         <span style="font-family:標楷體;">責任</span>
       </td>
-      <td colspan="2" style="padding:1pt 3pt;">
+      <td colspan="3" style="padding:1pt 3pt;">
         <span style="font-family:標楷體;"></span>
       </td>
     </tr>

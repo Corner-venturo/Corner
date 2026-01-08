@@ -66,7 +66,12 @@ export function useTourForm({
           outbound_flight_text: flightText,
           outbound_flight_number: result.data!.flightNumber,
         }))
-        toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          toast.warning(result.warning, { duration: 5000 })
+        } else {
+          toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+        }
       }
     } catch {
       toast.error('查詢航班時發生錯誤')
@@ -99,7 +104,12 @@ export function useTourForm({
           return_flight_text: flightText,
           return_flight_number: result.data!.flightNumber,
         }))
-        toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          toast.warning(result.warning, { duration: 5000 })
+        } else {
+          toast.success(`已查詢到航班: ${result.data.airline} ${result.data.flightNumber}`)
+        }
       }
     } catch {
       toast.error('查詢航班時發生錯誤')

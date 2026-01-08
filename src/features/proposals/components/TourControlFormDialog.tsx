@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Bus, Printer, X, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Bus, Printer, X, Plus, Trash2, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useToast } from '@/components/ui/use-toast'
@@ -63,6 +63,8 @@ export function TourControlFormDialog({
 }: TourControlFormDialogProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [existingFormId, setExistingFormId] = useState<string | null>(null)
 
   // 表單資料
   const [formData, setFormData] = useState<TourControlFormData>({
@@ -82,9 +84,25 @@ export function TourControlFormDialog({
 
     const loadData = async () => {
       setLoading(true)
+      setExistingFormId(null)
 
       try {
-        // 載入行程表資料
+        // 先檢查是否已有儲存的團控表資料
+        const { data: savedForm } = await supabase
+          .from('tour_control_forms')
+          .select('id, form_data')
+          .eq('package_id', pkg.id)
+          .single()
+
+        if (savedForm && savedForm.form_data) {
+          // 使用已儲存的資料
+          setExistingFormId(savedForm.id)
+          setFormData(savedForm.form_data as unknown as TourControlFormData)
+          setLoading(false)
+          return
+        }
+
+        // 沒有儲存的資料，從行程表載入
         if (pkg.itinerary_id) {
           const { data: itinerary } = await supabase
             .from('itineraries')
@@ -161,6 +179,58 @@ export function TourControlFormDialog({
 
     loadData()
   }, [isOpen, pkg, proposal])
+
+  // 儲存團控表資料
+  const handleSave = useCallback(async () => {
+    if (!pkg) return
+
+    setSaving(true)
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const jsonFormData = JSON.parse(JSON.stringify(formData)) as any
+
+      if (existingFormId) {
+        // 更新現有記錄
+        const { error } = await supabase
+          .from('tour_control_forms')
+          .update({
+            form_data: jsonFormData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingFormId)
+
+        if (error) throw error
+      } else {
+        // 新增記錄
+        const { data, error } = await supabase
+          .from('tour_control_forms')
+          .insert({
+            package_id: pkg.id,
+            workspace_id: proposal?.workspace_id || '',
+            form_data: jsonFormData,
+          })
+          .select('id')
+          .single()
+
+        if (error) throw error
+        if (data) setExistingFormId(data.id)
+      }
+
+      toast({
+        title: '儲存成功',
+        description: '團控表資料已儲存',
+      })
+    } catch (error) {
+      logger.error('儲存團控表失敗:', error)
+      toast({
+        title: '儲存失敗',
+        description: error instanceof Error ? error.message : '無法儲存團控表資料',
+        variant: 'destructive',
+      })
+    } finally {
+      setSaving(false)
+    }
+  }, [pkg, proposal, formData, existingFormId, toast])
 
   // 更新遊覽車公司
   const updateBusCompany = useCallback((index: number, field: keyof TourControlBusCompany, value: string) => {
@@ -676,6 +746,15 @@ export function TourControlFormDialog({
           <Button variant="outline" onClick={onClose} className="gap-2">
             <X size={16} />
             關閉
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={loading || saving}
+            variant="outline"
+            className="gap-2"
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            儲存
           </Button>
           <Button
             onClick={handlePrint}

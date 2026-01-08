@@ -7406,6 +7406,7 @@ export type Database = {
           is_active: boolean | null
           is_selected: boolean | null
           itinerary_id: string | null
+          itinerary_type: string | null
           main_city_id: string | null
           nights: number | null
           notes: string | null
@@ -7413,6 +7414,7 @@ export type Database = {
           proposal_id: string
           quote_id: string | null
           start_date: string | null
+          timeline_data: Json | null
           updated_at: string
           updated_by: string | null
           version_name: string
@@ -7432,6 +7434,7 @@ export type Database = {
           is_active?: boolean | null
           is_selected?: boolean | null
           itinerary_id?: string | null
+          itinerary_type?: string | null
           main_city_id?: string | null
           nights?: number | null
           notes?: string | null
@@ -7439,6 +7442,7 @@ export type Database = {
           proposal_id: string
           quote_id?: string | null
           start_date?: string | null
+          timeline_data?: Json | null
           updated_at?: string
           updated_by?: string | null
           version_name: string
@@ -7458,6 +7462,7 @@ export type Database = {
           is_active?: boolean | null
           is_selected?: boolean | null
           itinerary_id?: string | null
+          itinerary_type?: string | null
           main_city_id?: string | null
           nights?: number | null
           notes?: string | null
@@ -7465,6 +7470,7 @@ export type Database = {
           proposal_id?: string
           quote_id?: string | null
           start_date?: string | null
+          timeline_data?: Json | null
           updated_at?: string
           updated_by?: string | null
           version_name?: string
@@ -10330,6 +10336,54 @@ export type Database = {
           },
           {
             foreignKeyName: "tour_confirmation_sheets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_control_forms: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          form_data: Json
+          id: string
+          package_id: string
+          updated_at: string | null
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          form_data?: Json
+          id?: string
+          package_id: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          form_data?: Json
+          id?: string
+          package_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_control_forms_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: true
+            referencedRelation: "proposal_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_control_forms_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

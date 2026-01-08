@@ -356,6 +356,10 @@ export function PackageItineraryDialog({
           outboundFlight: flightDataToInfo(result.data!),
         }))
         setOutboundFlightNumber('')
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          setFlightSearchError(prev => ({ ...prev, outbound: result.warning }))
+        }
       }
     } finally {
       setSearchingOutbound(false)
@@ -392,6 +396,10 @@ export function PackageItineraryDialog({
           returnFlight: flightDataToInfo(result.data!),
         }))
         setReturnFlightNumber('')
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          setFlightSearchError(prev => ({ ...prev, return: result.warning }))
+        }
       }
     } finally {
       setSearchingReturn(false)

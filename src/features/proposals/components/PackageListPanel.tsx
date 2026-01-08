@@ -335,11 +335,14 @@ export function PackageListPanel({
       if (!selectedPackage) return
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const jsonData = JSON.parse(JSON.stringify(timelineData)) as any
+
         const { error } = await supabase
           .from('proposal_packages')
           .update({
             itinerary_type: 'timeline',
-            timeline_data: timelineData,
+            timeline_data: jsonData,
             updated_at: new Date().toISOString(),
           })
           .eq('id', selectedPackage.id)

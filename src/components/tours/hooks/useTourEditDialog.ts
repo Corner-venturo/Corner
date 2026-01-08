@@ -240,7 +240,12 @@ export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: (
             duration: result.data!.duration || '',
           },
         }))
-        toast.success('航班資料已更新')
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          toast.warning(result.warning, { duration: 5000 })
+        } else {
+          toast.success('航班資料已更新')
+        }
       }
     } catch {
       toast.error('查詢航班時發生錯誤')
@@ -285,7 +290,12 @@ export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: (
             duration: result.data!.duration || '',
           },
         }))
-        toast.success('航班資料已更新')
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          toast.warning(result.warning, { duration: 5000 })
+        } else {
+          toast.success('航班資料已更新')
+        }
       }
     } catch {
       toast.error('查詢航班時發生錯誤')

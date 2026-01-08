@@ -22,6 +22,7 @@ import { useToursForm } from '../hooks/useToursForm'
 import { TourFilters } from './TourFilters'
 import { TourTable } from './TourTable'
 import { TourForm } from './TourForm'
+import { CreateTourSourceDialog } from './CreateTourSourceDialog'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
@@ -59,6 +60,7 @@ export const ToursPage: React.FC = () => {
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
+  const [tourSourceDialogOpen, setTourSourceDialogOpen] = useState(false)
   const [proposalEditDialogOpen, setProposalEditDialogOpen] = useState(false)
   const [proposalArchiveDialogOpen, setProposalArchiveDialogOpen] = useState(false)
   const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
@@ -457,7 +459,8 @@ export const ToursPage: React.FC = () => {
           setActiveStatusTab(tab)
           setCurrentPage(1)
         }}
-        onAdd={() => setProposalDialogOpen(true)}
+        onAddProposal={() => setProposalDialogOpen(true)}
+        onAddTour={() => setTourSourceDialogOpen(true)}
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">

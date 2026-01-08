@@ -4,7 +4,7 @@ import { getTodayString, formatDate } from '@/lib/utils/format-date'
 
 import { useState, useCallback } from 'react'
 import { searchFlightAction, type FlightData } from '@/features/dashboard/actions/flight-actions'
-import { alertError } from '@/lib/ui/alert-dialog'
+import { alertError, alert } from '@/lib/ui/alert-dialog'
 
 interface FlightInfo {
   flightNumber: string
@@ -98,6 +98,10 @@ export function useFlightSearch({
           arrivalTime: flightData.arrival.time,
           departureDate: outboundFlight?.departureDate || '',
         })
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          await alert(result.warning, 'warning')
+        }
       }
     } catch {
       await alertError('查詢航班時發生錯誤')
@@ -161,6 +165,10 @@ export function useFlightSearch({
           arrivalTime: flightData.arrival.time,
           departureDate: returnFlight?.departureDate || '',
         })
+        // 顯示警告（如果資料不完整）
+        if (result.warning) {
+          await alert(result.warning, 'warning')
+        }
       }
     } catch {
       await alertError('查詢航班時發生錯誤')
