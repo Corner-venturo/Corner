@@ -71,6 +71,12 @@ export function PackageItineraryDialog({
   const { items: itineraries, fetchAll, create } = useItineraries()
   const { user: currentUser } = useAuthStore()
 
+  // 判斷是否為國內旅遊（台灣）- 國內旅遊不顯示航班資訊
+  const isDomestic = useMemo(() => {
+    const dest = pkg.destination?.toLowerCase() || ''
+    return dest.includes('台灣') || dest.includes('taiwan') || dest === 'tw'
+  }, [pkg.destination])
+
   const [isCreating, setIsCreating] = useState(false)
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [createError, setCreateError] = useState<string | null>(null)
@@ -814,7 +820,8 @@ export function PackageItineraryDialog({
                   </div>
                 </div>
 
-                {/* 航班資訊（選填） */}
+                {/* 航班資訊（選填）- 國內旅遊隱藏 */}
+                {!isDomestic && (
                 <div className="space-y-3">
                   <Label className="text-xs text-morandi-primary flex items-center gap-1">
                     <Plane size={12} />
@@ -1011,6 +1018,7 @@ export function PackageItineraryDialog({
                     )}
                   </div>
                 </div>
+                )}
 
                 {/* 錯誤訊息 */}
                 {createError && (

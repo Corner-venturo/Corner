@@ -482,6 +482,37 @@ export const ToursPage: React.FC = () => {
         )}
       </div>
 
+      {/* 選擇開團來源對話框 */}
+      <CreateTourSourceDialog
+        isOpen={tourSourceDialogOpen}
+        onClose={() => setTourSourceDialogOpen(false)}
+        onSelectBlank={() => {
+          setTourSourceDialogOpen(false)
+          openDialog('create')
+        }}
+        onSelectItinerary={(itinerary) => {
+          setTourSourceDialogOpen(false)
+          // 從行程表帶入資料
+          setNewTour(prev => ({
+            ...prev,
+            name: itinerary.title || '',
+            location: itinerary.city || '',
+            departure_date: itinerary.departure_date || '',
+          }))
+          openDialog('create')
+        }}
+        onSelectQuote={(quote) => {
+          setTourSourceDialogOpen(false)
+          // 從報價單帶入資料
+          setNewTour(prev => ({
+            ...prev,
+            name: quote.name || quote.destination || '',
+            location: quote.destination || '',
+          }))
+          openDialog('create')
+        }}
+      />
+
       <TourForm
         isOpen={dialog.isOpen}
         onClose={() => {
