@@ -112,8 +112,9 @@ type CacheStrategyType = 'STATIC' | 'DYNAMIC' | 'REALTIME'
 
 // 根據表格名稱自動判斷快取策略
 const TABLE_CACHE_STRATEGY: Record<string, CacheStrategyType> = {
+  // 動態資料：tours 需要較頻繁更新（新增後立即顯示）
+  tours: 'DYNAMIC',
   // 靜態資料：變動頻率低
-  tours: 'STATIC',
   customers: 'STATIC',
   quotes: 'STATIC',
   itineraries: 'STATIC',
