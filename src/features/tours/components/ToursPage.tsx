@@ -378,15 +378,20 @@ export const ToursPage: React.FC = () => {
       }
 
       try {
-        await createProposal(data as CreateProposalData, user.workspace_id, user.id)
+        const newProposal = await createProposal(data as CreateProposalData, user.workspace_id, user.id)
         setProposalDialogOpen(false)
-        // 不再自動切換 tab，避免意外的狀態變更
-        // 使用者可在「全部」tab 看到新提案，或手動切換到「提案」tab
+        // 刷新列表以顯示新提案
+        await refreshProposals()
+        // 自動展開新提案的詳情對話框
+        if (newProposal) {
+          setSelectedProposal(newProposal)
+          setProposalDetailDialogOpen(true)
+        }
       } catch (error) {
         await alert('建立提案失敗', 'error')
       }
     },
-    [user?.workspace_id, user?.id]
+    [user?.workspace_id, user?.id, refreshProposals]
   )
 
   // 更新提案

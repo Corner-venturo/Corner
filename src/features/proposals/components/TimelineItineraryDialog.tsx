@@ -1,12 +1,14 @@
 /**
  * TimelineItineraryDialog - 時間軸行程編輯器
  *
- * 表格式的時間軸介面，用於編輯每日行程
+ * 分頁式的時間軸介面，用於編輯每日行程
+ * - Tab 切換每日行程
+ * - 表格式編輯（點擊儲存格直接編輯，無格線）
  */
 
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,11 +19,11 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import {
   Clock,
   Plus,
   Trash2,
-  Calendar,
   X,
   Save,
   Printer,
@@ -32,10 +34,8 @@ import {
 } from 'lucide-react'
 import type { ProposalPackage } from '@/types/proposal.types'
 import type {
-  TimelineDay,
   TimelineAttraction,
   TimelineItineraryData,
-  MealType,
 } from '@/types/timeline-itinerary.types'
 import {
   generateId,
@@ -47,33 +47,36 @@ interface TimelineItineraryDialogProps {
   isOpen: boolean
   onClose: () => void
   pkg: ProposalPackage | null
+  onSave?: (timelineData: TimelineItineraryData) => Promise<void>
+}
+
+// 可編輯欄位
+type EditableField = 'startTime' | 'endTime' | 'name' | 'menu'
+
+// 編輯中的儲存格
+interface EditingCell {
+  rowIndex: number
+  field: EditableField
 }
 
 export function TimelineItineraryDialog({
   isOpen,
   onClose,
   pkg,
+  onSave,
 }: TimelineItineraryDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [uploadTarget, setUploadTarget] = useState<{ dayId: string; attractionId: string } | null>(null)
+  const [activeDayIndex, setActiveDayIndex] = useState(0)
+  const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
+  const [saving, setSaving] = useState(false)
 
-  // localStorage key
-  const storageKey = `timeline-itinerary-${pkg?.id || 'default'}`
-
-  // 初始化資料（從 localStorage 讀取或建立新的）
+  // 初始化資料
   const [data, setData] = useState<TimelineItineraryData>(() => {
-    // 嘗試從 localStorage 讀取
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(storageKey)
-      if (saved) {
-        try {
-          return JSON.parse(saved)
-        } catch {
-          // ignore parse error
-        }
-      }
+    if (pkg?.timeline_data) {
+      return pkg.timeline_data
     }
-    // 沒有存檔，建立新的
     const startDate = pkg?.start_date || ''
     return {
       title: pkg?.version_name || '行程表',
@@ -82,6 +85,9 @@ export function TimelineItineraryDialog({
       days: [createEmptyDay(1, startDate)],
     }
   })
+
+  // 當前選中的日期
+  const activeDay = data.days[activeDayIndex] || data.days[0]
 
   // 計算日期
   const calculateDate = useCallback((dayNumber: number, startDate?: string): string => {
@@ -101,13 +107,14 @@ export function TimelineItineraryDialog({
         days: [...prev.days, createEmptyDay(newDayNumber, newDate)],
       }
     })
-  }, [calculateDate])
+    setActiveDayIndex(data.days.length)
+  }, [calculateDate, data.days.length])
 
   // 刪除一天
-  const removeDay = useCallback((dayId: string) => {
+  const removeDay = useCallback((dayIndex: number) => {
     setData((prev) => {
       const newDays = prev.days
-        .filter((d) => d.id !== dayId)
+        .filter((_, idx) => idx !== dayIndex)
         .map((day, index) => ({
           ...day,
           dayNumber: index + 1,
@@ -115,66 +122,69 @@ export function TimelineItineraryDialog({
         }))
       return { ...prev, days: newDays.length > 0 ? newDays : [createEmptyDay(1, prev.startDate)] }
     })
-  }, [calculateDate])
+    if (activeDayIndex >= data.days.length - 1) {
+      setActiveDayIndex(Math.max(0, data.days.length - 2))
+    }
+  }, [calculateDate, activeDayIndex, data.days.length])
 
   // 更新每日標題
-  const updateDayTitle = useCallback((dayId: string, title: string) => {
+  const updateDayTitle = useCallback((title: string) => {
     setData((prev) => ({
       ...prev,
-      days: prev.days.map((day) =>
-        day.id === dayId ? { ...day, title } : day
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex ? { ...day, title } : day
       ),
     }))
-  }, [])
+  }, [activeDayIndex])
 
   // 新增景點
-  const addAttraction = useCallback((dayId: string) => {
+  const addAttraction = useCallback(() => {
     setData((prev) => ({
       ...prev,
-      days: prev.days.map((day) =>
-        day.id === dayId
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex
           ? { ...day, attractions: [...day.attractions, createEmptyAttraction()] }
           : day
       ),
     }))
-  }, [])
+  }, [activeDayIndex])
 
   // 刪除景點
-  const removeAttraction = useCallback((dayId: string, attractionId: string) => {
+  const removeAttraction = useCallback((attractionIndex: number) => {
     setData((prev) => ({
       ...prev,
-      days: prev.days.map((day) =>
-        day.id === dayId
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex
           ? {
               ...day,
               attractions:
                 day.attractions.length > 1
-                  ? day.attractions.filter((a) => a.id !== attractionId)
+                  ? day.attractions.filter((_, i) => i !== attractionIndex)
                   : day.attractions,
             }
           : day
       ),
     }))
-  }, [])
+  }, [activeDayIndex])
 
-  // 更新景點
-  const updateAttraction = useCallback(
-    (dayId: string, attractionId: string, field: keyof TimelineAttraction, value: unknown) => {
+  // 更新景點欄位
+  const updateAttractionField = useCallback(
+    (attractionIndex: number, field: keyof TimelineAttraction, value: unknown) => {
       setData((prev) => ({
         ...prev,
-        days: prev.days.map((day) =>
-          day.id === dayId
+        days: prev.days.map((day, idx) =>
+          idx === activeDayIndex
             ? {
                 ...day,
-                attractions: day.attractions.map((a) =>
-                  a.id === attractionId ? { ...a, [field]: value } : a
+                attractions: day.attractions.map((a, i) =>
+                  i === attractionIndex ? { ...a, [field]: value } : a
                 ),
               }
             : day
         ),
       }))
     },
-    []
+    [activeDayIndex]
   )
 
   // 壓縮圖片
@@ -187,12 +197,10 @@ export function TimelineItineraryDialog({
           const canvas = document.createElement('canvas')
           let width = img.width
           let height = img.height
-
           if (width > maxWidth) {
             height = (height * maxWidth) / width
             width = maxWidth
           }
-
           canvas.width = width
           canvas.height = height
           const ctx = canvas.getContext('2d')
@@ -205,12 +213,11 @@ export function TimelineItineraryDialog({
     })
   }, [])
 
-  // 處理圖片上傳（最多 3 張，自動壓縮）
+  // 處理圖片上傳
   const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || !uploadTarget) return
 
-    // 取得目前該景點已有幾張照片
     const currentDay = data.days.find(d => d.id === uploadTarget.dayId)
     const currentAttraction = currentDay?.attractions.find(a => a.id === uploadTarget.attractionId)
     const currentCount = currentAttraction?.images.length || 0
@@ -222,7 +229,6 @@ export function TimelineItineraryDialog({
       return
     }
 
-    // 只取剩餘可上傳的數量
     const filesToUpload = Array.from(files).slice(0, remaining)
     const targetDayId = uploadTarget.dayId
     const targetAttractionId = uploadTarget.attractionId
@@ -246,7 +252,6 @@ export function TimelineItineraryDialog({
       }))
     }
 
-    // Reset
     e.target.value = ''
     setUploadTarget(null)
   }, [uploadTarget, data.days, compressImage])
@@ -258,15 +263,15 @@ export function TimelineItineraryDialog({
   }, [])
 
   // 刪除照片
-  const removeImage = useCallback((dayId: string, attractionId: string, imageId: string) => {
+  const removeImage = useCallback((attractionIndex: number, imageId: string) => {
     setData((prev) => ({
       ...prev,
-      days: prev.days.map((day) =>
-        day.id === dayId
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex
           ? {
               ...day,
-              attractions: day.attractions.map((a) =>
-                a.id === attractionId
+              attractions: day.attractions.map((a, i) =>
+                i === attractionIndex
                   ? { ...a, images: a.images.filter((img) => img.id !== imageId) }
                   : a
               ),
@@ -274,9 +279,9 @@ export function TimelineItineraryDialog({
           : day
       ),
     }))
-  }, [])
+  }, [activeDayIndex])
 
-  // 格式化日期顯示
+  // 格式化日期
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
@@ -284,21 +289,141 @@ export function TimelineItineraryDialog({
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
-  // 儲存到 localStorage
-  const handleSave = useCallback(() => {
-    localStorage.setItem(storageKey, JSON.stringify(data))
-    alert('已儲存到本地')
-  }, [storageKey, data])
+  // 儲存
+  const handleSave = useCallback(async () => {
+    if (!onSave) {
+      window.alert('儲存功能未啟用')
+      return
+    }
+    setSaving(true)
+    try {
+      await onSave(data)
+      window.alert('儲存成功')
+    } catch {
+      window.alert('儲存失敗')
+    } finally {
+      setSaving(false)
+    }
+  }, [data, onSave])
 
-  // 列印功能
+  // 列印
   const handlePrint = useCallback(() => {
     const printWindow = window.open('', '_blank')
     if (!printWindow) return
-
     const html = generatePrintHtml(data)
     printWindow.document.write(html)
     printWindow.document.close()
   }, [data])
+
+  // 點擊儲存格開始編輯
+  const handleCellClick = useCallback((rowIndex: number, field: EditableField) => {
+    setEditingCell({ rowIndex, field })
+  }, [])
+
+  // 鍵盤導航
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, rowIndex: number, field: EditableField) => {
+    const editableFields: EditableField[] = ['startTime', 'endTime', 'name', 'menu']
+    const fieldIndex = editableFields.indexOf(field)
+
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      if (e.shiftKey) {
+        if (fieldIndex > 0) {
+          setEditingCell({ rowIndex, field: editableFields[fieldIndex - 1] })
+        } else if (rowIndex > 0) {
+          setEditingCell({ rowIndex: rowIndex - 1, field: editableFields[editableFields.length - 1] })
+        }
+      } else {
+        if (fieldIndex < editableFields.length - 1) {
+          setEditingCell({ rowIndex, field: editableFields[fieldIndex + 1] })
+        } else if (rowIndex < activeDay.attractions.length - 1) {
+          setEditingCell({ rowIndex: rowIndex + 1, field: editableFields[0] })
+        } else {
+          setEditingCell(null)
+        }
+      }
+    } else if (e.key === 'Escape') {
+      setEditingCell(null)
+    } else if (e.key === 'ArrowDown' && rowIndex < activeDay.attractions.length - 1) {
+      e.preventDefault()
+      setEditingCell({ rowIndex: rowIndex + 1, field })
+    } else if (e.key === 'ArrowUp' && rowIndex > 0) {
+      e.preventDefault()
+      setEditingCell({ rowIndex: rowIndex - 1, field })
+    }
+  }, [activeDay.attractions.length])
+
+  // 自動 focus 輸入框
+  useEffect(() => {
+    if (editingCell && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editingCell])
+
+  // 渲染儲存格
+  const renderCell = (attraction: TimelineAttraction, rowIndex: number, field: EditableField, width?: string) => {
+    const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.field === field
+    let value = ''
+    let placeholder = ''
+
+    switch (field) {
+      case 'startTime':
+        value = attraction.startTime || ''
+        placeholder = '0900'
+        break
+      case 'endTime':
+        value = attraction.endTime || ''
+        placeholder = '1200'
+        break
+      case 'name':
+        value = attraction.name || ''
+        placeholder = attraction.mealType && attraction.mealType !== 'none' ? '餐廳名稱' : '景點名稱'
+        break
+      case 'menu':
+        value = attraction.menu || ''
+        placeholder = '菜色內容'
+        break
+    }
+
+    if (isEditing) {
+      return (
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => {
+            let newValue = e.target.value
+            if (field === 'startTime' || field === 'endTime') {
+              newValue = newValue.replace(/\D/g, '').slice(0, 4)
+            }
+            updateAttractionField(rowIndex, field, newValue)
+          }}
+          onBlur={() => setEditingCell(null)}
+          onKeyDown={(e) => handleKeyDown(e, rowIndex, field)}
+          className={cn(
+            'w-full h-8 px-2 border-none outline-none bg-morandi-gold/10 focus:ring-0',
+            (field === 'startTime' || field === 'endTime') && 'text-center font-mono text-xs',
+            width
+          )}
+          maxLength={field === 'startTime' || field === 'endTime' ? 4 : undefined}
+        />
+      )
+    }
+
+    return (
+      <div
+        className={cn(
+          'h-8 px-2 flex items-center cursor-pointer hover:bg-morandi-gold/5 transition-colors',
+          (field === 'startTime' || field === 'endTime') && 'justify-center font-mono text-xs',
+          !value && 'text-morandi-muted/40',
+          width
+        )}
+        onClick={() => handleCellClick(rowIndex, field)}
+      >
+        {value || placeholder}
+      </div>
+    )
+  }
 
   if (!pkg) return null
 
@@ -322,248 +447,216 @@ export function TimelineItineraryDialog({
           className="hidden"
         />
 
-        <div className="max-h-[70vh] overflow-y-auto pr-2">
-          {/* 標題區 */}
-          <div className="mb-4 p-4 border border-border rounded-lg bg-morandi-container/20">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs text-morandi-secondary">行程標題</Label>
-                <Input
-                  value={data.title}
-                  onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
-                  placeholder="輸入行程標題..."
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-morandi-secondary">副標題</Label>
-                <Input
-                  value={data.subtitle || ''}
-                  onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
-                  placeholder="輸入副標題..."
-                  className="mt-1"
-                />
-              </div>
-            </div>
+        {/* 標題區 */}
+        <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
+          <div>
+            <Label className="text-xs text-morandi-secondary">行程標題</Label>
+            <Input
+              value={data.title}
+              onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
+              placeholder="輸入行程標題..."
+              className="mt-1 h-8"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-morandi-secondary">副標題</Label>
+            <Input
+              value={data.subtitle || ''}
+              onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
+              placeholder="輸入副標題..."
+              className="mt-1 h-8"
+            />
+          </div>
+        </div>
+
+        {/* Day 分頁 Tabs */}
+        <div className="flex items-center gap-1 border-b border-border">
+          {data.days.map((day, index) => (
+            <button
+              key={day.id}
+              onClick={() => setActiveDayIndex(index)}
+              className={cn(
+                'px-4 py-2 text-sm font-medium transition-colors relative',
+                activeDayIndex === index
+                  ? 'text-morandi-gold border-b-2 border-morandi-gold -mb-[1px]'
+                  : 'text-morandi-secondary hover:text-morandi-primary'
+              )}
+            >
+              Day {day.dayNumber}
+              {day.date && <span className="ml-1 text-xs opacity-60">{formatDate(day.date)}</span>}
+            </button>
+          ))}
+          <button
+            onClick={addDay}
+            className="px-3 py-2 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+            title="新增一天"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+
+        {/* 當日內容 */}
+        <div className="max-h-[50vh] overflow-y-auto">
+          {/* 每日標題 */}
+          <div className="flex items-center gap-3 py-3 border-b border-border/50">
+            <Label className="text-xs text-morandi-secondary shrink-0">今日主題</Label>
+            <Input
+              value={activeDay.title || ''}
+              onChange={(e) => updateDayTitle(e.target.value)}
+              placeholder="輸入今日主題（如：台北市區觀光）"
+              className="h-8 text-sm flex-1"
+            />
+            {data.days.length > 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeDay(activeDayIndex)}
+                className="h-8 px-2 text-morandi-red hover:bg-morandi-red/10"
+              >
+                <Trash2 size={14} className="mr-1" />
+                刪除此天
+              </Button>
+            )}
           </div>
 
-          {/* 新增一天按鈕 */}
-          <div className="mb-4">
+          {/* 景點表格（無格線） */}
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-xs text-morandi-secondary border-b border-border/30">
+                <th className="py-2 px-2 text-left font-medium w-16">開始</th>
+                <th className="py-2 px-2 text-left font-medium w-16">結束</th>
+                <th className="py-2 px-2 text-left font-medium">景點/餐廳</th>
+                <th className="py-2 px-2 text-left font-medium w-40">菜色</th>
+                <th className="py-2 px-2 text-center font-medium w-24">餐食</th>
+                <th className="py-2 px-2 text-center font-medium w-16">照片</th>
+                <th className="py-2 px-2 text-center font-medium w-10"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeDay.attractions.map((attraction, rowIndex) => (
+                <tr
+                  key={attraction.id}
+                  className="hover:bg-morandi-container/20 transition-colors"
+                >
+                  <td className="py-0.5 w-16">{renderCell(attraction, rowIndex, 'startTime', 'w-16')}</td>
+                  <td className="py-0.5 w-16">{renderCell(attraction, rowIndex, 'endTime', 'w-16')}</td>
+                  <td className="py-0.5">{renderCell(attraction, rowIndex, 'name')}</td>
+                  <td className="py-0.5 w-40">
+                    {attraction.mealType && attraction.mealType !== 'none'
+                      ? renderCell(attraction, rowIndex, 'menu')
+                      : <div className="h-8 px-2 flex items-center text-morandi-muted/30">-</div>
+                    }
+                  </td>
+                  <td className="py-0.5 w-24">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'breakfast' ? 'none' : 'breakfast')}
+                        className={cn(
+                          'p-1.5 rounded transition-colors',
+                          attraction.mealType === 'breakfast'
+                            ? 'bg-morandi-gold text-white'
+                            : 'text-morandi-muted hover:bg-morandi-container'
+                        )}
+                        title="早餐"
+                      >
+                        <Coffee size={14} />
+                      </button>
+                      <button
+                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'lunch' ? 'none' : 'lunch')}
+                        className={cn(
+                          'p-1.5 rounded transition-colors',
+                          attraction.mealType === 'lunch'
+                            ? 'bg-morandi-gold text-white'
+                            : 'text-morandi-muted hover:bg-morandi-container'
+                        )}
+                        title="午餐"
+                      >
+                        <UtensilsCrossed size={14} />
+                      </button>
+                      <button
+                        onClick={() => updateAttractionField(rowIndex, 'mealType', attraction.mealType === 'dinner' ? 'none' : 'dinner')}
+                        className={cn(
+                          'p-1.5 rounded transition-colors',
+                          attraction.mealType === 'dinner'
+                            ? 'bg-morandi-gold text-white'
+                            : 'text-morandi-muted hover:bg-morandi-container'
+                        )}
+                        title="晚餐"
+                      >
+                        <Moon size={14} />
+                      </button>
+                    </div>
+                  </td>
+                  <td className="py-0.5 w-16">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => triggerImageUpload(activeDay.id, attraction.id)}
+                        className="p-1.5 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+                        title="上傳照片"
+                      >
+                        <Upload size={14} />
+                      </button>
+                      {attraction.images.length > 0 && (
+                        <span className="text-xs text-morandi-gold font-medium">{attraction.images.length}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-0.5 w-10">
+                    {activeDay.attractions.length > 1 && (
+                      <button
+                        onClick={() => removeAttraction(rowIndex)}
+                        className="p-1.5 text-morandi-muted hover:text-morandi-red hover:bg-morandi-red/10 rounded transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* 新增景點 */}
+          <div className="py-2">
             <Button
-              variant="outline"
-              onClick={addDay}
-              className="gap-2 text-morandi-gold border-morandi-gold hover:bg-morandi-gold/10"
+              variant="ghost"
+              size="sm"
+              onClick={addAttraction}
+              className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold"
             >
-              <Plus size={16} />
-              新增一天
+              <Plus size={12} />
+              新增景點
             </Button>
           </div>
 
-          {/* 每日行程表格 */}
-          {data.days.map((day) => (
-            <div key={day.id} className="mb-6 shrink-0">
-              {/* Day 標題 */}
-              <div className="flex items-center gap-3 mb-2 px-2">
-                <div className="flex items-center gap-2 shrink-0">
-                  <Calendar size={16} className="text-morandi-gold" />
-                  <span className="font-medium text-morandi-gold">Day {day.dayNumber}</span>
-                  {day.date && (
-                    <span className="text-morandi-secondary text-sm">- {formatDate(day.date)}</span>
-                  )}
-                </div>
-                {/* 每日大標題輸入 */}
-                <Input
-                  value={day.title || ''}
-                  onChange={(e) => updateDayTitle(day.id, e.target.value)}
-                  placeholder="輸入今日主題（如：台北市區觀光）"
-                  className="h-7 text-sm flex-1"
-                />
-                {data.days.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDay(day.id)}
-                    className="h-6 w-6 p-0 text-morandi-red hover:bg-morandi-red/10 shrink-0"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                )}
-              </div>
-
-              {/* 景點列表 */}
-              <div className="space-y-1 shrink-0">
-                {day.attractions.map((attraction) => (
-                  <div key={attraction.id} className="hover:bg-morandi-container/10 rounded px-1 py-1">
-                    {/* 主要行：時間 + 名稱 + 餐食按鈕 + 照片 + 刪除 */}
-                    <div className="flex items-center gap-2">
-                      {/* 時間 */}
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Input
-                          value={attraction.startTime || ''}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/\D/g, '').slice(0, 4)
-                            updateAttraction(day.id, attraction.id, 'startTime', val)
-                          }}
-                          placeholder="0900"
-                          className="w-14 h-7 text-xs text-center font-mono"
-                          maxLength={4}
-                        />
-                        <span className="text-morandi-muted">-</span>
-                        <Input
-                          value={attraction.endTime || ''}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/\D/g, '').slice(0, 4)
-                            updateAttraction(day.id, attraction.id, 'endTime', val)
-                          }}
-                          placeholder="1000"
-                          className="w-14 h-7 text-xs text-center font-mono"
-                          maxLength={4}
-                        />
-                      </div>
-
-                      {/* 景點/餐廳名稱 */}
-                      <div className="flex-1">
-                        <Input
-                          value={attraction.name}
-                          onChange={(e) =>
-                            updateAttraction(day.id, attraction.id, 'name', e.target.value)
-                          }
-                          placeholder={attraction.mealType && attraction.mealType !== 'none' ? '輸入餐廳名稱...' : '輸入景點名稱...'}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-
-                      {/* 餐食類型按鈕 */}
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        <button
-                          onClick={() => updateAttraction(day.id, attraction.id, 'mealType', attraction.mealType === 'breakfast' ? 'none' : 'breakfast')}
-                          className={`p-1 rounded transition-colors ${
-                            attraction.mealType === 'breakfast'
-                              ? 'bg-morandi-gold text-white'
-                              : 'text-morandi-muted hover:bg-morandi-container'
-                          }`}
-                          title="早餐"
-                        >
-                          <Coffee size={14} />
-                        </button>
-                        <button
-                          onClick={() => updateAttraction(day.id, attraction.id, 'mealType', attraction.mealType === 'lunch' ? 'none' : 'lunch')}
-                          className={`p-1 rounded transition-colors ${
-                            attraction.mealType === 'lunch'
-                              ? 'bg-morandi-gold text-white'
-                              : 'text-morandi-muted hover:bg-morandi-container'
-                          }`}
-                          title="午餐"
-                        >
-                          <UtensilsCrossed size={14} />
-                        </button>
-                        <button
-                          onClick={() => updateAttraction(day.id, attraction.id, 'mealType', attraction.mealType === 'dinner' ? 'none' : 'dinner')}
-                          className={`p-1 rounded transition-colors ${
-                            attraction.mealType === 'dinner'
-                              ? 'bg-morandi-gold text-white'
-                              : 'text-morandi-muted hover:bg-morandi-container'
-                          }`}
-                          title="晚餐"
-                        >
-                          <Moon size={14} />
-                        </button>
-                      </div>
-
-                      {/* 照片 */}
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => triggerImageUpload(day.id, attraction.id)}
-                          className="h-7 w-7 p-0 text-morandi-secondary hover:text-morandi-gold"
-                          title="上傳照片"
-                        >
-                          <Upload size={14} />
-                        </Button>
-                        {attraction.images.length > 0 && (
-                          <span className="text-xs text-morandi-gold">{attraction.images.length}</span>
-                        )}
-                      </div>
-
-                      {/* 刪除 */}
-                      <div className="shrink-0">
-                        {day.attractions.length > 1 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeAttraction(day.id, attraction.id)}
-                            className="h-7 w-7 p-0 text-morandi-muted hover:text-morandi-red"
-                          >
-                            <X size={14} />
-                          </Button>
-                        )}
-                      </div>
+          {/* 已上傳的照片預覽 */}
+          {activeDay.attractions.some(a => a.images.length > 0) && (
+            <div className="py-3 border-t border-border/50">
+              <div className="text-xs text-morandi-secondary mb-2">已上傳照片：</div>
+              <div className="flex flex-wrap gap-2">
+                {activeDay.attractions.map((attraction, attrIndex) =>
+                  attraction.images.map((img) => (
+                    <div key={img.id} className="relative group">
+                      <img
+                        src={img.url}
+                        alt=""
+                        className="w-16 h-16 object-cover rounded border border-border"
+                      />
+                      <button
+                        onClick={() => removeImage(attrIndex, img.id)}
+                        className="absolute -top-1 -right-1 h-4 w-4 bg-morandi-red text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <X size={10} />
+                      </button>
+                      <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center bg-black/50 text-white truncate px-0.5">
+                        {attraction.name || '景點'}
+                      </span>
                     </div>
-
-                    {/* 菜色輸入（下方一排，選擇餐食後顯示） */}
-                    {attraction.mealType && attraction.mealType !== 'none' && (
-                      <div className="flex items-center gap-2 mt-1 ml-[124px]">
-                        <Input
-                          value={attraction.menu || ''}
-                          onChange={(e) =>
-                            updateAttraction(day.id, attraction.id, 'menu', e.target.value)
-                          }
-                          placeholder="輸入菜色..."
-                          className="h-7 text-xs flex-1"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* 已上傳的照片預覽 */}
-                {day.attractions.some(a => a.images.length > 0) && (
-                  <div className="px-3 py-2 border-t border-border/50 bg-morandi-container/10">
-                    <div className="text-xs text-morandi-secondary mb-2">已上傳照片：</div>
-                    <div className="flex flex-wrap gap-2">
-                      {day.attractions.map((attraction) =>
-                        attraction.images.map((img) => (
-                          <div key={img.id} className="relative group">
-                            <img
-                              src={img.url}
-                              alt=""
-                              className="w-12 h-12 object-cover rounded border border-border"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeImage(day.id, attraction.id, img.id)}
-                              className="absolute -top-1 -right-1 h-4 w-4 p-0 bg-morandi-red text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X size={8} />
-                            </Button>
-                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center bg-black/50 text-white truncate">
-                              {attraction.name || '景點'}
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
+                  ))
                 )}
-
-              </div>
-
-              {/* 新增景點按鈕 */}
-              <div className="mt-2 px-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => addAttraction(day.id)}
-                  className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold"
-                >
-                  <Plus size={12} />
-                  新增景點
-                </Button>
               </div>
             </div>
-          ))}
+          )}
         </div>
 
         {/* 底部按鈕 */}
@@ -576,9 +669,13 @@ export function TimelineItineraryDialog({
             <Printer size={16} />
             列印
           </Button>
-          <Button onClick={handleSave} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
             <Save size={16} />
-            儲存
+            {saving ? '儲存中...' : '儲存'}
           </Button>
         </div>
       </DialogContent>
@@ -600,26 +697,16 @@ function generatePrintHtml(data: TimelineItineraryData): string {
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
   }
 
-  const getMealLabel = (mealType?: string) => {
-    if (mealType === 'breakfast') return '早餐'
-    if (mealType === 'lunch') return '午餐'
-    if (mealType === 'dinner') return '晚餐'
-    return ''
-  }
-
   const daysHtml = data.days.map((day) => {
     const rowsHtml = day.attractions.map((attr) => {
       const timeStr = attr.startTime || attr.endTime
         ? `${formatTime(attr.startTime)} - ${formatTime(attr.endTime)}`
         : ''
 
-      const mealLabel = getMealLabel(attr.mealType)
-
       const imagesHtml = attr.images.length > 0
         ? `<div class="images">${attr.images.map(img => `<img src="${img.url}" alt="" />`).join('')}</div>`
         : ''
 
-      // 菜色在下方一排（不顯示標籤）
       const menuRow = attr.menu
         ? `<div class="menu-row"><span class="menu-text">${attr.menu}</span></div>`
         : ''
@@ -657,15 +744,8 @@ function generatePrintHtml(data: TimelineItineraryData): string {
   <meta charset="utf-8">
   <title>${data.title || '行程表'}</title>
   <style>
-    @page {
-      size: A4 portrait;
-      margin: 10mm;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    @page { size: A4 portrait; margin: 10mm; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: "標楷體", "Microsoft JhengHei", sans-serif;
       font-size: 11pt;
@@ -687,27 +767,15 @@ function generatePrintHtml(data: TimelineItineraryData): string {
     }
     .btn-outline { background: white; border: 1px solid #ddd; }
     .btn-primary { background: #c9aa7c; color: white; border: none; }
-
     .header {
       text-align: center;
       margin-bottom: 25px;
       padding-bottom: 15px;
       border-bottom: 2px solid #c9aa7c;
     }
-    .header h1 {
-      font-size: 22pt;
-      color: #3a3633;
-      margin-bottom: 6px;
-    }
-    .header .subtitle {
-      font-size: 13pt;
-      color: #8b8680;
-    }
-
-    .day {
-      margin-bottom: 20px;
-      page-break-inside: avoid;
-    }
+    .header h1 { font-size: 22pt; color: #3a3633; margin-bottom: 6px; }
+    .header .subtitle { font-size: 13pt; color: #8b8680; }
+    .day { margin-bottom: 20px; page-break-inside: avoid; }
     .day-header {
       display: flex;
       align-items: center;
@@ -717,15 +785,8 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       background: #f6f4f1;
       border-left: 4px solid #c9aa7c;
     }
-    .day-number {
-      font-size: 13pt;
-      font-weight: bold;
-      color: #c9aa7c;
-    }
-    .day-date {
-      font-size: 11pt;
-      color: #8b8680;
-    }
+    .day-number { font-size: 13pt; font-weight: bold; color: #c9aa7c; }
+    .day-date { font-size: 11pt; color: #8b8680; }
     .day-title {
       font-size: 12pt;
       font-weight: 500;
@@ -734,20 +795,13 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       padding-left: 10px;
       border-left: 2px solid #c9aa7c;
     }
-
-    .attractions {
-      padding: 8px 0;
-    }
+    .attractions { padding: 8px 0; }
     .attraction-item {
       margin-bottom: 8px;
       padding-bottom: 8px;
       border-bottom: 1px solid #f0ede8;
     }
-    .attraction-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
+    .attraction-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .attraction-row {
       display: flex;
       align-items: center;
@@ -761,13 +815,7 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       white-space: nowrap;
       min-width: 90px;
     }
-    .attraction-row .name {
-      font-size: 11pt;
-      font-weight: 500;
-      color: #3a3633;
-      flex: 1;
-    }
-    /* 菜色下方一排 */
+    .attraction-row .name { font-size: 11pt; font-weight: 500; color: #3a3633; flex: 1; }
     .menu-row {
       display: flex;
       align-items: center;
@@ -777,23 +825,8 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       border-radius: 4px;
       margin: 4px 12px 0 12px;
     }
-    .menu-row .meal-label {
-      font-size: 9pt;
-      color: #c9aa7c;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .menu-row .menu-text {
-      font-size: 10pt;
-      color: #3a3633;
-    }
-
-    .images {
-      display: flex;
-      gap: 8px;
-      padding: 8px 12px;
-      width: 100%;
-    }
+    .menu-row .menu-text { font-size: 10pt; color: #3a3633; }
+    .images { display: flex; gap: 8px; padding: 8px 12px; width: 100%; }
     .images img {
       flex: 1;
       height: auto;
@@ -802,7 +835,6 @@ function generatePrintHtml(data: TimelineItineraryData): string {
       border-radius: 4px;
       border: 1px solid #e8e5e0;
     }
-
     @media print {
       .print-controls { display: none !important; }
       body { padding: 0; }
@@ -814,12 +846,10 @@ function generatePrintHtml(data: TimelineItineraryData): string {
     <button class="btn-outline" onclick="window.close()">關閉</button>
     <button class="btn-primary" onclick="window.print()">列印</button>
   </div>
-
   <div class="header">
     <h1>${data.title || '行程表'}</h1>
     ${data.subtitle ? `<div class="subtitle">${data.subtitle}</div>` : ''}
   </div>
-
   ${daysHtml}
 </body>
 </html>

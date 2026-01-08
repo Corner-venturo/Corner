@@ -33,7 +33,7 @@ import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
 import { TourControlFormDialog } from './TourControlFormDialog'
 import { TimelineItineraryDialog } from './TimelineItineraryDialog'
-import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
+import type { Proposal, ProposalPackage, CreatePackageData, TimelineItineraryData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
   proposal: Proposal
@@ -329,6 +329,31 @@ export function PackageListPanel({
     [router, proposal, user, onPackagesChange]
   )
 
+  // 儲存時間軸資料到資料庫
+  const handleSaveTimeline = useCallback(
+    async (timelineData: TimelineItineraryData) => {
+      if (!selectedPackage) return
+
+      try {
+        const { error } = await supabase
+          .from('proposal_packages')
+          .update({
+            itinerary_type: 'timeline',
+            timeline_data: timelineData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', selectedPackage.id)
+
+        if (error) throw error
+        onPackagesChange()
+      } catch (error) {
+        logger.error('儲存時間軸資料失敗:', error)
+        throw error
+      }
+    },
+    [selectedPackage, onPackagesChange]
+  )
+
   // 已轉團的提案不能再操作
   const isConverted = proposal.status === 'converted'
   const isArchived = proposal.status === 'archived'
@@ -338,8 +363,8 @@ export function PackageListPanel({
     <div className="pt-4 h-full flex flex-col">
       <div className="flex-1 border border-border rounded-lg overflow-hidden min-h-[260px]">
         {packages.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-morandi-secondary">
-            尚無套件，請點擊「新增版本」開始建立
+          <div className="h-full flex items-center justify-center text-morandi-secondary text-center">
+            尚無版本
           </div>
         ) : (
           <div className="h-full flex flex-col">
@@ -410,9 +435,13 @@ export function PackageListPanel({
                       >
                         <FileText size={16} />
                       </button>
-                      {/* 簡易行程表 */}
+                      {/* 簡易行程表 - 與時間軸互斥 */}
                       <button
                         onClick={() => {
+                          if (pkg.itinerary_type === 'timeline') {
+                            void alert('已使用時間軸行程，無法使用簡易行程表', 'info')
+                            return
+                          }
                           if (pkg.itinerary_id) {
                             setSelectedPackage(pkg)
                             setBrochureDialogOpen(true)
@@ -421,12 +450,16 @@ export function PackageListPanel({
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
-                            ? 'text-morandi-primary hover:bg-morandi-container/80'
-                            : 'text-morandi-muted cursor-not-allowed'
+                          pkg.itinerary_type === 'timeline'
+                            ? 'text-morandi-muted cursor-not-allowed'
+                            : pkg.itinerary_id
+                              ? pkg.itinerary_type === 'simple'
+                                ? 'text-morandi-green hover:bg-morandi-green/10'
+                                : 'text-morandi-primary hover:bg-morandi-container/80'
+                              : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title="簡易行程表"
-                        disabled={!pkg.itinerary_id}
+                        title={pkg.itinerary_type === 'timeline' ? '已使用時間軸行程' : '簡易行程表'}
+                        disabled={pkg.itinerary_type === 'timeline' || !pkg.itinerary_id}
                       >
                         <Book size={16} />
                       </button>
@@ -520,14 +553,25 @@ export function PackageListPanel({
                       >
                         <BookMarked size={16} />
                       </button>
-                      {/* 時間軸編輯器 */}
+                      {/* 時間軸編輯器 - 與簡易行程表互斥 */}
                       <button
                         onClick={() => {
+                          if (pkg.itinerary_type === 'simple') {
+                            void alert('已使用簡易行程表，無法使用時間軸行程', 'info')
+                            return
+                          }
                           setSelectedPackage(pkg)
                           setTimelineDialogOpen(true)
                         }}
-                        className="p-1.5 rounded transition-colors text-morandi-secondary hover:bg-morandi-container/80 hover:text-morandi-gold"
-                        title="時間軸編輯器"
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_type === 'simple'
+                            ? 'text-morandi-muted cursor-not-allowed'
+                            : pkg.itinerary_type === 'timeline'
+                              ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                              : 'text-morandi-secondary hover:bg-morandi-container/80 hover:text-morandi-gold'
+                        }`}
+                        title={pkg.itinerary_type === 'simple' ? '已使用簡易行程表' : '時間軸編輯器'}
+                        disabled={pkg.itinerary_type === 'simple'}
                       >
                         <Clock size={16} />
                       </button>
@@ -668,6 +712,7 @@ export function PackageListPanel({
           setSelectedPackage(null)
         }}
         pkg={selectedPackage}
+        onSave={handleSaveTimeline}
       />
     </div>
   )

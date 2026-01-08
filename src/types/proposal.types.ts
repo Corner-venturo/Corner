@@ -3,6 +3,11 @@
  * Venturo ERP - Proposal System Types
  */
 
+import type { TimelineItineraryData } from './timeline-itinerary.types'
+
+// Re-export for convenience
+export type { TimelineItineraryData }
+
 // ============================================
 // 狀態類型
 // ============================================
@@ -135,6 +140,10 @@ export interface ProposalPackage {
   quote_id?: string | null                // 關聯報價單
   itinerary_id?: string | null            // 關聯行程表
   handbook_id?: string | null             // 關聯手冊（未來）
+
+  // 行程表類型（互斥：選一種就不能用另一種）
+  itinerary_type?: 'simple' | 'timeline' | null  // simple=簡易行程表, timeline=時間軸
+  timeline_data?: TimelineItineraryData | null   // 時間軸資料
 
   // 需求確認追蹤
   confirmed_requirements?: ConfirmedRequirementsSnapshot | null

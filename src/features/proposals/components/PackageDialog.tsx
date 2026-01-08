@@ -306,9 +306,21 @@ export function PackageDialog({
             </label>
             <DatePicker
               value={formData.start_date}
-              onChange={date =>
-                setFormData(prev => ({ ...prev, start_date: date || '' }))
-              }
+              onChange={date => {
+                const startDate = date || ''
+                setFormData(prev => {
+                  // 如果回程日期早於新的出發日期，自動調整回程日期
+                  let endDate = prev.end_date
+                  if (startDate && endDate && endDate < startDate) {
+                    endDate = startDate
+                  }
+                  // 如果沒有回程日期，自動設為出發日期
+                  if (startDate && !endDate) {
+                    endDate = startDate
+                  }
+                  return { ...prev, start_date: startDate, end_date: endDate }
+                })
+              }}
               placeholder="選擇日期"
             />
           </div>
@@ -319,10 +331,17 @@ export function PackageDialog({
             </label>
             <DatePicker
               value={formData.end_date}
-              onChange={date =>
-                setFormData(prev => ({ ...prev, end_date: date || '' }))
-              }
+              onChange={date => {
+                const endDate = date || ''
+                // 確保回程日期不早於出發日期
+                if (formData.start_date && endDate && endDate < formData.start_date) {
+                  setFormData(prev => ({ ...prev, end_date: formData.start_date }))
+                } else {
+                  setFormData(prev => ({ ...prev, end_date: endDate }))
+                }
+              }}
               placeholder="選擇日期"
+              minDate={formData.start_date ? new Date(formData.start_date) : undefined}
             />
           </div>
         </div>

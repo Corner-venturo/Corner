@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus } from 'lucide-react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useAuthStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
 import { convertToTour } from '@/services/proposal.service'
@@ -33,21 +32,19 @@ export function ConvertToTourDialog({
   const { user } = useAuthStore()
 
   // 使用 tour_destinations 資料
-  const { destinations, countries, loading: destinationsLoading, addDestination } = useTourDestinations()
+  const { destinations, countries, loading: destinationsLoading } = useTourDestinations()
 
   const [tourName, setTourName] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('')
   const [airportCode, setAirportCode] = useState('')
   const [departureDate, setDepartureDate] = useState('')
-  const [contactPerson, setContactPerson] = useState('')
-  const [contactPhone, setContactPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
-  // 新增機場代碼
-  const [showAddAirport, setShowAddAirport] = useState(false)
-  const [newCity, setNewCity] = useState('')
-  const [newAirportCode, setNewAirportCode] = useState('')
+  // 訂單資訊（選填）
+  const [createOrder, setCreateOrder] = useState(true)
+  const [contactPerson, setContactPerson] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
 
   // 國家選項
   const countryOptions = useMemo(() =>
@@ -102,31 +99,6 @@ export function ConvertToTourDialog({
     if (initialized) {
       // 只有初始化後的使用者操作才清空
       setAirportCode('')
-      setShowAddAirport(false)
-    }
-  }
-
-  // 新增機場代碼
-  const handleAddAirport = async () => {
-    if (!selectedCountry || !newCity.trim() || !newAirportCode.trim()) {
-      await alert('請填寫城市名稱和機場代碼', 'warning')
-      return
-    }
-
-    if (!/^[A-Z]{3}$/.test(newAirportCode.trim().toUpperCase())) {
-      await alert('機場代碼必須是 3 個大寫英文字母', 'warning')
-      return
-    }
-
-    const result = await addDestination(selectedCountry, newCity.trim(), newAirportCode.trim())
-    if (result.success) {
-      setAirportCode(newAirportCode.trim().toUpperCase())
-      setNewCity('')
-      setNewAirportCode('')
-      setShowAddAirport(false)
-      await alert('已新增機場代碼', 'success')
-    } else {
-      await alert(result.error || '新增失敗', 'error')
     }
   }
 
@@ -151,7 +123,8 @@ export function ConvertToTourDialog({
       return
     }
 
-    if (!contactPerson.trim()) {
+    // 如果勾選建立訂單，則聯絡人為必填
+    if (createOrder && !contactPerson.trim()) {
       await alert('請輸入聯絡人', 'warning')
       return
     }
@@ -165,8 +138,9 @@ export function ConvertToTourDialog({
           city_code: airportCode,
           departure_date: departureDate,
           tour_name: tourName.trim(),
-          contact_person: contactPerson.trim(),
-          contact_phone: contactPhone.trim() || undefined,
+          // 只有勾選建立訂單時才傳入聯絡人資訊
+          contact_person: createOrder ? contactPerson.trim() : undefined,
+          contact_phone: createOrder && contactPhone.trim() ? contactPhone.trim() : undefined,
         },
         user.workspace_id,
         user.id
@@ -196,172 +170,151 @@ export function ConvertToTourDialog({
       onOpenChange={onOpenChange}
       title="轉開團"
       onSubmit={handleSubmit}
-      submitLabel="確認開團"
+      submitLabel={createOrder ? '確認開團並建立訂單' : '確認開團'}
       loading={submitting}
-      maxWidth="md"
+      maxWidth="lg"
       nested
     >
       <div className="space-y-4">
-        <div className="p-4 bg-morandi-container/30 rounded-lg">
-          <div className="text-sm text-morandi-secondary mb-2">即將轉開團的套件</div>
+        {/* 套件資訊 */}
+        <div className="p-3 bg-morandi-container/30 rounded-lg">
+          <div className="text-xs text-morandi-secondary mb-1">即將轉開團的套件</div>
           <div className="font-medium text-morandi-primary">{pkg?.version_name}</div>
           {pkg?.destination && (
-            <div className="text-sm text-morandi-secondary mt-1">
-              目的地：{pkg.destination}
-            </div>
+            <span className="text-sm text-morandi-secondary ml-2">
+              ({pkg.destination})
+            </span>
           )}
         </div>
 
-        {/* 團名 */}
-        <div>
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            團名 <span className="text-morandi-red">*</span>
-          </label>
-          <Input
-            value={tourName}
-            onChange={e => setTourName(e.target.value)}
-            placeholder="輸入團名..."
-          />
-          <p className="text-xs text-morandi-secondary mt-1">
-            此名稱將顯示在旅遊團列表中
-          </p>
-        </div>
+        {/* 左右兩欄 */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* 左欄：開團資訊 */}
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-morandi-gold border-b border-morandi-gold/30 pb-1">
+              開團資訊
+            </div>
 
-        {/* 聯絡人資訊 */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              聯絡人 <span className="text-morandi-red">*</span>
-            </label>
-            <Input
-              value={contactPerson}
-              onChange={e => setContactPerson(e.target.value)}
-              placeholder="輸入聯絡人姓名..."
-            />
+            {/* 團名 */}
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                團名 <span className="text-morandi-red">*</span>
+              </label>
+              <Input
+                value={tourName}
+                onChange={e => setTourName(e.target.value)}
+                placeholder="輸入團名..."
+              />
+            </div>
+
+            {/* 國家選擇 */}
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                國家 <span className="text-morandi-red">*</span>
+              </label>
+              <Combobox
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                options={countryOptions}
+                placeholder={destinationsLoading ? "載入中..." : "選擇國家..."}
+                showSearchIcon
+              />
+            </div>
+
+            {/* 機場代碼選擇 */}
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                機場代碼 <span className="text-morandi-red">*</span>
+              </label>
+              <Combobox
+                value={airportCode}
+                onChange={setAirportCode}
+                options={airportOptions}
+                placeholder={selectedCountry ? "選擇機場代碼..." : "請先選擇國家"}
+                disabled={!selectedCountry}
+                showSearchIcon
+                emptyMessage="尚無此國家的機場代碼"
+              />
+              <p className="text-xs text-morandi-secondary mt-1">
+                用於生成團號，例如：CNX250128A
+              </p>
+            </div>
+
+            {/* 出發日期 */}
+            <div>
+              <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                出發日期 <span className="text-morandi-red">*</span>
+              </label>
+              <DatePicker
+                value={departureDate}
+                onChange={date => setDepartureDate(date || '')}
+                placeholder="選擇出發日期"
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              聯絡電話
-            </label>
-            <Input
-              value={contactPhone}
-              onChange={e => setContactPhone(e.target.value)}
-              placeholder="輸入聯絡電話..."
-            />
-          </div>
-        </div>
 
-        {/* 國家選擇 */}
-        <div>
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            國家 <span className="text-morandi-red">*</span>
-          </label>
-          <Combobox
-            value={selectedCountry}
-            onChange={handleCountryChange}
-            options={countryOptions}
-            placeholder={destinationsLoading ? "載入中..." : "選擇國家..."}
-            showSearchIcon
-          />
-        </div>
-
-        {/* 機場代碼選擇 */}
-        <div>
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            機場代碼 (IATA) <span className="text-morandi-red">*</span>
-          </label>
-          <Combobox
-            value={airportCode}
-            onChange={setAirportCode}
-            options={airportOptions}
-            placeholder={selectedCountry ? "選擇機場代碼..." : "請先選擇國家"}
-            disabled={!selectedCountry}
-            showSearchIcon
-            emptyMessage={selectedCountry ? "尚無機場代碼，請點擊下方新增" : "請先選擇國家"}
-          />
-          <p className="text-xs text-morandi-secondary mt-1">
-            機場代碼將用於生成團號，例如：CNX250128A
-          </p>
-        </div>
-
-        {/* 新增機場代碼區塊 */}
-        {selectedCountry && (
-          <div className="border border-dashed border-border rounded-lg p-3">
-            {!showAddAirport ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAddAirport(true)}
-                className="w-full text-morandi-secondary hover:text-morandi-primary"
+          {/* 右欄：訂單資訊（選填） */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-border pb-1">
+              <Checkbox
+                id="create-order"
+                checked={createOrder}
+                onCheckedChange={(checked) => setCreateOrder(checked === true)}
+              />
+              <label
+                htmlFor="create-order"
+                className="text-sm font-medium text-morandi-primary cursor-pointer"
               >
-                <Plus size={16} className="mr-1" />
-                新增 {selectedCountry} 的機場代碼
-              </Button>
-            ) : (
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-morandi-primary">
-                  新增 {selectedCountry} 的機場代碼
-                </div>
-                <div className="grid grid-cols-2 gap-2">
+                同時建立訂單
+              </label>
+              <span className="text-xs text-morandi-secondary">（選填）</span>
+            </div>
+
+            {createOrder && (
+              <>
+                {/* 聯絡人 */}
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                    聯絡人 <span className="text-morandi-red">*</span>
+                  </label>
                   <Input
-                    placeholder="城市名稱（如：金澤）"
-                    value={newCity}
-                    onChange={e => setNewCity(e.target.value)}
-                  />
-                  <Input
-                    placeholder="機場代碼（如：KMQ）"
-                    value={newAirportCode}
-                    onChange={e => setNewAirportCode(e.target.value.toUpperCase())}
-                    maxLength={3}
+                    value={contactPerson}
+                    onChange={e => setContactPerson(e.target.value)}
+                    placeholder="輸入聯絡人姓名..."
                   />
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleAddAirport}
-                    className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
-                  >
-                    確認新增
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowAddAirport(false)
-                      setNewCity('')
-                      setNewAirportCode('')
-                    }}
-                  >
-                    取消
-                  </Button>
+
+                {/* 聯絡電話 */}
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary mb-1 block">
+                    聯絡電話
+                  </label>
+                  <Input
+                    value={contactPhone}
+                    onChange={e => setContactPhone(e.target.value)}
+                    placeholder="輸入聯絡電話..."
+                  />
                 </div>
+
+                <p className="text-xs text-morandi-secondary">
+                  訂單將自動關聯到此旅遊團
+                </p>
+              </>
+            )}
+
+            {!createOrder && (
+              <div className="text-sm text-morandi-secondary py-4 text-center">
+                不建立訂單，僅開團
               </div>
             )}
           </div>
-        )}
-
-        <div>
-          <label className="text-sm font-medium text-morandi-primary mb-2 block">
-            出發日期 <span className="text-morandi-red">*</span>
-          </label>
-          <DatePicker
-            value={departureDate}
-            onChange={date => setDepartureDate(date || '')}
-            placeholder="選擇出發日期"
-          />
         </div>
 
-        <div className="p-4 bg-status-warning-bg rounded-lg border border-status-warning/30">
-          <div className="text-sm font-medium text-status-warning mb-1">
-            注意事項
-          </div>
-          <ul className="text-sm text-morandi-secondary space-y-1">
-            <li>- 轉開團後，此提案將標記為「已轉團」狀態</li>
-            <li>- 套件關聯的報價單和行程表將自動綁定到新旅遊團</li>
-            <li>- 此操作無法撤銷，請確認資訊正確後再執行</li>
+        {/* 注意事項 */}
+        <div className="p-3 bg-status-warning-bg rounded-lg border border-status-warning/30 text-sm">
+          <ul className="text-morandi-secondary space-y-0.5">
+            <li>• 轉開團後，此提案將標記為「已轉團」</li>
+            <li>• 套件關聯的報價單和行程表將自動綁定</li>
           </ul>
         </div>
       </div>
