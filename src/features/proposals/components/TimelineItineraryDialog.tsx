@@ -177,8 +177,36 @@ export function TimelineItineraryDialog({
     []
   )
 
-  // 處理圖片上傳（最多 3 張）
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  // 壓縮圖片
+  const compressImage = useCallback((file: File, maxWidth = 800): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', 0.7))
+        }
+        img.src = e.target?.result as string
+      }
+      reader.readAsDataURL(file)
+    })
+  }, [])
+
+  // 處理圖片上傳（最多 3 張，自動壓縮）
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || !uploadTarget) return
 
@@ -196,36 +224,32 @@ export function TimelineItineraryDialog({
 
     // 只取剩餘可上傳的數量
     const filesToUpload = Array.from(files).slice(0, remaining)
+    const targetDayId = uploadTarget.dayId
+    const targetAttractionId = uploadTarget.attractionId
 
-    filesToUpload.forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
-        if (dataUrl) {
-          setData((prev) => ({
-            ...prev,
-            days: prev.days.map((day) =>
-              day.id === uploadTarget.dayId
-                ? {
-                    ...day,
-                    attractions: day.attractions.map((a) =>
-                      a.id === uploadTarget.attractionId && a.images.length < 3
-                        ? { ...a, images: [...a.images, { id: generateId(), url: dataUrl }] }
-                        : a
-                    ),
-                  }
-                : day
-            ),
-          }))
-        }
-      }
-      reader.readAsDataURL(file)
-    })
+    for (const file of filesToUpload) {
+      const compressedUrl = await compressImage(file)
+      setData((prev) => ({
+        ...prev,
+        days: prev.days.map((day) =>
+          day.id === targetDayId
+            ? {
+                ...day,
+                attractions: day.attractions.map((a) =>
+                  a.id === targetAttractionId && a.images.length < 3
+                    ? { ...a, images: [...a.images, { id: generateId(), url: compressedUrl }] }
+                    : a
+                ),
+              }
+            : day
+        ),
+      }))
+    }
 
     // Reset
     e.target.value = ''
     setUploadTarget(null)
-  }, [uploadTarget, data.days])
+  }, [uploadTarget, data.days, compressImage])
 
   // 觸發圖片上傳
   const triggerImageUpload = useCallback((dayId: string, attractionId: string) => {
@@ -337,7 +361,7 @@ export function TimelineItineraryDialog({
 
           {/* 每日行程表格 */}
           {data.days.map((day) => (
-            <div key={day.id} className="mb-6">
+            <div key={day.id} className="mb-6 shrink-0">
               {/* Day 標題 */}
               <div className="flex items-center gap-3 mb-2 px-2">
                 <div className="flex items-center gap-2 shrink-0">
@@ -367,7 +391,7 @@ export function TimelineItineraryDialog({
               </div>
 
               {/* 景點列表 */}
-              <div className="space-y-1">
+              <div className="space-y-1 shrink-0">
                 {day.attractions.map((attraction) => (
                   <div key={attraction.id} className="hover:bg-morandi-container/10 rounded px-1 py-1">
                     {/* 主要行：時間 + 名稱 + 餐食按鈕 + 照片 + 刪除 */}

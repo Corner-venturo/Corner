@@ -1,3 +1,7 @@
+/**
+ * @deprecated 建議使用 useState 或 useManagedDialogState 代替
+ * 此 hook 僅保留供 ToursPage 使用，不建議新功能使用
+ */
 import { useState, useCallback } from 'react'
 
 interface DialogState<T = unknown> {

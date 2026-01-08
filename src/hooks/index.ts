@@ -11,11 +11,10 @@
 
 // 通用 Hooks
 export { usePermissions } from './usePermissions'
-export { useDialog } from './useDialog'
+export { useDialog } from './useDialog' // @deprecated - 使用 useManagedDialogState
 export { useEnterSubmit } from './useEnterSubmit'
 export { useCrudOperations } from './useCrudOperations'
 export { useDataFiltering } from './useDataFiltering'
-export { useDialogState } from './useDialogState'
 export { useListPageState } from './useListPageState'
 
 // Dialog 生命週期管理 Hooks
