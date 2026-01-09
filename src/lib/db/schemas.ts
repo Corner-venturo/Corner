@@ -58,6 +58,10 @@ export const TABLES = {
   LINKPAY_LOGS: 'linkpay_logs',
   VENDOR_COSTS: 'vendor_costs',
   TOUR_LEADERS: 'tour_leaders',
+  // 車隊調度系統
+  FLEET_VEHICLES: 'fleet_vehicles',
+  FLEET_SCHEDULES: 'fleet_schedules',
+  LEADER_SCHEDULES: 'leader_schedules',
   // 會計系統
   ACCOUNTING_SUBJECTS: 'accounting_subjects',
   VOUCHERS: 'vouchers',

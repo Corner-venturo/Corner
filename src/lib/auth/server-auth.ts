@@ -80,19 +80,52 @@ export async function getServerAuth(): Promise<AuthResult> {
 
     // 如果還是找不到，用 email 查（最後的備用方案）
     if (!employee && user.email) {
+      // 方案 A: 用個人 email 查
       const { data: emp3 } = await adminClient
         .from('employees')
         .select('id, workspace_id, supabase_user_id')
         .eq('personal_info->>email', user.email)
         .single()
 
-      // 如果用 email 找到了，自動更新 supabase_user_id
       if (emp3) {
+        employee = emp3
+      } else {
+        // 方案 B: 解析 auth email 格式 ({workspace}_{employee_number}@venturo.com 或 {employee_number}@venturo.com)
+        const emailMatch = user.email.match(/^(?:([A-Z]+)_)?([A-Z]\d+)@venturo\.com$/i)
+        if (emailMatch) {
+          const [, workspaceCode, employeeNumber] = emailMatch
+
+          let query = adminClient
+            .from('employees')
+            .select('id, workspace_id, supabase_user_id')
+            .eq('employee_number', employeeNumber.toUpperCase())
+
+          // 如果有 workspace code，加入 workspace 過濾
+          if (workspaceCode) {
+            const { data: workspace } = await adminClient
+              .from('workspaces')
+              .select('id')
+              .eq('code', workspaceCode.toUpperCase())
+              .single()
+
+            if (workspace) {
+              query = query.eq('workspace_id', workspace.id)
+            }
+          }
+
+          const { data: emp4 } = await query.single()
+          if (emp4) {
+            employee = emp4
+          }
+        }
+      }
+
+      // 如果找到了，自動更新 supabase_user_id
+      if (employee) {
         await adminClient
           .from('employees')
           .update({ supabase_user_id: user.id })
-          .eq('id', emp3.id)
-        employee = emp3
+          .eq('id', employee.id)
       }
     }
 

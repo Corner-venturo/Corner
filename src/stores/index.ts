@@ -240,6 +240,33 @@ export const useTourLeaderStore = createStore<import('@/types/tour-leader.types'
   workspaceScoped: false,
 })
 
+/**
+ * 車隊車輛 Store
+ * 🔒 啟用 Workspace 隔離
+ */
+export const useFleetVehicleStore = createStore<import('@/types/fleet.types').FleetVehicle>({
+  tableName: 'fleet_vehicles',
+  workspaceScoped: true,
+})
+
+/**
+ * 車輛調度 Store
+ * 🔒 啟用 Workspace 隔離
+ */
+export const useFleetScheduleStore = createStore<import('@/types/fleet.types').FleetSchedule>({
+  tableName: 'fleet_schedules',
+  workspaceScoped: true,
+})
+
+/**
+ * 領隊調度 Store
+ * 🔒 啟用 Workspace 隔離
+ */
+export const useLeaderScheduleStore = createStore<import('@/types/fleet.types').LeaderSchedule>({
+  tableName: 'leader_schedules',
+  workspaceScoped: true,
+})
+
 // 供應商類別 Store
 export { useSupplierCategoryStore } from './supplier-category-store'
 

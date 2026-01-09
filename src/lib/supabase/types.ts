@@ -3508,6 +3508,137 @@ export type Database = {
           },
         ]
       }
+      fleet_schedules: {
+        Row: {
+          client_name: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          end_date: string
+          id: string
+          notes: string | null
+          start_date: string
+          status: string
+          tour_code: string | null
+          tour_name: string | null
+          updated_at: string | null
+          vehicle_id: string
+          workspace_id: string
+        }
+        Insert: {
+          client_name?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          end_date: string
+          id?: string
+          notes?: string | null
+          start_date: string
+          status?: string
+          tour_code?: string | null
+          tour_name?: string | null
+          updated_at?: string | null
+          vehicle_id: string
+          workspace_id: string
+        }
+        Update: {
+          client_name?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          end_date?: string
+          id?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          tour_code?: string | null
+          tour_name?: string | null
+          updated_at?: string | null
+          vehicle_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_schedules_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_schedules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_vehicles: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          display_order: number | null
+          driver_name: string | null
+          driver_phone: string | null
+          id: string
+          license_plate: string
+          notes: string | null
+          status: string
+          updated_at: string | null
+          vehicle_name: string | null
+          vehicle_type: string
+          workspace_id: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate: string
+          notes?: string | null
+          status?: string
+          updated_at?: string | null
+          vehicle_name?: string | null
+          vehicle_type?: string
+          workspace_id: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          display_order?: number | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string | null
+          vehicle_name?: string | null
+          vehicle_type?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_vehicles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flight_status_subscriptions: {
         Row: {
           airline_code: string
@@ -4502,6 +4633,86 @@ export type Database = {
           },
           {
             foreignKeyName: "journal_vouchers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leader_schedules: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          destination: string | null
+          end_date: string
+          id: string
+          leader_id: string
+          notes: string | null
+          start_date: string
+          status: string
+          tour_code: string | null
+          tour_id: string | null
+          tour_name: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          destination?: string | null
+          end_date: string
+          id?: string
+          leader_id: string
+          notes?: string | null
+          start_date: string
+          status?: string
+          tour_code?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          destination?: string | null
+          end_date?: string
+          id?: string
+          leader_id?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          tour_code?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leader_schedules_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "tour_leaders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -9476,6 +9687,7 @@ export type Database = {
           currency: string | null
           display_order: number | null
           email: string | null
+          fax: string | null
           id: string
           is_active: boolean | null
           is_preferred: boolean | null
@@ -9517,6 +9729,7 @@ export type Database = {
           currency?: string | null
           display_order?: number | null
           email?: string | null
+          fax?: string | null
           id: string
           is_active?: boolean | null
           is_preferred?: boolean | null
@@ -9558,6 +9771,7 @@ export type Database = {
           currency?: string | null
           display_order?: number | null
           email?: string | null
+          fax?: string | null
           id?: string
           is_active?: boolean | null
           is_preferred?: boolean | null
@@ -14463,6 +14677,102 @@ export type Database = {
       }
     }
     Views: {
+      fleet_schedules_with_vehicle: {
+        Row: {
+          capacity: number | null
+          client_name: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          effective_driver_name: string | null
+          effective_driver_phone: string | null
+          end_date: string | null
+          id: string | null
+          license_plate: string | null
+          notes: string | null
+          start_date: string | null
+          status: string | null
+          tour_code: string | null
+          tour_name: string | null
+          updated_at: string | null
+          vehicle_id: string | null
+          vehicle_name: string | null
+          vehicle_type: string | null
+          workspace_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_schedules_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_schedules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leader_schedules_with_leader: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          destination: string | null
+          end_date: string | null
+          id: string | null
+          languages: string[] | null
+          leader_id: string | null
+          leader_name: string | null
+          leader_name_en: string | null
+          leader_phone: string | null
+          notes: string | null
+          specialties: string[] | null
+          start_date: string | null
+          status: string | null
+          tour_code: string | null
+          tour_id: string | null
+          tour_name: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leader_schedules_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "tour_leaders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_schedules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       my_erp_tours: {
         Row: {
           chinese_name: string | null
@@ -14642,9 +14952,27 @@ export type Database = {
         Args: { target_workspace_id: string }
         Returns: boolean
       }
+      check_leader_schedule_conflict: {
+        Args: {
+          p_end_date: string
+          p_exclude_id?: string
+          p_leader_id: string
+          p_start_date: string
+        }
+        Returns: boolean
+      }
       check_my_tours_updates: {
         Args: { p_last_synced_at?: string }
         Returns: Json
+      }
+      check_vehicle_schedule_conflict: {
+        Args: {
+          p_end_date: string
+          p_exclude_id?: string
+          p_start_date: string
+          p_vehicle_id: string
+        }
+        Returns: boolean
       }
       confirm_quote_by_customer: {
         Args: {

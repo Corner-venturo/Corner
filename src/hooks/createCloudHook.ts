@@ -222,7 +222,8 @@ export function createCloudHook<T extends BaseEntity>(
         // 每次重試都重新查詢並生成 code
         if (needsCodeGeneration) {
           // 從資料庫查詢最大 code，確保唯一性
-          const { data: maxCodeResults } = await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: maxCodeResults } = await (supabase as any)
             .from(tableName)
             .select('code')
             .like('code', `${codePrefix}%`)

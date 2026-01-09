@@ -80,6 +80,7 @@ const menuItems: MenuItem[] = [
       { href: '/database/transportation-rates', label: '車資管理', icon: Bus, requiredPermission: 'database' },
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
       { href: '/database/tour-leaders', label: '領隊資料', icon: Users, requiredPermission: 'database' },
+      { href: '/database/fleet', label: '車隊管理', icon: Bus, requiredPermission: 'database' },
       { href: '/database/company-assets', label: '公司資源管理', icon: ImageIcon, requiredPermission: 'database' },
       { href: '/database/archive-management', label: '封存管理', icon: Archive, requiredPermission: 'database' },
     ],
