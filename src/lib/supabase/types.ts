@@ -11495,7 +11495,7 @@ export type Database = {
           closing_date: string | null
           closing_status: string | null
           code: string
-          controller_id: string | null
+          confirmed_requirements: Json | null
           contract_archived_date: string | null
           contract_completed: boolean | null
           contract_content: string | null
@@ -11503,6 +11503,7 @@ export type Database = {
           contract_notes: string | null
           contract_status: string
           contract_template: string | null
+          controller_id: string | null
           converted_from_proposal: boolean | null
           country_id: string | null
           created_at: string | null
@@ -11555,7 +11556,7 @@ export type Database = {
           closing_date?: string | null
           closing_status?: string | null
           code: string
-          controller_id?: string | null
+          confirmed_requirements?: Json | null
           contract_archived_date?: string | null
           contract_completed?: boolean | null
           contract_content?: string | null
@@ -11563,6 +11564,7 @@ export type Database = {
           contract_notes?: string | null
           contract_status?: string
           contract_template?: string | null
+          controller_id?: string | null
           converted_from_proposal?: boolean | null
           country_id?: string | null
           created_at?: string | null
@@ -11615,7 +11617,7 @@ export type Database = {
           closing_date?: string | null
           closing_status?: string | null
           code?: string
-          controller_id?: string | null
+          confirmed_requirements?: Json | null
           contract_archived_date?: string | null
           contract_completed?: boolean | null
           contract_content?: string | null
@@ -11623,6 +11625,7 @@ export type Database = {
           contract_notes?: string | null
           contract_status?: string
           contract_template?: string | null
+          controller_id?: string | null
           converted_from_proposal?: boolean | null
           country_id?: string | null
           created_at?: string | null
@@ -11668,6 +11671,13 @@ export type Database = {
           {
             foreignKeyName: "tours_closed_by_fkey"
             columns: ["closed_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_controller_id_fkey"
+            columns: ["controller_id"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]

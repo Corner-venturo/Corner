@@ -80,13 +80,13 @@ export function LinkDocumentsToTourDialog({
       fetchQuotes()
       fetchProposalPackages()
     }
-  }, [isOpen, fetchQuotes, fetchProposalPackages])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   // 取得 tour 關聯的 proposal_package（透過 proposal_package_id）
   const tourProposalPackage = useMemo(() => {
-    const tourWithPackage = tour as Tour & { proposal_package_id?: string }
-    if (!tourWithPackage.proposal_package_id) return null
-    return proposalPackages.find(p => p.id === tourWithPackage.proposal_package_id) || null
+    if (!tour.proposal_package_id) return null
+    return proposalPackages.find(p => p.id === tour.proposal_package_id) || null
   }, [tour, proposalPackages])
 
   // 檢查行程表類型
@@ -199,17 +199,9 @@ export function LinkDocumentsToTourDialog({
     router.push(`/quotes/${quote.id}`)
   }
 
-  // 開啟快速行程表對話框
-  const handleOpenTimelineDialog = () => {
+  // 開啟行程表對話框
+  const handleOpenItineraryDialog = () => {
     setTimelineDialogOpen(true)
-  }
-
-  // 開啟簡易行程表（跳轉到行程編輯頁面）
-  const handleOpenSimpleItinerary = () => {
-    if (tourProposalPackage?.itinerary_id) {
-      onClose()
-      router.push(`/itinerary/new?itinerary_id=${tourProposalPackage.itinerary_id}`)
-    }
   }
 
   // 關閉行程表對話框
@@ -249,7 +241,7 @@ export function LinkDocumentsToTourDialog({
       {/* 主對話框 */}
       {mainDialogOpen && (
         <Dialog open={mainDialogOpen} onOpenChange={open => !open && onClose()} modal={true}>
-          <DialogContent className="max-w-6xl max-h-[85vh] flex flex-col overflow-hidden">
+          <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle>管理文件</DialogTitle>
               <DialogDescription>
@@ -258,209 +250,171 @@ export function LinkDocumentsToTourDialog({
             </DialogHeader>
 
             <div className="grid grid-cols-3 gap-4 mt-4 flex-1 min-h-0 overflow-hidden">
-              {/* ========== 左邊：行程表 ========== */}
-              <div className="flex flex-col overflow-hidden min-h-0">
-                <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
-                  <FileText className="w-5 h-5 text-morandi-primary" />
-                  <span className="font-medium text-morandi-primary">行程表</span>
+              {/* ========== 行程 ========== */}
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+                <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-morandi-gold" />
+                    <span className="font-medium text-sm text-morandi-primary">行程</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onClose()
+                      router.push(`/itinerary/new?tour_id=${tour.id}`)
+                    }}
+                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+                    title="新增行程表"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
                 </div>
-
-                {hasTimelineData ? (
-                  // 快速行程表（Timeline）
-                  <div className="mt-3">
+                <div className="flex-1 overflow-auto mt-2">
+                  {hasTimelineData ? (
                     <button
-                      onClick={handleOpenTimelineDialog}
-                      className="w-full flex items-center gap-2 p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 transition-colors text-left"
+                      onClick={handleOpenItineraryDialog}
+                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
                     >
-                      <div className="w-6 h-6 rounded bg-morandi-gold/20 flex items-center justify-center shrink-0">
-                        <Eye className="w-3.5 h-3.5 text-morandi-gold" />
-                      </div>
+                      <Eye className="w-3.5 h-3.5 text-morandi-gold" />
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-morandi-gold text-xs">查看/編輯行程表</div>
-                        <div className="text-[10px] text-morandi-secondary mt-0.5">
-                          快速行程表 · {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
+                        <div className="text-xs text-morandi-primary">快速行程表</div>
+                        <div className="text-[10px] text-morandi-secondary">
+                          {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
                         </div>
                       </div>
-                      <ExternalLink className="w-4 h-4 text-morandi-gold/60" />
                     </button>
-                  </div>
-                ) : hasSimpleItinerary ? (
-                  // 簡易行程表（連結到行程表系統）
-                  <div className="mt-3">
-                    <button
-                      onClick={handleOpenSimpleItinerary}
-                      className="w-full flex items-center gap-2 p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 transition-colors text-left"
-                    >
-                      <div className="w-6 h-6 rounded bg-morandi-gold/20 flex items-center justify-center shrink-0">
-                        <Eye className="w-3.5 h-3.5 text-morandi-gold" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-morandi-gold text-xs">查看/編輯行程表</div>
-                        <div className="text-[10px] text-morandi-secondary mt-0.5">
-                          網頁行程表
-                        </div>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-morandi-gold/60" />
-                    </button>
-                  </div>
-                ) : (
-                  // 尚未建立行程表
-                  <div className="flex-1 flex items-center justify-center mt-3">
-                    <div className="text-center py-4 text-morandi-secondary text-[10px]">
-                      尚未建立行程表
+                  ) : hasSimpleItinerary ? (
+                    <div className="flex items-center gap-2 p-2 text-xs text-morandi-primary">
+                      <FileText className="w-3.5 h-3.5 text-morandi-gold" />
+                      網頁行程表
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-xs text-morandi-secondary text-center py-4">
+                      尚未建立
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* ========== 中間：團體報價單 ========== */}
-              <div className="flex flex-col overflow-hidden min-h-0">
-                <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
-                  <Calculator className="w-5 h-5 text-morandi-gold" />
-                  <span className="font-medium text-morandi-primary">團體報價單</span>
-                </div>
-
-                {/* 建立新團體報價單 */}
-                <button
-                  onClick={handleCreateStandardQuote}
-                  disabled={isCreatingStandardQuote}
-                  className="w-full flex items-center gap-2 p-2 mt-3 rounded-lg border border-dashed border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 hover:border-morandi-gold/50 transition-colors text-left disabled:opacity-50 flex-shrink-0"
-                >
-                  <div className="w-6 h-6 rounded bg-morandi-gold/20 flex items-center justify-center shrink-0">
+              {/* ========== 報價 ========== */}
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+                <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-morandi-gold" />
+                    <span className="font-medium text-sm text-morandi-primary">報價</span>
+                  </div>
+                  <button
+                    onClick={handleCreateStandardQuote}
+                    disabled={isCreatingStandardQuote}
+                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
+                    title="新增報價單"
+                  >
                     {isCreatingStandardQuote ? (
-                      <Loader2 className="w-3.5 h-3.5 text-morandi-gold animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <Plus className="w-3.5 h-3.5 text-morandi-gold" />
+                      <Plus className="w-4 h-4" />
                     )}
-                  </div>
-                  <span className="font-medium text-morandi-gold text-xs">建立團體報價單</span>
-                </button>
-
-                {/* 已關聯的團體報價單 */}
-                {linkedStandardQuotes.length > 0 && (
-                  <div className="flex-shrink-0 mt-3">
-                    <div className="text-xs font-medium text-morandi-secondary mb-1.5">已建立</div>
-                    <div className="space-y-1">
-                      {linkedStandardQuotes.map(quote => (
-                        <div
-                          key={quote.id}
-                          className="flex items-center justify-between p-1.5 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 text-xs"
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto mt-2 space-y-1">
+                  {linkedStandardQuotes.length > 0 ? (
+                    linkedStandardQuotes.map(quote => (
+                      <div
+                        key={quote.id}
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-morandi-gold/5 text-xs"
+                      >
+                        <button
+                          onClick={() => handleViewQuote(quote)}
+                          className="flex-1 min-w-0 text-left"
                         >
+                          <div className="font-mono text-morandi-gold">{quote.code}</div>
+                          <div className="text-morandi-secondary truncate text-[10px]">
+                            {stripHtml(quote.name) || '未命名'}
+                          </div>
+                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => handleViewQuote(quote)}
-                            className="flex-1 min-w-0 text-left hover:opacity-80"
+                            className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
                           >
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[10px] text-morandi-gold">{quote.code}</span>
-                              <span className="text-morandi-text truncate">{stripHtml(quote.name) || '未命名'}</span>
-                            </div>
+                            <ExternalLink className="w-3 h-3" />
                           </button>
-                          <div className="flex items-center gap-0.5 shrink-0 ml-1">
-                            <button
-                              onClick={() => handleViewQuote(quote)}
-                              className="p-0.5 text-morandi-secondary hover:text-morandi-primary rounded"
-                              title="查看"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={(e) => handleUnlinkQuote(e, quote)}
-                              disabled={isUnlinkingQuote}
-                              className="p-0.5 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
-                              title="移除"
-                            >
-                              <Unlink className="w-3 h-3" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={(e) => handleUnlinkQuote(e, quote)}
+                            disabled={isUnlinkingQuote}
+                            className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </button>
                         </div>
-                      ))}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-morandi-secondary text-center py-4">
+                      尚未建立
                     </div>
-                  </div>
-                )}
-
-                {/* 空白狀態 */}
-                {linkedStandardQuotes.length === 0 && (
-                  <div className="flex-1 flex items-center justify-center mt-3">
-                    <div className="text-center py-4 text-morandi-secondary text-[10px]">
-                      尚未建立團體報價單
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              {/* ========== 右邊：快速報價單 ========== */}
-              <div className="flex flex-col overflow-hidden min-h-0">
-                <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
-                  <Calculator className="w-5 h-5 text-morandi-primary" />
-                  <span className="font-medium text-morandi-primary">快速報價單</span>
-                </div>
-
-                {/* 建立新快速報價單 */}
-                <button
-                  onClick={handleCreateQuickQuote}
-                  disabled={isCreatingQuickQuote}
-                  className="w-full flex items-center gap-2 p-2 mt-3 rounded-lg border border-dashed border-morandi-primary/30 bg-morandi-primary/5 hover:bg-morandi-primary/10 hover:border-morandi-primary/50 transition-colors text-left disabled:opacity-50 flex-shrink-0"
-                >
-                  <div className="w-6 h-6 rounded bg-morandi-primary/20 flex items-center justify-center shrink-0">
-                    {isCreatingQuickQuote ? (
-                      <Loader2 className="w-3.5 h-3.5 text-morandi-primary animate-spin" />
-                    ) : (
-                      <Plus className="w-3.5 h-3.5 text-morandi-primary" />
-                    )}
+              {/* ========== 快速報價單 ========== */}
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+                <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-morandi-primary" />
+                    <span className="font-medium text-sm text-morandi-primary">快速報價單</span>
                   </div>
-                  <span className="font-medium text-morandi-primary text-xs">建立快速報價單</span>
-                </button>
-
-                {/* 已關聯的快速報價單 */}
-                {linkedQuickQuotes.length > 0 && (
-                  <div className="flex-shrink-0 mt-3">
-                    <div className="text-xs font-medium text-morandi-secondary mb-1.5">已建立</div>
-                    <div className="space-y-1">
-                      {linkedQuickQuotes.map(quote => (
-                        <div
-                          key={quote.id}
-                          className="flex items-center justify-between p-1.5 rounded-lg border border-morandi-primary/30 bg-morandi-primary/5 text-xs"
+                  <button
+                    onClick={handleCreateQuickQuote}
+                    disabled={isCreatingQuickQuote}
+                    className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors disabled:opacity-50"
+                    title="新增快速報價單"
+                  >
+                    {isCreatingQuickQuote ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto mt-2 space-y-1">
+                  {linkedQuickQuotes.length > 0 ? (
+                    linkedQuickQuotes.map(quote => (
+                      <div
+                        key={quote.id}
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-morandi-primary/5 text-xs"
+                      >
+                        <button
+                          onClick={() => handleViewQuote(quote)}
+                          className="flex-1 min-w-0 text-left"
                         >
+                          <div className="font-mono text-morandi-primary">{quote.code}</div>
+                          <div className="text-morandi-secondary truncate text-[10px]">
+                            {stripHtml(quote.name) || '未命名'}
+                          </div>
+                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => handleViewQuote(quote)}
-                            className="flex-1 min-w-0 text-left hover:opacity-80"
+                            className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
                           >
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[10px] text-morandi-primary">{quote.code}</span>
-                              <span className="text-morandi-text truncate">{stripHtml(quote.name) || '未命名'}</span>
-                            </div>
+                            <ExternalLink className="w-3 h-3" />
                           </button>
-                          <div className="flex items-center gap-0.5 shrink-0 ml-1">
-                            <button
-                              onClick={() => handleViewQuote(quote)}
-                              className="p-0.5 text-morandi-secondary hover:text-morandi-primary rounded"
-                              title="查看"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={(e) => handleUnlinkQuote(e, quote)}
-                              disabled={isUnlinkingQuote}
-                              className="p-0.5 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
-                              title="移除"
-                            >
-                              <Unlink className="w-3 h-3" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={(e) => handleUnlinkQuote(e, quote)}
+                            disabled={isUnlinkingQuote}
+                            className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
+                          >
+                            <Unlink className="w-3 h-3" />
+                          </button>
                         </div>
-                      ))}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-morandi-secondary text-center py-4">
+                      尚未建立
                     </div>
-                  </div>
-                )}
-
-                {/* 空白狀態 */}
-                {linkedQuickQuotes.length === 0 && (
-                  <div className="flex-1 flex items-center justify-center mt-3">
-                    <div className="text-center py-4 text-morandi-secondary text-[10px]">
-                      尚未建立快速報價單
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </DialogContent>

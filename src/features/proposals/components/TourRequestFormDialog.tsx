@@ -35,6 +35,7 @@ import { useAuthStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
+import type { Tour } from '@/stores/types'
 
 // 供應商資料類型（從 SupplierSearchInput 選取）
 interface SelectedSupplier {
@@ -75,8 +76,11 @@ const CATEGORY_NAMES: Record<string, string> = {
 interface TourRequestFormDialogProps {
   isOpen: boolean
   onClose: () => void
-  pkg: ProposalPackage | null
-  proposal: Proposal | null
+  // 提案套件模式
+  pkg?: ProposalPackage | null
+  proposal?: Proposal | null
+  // 旅遊團模式
+  tour?: Tour | null
   // 從需求確認單傳入的資料
   category: string
   supplierName: string

@@ -35,6 +35,7 @@ export interface Tour extends BaseEntity {
   features?: unknown // 行程特色（用於展示頁面，對應 Supabase Json）
   quote_id?: string | null // 關聯的報價單ID
   quote_cost_structure?: unknown // 報價成本結構快照（對應 Supabase Json）
+  proposal_package_id?: string | null // 關聯的提案套件 ID（來源提案）
 
   // 合約相關欄位
   contract_template?: string | null // 合約範本

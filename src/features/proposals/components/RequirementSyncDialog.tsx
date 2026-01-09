@@ -6,6 +6,10 @@
  * 2. 比對現有需求單，顯示 diff
  * 3. 綠色=新增，紅色刪除線=移除
  * 4. 點「同步」才真正更新
+ *
+ * 支援兩種模式：
+ * - ProposalPackage 模式：提案階段使用
+ * - Tour 模式：開團後使用（資料來源相同，都是從 quote_id 讀取）
  */
 
 'use client'
@@ -33,9 +37,11 @@ import {
 } from 'lucide-react'
 import { TourRequestFormDialog } from './TourRequestFormDialog'
 import { supabase } from '@/lib/supabase/client'
+import type { Json } from '@/lib/supabase/types'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuthStore } from '@/stores'
 import type { ProposalPackage, Proposal, ConfirmedRequirementItem, ConfirmedRequirementsSnapshot } from '@/types/proposal.types'
+import type { Tour } from '@/stores/types'
 import type { CostCategory } from '@/features/quotes/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Printer } from 'lucide-react'
@@ -43,8 +49,11 @@ import { Printer } from 'lucide-react'
 interface RequirementSyncDialogProps {
   isOpen: boolean
   onClose: () => void
-  pkg: ProposalPackage | null
-  proposal: Proposal | null
+  // 提案套件模式
+  pkg?: ProposalPackage | null
+  proposal?: Proposal | null
+  // 旅遊團模式
+  tour?: Tour | null
   onSyncComplete?: () => void
 }
 
@@ -126,6 +135,7 @@ export function RequirementSyncDialog({
   onClose,
   pkg,
   proposal,
+  tour,
   onSyncComplete,
 }: RequirementSyncDialogProps) {
   const { toast } = useToast()
@@ -154,34 +164,81 @@ export function RequirementSyncDialog({
     items: { id?: string; serviceDate: string | null; title: string; quantity: number; note?: string }[]
   } | null>(null)
 
+  // 判斷模式：Tour 模式 或 ProposalPackage 模式
+  const mode = tour ? 'tour' : 'package'
+
+  // 統一資料來源
+  const source = useMemo(() => {
+    if (tour) {
+      return {
+        id: tour.id,
+        quoteId: tour.quote_id || tour.locked_quote_id || null,
+        itineraryId: tour.locked_itinerary_id || null,
+        startDate: tour.departure_date || null,
+        code: tour.code,
+        title: tour.name,
+        groupSize: tour.current_participants || tour.max_participants || null,
+        workspaceId: tour.workspace_id || user?.workspace_id || '',
+        // Tour 模式：航班從 tour 直接取
+        outboundFlight: tour.outbound_flight as FlightInfo | null,
+        returnFlight: tour.return_flight as FlightInfo | null,
+      }
+    }
+    if (pkg) {
+      return {
+        id: pkg.id,
+        quoteId: pkg.quote_id || null,
+        itineraryId: pkg.itinerary_id || null,
+        startDate: pkg.start_date || null,
+        code: proposal?.code || '',
+        title: proposal?.title || '',
+        groupSize: proposal?.group_size || null,
+        workspaceId: proposal?.workspace_id || user?.workspace_id || '',
+        outboundFlight: null as FlightInfo | null,
+        returnFlight: null as FlightInfo | null,
+      }
+    }
+    return null
+  }, [tour, pkg, proposal, user])
+
   // 載入資料
   useEffect(() => {
-    if (!isOpen || !pkg) return
+    if (!isOpen || !source) return
 
     const loadData = async () => {
       setLoading(true)
 
       try {
         // 1. 載入報價單的 categories
-        if (pkg.quote_id) {
+        if (source.quoteId) {
           const { data: quote } = await supabase
             .from('quotes')
             .select('categories, start_date')
-            .eq('id', pkg.quote_id)
+            .eq('id', source.quoteId)
             .single()
 
           if (quote) {
             setQuoteCategories((quote.categories as unknown as CostCategory[]) || [])
-            setStartDate(quote.start_date || pkg.start_date || null)
+            setStartDate(quote.start_date || source.startDate || null)
           }
+        } else {
+          // 沒有報價單時重設
+          setQuoteCategories([])
+          setStartDate(source.startDate)
         }
 
         // 1.5 載入行程表的航班資訊和每日行程（餐食、住宿）
-        if (pkg.itinerary_id) {
+        // Tour 模式：航班從 tour 直接取；Package 模式：從行程表取
+        if (mode === 'tour' && source.outboundFlight) {
+          setOutboundFlight(source.outboundFlight)
+          setReturnFlight(source.returnFlight)
+        }
+
+        if (source.itineraryId) {
           const { data: itinerary } = await supabase
             .from('itineraries')
             .select('outbound_flight, return_flight, daily_itinerary, departure_date')
-            .eq('id', pkg.itinerary_id)
+            .eq('id', source.itineraryId)
             .single()
 
           if (itinerary) {
@@ -191,39 +248,64 @@ export function RequirementSyncDialog({
               daily_itinerary: DailyItineraryDayData[] | null
               departure_date: string | null
             }
-            setOutboundFlight(itineraryData.outbound_flight)
-            setReturnFlight(itineraryData.return_flight)
+            // 如果 tour 沒有航班資訊，從行程表取
+            if (!source.outboundFlight) {
+              setOutboundFlight(itineraryData.outbound_flight)
+              setReturnFlight(itineraryData.return_flight)
+            }
             setDailyItinerary(itineraryData.daily_itinerary || [])
             // 優先使用行程表的出發日期
             if (itineraryData.departure_date) {
               setStartDate(itineraryData.departure_date)
             }
           }
+        } else {
+          setDailyItinerary([])
         }
 
         // 2. 載入已建立的需求單
-        const { data: requests } = await supabase
-          .from('tour_requests')
-          .select('id, category, supplier_name, title, service_date, quantity, note')
-          .eq('proposal_package_id', pkg.id)
-          .order('created_at', { ascending: true })
-
-        if (requests) {
-          setExistingRequests(requests as TourRequest[])
+        // Tour 模式：用 tour_id；Package 模式：用 proposal_package_id
+        if (mode === 'tour') {
+          const { data: requests } = await supabase
+            .from('tour_requests')
+            .select('id, category, supplier_name, title, service_date, quantity, note')
+            .eq('tour_id', source.id)
+            .order('created_at', { ascending: true })
+          setExistingRequests((requests as TourRequest[]) || [])
+        } else {
+          const { data: requests } = await supabase
+            .from('tour_requests')
+            .select('id, category, supplier_name, title, service_date, quantity, note')
+            .eq('proposal_package_id', source.id)
+            .order('created_at', { ascending: true })
+          setExistingRequests((requests as TourRequest[]) || [])
         }
 
         // 3. 載入已確認的需求快照
-         
-        const { data: pkgData } = await (supabase as any)
-          .from('proposal_packages')
-          .select('confirmed_requirements')
-          .eq('id', pkg.id)
-          .single()
-
-        if (pkgData?.confirmed_requirements?.snapshot) {
-          setConfirmedSnapshot(pkgData.confirmed_requirements.snapshot as ConfirmedRequirementItem[])
+        if (mode === 'tour') {
+          const { data: tourData } = await supabase
+            .from('tours')
+            .select('confirmed_requirements')
+            .eq('id', source.id)
+            .single()
+          if (tourData?.confirmed_requirements && typeof tourData.confirmed_requirements === 'object') {
+            const snapshot = (tourData.confirmed_requirements as unknown as ConfirmedRequirementsSnapshot)?.snapshot
+            setConfirmedSnapshot(snapshot || [])
+          } else {
+            setConfirmedSnapshot([])
+          }
         } else {
-          setConfirmedSnapshot([])
+          const { data: pkgData } = await (supabase as any)
+            .from('proposal_packages')
+            .select('confirmed_requirements')
+            .eq('id', source.id)
+            .single()
+
+          if (pkgData?.confirmed_requirements?.snapshot) {
+            setConfirmedSnapshot(pkgData.confirmed_requirements.snapshot as ConfirmedRequirementItem[])
+          } else {
+            setConfirmedSnapshot([])
+          }
         }
       } catch (error) {
         logger.error('載入資料失敗:', error)
@@ -233,7 +315,7 @@ export function RequirementSyncDialog({
     }
 
     loadData()
-  }, [isOpen, pkg])
+  }, [isOpen, source, mode])
 
   // 計算日期
   const calculateDate = useCallback((dayNum: number): string | null => {
@@ -576,7 +658,7 @@ export function RequirementSyncDialog({
 
   // 同步操作
   const handleSync = useCallback(async () => {
-    if (!pkg || !user || !user.workspace_id) return
+    if (!source || !user || !user.workspace_id) return
 
     setSyncing(true)
 
@@ -617,7 +699,8 @@ export function RequirementSyncDialog({
         .map((item, idx) => ({
           code: `RQ${Date.now().toString().slice(-6)}${idx}`,
           workspace_id: workspaceId,
-          proposal_package_id: pkg.id,
+          // 根據模式設定關聯欄位
+          ...(mode === 'tour' ? { tour_id: source.id } : { proposal_package_id: source.id }),
           category: item.quoteItem!.category,
           supplier_name: item.quoteItem!.supplierName,
           title: item.quoteItem!.title,
@@ -635,10 +718,11 @@ export function RequirementSyncDialog({
       }
 
       // 4. 重新載入
+      const filterField = mode === 'tour' ? 'tour_id' : 'proposal_package_id'
       const { data } = await supabase
         .from('tour_requests')
         .select('id, category, supplier_name, title, service_date, quantity, note')
-        .eq('proposal_package_id', pkg.id)
+        .eq(filterField, source.id)
         .order('created_at', { ascending: true })
 
       if (data) {
@@ -653,11 +737,12 @@ export function RequirementSyncDialog({
     } finally {
       setSyncing(false)
     }
-  }, [pkg, user, diffByCategory, toast, onSyncComplete])
+  }, [source, mode, user, diffByCategory, toast, onSyncComplete])
 
   // 儲存取消單到 tour_documents
   const saveCancellationToTourDocuments = useCallback(async (supplierName: string, htmlContent: string) => {
-    const tourId = proposal?.converted_tour_id
+    // Tour 模式直接用 tour.id，Package 模式用 proposal.converted_tour_id
+    const tourId = tour?.id || proposal?.converted_tour_id
     if (!tourId || !user?.workspace_id) {
       logger.log('無法存檔取消單：尚未轉團或缺少 workspace_id')
       return
@@ -834,7 +919,7 @@ export function RequirementSyncDialog({
 
   // 確認變更（更新快照）
   const handleConfirmChanges = useCallback(async () => {
-    if (!pkg || !user) return
+    if (!source || !user) return
 
     setConfirmingChanges(true)
 
@@ -856,14 +941,20 @@ export function RequirementSyncDialog({
         confirmed_by: user.id,
       }
 
-      // 更新資料庫
-       
-      const { error } = await (supabase as any)
-        .from('proposal_packages')
-        .update({ confirmed_requirements: snapshotData })
-        .eq('id', pkg.id)
-
-      if (error) throw error
+      // 根據模式更新對應的資料庫表
+      if (mode === 'tour') {
+        const { error } = await supabase
+          .from('tours')
+          .update({ confirmed_requirements: snapshotData as unknown as Json })
+          .eq('id', source.id)
+        if (error) throw error
+      } else {
+        const { error } = await (supabase as any)
+          .from('proposal_packages')
+          .update({ confirmed_requirements: snapshotData as unknown as Json })
+          .eq('id', source.id)
+        if (error) throw error
+      }
 
       // 更新本地狀態
       setConfirmedSnapshot(newSnapshot)
@@ -876,7 +967,7 @@ export function RequirementSyncDialog({
     } finally {
       setConfirmingChanges(false)
     }
-  }, [pkg, user, quoteItems, toast])
+  }, [source, mode, user, quoteItems, toast])
 
   // 格式化日期
   const formatDate = (dateStr: string | null | undefined) => {
@@ -916,7 +1007,7 @@ export function RequirementSyncDialog({
     setRequestDialogOpen(true)
   }, [changeTrackByCategory])
 
-  if (!pkg) return null
+  if (!source) return null
 
   return (
     <>
@@ -926,8 +1017,9 @@ export function RequirementSyncDialog({
           <DialogTitle className="flex items-center gap-2">
             <ClipboardList size={18} className="text-morandi-gold" />
             需求確認單
+            {mode === 'tour' && <span className="text-xs font-normal text-morandi-secondary ml-1">({source.code})</span>}
             {hasUnconfirmedChanges && (
-              <span className="text-xs font-normal text-orange-500 ml-2">
+              <span className="text-xs font-normal text-morandi-gold ml-2">
                 (有變更待確認)
               </span>
             )}
@@ -939,11 +1031,11 @@ export function RequirementSyncDialog({
             <div className="h-48 flex items-center justify-center">
               <Loader2 className="animate-spin text-morandi-gold" size={24} />
             </div>
-          ) : !pkg.quote_id ? (
+          ) : !source.quoteId ? (
             <div className="h-48 flex flex-col items-center justify-center text-morandi-secondary">
               <AlertCircle size={32} className="mb-2 opacity-50" />
-              <p>請先建立報價單</p>
-              <p className="text-xs mt-1">需求確認單需要從報價單讀取資料</p>
+              <p>尚無報價單資料</p>
+              <p className="text-xs mt-1">{mode === 'tour' ? '此團尚未關聯報價單' : '請先建立報價單'}</p>
             </div>
           ) : quoteItems.length === 0 && existingRequests.length === 0 ? (
             <div className="h-48 flex flex-col items-center justify-center text-morandi-secondary">
@@ -1011,16 +1103,16 @@ export function RequirementSyncDialog({
                             const title = itemData.title
                             const note = itemData.note
 
-                            // 決定文字顏色
-                            // 取消 = 紅色刪除線，新增 = 藍色，已確認 = 黑色
+                            // 決定文字顏色（使用莫蘭迪色系）
+                            // 取消 = 莫蘭迪紅色刪除線，新增 = 莫蘭迪金色，已確認 = 黑色
                             let textClass = ''
                             let rowBgClass = ''
                             if (isCancelled) {
-                              textClass = 'text-red-500 line-through'
-                              rowBgClass = 'bg-red-50/50'
+                              textClass = 'text-morandi-red line-through'
+                              rowBgClass = 'bg-morandi-red/10'
                             } else if (isNew) {
-                              textClass = 'text-blue-600'
-                              rowBgClass = 'bg-blue-50/50'
+                              textClass = 'text-morandi-gold'
+                              rowBgClass = 'bg-morandi-gold/10'
                             }
 
                             return (
@@ -1042,7 +1134,7 @@ export function RequirementSyncDialog({
                                     {title}
                                     {/* 備註（航班資訊）*/}
                                     {note && (
-                                      <div className={`text-xs mt-1 whitespace-pre-line ${isCancelled ? 'text-red-400' : isNew ? 'text-blue-500' : 'text-morandi-secondary'}`}>
+                                      <div className={`text-xs mt-1 whitespace-pre-line ${isCancelled ? 'text-morandi-red/80' : isNew ? 'text-morandi-gold/80' : 'text-morandi-secondary'}`}>
                                         {note}
                                       </div>
                                     )}
@@ -1052,13 +1144,13 @@ export function RequirementSyncDialog({
                                   <div className="flex items-center justify-center gap-1">
                                     {/* 狀態標籤 */}
                                     {isCancelled && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600">
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-morandi-red/20 text-morandi-red">
                                         <Trash2 size={10} />
                                         取消
                                       </span>
                                     )}
                                     {isNew && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-morandi-gold/20 text-morandi-gold">
                                         <Plus size={10} />
                                         新增
                                       </span>
@@ -1072,7 +1164,7 @@ export function RequirementSyncDialog({
                                           const items = cancelledBySupplier.get(supplierName)
                                           if (items) handlePrintCancellation(supplierName, items)
                                         }}
-                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                        className="h-6 w-6 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
                                         title="列印取消單"
                                       >
                                         <Printer size={14} />
@@ -1106,16 +1198,16 @@ export function RequirementSyncDialog({
               {hasUnconfirmedChanges && (
                 <div className="flex items-center gap-4 text-xs text-morandi-secondary px-2">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-red-100 rounded border border-red-300" />
-                    <span className="text-red-600">取消（紅色）</span>
+                    <div className="w-3 h-3 bg-morandi-red/20 rounded border border-morandi-red/50" />
+                    <span className="text-morandi-red">取消</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-blue-100 rounded border border-blue-300" />
-                    <span className="text-blue-600">新增（藍色）</span>
+                    <div className="w-3 h-3 bg-morandi-gold/20 rounded border border-morandi-gold/50" />
+                    <span className="text-morandi-gold">新增</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 bg-white rounded border border-border" />
-                    <span>已確認（黑色）</span>
+                    <span>已確認</span>
                   </div>
                 </div>
               )}
@@ -1129,18 +1221,18 @@ export function RequirementSyncDialog({
             {confirmedSnapshot.length === 0 ? (
               <span>尚未確認需求，點擊「確認需求」開始追蹤變更</span>
             ) : hasUnconfirmedChanges ? (
-              <span className="text-orange-500">
+              <span className="text-morandi-gold">
                 發現變更：
-                {cancelledItems.length > 0 && <span className="text-red-500 ml-1">{cancelledItems.length} 項取消</span>}
+                {cancelledItems.length > 0 && <span className="text-morandi-red ml-1">{cancelledItems.length} 項取消</span>}
                 {cancelledItems.length > 0 && quoteItems.filter(q => !confirmedSnapshot.some(s => generateItemKey(s.category, s.supplier_name, s.title, s.service_date) === generateItemKey(q.category, q.supplierName, q.title, q.serviceDate))).length > 0 && '、'}
                 {quoteItems.filter(q => !confirmedSnapshot.some(s => generateItemKey(s.category, s.supplier_name, s.title, s.service_date) === generateItemKey(q.category, q.supplierName, q.title, q.serviceDate))).length > 0 && (
-                  <span className="text-blue-500 ml-1">
+                  <span className="text-morandi-gold ml-1">
                     {quoteItems.filter(q => !confirmedSnapshot.some(s => generateItemKey(s.category, s.supplier_name, s.title, s.service_date) === generateItemKey(q.category, q.supplierName, q.title, q.serviceDate))).length} 項新增
                   </span>
                 )}
               </span>
             ) : (
-              <span className="text-green-600">需求已確認，無變更</span>
+              <span className="text-morandi-green">需求已確認，無變更</span>
             )}
           </div>
           <div className="flex gap-2">
@@ -1178,13 +1270,14 @@ export function RequirementSyncDialog({
         }}
         pkg={pkg}
         proposal={proposal}
+        tour={tour}
         category={selectedRequestData.category}
         supplierName={selectedRequestData.supplierName}
         items={selectedRequestData.items}
-        tourCode={proposal?.code}
-        tourName={proposal?.title}
+        tourCode={source.code}
+        tourName={source.title}
         departureDate={startDate || undefined}
-        pax={proposal?.group_size || undefined}
+        pax={source.groupSize || undefined}
       />
     )}
     </>
