@@ -1,15 +1,20 @@
-import { useEffect } from 'react'
-import { Plus, X } from 'lucide-react'
+import { useEffect, useState, useMemo } from 'react'
+import { Plus, X, FileInput, Check, Building2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
+import { Checkbox } from '@/components/ui/checkbox'
 import { RequestDateInput } from './RequestDateInput'
 import { CurrencyCell } from '@/components/table-cells'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
+import { useTourRequestItems } from '../hooks/useTourRequestItems'
+import { RequestItem } from '../types'
+import { PaymentItemCategory } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
+import { cn } from '@/lib/utils'
 
 interface AddRequestDialogProps {
   open: boolean
@@ -21,6 +26,24 @@ interface AddRequestDialogProps {
   defaultOrderId?: string
   /** 是否為巢狀 Dialog（用於從其他 Dialog 中打開時，使用更高的 z-index 層級） */
   nested?: boolean
+}
+
+// 類別對應的圖標和顏色
+const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
+  '住宿': { icon: '🏨', color: 'text-blue-600' },
+  'accommodation': { icon: '🏨', color: 'text-blue-600' },
+  '交通': { icon: '🚌', color: 'text-green-600' },
+  'transportation': { icon: '🚌', color: 'text-green-600' },
+  '門票': { icon: '🎫', color: 'text-purple-600' },
+  'ticket': { icon: '🎫', color: 'text-purple-600' },
+  'activity': { icon: '🎫', color: 'text-purple-600' },
+  '餐食': { icon: '🍽️', color: 'text-orange-600' },
+  'meal': { icon: '🍽️', color: 'text-orange-600' },
+  '其他': { icon: '📦', color: 'text-gray-600' },
+}
+
+function getCategoryConfig(category: string) {
+  return CATEGORY_CONFIG[category] || CATEGORY_CONFIG['其他']
 }
 
 export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false }: AddRequestDialogProps) {
@@ -41,6 +64,63 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   } = useRequestForm()
 
   const { generateRequestCode, createRequest } = useRequestOperations()
+
+  // 從需求單帶入的狀態
+  const [importFromRequests, setImportFromRequests] = useState(false)
+  const [selectedRequestItems, setSelectedRequestItems] = useState<Record<string, { selected: boolean; amount: number }>>({})
+
+  // 查詢該團有供應商的需求單
+  const { items: tourRequestItems, loading: loadingRequestItems } = useTourRequestItems(
+    importFromRequests && formData.tour_id ? formData.tour_id : null
+  )
+
+  // 當需求單項目載入後，初始化選擇狀態
+  useEffect(() => {
+    if (tourRequestItems.length > 0) {
+      const initialState: Record<string, { selected: boolean; amount: number }> = {}
+      tourRequestItems.forEach(item => {
+        initialState[item.id] = {
+          selected: false,
+          amount: item.finalCost || item.estimatedCost || 0,
+        }
+      })
+      setSelectedRequestItems(initialState)
+    }
+  }, [tourRequestItems])
+
+  // 切換需求單項目選擇
+  const toggleRequestItem = (itemId: string) => {
+    setSelectedRequestItems(prev => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        selected: !prev[itemId]?.selected,
+      },
+    }))
+  }
+
+  // 更新需求單項目金額
+  const updateRequestItemAmount = (itemId: string, amount: number) => {
+    setSelectedRequestItems(prev => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        amount,
+      },
+    }))
+  }
+
+  // 計算選中的需求單項目總金額
+  const selectedRequestTotal = useMemo(() => {
+    return Object.entries(selectedRequestItems)
+      .filter(([, val]) => val.selected)
+      .reduce((sum, [, val]) => sum + val.amount, 0)
+  }, [selectedRequestItems])
+
+  // 選中的需求單項目數量
+  const selectedRequestCount = useMemo(() => {
+    return Object.values(selectedRequestItems).filter(val => val.selected).length
+  }, [selectedRequestItems])
 
   // 當對話框開啟且有預設值時，自動帶入
   useEffect(() => {
@@ -78,6 +158,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   const handleCancel = () => {
     resetForm()
+    setImportFromRequests(false)
+    setSelectedRequestItems({})
     onOpenChange(false)
   }
 
@@ -93,15 +175,35 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         return
       }
 
+      // 判斷使用需求單項目還是手動輸入項目
+      let itemsToSubmit = requestItems
+
+      if (importFromRequests && selectedRequestCount > 0) {
+        // 從需求單帶入：將選中的需求單項目轉換為請款項目
+        itemsToSubmit = tourRequestItems
+          .filter(item => selectedRequestItems[item.id]?.selected)
+          .map(item => ({
+            id: Math.random().toString(36).substr(2, 9),
+            category: item.category as PaymentItemCategory,
+            supplier_id: item.supplierId,
+            supplierName: item.supplierName,
+            description: item.title,
+            unit_price: selectedRequestItems[item.id]?.amount || 0,
+            quantity: 1,
+          }))
+      }
+
       await createRequest(
         formData,
-        requestItems,
+        itemsToSubmit,
         selectedTour.name || '',
         selectedTour.code || '',
         selectedOrder?.order_number ?? undefined,
         currentUser?.display_name || currentUser?.chinese_name || '' // 請款人姓名
       )
       resetForm()
+      setImportFromRequests(false)
+      setSelectedRequestItems({})
       onOpenChange(false)
       onSuccess?.()
     } catch (error) {
@@ -173,14 +275,122 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               </div>
           </div>
 
-          {/* Item List */}
-          <EditableRequestItemList
-            items={requestItems}
-            suppliers={suppliers}
-            updateItem={updateItem}
-            removeItem={removeItem}
-            addNewEmptyItem={addNewEmptyItem}
-          />
+          {/* 從需求單帶入選項 */}
+          {formData.tour_id && (
+            <div className="flex items-center gap-2 p-3 bg-morandi-container/30 rounded-lg">
+              <Checkbox
+                id="import-from-requests"
+                checked={importFromRequests}
+                onCheckedChange={(checked) => setImportFromRequests(checked === true)}
+              />
+              <label
+                htmlFor="import-from-requests"
+                className="flex items-center gap-2 text-sm font-medium text-morandi-primary cursor-pointer"
+              >
+                <FileInput size={16} className="text-morandi-gold" />
+                從需求單帶入（自動列出有供應商的項目）
+              </label>
+            </div>
+          )}
+
+          {/* 需求單項目列表 或 手動輸入列表 */}
+          {importFromRequests ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-morandi-primary">
+                  需求單項目
+                  {loadingRequestItems && <span className="ml-2 text-morandi-secondary">載入中...</span>}
+                </h3>
+                {tourRequestItems.length > 0 && (
+                  <span className="text-sm text-morandi-secondary">
+                    已選 {selectedRequestCount} 項
+                  </span>
+                )}
+              </div>
+
+              {tourRequestItems.length === 0 && !loadingRequestItems ? (
+                <div className="text-center py-8 text-morandi-secondary">
+                  此旅遊團沒有有供應商的需求單項目
+                </div>
+              ) : (
+                <div className="border border-border rounded-lg overflow-hidden">
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {tourRequestItems.map(item => {
+                      const categoryConfig = getCategoryConfig(item.category)
+                      const itemState = selectedRequestItems[item.id]
+                      const isSelected = itemState?.selected || false
+                      const amount = itemState?.amount || 0
+
+                      return (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            'flex items-start gap-3 p-4 border-b border-border last:border-b-0',
+                            isSelected ? 'bg-morandi-gold/5' : 'bg-white'
+                          )}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleRequestItem(item.id)}
+                            className="mt-1"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-base">{categoryConfig.icon}</span>
+                              <span className={cn('text-xs font-medium', categoryConfig.color)}>
+                                {item.category}
+                              </span>
+                              <span className="text-sm font-medium text-morandi-primary truncate">
+                                {item.title}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-morandi-secondary">
+                              <Building2 size={12} />
+                              <span>供應商：{item.supplierName}</span>
+                            </div>
+                            {(item.estimatedCost > 0 || item.finalCost) && (
+                              <div className="text-xs text-morandi-secondary mt-1">
+                                {item.finalCost
+                                  ? `確認成本：NT$ ${item.finalCost.toLocaleString()}`
+                                  : `預估成本：NT$ ${item.estimatedCost.toLocaleString()}`}
+                              </div>
+                            )}
+                          </div>
+                          <div className="w-32 flex-shrink-0">
+                            <div className="text-xs text-morandi-secondary mb-1">請款金額</div>
+                            <div className="relative">
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-morandi-secondary">
+                                NT$
+                              </span>
+                              <Input
+                                type="text"
+                                value={amount.toLocaleString()}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value.replace(/,/g, '')) || 0
+                                  updateRequestItemAmount(item.id, value)
+                                }}
+                                className="pl-8 text-right text-sm h-8"
+                                disabled={!isSelected}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Item List - 手動輸入 */
+            <EditableRequestItemList
+              items={requestItems}
+              suppliers={suppliers}
+              updateItem={updateItem}
+              removeItem={removeItem}
+              addNewEmptyItem={addNewEmptyItem}
+            />
+          )}
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4 border-t border-border">
@@ -190,11 +400,15 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!formData.tour_id || requestItems.length === 0}
+              disabled={
+                !formData.tour_id ||
+                (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
+              }
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
               <Plus size={16} />
-              新增請款單 (共 {requestItems.length} 項，<CurrencyCell amount={total_amount} className="inline" />)
+              新增請款單 (共 {importFromRequests ? selectedRequestCount : requestItems.length} 項，
+              <CurrencyCell amount={importFromRequests ? selectedRequestTotal : total_amount} className="inline" />)
             </Button>
           </div>
         </div>

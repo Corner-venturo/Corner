@@ -19,6 +19,12 @@ import {
   Loader2,
   Calendar,
   FileText,
+  DollarSign,
+  Building2,
+  Bus,
+  Ticket,
+  UtensilsCrossed,
+  Package,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useItineraries } from '@/hooks/cloud-hooks'
@@ -26,6 +32,7 @@ import { useTourRequests } from '@/stores/tour-request-store'
 import { useTours } from '@/hooks/cloud-hooks'
 import { useAuthStore } from '@/stores/auth-store'
 import { useToast } from '@/components/ui/use-toast'
+import { QuickRequestFromItemDialog } from '@/features/finance/requests/components/QuickRequestFromItemDialog'
 import type { DailyItineraryDay } from '@/stores/types/tour.types'
 
 interface TourConfirmationSheetProps {
@@ -63,6 +70,19 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
   const { toast } = useToast()
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
+
+  // 快速請款對話框狀態
+  const [quickRequestItem, setQuickRequestItem] = useState<{
+    id: string
+    category: string
+    title: string
+    supplierName: string
+    supplierId: string
+    estimatedCost: number
+    tourId: string
+    tourCode: string
+    tourName: string
+  } | null>(null)
 
   // 找到當前團
   const tour = useMemo(() => {
@@ -175,6 +195,14 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
     }))
   }, [itinerary])
 
+  // 過濾出有供應商的需求單（可請款）
+  const requestsWithSupplier = useMemo(() => {
+    return existingRequests.filter(req =>
+      req.tour_id === tourId &&
+      req.supplier_id // 有供應商 ID 才能請款
+    )
+  }, [existingRequests, tourId])
+
   // 檢查是否已產生需求單
   const hasExistingRequest = useCallback((supplierName: string, category: string) => {
     return existingRequests.some(req =>
@@ -183,6 +211,45 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       req.category === category
     )
   }, [existingRequests, tourId])
+
+  // 取得類別圖標
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'hotel':
+      case '住宿':
+        return <Hotel size={14} className="text-blue-600" />
+      case 'transportation':
+      case '交通':
+        return <Bus size={14} className="text-green-600" />
+      case 'activity':
+      case 'ticket':
+      case '門票':
+        return <Ticket size={14} className="text-purple-600" />
+      case 'restaurant':
+      case 'meal':
+      case '餐食':
+        return <UtensilsCrossed size={14} className="text-orange-600" />
+      default:
+        return <Package size={14} className="text-gray-600" />
+    }
+  }
+
+  // 處理請款按鈕點擊
+  const handleRequestPayment = (request: typeof existingRequests[0]) => {
+    if (!tour) return
+
+    setQuickRequestItem({
+      id: request.id,
+      category: request.category,
+      title: request.title,
+      supplierName: request.supplier_name || '未知供應商',
+      supplierId: request.supplier_id || '',
+      estimatedCost: request.estimated_cost || 0,
+      tourId: tourId,
+      tourCode: tour.code || '',
+      tourName: tour.name || '',
+    })
+  }
 
   // 產生需求單
   const handleGenerateRequest = useCallback(async (
@@ -425,6 +492,96 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
             })}
           </div>
         </div>
+      )}
+
+      {/* 需求單項目（有供應商可請款） */}
+      {requestsWithSupplier.length > 0 && (
+        <div className="border border-border rounded-lg overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 bg-morandi-gold text-white">
+            <DollarSign size={18} />
+            <span className="font-medium">需求單項目</span>
+            <span className="text-white/80 text-sm">({requestsWithSupplier.length} 項可請款)</span>
+          </div>
+          <div className="bg-card divide-y divide-border">
+            {requestsWithSupplier.map(request => (
+              <div
+                key={request.id}
+                className="flex items-center justify-between px-4 py-3 hover:bg-morandi-container/20"
+              >
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="mt-0.5">{getCategoryIcon(request.category)}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-morandi-primary truncate">
+                        {request.title}
+                      </span>
+                      {request.status && (
+                        <span className={`
+                          text-xs px-1.5 py-0.5 rounded
+                          ${request.status === 'confirmed' ? 'bg-morandi-green/20 text-morandi-green' : ''}
+                          ${request.status === 'draft' ? 'bg-morandi-container text-morandi-secondary' : ''}
+                          ${request.status === 'processing' ? 'bg-morandi-gold/20 text-morandi-gold' : ''}
+                        `}>
+                          {request.status === 'confirmed' ? '已確認' :
+                           request.status === 'draft' ? '草稿' :
+                           request.status === 'processing' ? '處理中' : request.status}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-morandi-secondary mt-1">
+                      <span className="flex items-center gap-1">
+                        <Building2 size={12} />
+                        {request.supplier_name || '未知供應商'}
+                      </span>
+                      {request.service_date && (
+                        <span className="flex items-center gap-1">
+                          <Calendar size={12} />
+                          {request.service_date}
+                          {request.service_date_end && request.service_date_end !== request.service_date && (
+                            <> ~ {request.service_date_end}</>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    {(request.estimated_cost || request.final_cost) && (
+                      <div className="text-xs text-morandi-secondary mt-1">
+                        {request.final_cost
+                          ? `確認成本：NT$ ${request.final_cost.toLocaleString()}`
+                          : `預估成本：NT$ ${(request.estimated_cost || 0).toLocaleString()}`}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => handleRequestPayment(request)}
+                  className="h-8 px-3 gap-1.5 bg-morandi-gold hover:bg-morandi-gold-hover text-white flex-shrink-0"
+                >
+                  <DollarSign size={14} />
+                  請款
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 快速請款對話框 */}
+      {quickRequestItem && (
+        <QuickRequestFromItemDialog
+          open={!!quickRequestItem}
+          onOpenChange={(open) => {
+            if (!open) setQuickRequestItem(null)
+          }}
+          item={quickRequestItem}
+          onSuccess={() => {
+            refreshRequests()
+            toast({
+              title: '請款單已建立',
+              description: `${quickRequestItem.supplierName} 的請款單已建立`,
+            })
+          }}
+        />
       )}
     </div>
   )

@@ -9,14 +9,14 @@ import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployeeStore } from '@/stores'
 
 interface UseTourTableColumnsParams {
   getStatusColor: (status: string) => string
 }
 
 export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParams) {
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
+  const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
 
   // 載入員工資料（用於顯示團控人員名稱）
   useEffect(() => {

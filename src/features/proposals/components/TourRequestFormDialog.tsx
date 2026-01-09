@@ -338,8 +338,8 @@ export function TourRequestFormDialog({
 
   // 儲存文件到 tour_documents
   const saveToTourDocuments = async (htmlContent: string) => {
-    // 需要有團號才能存
-    const tourId = proposal?.converted_tour_id
+    // 需要有團號才能存（支援 proposal 模式和 tour 模式）
+    const tourId = tour?.id || proposal?.converted_tour_id
     if (!tourId || !user?.workspace_id) {
       logger.log('無法存檔：尚未轉團或缺少 workspace_id')
       return

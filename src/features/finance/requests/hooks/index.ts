@@ -1,3 +1,5 @@
 export { useRequestForm } from './useRequestForm'
 export { useRequestOperations } from './useRequestOperations'
 export { useRequestTable } from './useRequestTable'
+export { useTourRequestItems, useTourRequestItemsByPackage } from './useTourRequestItems'
+export type { TourRequestItem } from './useTourRequestItems'
