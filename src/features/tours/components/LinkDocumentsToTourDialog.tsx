@@ -26,6 +26,7 @@ import {
   ExternalLink,
   Unlink,
   Eye,
+  Receipt,
 } from 'lucide-react'
 import { useQuoteStore, useTourStore } from '@/stores'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
@@ -37,6 +38,39 @@ import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { QuickQuoteDialog } from '@/features/quotes/components/QuickQuoteDialog'
+import { toast } from 'sonner'
+
+interface QuickQuoteItem {
+  id: string
+  description: string
+  quantity: number
+  unit_price: number
+  amount: number
+  notes: string
+}
+
+interface QuickQuoteFormData {
+  customer_name: string
+  contact_phone: string
+  contact_address: string
+  tour_code: string
+  handler_name: string
+  issue_date: string
+  items: QuickQuoteItem[]
+  received_amount: number | ''
+}
+
+const getInitialQuickQuoteFormData = (tour: Tour): QuickQuoteFormData => ({
+  customer_name: tour.name || '',
+  contact_phone: '',
+  contact_address: '',
+  tour_code: tour.code || '',
+  handler_name: '',
+  issue_date: new Date().toISOString().split('T')[0],
+  items: [],
+  received_amount: '',
+})
 
 interface LinkDocumentsToTourDialogProps {
   isOpen: boolean
@@ -74,6 +108,12 @@ export function LinkDocumentsToTourDialog({
   // 行程表對話框狀態
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
 
+  // 快速報價單對話框狀態
+  const [quickQuoteDialogOpen, setQuickQuoteDialogOpen] = useState(false)
+  const [quickQuoteFormData, setQuickQuoteFormData] = useState<QuickQuoteFormData>(
+    getInitialQuickQuoteFormData(tour)
+  )
+
   // 載入資料
   useEffect(() => {
     if (isOpen) {
@@ -94,17 +134,12 @@ export function LinkDocumentsToTourDialog({
     return tourProposalPackage?.itinerary_type || null
   }, [tourProposalPackage])
 
-  // 檢查是否有 timeline_data（快速行程表）
+  // 檢查是否有快速行程表（timeline_data）
   const hasTimelineData = useMemo(() => {
     return itineraryType === 'timeline' &&
            tourProposalPackage?.timeline_data &&
            typeof tourProposalPackage.timeline_data === 'object' &&
            Object.keys(tourProposalPackage.timeline_data).length > 0
-  }, [itineraryType, tourProposalPackage])
-
-  // 檢查是否有簡易行程表（連結到行程表系統）
-  const hasSimpleItinerary = useMemo(() => {
-    return itineraryType === 'simple' && !!tourProposalPackage?.itinerary_id
   }, [itineraryType, tourProposalPackage])
 
   // ========== 報價單相關 ==========
@@ -152,30 +187,65 @@ export function LinkDocumentsToTourDialog({
     }
   }
 
-  // 建立快速報價單
-  const handleCreateQuickQuote = async () => {
+  // 開啟快速報價單對話框
+  const handleOpenQuickQuoteDialog = () => {
+    setQuickQuoteFormData(getInitialQuickQuoteFormData(tour))
+    setQuickQuoteDialogOpen(true)
+  }
+
+  // 設定快速報價單表單欄位
+  const setQuickQuoteFormField = (field: string, value: string | number | QuickQuoteItem[]) => {
+    setQuickQuoteFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // 提交快速報價單
+  const handleQuickQuoteSubmit = async (): Promise<boolean> => {
     try {
       setIsCreatingQuickQuote(true)
       const code = generateCode('TP', { quoteType: 'quick' }, quotes)
 
+      // 計算總金額
+      const totalAmount = quickQuoteFormData.items.reduce((sum, item) => sum + item.amount, 0)
+      const receivedAmount = Number(quickQuoteFormData.received_amount) || 0
+      const balanceAmount = totalAmount - receivedAmount
+
       const newQuote = await createQuote({
         code,
-        name: tour.name,
+        name: quickQuoteFormData.customer_name,
         quote_type: 'quick',
         status: 'draft',
         tour_id: tour.id,
+        customer_name: quickQuoteFormData.customer_name,
+        contact_phone: quickQuoteFormData.contact_phone,
+        contact_address: quickQuoteFormData.contact_address,
+        tour_code: quickQuoteFormData.tour_code,
+        handler_name: quickQuoteFormData.handler_name,
+        issue_date: quickQuoteFormData.issue_date,
+        quick_quote_items: quickQuoteFormData.items,
+        received_amount: receivedAmount,
+        balance_amount: balanceAmount,
+        total_amount: totalAmount,
         group_size: tour.max_participants || 20,
       } as Omit<Quote, 'id' | 'created_at' | 'updated_at'>)
 
       if (newQuote?.id) {
-        onClose()
-        router.push(`/quotes/${newQuote.id}`)
+        toast.success('快速報價單建立成功')
+        await fetchQuotes()
+        return true
       }
+      return false
     } catch (error) {
       logger.error('建立快速報價單失敗:', error)
+      toast.error('建立快速報價單失敗')
+      return false
     } finally {
       setIsCreatingQuickQuote(false)
     }
+  }
+
+  // 關閉快速報價單對話框
+  const handleCloseQuickQuoteDialog = () => {
+    setQuickQuoteDialogOpen(false)
   }
 
   const handleUnlinkQuote = async (e: React.MouseEvent, quote: Quote) => {
@@ -234,7 +304,7 @@ export function LinkDocumentsToTourDialog({
   }, [tourProposalPackage, fetchProposalPackages])
 
   // 主對話框開啟時，子對話框應關閉
-  const mainDialogOpen = isOpen && !timelineDialogOpen
+  const mainDialogOpen = isOpen && !timelineDialogOpen && !quickQuoteDialogOpen
 
   return (
     <>
@@ -282,11 +352,6 @@ export function LinkDocumentsToTourDialog({
                         </div>
                       </div>
                     </button>
-                  ) : hasSimpleItinerary ? (
-                    <div className="flex items-center gap-2 p-2 text-xs text-morandi-primary">
-                      <FileText className="w-3.5 h-3.5 text-morandi-gold" />
-                      網頁行程表
-                    </div>
                   ) : (
                     <div className="text-xs text-morandi-secondary text-center py-4">
                       尚未建立
@@ -364,16 +429,11 @@ export function LinkDocumentsToTourDialog({
                     <span className="font-medium text-sm text-morandi-primary">快速報價單</span>
                   </div>
                   <button
-                    onClick={handleCreateQuickQuote}
-                    disabled={isCreatingQuickQuote}
-                    className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors disabled:opacity-50"
+                    onClick={handleOpenQuickQuoteDialog}
+                    className="p-1 text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors"
                     title="新增快速報價單"
                   >
-                    {isCreatingQuickQuote ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4" />
-                    )}
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
                 <div className="flex-1 overflow-auto mt-2 space-y-1">
@@ -417,6 +477,20 @@ export function LinkDocumentsToTourDialog({
                 </div>
               </div>
             </div>
+
+            {/* 請款單快捷入口 */}
+            <div className="mt-4 pt-4 border-t border-morandi-container/50 flex justify-end">
+              <button
+                onClick={() => {
+                  onClose()
+                  router.push(`/finance/requests?tour_id=${tour.id}`)
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-morandi-gold border border-morandi-gold rounded-lg hover:bg-morandi-gold hover:text-white transition-colors"
+              >
+                <Receipt className="w-4 h-4" />
+                建立請款單
+              </button>
+            </div>
           </DialogContent>
         </Dialog>
       )}
@@ -430,6 +504,16 @@ export function LinkDocumentsToTourDialog({
           onSave={handleSaveTimeline}
         />
       )}
+
+      {/* 快速報價單對話框 */}
+      <QuickQuoteDialog
+        open={quickQuoteDialogOpen}
+        onOpenChange={setQuickQuoteDialogOpen}
+        formData={quickQuoteFormData}
+        setFormField={setQuickQuoteFormField}
+        onSubmit={handleQuickQuoteSubmit}
+        onClose={handleCloseQuickQuoteDialog}
+      />
     </>
   )
 }

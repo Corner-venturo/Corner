@@ -23,10 +23,9 @@ export interface Supplier {
   name: string
   contact_person?: string
   phone?: string
-  fax?: string
-  city?: string
+  type?: string
   country?: string
-  supplier_type_code?: string
+  address?: string
 }
 
 interface SupplierSearchInputProps {
@@ -63,14 +62,14 @@ export function SupplierSearchInput({
 
       setLoading(true)
       try {
-        // 將 category 轉換為 supplier_type_code（activity → attraction）
-        const supplierTypeCode = category === 'activity' ? 'attraction' : category
+        // 將 category 轉換為 supplier type（activity → attraction）
+        const supplierType = category === 'activity' ? 'attraction' : category
 
         // 查詢供應商（包含完整欄位）
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let query = (supabase as any)
           .from('suppliers')
-          .select('id, code, name, contact_person, phone, fax, city, country, supplier_type_code')
+          .select('id, code, name, contact_person, phone, type')
           .ilike('name', `%${searchTerm}%`)
           .eq('is_active', true)
           .limit(15)
@@ -85,10 +84,10 @@ export function SupplierSearchInput({
 
         // 排序：同類別優先
         let sortedData = (data as Supplier[]) || []
-        if (supplierTypeCode && sortedData.length > 0) {
+        if (supplierType && sortedData.length > 0) {
           sortedData = sortedData.sort((a, b) => {
-            const aMatch = a.supplier_type_code === supplierTypeCode ? 0 : 1
-            const bMatch = b.supplier_type_code === supplierTypeCode ? 0 : 1
+            const aMatch = a.type === supplierType ? 0 : 1
+            const bMatch = b.type === supplierType ? 0 : 1
             return aMatch - bMatch
           })
         }
@@ -194,11 +193,6 @@ export function SupplierSearchInput({
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate">
                       {supplier.name}
-                      {supplier.city && (
-                        <span className="text-morandi-secondary font-normal ml-1">
-                          ({supplier.city})
-                        </span>
-                      )}
                     </div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
                       {supplier.contact_person && <span>聯絡人: {supplier.contact_person}</span>}

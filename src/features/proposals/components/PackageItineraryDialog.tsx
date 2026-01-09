@@ -630,11 +630,15 @@ export function PackageItineraryDialog({
             logger.log('資料庫 proposal_package_id:', dbItinerary?.proposal_package_id)
           }
 
-          // 更新套件關聯
-           
+          // 更新套件關聯（只設置 itinerary_id 和 itinerary_type，保留 timeline_data）
+
           await (supabase as any)
             .from('proposal_packages')
-            .update({ itinerary_id: newItinerary.id })
+            .update({
+              itinerary_id: newItinerary.id,
+              itinerary_type: 'simple',
+              // 注意：不清除 timeline_data，保留快速行程表資料
+            })
             .eq('id', pkg.id)
 
           await alert('行程表建立成功', 'success')

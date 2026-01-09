@@ -30,6 +30,7 @@ import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { logger } from '@/lib/utils/logger'
 import { TourConfirmationDialog } from './TourConfirmationDialog'
+import { TourControlDialogWrapper } from './TourControlDialogWrapper'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
@@ -59,6 +60,7 @@ export const ToursPage: React.FC = () => {
   const { user } = useAuthStore()
 
   const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
+  const [tourControlDialogTour, setTourControlDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
   const [proposalEditDialogOpen, setProposalEditDialogOpen] = useState(false)
   const [proposalArchiveDialogOpen, setProposalArchiveDialogOpen] = useState(false)
@@ -347,6 +349,9 @@ export const ToursPage: React.FC = () => {
     onOpenTourConfirmationDialog: (tour: Tour) => {
       setTourConfirmationDialogTour(tour)
     },
+    onOpenTourControlDialog: (tour: Tour) => {
+      setTourControlDialogTour(tour)
+    },
     onProposalClick: (proposal) => {
       setSelectedProposal(proposal)
       setProposalDetailDialogOpen(true)
@@ -615,6 +620,14 @@ export const ToursPage: React.FC = () => {
         tour={tourConfirmationDialogTour}
         onClose={() => setTourConfirmationDialogTour(null)}
       />
+
+      {/* 團控表對話框 */}
+      {tourControlDialogTour && (
+        <TourControlDialogWrapper
+          tour={tourControlDialogTour}
+          onClose={() => setTourControlDialogTour(null)}
+        />
+      )}
 
       {/* 新增提案對話框 */}
       <ProposalDialog

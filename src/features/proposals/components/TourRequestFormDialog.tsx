@@ -10,6 +10,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ import {
   Plus,
   Trash2,
   Loader2,
+  Receipt,
 } from 'lucide-react'
 import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
@@ -103,6 +105,7 @@ export function TourRequestFormDialog({
   onClose,
   pkg,
   proposal,
+  tour,
   category,
   supplierName,
   items: initialItems,
@@ -111,6 +114,7 @@ export function TourRequestFormDialog({
   departureDate,
   pax,
 }: TourRequestFormDialogProps) {
+  const router = useRouter()
   const { user } = useAuthStore()
   const { toast } = useToast()
 
@@ -157,16 +161,14 @@ export function TourRequestFormDialog({
       name: supplier.name,
       contactPerson: supplier.contact_person || '',
       phone: supplier.phone || '',
-      fax: supplier.fax || '',
+      fax: '',  // 供應商表沒有 fax 欄位
     })
 
-    // 如果供應商有城市資訊，帶入城市選擇
-    if (supplier.city) {
+    // 如果供應商有國家資訊，帶入
+    if (supplier.country) {
       setCityInfo(prev => ({
         ...prev,
-        cityName: supplier.city || '',
         countryName: supplier.country || '',
-        customCity: supplier.city || '',  // 暫時用 customCity 儲存
       }))
     }
   }
@@ -418,8 +420,6 @@ export function TourRequestFormDialog({
           .update({
             contact_person: supplierInfo.contactPerson || null,
             phone: supplierInfo.phone || null,
-            fax: supplierInfo.fax || null,
-            city: cityName || null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', supplierInfo.id)
@@ -436,7 +436,7 @@ export function TourRequestFormDialog({
         .from('suppliers')
         .select('id')
         .eq('name', supplierInfo.name)
-        .eq('supplier_type_code', supplierTypeCode)
+        .eq('type', supplierTypeCode)
         .eq('workspace_id', user.workspace_id)
         .maybeSingle()
 
@@ -448,8 +448,6 @@ export function TourRequestFormDialog({
           .update({
             contact_person: supplierInfo.contactPerson || null,
             phone: supplierInfo.phone || null,
-            fax: supplierInfo.fax || null,
-            city: cityName || null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existing.id)
@@ -480,11 +478,9 @@ export function TourRequestFormDialog({
           .insert({
             code: newCode,
             name: supplierInfo.name,
-            supplier_type_code: supplierTypeCode,
+            type: supplierTypeCode,
             contact_person: supplierInfo.contactPerson || null,
             phone: supplierInfo.phone || null,
-            fax: supplierInfo.fax || null,
-            city: cityName || null,
             workspace_id: user.workspace_id,
             is_active: true,
           })
@@ -732,6 +728,19 @@ export function TourRequestFormDialog({
               <X size={16} />
               關閉
             </Button>
+            {tour?.id && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose()
+                  router.push(`/finance/requests?tour_id=${tour.id}`)
+                }}
+                className="gap-2 text-morandi-gold border-morandi-gold hover:bg-morandi-gold hover:text-white"
+              >
+                <Receipt size={16} />
+                建立請款單
+              </Button>
+            )}
             <Button
               onClick={handlePrintInNewWindow}
               disabled={saving}
