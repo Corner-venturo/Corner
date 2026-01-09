@@ -159,8 +159,10 @@ export function generateCode(
   })
 
   const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
-  const finalCode = `Q${nextNumber}`
-  logger.log('✅ [code-generator] 報價單編號生成:', finalCode, { maxNumber })
+  // 快速報價單使用 X 前綴，團體報價單使用 Q 前綴
+  const prefix = config.quoteType === 'quick' ? 'X' : 'Q'
+  const finalCode = `${prefix}${nextNumber}`
+  logger.log('✅ [code-generator] 報價單編號生成:', finalCode, { maxNumber, quoteType: config.quoteType })
   return finalCode
 }
 

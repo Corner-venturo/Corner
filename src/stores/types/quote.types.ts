@@ -28,7 +28,7 @@ export interface Quote {
   id: string
   code?: string // 報價單編號 (Q20250001 或自訂編號如 JP-BASIC)
   quote_number?: string // 報價單號碼 (QUOTE-2025-0001) - 向下相容
-  quote_type: 'standard' // ✅ 報價單類型（僅標準報價單）
+  quote_type: 'standard' | 'quick' // 報價單類型（standard: 團體報價單, quick: 快速報價單）
   name?: string // 團體名稱（標準報價單必填，快速報價單選填）
   destination?: string // 目的地（向後相容）
   days?: number // 天數（向後相容）

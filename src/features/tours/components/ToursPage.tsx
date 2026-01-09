@@ -25,6 +25,7 @@ import { TourForm } from './TourForm'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
+import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { logger } from '@/lib/utils/logger'
@@ -98,6 +99,9 @@ export const ToursPage: React.FC = () => {
     itineraryDialogTour,
     openItineraryDialog,
     closeItineraryDialog,
+    quoteDialogTour,
+    openQuoteDialog,
+    closeQuoteDialog,
     contractDialogState,
     openContractDialog,
     closeContractDialog,
@@ -336,6 +340,7 @@ export const ToursPage: React.FC = () => {
     setDeleteConfirm: (state) => state.tour && openDeleteDialog(state.tour),
     handleCreateChannel,
     onOpenItineraryDialog: openItineraryDialog,
+    onOpenQuoteDialog: openQuoteDialog,
     onOpenContractDialog: openContractDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
@@ -567,6 +572,14 @@ export const ToursPage: React.FC = () => {
           isOpen={!!itineraryDialogTour}
           onClose={closeItineraryDialog}
           tour={itineraryDialogTour}
+        />
+      )}
+
+      {quoteDialogTour && (
+        <LinkDocumentsToTourDialog
+          isOpen={!!quoteDialogTour}
+          onClose={closeQuoteDialog}
+          tour={quoteDialogTour}
         />
       )}
 

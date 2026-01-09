@@ -73,6 +73,14 @@ export function DayTitleSection({
           >
             <Sparkles size={14} className="text-morandi-gold" />
           </button>
+          <button
+            type="button"
+            onClick={() => insertSymbol(' ✈ ')}
+            className="px-2 py-0.5 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+            title="插入飛機"
+          >
+            ✈
+          </button>
         </div>
       </div>
       <input

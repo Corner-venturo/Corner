@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Tour } from '@/stores/types'
 import { useTourPageState } from './useTourPageState'
@@ -38,6 +38,9 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
   // 從提案轉開團的資料
   const [proposalConvertData, setProposalConvertData] = useState<{ proposal: Proposal; package: ProposalPackage } | null>(null)
 
+  // 追蹤是否已處理過導航參數（防止重複填入覆蓋用戶輸入）
+  const navigationProcessedRef = useRef(false)
+
   const {
     setNewTour,
     setAvailableCities,
@@ -47,6 +50,8 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
 
   const clearProposalConvertData = useCallback(() => {
     setProposalConvertData(null)
+    // 重置導航處理標記（允許下次轉開團重新填入）
+    navigationProcessedRef.current = false
     // 清除 URL 參數
     router.replace('/tours', { scroll: false })
   }, [router])
@@ -61,7 +66,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
         departure_date: '',
         return_date: '',
         price: 0,
-        status: '提案',
+        status: '進行中',  // 直接開團預設為進行中
         isSpecial: false,
         max_participants: 20,
         description: '',
@@ -98,6 +103,8 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
       total_amount: 0,
     })
     setFormError(null)
+    // 重置導航處理標記（允許下次轉開團重新填入）
+    navigationProcessedRef.current = false
   }, [setNewTour, setAvailableCities, setNewOrder, setFormError])
 
   // 打開編輯對話框
@@ -176,6 +183,11 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
 
     // 從提案轉開團
     if (action === 'create' && fromProposal && packageId) {
+      // 防止重複處理（避免覆蓋用戶已輸入的資料）
+      if (navigationProcessedRef.current) {
+        return
+      }
+      navigationProcessedRef.current = true
       try {
         // 取得提案、套件和行程表資料
         const [proposalRes, packageRes, itineraryRes] = await Promise.all([

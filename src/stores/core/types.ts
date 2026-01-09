@@ -75,6 +75,7 @@ export interface StoreState<T extends BaseEntity> {
 export interface CodeConfig {
   prefix?: string // 前綴（如 'T', 'O', 'C'）
   year?: number // 年份（預設當前年份）
+  quoteType?: 'standard' | 'quick' // 報價單類型（standard: Q 前綴, quick: X 前綴）
 }
 
 /**

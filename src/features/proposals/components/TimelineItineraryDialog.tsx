@@ -33,6 +33,9 @@ import {
   Moon,
   Palette,
   Database,
+  ArrowRight,
+  Minus,
+  Sparkles,
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
 
@@ -85,6 +88,7 @@ export function TimelineItineraryDialog({
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<number | null>(null)
   const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
+  const [insertAtRowIndex, setInsertAtRowIndex] = useState<number | null>(null) // 插入到哪一行之後
   const [saving, setSaving] = useState(false)
 
   // 計算日期的輔助函數（提前定義）
@@ -168,6 +172,21 @@ export function TimelineItineraryDialog({
     }))
   }, [activeDayIndex])
 
+  // 插入符號到今日主題
+  const insertSymbolToTitle = useCallback((symbol: string) => {
+    const input = document.querySelector('#day-title-input') as HTMLInputElement
+    if (input) {
+      const currentTitle = activeDay.title || ''
+      const cursorPos = input.selectionStart || currentTitle.length
+      const newValue = currentTitle.slice(0, cursorPos) + symbol + currentTitle.slice(cursorPos)
+      updateDayTitle(newValue)
+      setTimeout(() => {
+        input.focus()
+        input.setSelectionRange(cursorPos + symbol.length, cursorPos + symbol.length)
+      }, 0)
+    }
+  }, [activeDay.title, updateDayTitle])
+
   // 新增景點
   const addAttraction = useCallback(() => {
     setData((prev) => ({
@@ -180,29 +199,56 @@ export function TimelineItineraryDialog({
     }))
   }, [activeDayIndex])
 
+  // 打開景點選擇器（指定插入位置）
+  const openAttractionSelector = useCallback((rowIndex: number | null = null) => {
+    setInsertAtRowIndex(rowIndex)
+    setAttractionSelectorOpen(true)
+  }, [])
+
   // 從景點庫選擇後新增
-  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; name_en?: string; description?: string; thumbnail?: string }[]) => {
+  const handleAttractionSelect = useCallback((selectedAttractions: { id: string; name: string; name_en?: string; description?: string; thumbnail?: string; images?: string[] }[]) => {
+    const newAttractions = selectedAttractions.map((a) => {
+      // 優先使用 images 陣列，否則用 thumbnail
+      let imageList: { id: string; url: string }[] = []
+      if (a.images && a.images.length > 0) {
+        imageList = a.images.slice(0, 3).map(url => ({ id: generateId(), url }))
+      } else if (a.thumbnail) {
+        imageList = [{ id: generateId(), url: a.thumbnail }]
+      }
+
+      return {
+        id: generateId(),
+        name: a.name,
+        description: a.description || '',
+        images: imageList,
+      }
+    })
+
     setData((prev) => ({
       ...prev,
-      days: prev.days.map((day, idx) =>
-        idx === activeDayIndex
-          ? {
-              ...day,
-              attractions: [
-                ...day.attractions,
-                ...selectedAttractions.map((a) => ({
-                  id: generateId(),
-                  name: a.name,
-                  description: a.description || '',
-                  images: a.thumbnail ? [{ id: generateId(), url: a.thumbnail }] : [],
-                })),
-              ],
-            }
-          : day
-      ),
+      days: prev.days.map((day, idx) => {
+        if (idx !== activeDayIndex) return day
+
+        // 如果有指定插入位置，則插入到該行之後
+        if (insertAtRowIndex !== null) {
+          const before = day.attractions.slice(0, insertAtRowIndex + 1)
+          const after = day.attractions.slice(insertAtRowIndex + 1)
+          return {
+            ...day,
+            attractions: [...before, ...newAttractions, ...after],
+          }
+        }
+
+        // 否則加到最後
+        return {
+          ...day,
+          attractions: [...day.attractions, ...newAttractions],
+        }
+      }),
     }))
     setAttractionSelectorOpen(false)
-  }, [activeDayIndex])
+    setInsertAtRowIndex(null)
+  }, [activeDayIndex, insertAtRowIndex])
 
   // 刪除景點
   const removeAttraction = useCallback((attractionIndex: number) => {
@@ -562,25 +608,79 @@ export function TimelineItineraryDialog({
         {/* 當日內容 */}
         <div className="flex flex-col">
           {/* 每日標題 */}
-          <div className="flex items-center gap-3 py-3 border-b border-border/50 shrink-0">
-            <Label className="text-xs text-morandi-secondary shrink-0">今日主題</Label>
+          <div className="py-3 border-b border-border/50 shrink-0">
+            <div className="flex items-center justify-between mb-1">
+              <Label className="text-xs text-morandi-secondary">今日主題</Label>
+              <div className="flex items-center gap-1">
+                {/* 符號插入按鈕 */}
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' → ')}
+                  className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入箭頭"
+                >
+                  <ArrowRight size={14} className="text-morandi-primary" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' ⇀ ')}
+                  className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
+                  title="插入鉤箭頭"
+                >
+                  ⇀
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' · ')}
+                  className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors font-medium"
+                  title="插入間隔點"
+                >
+                  ·
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' | ')}
+                  className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入直線"
+                >
+                  <Minus size={14} className="text-morandi-primary" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' ⭐ ')}
+                  className="p-1.5 bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入星號"
+                >
+                  <Sparkles size={14} className="text-morandi-gold" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertSymbolToTitle(' ✈ ')}
+                  className="px-2 py-1 text-xs bg-morandi-container hover:bg-morandi-gold/20 rounded transition-colors"
+                  title="插入飛機"
+                >
+                  ✈
+                </button>
+                {data.days.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeDay(activeDayIndex)}
+                    className="h-7 px-2 text-morandi-red hover:bg-morandi-red/10 ml-2"
+                  >
+                    <Trash2 size={14} className="mr-1" />
+                    刪除此天
+                  </Button>
+                )}
+              </div>
+            </div>
             <Input
+              id="day-title-input"
               value={activeDay.title || ''}
               onChange={(e) => updateDayTitle(e.target.value)}
-              placeholder="輸入今日主題（如：台北市區觀光）"
-              className="h-8 text-sm flex-1"
+              placeholder="台北 ✈ 福岡空港 → 由布院 · 金麟湖 → 阿蘇溫泉"
+              className="h-8 text-sm"
             />
-            {data.days.length > 1 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeDay(activeDayIndex)}
-                className="h-8 px-2 text-morandi-red hover:bg-morandi-red/10"
-              >
-                <Trash2 size={14} className="mr-1" />
-                刪除此天
-              </Button>
-            )}
           </div>
 
           {/* 景點表格區域（固定高度可捲動） */}
@@ -589,6 +689,7 @@ export function TimelineItineraryDialog({
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-morandi-secondary border-b border-border/30">
+                <th className="py-2 px-1 text-center font-medium w-8"></th>
                 <th className="py-2 px-2 text-left font-medium w-16">開始</th>
                 <th className="py-2 px-2 text-left font-medium w-16">結束</th>
                 <th className="py-2 px-2 text-left font-medium">景點/餐廳</th>
@@ -605,6 +706,16 @@ export function TimelineItineraryDialog({
                   key={attraction.id}
                   className="hover:bg-morandi-container/20 transition-colors"
                 >
+                  <td className="py-0.5 w-8">
+                    <button
+                      type="button"
+                      onClick={() => openAttractionSelector(rowIndex)}
+                      className="p-1 text-morandi-muted hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
+                      title="在此行下方插入景點"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </td>
                   <td className="py-0.5 w-16">{renderCell(attraction, rowIndex, 'startTime', 'w-16')}</td>
                   <td className="py-0.5 w-16">{renderCell(attraction, rowIndex, 'endTime', 'w-16')}</td>
                   <td className="py-0.5">{renderCell(attraction, rowIndex, 'name')}</td>
@@ -719,11 +830,12 @@ export function TimelineItineraryDialog({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setAttractionSelectorOpen(true)}
+              onClick={() => openAttractionSelector(null)}
               className="gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
               title="從景點庫選擇"
             >
               <Database size={12} />
+              從景點庫新增
             </Button>
             <Button
               variant="ghost"
@@ -732,7 +844,7 @@ export function TimelineItineraryDialog({
               className="gap-1 text-xs text-morandi-secondary hover:text-morandi-gold"
             >
               <Plus size={12} />
-              新增景點
+              手動新增
             </Button>
           </div>
           </div>
@@ -793,8 +905,12 @@ export function TimelineItineraryDialog({
     {/* 景點選擇器（放在父 Dialog 外面） */}
     <AttractionSelector
       isOpen={attractionSelectorOpen}
-      onClose={() => setAttractionSelectorOpen(false)}
+      onClose={() => {
+        setAttractionSelectorOpen(false)
+        setInsertAtRowIndex(null)
+      }}
       onSelect={handleAttractionSelect}
+      dayTitle={activeDay.title || ''}
     />
     </>
   )
