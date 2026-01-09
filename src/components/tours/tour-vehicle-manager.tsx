@@ -221,6 +221,9 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
   const totalCapacity = vehicles.reduce((sum, v) => sum + v.capacity, 0)
 
   return (
+    <>
+    {/* 主 Dialog：新增車輛 Dialog 開啟時不渲染（避免多重遮罩） */}
+    {!showAddVehicle && (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-4 border-b border-border">
@@ -411,99 +414,101 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             </div>
           </div>
         </div>
-
-        {/* 新增車輛 Dialog */}
-        <Dialog open={showAddVehicle} onOpenChange={setShowAddVehicle}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-morandi-primary">
-                <Plus className="h-5 w-5 text-morandi-gold" />
-                新增車輛
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-1.5">
-                <Label className="text-morandi-primary">車輛名稱 *</Label>
-                <Input
-                  value={newVehicle.vehicle_name}
-                  onChange={e => setNewVehicle({ ...newVehicle, vehicle_name: e.target.value })}
-                  placeholder="例如：1號車、A車"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-morandi-primary">車型</Label>
-                  <Select
-                    value={newVehicle.vehicle_type}
-                    onValueChange={value => {
-                      const type = VEHICLE_TYPES.find(t => t.value === value)
-                      setNewVehicle({
-                        ...newVehicle,
-                        vehicle_type: value,
-                        capacity: type?.capacity || 45
-                      })
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {VEHICLE_TYPES.map(type => (
-                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-morandi-primary">座位數</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={newVehicle.capacity}
-                    onChange={e => setNewVehicle({ ...newVehicle, capacity: parseInt(e.target.value) || 45 })}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-morandi-primary">司機姓名</Label>
-                  <Input
-                    value={newVehicle.driver_name}
-                    onChange={e => setNewVehicle({ ...newVehicle, driver_name: e.target.value })}
-                    placeholder="選填"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-morandi-primary">司機電話</Label>
-                  <Input
-                    value={newVehicle.driver_phone}
-                    onChange={e => setNewVehicle({ ...newVehicle, driver_phone: e.target.value })}
-                    placeholder="選填"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-morandi-primary">車牌號碼</Label>
-                <Input
-                  value={newVehicle.license_plate}
-                  onChange={e => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
-                  placeholder="選填"
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-3 border-t border-border">
-                <Button variant="outline" onClick={() => setShowAddVehicle(false)} className="btn-morandi-secondary gap-2">
-                  <X size={16} />
-                  取消
-                </Button>
-                <Button onClick={handleAddVehicle} className="btn-morandi-primary gap-2">
-                  <Plus size={16} />
-                  新增車輛
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </DialogContent>
     </Dialog>
+    )}
+
+    {/* 新增車輛 Dialog - 放在主 Dialog 外面（避免多重遮罩） */}
+    <Dialog open={showAddVehicle} onOpenChange={setShowAddVehicle}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-morandi-primary">
+            <Plus className="h-5 w-5 text-morandi-gold" />
+            新增車輛
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-1.5">
+            <Label className="text-morandi-primary">車輛名稱 *</Label>
+            <Input
+              value={newVehicle.vehicle_name}
+              onChange={e => setNewVehicle({ ...newVehicle, vehicle_name: e.target.value })}
+              placeholder="例如：1號車、A車"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-morandi-primary">車型</Label>
+              <Select
+                value={newVehicle.vehicle_type}
+                onValueChange={value => {
+                  const type = VEHICLE_TYPES.find(t => t.value === value)
+                  setNewVehicle({
+                    ...newVehicle,
+                    vehicle_type: value,
+                    capacity: type?.capacity || 45
+                  })
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VEHICLE_TYPES.map(type => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-morandi-primary">座位數</Label>
+              <Input
+                type="number"
+                min={1}
+                value={newVehicle.capacity}
+                onChange={e => setNewVehicle({ ...newVehicle, capacity: parseInt(e.target.value) || 45 })}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-morandi-primary">司機姓名</Label>
+              <Input
+                value={newVehicle.driver_name}
+                onChange={e => setNewVehicle({ ...newVehicle, driver_name: e.target.value })}
+                placeholder="選填"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-morandi-primary">司機電話</Label>
+              <Input
+                value={newVehicle.driver_phone}
+                onChange={e => setNewVehicle({ ...newVehicle, driver_phone: e.target.value })}
+                placeholder="選填"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-morandi-primary">車牌號碼</Label>
+            <Input
+              value={newVehicle.license_plate}
+              onChange={e => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
+              placeholder="選填"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
+            <Button variant="outline" onClick={() => setShowAddVehicle(false)} className="btn-morandi-secondary gap-2">
+              <X size={16} />
+              取消
+            </Button>
+            <Button onClick={handleAddVehicle} className="btn-morandi-primary gap-2">
+              <Plus size={16} />
+              新增車輛
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }

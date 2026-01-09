@@ -85,6 +85,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
   // 入境卡列印
   const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
+
+  // 子組件內的 Dialog 狀態（用於避免多重遮罩）
+  const [membersHasChildDialog, setMembersHasChildDialog] = useState(false)
+  const [ordersHasChildDialog, setOrdersHasChildDialog] = useState(false)
+  const [paymentsHasChildDialog, setPaymentsHasChildDialog] = useState(false)
+  const [costsHasChildDialog, setCostsHasChildDialog] = useState(false)
   const [entryCardSettings, setEntryCardSettings] = useState({
     flightNumber: '',
     hotelName: '',
@@ -335,6 +341,11 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     }
   }
 
+  // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
+  const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
+    showEditDialog || showQuotePicker || showItineraryPicker || showPnrToolDialog || showEntryCardDialog ||
+    membersHasChildDialog || ordersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
+
   const renderTabContent = () => {
     if (!tour) return null
 
@@ -356,10 +367,11 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               triggerAdd={triggerPaymentAdd}
               onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
               showSummary={false}
+              onChildDialogChange={setPaymentsHasChildDialog}
             />
 
             {/* 成本支出 */}
-            <TourCosts tour={tour} showSummary={false} />
+            <TourCosts tour={tour} showSummary={false} onChildDialogChange={setCostsHasChildDialog} />
 
             {/* 文件確認 */}
             <div>
@@ -369,9 +381,9 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
           </div>
         )
       case 'orders':
-        return <TourOrders tour={tour} />
+        return <TourOrders tour={tour} onChildDialogChange={setOrdersHasChildDialog} />
       case 'members':
-        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} tour={tour} />
+        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} tour={tour} onChildDialogChange={setMembersHasChildDialog} />
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
       default:
@@ -380,285 +392,290 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col [&>button:last-child]:hidden">
-        {/* Accessibility: Hidden title for screen readers */}
-        <VisuallyHidden>
-          <DialogTitle>
-            {tour ? `${tour.name} (${tour.code})` : '旅遊團詳情'}
-          </DialogTitle>
-        </VisuallyHidden>
+    <>
+      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+      {!hasChildDialogOpen && (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+          <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col [&>button:last-child]:hidden">
+            {/* Accessibility: Hidden title for screen readers */}
+            <VisuallyHidden>
+              <DialogTitle>
+                {tour ? `${tour.name} (${tour.code})` : '旅遊團詳情'}
+              </DialogTitle>
+            </VisuallyHidden>
 
-        {/* Header: 團名 + Tabs + 功能按鈕 (同一排) */}
-        <div className="flex-shrink-0 h-12 bg-morandi-gold text-white px-4 flex items-center gap-4">
-          {/* 團名 */}
-          <h2 className="text-base font-semibold whitespace-nowrap">
-            {loading ? '載入中...' : tour?.name || '找不到旅遊團'}
-          </h2>
+            {/* Header: 團名 + Tabs + 功能按鈕 (同一排) */}
+            <div className="flex-shrink-0 h-12 bg-morandi-gold text-white px-4 flex items-center gap-4">
+              {/* 團名 */}
+              <h2 className="text-base font-semibold whitespace-nowrap">
+                {loading ? '載入中...' : tour?.name || '找不到旅遊團'}
+              </h2>
 
-          {/* Tabs */}
-          {tour && (
-            <div className="flex items-center flex-1 min-w-0">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setActiveTab(tab.value)}
-                  className={cn(
-                    'px-3 py-1.5 text-sm font-medium transition-colors rounded',
-                    activeTab === tab.value
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* 功能按鈕 */}
-          <div className="flex items-center gap-1">
-            {tour && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                  onClick={() => setShowConfirmationDialog(true)}
-                >
-                  <ClipboardList size={15} className="mr-1" />
-                  團確單
-                </Button>
-                {!tour.archived && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                    onClick={() => setShowCloseDialog(true)}
-                  >
-                    結團
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                  onClick={() => setShowPnrToolDialog(true)}
-                >
-                  <Plane size={15} className="mr-1" />
-                  PNR
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                  onClick={() => setShowEntryCardDialog(true)}
-                >
-                  <Printer size={15} className="mr-1" />
-                  入境卡
-                </Button>
-                {existingChannel && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white/90 hover:text-white hover:bg-white/20 h-8"
-                    onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
-                  >
-                    <MessageSquare size={15} />
-                  </Button>
-                )}
-              </>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20 h-8 w-8"
-              onClick={onClose}
-            >
-              <X size={18} />
-            </Button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-auto flex flex-col">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-morandi-secondary">載入中...</p>
-            </div>
-          ) : !tour ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-morandi-secondary">找不到指定的旅遊團</p>
-            </div>
-          ) : (
-            <div className="flex-1 flex flex-col min-h-0 px-4 pb-4 overflow-auto">
-              {renderTabContent()}
-            </div>
-          )}
-        </div>
-
-        {/* Dialogs */}
-        {tour && (
-          <>
-            <TourCloseDialog
-              tour={tour}
-              open={showCloseDialog}
-              onOpenChange={setShowCloseDialog}
-              onSuccess={handleSuccess}
-            />
-
-            <TourConfirmationDialog
-              tour={tour}
-              open={showConfirmationDialog}
-              onClose={() => setShowConfirmationDialog(false)}
-              nested
-            />
-
-            <CreateChannelDialog
-              isOpen={showCreateChannelDialog}
-              channelName={channelName}
-              channelDescription={channelDescription}
-              channelType="private"
-              selectedMembers={selectedMembers}
-              onChannelNameChange={setChannelName}
-              onChannelDescriptionChange={setChannelDescription}
-              onChannelTypeChange={() => {}}
-              onMembersChange={setSelectedMembers}
-              onClose={handleCloseChannelDialog}
-              onCreate={handleConfirmCreateChannel}
-            />
-
-            <TourEditDialog
-              isOpen={showEditDialog}
-              onClose={() => setShowEditDialog(false)}
-              tour={tour}
-              onSuccess={handleSuccess}
-            />
-
-            {/* 報價單版本選擇器（嵌套 Dialog） */}
-            <DocumentVersionPicker
-              isOpen={showQuotePicker}
-              onClose={() => setShowQuotePicker(false)}
-              tour={tour}
-              nested
-            />
-
-            {/* 行程表版本選擇器（嵌套 Dialog） */}
-            <ItineraryVersionPicker
-              isOpen={showItineraryPicker}
-              onClose={() => setShowItineraryPicker(false)}
-              tour={tour}
-              nested
-            />
-
-            {/* PNR 電報工具（嵌套 Dialog） */}
-            <TourPnrToolDialog
-              isOpen={showPnrToolDialog}
-              onClose={() => setShowPnrToolDialog(false)}
-              nested
-              tourId={tour.id}
-              tourCode={tour.code || ''}
-              tourName={tour.name}
-              members={tourMembers.map(m => ({
-                id: m.id,
-                order_id: m.order_id,
-                passport_name: m.passport_name,
-                chinese_name: m.chinese_name,
-                special_meal: m.special_meal,
-                flight_cost: m.flight_cost,
-                pnr: m.pnr,
-              }))}
-              onSuccess={handleSuccess}
-            />
-
-            {/* 入境卡列印對話框（嵌套 Dialog） */}
-            <EntryCardDialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
-              <EntryCardDialogContent nested className="max-w-[95vw] max-h-[95vh] overflow-auto">
-                <div className="no-print flex items-center justify-between mb-4">
-                  <EntryCardDialogHeader>
-                    <EntryCardDialogTitle>列印日本入境卡</EntryCardDialogTitle>
-                  </EntryCardDialogHeader>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => setShowEntryCardDialog(false)}
+              {/* Tabs */}
+              {tour && (
+                <div className="flex items-center flex-1 min-w-0">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.value}
+                      onClick={() => setActiveTab(tab.value)}
+                      className={cn(
+                        'px-3 py-1.5 text-sm font-medium transition-colors rounded',
+                        activeTab === tab.value
+                          ? 'bg-white/20 text-white'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      )}
                     >
-                      <X size={16} />
-                      關閉
-                    </Button>
-                    <Button className="gap-2" onClick={() => window.print()}>
-                      <Printer size={16} />
-                      列印
-                    </Button>
-                  </div>
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
+              )}
 
-                {/* 設定區域 */}
-                <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">航班號碼</label>
-                    <Input
-                      value={entryCardSettings.flightNumber}
-                      onChange={e => setEntryCardSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
-                      placeholder="例：BR-108"
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店名稱</label>
-                    <Input
-                      value={entryCardSettings.hotelName}
-                      onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelName: e.target.value }))}
-                      placeholder="例：東京灣希爾頓"
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店地址</label>
-                    <Input
-                      value={entryCardSettings.hotelAddress}
-                      onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
-                      placeholder="例：東京都港區..."
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店電話</label>
-                    <Input
-                      value={entryCardSettings.hotelPhone}
-                      onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
-                      placeholder="例：03-1234-5678"
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-morandi-primary mb-1 block">停留天數</label>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={90}
-                      value={entryCardSettings.stayDays}
-                      onChange={e => setEntryCardSettings(prev => ({ ...prev, stayDays: parseInt(e.target.value) || 5 }))}
-                      className="text-sm"
-                    />
-                  </div>
+              {/* 功能按鈕 */}
+              <div className="flex items-center gap-1">
+                {tour && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      onClick={() => setShowConfirmationDialog(true)}
+                    >
+                      <ClipboardList size={15} className="mr-1" />
+                      團確單
+                    </Button>
+                    {!tour.archived && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                        onClick={() => setShowCloseDialog(true)}
+                      >
+                        結團
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      onClick={() => setShowPnrToolDialog(true)}
+                    >
+                      <Plane size={15} className="mr-1" />
+                      PNR
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      onClick={() => setShowEntryCardDialog(true)}
+                    >
+                      <Printer size={15} className="mr-1" />
+                      入境卡
+                    </Button>
+                    {existingChannel && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                        onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
+                      >
+                        <MessageSquare size={15} />
+                      </Button>
+                    )}
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/20 h-8 w-8"
+                  onClick={onClose}
+                >
+                  <X size={18} />
+                </Button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto flex flex-col">
+              {loading ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-morandi-secondary">載入中...</p>
                 </div>
+              ) : !tour ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-morandi-secondary">找不到指定的旅遊團</p>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col min-h-0 px-4 pb-4 overflow-auto">
+                  {renderTabContent()}
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
-                {/* 預覽區域 */}
-                <JapanEntryCardPrint
-                  members={tourMembers}
-                  flightNumber={entryCardSettings.flightNumber || 'BR-XXX'}
-                  hotelName={entryCardSettings.hotelName}
-                  hotelAddress={entryCardSettings.hotelAddress}
-                  hotelPhone={entryCardSettings.hotelPhone}
-                  stayDays={entryCardSettings.stayDays}
-                />
-              </EntryCardDialogContent>
-            </EntryCardDialog>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+      {/* 子 Dialogs：放在主 Dialog 外面，避免多重遮罩 */}
+      {tour && (
+        <>
+          <TourCloseDialog
+            tour={tour}
+            open={showCloseDialog}
+            onOpenChange={setShowCloseDialog}
+            onSuccess={handleSuccess}
+          />
+
+          <TourConfirmationDialog
+            tour={tour}
+            open={showConfirmationDialog}
+            onClose={() => setShowConfirmationDialog(false)}
+            nested
+          />
+
+          <CreateChannelDialog
+            isOpen={showCreateChannelDialog}
+            channelName={channelName}
+            channelDescription={channelDescription}
+            channelType="private"
+            selectedMembers={selectedMembers}
+            onChannelNameChange={setChannelName}
+            onChannelDescriptionChange={setChannelDescription}
+            onChannelTypeChange={() => {}}
+            onMembersChange={setSelectedMembers}
+            onClose={handleCloseChannelDialog}
+            onCreate={handleConfirmCreateChannel}
+          />
+
+          <TourEditDialog
+            isOpen={showEditDialog}
+            onClose={() => setShowEditDialog(false)}
+            tour={tour}
+            onSuccess={handleSuccess}
+          />
+
+          {/* 報價單版本選擇器 */}
+          <DocumentVersionPicker
+            isOpen={showQuotePicker}
+            onClose={() => setShowQuotePicker(false)}
+            tour={tour}
+            nested
+          />
+
+          {/* 行程表版本選擇器 */}
+          <ItineraryVersionPicker
+            isOpen={showItineraryPicker}
+            onClose={() => setShowItineraryPicker(false)}
+            tour={tour}
+            nested
+          />
+
+          {/* PNR 電報工具 */}
+          <TourPnrToolDialog
+            isOpen={showPnrToolDialog}
+            onClose={() => setShowPnrToolDialog(false)}
+            nested
+            tourId={tour.id}
+            tourCode={tour.code || ''}
+            tourName={tour.name}
+            members={tourMembers.map(m => ({
+              id: m.id,
+              order_id: m.order_id,
+              passport_name: m.passport_name,
+              chinese_name: m.chinese_name,
+              special_meal: m.special_meal,
+              flight_cost: m.flight_cost,
+              pnr: m.pnr,
+            }))}
+            onSuccess={handleSuccess}
+          />
+
+          {/* 入境卡列印對話框 */}
+          <EntryCardDialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
+            <EntryCardDialogContent nested className="max-w-[95vw] max-h-[95vh] overflow-auto">
+              <div className="no-print flex items-center justify-between mb-4">
+                <EntryCardDialogHeader>
+                  <EntryCardDialogTitle>列印日本入境卡</EntryCardDialogTitle>
+                </EntryCardDialogHeader>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => setShowEntryCardDialog(false)}
+                  >
+                    <X size={16} />
+                    關閉
+                  </Button>
+                  <Button className="gap-2" onClick={() => window.print()}>
+                    <Printer size={16} />
+                    列印
+                  </Button>
+                </div>
+              </div>
+
+              {/* 設定區域 */}
+              <div className="no-print grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 p-4 bg-morandi-container/20 rounded-lg">
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">航班號碼</label>
+                  <Input
+                    value={entryCardSettings.flightNumber}
+                    onChange={e => setEntryCardSettings(prev => ({ ...prev, flightNumber: e.target.value }))}
+                    placeholder="例：BR-108"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店名稱</label>
+                  <Input
+                    value={entryCardSettings.hotelName}
+                    onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelName: e.target.value }))}
+                    placeholder="例：東京灣希爾頓"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店地址</label>
+                  <Input
+                    value={entryCardSettings.hotelAddress}
+                    onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelAddress: e.target.value }))}
+                    placeholder="例：東京都港區..."
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">飯店電話</label>
+                  <Input
+                    value={entryCardSettings.hotelPhone}
+                    onChange={e => setEntryCardSettings(prev => ({ ...prev, hotelPhone: e.target.value }))}
+                    placeholder="例：03-1234-5678"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-morandi-primary mb-1 block">停留天數</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={90}
+                    value={entryCardSettings.stayDays}
+                    onChange={e => setEntryCardSettings(prev => ({ ...prev, stayDays: parseInt(e.target.value) || 5 }))}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* 預覽區域 */}
+              <JapanEntryCardPrint
+                members={tourMembers}
+                flightNumber={entryCardSettings.flightNumber || 'BR-XXX'}
+                hotelName={entryCardSettings.hotelName}
+                hotelAddress={entryCardSettings.hotelAddress}
+                hotelPhone={entryCardSettings.hotelPhone}
+                stayDays={entryCardSettings.stayDays}
+              />
+            </EntryCardDialogContent>
+          </EntryCardDialog>
+        </>
+      )}
+    </>
   )
 }

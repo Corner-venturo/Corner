@@ -31,6 +31,7 @@ interface TourCostsProps {
   tour: Tour
   orderFilter?: string // 選填：只顯示特定訂單相關的成本
   showSummary?: boolean
+  onChildDialogChange?: (hasOpen: boolean) => void
 }
 
 // 擴展 Payment 型別以包含成本專用欄位
@@ -40,7 +41,7 @@ interface CostPayment extends Payment {
   receipt?: string
 }
 
-export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true }: TourCostsProps) {
+export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true, onChildDialogChange }: TourCostsProps) {
   const { items: orders } = useOrderStore()
   const {
     items: paymentRequests,
@@ -203,6 +204,12 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   }
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+
+  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
+  React.useEffect(() => {
+    onChildDialogChange?.(isAddDialogOpen)
+  }, [isAddDialogOpen, onChildDialogChange])
+
   const [newCost, setNewCost] = useState({
     amount: 0,
     description: '',

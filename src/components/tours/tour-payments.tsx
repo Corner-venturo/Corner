@@ -16,6 +16,7 @@ interface TourPaymentsProps {
   triggerAdd?: boolean
   onTriggerAddComplete?: () => void
   showSummary?: boolean
+  onChildDialogChange?: (hasOpen: boolean) => void
 }
 
 export const TourPayments = React.memo(function TourPayments({
@@ -24,6 +25,7 @@ export const TourPayments = React.memo(function TourPayments({
   triggerAdd,
   onTriggerAddComplete,
   showSummary = true,
+  onChildDialogChange,
 }: TourPaymentsProps) {
   const {
     // 資料
@@ -70,6 +72,11 @@ export const TourPayments = React.memo(function TourPayments({
     openInvoiceDialog,
     handleIssueInvoice,
   } = useTourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete })
+
+  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
+  React.useEffect(() => {
+    onChildDialogChange?.(isAddDialogOpen || isInvoiceDialogOpen)
+  }, [isAddDialogOpen, isInvoiceDialogOpen, onChildDialogChange])
 
   return (
     <div className="space-y-4">

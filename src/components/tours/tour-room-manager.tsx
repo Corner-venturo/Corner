@@ -181,7 +181,9 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
 
   return (
     <>
-      <Dialog open={open && !addRoomOpen} onOpenChange={handleOpenChange}>
+      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+      {!addRoomOpen && !editRoomOpen && (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-6xl w-[95vw] h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="pb-3 border-b border-border">
             <DialogTitle className="flex items-center gap-2 text-morandi-primary">
@@ -266,7 +268,8 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
             />
           </div>
         </DialogContent>
-      </Dialog>
+        </Dialog>
+      )}
 
       {/* 新增房間 Dialog */}
       <AddRoomDialog

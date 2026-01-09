@@ -11,9 +11,10 @@ import { logger } from '@/lib/utils/logger'
 
 interface TourOrdersProps {
   tour: Tour
+  onChildDialogChange?: (hasOpen: boolean) => void
 }
 
-export function TourOrders({ tour }: TourOrdersProps) {
+export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -24,6 +25,11 @@ export function TourOrders({ tour }: TourOrdersProps) {
   // 請款對話框狀態
   const [requestDialogOpen, setRequestDialogOpen] = useState(false)
   const [selectedOrderForRequest, setSelectedOrderForRequest] = useState<Order | null>(null)
+
+  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
+  useEffect(() => {
+    onChildDialogChange?.(receiptDialogOpen || requestDialogOpen)
+  }, [receiptDialogOpen, requestDialogOpen, onChildDialogChange])
 
   useEffect(() => {
     const fetchOrders = async () => {

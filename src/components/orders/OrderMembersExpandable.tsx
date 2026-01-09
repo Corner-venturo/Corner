@@ -11,7 +11,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil } from 'lucide-react'
+import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +45,7 @@ import {
   CustomerMatchDialog,
   CustomCostFieldsSection,
   MemberTableHeader,
+  PnrMatchDialog,
 } from './components'
 import { TourPrintDialog } from '@/components/tours/TourPrintDialog'
 import type { OrderMember, OrderMembersExpandableProps, CustomCostField } from './order-member.types'
@@ -113,7 +114,8 @@ export function OrderMembersExpandable({
   embedded = false,
   forceShowPnr = false,
   tour,
-}: OrderMembersExpandableProps) {
+  onChildDialogChange,
+}: OrderMembersExpandableProps & { onChildDialogChange?: (hasOpen: boolean) => void }) {
   const mode = propMode || (orderId ? 'order' : 'tour')
 
   // Hooks
@@ -154,6 +156,7 @@ export function OrderMembersExpandable({
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(getInitialColumnVisibility)
+  const [showPnrMatchDialog, setShowPnrMatchDialog] = useState(false)
 
   // 切換欄位可見性
   const toggleColumnVisibility = useCallback((column: keyof ColumnVisibility) => {
@@ -189,6 +192,15 @@ export function OrderMembersExpandable({
       })
     }
   }, [forceShowPnr])
+
+  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
+  const hasChildDialogOpen = showPnrMatchDialog || roomVehicle.showRoomManager || roomVehicle.showVehicleManager ||
+    memberEdit.isEditDialogOpen || memberExport.isExportDialogOpen || membersData.isAddDialogOpen ||
+    membersData.showOrderSelectDialog || customerMatch.showCustomerMatchDialog || !!previewMember
+
+  useEffect(() => {
+    onChildDialogChange?.(hasChildDialogOpen)
+  }, [hasChildDialogOpen, onChildDialogChange])
 
   // 從 members 資料初始化 pnrValues
   React.useEffect(() => {
@@ -259,6 +271,9 @@ export function OrderMembersExpandable({
         <div className="flex items-center gap-1">
           {mode === 'tour' && (
             <>
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrMatchDialog(true)}>
+                <Plane size={14} className="mr-1" />PNR 配對
+              </Button>
               <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
                 <Hotel size={14} className="mr-1" />分房
               </Button>
@@ -510,6 +525,23 @@ export function OrderMembersExpandable({
         matchType={customerMatch.matchType}
         onClose={customerMatch.closeCustomerMatchDialog}
         onSelect={customerMatch.handleSelectCustomer}
+      />
+      <PnrMatchDialog
+        isOpen={showPnrMatchDialog}
+        onClose={() => setShowPnrMatchDialog(false)}
+        members={membersData.members.map(m => ({
+          id: m.id,
+          chinese_name: m.chinese_name ?? null,
+          passport_name: m.passport_name ?? null,
+          pnr: m.pnr,
+        }))}
+        orderId={orderId || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0].id : undefined)}
+        workspaceId={workspaceId}
+        onSuccess={() => {
+          membersData.loadMembers()
+          // PNR 配對成功後自動顯示 PNR 欄位
+          setColumnVisibility(prev => ({ ...prev, pnr: true }))
+        }}
       />
       <MemberEditDialog
         isOpen={memberEdit.isEditDialogOpen}
