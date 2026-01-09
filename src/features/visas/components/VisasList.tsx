@@ -35,27 +35,32 @@ export function VisasList({
     {
       key: 'applicant_name',
       label: '申請人',
+      width: '100',
       sortable: true,
       render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_person',
       label: '聯絡人',
+      width: '100',
       render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'contact_phone',
-      label: '聯絡電話',
+      label: '電話',
+      width: '110',
       render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'country',
       label: '簽證',
+      width: '80',
       render: (value) => <TextCell text={String(value || '')} />,
     },
     {
       key: 'status',
       label: '狀態',
+      width: '80',
       render: (value, rowData) => {
         const visa = rowData as Visa
         const statusColors: Record<string, string> = {
@@ -74,7 +79,8 @@ export function VisasList({
     },
     {
       key: 'received_date',
-      label: '收件時間',
+      label: '收件',
+      width: '100',
       render: (value, rowData) => {
         const visa = rowData as Visa
         // 優先用新欄位，向後相容舊欄位
@@ -84,32 +90,38 @@ export function VisasList({
     },
     {
       key: 'actual_submission_date',
-      label: '送件時間',
+      label: '送件',
+      width: '100',
       render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'expected_issue_date',
       label: '預計下件',
+      width: '100',
       render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'vendor',
       label: '送件單位',
+      width: '100',
       render: (value) => <TextCell text={typeof value === 'string' ? value : ''} />,
     },
     {
       key: 'documents_returned_date',
-      label: '證件歸還',
+      label: '歸還',
+      width: '100',
       render: (value) => <DateCell date={value as string | null} />,
     },
     {
       key: 'fee',
       label: '代辦費',
+      width: '90',
       render: (value) => <CurrencyCell amount={Number(value || 0)} />,
     },
     {
       key: 'cost',
       label: '成本',
+      width: '90',
       render: (value) => <CurrencyCell amount={Number(value || 0)} variant="default" />,
     },
   ]
