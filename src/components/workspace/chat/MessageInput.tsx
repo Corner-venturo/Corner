@@ -83,7 +83,7 @@ export function MessageInput({
 
       // 檢查是否是機器人
       if (parts.includes(SYSTEM_BOT_ID)) {
-        return '角落機器人'
+        return 'VENTURO 機器人'
       }
 
       // 查找員工名字

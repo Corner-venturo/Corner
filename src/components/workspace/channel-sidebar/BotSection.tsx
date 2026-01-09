@@ -1,6 +1,6 @@
 /**
  * 機器人區塊
- * 獨立顯示角落機器人，放在公告下方
+ * 獨立顯示 VENTURO 機器人，放在公告下方
  */
 
 'use client'
@@ -56,7 +56,7 @@ export function BotSection({
           <Bot size={14} className="text-morandi-gold" />
         </div>
         <span className="flex-1 text-left truncate font-medium">
-          {bot.chinese_name || bot.display_name || '角落機器人'}
+          {bot.chinese_name || bot.display_name || 'VENTURO 機器人'}
         </span>
       </button>
     </div>

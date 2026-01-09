@@ -28,7 +28,7 @@ export function EmptyState({ channelName, channelType }: EmptyStateProps) {
         return {
           isDm: true,
           isBot: true,
-          name: '角落機器人',
+          name: 'VENTURO 機器人',
           icon: Bot,
         }
       }
@@ -72,7 +72,7 @@ export function EmptyState({ channelName, channelType }: EmptyStateProps) {
       </h3>
       <p className="text-morandi-secondary">
         {displayInfo.isBot
-          ? '角落機器人會在這裡通知你重要的系統訊息'
+          ? 'VENTURO 機器人會在這裡通知你重要的系統訊息'
           : '這裡還沒有任何訊息。開始對話吧！'}
       </p>
     </div>

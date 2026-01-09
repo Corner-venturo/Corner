@@ -147,7 +147,7 @@ export function ChannelList({
             />
           )}
 
-          {/* 1.5 角落機器人（公告下方） */}
+          {/* 1.5 VENTURO 機器人（公告下方） */}
           <BotSection
             onSelectBot={onSelectMember}
             selectedBotId={selectedChannelId}
