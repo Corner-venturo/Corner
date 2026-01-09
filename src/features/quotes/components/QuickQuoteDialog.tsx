@@ -4,7 +4,7 @@
 
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,7 +37,7 @@ interface QuickQuoteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   formData: QuickQuoteFormData
-  setFormField: (field: string, value: string | number | QuickQuoteItem[]) => void
+  setFormField: (field: string, value: string | number | QuickQuoteItem[] | ((prev: QuickQuoteFormData) => string | number | QuickQuoteItem[])) => void
   onSubmit: () => Promise<boolean>
   onClose: () => void
 }
@@ -50,9 +50,28 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
   onSubmit,
   onClose,
 }) => {
+  // 使用 local state 管理 items，避免 stale closure 問題
+  const [localItems, setLocalItems] = useState<QuickQuoteItem[]>(formData.items)
+
+  // 當 dialog 開啟時，同步 formData.items 到 local state
+  useEffect(() => {
+    if (open) {
+      setLocalItems(formData.items)
+    }
+  }, [open, formData.items])
+
+  // 當 localItems 變化時，同步回 parent
+  useEffect(() => {
+    if (open && localItems !== formData.items) {
+      setFormField('items', localItems)
+    }
+  }, [localItems])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (formData.customer_name.trim()) {
+      // 確保最新的 items 已同步
+      setFormField('items', localItems)
       const success = await onSubmit()
       if (success) {
         onClose()
@@ -61,7 +80,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
   }
 
   // 計算應收金額（所有項目的金額總和）
-  const totalAmount = formData.items.reduce((sum, item) => sum + item.amount, 0)
+  const totalAmount = localItems.reduce((sum, item) => sum + item.amount, 0)
 
   // 計算應收餘額
   const balanceAmount = totalAmount - (Number(formData.received_amount) || 0)
@@ -76,22 +95,18 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
       amount: 0,
       notes: '',
     }
-    setFormField('items', [...formData.items, newItem])
+    setLocalItems(prev => [...prev, newItem])
   }
 
   // 刪除項目
   const removeItem = (id: string) => {
-    setFormField(
-      'items',
-      formData.items.filter(item => item.id !== id)
-    )
+    setLocalItems(prev => prev.filter(item => item.id !== id))
   }
 
   // 更新項目
   const updateItem = (id: string, field: keyof QuickQuoteItem, value: string | number) => {
-    setFormField(
-      'items',
-      formData.items.map(item => {
+    setLocalItems(prev =>
+      prev.map(item => {
         if (item.id === id) {
           const updated = { ...item, [field]: value }
           // 自動計算金額
@@ -193,14 +208,15 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {formData.items.map((item, index) => (
+                  {localItems.map((item, index) => (
                     <tr key={item.id} className="border-t border-border">
                       <td className="px-3 py-2">
-                        <Input
+                        <input
+                          type="text"
                           value={item.description || ''}
                           onChange={e => updateItem(item.id, 'description', e.target.value)}
                           placeholder="項目說明"
-                          className="h-8"
+                          className="h-8 w-full px-2 border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-morandi-gold"
                           autoComplete="off"
                         />
                       </td>
@@ -250,11 +266,12 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                         <CurrencyCell amount={item.amount} className="font-medium justify-end" />
                       </td>
                       <td className="px-3 py-2">
-                        <Input
+                        <input
+                          type="text"
                           value={item.notes || ''}
                           onChange={e => updateItem(item.id, 'notes', e.target.value)}
                           placeholder="備註"
-                          className="h-8"
+                          className="h-8 w-full px-2 border border-border rounded text-sm focus:outline-none focus:ring-1 focus:ring-morandi-gold"
                           autoComplete="off"
                         />
                       </td>
@@ -269,7 +286,7 @@ export const QuickQuoteDialog: React.FC<QuickQuoteDialogProps> = ({
                       </td>
                     </tr>
                   ))}
-                  {formData.items.length === 0 && (
+                  {localItems.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-3 py-8 text-center text-morandi-secondary">
                         尚無項目，點擊「新增項目」開始

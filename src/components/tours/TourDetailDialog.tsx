@@ -47,11 +47,17 @@ const TourConfirmationSheet = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+const TourControlSheet = dynamic(
+  () => import('@/components/tours/tour-control-sheet').then(m => m.TourControlSheet),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
 const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
   { value: 'confirmation', label: '團確單' },
+  { value: 'control', label: '團控' },
 ]
 
 interface TourDetailDialogProps {
@@ -386,6 +392,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} tour={tour} onChildDialogChange={setMembersHasChildDialog} />
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
+      case 'control':
+        return <TourControlSheet tourId={tour.id} />
       default:
         return <TourOverview tour={tour} />
     }

@@ -68,7 +68,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
   const totalProfit = totalAmount - totalCost
   const balanceAmount = totalAmount - formData.received_amount
 
-  // 項目操作
+  // 項目操作 - 使用 functional update 避免 stale closure
   const addItem = () => {
     const newItem: QuickQuoteItem = {
       id: `item-${Date.now()}`,
@@ -78,17 +78,17 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
       amount: 0,
       notes: '',
     }
-    setItems([...items, newItem])
+    setItems(prev => [...prev, newItem])
     setIsEditing(true)
   }
 
   const removeItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id))
+    setItems(prev => prev.filter(item => item.id !== id))
   }
 
   const updateItem = <K extends keyof QuickQuoteItem>(id: string, field: K, value: QuickQuoteItem[K]) => {
-    setItems(
-      items.map(item => {
+    setItems(prev =>
+      prev.map(item => {
         if (item.id === id) {
           const updated = { ...item, [field]: value }
           if (field === 'quantity' || field === 'unit_price') {

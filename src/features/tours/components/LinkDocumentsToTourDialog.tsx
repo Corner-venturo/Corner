@@ -193,9 +193,15 @@ export function LinkDocumentsToTourDialog({
     setQuickQuoteDialogOpen(true)
   }
 
-  // 設定快速報價單表單欄位
-  const setQuickQuoteFormField = (field: string, value: string | number | QuickQuoteItem[]) => {
-    setQuickQuoteFormData(prev => ({ ...prev, [field]: value }))
+  // 設定快速報價單表單欄位 - 支援 callback 模式
+  const setQuickQuoteFormField = (
+    field: string,
+    value: string | number | QuickQuoteItem[] | ((prev: QuickQuoteFormData) => string | number | QuickQuoteItem[])
+  ) => {
+    setQuickQuoteFormData(prev => {
+      const newValue = typeof value === 'function' ? value(prev) : value
+      return { ...prev, [field]: newValue }
+    })
   }
 
   // 提交快速報價單
