@@ -54,6 +54,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
     addItem,
     removeItem,
     updateItem,
+    reorderItems,
     handleSave,
     handleSaveAsNewVersion,
     handleLoadVersion,
@@ -167,6 +168,7 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
           onAddItem={addItem}
           onRemoveItem={removeItem}
           onUpdateItem={updateItem}
+          onReorderItems={reorderItems}
         />
 
         {/* 費用說明 & 金額統計 */}

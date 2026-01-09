@@ -24,8 +24,8 @@ interface FormData {
 }
 
 export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProps) {
-  // 狀態管理
-  const [isEditing, setIsEditing] = useState(false)
+  // 狀態管理 - 草稿狀態自動進入編輯模式
+  const [isEditing, setIsEditing] = useState(quote.status === 'draft')
   const [isSaving, setIsSaving] = useState(false)
   const [showPrintPreview, setShowPrintPreview] = useState(false)
   const [currentEditingVersion, setCurrentEditingVersion] = useState<number | null>(null)
@@ -99,6 +99,16 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
         return item
       })
     )
+  }
+
+  // 重新排序項目
+  const reorderItems = (oldIndex: number, newIndex: number) => {
+    setItems(prev => {
+      const newItems = [...prev]
+      const [removed] = newItems.splice(oldIndex, 1)
+      newItems.splice(newIndex, 0, removed)
+      return newItems
+    })
   }
 
   // 準備版本資料
@@ -243,7 +253,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
       issue_date?: string
       received_amount?: number
       expense_description?: string
-      items?: QuickQuoteItem[]
+      quick_quote_items?: QuickQuoteItem[]
     }
 
     setFormData({
@@ -257,8 +267,8 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
       expense_description: versionData.expense_description || '',
     })
 
-    if (versionData.items) {
-      setItems(versionData.items)
+    if (versionData.quick_quote_items) {
+      setItems(versionData.quick_quote_items)
     }
 
     setCurrentEditingVersion(versionIndex)
@@ -297,6 +307,7 @@ export function useQuickQuoteDetail({ quote, onUpdate }: UseQuickQuoteDetailProp
     addItem,
     removeItem,
     updateItem,
+    reorderItems,
     handleSave,
     handleSaveAsNewVersion,
     handleLoadVersion,
