@@ -1,6 +1,8 @@
 /**
  * LinkDocumentsToTourDialog - 旅遊團文件管理對話框
- * 左邊：快速行程表（從 proposal_package.timeline_data）
+ * 左邊：行程表（根據 proposal_package.itinerary_type 顯示對應類型）
+ *   - timeline: 快速行程表（開啟 TimelineItineraryDialog）
+ *   - simple: 網頁行程表（跳轉到行程編輯頁面）
  * 中間：團體報價單
  * 右邊：快速報價單
  */
@@ -256,14 +258,15 @@ export function LinkDocumentsToTourDialog({
             </DialogHeader>
 
             <div className="grid grid-cols-3 gap-4 mt-4 flex-1 min-h-0 overflow-hidden">
-              {/* ========== 左邊：快速行程表 ========== */}
+              {/* ========== 左邊：行程表 ========== */}
               <div className="flex flex-col overflow-hidden min-h-0">
                 <div className="flex items-center gap-2 pb-2 border-b border-morandi-container flex-shrink-0">
                   <FileText className="w-5 h-5 text-morandi-primary" />
-                  <span className="font-medium text-morandi-primary">快速行程表</span>
+                  <span className="font-medium text-morandi-primary">行程表</span>
                 </div>
 
                 {hasTimelineData ? (
+                  // 快速行程表（Timeline）
                   <div className="mt-3">
                     <button
                       onClick={handleOpenTimelineDialog}
@@ -275,16 +278,36 @@ export function LinkDocumentsToTourDialog({
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-morandi-gold text-xs">查看/編輯行程表</div>
                         <div className="text-[10px] text-morandi-secondary mt-0.5">
-                          {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天行程
+                          快速行程表 · {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
+                        </div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-morandi-gold/60" />
+                    </button>
+                  </div>
+                ) : hasSimpleItinerary ? (
+                  // 簡易行程表（連結到行程表系統）
+                  <div className="mt-3">
+                    <button
+                      onClick={handleOpenSimpleItinerary}
+                      className="w-full flex items-center gap-2 p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 hover:bg-morandi-gold/10 transition-colors text-left"
+                    >
+                      <div className="w-6 h-6 rounded bg-morandi-gold/20 flex items-center justify-center shrink-0">
+                        <Eye className="w-3.5 h-3.5 text-morandi-gold" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-morandi-gold text-xs">查看/編輯行程表</div>
+                        <div className="text-[10px] text-morandi-secondary mt-0.5">
+                          網頁行程表
                         </div>
                       </div>
                       <ExternalLink className="w-4 h-4 text-morandi-gold/60" />
                     </button>
                   </div>
                 ) : (
+                  // 尚未建立行程表
                   <div className="flex-1 flex items-center justify-center mt-3">
                     <div className="text-center py-4 text-morandi-secondary text-[10px]">
-                      尚未建立快速行程表
+                      尚未建立行程表
                     </div>
                   </div>
                 )}
