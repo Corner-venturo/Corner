@@ -27,7 +27,7 @@ import {
   Trash2,
   Loader2,
 } from 'lucide-react'
-import { SupplierSearchInput } from './SupplierSearchInput'
+import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSearchInput'
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
 import { COMPANY } from '@/lib/constants/company'
 import { supabase } from '@/lib/supabase/client'
@@ -37,12 +37,13 @@ import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 import type { Tour } from '@/stores/types'
 
-// 供應商資料類型（從 SupplierSearchInput 選取）
-interface SelectedSupplier {
-  id: string
-  name: string
-  contact_person?: string
-  phone?: string
+// 分類對應表（TourRequest category → supplier_type_code）
+const CATEGORY_TO_SUPPLIER_TYPE: Record<string, string> = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  transport: 'transport',
+  activity: 'attraction',  // 注意：不同名稱
+  other: 'other',
 }
 
 // 需求項目類型
@@ -127,10 +128,20 @@ export function TourRequestFormDialog({
 
   // 供應商資訊（可編輯）
   const [supplierInfo, setSupplierInfo] = useState({
+    id: '',  // 如果是已存在的供應商，記錄 ID
     name: supplierName,
     contactPerson: '',
     phone: '',
     fax: '',
+  })
+
+  // 城市資訊
+  const [cityInfo, setCityInfo] = useState({
+    countryCode: '',
+    cityCode: '',
+    cityName: '',
+    countryName: '',
+    customCity: '',  // 不在列表時手動輸入
   })
 
   // 列印/儲存狀態
@@ -140,13 +151,24 @@ export function TourRequestFormDialog({
   const logoUrl = usePrintLogo(isOpen)
 
   // 選擇供應商時自動帶入資訊
-  const handleSupplierSelect = (supplier: SelectedSupplier) => {
+  const handleSupplierSelect = (supplier: SupplierData) => {
     setSupplierInfo({
+      id: supplier.id,
       name: supplier.name,
       contactPerson: supplier.contact_person || '',
       phone: supplier.phone || '',
-      fax: '',
+      fax: supplier.fax || '',
     })
+
+    // 如果供應商有城市資訊，帶入城市選擇
+    if (supplier.city) {
+      setCityInfo(prev => ({
+        ...prev,
+        cityName: supplier.city || '',
+        countryName: supplier.country || '',
+        customCity: supplier.city || '',  // 暫時用 customCity 儲存
+      }))
+    }
   }
 
   // 我方資訊（TODO: 之後從 workspace settings 讀取）
@@ -377,6 +399,107 @@ export function TourRequestFormDialog({
     }
   }
 
+  // 儲存/更新供應商資訊
+  const saveSupplierInfo = async () => {
+    // 沒有供應商名稱或沒有 workspace_id 就不儲存
+    if (!supplierInfo.name || !user?.workspace_id) {
+      return
+    }
+
+    try {
+      const supplierTypeCode = CATEGORY_TO_SUPPLIER_TYPE[category] || 'other'
+      const cityName = cityInfo.customCity || cityInfo.cityName
+
+      // 如果有 ID，表示是選擇的既有供應商，更新聯絡資訊
+      if (supplierInfo.id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any)
+          .from('suppliers')
+          .update({
+            contact_person: supplierInfo.contactPerson || null,
+            phone: supplierInfo.phone || null,
+            fax: supplierInfo.fax || null,
+            city: cityName || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', supplierInfo.id)
+
+        if (error) {
+          logger.warn('更新供應商失敗:', error)
+        }
+        return
+      }
+
+      // 檢查是否已存在同名同類別的供應商
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: existing } = await (supabase as any)
+        .from('suppliers')
+        .select('id')
+        .eq('name', supplierInfo.name)
+        .eq('supplier_type_code', supplierTypeCode)
+        .eq('workspace_id', user.workspace_id)
+        .maybeSingle()
+
+      if (existing) {
+        // 已存在，更新聯絡資訊
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any)
+          .from('suppliers')
+          .update({
+            contact_person: supplierInfo.contactPerson || null,
+            phone: supplierInfo.phone || null,
+            fax: supplierInfo.fax || null,
+            city: cityName || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id)
+
+        if (error) {
+          logger.warn('更新供應商失敗:', error)
+        }
+      } else {
+        // 不存在，建立新供應商
+        // 生成供應商代碼
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: maxCodeData } = await (supabase as any)
+          .from('suppliers')
+          .select('code')
+          .like('code', 'S%')
+          .order('code', { ascending: false })
+          .limit(1)
+
+        let newCode = 'S000001'
+        if (maxCodeData && maxCodeData.length > 0) {
+          const maxNum = parseInt(maxCodeData[0].code.replace('S', ''), 10) || 0
+          newCode = `S${String(maxNum + 1).padStart(6, '0')}`
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any)
+          .from('suppliers')
+          .insert({
+            code: newCode,
+            name: supplierInfo.name,
+            supplier_type_code: supplierTypeCode,
+            contact_person: supplierInfo.contactPerson || null,
+            phone: supplierInfo.phone || null,
+            fax: supplierInfo.fax || null,
+            city: cityName || null,
+            workspace_id: user.workspace_id,
+            is_active: true,
+          })
+
+        if (error) {
+          logger.warn('建立供應商失敗:', error)
+        } else {
+          logger.log('已建立新供應商:', supplierInfo.name)
+        }
+      }
+    } catch (err) {
+      logger.error('儲存供應商失敗:', err)
+    }
+  }
+
   // 開啟新視窗列印（避免 Dialog z-index 問題）
   const handlePrintInNewWindow = async () => {
     setSaving(true)
@@ -387,6 +510,9 @@ export function TourRequestFormDialog({
 
       // 儲存到文件管理（背景執行，不阻塞列印）
       saveToTourDocuments(printContent)
+
+      // 儲存供應商資訊（背景執行）
+      saveSupplierInfo()
 
       // 開啟新視窗列印
       const printWindow = window.open('', '_blank', 'width=900,height=700')
@@ -446,9 +572,19 @@ export function TourRequestFormDialog({
                     <span className="text-morandi-secondary w-16">廠商：</span>
                     <SupplierSearchInput
                       value={supplierInfo.name}
-                      onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val }))}
+                      onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val, id: '' }))}
                       onSupplierSelect={handleSupplierSelect}
+                      category={category}
                       className="flex-1"
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-morandi-secondary w-16">城市：</span>
+                    <Input
+                      value={cityInfo.customCity}
+                      onChange={(e) => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
+                      className="h-7 text-sm flex-1"
+                      placeholder="輸入城市（如：清邁、東京）"
                     />
                   </div>
                   <div className="flex gap-2 items-center">
@@ -467,6 +603,15 @@ export function TourRequestFormDialog({
                       onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
                       className="h-7 text-sm"
                       placeholder="輸入電話"
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-morandi-secondary w-16">傳真：</span>
+                    <Input
+                      value={supplierInfo.fax}
+                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}
+                      className="h-7 text-sm"
+                      placeholder="輸入傳真"
                     />
                   </div>
                 </div>

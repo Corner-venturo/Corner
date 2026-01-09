@@ -16,19 +16,24 @@ import { Search, Plus, Loader2, Building2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 
-// 供應商資料（只使用確定存在的欄位）
-interface Supplier {
+// 供應商資料（完整欄位）
+export interface Supplier {
   id: string
   code: string
   name: string
   contact_person?: string
   phone?: string
+  fax?: string
+  city?: string
+  country?: string
+  supplier_type_code?: string
 }
 
 interface SupplierSearchInputProps {
   value: string
   onChange: (value: string) => void
   onSupplierSelect?: (supplier: Supplier) => void
+  category?: string  // 優先顯示同類別供應商
   placeholder?: string
   className?: string
 }
@@ -37,6 +42,7 @@ export function SupplierSearchInput({
   value,
   onChange,
   onSupplierSelect,
+  category,
   placeholder = '輸入供應商名稱',
   className = '',
 }: SupplierSearchInputProps) {
@@ -57,21 +63,37 @@ export function SupplierSearchInput({
 
       setLoading(true)
       try {
-        // 繞過 TypeScript 類型檢查（suppliers 表欄位尚未在 generated types 中）
-         
-        const { data, error } = await (supabase as any)
+        // 將 category 轉換為 supplier_type_code（activity → attraction）
+        const supplierTypeCode = category === 'activity' ? 'attraction' : category
+
+        // 查詢供應商（包含完整欄位）
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let query = (supabase as any)
           .from('suppliers')
-          .select('id, code, name, contact_person, phone')
+          .select('id, code, name, contact_person, phone, fax, city, country, supplier_type_code')
           .ilike('name', `%${searchTerm}%`)
           .eq('is_active', true)
-          .limit(10)
+          .limit(15)
+
+        const { data, error } = await query
 
         if (error) {
           logger.error('搜尋供應商失敗:', error.message || error)
           setSuppliers([])
           return
         }
-        setSuppliers((data as Supplier[]) || [])
+
+        // 排序：同類別優先
+        let sortedData = (data as Supplier[]) || []
+        if (supplierTypeCode && sortedData.length > 0) {
+          sortedData = sortedData.sort((a, b) => {
+            const aMatch = a.supplier_type_code === supplierTypeCode ? 0 : 1
+            const bMatch = b.supplier_type_code === supplierTypeCode ? 0 : 1
+            return aMatch - bMatch
+          })
+        }
+
+        setSuppliers(sortedData.slice(0, 10))
       } catch (error) {
         const err = error as Error
         logger.error('搜尋供應商失敗:', err.message || err)
@@ -83,7 +105,7 @@ export function SupplierSearchInput({
 
     const debounce = setTimeout(searchSuppliers, 300)
     return () => clearTimeout(debounce)
-  }, [searchTerm])
+  }, [searchTerm, category])
 
   // 點擊外部關閉
   useEffect(() => {
@@ -170,7 +192,14 @@ export function SupplierSearchInput({
                 <div className="flex items-center gap-2">
                   <Building2 size={14} className="text-morandi-secondary shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">{supplier.name}</div>
+                    <div className="font-medium text-sm truncate">
+                      {supplier.name}
+                      {supplier.city && (
+                        <span className="text-morandi-secondary font-normal ml-1">
+                          ({supplier.city})
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-morandi-secondary flex gap-2">
                       {supplier.contact_person && <span>聯絡人: {supplier.contact_person}</span>}
                       {supplier.phone && <span>{supplier.phone}</span>}
