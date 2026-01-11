@@ -1873,11 +1873,11 @@ function DesignerPageContent() {
               {/* 日系風格 */}
               <button
                 onClick={() => handleSelectStyle('japanese-style-v1')}
-                className="group relative bg-white rounded-xl border-2 border-border hover:border-morandi-gold transition-all overflow-hidden text-left"
+                className="group relative bg-card rounded-xl border-2 border-border hover:border-morandi-gold transition-all overflow-hidden text-left"
               >
                 {/* 預覽圖 */}
-                <div className="aspect-[3/4] bg-gradient-to-b from-morandi-container to-white flex items-center justify-center">
-                  <div className="w-32 h-44 bg-white rounded-lg shadow-lg border border-border/50 flex flex-col items-center justify-center p-3">
+                <div className="aspect-[3/4] bg-gradient-to-b from-morandi-container to-card flex items-center justify-center">
+                  <div className="w-32 h-44 bg-card rounded-lg shadow-lg border border-border/50 flex flex-col items-center justify-center p-3">
                     <div className="w-full h-20 bg-morandi-container rounded-t-[40px] rounded-b mb-2" />
                     <div className="w-16 h-1 bg-morandi-gold rounded mb-2" />
                     <div className="w-full h-2 bg-morandi-container/50 rounded mb-1" />
@@ -1940,7 +1940,7 @@ function DesignerPageContent() {
       {/* 上傳中遮罩 */}
       {isUploading && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 flex items-center gap-3">
+          <div className="bg-card rounded-lg p-6 flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-morandi-gold" />
             <span className="text-morandi-primary">上傳中...</span>
           </div>
@@ -2049,7 +2049,7 @@ function DesignerPageContent() {
             onClick={() => setShowPageDrawer(false)}
           />
           {/* 抽屜內容 */}
-          <div className="relative w-[320px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-200 ml-16">
+          <div className="relative w-[320px] h-full bg-card shadow-2xl flex flex-col animate-in slide-in-from-left duration-200 ml-16">
             {/* 抽屜標題 */}
             <div className="p-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -2324,7 +2324,7 @@ function DesignerPageContent() {
       {/* 主內容區 - 左側屬性，右側預覽 */}
       <div className="flex-1 flex overflow-hidden">
         {/* 左側：屬性面板 */}
-        <aside className="w-[400px] flex-none overflow-y-auto border-r border-border bg-white p-6 flex flex-col gap-6">
+        <aside className="w-[400px] flex-none overflow-y-auto border-r border-border bg-card p-6 flex flex-col gap-6">
           {/* 標題 */}
           <div>
             <h2 className="text-xl font-bold text-morandi-primary">
@@ -2401,7 +2401,7 @@ function DesignerPageContent() {
                   value={templateData?.companyName || ''}
                   onChange={(e) => handleTemplateDataChange('companyName', e.target.value)}
                   placeholder="例：Corner Travel"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2413,7 +2413,7 @@ function DesignerPageContent() {
                   value={templateData?.destination || ''}
                   onChange={(e) => handleTemplateDataChange('destination', e.target.value)}
                   placeholder="例：京都, 日本"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2425,7 +2425,7 @@ function DesignerPageContent() {
                   value={templateData?.mainTitle || ''}
                   onChange={(e) => handleTemplateDataChange('mainTitle', e.target.value)}
                   placeholder="例：春日京阪遊"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2437,7 +2437,7 @@ function DesignerPageContent() {
                   value={templateData?.subtitle || ''}
                   onChange={(e) => handleTemplateDataChange('subtitle', e.target.value)}
                   placeholder="例：Travel Handbook"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2449,7 +2449,7 @@ function DesignerPageContent() {
                   value={templateData?.travelDates || ''}
                   onChange={(e) => handleTemplateDataChange('travelDates', e.target.value)}
                   placeholder="例：2024/04/10 - 2024/04/15"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2461,7 +2461,7 @@ function DesignerPageContent() {
                   value={templateData?.tourCode || ''}
                   onChange={(e) => handleTemplateDataChange('tourCode', e.target.value)}
                   placeholder="例：KIX240410A"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
             </div>
@@ -2482,7 +2482,7 @@ function DesignerPageContent() {
                   value={templateData?.meetingTime || ''}
                   onChange={(e) => handleTemplateDataChange('meetingTime', e.target.value)}
                   placeholder="例：07:30"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2494,7 +2494,7 @@ function DesignerPageContent() {
                   value={templateData?.meetingPlace || ''}
                   onChange={(e) => handleTemplateDataChange('meetingPlace', e.target.value)}
                   placeholder="例：桃園機場第二航廈"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
             </div>
@@ -2514,7 +2514,7 @@ function DesignerPageContent() {
                   value={templateData?.leaderName || ''}
                   onChange={(e) => handleTemplateDataChange('leaderName', e.target.value)}
                   placeholder="例：王小明"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2525,7 +2525,7 @@ function DesignerPageContent() {
                   value={templateData?.leaderPhone || ''}
                   onChange={(e) => handleTemplateDataChange('leaderPhone', e.target.value)}
                   placeholder="例：0912-345-678"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
             </div>
@@ -2545,7 +2545,7 @@ function DesignerPageContent() {
                   value={templateData?.outboundFlight || ''}
                   onChange={(e) => handleTemplateDataChange('outboundFlight', e.target.value)}
                   placeholder="例：JL802 08:40 (TPE) ▶ 12:10 (KIX)"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
 
@@ -2556,7 +2556,7 @@ function DesignerPageContent() {
                   value={templateData?.returnFlight || ''}
                   onChange={(e) => handleTemplateDataChange('returnFlight', e.target.value)}
                   placeholder="例：JL805 18:20 (KIX) ▶ 20:30 (TPE)"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                 />
               </label>
             </div>
@@ -2598,7 +2598,7 @@ function DesignerPageContent() {
                           value={dayData.title || ''}
                           onChange={(e) => handleDailyItineraryChange(i, 'title', e.target.value)}
                           placeholder="行程標題"
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
                         />
                         {/* 餐食 */}
                         <div className="space-y-2">
@@ -2608,7 +2608,7 @@ function DesignerPageContent() {
                             <select
                               value={dayData.mealIcons?.breakfast || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'breakfastIcon', e.target.value)}
-                              className="w-20 px-1 py-1 rounded border border-border bg-white text-xs"
+                              className="w-20 px-1 py-1 rounded border border-border bg-card text-xs"
                             >
                               <option value="">自動</option>
                               {MEAL_ICON_OPTIONS.map((opt) => (
@@ -2620,7 +2620,7 @@ function DesignerPageContent() {
                               value={dayData.meals?.breakfast || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'breakfast', e.target.value)}
                               placeholder="飯店內"
-                              className="flex-1 px-2 py-1 rounded border border-border bg-white focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
+                              className="flex-1 px-2 py-1 rounded border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
                             />
                           </div>
                           {/* 午餐 */}
@@ -2629,7 +2629,7 @@ function DesignerPageContent() {
                             <select
                               value={dayData.mealIcons?.lunch || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'lunchIcon', e.target.value)}
-                              className="w-20 px-1 py-1 rounded border border-border bg-white text-xs"
+                              className="w-20 px-1 py-1 rounded border border-border bg-card text-xs"
                             >
                               <option value="">自動</option>
                               {MEAL_ICON_OPTIONS.map((opt) => (
@@ -2641,7 +2641,7 @@ function DesignerPageContent() {
                               value={dayData.meals?.lunch || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'lunch', e.target.value)}
                               placeholder="自理"
-                              className="flex-1 px-2 py-1 rounded border border-border bg-white focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
+                              className="flex-1 px-2 py-1 rounded border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
                             />
                           </div>
                           {/* 晚餐 */}
@@ -2650,7 +2650,7 @@ function DesignerPageContent() {
                             <select
                               value={dayData.mealIcons?.dinner || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'dinnerIcon', e.target.value)}
-                              className="w-20 px-1 py-1 rounded border border-border bg-white text-xs"
+                              className="w-20 px-1 py-1 rounded border border-border bg-card text-xs"
                             >
                               <option value="">自動</option>
                               {MEAL_ICON_OPTIONS.map((opt) => (
@@ -2662,7 +2662,7 @@ function DesignerPageContent() {
                               value={dayData.meals?.dinner || ''}
                               onChange={(e) => handleDailyItineraryChange(i, 'dinner', e.target.value)}
                               placeholder="自理"
-                              className="flex-1 px-2 py-1 rounded border border-border bg-white focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
+                              className="flex-1 px-2 py-1 rounded border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 outline-none text-xs"
                             />
                           </div>
                         </div>
@@ -2672,7 +2672,7 @@ function DesignerPageContent() {
                           value={dayData.accommodation || ''}
                           onChange={(e) => handleDailyItineraryChange(i, 'accommodation', e.target.value)}
                           placeholder="住宿飯店"
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
                         />
                       </div>
                     )}
@@ -2698,7 +2698,7 @@ function DesignerPageContent() {
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
                     <button
                       onClick={handleCoverUpload}
-                      className="px-3 py-1.5 bg-white rounded text-sm font-medium text-morandi-primary"
+                      className="px-3 py-1.5 bg-card rounded text-sm font-medium text-morandi-primary"
                     >
                       更換圖片
                     </button>
@@ -2764,7 +2764,7 @@ function DesignerPageContent() {
                       type="date"
                       value={dayDetail.date || ''}
                       onChange={(e) => handleDailyDetailChange(dayIndex, 'date', e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
 
@@ -2776,7 +2776,7 @@ function DesignerPageContent() {
                       value={dayDetail.title || ''}
                       onChange={(e) => handleDailyDetailChange(dayIndex, 'title', e.target.value)}
                       placeholder="例：機場 → 市區觀光 → 飯店"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
                 </div>
@@ -2837,7 +2837,7 @@ function DesignerPageContent() {
                             value={item.time || ''}
                             onChange={(e) => handleTimelineChange(dayIndex, itemIndex, 'time', e.target.value)}
                             placeholder="09:00"
-                            className="w-14 px-2 py-1.5 rounded border border-border bg-white text-xs text-center"
+                            className="w-14 px-2 py-1.5 rounded border border-border bg-card text-xs text-center"
                           />
                           {/* 活動 */}
                           <input
@@ -2845,7 +2845,7 @@ function DesignerPageContent() {
                             value={item.activity || ''}
                             onChange={(e) => handleTimelineChange(dayIndex, itemIndex, 'activity', e.target.value)}
                             placeholder="活動內容"
-                            className="flex-1 px-2 py-1.5 rounded border border-border bg-white text-xs"
+                            className="flex-1 px-2 py-1.5 rounded border border-border bg-card text-xs"
                           />
                           {/* 重點標記 */}
                           <button
@@ -2854,7 +2854,7 @@ function DesignerPageContent() {
                               'p-1.5 rounded text-xs',
                               item.isHighlight
                                 ? 'bg-morandi-gold text-white'
-                                : 'bg-white border border-border text-morandi-secondary hover:border-morandi-gold'
+                                : 'bg-card border border-border text-morandi-secondary hover:border-morandi-gold'
                             )}
                             title="標記為重點"
                           >
@@ -2886,7 +2886,7 @@ function DesignerPageContent() {
                       value={dayDetail.meals.breakfast || ''}
                       onChange={(e) => handleDailyDetailChange(dayIndex, 'breakfast', e.target.value)}
                       placeholder="例：飯店內享用"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
 
@@ -2897,7 +2897,7 @@ function DesignerPageContent() {
                       value={dayDetail.meals.lunch || ''}
                       onChange={(e) => handleDailyDetailChange(dayIndex, 'lunch', e.target.value)}
                       placeholder="例：當地特色餐廳"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
 
@@ -2908,7 +2908,7 @@ function DesignerPageContent() {
                       value={dayDetail.meals.dinner || ''}
                       onChange={(e) => handleDailyDetailChange(dayIndex, 'dinner', e.target.value)}
                       placeholder="例：自理"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-white focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
                 </div>
@@ -2927,7 +2927,7 @@ function DesignerPageContent() {
                       />
                       <button
                         onClick={() => handleDailyDetailChange(dayIndex, 'coverImage', '')}
-                        className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-morandi-red hover:text-white"
+                        className="absolute top-2 right-2 p-1 bg-card rounded-full shadow hover:bg-morandi-red hover:text-white"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -3167,7 +3167,7 @@ function DesignerPageContent() {
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                           <button
                             onClick={() => hotelCoverInputRef.current?.click()}
-                            className="px-3 py-1.5 bg-white rounded text-sm font-medium text-morandi-primary"
+                            className="px-3 py-1.5 bg-card rounded text-sm font-medium text-morandi-primary"
                           >
                             更換
                           </button>
@@ -3313,7 +3313,7 @@ function DesignerPageContent() {
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                           <button
                             onClick={() => attractionImageInputRef.current?.click()}
-                            className="px-2 py-1 bg-white rounded text-xs"
+                            className="px-2 py-1 bg-card rounded text-xs"
                           >
                             更換
                           </button>
@@ -3413,7 +3413,7 @@ function DesignerPageContent() {
                                 setUploadingAttractionIndex(attraction2Index)
                                 attractionImageInputRef.current?.click()
                               }}
-                              className="px-2 py-1 bg-white rounded text-xs"
+                              className="px-2 py-1 bg-card rounded text-xs"
                             >
                               更換
                             </button>
@@ -3519,11 +3519,11 @@ function DesignerPageContent() {
             }}
           />
 
-          {/* 可滾動的預覽容器 */}
-          <div className="absolute inset-0 overflow-auto flex items-center justify-center p-8">
+          {/* 可滾動的預覽容器 - 靠左對齊像書本 */}
+          <div className="absolute inset-0 overflow-auto flex items-center justify-start p-8">
             {/* A5 預覽 - 固定尺寸 559x794 */}
             <div
-              className="relative bg-white shadow-xl rounded-sm flex-shrink-0"
+              className="relative bg-card shadow-xl rounded-sm flex-shrink-0"
               style={{
                 width: 559,
                 height: 794,
@@ -3540,18 +3540,18 @@ function DesignerPageContent() {
             <Button
               variant="outline"
               size="icon"
-              className="bg-white shadow-lg"
+              className="bg-card shadow-lg"
               onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
             >
               <ZoomOut size={16} />
             </Button>
-            <div className="h-10 px-4 bg-white rounded-lg shadow-lg border border-border flex items-center justify-center text-sm font-bold text-morandi-primary">
+            <div className="h-10 px-4 bg-card rounded-lg shadow-lg border border-border flex items-center justify-center text-sm font-bold text-morandi-primary">
               {Math.round(zoom * 100)}%
             </div>
             <Button
               variant="outline"
               size="icon"
-              className="bg-white shadow-lg"
+              className="bg-card shadow-lg"
               onClick={() => setZoom(Math.min(2, zoom + 0.1))}
             >
               <ZoomIn size={16} />
@@ -3560,7 +3560,7 @@ function DesignerPageContent() {
         </section>
 
         {/* 右側：圖層面板 */}
-        <aside className="w-[240px] flex-none overflow-y-auto border-l border-border bg-white p-4">
+        <aside className="w-[240px] flex-none overflow-y-auto border-l border-border bg-card p-4">
           <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2 mb-3">
             圖層 ({page.elements.length})
           </h3>
@@ -3580,7 +3580,7 @@ function DesignerPageContent() {
                 >
                   <span className="flex-1 truncate">{el.name}</span>
                   <button
-                    className="p-1 hover:bg-white rounded"
+                    className="p-1 hover:bg-card rounded"
                     onClick={(e) => {
                       e.stopPropagation()
                       toggleElementVisibility(el.id)
@@ -3589,7 +3589,7 @@ function DesignerPageContent() {
                     {el.visible ? <Eye size={12} /> : <EyeOff size={12} />}
                   </button>
                   <button
-                    className="p-1 hover:bg-white rounded"
+                    className="p-1 hover:bg-card rounded"
                     onClick={(e) => {
                       e.stopPropagation()
                       toggleElementLock(el.id)
@@ -3605,9 +3605,9 @@ function DesignerPageContent() {
 
       {/* 列印預覽 Portal */}
       {showPrintPreview && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[99999] bg-white overflow-auto">
+        <div className="fixed inset-0 z-[99999] bg-card overflow-auto">
           {/* 螢幕上的控制列 */}
-          <div className="sticky top-0 z-10 bg-white border-b border-border p-4 flex items-center justify-between">
+          <div className="sticky top-0 z-10 bg-card border-b border-border p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-bold text-morandi-primary">列印預覽</h2>
               <span className="text-sm text-morandi-secondary">共 {printImages.length} 頁</span>
@@ -3630,11 +3630,11 @@ function DesignerPageContent() {
           </div>
 
           {/* 頁面內容預覽 */}
-          <div className="p-8 flex flex-col items-center gap-8 bg-gray-100 min-h-screen">
+          <div className="p-8 flex flex-col items-center gap-8 bg-morandi-container min-h-screen">
             {printImages.map((imgSrc, idx) => (
               <div
                 key={idx}
-                className="bg-white shadow-xl rounded-sm overflow-hidden"
+                className="bg-card shadow-xl rounded-sm overflow-hidden"
                 style={{
                   width: '148mm',  // A5 寬度
                   height: '210mm', // A5 高度
