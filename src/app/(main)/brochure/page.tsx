@@ -1855,14 +1855,14 @@ function DesignerPageContent() {
   if (!selectedStyleId || !page) {
     return (
       <main className="h-screen flex flex-col bg-background lg:ml-16">
-        {/* Header */}
-        <header className="h-[56px] flex-shrink-0 bg-card border-b border-border flex items-center px-4">
+        {/* Header - 高度與其他頁面一致 (72px) */}
+        <header className="h-[72px] flex-shrink-0 bg-card border-b border-border flex items-center px-6">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft size={18} />
           </Button>
-          <div className="ml-3">
-            <h1 className="text-sm font-bold text-morandi-primary">選擇手冊風格</h1>
-            <p className="text-xs text-morandi-secondary">請選擇一個範本開始製作</p>
+          <div className="ml-4">
+            <h1 className="text-lg font-bold text-morandi-primary">選擇手冊風格</h1>
+            <p className="text-sm text-morandi-secondary">請選擇一個範本開始製作</p>
           </div>
         </header>
 
@@ -1947,8 +1947,8 @@ function DesignerPageContent() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="h-[56px] flex-shrink-0 bg-card border-b border-border flex items-center justify-between px-6 z-10">
+      {/* Header - 高度與其他頁面一致 (72px) */}
+      <header className="h-[72px] flex-shrink-0 bg-card border-b border-border flex items-center justify-between px-6 z-10">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft size={18} />
