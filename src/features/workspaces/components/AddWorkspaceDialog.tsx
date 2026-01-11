@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Building2, Save, Loader2 } from 'lucide-react'
+import { Building2, Save, Loader2, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -239,7 +239,8 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button

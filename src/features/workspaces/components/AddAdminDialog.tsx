@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { UserPlus, Save, Loader2 } from 'lucide-react'
+import { UserPlus, Save, Loader2, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -153,7 +153,8 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="gap-2">
+            <X size={16} />
             取消
           </Button>
           <Button
