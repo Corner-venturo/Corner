@@ -694,7 +694,7 @@ function DesignerPageContent() {
         }
       }
     }
-  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages, proposalId, proposals, templateData])
+  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages, proposalId, proposals])
 
   // 當天數變更時，重新生成每日行程頁面
   useEffect(() => {

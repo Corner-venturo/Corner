@@ -43,6 +43,8 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
     name: '',
     code: '',
     type: 'travel_agency' as WorkspaceType,
+    employee_number_prefix: 'E',
+    default_password: '1234',
     admin_name: '',
     admin_employee_number: '',
     admin_password: '',
@@ -57,6 +59,8 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
       name: '',
       code: '',
       type: 'travel_agency',
+      employee_number_prefix: 'E',
+      default_password: '1234',
       admin_name: '',
       admin_employee_number: '',
       admin_password: '',
@@ -96,6 +100,8 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
           code: formData.code.toLowerCase().trim(),
           type: formData.type,
           is_active: true,
+          employee_number_prefix: formData.employee_number_prefix.trim().toUpperCase() || 'E',
+          default_password: formData.default_password.trim() || '1234',
         })
         .select('id')
         .single()
@@ -196,6 +202,32 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>員工編號前綴</Label>
+                <Input
+                  value={formData.employee_number_prefix}
+                  onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
+                  placeholder="E"
+                  className="uppercase"
+                  maxLength={5}
+                />
+                <p className="text-xs text-morandi-secondary">
+                  編號格式：{formData.employee_number_prefix || 'E'}001
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>預設密碼</Label>
+                <Input
+                  value={formData.default_password}
+                  onChange={(e) => handleFieldChange('default_password', e.target.value)}
+                  placeholder="1234"
+                />
+                <p className="text-xs text-morandi-secondary">新員工預設密碼</p>
+              </div>
             </div>
           </div>
 

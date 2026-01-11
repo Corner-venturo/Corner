@@ -1,0 +1,600 @@
+/**
+ * 薪資管理 Hook
+ */
+
+'use client'
+
+import { useState, useCallback } from 'react'
+import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores/auth-store'
+import { logger } from '@/lib/utils/logger'
+
+// ============================================
+// 類型定義
+// ============================================
+
+export type PayrollPeriodStatus = 'draft' | 'processing' | 'confirmed' | 'paid'
+
+export interface PayrollPeriod {
+  id: string
+  workspace_id: string
+  year: number
+  month: number
+  start_date: string
+  end_date: string
+  status: PayrollPeriodStatus
+  confirmed_by: string | null
+  confirmed_at: string | null
+  created_at: string | null
+}
+
+export interface PayrollRecord {
+  id: string
+  workspace_id: string
+  payroll_period_id: string
+  employee_id: string
+  // 基本資訊
+  base_salary: number
+  // 加項
+  overtime_pay: number
+  bonus: number
+  allowances: number
+  other_additions: number
+  // 減項
+  unpaid_leave_deduction: number
+  other_deductions: number
+  // 計算結果
+  gross_salary: number
+  net_salary: number
+  // 出勤統計
+  work_days: number
+  actual_work_days: number
+  overtime_hours: number
+  paid_leave_days: number
+  unpaid_leave_days: number
+  // 備註
+  notes: string | null
+  created_at: string | null
+  updated_at: string | null
+  // 關聯資料
+  employee_name?: string
+}
+
+export interface PayrollRecordInput {
+  employee_id: string
+  payroll_period_id: string
+  base_salary: number
+  overtime_pay?: number
+  bonus?: number
+  allowances?: number
+  other_additions?: number
+  unpaid_leave_deduction?: number
+  other_deductions?: number
+  work_days?: number
+  actual_work_days?: number
+  overtime_hours?: number
+  paid_leave_days?: number
+  unpaid_leave_days?: number
+  notes?: string | null
+}
+
+// ============================================
+// 狀態標籤
+// ============================================
+
+export const PAYROLL_PERIOD_STATUS_LABELS: Record<PayrollPeriodStatus, string> = {
+  draft: '草稿',
+  processing: '計算中',
+  confirmed: '已確認',
+  paid: '已發放',
+}
+
+export const PAYROLL_PERIOD_STATUS_COLORS: Record<PayrollPeriodStatus, string> = {
+  draft: 'bg-gray-100 text-gray-700',
+  processing: 'bg-yellow-100 text-yellow-700',
+  confirmed: 'bg-blue-100 text-blue-700',
+  paid: 'bg-green-100 text-green-700',
+}
+
+// ============================================
+// Hook 實作
+// ============================================
+
+export function usePayroll() {
+  const user = useAuthStore(state => state.user)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [periods, setPeriods] = useState<PayrollPeriod[]>([])
+  const [records, setRecords] = useState<PayrollRecord[]>([])
+
+  /**
+   * 取得薪資期間列表
+   */
+  const fetchPeriods = useCallback(async (year?: number) => {
+    if (!user?.workspace_id) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      let query = supabase
+        .from('payroll_periods')
+        .select('*')
+        .eq('workspace_id', user.workspace_id)
+        .order('year', { ascending: false })
+        .order('month', { ascending: false })
+
+      if (year) {
+        query = query.eq('year', year)
+      }
+
+      const { data, error: queryError } = await query
+
+      if (queryError) throw queryError
+
+      setPeriods((data || []).map(item => ({
+        ...item,
+        status: item.status as PayrollPeriodStatus,
+      })))
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '載入薪資期間失敗'
+      setError(message)
+      logger.error('載入薪資期間失敗:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id])
+
+  /**
+   * 建立薪資期間
+   */
+  const createPeriod = useCallback(async (year: number, month: number): Promise<PayrollPeriod | null> => {
+    if (!user?.workspace_id) return null
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // 檢查是否已存在
+      const { data: existing } = await supabase
+        .from('payroll_periods')
+        .select('id')
+        .eq('workspace_id', user.workspace_id)
+        .eq('year', year)
+        .eq('month', month)
+        .single()
+
+      if (existing) {
+        setError('該月份薪資期間已存在')
+        return null
+      }
+
+      // 計算起訖日期
+      const startDate = new Date(year, month - 1, 1)
+      const endDate = new Date(year, month, 0) // 該月最後一天
+
+      const { data, error: insertError } = await supabase
+        .from('payroll_periods')
+        .insert({
+          workspace_id: user.workspace_id,
+          year,
+          month,
+          start_date: startDate.toISOString().split('T')[0],
+          end_date: endDate.toISOString().split('T')[0],
+          status: 'draft',
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+
+      await fetchPeriods()
+      return {
+        ...data,
+        status: data.status as PayrollPeriodStatus,
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '建立薪資期間失敗'
+      setError(message)
+      logger.error('建立薪資期間失敗:', err)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id, fetchPeriods])
+
+  /**
+   * 取得薪資紀錄
+   */
+  const fetchRecords = useCallback(async (periodId: string) => {
+    if (!user?.workspace_id) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from('payroll_records')
+        .select(`
+          *,
+          employee:employees!payroll_records_employee_id_fkey(id, chinese_name, display_name)
+        `)
+        .eq('workspace_id', user.workspace_id)
+        .eq('payroll_period_id', periodId)
+        .order('created_at', { ascending: true })
+
+      if (queryError) throw queryError
+
+      const mappedData: PayrollRecord[] = (data || []).map(item => {
+        const employee = item.employee as { id: string; chinese_name: string | null; display_name: string | null } | null
+        return {
+          id: item.id,
+          workspace_id: item.workspace_id,
+          payroll_period_id: item.payroll_period_id,
+          employee_id: item.employee_id,
+          base_salary: item.base_salary || 0,
+          overtime_pay: item.overtime_pay || 0,
+          bonus: item.bonus || 0,
+          allowances: item.allowances || 0,
+          other_additions: item.other_additions || 0,
+          unpaid_leave_deduction: item.unpaid_leave_deduction || 0,
+          other_deductions: item.other_deductions || 0,
+          gross_salary: item.gross_salary || 0,
+          net_salary: item.net_salary || 0,
+          work_days: item.work_days || 0,
+          actual_work_days: item.actual_work_days || 0,
+          overtime_hours: item.overtime_hours || 0,
+          paid_leave_days: item.paid_leave_days || 0,
+          unpaid_leave_days: item.unpaid_leave_days || 0,
+          notes: item.notes,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          employee_name: employee?.display_name || employee?.chinese_name || '未知',
+        }
+      })
+
+      setRecords(mappedData)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '載入薪資紀錄失敗'
+      setError(message)
+      logger.error('載入薪資紀錄失敗:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id])
+
+  /**
+   * 計算並建立薪資紀錄
+   */
+  const calculatePayroll = useCallback(async (periodId: string): Promise<boolean> => {
+    if (!user?.workspace_id) return false
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // 取得期間資訊
+      const { data: period, error: periodError } = await supabase
+        .from('payroll_periods')
+        .select('*')
+        .eq('id', periodId)
+        .single()
+
+      if (periodError) throw periodError
+      if (!period) throw new Error('找不到薪資期間')
+
+      // 更新狀態為計算中
+      await supabase
+        .from('payroll_periods')
+        .update({ status: 'processing' })
+        .eq('id', periodId)
+
+      // 取得所有在職員工
+      const { data: employees, error: empError } = await supabase
+        .from('employees')
+        .select('id, chinese_name, display_name, salary_info')
+        .eq('workspace_id', user.workspace_id)
+        .eq('is_active', true)
+
+      if (empError) throw empError
+
+      // 取得出勤紀錄
+      const { data: attendanceRecords, error: attError } = await supabase
+        .from('attendance_records')
+        .select('*')
+        .eq('workspace_id', user.workspace_id)
+        .gte('date', period.start_date)
+        .lte('date', period.end_date)
+
+      if (attError) throw attError
+
+      // 取得請假紀錄
+      const { data: leaveRequests, error: leaveError } = await supabase
+        .from('leave_requests')
+        .select(`
+          *,
+          leave_type:leave_types!leave_requests_leave_type_id_fkey(id, is_paid)
+        `)
+        .eq('workspace_id', user.workspace_id)
+        .eq('status', 'approved')
+        .gte('start_date', period.start_date)
+        .lte('end_date', period.end_date)
+
+      if (leaveError) throw leaveError
+
+      // 計算工作天數（不含週末）
+      const workDays = countWorkDays(period.start_date, period.end_date)
+
+      // 刪除現有薪資紀錄
+      await supabase
+        .from('payroll_records')
+        .delete()
+        .eq('payroll_period_id', periodId)
+
+      // 為每位員工計算薪資
+      const payrollRecords = []
+      for (const emp of employees || []) {
+        const salaryInfo = emp.salary_info as { base_salary?: number; bonus?: number; allowances?: number } | null
+        const baseSalary = salaryInfo?.base_salary || 0
+
+        // 計算出勤
+        const empAttendance = (attendanceRecords || []).filter(a => a.employee_id === emp.id)
+        const actualWorkDays = empAttendance.filter(a => a.status === 'present' || a.status === 'late').length
+        const overtimeHours = empAttendance.reduce((sum, a) => sum + (a.overtime_hours || 0), 0)
+
+        // 計算請假
+        const empLeaves = (leaveRequests || []).filter(l => l.employee_id === emp.id)
+        let paidLeaveDays = 0
+        let unpaidLeaveDays = 0
+        for (const leave of empLeaves) {
+          const leaveType = leave.leave_type as { id: string; is_paid: boolean | null } | null
+          if (leaveType?.is_paid !== false) {
+            paidLeaveDays += leave.days
+          } else {
+            unpaidLeaveDays += leave.days
+          }
+        }
+
+        // 計算加班費（時薪 * 1.33）
+        const hourlyRate = baseSalary / 30 / 8
+        const overtimePay = Math.round(hourlyRate * 1.33 * overtimeHours)
+
+        // 計算無薪假扣款
+        const dailyRate = baseSalary / 30
+        const unpaidLeaveDeduction = Math.round(dailyRate * unpaidLeaveDays)
+
+        // 加項
+        const bonus = salaryInfo?.bonus || 0
+        const allowances = salaryInfo?.allowances || 0
+
+        // 總額計算
+        const grossSalary = baseSalary + overtimePay + bonus + allowances
+        const netSalary = grossSalary - unpaidLeaveDeduction
+
+        payrollRecords.push({
+          workspace_id: user.workspace_id,
+          payroll_period_id: periodId,
+          employee_id: emp.id,
+          base_salary: baseSalary,
+          overtime_pay: overtimePay,
+          bonus,
+          allowances,
+          other_additions: 0,
+          unpaid_leave_deduction: unpaidLeaveDeduction,
+          other_deductions: 0,
+          gross_salary: grossSalary,
+          net_salary: netSalary,
+          work_days: workDays,
+          actual_work_days: actualWorkDays,
+          overtime_hours: overtimeHours,
+          paid_leave_days: paidLeaveDays,
+          unpaid_leave_days: unpaidLeaveDays,
+        })
+      }
+
+      // 批量新增薪資紀錄
+      if (payrollRecords.length > 0) {
+        const { error: insertError } = await supabase
+          .from('payroll_records')
+          .insert(payrollRecords)
+
+        if (insertError) throw insertError
+      }
+
+      // 更新狀態為草稿（計算完成）
+      await supabase
+        .from('payroll_periods')
+        .update({ status: 'draft' })
+        .eq('id', periodId)
+
+      await fetchPeriods()
+      await fetchRecords(periodId)
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '計算薪資失敗'
+      setError(message)
+      logger.error('計算薪資失敗:', err)
+
+      // 錯誤時回復狀態
+      await supabase
+        .from('payroll_periods')
+        .update({ status: 'draft' })
+        .eq('id', periodId)
+
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id, fetchPeriods, fetchRecords])
+
+  /**
+   * 更新薪資紀錄
+   */
+  const updateRecord = useCallback(async (id: string, input: Partial<PayrollRecordInput>): Promise<boolean> => {
+    if (!user?.workspace_id) return false
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // 重新計算總額
+      const { data: existing, error: fetchError } = await supabase
+        .from('payroll_records')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      const baseSalary = input.base_salary ?? existing.base_salary ?? 0
+      const overtimePay = input.overtime_pay ?? existing.overtime_pay ?? 0
+      const bonus = input.bonus ?? existing.bonus ?? 0
+      const allowances = input.allowances ?? existing.allowances ?? 0
+      const otherAdditions = input.other_additions ?? existing.other_additions ?? 0
+      const unpaidLeaveDeduction = input.unpaid_leave_deduction ?? existing.unpaid_leave_deduction ?? 0
+      const otherDeductions = input.other_deductions ?? existing.other_deductions ?? 0
+
+      const grossSalary = baseSalary + overtimePay + bonus + allowances + otherAdditions
+      const netSalary = grossSalary - unpaidLeaveDeduction - otherDeductions
+
+      const { error: updateError } = await supabase
+        .from('payroll_records')
+        .update({
+          ...input,
+          gross_salary: grossSalary,
+          net_salary: netSalary,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('workspace_id', user.workspace_id)
+
+      if (updateError) throw updateError
+
+      await fetchRecords(existing.payroll_period_id)
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '更新薪資紀錄失敗'
+      setError(message)
+      logger.error('更新薪資紀錄失敗:', err)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id, fetchRecords])
+
+  /**
+   * 確認薪資期間
+   */
+  const confirmPeriod = useCallback(async (periodId: string): Promise<boolean> => {
+    if (!user?.workspace_id || !user.id) return false
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { error: updateError } = await supabase
+        .from('payroll_periods')
+        .update({
+          status: 'confirmed',
+          confirmed_by: user.id,
+          confirmed_at: new Date().toISOString(),
+        })
+        .eq('id', periodId)
+        .eq('workspace_id', user.workspace_id)
+
+      if (updateError) throw updateError
+
+      await fetchPeriods()
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '確認薪資期間失敗'
+      setError(message)
+      logger.error('確認薪資期間失敗:', err)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id, user?.id, fetchPeriods])
+
+  /**
+   * 標記為已發放
+   */
+  const markAsPaid = useCallback(async (periodId: string): Promise<boolean> => {
+    if (!user?.workspace_id) return false
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { error: updateError } = await supabase
+        .from('payroll_periods')
+        .update({ status: 'paid' })
+        .eq('id', periodId)
+        .eq('workspace_id', user.workspace_id)
+
+      if (updateError) throw updateError
+
+      await fetchPeriods()
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '更新發放狀態失敗'
+      setError(message)
+      logger.error('更新發放狀態失敗:', err)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.workspace_id, fetchPeriods])
+
+  /**
+   * 計算薪資統計
+   */
+  const calculateSummary = useCallback((records: PayrollRecord[]) => {
+    return {
+      totalEmployees: records.length,
+      totalGrossSalary: records.reduce((sum, r) => sum + r.gross_salary, 0),
+      totalNetSalary: records.reduce((sum, r) => sum + r.net_salary, 0),
+      totalOvertimePay: records.reduce((sum, r) => sum + r.overtime_pay, 0),
+      totalDeductions: records.reduce((sum, r) => sum + r.unpaid_leave_deduction + r.other_deductions, 0),
+    }
+  }, [])
+
+  return {
+    loading,
+    error,
+    periods,
+    records,
+    fetchPeriods,
+    createPeriod,
+    fetchRecords,
+    calculatePayroll,
+    updateRecord,
+    confirmPeriod,
+    markAsPaid,
+    calculateSummary,
+  }
+}
+
+// ============================================
+// 工具函式
+// ============================================
+
+/**
+ * 計算工作天數（不含週末）
+ */
+function countWorkDays(startDate: string, endDate: string): number {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  let count = 0
+
+  const current = new Date(start)
+  while (current <= end) {
+    const dayOfWeek = current.getDay()
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      count++
+    }
+    current.setDate(current.getDate() + 1)
+  }
+
+  return count
+}
