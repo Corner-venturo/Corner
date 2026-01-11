@@ -112,6 +112,7 @@ function DesignerPageContent() {
   const proposalId = searchParams.get('proposal_id')
   const itineraryId = searchParams.get('itinerary_id')
   const packageId = searchParams.get('package_id') // 時間軸行程表用
+  const styleIdFromUrl = searchParams.get('style_id') // 從 URL 恢復風格選擇
 
   // 使用者資訊
   const { user } = useAuthStore()
@@ -147,6 +148,7 @@ function DesignerPageContent() {
   const attractionImageInputRef = useRef<HTMLInputElement>(null) // 景點圖片上傳
   const [uploadingAttractionIndex, setUploadingAttractionIndex] = useState<number | null>(null)
   const uploadingAttractionIndexRef = useRef<number | null>(null) // 用於同步傳遞 index（避免 state race condition）
+  const templateDataRef = useRef<TemplateData | null>(null) // 用於 useEffect 存取最新 templateData
   // 頁面導航抽屜
   const [showPageDrawer, setShowPageDrawer] = useState(false)
   // 儲存草稿狀態
@@ -172,6 +174,11 @@ function DesignerPageContent() {
 
   // 取得當前頁面
   const page = pages[currentPageType]
+
+  // 同步 templateDataRef（讓 useEffect 能存取最新值而不觸發無限迴圈）
+  useEffect(() => {
+    templateDataRef.current = templateData
+  }, [templateData])
 
   // 封面圖片上傳
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -241,6 +248,11 @@ function DesignerPageContent() {
 
     setSelectedStyleId(styleId)
     setIsLoading(true)
+
+    // 更新 URL 加入 style_id（讓重新整理後能恢復狀態）
+    const url = new URL(window.location.href)
+    url.searchParams.set('style_id', styleId)
+    window.history.replaceState({}, '', url.toString())
 
     // 取得出發日期（優先順序：套件 > 行程表 > 提案）
     let departureDate: string | undefined
@@ -477,6 +489,19 @@ function DesignerPageContent() {
     setIsLoading(false)
   }, [itineraryId, itineraries, proposalId, proposals, proposalPackages, tripDays, calculateDailyDates, packageId])
 
+  // 從 URL 恢復風格選擇（重新整理後自動選擇）
+  const hasAutoSelectedStyle = useRef(false)
+  useEffect(() => {
+    if (styleIdFromUrl && !selectedStyleId && !hasAutoSelectedStyle.current) {
+      hasAutoSelectedStyle.current = true
+      // 延遲執行，等待資料載入
+      const timer = setTimeout(() => {
+        handleSelectStyle(styleIdFromUrl)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [styleIdFromUrl, selectedStyleId, handleSelectStyle])
+
   // 當資料載入後，自動更新已選擇的範本（修復資料載入時機問題）
   // 注意：如果是從草稿載入，跳過此邏輯以保留草稿資料
   useEffect(() => {
@@ -494,6 +519,13 @@ function DesignerPageContent() {
 
           // 從時間軸資料更新 tripDays
           const itineraryDays = itineraryData.dailyDetails?.length || tripDays
+
+          // 檢查是否需要更新（避免無限迴圈）
+          const currentDailyCount = templateData.dailyDetails?.length || 0
+          if (itineraryDays > 0 && itineraryDays === currentDailyCount) {
+            return // 已經是正確的天數，不需更新
+          }
+
           if (itineraryDays !== tripDays) {
             setTripDays(itineraryDays)
           }
@@ -546,6 +578,13 @@ function DesignerPageContent() {
 
           // 從行程表資料更新 tripDays
           const itineraryDays = itineraryData.dailyDetails?.length || tripDays
+
+          // 檢查是否需要更新（避免無限迴圈）
+          const currentDailyCount = templateData.dailyDetails?.length || 0
+          if (itineraryDays > 0 && itineraryDays === currentDailyCount) {
+            return // 已經是正確的天數，不需更新
+          }
+
           if (itineraryDays !== tripDays) {
             setTripDays(itineraryDays)
           }
@@ -606,8 +645,10 @@ function DesignerPageContent() {
             if (diffDays > 0) packageDays = diffDays
           }
 
-          // 如果天數不同，更新
-          if (packageDays !== tripDays) {
+          // 如果天數不同，重新生成頁面
+          // 只檢查 dailyDetails 長度是否需要更新（避免無限迴圈）
+          const currentDailyCount = templateData.dailyDetails?.length || 0
+          if (packageDays > 0 && packageDays !== currentDailyCount) {
             setTripDays(packageDays)
 
             const dailyDates = calculateDailyDates(pkg.start_date || undefined, packageDays)
@@ -661,8 +702,10 @@ function DesignerPageContent() {
               if (diffDays > 0) proposalDays = diffDays
             }
 
-            // 如果天數不同，更新
-            if (proposalDays !== tripDays) {
+            // 如果天數不同，重新生成頁面
+            // 只檢查 dailyDetails 長度是否需要更新（避免無限迴圈）
+            const currentDailyCount = templateData.dailyDetails?.length || 0
+            if (proposalDays > 0 && proposalDays !== currentDailyCount) {
               setTripDays(proposalDays)
 
               const dailyDates = calculateDailyDates(latestPackage.start_date || proposal.expected_start_date || undefined, proposalDays)
@@ -694,7 +737,7 @@ function DesignerPageContent() {
         }
       }
     }
-  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages, proposalId, proposals])
+  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages, proposalId, proposals, templateData])
 
   // 當天數變更時，重新生成每日行程頁面
   useEffect(() => {
