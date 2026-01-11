@@ -1855,8 +1855,8 @@ function DesignerPageContent() {
   if (!selectedStyleId || !page) {
     return (
       <main className="h-screen flex flex-col bg-background lg:ml-16">
-        {/* Header - 高度與其他頁面一致 (72px) */}
-        <header className="h-[72px] flex-shrink-0 bg-card border-b border-border flex items-center px-6">
+        {/* Header - 樣式與 ResponsiveHeader 一致 */}
+        <header className="h-[72px] flex-shrink-0 bg-background flex items-center px-6 relative">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft size={18} />
           </Button>
@@ -1864,12 +1864,16 @@ function DesignerPageContent() {
             <h1 className="text-lg font-bold text-morandi-primary">選擇手冊風格</h1>
             <p className="text-sm text-morandi-secondary">請選擇一個範本開始製作</p>
           </div>
+          {/* 分割線 - 左右留 24px 間距 */}
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+            style={{ marginLeft: '24px', marginRight: '24px', borderTop: '1px solid var(--border)' }}
+          />
         </header>
 
-        {/* 範本選擇區 */}
+        {/* 範本選擇區 - 靠左對齊 */}
         <div className="flex-1 overflow-auto p-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-wrap gap-6">
               {/* 日系風格 */}
               <button
                 onClick={() => handleSelectStyle('japanese-style-v1')}
@@ -1911,7 +1915,6 @@ function DesignerPageContent() {
                   <p className="text-xs text-morandi-muted mt-1">即將推出</p>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </main>
@@ -1947,8 +1950,13 @@ function DesignerPageContent() {
         </div>
       )}
 
-      {/* Header - 高度與其他頁面一致 (72px) */}
-      <header className="h-[72px] flex-shrink-0 bg-card border-b border-border flex items-center justify-between px-6 z-10">
+      {/* Header - 樣式與 ResponsiveHeader 一致 */}
+      <header className="h-[72px] flex-shrink-0 bg-background flex items-center justify-between px-6 z-10 relative">
+        {/* 分割線 - 左右留 24px 間距 */}
+        <div
+          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{ marginLeft: '24px', marginRight: '24px', borderTop: '1px solid var(--border)' }}
+        />
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft size={18} />
