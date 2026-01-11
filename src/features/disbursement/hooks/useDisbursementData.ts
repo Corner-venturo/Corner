@@ -67,8 +67,28 @@ export function useDisbursementData() {
     fetchPaymentRequests()
     fetchDisbursementOrders()
     fetchRequestItems()
-     
+
   }, [])
+
+  // 🔧 優化：建立 Map 避免 N+1 查詢
+  const paymentRequestMap = useMemo(() => {
+    const map = new Map<string, typeof payment_requests[0]>()
+    payment_requests.forEach(r => map.set(r.id, r))
+    return map
+  }, [payment_requests])
+
+  // 🔧 優化：按 request_id 分組 items，避免重複 filter
+  const requestItemsByRequestId = useMemo(() => {
+    const map = new Map<string, typeof requestItems>()
+    requestItems.forEach(item => {
+      const id = item.request_id
+      if (!map.has(id)) {
+        map.set(id, [])
+      }
+      map.get(id)!.push(item)
+    })
+    return map
+  }, [requestItems])
 
   // 待出帳的請款單 (status = pending 或 approved)
   const pendingRequests = useMemo(
@@ -90,15 +110,15 @@ export function useDisbursementData() {
   // 下一個週四日期
   const nextThursday = useMemo(() => getNextThursday(), [])
 
-  // 本週出帳的請款單詳情
+  // 本週出帳的請款單詳情 - 使用 Map 做 O(1) 查詢
   const currentOrderRequests = useMemo(() => {
     if (!currentOrder || !currentOrder.payment_request_ids) return []
     return currentOrder.payment_request_ids
-      .map(id => payment_requests.find(r => r.id === id))
+      .map(id => paymentRequestMap.get(id))
       .filter(Boolean) as PaymentRequest[]
-  }, [currentOrder, payment_requests])
+  }, [currentOrder, paymentRequestMap])
 
-  // 按供應商分組的請款項目
+  // 按供應商分組的請款項目 - 使用 Map 做 O(1) 查詢
   const groupedBySupplier = useMemo(() => {
     const groups: Record<string, {
       supplier_id: string
@@ -110,9 +130,9 @@ export function useDisbursementData() {
       total: number
     }> = {}
 
-    // 遍歷待出帳的請款單
+    // 遍歷待出帳的請款單，使用 Map 取得 items
     pendingRequests.forEach(request => {
-      const items = requestItems.filter(item => item.request_id === request.id)
+      const items = requestItemsByRequestId.get(request.id) || []
       items.forEach(item => {
         const supplierId = item.supplier_id || 'unknown'
         const supplierName = item.supplier_name || '無供應商'
@@ -132,7 +152,7 @@ export function useDisbursementData() {
     })
 
     return Object.values(groups).sort((a, b) => b.total - a.total)
-  }, [pendingRequests, requestItems])
+  }, [pendingRequests, requestItemsByRequestId])
 
   // 加入本週出帳
   const addToCurrentDisbursementOrder = useCallback(async (requestIds: string[]) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -38,6 +38,15 @@ export default function OrdersPage() {
     loadWorkspaces()
   }, [])
 
+  // 🔧 優化：建立 tour 出發日期 Map，避免排序時 O(n²) 查詢
+  const tourDepartureDates = useMemo(() => {
+    const map = new Map<string, number>()
+    tours.forEach(t => {
+      map.set(t.id, t.departure_date ? new Date(t.departure_date).getTime() : 0)
+    })
+    return map
+  }, [tours])
+
   const filteredOrders = orders.filter(order => {
     let matchesFilter: boolean
     switch (statusFilter) {
@@ -70,12 +79,10 @@ export default function OrdersPage() {
     return matchesFilter && matchesTour && matchesSearch
   })
 
-  // 按出發日期排序（近的在前）
+  // 按出發日期排序（近的在前）- 使用 Map 做 O(1) 查詢
   const sortedOrders = [...filteredOrders].sort((a, b) => {
-    const tourA = tours.find(t => t.id === a.tour_id)
-    const tourB = tours.find(t => t.id === b.tour_id)
-    const dateA = tourA?.departure_date ? new Date(tourA.departure_date).getTime() : 0
-    const dateB = tourB?.departure_date ? new Date(tourB.departure_date).getTime() : 0
+    const dateA = a.tour_id ? (tourDepartureDates.get(a.tour_id) ?? 0) : 0
+    const dateB = b.tour_id ? (tourDepartureDates.get(b.tour_id) ?? 0) : 0
     return dateA - dateB
   })
 
@@ -238,7 +245,7 @@ export default function OrdersPage() {
                 {todos.map((todo, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
+                    className="flex items-start gap-3 p-3 bg-card rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
                     onClick={() => {
                       const order = orders.find(o => o.id === todo.order_id)
                       if (order) {

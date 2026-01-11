@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { FileSignature, Edit2, Trash2, Eye, Mail, Plus } from 'lucide-react'
 import { useTours } from '@/hooks/cloud-hooks'
-import { useOrdersListSlim, useMembersCountSlim } from '@/hooks/useListSlim'
+// 🔧 優化：移除 useOrdersListSlim/useMembersCountSlim，改用 tour.current_participants
 import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { Tour } from '@/stores/types'
@@ -21,8 +21,6 @@ export default function ContractsPage() {
   const searchParams = useSearchParams()
   const tourIdParam = searchParams?.get('tour_id')
   const { items: tours, update: updateTour } = useTours()
-  const { items: orders } = useOrdersListSlim()
-  const { items: members } = useMembersCountSlim()
   const { toast } = useToast()
   const [contractDialog, setContractDialog] = useState<{
     isOpen: boolean
@@ -108,13 +106,7 @@ export default function ContractsPage() {
       {
         key: 'participants',
         label: '人數',
-        render: (_, tour) => {
-          const tourOrders = orders.filter(order => order.tour_id === tour.id)
-          const actualMembers = members.filter(member =>
-            tourOrders.some(order => order.id === member.order_id)
-          ).length
-          return <NumberCell value={actualMembers} suffix="人" />
-        },
+        render: (_, tour) => <NumberCell value={tour.current_participants || 0} suffix="人" />,
       },
       {
         key: 'contract_status',
@@ -136,7 +128,7 @@ export default function ContractsPage() {
         },
       },
     ],
-    [orders, members]
+    []
   )
 
   const handleDeleteContract = useCallback(
