@@ -52,10 +52,11 @@ const TourControlSheet = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+// 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
 const tabs = [
-  { value: 'overview', label: '總覽' },
-  { value: 'orders', label: '訂單管理' },
   { value: 'members', label: '團員名單' },
+  { value: 'orders', label: '訂單管理' },
+  { value: 'overview', label: '總覽' },
   { value: 'confirmation', label: '團確單' },
   { value: 'control', label: '團控' },
 ]
@@ -73,7 +74,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
 
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('members') // 預設顯示團員名單
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
@@ -211,7 +212,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   // Reset state when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setActiveTab('overview')
+      setActiveTab('members') // 預設顯示團員名單
     }
   }, [isOpen, tourId])
 
@@ -429,8 +430,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                       className={cn(
                         'px-3 py-1.5 text-sm font-medium transition-colors rounded',
                         activeTab === tab.value
-                          ? 'bg-white/20 text-white'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                          ? 'bg-card/20 text-white'
+                          : 'text-white/70 hover:text-white hover:bg-card/10'
                       )}
                     >
                       {tab.label}
@@ -446,7 +447,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      className="text-white/90 hover:text-white hover:bg-card/20 h-8"
                       onClick={() => setShowConfirmationDialog(true)}
                     >
                       <ClipboardList size={15} className="mr-1" />
@@ -456,7 +457,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                        className="text-white/90 hover:text-white hover:bg-card/20 h-8"
                         onClick={() => setShowCloseDialog(true)}
                       >
                         結團
@@ -465,7 +466,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      className="text-white/90 hover:text-white hover:bg-card/20 h-8"
                       onClick={() => setShowPnrToolDialog(true)}
                     >
                       <Plane size={15} className="mr-1" />
@@ -474,7 +475,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                      className="text-white/90 hover:text-white hover:bg-card/20 h-8"
                       onClick={() => setShowEntryCardDialog(true)}
                     >
                       <Printer size={15} className="mr-1" />
@@ -484,7 +485,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-white/90 hover:text-white hover:bg-white/20 h-8"
+                        className="text-white/90 hover:text-white hover:bg-card/20 h-8"
                         onClick={() => router.push(`/workspace?channel=${existingChannel.id}`)}
                       >
                         <MessageSquare size={15} />
@@ -495,7 +496,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:bg-white/20 h-8 w-8"
+                  className="text-white hover:bg-card/20 h-8 w-8"
                   onClick={onClose}
                 >
                   <X size={18} />

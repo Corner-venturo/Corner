@@ -54,14 +54,14 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
   // 更新 tour 的成本財務欄位
   const updateTourCostFinancials = useCallback(async () => {
     try {
-      // 取得該團已確認/已付款的請款單（只有確認付出去才計入成本）
+      // 🔧 優化：一請款就計入成本（pending/confirmed/paid 都算），除非被取消
       // 注意：必須過濾已刪除的請款單
       const { data: requestsData } = await supabase
         .from('payment_requests')
         .select('id, status')
         .eq('tour_id', tour.id)
         .is('deleted_at', null) // 過濾已刪除的請款單
-        .in('status', ['confirmed', 'paid']) // 只計算已確認或已付款的
+        .in('status', ['pending', 'approved', 'confirmed', 'paid']) // pending 也計入（取消/rejected 不計）
 
       if (!requestsData || requestsData.length === 0) {
         // 如果沒有已確認的請款單，設成本為 0
