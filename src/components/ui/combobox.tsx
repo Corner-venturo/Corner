@@ -313,9 +313,8 @@ export function Combobox<T = unknown>({
               filteredOptions.map((option, index) => (
                 <button
                   key={`${option.value}-${index}`}
-                  ref={el => {
-                    optionRefs.current[index] = el
-                  }}
+                  ref={el => { optionRefs.current[index] = el }}
+                  type="button"
                   onClick={() => handleOptionSelect(option)}
                   disabled={option.disabled}
                   className={cn(

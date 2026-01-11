@@ -188,14 +188,10 @@ export function TourItineraryDialog({
     }
   }, [tourProposalPackage, fetchProposalPackages])
 
-  // 主對話框開啟時，子對話框應關閉
-  const mainDialogOpen = isOpen && !timelineDialogOpen
-
   return (
     <>
-      {/* 主對話框 */}
-      {mainDialogOpen && (
-        <Dialog open={mainDialogOpen} onOpenChange={open => !open && onClose()}>
+      {/* 主對話框 - 使用 open 控制而非條件渲染，避免動畫期間的 ref 問題 */}
+      <Dialog open={isOpen && !timelineDialogOpen} onOpenChange={open => !open && onClose()}>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -279,7 +275,6 @@ export function TourItineraryDialog({
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
       {/* 時間軸行程表對話框 */}
       {tourProposalPackage && (

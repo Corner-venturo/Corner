@@ -127,14 +127,13 @@ export function ProposalDetailDialog({
 
   if (!proposal) return null
 
-  // 任何子 Dialog 開啟時，主 Dialog 完全不渲染（避免多重遮罩）
+  // 任何子 Dialog 開啟時，主 Dialog 關閉但不卸載（避免 ref 問題）
   const hasChildDialogOpen = itineraryDialogOpen || timelineDialogOpen
 
   return (
     <>
-      {/* 主對話框：子對話框開啟時完全不渲染，避免多重遮罩 */}
-      {!hasChildDialogOpen && (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* 主對話框：使用 open 控制而非條件渲染，避免動畫期間的 ref 問題 */}
+      <Dialog open={open && !hasChildDialogOpen} onOpenChange={onOpenChange}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
             <VisuallyHidden>
               <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
@@ -176,7 +175,6 @@ export function ProposalDetailDialog({
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
       {/* 快速行程表對話框：放在主對話框外面（單一遮罩模式） */}
       {itineraryPackage && (
