@@ -1,6 +1,5 @@
 /**
- * AddAdminDialog - 新增管理員對話框
- * 為現有公司新增管理員帳號
+ * EditWorkspaceDialog - 編輯公司設定對話框
  */
 
 'use client'
@@ -16,35 +15,34 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { UserPlus, Save, Loader2, X } from 'lucide-react'
+import { Settings, Save, Loader2, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
-import bcrypt from 'bcryptjs'
 import type { WorkspaceWithDetails } from '../types'
 
-interface AddAdminDialogProps {
+interface EditWorkspaceDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   workspace: WorkspaceWithDetails | null
   onSuccess: () => void
 }
 
-export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: AddAdminDialogProps) {
+export function EditWorkspaceDialog({ open, onOpenChange, workspace, onSuccess }: EditWorkspaceDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
-    employee_number: '',
-    password: '',
+    employee_number_prefix: '',
+    default_password: '',
   })
 
-  // 重置表單，使用公司預設密碼
+  // 載入現有資料
   useEffect(() => {
     if (open && workspace) {
       setFormData({
-        name: '',
-        employee_number: '',
-        password: workspace.default_password || '1234',
+        name: workspace.name || '',
+        employee_number_prefix: workspace.employee_number_prefix || 'E',
+        default_password: workspace.default_password || '1234',
       })
     }
   }, [open, workspace])
@@ -58,47 +56,38 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
 
     // 驗證
     if (!formData.name.trim()) {
-      await alert('請輸入姓名', 'error')
+      await alert('請輸入公司名稱', 'error')
       return
     }
-    if (!formData.employee_number.trim()) {
-      await alert('請輸入員工編號', 'error')
+    if (!formData.employee_number_prefix.trim()) {
+      await alert('請輸入員工編號前綴', 'error')
       return
     }
-    if (!formData.password.trim()) {
-      await alert('請輸入密碼', 'error')
+    if (!formData.default_password.trim()) {
+      await alert('請輸入預設密碼', 'error')
       return
     }
 
     setIsSubmitting(true)
     try {
-      const passwordHash = await bcrypt.hash(formData.password, 10)
-
       const { error } = await supabase
-        .from('employees')
-        .insert({
-          workspace_id: workspace.id,
-          display_name: formData.name.trim(),
-          employee_number: formData.employee_number.trim().toUpperCase(),
-          password_hash: passwordHash,
-          role: 'admin',
-          status: 'active',
+        .from('workspaces')
+        .update({
+          name: formData.name.trim(),
+          employee_number_prefix: formData.employee_number_prefix.trim().toUpperCase(),
+          default_password: formData.default_password.trim(),
+          updated_at: new Date().toISOString(),
         })
+        .eq('id', workspace.id)
 
-      if (error) {
-        if (error.code === '23505') {
-          await alert('此員工編號已存在', 'error')
-          return
-        }
-        throw error
-      }
+      if (error) throw error
 
-      await alert(`管理員「${formData.name}」已新增`, 'success')
+      await alert('設定已更新', 'success')
       onOpenChange(false)
       onSuccess()
     } catch (error) {
-      logger.error('新增管理員失敗:', error)
-      await alert('新增失敗，請稍後再試', 'error')
+      logger.error('更新公司設定失敗:', error)
+      await alert('更新失敗，請稍後再試', 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -111,44 +100,50 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
       <DialogContent className={DIALOG_SIZES.sm}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UserPlus size={20} className="text-morandi-gold" />
-            新增管理員
+            <Settings size={20} className="text-morandi-gold" />
+            公司設定
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="p-3 bg-morandi-container/30 rounded-lg">
-            <p className="text-sm text-morandi-secondary">公司：</p>
-            <p className="font-medium text-morandi-primary">{workspace.name}</p>
+            <p className="text-sm text-morandi-secondary">公司代號：</p>
+            <p className="font-medium text-morandi-primary">{workspace.code}</p>
           </div>
 
           <div className="space-y-2">
-            <Label required>姓名</Label>
+            <Label required>公司名稱</Label>
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder="例：王大明"
+              placeholder="例：角落旅遊"
             />
           </div>
 
           <div className="space-y-2">
-            <Label required>員工編號（帳號）</Label>
+            <Label required>員工編號前綴</Label>
             <Input
-              value={formData.employee_number}
-              onChange={(e) => handleFieldChange('employee_number', e.target.value)}
-              placeholder="例：E002"
+              value={formData.employee_number_prefix}
+              onChange={(e) => handleFieldChange('employee_number_prefix', e.target.value)}
+              placeholder="例：E、TP、JY"
               className="uppercase"
+              maxLength={5}
             />
+            <p className="text-xs text-morandi-secondary">
+              新增員工時的編號格式：{formData.employee_number_prefix || 'E'}001, {formData.employee_number_prefix || 'E'}002...
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label required>登入密碼</Label>
+            <Label required>預設密碼</Label>
             <Input
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleFieldChange('password', e.target.value)}
-              placeholder="請設定密碼"
+              value={formData.default_password}
+              onChange={(e) => handleFieldChange('default_password', e.target.value)}
+              placeholder="新員工的預設密碼"
             />
+            <p className="text-xs text-morandi-secondary">
+              新增員工時的預設密碼，員工可自行更改
+            </p>
           </div>
         </div>
 
@@ -167,7 +162,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             ) : (
               <Save size={16} />
             )}
-            新增管理員
+            儲存設定
           </Button>
         </div>
       </DialogContent>

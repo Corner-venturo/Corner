@@ -1,0 +1,313 @@
+/**
+ * 損益表 (Income Statement Report)
+ * 顯示收入與費用，計算本期損益
+ */
+
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { TrendingUp, Download, Calendar, Search, ArrowUp, ArrowDown, Minus } from 'lucide-react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
+import { useAccountingReports, type IncomeStatementResult } from '../../hooks/useAccountingReports'
+import { formatDate } from '@/lib/utils/format-date'
+
+function formatCurrency(amount: number): string {
+  return `NT$ ${amount.toLocaleString()}`
+}
+
+function formatPercent(value: number): string {
+  return `${value.toFixed(1)}%`
+}
+
+export function IncomeStatementReport() {
+  const { loading, error, fetchIncomeStatement } = useAccountingReports()
+
+  // 篩選條件
+  const [startDate, setStartDate] = useState<string>(() => {
+    const date = new Date()
+    date.setDate(1) // 本月第一天
+    return formatDate(date)
+  })
+  const [endDate, setEndDate] = useState<string>(() => formatDate(new Date()))
+
+  // 資料
+  const [data, setData] = useState<IncomeStatementResult | null>(null)
+
+  // 查詢報表
+  const handleSearch = async () => {
+    if (!startDate || !endDate) return
+    const result = await fetchIncomeStatement(startDate, endDate)
+    setData(result)
+  }
+
+  // 初次載入時查詢
+  useEffect(() => {
+    if (startDate && endDate) {
+      handleSearch()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 匯出 CSV
+  const handleExport = () => {
+    if (!data) return
+
+    const rows: string[][] = []
+
+    // 收入
+    rows.push(['一、營業收入', '', ''])
+    data.revenue.forEach(e => {
+      rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
+    })
+    rows.push(['營業收入合計', data.total_revenue.toString(), '100%'])
+    rows.push(['', '', ''])
+
+    // 成本
+    rows.push(['二、營業成本', '', ''])
+    data.cost.forEach(e => {
+      rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
+    })
+    rows.push(['營業成本合計', data.total_cost.toString(), formatPercent((data.total_cost / data.total_revenue) * 100)])
+    rows.push(['', '', ''])
+
+    // 毛利
+    rows.push(['三、營業毛利', data.gross_profit.toString(), formatPercent((data.gross_profit / data.total_revenue) * 100)])
+    rows.push(['', '', ''])
+
+    // 費用
+    rows.push(['四、營業費用', '', ''])
+    data.expense.forEach(e => {
+      rows.push([`  ${e.account_code} ${e.account_name}`, e.amount.toString(), formatPercent(e.percentage)])
+    })
+    rows.push(['營業費用合計', data.total_expense.toString(), formatPercent((data.total_expense / data.total_revenue) * 100)])
+    rows.push(['', '', ''])
+
+    // 淨利
+    rows.push(['五、營業淨利', data.operating_income.toString(), formatPercent((data.operating_income / data.total_revenue) * 100)])
+
+    const csvContent = [
+      ['項目', '金額', '佔收入比例'].join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n')
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `損益表_${startDate}_${endDate}.csv`
+    link.click()
+  }
+
+  return (
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="損益表"
+        icon={TrendingUp}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '會計', href: '/erp-accounting' },
+          { label: '損益表', href: '/erp-accounting/reports/income-statement' },
+        ]}
+        actions={
+          <Button
+            onClick={handleExport}
+            disabled={!data}
+            variant="outline"
+            className="gap-2"
+          >
+            <Download size={16} />
+            匯出 CSV
+          </Button>
+        }
+      />
+
+      {/* 篩選區 */}
+      <div className="p-4 bg-card border-b border-border">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-morandi-secondary" />
+            <div className="flex items-center gap-2">
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="開始日期"
+              />
+              <span className="text-morandi-secondary">至</span>
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="結束日期"
+              />
+            </div>
+          </div>
+
+          <Button onClick={handleSearch} disabled={loading} className="gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white">
+            <Search size={16} />
+            查詢
+          </Button>
+        </div>
+      </div>
+
+      {/* 錯誤訊息 */}
+      {error && (
+        <div className="mx-4 mt-4 p-3 bg-morandi-red/10 border border-morandi-red/30 rounded-lg text-morandi-red">
+          {error}
+        </div>
+      )}
+
+      {/* 報表內容 */}
+      <div className="flex-1 overflow-auto p-4">
+        {data ? (
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* 摘要卡片 */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-morandi-secondary mb-2">
+                  <ArrowUp size={16} className="text-morandi-green" />
+                  <span>營業收入</span>
+                </div>
+                <div className="text-2xl font-bold text-morandi-green">
+                  {formatCurrency(data.total_revenue)}
+                </div>
+              </div>
+
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-morandi-secondary mb-2">
+                  <ArrowDown size={16} className="text-morandi-red" />
+                  <span>總支出</span>
+                </div>
+                <div className="text-2xl font-bold text-morandi-red">
+                  {formatCurrency(data.total_cost + data.total_expense)}
+                </div>
+              </div>
+
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-morandi-secondary mb-2">
+                  <Minus size={16} className={data.operating_income >= 0 ? 'text-morandi-green' : 'text-morandi-red'} />
+                  <span>營業淨利</span>
+                </div>
+                <div className={`text-2xl font-bold ${data.operating_income >= 0 ? 'text-morandi-green' : 'text-morandi-red'}`}>
+                  {formatCurrency(data.operating_income)}
+                </div>
+              </div>
+            </div>
+
+            {/* 詳細報表 */}
+            <div className="bg-card rounded-lg border border-border overflow-hidden">
+              {/* 一、營業收入 */}
+              <div className="border-b border-border">
+                <div className="p-4 bg-morandi-container/30">
+                  <h3 className="font-medium text-morandi-primary">一、營業收入</h3>
+                </div>
+                <div className="divide-y divide-border">
+                  {data.revenue.map(item => (
+                    <div key={item.account_id} className="p-4 flex items-center justify-between">
+                      <div>
+                        <span className="font-mono text-xs text-morandi-secondary">{item.account_code}</span>
+                        <span className="ml-2 text-morandi-primary">{item.account_name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-morandi-primary">{formatCurrency(item.amount)}</span>
+                        <span className="text-sm text-morandi-secondary w-16 text-right">{formatPercent(item.percentage)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-4 bg-green-50 flex items-center justify-between font-medium">
+                  <span>營業收入合計</span>
+                  <span className="font-mono text-morandi-green">{formatCurrency(data.total_revenue)}</span>
+                </div>
+              </div>
+
+              {/* 二、營業成本 */}
+              <div className="border-b border-border">
+                <div className="p-4 bg-morandi-container/30">
+                  <h3 className="font-medium text-morandi-primary">二、營業成本</h3>
+                </div>
+                <div className="divide-y divide-border">
+                  {data.cost.map(item => (
+                    <div key={item.account_id} className="p-4 flex items-center justify-between">
+                      <div>
+                        <span className="font-mono text-xs text-morandi-secondary">{item.account_code}</span>
+                        <span className="ml-2 text-morandi-primary">{item.account_name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-morandi-primary">{formatCurrency(item.amount)}</span>
+                        <span className="text-sm text-morandi-secondary w-16 text-right">{formatPercent(item.percentage)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-4 bg-orange-50 flex items-center justify-between font-medium">
+                  <span>營業成本合計</span>
+                  <span className="font-mono text-orange-600">{formatCurrency(data.total_cost)}</span>
+                </div>
+              </div>
+
+              {/* 三、營業毛利 */}
+              <div className="p-4 bg-blue-50 border-b border-border">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-blue-800">三、營業毛利</h3>
+                  <div className="flex items-center gap-4">
+                    <span className="font-mono font-bold text-blue-800">{formatCurrency(data.gross_profit)}</span>
+                    <span className="text-sm text-blue-600 w-16 text-right">
+                      {data.total_revenue > 0 ? formatPercent((data.gross_profit / data.total_revenue) * 100) : '0%'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 四、營業費用 */}
+              <div className="border-b border-border">
+                <div className="p-4 bg-morandi-container/30">
+                  <h3 className="font-medium text-morandi-primary">四、營業費用</h3>
+                </div>
+                <div className="divide-y divide-border">
+                  {data.expense.map(item => (
+                    <div key={item.account_id} className="p-4 flex items-center justify-between">
+                      <div>
+                        <span className="font-mono text-xs text-morandi-secondary">{item.account_code}</span>
+                        <span className="ml-2 text-morandi-primary">{item.account_name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-morandi-primary">{formatCurrency(item.amount)}</span>
+                        <span className="text-sm text-morandi-secondary w-16 text-right">{formatPercent(item.percentage)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-4 bg-red-50 flex items-center justify-between font-medium">
+                  <span>營業費用合計</span>
+                  <span className="font-mono text-morandi-red">{formatCurrency(data.total_expense)}</span>
+                </div>
+              </div>
+
+              {/* 五、營業淨利 */}
+              <div className={`p-6 ${data.operating_income >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+                <div className="flex items-center justify-between">
+                  <h3 className={`text-lg font-bold ${data.operating_income >= 0 ? 'text-green-800' : 'text-red-800'}`}>
+                    五、營業淨利（淨損）
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <span className={`font-mono text-2xl font-bold ${data.operating_income >= 0 ? 'text-green-800' : 'text-red-800'}`}>
+                      {formatCurrency(data.operating_income)}
+                    </span>
+                    <span className={`text-sm ${data.operating_income >= 0 ? 'text-green-600' : 'text-red-600'} w-16 text-right`}>
+                      {data.total_revenue > 0 ? formatPercent((data.operating_income / data.total_revenue) * 100) : '0%'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : !loading ? (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <TrendingUp size={48} className="text-morandi-muted mb-4" />
+            <p className="text-morandi-secondary">請選擇日期範圍並點擊查詢</p>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  )
+}

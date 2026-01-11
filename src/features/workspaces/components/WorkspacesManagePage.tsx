@@ -9,12 +9,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { StatusCell, ActionCell, DateCell } from '@/components/table-cells'
-import { Building2, Edit2, Trash2, UserPlus } from 'lucide-react'
+import { Building2, Edit2, Trash2, UserPlus, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { AddWorkspaceDialog } from './AddWorkspaceDialog'
 import { AddAdminDialog } from './AddAdminDialog'
+import { EditWorkspaceDialog } from './EditWorkspaceDialog'
 import type { WorkspaceWithDetails } from '../types'
 import { WORKSPACE_TYPE_LABELS } from '../types'
 
@@ -24,6 +25,7 @@ export function WorkspacesManagePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceWithDetails | null>(null)
 
   // 載入公司列表
@@ -33,7 +35,7 @@ export function WorkspacesManagePage() {
       // 取得所有 workspaces
       const { data: workspacesData, error: wsError } = await supabase
         .from('workspaces')
-        .select('id, name, code, type, is_active, description, created_at, updated_at')
+        .select('id, name, code, type, is_active, description, created_at, updated_at, employee_number_prefix, default_password')
         .order('created_at', { ascending: true })
 
       if (wsError) throw wsError
@@ -100,6 +102,12 @@ export function WorkspacesManagePage() {
     setIsAddAdminDialogOpen(true)
   }, [])
 
+  // 編輯設定
+  const handleEdit = useCallback((workspace: WorkspaceWithDetails) => {
+    setSelectedWorkspace(workspace)
+    setIsEditDialogOpen(true)
+  }, [])
+
   // 表格欄位
   const columns = [
     {
@@ -116,11 +124,22 @@ export function WorkspacesManagePage() {
     {
       key: 'type',
       label: '類型',
-      width: '120',
+      width: '100',
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <span className="text-sm text-morandi-secondary">
           {row.type ? WORKSPACE_TYPE_LABELS[row.type as keyof typeof WORKSPACE_TYPE_LABELS] || row.type : '-'}
         </span>
+      ),
+    },
+    {
+      key: 'settings',
+      label: '設定',
+      width: '150',
+      render: (_: unknown, row: WorkspaceWithDetails) => (
+        <div className="text-xs text-morandi-secondary">
+          <div>編號前綴：{row.employee_number_prefix || 'E'}</div>
+          <div>預設密碼：{row.default_password || '1234'}</div>
+        </div>
       ),
     },
     {
@@ -152,6 +171,11 @@ export function WorkspacesManagePage() {
       render: (_: unknown, row: WorkspaceWithDetails) => (
         <ActionCell
           actions={[
+            {
+              icon: Settings,
+              label: '設定',
+              onClick: () => handleEdit(row),
+            },
             {
               icon: UserPlus,
               label: '新增管理員',
@@ -207,6 +231,14 @@ export function WorkspacesManagePage() {
       <AddAdminDialog
         open={isAddAdminDialogOpen}
         onOpenChange={setIsAddAdminDialogOpen}
+        workspace={selectedWorkspace}
+        onSuccess={fetchWorkspaces}
+      />
+
+      {/* 編輯公司設定對話框 */}
+      <EditWorkspaceDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
         workspace={selectedWorkspace}
         onSuccess={fetchWorkspaces}
       />

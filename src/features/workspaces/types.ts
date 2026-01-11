@@ -13,6 +13,8 @@ export interface WorkspaceWithDetails {
   description: string | null
   created_at: string | null
   updated_at: string | null
+  employee_number_prefix: string | null
+  default_password: string | null
 }
 
 export interface CreateWorkspaceData {
