@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { MapPin, Bus, Building2, ImageIcon, Archive } from 'lucide-react'
+import { MapPin, Bus, Building2, ImageIcon, Archive, Building } from 'lucide-react'
 
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
@@ -51,6 +51,15 @@ const databaseModules = [
     icon: Archive,
     href: '/database/archive-management',
     color: 'bg-morandi-red',
+    count: 0,
+  },
+  {
+    id: 'workspaces',
+    title: '公司管理',
+    description: '管理公司帳號、新增公司與管理員',
+    icon: Building,
+    href: '/database/workspaces',
+    color: 'bg-morandi-primary',
     count: 0,
   },
 ]
