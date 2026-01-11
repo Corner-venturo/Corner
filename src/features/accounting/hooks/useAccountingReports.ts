@@ -169,29 +169,31 @@ export function useAccountingReports() {
 
       // 計算累計餘額
       let runningBalance = 0
-      const entries: GeneralLedgerEntry[] = (data || []).map((item) => {
-        const debit = Number(item.debit_amount) || 0
-        const credit = Number(item.credit_amount) || 0
-        runningBalance += debit - credit
+      const entries: GeneralLedgerEntry[] = (data || [])
+        .filter((item) => item.account_id !== null) // 過濾掉沒有科目的分錄
+        .map((item) => {
+          const debit = Number(item.debit_amount) || 0
+          const credit = Number(item.credit_amount) || 0
+          runningBalance += debit - credit
 
-        // 安全地取得 voucher 和 account 資料
-        const voucher = item.voucher as { id: string; voucher_no: string; voucher_date: string } | null
-        const account = item.account as { id: string; code: string; name: string } | null
+          // 安全地取得 voucher 和 account 資料
+          const voucher = item.voucher as { id: string; voucher_no: string; voucher_date: string } | null
+          const account = item.account as { id: string; code: string; name: string } | null
 
-        return {
-          id: item.id,
-          date: voucher?.voucher_date || '',
-          voucher_no: voucher?.voucher_no || '',
-          voucher_id: voucher?.id || '',
-          description: item.description,
-          debit_amount: debit,
-          credit_amount: credit,
-          balance: runningBalance,
-          account_id: item.account_id,
-          account_code: account?.code || '',
-          account_name: account?.name || '',
-        }
-      })
+          return {
+            id: item.id,
+            date: voucher?.voucher_date || '',
+            voucher_no: voucher?.voucher_no || '',
+            voucher_id: voucher?.id || '',
+            description: item.description,
+            debit_amount: debit,
+            credit_amount: credit,
+            balance: runningBalance,
+            account_id: item.account_id!, // 已經過濾掉 null
+            account_code: account?.code || '',
+            account_name: account?.name || '',
+          }
+        })
 
       return entries
     } catch (err) {
@@ -250,6 +252,7 @@ export function useAccountingReports() {
 
       for (const line of (lines || [])) {
         const accountId = line.account_id
+        if (!accountId) continue // 跳過沒有科目的分錄
         const current = balanceMap.get(accountId) || { debit: 0, credit: 0 }
         current.debit += Number(line.debit_amount) || 0
         current.credit += Number(line.credit_amount) || 0
@@ -346,6 +349,7 @@ export function useAccountingReports() {
 
       for (const line of (lines || [])) {
         const accountId = line.account_id
+        if (!accountId) continue // 跳過沒有科目的分錄
         const account = (accounts || []).find(a => a.id === accountId)
         if (!account) continue
 
@@ -479,6 +483,7 @@ export function useAccountingReports() {
 
       for (const line of (lines || [])) {
         const accountId = line.account_id
+        if (!accountId) continue // 跳過沒有科目的分錄
         const account = (accounts || []).find(a => a.id === accountId)
         if (!account) continue
 
@@ -564,7 +569,7 @@ export function useAccountingReports() {
     try {
       // 取得銀行帳戶科目（現金科目）
       const { data: bankAccounts, error: bankError } = await supabase
-        .from('bank_accounts')
+        .from('erp_bank_accounts')
         .select('account_id')
         .eq('workspace_id', user.workspace_id)
         .eq('is_active', true)
@@ -613,7 +618,7 @@ export function useAccountingReports() {
             status,
             voucher_date,
             workspace_id,
-            description
+            memo
           )
         `)
         .eq('voucher.status', 'posted')
@@ -633,8 +638,8 @@ export function useAccountingReports() {
         const amount = (Number(line.debit_amount) || 0) - (Number(line.credit_amount) || 0)
         netOperating += amount
 
-        const voucher = line.voucher as { description: string | null } | null
-        const desc = line.description || voucher?.description || '現金交易'
+        const voucher = line.voucher as { memo: string | null } | null
+        const desc = line.description || voucher?.memo || '現金交易'
 
         operatingActivities.push({
           description: desc,

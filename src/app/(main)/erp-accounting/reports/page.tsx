@@ -52,7 +52,7 @@ export default function AccountingReportsPage() {
         breadcrumb={[
           { label: '首頁', href: '/' },
           { label: '會計', href: '/erp-accounting' },
-          { label: '報表' },
+          { label: '報表', href: '/erp-accounting/reports' },
         ]}
       />
 
