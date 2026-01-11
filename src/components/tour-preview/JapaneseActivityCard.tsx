@@ -33,7 +33,7 @@ export function JapaneseActivityCard({
     <article
       onClick={onClick}
       className={cn(
-        'group bg-white rounded-[1rem] shadow-[0_4px_20px_-2px_rgba(132,158,103,0.15)]',
+        'group bg-card rounded-[1rem] shadow-[0_4px_20px_-2px_rgba(132,158,103,0.15)]',
         'hover:shadow-lg transition-all duration-500',
         'border border-[#EBE5DC] overflow-hidden',
         onClick && 'cursor-pointer',
@@ -58,7 +58,7 @@ export function JapaneseActivityCard({
       )}
 
       {/* 內容區塊 */}
-      <div className="p-4 sm:p-6 md:p-8 bg-white relative">
+      <div className="p-4 sm:p-6 md:p-8 bg-card relative">
         {/* 和紙紋理背景 */}
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"

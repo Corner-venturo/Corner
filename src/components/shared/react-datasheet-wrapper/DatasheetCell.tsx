@@ -71,7 +71,7 @@ export function DatasheetCell({
 
         {/* Column action buttons */}
         {hoveredColumn === col && (canHide || isCustomField) && (
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1 bg-white shadow-sm rounded px-1 z-10 border border-border">
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1 bg-card shadow-sm rounded px-1 z-10 border border-border">
             {canHide && (
               <button
                 onClick={e => {

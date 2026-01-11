@@ -207,7 +207,7 @@ export function TourHeroCollage({ data, viewMode }: TourHeroCollageProps) {
         <div className={`relative mt-12 w-full max-w-3xl mx-auto ${isMobile ? 'h-[300px]' : 'h-[400px] lg:h-[500px]'}`}>
           {/* 主圖片（拍立得風格） */}
           <motion.div
-            className="absolute inset-0 w-4/5 h-full mx-auto bg-white p-4 pb-16 z-10"
+            className="absolute inset-0 w-4/5 h-full mx-auto bg-card p-4 pb-16 z-10"
             style={{
               boxShadow: '10px 10px 0px 0px rgba(0,0,0,1)',
               transform: 'rotate(-3deg)',

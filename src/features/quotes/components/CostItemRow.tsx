@@ -51,7 +51,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             type="text"
             value={item.name}
             onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="輸入項目名稱"
           />
         </div>
@@ -65,7 +65,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             const val = e.target.value.trim()
             handleUpdateItem(categoryId, item.id, 'quantity', val === '' ? null : Number(val) || 0)
           }}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
         />
       </td>
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
@@ -78,7 +78,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
               const val = e.target.value.trim()
               handleUpdateItem(categoryId, item.id, 'adult_price', val === '' ? null : Number(val) || 0)
             }}
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="成人票價"
           />
         ) : item.name === '兒童' ? (
@@ -90,7 +90,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
               const val = e.target.value.trim()
               handleUpdateItem(categoryId, item.id, 'child_price', val === '' ? null : Number(val) || 0)
             }}
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="兒童票價"
           />
         ) : item.name === '嬰兒' ? (
@@ -102,7 +102,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
               const val = e.target.value.trim()
               handleUpdateItem(categoryId, item.id, 'infant_price', val === '' ? null : Number(val) || 0)
             }}
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="嬰兒票價"
           />
         ) : (
@@ -114,7 +114,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
               const val = e.target.value.trim()
               handleUpdateItem(categoryId, item.id, 'unit_price', val === '' ? null : Number(val) || 0)
             }}
-            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
           />
         )}
       </td>
@@ -129,7 +129,7 @@ export const CostItemRow: React.FC<CostItemRowProps> = ({
             type="text"
             value={item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
-            className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="備註"
           />
           <button

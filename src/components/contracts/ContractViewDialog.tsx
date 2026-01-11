@@ -172,7 +172,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
             </div>
           ) : (
             <div
-              className="bg-white p-8 shadow-sm border border-border rounded-lg"
+              className="bg-card p-8 shadow-sm border border-border rounded-lg"
               dangerouslySetInnerHTML={{ __html: contractHtml }}
             />
           )}

@@ -152,7 +152,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
     <div
       ref={containerRef}
       className={cn(
-        'relative border border-morandi-border rounded-md bg-white',
+        'relative border border-morandi-border rounded-md bg-card',
         'focus-within:ring-2 focus-within:ring-morandi-accent/20 focus-within:border-morandi-accent',
         className
       )}
@@ -160,7 +160,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
       {/* 浮動工具列 */}
       {showToolbar && (
         <div
-          className="absolute z-50 flex items-center gap-0.5 bg-white rounded-lg shadow-lg border border-border p-1"
+          className="absolute z-50 flex items-center gap-0.5 bg-card rounded-lg shadow-lg border border-border p-1"
           style={{
             top: Math.max(toolbarPos.top, -45),
             left: Math.max(toolbarPos.left, 0),
@@ -231,7 +231,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               <Palette size={16} />
             </button>
             {showColorPicker && (
-              <div className="absolute left-0 top-full mt-1 grid grid-cols-4 gap-1 p-2 bg-white rounded-lg shadow-lg border border-border z-50 min-w-[140px]">
+              <div className="absolute left-0 top-full mt-1 grid grid-cols-4 gap-1 p-2 bg-card rounded-lg shadow-lg border border-border z-50 min-w-[140px]">
                 {COLORS.map(color => (
                   <button
                     key={color.value}
@@ -263,7 +263,7 @@ export function RichTextInput({ value, onChange, placeholder, className, singleL
               <Highlighter size={16} />
             </button>
             {showHighlightPicker && (
-              <div className="absolute left-0 top-full mt-1 flex flex-col gap-1 p-2 bg-white rounded-lg shadow-lg border border-border z-50">
+              <div className="absolute left-0 top-full mt-1 flex flex-col gap-1 p-2 bg-card rounded-lg shadow-lg border border-border z-50">
                 <div className="grid grid-cols-5 gap-1">
                   {HIGHLIGHTS.map(color => (
                     <button

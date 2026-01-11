@@ -346,20 +346,6 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 <Plus size={12} className="mr-1" />
                 餐飲
               </Button>
-              {onOpenMealsImportDialog && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={onOpenMealsImportDialog}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'text-morandi-secondary hover:bg-morandi-gold/10',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                >
-                  匯入
-                </Button>
-              )}
             </div>
           ) : category.id === 'activities' && handleAddActivity ? (
             <div className="flex gap-1 justify-end">
@@ -376,20 +362,6 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 <Plus size={12} className="mr-1" />
                 新增
               </Button>
-              {onOpenActivitiesImportDialog && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={onOpenActivitiesImportDialog}
-                  disabled={isReadOnly}
-                  className={cn(
-                    'text-morandi-secondary hover:bg-morandi-gold/10',
-                    isReadOnly && 'cursor-not-allowed opacity-60'
-                  )}
-                >
-                  匯入
-                </Button>
-              )}
             </div>
           ) : (
             <div className="flex justify-end">

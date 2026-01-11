@@ -204,8 +204,8 @@ export function VisaWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
-          'bg-gradient-to-br from-emerald-50 via-white to-teal-50'
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
+          'bg-gradient-to-br from-emerald-50 via-card to-teal-50'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -215,7 +215,7 @@ export function VisaWidget() {
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br from-emerald-200/60 to-teal-100/60',
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <Shield className="w-5 h-5 drop-shadow-sm" />
@@ -231,7 +231,7 @@ export function VisaWidget() {
           </div>
 
           {/* 查詢表單 */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40 space-y-3">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5">
@@ -239,7 +239,7 @@ export function VisaWidget() {
                   護照國家
                 </label>
                 <Select value={passport} onValueChange={setPassport}>
-                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇國家" />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,7 +258,7 @@ export function VisaWidget() {
                   目的地
                 </label>
                 <Select value={destination} onValueChange={setDestination}>
-                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇目的地" />
                   </SelectTrigger>
                   <SelectContent>
@@ -308,7 +308,7 @@ export function VisaWidget() {
 
           {/* 查詢結果 */}
           {result && visaStatus && !error && (
-            <div className="flex-1 rounded-xl bg-white/70 p-4 shadow-md border border-white/40 overflow-auto space-y-4">
+            <div className="flex-1 rounded-xl bg-card/70 p-4 shadow-md border border-border/40 overflow-auto space-y-4">
               {/* 路線資訊 */}
               <div className="flex items-center justify-center gap-3 pb-3 border-b border-morandi-container/30">
                 <div className="text-center">
@@ -329,7 +329,7 @@ export function VisaWidget() {
                 <div className="flex items-center gap-3 mb-3">
                   <div
                     className={cn(
-                      'w-10 h-10 rounded-full bg-white/50 flex items-center justify-center'
+                      'w-10 h-10 rounded-full bg-card/50 flex items-center justify-center'
                     )}
                   >
                     <visaStatus.icon className={cn('w-6 h-6', visaStatus.color)} />
@@ -344,7 +344,7 @@ export function VisaWidget() {
 
                 {/* 停留期限 */}
                 {result.stayDuration && (
-                  <div className="bg-white/50 rounded-lg p-3 mt-3">
+                  <div className="bg-card/50 rounded-lg p-3 mt-3">
                     <p className="text-xs text-morandi-secondary mb-1">停留期限</p>
                     <p className="font-semibold text-sm text-morandi-primary">
                       {result.stayDuration}
@@ -354,7 +354,7 @@ export function VisaWidget() {
 
                 {/* 備註 */}
                 {result.notes && (
-                  <div className="bg-white/50 rounded-lg p-3 mt-3">
+                  <div className="bg-card/50 rounded-lg p-3 mt-3">
                     <p className="text-xs text-morandi-secondary mb-1">注意事項</p>
                     <p className="text-xs text-morandi-primary">{result.notes}</p>
                   </div>

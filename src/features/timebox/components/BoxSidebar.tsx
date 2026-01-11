@@ -155,7 +155,7 @@ export default function BoxSidebar({ onManageClick }: BoxSidebarProps) {
               return (
                 <div
                   key={box.id}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/60 cursor-grab transition-colors group border border-transparent hover:border-border/50"
+                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-card/60 cursor-grab transition-colors group border border-transparent hover:border-border/50"
                   draggable
                   onDragStart={(e) => {
                     e.dataTransfer.setData('application/json', JSON.stringify({

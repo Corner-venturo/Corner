@@ -27,7 +27,7 @@ export function CostSummaryCard({ summary }: CostSummaryCardProps) {
     { key: 'meal', label: '餐食', icon: Utensils, color: 'text-orange-500' },
     { key: 'accommodation', label: '住宿', icon: Hotel, color: 'text-purple-500' },
     { key: 'activity', label: '活動', icon: Ticket, color: 'text-green-500' },
-    { key: 'other', label: '其他', icon: FileText, color: 'text-gray-500' },
+    { key: 'other', label: '其他', icon: FileText, color: 'text-morandi-secondary' },
   ] as const
 
   const difference = summary.total.actual - summary.total.expected

@@ -29,6 +29,7 @@ import {
   Bus,
   CheckSquare,
   Archive,
+  ClipboardList,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -80,26 +81,38 @@ const menuItems: MenuItem[] = [
       { href: '/database/transportation-rates', label: '車資管理', icon: Bus, requiredPermission: 'database' },
       { href: '/database/suppliers', label: '供應商管理', icon: Building2, requiredPermission: 'database' },
       { href: '/database/tour-leaders', label: '領隊資料', icon: Users, requiredPermission: 'database' },
-      { href: '/database/fleet', label: '車隊管理', icon: Bus, requiredPermission: 'database' },
       { href: '/database/company-assets', label: '公司資源管理', icon: ImageIcon, requiredPermission: 'database' },
       { href: '/database/archive-management', label: '封存管理', icon: Archive, requiredPermission: 'database' },
     ],
   },
   { href: '/hr', label: '人資管理', icon: UserCog, requiredPermission: 'hr' },
+  { href: '/scheduling', label: '資源調度', icon: Calendar, requiredPermission: 'hr' },
+  { href: '/database/fleet', label: '車隊管理', icon: Bus, requiredPermission: 'hr' },
   { href: '/esims', label: '網卡管理', icon: Wifi, requiredPermission: 'hr', restrictedFeature: 'esim' },
 ]
 
+// 供應商專用選單（車行、領隊公司）
+const supplierMenuItems: MenuItem[] = [
+  { href: '/', label: '首頁', icon: Home },
+  { href: '/supplier/requests', label: '需求收件匣', icon: ClipboardList },
+  { href: '/database/fleet', label: '車隊管理', icon: Bus }, // 車行專用
+]
+
 const personalToolItems: MenuItem[] = [
-  { href: '/accounting', label: '記帳管理', icon: Wallet, requiredPermission: 'accounting' },
-  { href: '/timebox', label: '箱型時間', icon: Clock, requiredPermission: 'timebox' },
+  { href: '/accounting', label: '記帳管理', icon: Wallet, requiredPermission: 'super_admin_only' },
+  { href: '/timebox', label: '箱型時間', icon: Clock, requiredPermission: 'super_admin_only' },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const { user } = useAuthStore()
   const [mounted, setMounted] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false) // 點擊固定展開
+  const [isHovered, setIsHovered] = useState(false)   // 滑鼠懸停暫時展開
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
+
+  // 實際顯示狀態：固定展開 或 懸停展開
+  const showExpanded = isExpanded || isHovered
 
   useEffect(() => {
     setMounted(true)
@@ -122,8 +135,8 @@ export function Sidebar() {
 
   // 切換子選單展開/收起
   const toggleSubmenu = (href: string) => {
-    // 如果側邊欄是收起的，先展開側邊欄再展開子選單
-    if (!isExpanded) {
+    // 如果側邊欄是收起的（非固定展開），先固定展開再展開子選單
+    if (!isExpanded && !isHovered) {
       setIsExpanded(true)
       setExpandedMenus([href])
       return
@@ -131,6 +144,21 @@ export function Sidebar() {
     setExpandedMenus(prev =>
       prev.includes(href) ? prev.filter(h => h !== href) : [...prev, href]
     )
+  }
+
+  // 滑鼠進入/離開側邊欄
+  const handleMouseEnter = () => {
+    if (!isExpanded) {
+      setIsHovered(true)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    // 離開時收起子選單（如果不是固定展開狀態）
+    if (!isExpanded) {
+      setExpandedMenus([])
+    }
   }
 
   const is_active = (href: string) => {
@@ -151,8 +179,22 @@ export function Sidebar() {
     userPermissions.includes('*') ||
     userRoles.includes('super_admin')
 
+  // 檢查是否為供應商 workspace
+  const isSupplierWorkspace = user?.workspace_type === 'vehicle_supplier' || user?.workspace_type === 'guide_supplier'
+  const isVehicleSupplier = user?.workspace_type === 'vehicle_supplier'
+
   const visibleMenuItems = useMemo(() => {
     const workspaceCode = user?.workspace_code
+
+    // 供應商使用簡化選單
+    if (isSupplierWorkspace) {
+      return supplierMenuItems.filter(item => {
+        // 車隊管理只給車行看
+        if (item.href === '/database/fleet' && !isVehicleSupplier) return false
+        return true
+      })
+    }
+
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) return items.filter(item => !item.requiredPermission)
 
@@ -180,9 +222,12 @@ export function Sidebar() {
         .filter((item): item is MenuItem => item !== null)
     }
     return filterMenuByPermissions(menuItems)
-  }, [user?.id, user?.workspace_code, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, user?.workspace_code, user?.workspace_type, isSupplierWorkspace, isVehicleSupplier, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   const visiblePersonalToolItems = useMemo(() => {
+    // 供應商不顯示個人工具
+    if (isSupplierWorkspace) return []
+
     const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
       if (!user) return items.filter(item => !item.requiredPermission)
       return items
@@ -195,7 +240,7 @@ export function Sidebar() {
         .filter((item): item is MenuItem => item !== null)
     }
     return filterMenuByPermissions(personalToolItems)
-  }, [user?.id, isSuperAdmin, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, isSupplierWorkspace, isSuperAdmin, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
 
   // 渲染菜單項目
   const renderMenuItem = (item: MenuItem, isChild = false) => {
@@ -219,7 +264,7 @@ export function Sidebar() {
               size={18}
               className="absolute left-5 top-1/2 -translate-y-1/2"
             />
-            {isExpanded && (
+            {showExpanded && (
               <>
                 <span className="ml-12 block text-left leading-9">{item.label}</span>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -234,7 +279,7 @@ export function Sidebar() {
           </div>
 
           {/* 子項目 - 展開在下方 */}
-          {isExpanded && isSubmenuExpanded && item.children && (
+          {showExpanded && isSubmenuExpanded && item.children && (
             <ul className="bg-morandi-background/30">
               {item.children.map(child => renderMenuItem(child, true))}
             </ul>
@@ -264,7 +309,7 @@ export function Sidebar() {
               isChild ? 'left-8' : 'left-5'
             )}
           />
-          {isExpanded && (
+          {showExpanded && (
             <span className={cn('block text-left leading-9', isChild ? 'ml-14' : 'ml-12')}>
               {item.label}
             </span>
@@ -279,41 +324,18 @@ export function Sidebar() {
       className={cn(
         'fixed left-0 top-0 h-screen bg-morandi-container border-r-2 border-morandi-gold/20 z-30 transition-[width] duration-300 flex flex-col',
         'hidden lg:flex',
-        isExpanded ? 'w-[180px]' : 'w-16'
+        showExpanded ? 'w-[180px]' : 'w-16'
       )}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* 展開/收起三角箭頭按鈕 */}
-      <button
-        onClick={toggleSidebar}
-        className={cn(
-          'absolute top-1/2 -translate-y-1/2 z-50 w-5 h-10 flex items-center justify-center',
-          'transition-all duration-300',
-          isExpanded ? 'right-0' : '-right-2.5'
-        )}
-        aria-label={isExpanded ? '收起側邊欄' : '展開側邊欄'}
-      >
-        <div
-          className={cn(
-            'w-0 h-0 transition-transform duration-300',
-            'border-t-[10px] border-t-transparent',
-            'border-b-[10px] border-b-transparent',
-            isExpanded
-              ? 'border-r-[10px] border-r-morandi-gold/60'
-              : 'border-l-[10px] border-l-morandi-gold/60'
-          )}
-          style={{
-            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
-          }}
-        />
-      </button>
-
       {/* Logo區域 */}
       <div className="shrink-0 border-b border-border mx-3">
         <div className="h-18 flex items-center relative">
           <div className="absolute left-5 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-morandi-gold flex items-center justify-center shadow-sm flex-shrink-0 opacity-90">
             <span className="text-white font-semibold text-lg">V</span>
           </div>
-          {isExpanded && (
+          {showExpanded && (
             <div className="ml-[58px] text-xl font-bold text-morandi-primary">
               CORNER
             </div>
@@ -340,7 +362,7 @@ export function Sidebar() {
               )}
             >
               <Settings size={18} className="absolute left-5 top-1/2 -translate-y-1/2" />
-              {isExpanded && (
+              {showExpanded && (
                 <span className="ml-12 block text-left leading-9">設定</span>
               )}
             </Link>

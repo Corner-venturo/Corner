@@ -559,7 +559,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                   return (
                     <div
                       key={exercise.id}
-                      className="bg-white rounded-lg border border-border p-4 hover:border-morandi-gold/20 transition-colors"
+                      className="bg-card rounded-lg border border-border p-4 hover:border-morandi-gold/20 transition-colors"
                     >
                       {/* 動作標題 */}
                       <div className="flex items-start justify-between mb-3">
@@ -616,7 +616,7 @@ export default function WorkoutDialog({ scheduledBox, box, onClose }: WorkoutDia
                                 active:scale-95
                                 ${completed
                                   ? 'bg-status-success border-status-success text-white shadow-lg scale-105'
-                                  : 'border-border hover:border-morandi-gold hover:bg-morandi-gold/5 bg-white hover:scale-105'
+                                  : 'border-border hover:border-morandi-gold hover:bg-morandi-gold/5 bg-card hover:scale-105'
                                 }
                               `}
                               title={exercise.completedSetsTime[setIndex]

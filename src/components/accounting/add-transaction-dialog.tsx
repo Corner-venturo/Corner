@@ -230,7 +230,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                   }
                 }}
                 placeholder="例如：餐費、交通、娛樂"
-                className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+                className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
                 autoFocus
               />
             </div>
@@ -264,7 +264,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelect(category.id)}
-                  className="p-4 rounded-xl bg-white/60 hover:bg-white border-2 border-[#E8E4E0] hover:border-[#B8A99A] transition-all text-left"
+                  className="p-4 rounded-xl bg-card/60 hover:bg-card border-2 border-[#E8E4E0] hover:border-[#B8A99A] transition-all text-left"
                 >
                   <div className="font-medium text-[#333333]">{category.name}</div>
                 </button>
@@ -349,7 +349,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
             onKeyDown={handleKeyDown}
             {...compositionProps}
             placeholder="0"
-            className="pl-12 text-lg font-semibold border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+            className="pl-12 text-lg font-semibold border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
             min="0"
             step="1"
             autoFocus
@@ -364,7 +364,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
           value={formData.date}
           onChange={date => setFormData(prev => ({ ...prev, date }))}
           placeholder="選擇日期"
-          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+          className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
@@ -377,7 +377,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder="輸入備註（選填）"
-          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+          className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
     </FormDialog>

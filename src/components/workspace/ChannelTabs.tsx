@@ -91,7 +91,7 @@ export function ChannelTabs({ channel, children, headerActions }: ChannelTabsPro
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* 分頁標籤 - 高度對齊 logo 分割線 (72px - 16px padding = 56px) */}
-      <div className="h-[56px] border-b border-border bg-white px-6 flex items-center shrink-0">
+      <div className="h-[56px] border-b border-border bg-card px-6 flex items-center shrink-0">
         <div className="flex items-center justify-between w-full">
           <div className="flex gap-1 items-center">
             {/* 對話 Tab */}

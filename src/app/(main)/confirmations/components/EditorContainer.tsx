@@ -15,7 +15,7 @@ export function EditorContainer({
   onTypeChange,
 }: EditorContainerProps) {
   return (
-    <div className="w-1/2 bg-white border-r border-border flex flex-col">
+    <div className="w-1/2 bg-card border-r border-border flex flex-col">
       {/* 標題列 */}
       <div className="h-14 bg-morandi-gold text-white px-6 flex items-center justify-between border-b border-border">
         <h2 className="text-lg font-semibold">編輯確認單</h2>
@@ -28,7 +28,7 @@ export function EditorContainer({
             onClick={() => onTypeChange('accommodation')}
             className={
               formData.type === 'accommodation'
-                ? 'bg-white text-morandi-gold hover:bg-muted'
+                ? 'bg-card text-morandi-gold hover:bg-muted'
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >
@@ -40,7 +40,7 @@ export function EditorContainer({
             onClick={() => onTypeChange('flight')}
             className={
               formData.type === 'flight'
-                ? 'bg-white text-morandi-gold hover:bg-muted'
+                ? 'bg-card text-morandi-gold hover:bg-muted'
                 : 'text-white border-white hover:bg-morandi-gold-dark'
             }
           >

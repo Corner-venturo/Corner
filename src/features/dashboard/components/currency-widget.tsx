@@ -14,42 +14,42 @@ export function CurrencyWidget() {
         symbol: '$',
         name: '美金',
         color: 'from-morandi-green/30 to-morandi-green/10',
-        gradient: 'bg-gradient-to-br from-status-success-bg via-white to-morandi-green/5',
+        gradient: 'bg-gradient-to-br from-status-success-bg via-card to-morandi-green/5',
       },
       JPY: {
         rate: 0.21,
         symbol: '¥',
         name: '日幣',
         color: 'from-morandi-red/30 to-morandi-red/10',
-        gradient: 'bg-gradient-to-br from-status-danger-bg via-white to-morandi-red/5',
+        gradient: 'bg-gradient-to-br from-status-danger-bg via-card to-morandi-red/5',
       },
       KRW: {
         rate: 0.024,
         symbol: '₩',
         name: '韓元',
         color: 'from-morandi-secondary/40 to-morandi-container/60',
-        gradient: 'bg-gradient-to-br from-morandi-container/20 via-white to-morandi-secondary/10',
+        gradient: 'bg-gradient-to-br from-morandi-container/20 via-card to-morandi-secondary/10',
       },
       CNY: {
         rate: 4.35,
         symbol: '¥',
         name: '人民幣',
         color: 'from-status-warning-bg to-morandi-gold/20',
-        gradient: 'bg-gradient-to-br from-status-warning-bg via-white to-morandi-gold/10',
+        gradient: 'bg-gradient-to-br from-status-warning-bg via-card to-morandi-gold/10',
       },
       VND: {
         rate: 0.00127,
         symbol: '₫',
         name: '越南盾',
         color: 'from-morandi-green/40 to-morandi-green/20',
-        gradient: 'bg-gradient-to-br from-morandi-green/10 via-white to-morandi-container/20',
+        gradient: 'bg-gradient-to-br from-morandi-green/10 via-card to-morandi-container/20',
       },
       IDR: {
         rate: 0.002,
         symbol: 'Rp',
         name: '印尼盾',
         color: 'from-morandi-red/30 to-morandi-container/40',
-        gradient: 'bg-gradient-to-br from-morandi-red/5 via-white to-morandi-container/10',
+        gradient: 'bg-gradient-to-br from-morandi-red/5 via-card to-morandi-container/10',
       },
     }),
     []
@@ -130,7 +130,7 @@ export function CurrencyWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
           currencyInfo.gradient
         )}
       >
@@ -142,7 +142,7 @@ export function CurrencyWidget() {
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br',
                 currencyInfo.color,
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <DollarSign className="w-5 h-5 drop-shadow-sm" />
@@ -158,7 +158,7 @@ export function CurrencyWidget() {
           </div>
 
           {/* Currency Selection */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <label className="text-xs font-semibold text-morandi-primary mb-2 block">
               選擇貨幣
             </label>
@@ -169,7 +169,7 @@ export function CurrencyWidget() {
                 setUseCustomRate(false)
               }}
             >
-              <SelectTrigger className="w-full px-3.5 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+              <SelectTrigger className="w-full px-3.5 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                 <SelectValue placeholder="選擇貨幣" />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +183,7 @@ export function CurrencyWidget() {
           </div>
 
           {/* Currency Conversion - Side by Side */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <div className="flex items-end gap-2">
               {/* Left Input - 根據 direction 決定顯示哪個貨幣 */}
               <div className="flex-1">
@@ -198,7 +198,7 @@ export function CurrencyWidget() {
                     type="number"
                     value={direction === 'twd-to-foreign' ? twdAmount : foreignAmount}
                     onChange={e => direction === 'twd-to-foreign' ? handleTwdChange(e.target.value) : handleForeignChange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                    className="w-full px-3.5 py-2.5 pl-[46px] border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder={direction === 'twd-to-foreign' ? '10000' : '0.00'}
                   />
                 </div>
@@ -207,7 +207,7 @@ export function CurrencyWidget() {
               {/* Arrow Button - 交換左右位置 */}
               <button
                 onClick={swapDirection}
-                className="p-2.5 hover:bg-white/80 rounded-xl transition-all group mb-0.5 shadow-sm hover:shadow-md border border-transparent hover:border-white/60"
+                className="p-2.5 hover:bg-card/80 rounded-xl transition-all group mb-0.5 shadow-sm hover:shadow-md border border-transparent hover:border-border/60"
                 title="交換左右位置"
               >
                 <ArrowRightLeft className={cn(
@@ -229,7 +229,7 @@ export function CurrencyWidget() {
                     type="number"
                     value={direction === 'twd-to-foreign' ? foreignAmount : twdAmount}
                     onChange={e => direction === 'twd-to-foreign' ? handleForeignChange(e.target.value) : handleTwdChange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-[46px] border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                    className="w-full px-3.5 py-2.5 pl-[46px] border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                     placeholder={direction === 'twd-to-foreign' ? '0.00' : '10000'}
                   />
                 </div>
@@ -238,7 +238,7 @@ export function CurrencyWidget() {
           </div>
 
           {/* Exchange Rate Setting */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40 space-y-2.5">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-morandi-primary">
                 匯率 (1 {selectedCurrency} = ? TWD)
@@ -261,10 +261,10 @@ export function CurrencyWidget() {
                 setCustomRate(e.target.value)
                 setUseCustomRate(true)
               }}
-              className="w-full px-3.5 py-2.5 border border-white/60 rounded-xl font-mono text-sm font-medium bg-white/90 hover:bg-white hover:shadow-sm focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+              className="w-full px-3.5 py-2.5 border border-border/60 rounded-xl font-mono text-sm font-medium bg-card/90 hover:bg-card hover:shadow-sm focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
               placeholder="輸入匯率"
             />
-            <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-white/40 px-2.5 py-1.5 rounded-lg">
+            <div className="flex items-center gap-1.5 text-xs text-morandi-secondary/90 bg-card/40 px-2.5 py-1.5 rounded-lg">
               <TrendingUp className="w-3.5 h-3.5 text-morandi-gold" />
               <span className="font-medium">
                 {useCustomRate ? '已自訂匯率' : `預設匯率: ${DEFAULT_RATES[selectedCurrency].rate}`}

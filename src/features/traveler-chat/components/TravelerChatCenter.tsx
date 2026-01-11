@@ -37,7 +37,7 @@ export function TravelerChatCenter() {
   }, 0)
 
   return (
-    <div className="flex h-full bg-white rounded-lg border border-border overflow-hidden">
+    <div className="flex h-full bg-card rounded-lg border border-border overflow-hidden">
       {/* 左側 - 團列表 */}
       <div className="w-80 border-r border-border flex flex-col shrink-0">
         {/* 標題 */}

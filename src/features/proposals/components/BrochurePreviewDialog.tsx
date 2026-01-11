@@ -238,7 +238,7 @@ export function BrochurePreviewDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto border border-border rounded-lg bg-white">
+        <div className="flex-1 overflow-y-auto border border-border rounded-lg bg-card">
           {loading ? (
             <div className="h-64 flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
@@ -299,7 +299,7 @@ export function BrochurePreviewDialog({
                 </thead>
                 <tbody>
                   {currentDailyItinerary.map((day, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-morandi-container/20'}>
+                    <tr key={index} className={index % 2 === 0 ? 'bg-card' : 'bg-morandi-container/20'}>
                       <td className="border border-morandi-container px-3 py-2">
                         <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>
                         <div className="text-xs text-morandi-secondary">{day.date}</div>

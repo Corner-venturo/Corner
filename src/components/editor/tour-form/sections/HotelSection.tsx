@@ -254,7 +254,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
         </div>
 
         {hotels.length === 0 && (
-          <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-morandi-container">
+          <div className="text-center py-8 bg-card rounded-lg border-2 border-dashed border-morandi-container">
             <p className="text-sm text-morandi-secondary mb-2">尚未新增飯店資訊</p>
             <p className="text-xs text-morandi-muted">點擊「新增飯店」按鈕開始</p>
           </div>
@@ -267,7 +267,7 @@ export function HotelSection({ data, updateField }: HotelSectionProps) {
           return (
             <div
               key={hotelIndex}
-              className="bg-white p-4 rounded-lg border border-morandi-container space-y-3 relative"
+              className="bg-card p-4 rounded-lg border border-morandi-container space-y-3 relative"
             >
               <button
                 type="button"

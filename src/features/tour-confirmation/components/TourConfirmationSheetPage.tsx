@@ -914,7 +914,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.supplier_name}
                               onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
                               placeholder="車行..."
-                              className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-2 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -922,7 +922,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.title}
                               onChange={(e) => handleNewItemChange('title', e.target.value)}
                               placeholder={newItemData.service_date_end ? '全程用車' : '單日用車'}
-                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -931,7 +931,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.unit_price}
                               onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
                               placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -940,7 +940,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.quantity}
                               onChange={(e) => handleNewItemChange('quantity', e.target.value)}
                               placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -949,7 +949,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.expected_cost}
                               onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
                               placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -958,7 +958,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.actual_cost}
                               onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
                               placeholder="0"
-                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                           <td className="p-0 border-r border-border/30">
@@ -966,7 +966,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                               value={newItemData.notes}
                               onChange={(e) => handleNewItemChange('notes', e.target.value)}
                               placeholder="備註..."
-                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                              className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                             />
                           </td>
                         </>
@@ -1007,7 +1007,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           type="date"
                           value={newItemData.service_date}
                           onChange={(e) => handleNewItemChange('service_date', e.target.value)}
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1015,7 +1015,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.supplier_name}
                           onChange={(e) => handleNewItemChange('supplier_name', e.target.value)}
                           placeholder="輸入供應商..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1023,7 +1023,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.title}
                           onChange={(e) => handleNewItemChange('title', e.target.value)}
                           placeholder="輸入項目說明..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1032,7 +1032,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.unit_price}
                           onChange={(e) => handleNewItemChange('unit_price', e.target.value)}
                           placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1041,7 +1041,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.quantity}
                           onChange={(e) => handleNewItemChange('quantity', e.target.value)}
                           placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm text-center bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1050,7 +1050,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.expected_cost}
                           onChange={(e) => handleNewItemChange('expected_cost', e.target.value)}
                           placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1059,7 +1059,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.actual_cost}
                           onChange={(e) => handleNewItemChange('actual_cost', e.target.value)}
                           placeholder="0"
-                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm text-right font-mono bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="p-0 border-r border-border/30">
@@ -1067,7 +1067,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                           value={newItemData.notes}
                           onChange={(e) => handleNewItemChange('notes', e.target.value)}
                           placeholder="輸入備註..."
-                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-white focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
+                          className="w-full h-full px-3 py-2 text-sm bg-transparent border-0 outline-none focus:bg-card focus:ring-2 focus:ring-inset focus:ring-morandi-gold/50 placeholder:text-morandi-secondary/50"
                         />
                       </td>
                       <td className="px-2 py-2">

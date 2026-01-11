@@ -27,6 +27,7 @@ import type {
   GradientFill,
 } from '../types'
 import { MATERIAL_ICON_PATHS, ICON_VIEWBOX_SIZE } from './icon-paths'
+import { logger } from '@/lib/utils/logger'
 
 interface RenderOptions {
   isEditable: boolean
@@ -268,13 +269,30 @@ async function renderImageElement(
       scaleY = targetHeight / originalHeight
     }
 
+    // 如果有自訂位置設定，套用額外縮放
+    const positionScale = el.position?.scale || 1
+    scaleX *= positionScale
+    scaleY *= positionScale
+
     // 計算縮放後的圖片尺寸
     const scaledWidth = originalWidth * scaleX
     const scaledHeight = originalHeight * scaleY
 
-    // 圖片在裁切區域內的偏移（置中）
-    const offsetX = (targetWidth - scaledWidth) / 2
-    const offsetY = (targetHeight - scaledHeight) / 2
+    // 圖片在裁切區域內的偏移
+    // 如果有自訂位置，使用百分比計算；否則置中
+    let offsetX: number, offsetY: number
+    if (el.position) {
+      // position.x/y 是 0-100 的百分比，50 = 置中
+      // 當 x=0 時圖片靠左，x=100 時圖片靠右
+      const maxOffsetX = targetWidth - scaledWidth
+      const maxOffsetY = targetHeight - scaledHeight
+      offsetX = (el.position.x / 100) * maxOffsetX
+      offsetY = (el.position.y / 100) * maxOffsetY
+    } else {
+      // 預設置中
+      offsetX = (targetWidth - scaledWidth) / 2
+      offsetY = (targetHeight - scaledHeight) / 2
+    }
 
     // 建立裁切用的形狀（支援自訂圓角）
     let clipShape: Rect | Path
@@ -406,11 +424,29 @@ export async function renderPageOnCanvas(
   page: CanvasPage,
   options: RenderOptions
 ): Promise<void> {
+  // 安全檢查：確保 canvas 已正確初始化
+  if (!canvas) {
+    logger.warn('Canvas not provided, skipping render')
+    return
+  }
+
+  // Fabric.js canvas 需要檢查內部的 contextContainer
+  const ctx = canvas.getContext()
+  if (!ctx) {
+    logger.warn('Canvas context not available, skipping render')
+    return
+  }
+
   // 確保字體已載入
   await ensureFontsLoaded()
 
   // 清除現有內容
-  canvas.clear()
+  try {
+    canvas.clear()
+  } catch (err) {
+    logger.warn('Canvas clear failed, canvas may not be fully initialized:', err)
+    return
+  }
   canvas.backgroundColor = page.backgroundColor
 
   // 按 zIndex 排序

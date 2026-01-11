@@ -68,7 +68,7 @@ export function MemberPassportInfo({
     <>
       {/* 護照號碼 */}
       {cv.passport_number && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"
@@ -87,7 +87,7 @@ export function MemberPassportInfo({
 
       {/* 護照效期 */}
       {cv.passport_expiry && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
@@ -53,9 +53,28 @@ function SortableWidget({ id, widget }: { id: string; widget: (typeof AVAILABLE_
 export function DashboardClient() {
   const router = useRouter()
   const t = useI18n()
-  const { isAuthenticated, _hasHydrated } = useAuthStore()
+  const { isAuthenticated, _hasHydrated, user } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
   const { activeWidgets, toggleWidget, reorderWidgets } = useWidgets()
+
+  // 是否為超級管理員
+  const userRoles = user?.roles || []
+  const isSuperAdmin = userRoles.includes('super_admin')
+
+  // 過濾可渲染的 widgets（過濾掉沒權限的）
+  const filteredActiveWidgets = useMemo(() => {
+    return activeWidgets.filter(widgetId => {
+      const widget = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
+      if (!widget) return false
+      // 沒有權限限制的 widget 所有人都看得到
+      if (!widget.requiredPermission) return true
+      // super_admin_only 只有超級管理員看得到
+      if (widget.requiredPermission === 'super_admin_only') {
+        return isSuperAdmin
+      }
+      return true
+    })
+  }, [activeWidgets, isSuperAdmin])
 
   // 設定拖拽感應器（長按 500ms 才觸發，避免影響正常互動）
   const sensors = useSensors(
@@ -120,8 +139,8 @@ export function DashboardClient() {
       />
 
       <div className="flex-1 overflow-auto min-h-0">
-        {activeWidgets.length === 0 ? (
-          <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-white">
+        {filteredActiveWidgets.length === 0 ? (
+          <Card className="p-12 text-center border-morandi-gold/20 shadow-sm rounded-2xl bg-card">
             <div className="max-w-md mx-auto">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[#B5986A]/10 to-[#D4C4A8]/10 flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <Settings className="h-8 w-8 text-morandi-gold" />
@@ -140,9 +159,9 @@ export function DashboardClient() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={activeWidgets} strategy={rectSortingStrategy}>
+            <SortableContext items={filteredActiveWidgets} strategy={rectSortingStrategy}>
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {activeWidgets.map(widgetId => {
+                {filteredActiveWidgets.map(widgetId => {
                   const widget = AVAILABLE_WIDGETS.find(w => w.id === widgetId)
                   if (!widget) return null
                   return <SortableWidget key={widget.id} id={widget.id} widget={widget} />

@@ -66,7 +66,7 @@ function SortableAttractionItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'group bg-white border border-border rounded-lg p-4 hover:shadow-sm transition-shadow',
+        'group bg-card border border-border rounded-lg p-4 hover:shadow-sm transition-shadow',
         isDragging && 'shadow-lg scale-105'
       )}
     >
@@ -244,7 +244,7 @@ export function SortableAttractionsList({
     return (
       <div className="space-y-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="bg-white border border-border rounded-lg p-4 animate-pulse">
+          <div key={i} className="bg-card border border-border rounded-lg p-4 animate-pulse">
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-morandi-container rounded" />
               <div className="w-16 h-12 bg-morandi-container rounded" />

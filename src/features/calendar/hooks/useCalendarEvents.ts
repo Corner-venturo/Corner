@@ -1,6 +1,6 @@
 'use client'
 
-import { formatDate } from '@/lib/utils/format-date'
+import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import {
@@ -8,8 +8,6 @@ import {
   useCalendarEventStore,
   useEmployeeStore,
   useTourStore,
-  useOrderStore,
-  useMemberStore,
   useCustomerStore,
   useAuthStore,
   useWorkspaceStore,
@@ -24,44 +22,17 @@ import type { CalendarEvent } from '@/types/calendar.types'
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   if (allDay) return ''
-  if (!isoString) return ''
-
-  try {
-    const date = new Date(isoString)
-    if (isNaN(date.getTime())) return ''
-
-    const timeStr = date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Taipei',
-    })
-
-    if (timeStr === '00:00') return ''
-    return timeStr
-  } catch {
-    return ''
-  }
+  return toTaipeiTimeString(isoString, { skipMidnight: true })
 }
 
-// 🔧 修正：從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
+// 從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
 // 用於全天事件，避免 FullCalendar 時區轉換問題
 const getDateInTaipei = (isoString: string): string => {
-  if (!isoString) return ''
-  try {
-    const date = new Date(isoString)
-    if (isNaN(date.getTime())) return isoString
-    // 使用 sv-SE locale 取得 YYYY-MM-DD 格式
-    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
-  } catch {
-    return isoString
-  }
+  return toTaipeiDateString(isoString) || isoString
 }
 
 export function useCalendarEvents() {
   const { items: tours, fetchAll: fetchTours } = useTourStore()
-  const { items: orders, fetchAll: fetchOrders } = useOrderStore()
-  const { items: members, fetchAll: fetchMembers } = useMemberStore()
   const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
   const { settings } = useCalendarStore()
   const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
@@ -100,19 +71,18 @@ export function useCalendarEvents() {
         isSuperAdmin,
       })
       // 載入所有行事曆需要的資料
+      // 🔧 優化：移除 fetchOrders/fetchMembers，改用 tour.current_participants
       fetchCalendarEvents()
       fetchEmployees()
       fetchTours()
-      fetchOrders()
-      fetchMembers()
-      fetchCustomers() // 🔧 修正：載入客戶資料以顯示客戶生日
+      fetchCustomers() // 用於客戶生日顯示
 
       // 顯示載入的資料數量（除錯用）
       setTimeout(() => {
         logger.log('[Calendar] 資料載入完成，tours 數量:', tours?.length || 0)
       }, 2000)
     }
-  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchOrders, fetchMembers, fetchCustomers, user, isSuperAdmin, tours?.length])
+  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchCustomers, user, isSuperAdmin, tours?.length])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -163,10 +133,8 @@ export function useCalendarEvents() {
       .filter(tour => tour.status !== '特殊團' && !tour.archived) // 過濾掉簽證專用團等特殊團，以及已封存的
       .map(tour => {
         const color = getEventColor('tour', tour.status || '提案')
-        const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
-        const actualMembers = (members || []).filter(member =>
-          tourOrders.some(order => order.id === member.order_id)
-        ).length
+        // 🔧 優化：直接使用 tour.current_participants，不再遍歷 orders/members
+        const actualMembers = tour.current_participants || 0
 
         // 修正 FullCalendar 的多日事件顯示問題
         // 如果有 return_date，則需要加一天才能正確顯示跨日事件
@@ -195,7 +163,7 @@ export function useCalendarEvents() {
           },
         } as FullCalendarEvent
       })
-  }, [tours, orders, members, getEventColor])
+  }, [tours, getEventColor])
 
   // 轉換個人事項為日曆事件（只顯示當前用戶的個人事項）
   const personalCalendarEvents: FullCalendarEvent[] = useMemo(() => {
@@ -294,36 +262,8 @@ export function useCalendarEvents() {
       })
   }, [calendarEvents, getEventColor, employees, user, isSuperAdmin, selectedWorkspaceId])
 
-  // 轉換會員生日為日曆事件
-  const memberBirthdayEvents: FullCalendarEvent[] = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-
-    return (members || [])
-      .map(member => {
-        if (!member?.birthday) return null
-
-        // 計算今年的生日日期
-        const birthdayThisYear = `${currentYear}-${member.birthday.slice(5)}`
-
-        return {
-          id: `member-birthday-${member.id}`,
-          title: `🎂 ${member.name} 生日`,
-          start: birthdayThisYear,
-          backgroundColor: getEventColor('birthday').bg,
-          borderColor: getEventColor('birthday').border,
-          extendedProps: {
-            type: 'birthday' as const,
-            member_id: member.id,
-            member_name: member.name,
-            order_id: member.order_id,
-            source: 'member' as const,
-          },
-        }
-      })
-      .filter(Boolean) as FullCalendarEvent[]
-  }, [members, getEventColor])
-
   // 轉換客戶生日為日曆事件
+  // 🔧 優化：移除 memberBirthdayEvents，因不再載入 members 資料
   const customerBirthdayEvents: FullCalendarEvent[] = useMemo(() => {
     const currentYear = new Date().getFullYear()
 
@@ -351,10 +291,10 @@ export function useCalendarEvents() {
       .filter(Boolean) as FullCalendarEvent[]
   }, [customers, getEventColor])
 
-  // 合併所有生日事件
+  // 合併所有生日事件（目前只有客戶生日）
   const birthdayEvents = useMemo(() => {
-    return [...memberBirthdayEvents, ...customerBirthdayEvents]
-  }, [memberBirthdayEvents, customerBirthdayEvents])
+    return [...customerBirthdayEvents]
+  }, [customerBirthdayEvents])
 
   // 合併所有事件（生日改用獨立彈窗顯示，不在行事曆上顯示）
   const allEvents = useMemo(() => {

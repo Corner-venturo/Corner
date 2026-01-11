@@ -2943,6 +2943,7 @@ export type Database = {
           itinerary_id: string | null
           memo_settings: Json | null
           name: string
+          package_id: string | null
           proposal_id: string | null
           style_id: string
           template_data: Json
@@ -2962,6 +2963,7 @@ export type Database = {
           itinerary_id?: string | null
           memo_settings?: Json | null
           name?: string
+          package_id?: string | null
           proposal_id?: string | null
           style_id: string
           template_data?: Json
@@ -2981,6 +2983,7 @@ export type Database = {
           itinerary_id?: string | null
           memo_settings?: Json | null
           name?: string
+          package_id?: string | null
           proposal_id?: string | null
           style_id?: string
           template_data?: Json
@@ -4640,6 +4643,57 @@ export type Database = {
           },
         ]
       }
+      leader_availability: {
+        Row: {
+          available_end_date: string
+          available_start_date: string
+          created_at: string | null
+          id: string
+          leader_id: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          available_end_date: string
+          available_start_date: string
+          created_at?: string | null
+          id?: string
+          leader_id: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          available_end_date?: string
+          available_start_date?: string
+          created_at?: string | null
+          id?: string
+          leader_id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leader_availability_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "tour_leaders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_availability_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leader_schedules: {
         Row: {
           created_at: string | null
@@ -5070,6 +5124,7 @@ export type Database = {
           checked_in: boolean | null
           checked_in_at: string | null
           created_at: string | null
+          created_by: string | null
           dietary_requirements: string | null
           email: string | null
           emergency_contact: string | null
@@ -5100,6 +5155,7 @@ export type Database = {
           special_requests: string | null
           tour_id: string | null
           updated_at: string | null
+          workspace_id: string | null
         }
         Insert: {
           add_ons?: string[] | null
@@ -5109,6 +5165,7 @@ export type Database = {
           checked_in?: boolean | null
           checked_in_at?: string | null
           created_at?: string | null
+          created_by?: string | null
           dietary_requirements?: string | null
           email?: string | null
           emergency_contact?: string | null
@@ -5139,6 +5196,7 @@ export type Database = {
           special_requests?: string | null
           tour_id?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Update: {
           add_ons?: string[] | null
@@ -5148,6 +5206,7 @@ export type Database = {
           checked_in?: boolean | null
           checked_in_at?: string | null
           created_at?: string | null
+          created_by?: string | null
           dietary_requirements?: string | null
           email?: string | null
           emergency_contact?: string | null
@@ -5178,8 +5237,16 @@ export type Database = {
           special_requests?: string | null
           tour_id?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "members_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "members_order_id_fkey"
             columns: ["order_id"]
@@ -5199,6 +5266,13 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -5943,6 +6017,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           created_by_name: string | null
+          expense_type: string | null
           id: string
           items: Json | null
           note: string | null
@@ -5950,6 +6025,7 @@ export type Database = {
           order_number: string | null
           paid_at: string | null
           paid_by: string | null
+          request_category: string | null
           request_date: string | null
           request_type: string
           status: string | null
@@ -5972,6 +6048,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          expense_type?: string | null
           id?: string
           items?: Json | null
           note?: string | null
@@ -5979,6 +6056,7 @@ export type Database = {
           order_number?: string | null
           paid_at?: string | null
           paid_by?: string | null
+          request_category?: string | null
           request_date?: string | null
           request_type: string
           status?: string | null
@@ -6001,6 +6079,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          expense_type?: string | null
           id?: string
           items?: Json | null
           note?: string | null
@@ -6008,6 +6087,7 @@ export type Database = {
           order_number?: string | null
           paid_at?: string | null
           paid_by?: string | null
+          request_category?: string | null
           request_date?: string | null
           request_type?: string
           status?: string | null
@@ -7945,6 +8025,7 @@ export type Database = {
           unit_price: number | null
           updated_at: string | null
           updated_by: string | null
+          workspace_id: string | null
         }
         Insert: {
           category: string
@@ -7963,6 +8044,7 @@ export type Database = {
           unit_price?: number | null
           updated_at?: string | null
           updated_by?: string | null
+          workspace_id?: string | null
         }
         Update: {
           category?: string
@@ -7981,6 +8063,7 @@ export type Database = {
           unit_price?: number | null
           updated_at?: string | null
           updated_by?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -7988,6 +8071,13 @@ export type Database = {
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -8821,6 +8911,113 @@ export type Database = {
           {
             foreignKeyName: "regions_workspace_id_fkey"
             columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_response_items: {
+        Row: {
+          available_end_date: string | null
+          available_start_date: string | null
+          created_at: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          id: string
+          license_plate: string | null
+          notes: string | null
+          resource_id: string | null
+          resource_name: string | null
+          resource_type: string
+          response_id: string
+          unit_price: number | null
+        }
+        Insert: {
+          available_end_date?: string | null
+          available_start_date?: string | null
+          created_at?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          resource_id?: string | null
+          resource_name?: string | null
+          resource_type: string
+          response_id: string
+          unit_price?: number | null
+        }
+        Update: {
+          available_end_date?: string | null
+          available_start_date?: string | null
+          created_at?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          license_plate?: string | null
+          notes?: string | null
+          resource_id?: string | null
+          resource_name?: string | null
+          resource_type?: string
+          response_id?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_response_items_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "request_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_responses: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          request_id: string
+          responder_workspace_id: string
+          response_date: string | null
+          status: string | null
+          total_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          request_id: string
+          responder_workspace_id: string
+          response_date?: string | null
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          request_id?: string
+          responder_workspace_id?: string
+          response_date?: string | null
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_responses_responder_workspace_id_fkey"
+            columns: ["responder_workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
@@ -11301,8 +11498,14 @@ export type Database = {
       tour_requests: {
         Row: {
           app_sync_data: Json | null
+          assigned_at: string | null
+          assigned_by: string | null
+          assigned_by_name: string | null
+          assigned_leader_id: string | null
+          assigned_vehicle_id: string | null
           assignee_id: string | null
           assignee_name: string | null
+          assignment_note: string | null
           category: string
           code: string
           confirmed_at: string | null
@@ -11325,11 +11528,13 @@ export type Database = {
           proposal_package_id: string | null
           quantity: number | null
           quoted_cost: number | null
+          recipient_workspace_id: string | null
           replied_at: string | null
           replied_by: string | null
           reply_content: Json | null
           reply_note: string | null
           request_type: string | null
+          response_status: string | null
           service_date: string | null
           service_date_end: string | null
           specifications: Json | null
@@ -11352,8 +11557,14 @@ export type Database = {
         }
         Insert: {
           app_sync_data?: Json | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_by_name?: string | null
+          assigned_leader_id?: string | null
+          assigned_vehicle_id?: string | null
           assignee_id?: string | null
           assignee_name?: string | null
+          assignment_note?: string | null
           category: string
           code: string
           confirmed_at?: string | null
@@ -11376,11 +11587,13 @@ export type Database = {
           proposal_package_id?: string | null
           quantity?: number | null
           quoted_cost?: number | null
+          recipient_workspace_id?: string | null
           replied_at?: string | null
           replied_by?: string | null
           reply_content?: Json | null
           reply_note?: string | null
           request_type?: string | null
+          response_status?: string | null
           service_date?: string | null
           service_date_end?: string | null
           specifications?: Json | null
@@ -11403,8 +11616,14 @@ export type Database = {
         }
         Update: {
           app_sync_data?: Json | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_by_name?: string | null
+          assigned_leader_id?: string | null
+          assigned_vehicle_id?: string | null
           assignee_id?: string | null
           assignee_name?: string | null
+          assignment_note?: string | null
           category?: string
           code?: string
           confirmed_at?: string | null
@@ -11427,11 +11646,13 @@ export type Database = {
           proposal_package_id?: string | null
           quantity?: number | null
           quoted_cost?: number | null
+          recipient_workspace_id?: string | null
           replied_at?: string | null
           replied_by?: string | null
           reply_content?: Json | null
           reply_note?: string | null
           request_type?: string | null
+          response_status?: string | null
           service_date?: string | null
           service_date_end?: string | null
           specifications?: Json | null
@@ -11454,10 +11675,31 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "tour_requests_assigned_leader_id_fkey"
+            columns: ["assigned_leader_id"]
+            isOneToOne: false
+            referencedRelation: "tour_leaders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_requests_assigned_vehicle_id_fkey"
+            columns: ["assigned_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tour_requests_proposal_package_id_fkey"
             columns: ["proposal_package_id"]
             isOneToOne: false
             referencedRelation: "proposal_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_requests_recipient_workspace_id_fkey"
+            columns: ["recipient_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -14633,6 +14875,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           payment_config: Json | null
+          type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -14648,6 +14891,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           payment_config?: Json | null
+          type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -14663,6 +14907,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           payment_config?: Json | null
+          type?: string | null
           updated_at?: string | null
         }
         Relationships: [

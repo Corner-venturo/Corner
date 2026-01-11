@@ -101,7 +101,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">旅客資訊</h3>
         {(data.passengers || []).map((passenger, index) => (
-          <div key={index} className="space-y-2 p-3 bg-white rounded border">
+          <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label>英文姓名</Label>
@@ -177,7 +177,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">航班資訊</h3>
         {(data.segments || []).map((segment, index) => (
-          <div key={index} className="space-y-2 p-3 bg-white rounded border">
+          <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
               <Label>航段</Label>
               <Input
@@ -279,7 +279,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">行李額度</h3>
         {(data.baggage || []).map((bag, index) => (
-          <div key={index} className="space-y-2 p-3 bg-white rounded border">
+          <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
               <Label>旅客姓名</Label>
               <Input
@@ -363,7 +363,7 @@ export function FlightForm({ formData, onChange }: FlightFormProps) {
       <div className="space-y-4 p-4 bg-muted rounded-md">
         <h3 className="font-semibold text-morandi-primary">行李詳細資訊</h3>
         {(data.baggageDetails || []).map((detail, index) => (
-          <div key={index} className="space-y-2 p-3 bg-white rounded border">
+          <div key={index} className="space-y-2 p-3 bg-card rounded border">
             <div>
               <Label>航段</Label>
               <Input

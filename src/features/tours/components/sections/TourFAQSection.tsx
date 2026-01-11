@@ -49,7 +49,7 @@ export function TourFAQSection({ data, viewMode = 'desktop', coverStyle = 'origi
             <div
               key={index}
               className={cn(
-                'bg-white rounded-xl border border-morandi-container/50 overflow-hidden',
+                'bg-card rounded-xl border border-morandi-container/50 overflow-hidden',
                 'transition-shadow duration-200',
                 expandedIndex === index && 'shadow-md'
               )}

@@ -62,7 +62,7 @@ export function ThreeDPhotoWall({ images, onClose, className, open = true }: Pho
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-6 right-6 z-[100000] p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors backdrop-blur-sm"
+              className="absolute top-6 right-6 z-[100000] p-3 bg-card/10 hover:bg-card/20 rounded-full text-white transition-colors backdrop-blur-sm"
             >
               <X size={24} />
             </button>

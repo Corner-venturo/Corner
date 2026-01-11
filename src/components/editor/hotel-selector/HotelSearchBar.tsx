@@ -60,7 +60,7 @@ export function HotelSearchBar({
       <div className="flex gap-3 flex-wrap">
         {/* 國家選擇 */}
         <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
-          <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
+          <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
             <SelectValue placeholder="全部國家" />
           </SelectTrigger>
           <SelectContent>
@@ -76,7 +76,7 @@ export function HotelSearchBar({
         {/* 區域選擇 */}
         {selectedCountryId && regions.length > 0 && (
           <Select value={selectedRegionId || '__all__'} onValueChange={onRegionChange}>
-            <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
+            <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
               <SelectValue placeholder="全部區域" />
             </SelectTrigger>
             <SelectContent>
@@ -93,7 +93,7 @@ export function HotelSearchBar({
         {/* 城市選擇 */}
         {selectedCountryId && cities.length > 0 && (
           <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
-            <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
+            <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[120px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
               <SelectValue placeholder="全部城市" />
             </SelectTrigger>
             <SelectContent>
@@ -109,7 +109,7 @@ export function HotelSearchBar({
 
         {/* 品牌選擇 */}
         <Select value={selectedBrand || '__all__'} onValueChange={onBrandChange}>
-          <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-white min-w-[140px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
+          <SelectTrigger className="h-11 px-4 border-morandi-container rounded-xl text-sm bg-card min-w-[140px] focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold">
             <SelectValue placeholder="全部品牌" />
           </SelectTrigger>
           <SelectContent>

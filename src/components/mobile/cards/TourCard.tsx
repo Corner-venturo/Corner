@@ -47,7 +47,7 @@ export function TourCard({ tour, showActions = true, children, className }: Tour
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border border-border shadow-sm overflow-hidden',
+        'bg-card rounded-xl border border-border shadow-sm overflow-hidden',
         className
       )}
     >

@@ -36,6 +36,7 @@ import {
   ArrowRight,
   Minus,
   Sparkles,
+  Building2,
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
 
@@ -168,6 +169,16 @@ export function TimelineItineraryDialog({
       ...prev,
       days: prev.days.map((day, idx) =>
         idx === activeDayIndex ? { ...day, title } : day
+      ),
+    }))
+  }, [activeDayIndex])
+
+  // 更新每日住宿
+  const updateDayAccommodation = useCallback((accommodation: string) => {
+    setData((prev) => ({
+      ...prev,
+      days: prev.days.map((day, idx) =>
+        idx === activeDayIndex ? { ...day, accommodation } : day
       ),
     }))
   }, [activeDayIndex])
@@ -790,7 +801,7 @@ export function TimelineItineraryDialog({
                         <Palette size={14} />
                       </button>
                       {colorPickerOpen === rowIndex && (
-                        <div className="absolute right-0 top-full mt-1 bg-white border border-border rounded-lg shadow-lg p-1 flex gap-1 z-10">
+                        <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg p-1 flex gap-1 z-10">
                           {COLOR_OPTIONS.map((opt) => (
                             <button
                               key={opt.value}
@@ -877,6 +888,20 @@ export function TimelineItineraryDialog({
               </div>
             </div>
           )}
+
+          {/* 當晚住宿 */}
+          <div className="py-3 border-t border-border/50">
+            <div className="flex items-center gap-2">
+              <Building2 size={16} className="text-morandi-gold shrink-0" />
+              <Label className="text-xs text-morandi-secondary shrink-0">當晚住宿：</Label>
+              <Input
+                value={activeDay.accommodation || ''}
+                onChange={(e) => updateDayAccommodation(e.target.value)}
+                placeholder="輸入飯店名稱..."
+                className="h-8 text-sm flex-1"
+              />
+            </div>
+          </div>
         </div>
 
         {/* 底部按鈕 */}

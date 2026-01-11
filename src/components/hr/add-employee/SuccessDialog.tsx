@@ -47,7 +47,7 @@ export function SuccessDialog({
 
             <div className="space-y-3">
               {/* 員工編號 */}
-              <div className="bg-white rounded-lg p-4 border border-border">
+              <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-xs text-morandi-muted mb-1.5">員工編號</p>
@@ -70,7 +70,7 @@ export function SuccessDialog({
               </div>
 
               {/* 預設密碼 */}
-              <div className="bg-white rounded-lg p-4 border border-border">
+              <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-xs text-morandi-muted mb-1.5">預設密碼</p>

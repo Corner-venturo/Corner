@@ -53,8 +53,8 @@ export function DayStylePicker({
               onClick={() => handleStyleClick(option.value)}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs transition-all ${
                 currentStyle === option.value
-                  ? 'bg-white shadow-sm'
-                  : 'hover:bg-white/50'
+                  ? 'bg-card shadow-sm'
+                  : 'hover:bg-card/50'
               }`}
               style={{
                 color: currentStyle === option.value ? option.color : undefined,

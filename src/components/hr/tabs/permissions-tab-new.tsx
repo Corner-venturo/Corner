@@ -185,7 +185,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         )}
 
         {/* 角色選擇（複選） */}
-        <div className="bg-white rounded-lg border border-border p-6">
+        <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <h4 className="font-semibold text-lg text-morandi-primary">選擇職位角色</h4>
             <span className="text-xs text-morandi-secondary bg-morandi-container/30 px-2 py-1 rounded">可複選</span>
@@ -198,7 +198,17 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {getAllRoles().map(role => {
+            {getAllRoles()
+              .filter(role => {
+                // 非超級管理員不能看到 super_admin 角色選項
+                const currentUserRoles = user?.roles || []
+                const currentUserIsSuperAdmin = currentUserRoles.includes('super_admin')
+                if (role.id === 'super_admin' && !currentUserIsSuperAdmin) {
+                  return false
+                }
+                return true
+              })
+              .map(role => {
               const isSelected = selectedRoles.includes(role.id)
               return (
                 <div
@@ -208,7 +218,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                     'p-4 rounded-lg border-2 cursor-pointer transition-all',
                     isSelected
                       ? 'border-morandi-gold bg-morandi-gold/5'
-                      : 'border-border bg-white hover:border-morandi-gold/50'
+                      : 'border-border bg-card hover:border-morandi-gold/50'
                   )}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -278,7 +288,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
         )}
 
         {/* 額外權限（進階，可選） */}
-        <details className="bg-white rounded-lg border border-border">
+        <details className="bg-card rounded-lg border border-border">
           <summary className="p-4 cursor-pointer font-medium text-morandi-primary hover:bg-morandi-container/10">
             進階：新增額外功能權限（選填）
           </summary>
@@ -309,7 +319,7 @@ export const PermissionsTabNew = forwardRef<{ handleSave: () => void }, Permissi
                             ? 'border-morandi-secondary/30 bg-morandi-secondary/5 cursor-not-allowed opacity-60'
                             : isExtra
                               ? 'border-morandi-gold bg-morandi-gold/10 cursor-pointer'
-                              : 'border-border bg-white cursor-pointer hover:bg-morandi-container/20'
+                              : 'border-border bg-card cursor-pointer hover:bg-morandi-container/20'
                         )}
                       >
                         <div

@@ -9,8 +9,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
-import { format, addDays, parseISO } from 'date-fns'
+import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { parseLocalDate } from '@/lib/utils/format-date'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -78,9 +79,11 @@ function formatNotificationMessage(tours: TourStats[]): string {
     totalNeedsTicketing += tour.total_needs_ticketing
     totalNoRecord += tour.total_no_record
 
-    const departureFormatted = format(parseISO(tour.departure_date), 'MM/dd', { locale: zhTW })
-    const dlFormatted = tour.earliest_deadline
-      ? format(parseISO(tour.earliest_deadline), 'MM/dd', { locale: zhTW })
+    const departureDate = parseLocalDate(tour.departure_date)
+    const departureFormatted = departureDate ? format(departureDate, 'MM/dd', { locale: zhTW }) : ''
+    const earliestDeadlineDate = parseLocalDate(tour.earliest_deadline)
+    const dlFormatted = earliestDeadlineDate
+      ? format(earliestDeadlineDate, 'MM/dd', { locale: zhTW })
       : null
 
     body += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
@@ -93,8 +96,9 @@ function formatNotificationMessage(tours: TourStats[]): string {
       // 跳過全部完成或全部自理的訂單
       if (order.needs_ticketing === 0 && order.no_record === 0) continue
 
-      const orderDl = order.earliest_deadline
-        ? `(DL:${format(parseISO(order.earliest_deadline), 'MM/dd', { locale: zhTW })})`
+      const orderDlDate = parseLocalDate(order.earliest_deadline)
+      const orderDl = orderDlDate
+        ? `(DL:${format(orderDlDate, 'MM/dd', { locale: zhTW })})`
         : ''
 
       body += `\n   ┌─ ${order.order_code} ${order.contact_person}\n`

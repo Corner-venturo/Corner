@@ -123,7 +123,7 @@ export function TourPricingSectionArt({ data, viewMode = 'desktop' }: TourPricin
                   className="relative group"
                 >
                   <div
-                    className="bg-white border-2 p-8 transition-transform duration-300 hover:-translate-y-2"
+                    className="bg-card border-2 p-8 transition-transform duration-300 hover:-translate-y-2"
                     style={{
                       borderColor: colors.ink,
                       boxShadow: brutalistShadow,

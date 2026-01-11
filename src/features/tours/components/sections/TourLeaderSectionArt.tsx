@@ -99,7 +99,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
             className={`${isMobile ? '' : 'lg:col-span-5'}`}
           >
             <div
-              className="border-2 bg-white relative"
+              className="border-2 bg-card relative"
               style={{
                 borderColor: colors.ink,
                 boxShadow: brutalistShadow,
@@ -281,7 +281,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
 
             {/* 集合時間與日期 */}
             <div
-              className="border-2 p-8 bg-white"
+              className="border-2 p-8 bg-card"
               style={{
                 borderColor: colors.ink,
                 boxShadow: brutalistShadow,
@@ -324,7 +324,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
 
             {/* 集合地點 */}
             <div
-              className="border-2 p-8 bg-white"
+              className="border-2 p-8 bg-card"
               style={{
                 borderColor: colors.ink,
                 boxShadow: brutalistShadow,
@@ -364,7 +364,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
             {/* 航班資訊 */}
             {data.meetingInfo?.flightNo && (
               <div
-                className="border-2 p-8 bg-white"
+                className="border-2 p-8 bg-card"
                 style={{
                   borderColor: colors.ink,
                   boxShadow: brutalistShadow,
@@ -399,7 +399,7 @@ export function TourLeaderSectionArt({ data, viewMode }: TourLeaderSectionArtPro
 
             {/* 注意事項 */}
             <div
-              className="border-2 p-8 bg-white"
+              className="border-2 p-8 bg-card"
               style={{
                 borderColor: colors.ink,
                 boxShadow: '4px 4px 0px 0px rgba(28,28,28,1)',

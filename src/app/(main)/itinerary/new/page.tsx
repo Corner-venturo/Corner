@@ -209,13 +209,13 @@ function NewItineraryPageContent() {
               <div className="h-14 bg-morandi-green/90 text-white px-6 flex items-center border-b border-morandi-container">
                 <h2 className="text-lg font-semibold">編輯表單</h2>
               </div>
-              <div className="flex-1 overflow-y-auto bg-white">
+              <div className="flex-1 overflow-y-auto bg-card">
                 <PrintItineraryForm data={printData} onChange={setPrintData} />
               </div>
             </div>
 
             <div className="w-1/2 bg-muted flex flex-col print:w-full">
-              <div className="h-14 bg-white border-b px-6 flex items-center justify-between print:hidden">
+              <div className="h-14 bg-card border-b px-6 flex items-center justify-between print:hidden">
                 <h2 className="text-lg font-semibold text-morandi-primary">列印預覽</h2>
                 <div className="text-sm text-morandi-secondary">A4 尺寸 (210mm × 297mm)</div>
               </div>
@@ -242,7 +242,6 @@ function NewItineraryPageContent() {
           setTourData((prev) => ({ ...prev, version_records: versionRecords }))
         }}
         onBack={() => router.back()}
-        onPrintA5={() => router.push(`/itinerary/brochure-designer?id=${currentItineraryId}`)}
       />
 
       {currentItineraryId && (

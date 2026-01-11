@@ -193,7 +193,7 @@ function AccordionItem({
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-lg shadow-sm border border-border overflow-hidden"
+      className="bg-card rounded-lg shadow-sm border border-border overflow-hidden"
     >
       {/* Header */}
       <button
@@ -232,7 +232,7 @@ function AccordionItem({
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="overflow-hidden"
       >
-        <div className="p-6 pt-0 border-t border-border bg-white">
+        <div className="p-6 pt-0 border-t border-border bg-card">
           {children}
         </div>
       </motion.div>

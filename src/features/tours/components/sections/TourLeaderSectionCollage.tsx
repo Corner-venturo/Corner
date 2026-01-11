@@ -74,7 +74,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               initial={{ opacity: 0, rotate: -10 }}
               whileInView={{ opacity: 1, rotate: -3 }}
               viewport={{ once: true }}
-              className="bg-white px-4 py-2 border border-black shadow-sm absolute top-6 left-6 z-10"
+              className="bg-card px-4 py-2 border border-black shadow-sm absolute top-6 left-6 z-10"
             >
               <span className="text-xl text-red-600" style={{ fontFamily: "'Permanent Marker', cursive" }}>
                 Leader Info
@@ -88,7 +88,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-white p-3 pb-8 border border-border transform rotate-2 w-64 hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer relative"
+              className="bg-card p-3 pb-8 border border-border transform rotate-2 w-64 hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer relative"
               style={{ boxShadow: '10px 10px 0px 0px rgba(0,0,0,1)' }}
             >
               {/* 膠帶 */}
@@ -157,7 +157,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
               <div className="w-full h-px bg-black/20 mb-3" />
 
               <div className="flex gap-3 mb-4">
-                <div className="w-12 h-12 bg-white border border-black flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-card border border-black flex items-center justify-center shrink-0">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                   </svg>
@@ -167,7 +167,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
                 </div>
               </div>
 
-              <div className="bg-white border border-black p-2 text-center">
+              <div className="bg-card border border-black p-2 text-center">
                 <span className="block font-bold text-xs" style={{ fontFamily: "'Space Mono', monospace" }}>
                   {data.meetingInfo?.date || 'DATE TBD'}
                 </span>
@@ -198,7 +198,7 @@ export function TourLeaderSectionCollage({ data, viewMode }: TourLeaderSectionCo
           className="mt-12 max-w-2xl mx-auto"
         >
           <div
-            className="bg-white border-2 border-black p-6 transform rotate-1"
+            className="bg-card border-2 border-black p-6 transform rotate-1"
             style={{ boxShadow: '6px 6px 0px 0px rgba(0,0,0,1)' }}
           >
             <h4

@@ -36,6 +36,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { TourRequestFormDialog } from './TourRequestFormDialog'
+import { AddManualRequestDialog } from './AddManualRequestDialog'
 import { supabase } from '@/lib/supabase/client'
 import type { Json } from '@/lib/supabase/types'
 import { useToast } from '@/components/ui/use-toast'
@@ -163,6 +164,9 @@ export function RequirementSyncDialog({
     supplierName: string
     items: { id?: string; serviceDate: string | null; title: string; quantity: number; note?: string }[]
   } | null>(null)
+
+  // 手動新增需求 Dialog 狀態
+  const [addManualDialogOpen, setAddManualDialogOpen] = useState(false)
 
   // 判斷模式：Tour 模式 或 ProposalPackage 模式
   const mode = tour ? 'tour' : 'package'
@@ -387,11 +391,14 @@ export function RequirementSyncDialog({
             serviceDate = calculateDate(item.day)
           }
         } else if (cat.key === 'restaurant') {
-          const match = item.name.match(/Day(\d+)\s*(早餐|午餐|晚餐)[：:]\s*(.+)/)
+          // 支援兩種格式：
+          // 1. 匯入格式：Day 1 早餐：餐廳名
+          // 2. 手動格式：Day 1 午餐 - 餐廳名
+          const match = item.name.match(/Day\s*(\d+)\s*(早餐|午餐|晚餐)\s*(?:[：:]|\s*-\s*)\s*(.+)/)
           if (match) {
             const dayNum = parseInt(match[1])
             const mealType = match[2]
-            supplierName = match[3]  // 餐廳名稱
+            supplierName = match[3].trim()  // 餐廳名稱
             title = mealType  // 只顯示餐別（早餐/午餐/晚餐）
             serviceDate = calculateDate(dayNum)
           }
@@ -1011,9 +1018,9 @@ export function RequirementSyncDialog({
 
   return (
     <>
-    <Dialog open={isOpen && !requestDialogOpen} onOpenChange={(open) => !open && !requestDialogOpen && onClose()} modal={true}>
+    <Dialog open={isOpen && !requestDialogOpen && !addManualDialogOpen} onOpenChange={(open) => !open && !requestDialogOpen && !addManualDialogOpen && onClose()} modal={true}>
       <DialogContent nested className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="flex items-center gap-2">
             <ClipboardList size={18} className="text-morandi-gold" />
             需求確認單
@@ -1024,6 +1031,15 @@ export function RequirementSyncDialog({
               </span>
             )}
           </DialogTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAddManualDialogOpen(true)}
+            className="gap-1.5 text-morandi-gold border-morandi-gold/50 hover:bg-morandi-gold hover:text-white"
+          >
+            <Plus size={14} />
+            新增需求
+          </Button>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">
@@ -1206,7 +1222,7 @@ export function RequirementSyncDialog({
                     <span className="text-morandi-gold">新增</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-white rounded border border-border" />
+                    <div className="w-3 h-3 bg-card rounded border border-border" />
                     <span>已確認</span>
                   </div>
                 </div>
@@ -1280,6 +1296,29 @@ export function RequirementSyncDialog({
         pax={source.groupSize || undefined}
       />
     )}
+
+    {/* 手動新增需求 Dialog */}
+    <AddManualRequestDialog
+      isOpen={addManualDialogOpen}
+      onClose={() => setAddManualDialogOpen(false)}
+      tourId={mode === 'tour' ? source.id : undefined}
+      proposalPackageId={mode === 'package' ? source.id : undefined}
+      tourCode={source.code}
+      tourName={source.title}
+      startDate={startDate}
+      onSuccess={async () => {
+        // 重新載入需求單
+        const filterField = mode === 'tour' ? 'tour_id' : 'proposal_package_id'
+        const { data } = await supabase
+          .from('tour_requests')
+          .select('id, category, supplier_name, title, service_date, quantity, note')
+          .eq(filterField, source.id)
+          .order('created_at', { ascending: true })
+        if (data) {
+          setExistingRequests(data as TourRequest[])
+        }
+      }}
+    />
     </>
   )
 }

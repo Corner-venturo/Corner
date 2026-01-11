@@ -50,9 +50,9 @@ export function TourItinerarySectionArt({
       style={{ backgroundColor: ART.ink }}
     >
       {/* 背景裝飾線 */}
-      <div className="absolute top-0 left-1/4 w-px h-full bg-white/10 hidden lg:block" />
-      <div className="absolute top-0 left-2/4 w-px h-full bg-white/10 hidden lg:block" />
-      <div className="absolute top-0 left-3/4 w-px h-full bg-white/10 hidden lg:block" />
+      <div className="absolute top-0 left-1/4 w-px h-full bg-card/10 hidden lg:block" />
+      <div className="absolute top-0 left-2/4 w-px h-full bg-card/10 hidden lg:block" />
+      <div className="absolute top-0 left-3/4 w-px h-full bg-card/10 hidden lg:block" />
 
       {/* Section 標題 */}
       <motion.div

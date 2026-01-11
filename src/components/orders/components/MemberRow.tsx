@@ -126,7 +126,7 @@ export function MemberRow({
 
       {/* 飲食禁忌 */}
       {cv.special_meal && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-status-warning-bg")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-status-warning-bg")}>
           {isEditMode ? (
             <input
               type="text"
@@ -153,7 +153,7 @@ export function MemberRow({
 
       {/* 應付金額 */}
       {cv.total_payable && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-card">
           <input
             type="text"
             inputMode="numeric"
@@ -166,7 +166,7 @@ export function MemberRow({
 
       {/* 訂金 */}
       {cv.deposit_amount && (
-        <td className="border border-morandi-gold/20 px-2 py-1 bg-white">
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-card">
           <input
             type="text"
             inputMode="numeric"
@@ -186,7 +186,7 @@ export function MemberRow({
 
       {/* 備註 */}
       {cv.remarks && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"

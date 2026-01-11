@@ -190,6 +190,8 @@ export function useCustomerMatch() {
   // 開始客戶比對流程
   const startCustomerMatch = async (peopleToCheck: Array<{ name: string; phone: string }>) => {
     const { useCustomerStore } = await import('@/stores')
+    // 🔧 優化：在需要時才載入客戶資料（延遲載入）
+    await useCustomerStore.getState().fetchAll()
     const customers = useCustomerStore.getState().items
 
     // 為每個人找同名的客戶

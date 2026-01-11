@@ -131,7 +131,7 @@ export function SimpleDateInput({
 
   return (
     <div className={cn('relative', className)}>
-      <div className="flex items-center gap-3 h-10 w-full rounded-md border border-input bg-white px-3 text-sm focus-within:border-morandi-gold transition-colors">
+      <div className="flex items-center gap-3 h-10 w-full rounded-md border border-input bg-card px-3 text-sm focus-within:border-morandi-gold transition-colors">
         {/* 顯示模式：已選擇日期 */}
         {displayText ? (
           <>

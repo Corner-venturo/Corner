@@ -107,7 +107,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
         <div className={`flex flex-wrap items-center gap-4 ${viewMode === 'mobile' ? 'gap-2' : 'gap-6'} text-sm`}>
           {data.country && (
             <div
-              className={`flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full ${
+              className={`flex items-center gap-2 bg-card/10 backdrop-blur-sm rounded-full ${
                 viewMode === 'mobile' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
               }`}
             >
@@ -120,7 +120,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
           )}
           {data.departureDate && (
             <div
-              className={`flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full ${
+              className={`flex items-center gap-2 bg-card/10 backdrop-blur-sm rounded-full ${
                 viewMode === 'mobile' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
               }`}
             >
@@ -130,7 +130,7 @@ export function TourHeroGemini({ data, viewMode }: TourHeroGeminiProps) {
           )}
           {data.tourCode && (
             <div
-              className={`flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full ${
+              className={`flex items-center gap-2 bg-card/10 backdrop-blur-sm rounded-full ${
                 viewMode === 'mobile' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
               }`}
             >

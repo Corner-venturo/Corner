@@ -395,7 +395,7 @@ export const TourOperations = React.memo(function TourOperations({
                 <button
                   key={columnKey}
                   onClick={() => handleColumnShow(columnKey)}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-border rounded text-xs"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-card border border-border rounded text-xs"
                 >
                   <Eye size={12} />
                   {columnName}
@@ -407,7 +407,7 @@ export const TourOperations = React.memo(function TourOperations({
       )}
 
       {/* 使用 ReactDataSheet 替代原來的表格 */}
-      <div className="overflow-hidden bg-white rounded-lg shadow-sm">
+      <div className="overflow-hidden bg-card rounded-lg shadow-sm">
         <ReactDataSheetWrapper
           columns={dataSheetColumns}
           data={tableMembers.map((member, index) => ({

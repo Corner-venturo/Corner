@@ -4,8 +4,10 @@ import { useThemeStore } from '@/stores/theme-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
-import { User, LogOut } from 'lucide-react'
+import { User, LogOut, AlertCircle, Lock, Camera } from 'lucide-react'
 import { useSettingsState } from './hooks/useSettingsState'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import {
   AppearanceSettings,
   AccountSettings,
@@ -14,8 +16,6 @@ import {
   PermissionManagementSettings,
   WorkspaceSwitcher,
   ModuleManagementSettings,
-  PreferredFeaturesSettings,
-  ApiSettings,
   DevToolsSettings,
   NewebPaySettings,
 } from './components'
@@ -27,11 +27,9 @@ export const fetchCache = 'force-no-store'
 export default function SettingsPage() {
   const { currentTheme, setTheme } = useThemeStore()
   const { user, logout } = useAuthStore()
-
-  // 判斷是否有系統設定權限（super_admin、admin 或 settings 權限）
-  const hasSettingsAccess = user?.permissions?.includes('super_admin') ||
-    user?.permissions?.includes('admin') ||
-    user?.permissions?.includes('settings')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [isSetupMode, setIsSetupMode] = useState(false)
 
   const {
     showPasswordSection,
@@ -46,6 +44,27 @@ export default function SettingsPage() {
     clearingCache,
     setClearingCache,
   } = useSettingsState()
+
+  // 檢查是否為首次設定模式
+  useEffect(() => {
+    const setupParam = searchParams.get('setup')
+    if (setupParam === 'true') {
+      setIsSetupMode(true)
+      // 自動展開密碼修改區塊
+      setShowPasswordSection(true)
+    }
+  }, [searchParams, setShowPasswordSection])
+
+  // 完成設定後清除 setup 參數
+  const handleDismissSetup = () => {
+    setIsSetupMode(false)
+    router.replace('/settings')
+  }
+
+  // 判斷是否有系統設定權限（super_admin、admin 或 settings 權限）
+  const hasSettingsAccess = user?.permissions?.includes('super_admin') ||
+    user?.permissions?.includes('admin') ||
+    user?.permissions?.includes('settings')
 
   const handleLogout = () => {
     logout()
@@ -91,13 +110,59 @@ export default function SettingsPage() {
 
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto space-y-8 p-6">
+          {/* 首次設定提示 */}
+          {isSetupMode && (
+            <div className="bg-gradient-to-r from-morandi-gold/10 to-morandi-gold/5 border border-morandi-gold/30 rounded-xl p-6 mb-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-morandi-gold" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-morandi-primary mb-2">
+                    歡迎！請完成帳號設定
+                  </h3>
+                  <p className="text-sm text-morandi-secondary mb-4">
+                    這是您首次登入系統，請完成以下設定以確保帳號安全：
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
+                      <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                        <Lock className="w-4 h-4 text-morandi-gold" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-morandi-primary">1. 修改密碼</p>
+                        <p className="text-xs text-morandi-secondary">請將預設密碼改為您自己的密碼</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg">
+                      <div className="w-8 h-8 bg-morandi-gold/20 rounded-full flex items-center justify-center">
+                        <Camera className="w-4 h-4 text-morandi-gold" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-morandi-primary">2. 上傳頭像</p>
+                        <p className="text-xs text-morandi-secondary">上傳您的照片，方便同事辨認</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDismissSetup}
+                      className="text-morandi-secondary hover:text-morandi-primary"
+                    >
+                      稍後再說
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ===== 一般使用者可見 ===== */}
 
           {/* 主題設定 */}
           <AppearanceSettings currentTheme={currentTheme} onThemeChange={setTheme} />
-
-          {/* 常用功能設定 */}
-          <PreferredFeaturesSettings />
 
           {/* 帳號安全設定 */}
           <AccountSettings
@@ -115,9 +180,6 @@ export default function SettingsPage() {
           {/* ===== 以下僅有設定權限者可見 ===== */}
           {hasSettingsAccess && (
             <>
-              {/* API 設定 */}
-              <ApiSettings />
-
               {/* 藍新金流設定 */}
               <NewebPaySettings />
 

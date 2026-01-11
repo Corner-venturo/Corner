@@ -573,7 +573,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                     {unmatchedMembers.map((m) => (
                       <span
                         key={m.id}
-                        className="px-2 py-1 bg-white rounded text-xs border border-amber-200"
+                        className="px-2 py-1 bg-card rounded text-xs border border-amber-200"
                       >
                         {m.chinese_name || m.passport_name}
                       </span>

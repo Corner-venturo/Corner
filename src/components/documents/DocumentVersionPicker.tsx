@@ -317,7 +317,7 @@ export function DocumentVersionPicker({
               onBlur={() => handleSaveRename(quote)}
               onKeyDown={e => handleKeyDown(e, quote)}
               onClick={e => e.stopPropagation()}
-              className="flex-1 text-sm bg-white border border-morandi-gold rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+              className="flex-1 text-sm bg-card border border-morandi-gold rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-morandi-gold"
             />
           ) : (
             <span className="text-sm text-morandi-primary truncate">

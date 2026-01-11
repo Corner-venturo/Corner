@@ -18,7 +18,7 @@ export function FilePreview({ files, onRemove }: FilePreviewProps) {
         return (
           <div
             key={index}
-            className="relative bg-white border border-morandi-container rounded-lg p-2 pr-8 flex items-center gap-2 max-w-xs"
+            className="relative bg-card border border-morandi-container rounded-lg p-2 pr-8 flex items-center gap-2 max-w-xs"
           >
             {isImage ? (
               <ImageIcon size={16} className="text-morandi-gold shrink-0" />

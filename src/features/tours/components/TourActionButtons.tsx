@@ -14,11 +14,11 @@ import {
   FileSignature,
   MessageSquare,
   Calculator,
-  FileText,
   FileCheck,
   ClipboardList,
   ClipboardEdit,
-  BookOpen,
+  Palette,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -45,12 +45,12 @@ interface UseTourActionButtonsParams {
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
   onOpenContractDialog?: (tour: Tour) => void
+  // 新增：打開行程表選擇對話框
+  onOpenTourItineraryDialog?: (tour: Tour) => void
   // 結案
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
   onOpenArchiveDialog?: (tour: Tour) => void
-  // 團確單對話框
-  onOpenTourConfirmationDialog?: (tour: Tour) => void
   // 團控表對話框
   onOpenTourControlDialog?: (tour: Tour) => void
   // 提案點擊處理（查看版本）
@@ -75,9 +75,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenQuoteDialog,
     onOpenItineraryDialog,
     onOpenContractDialog,
+    onOpenTourItineraryDialog,
     onCloseTour,
     onOpenArchiveDialog,
-    onOpenTourConfirmationDialog,
     onOpenTourControlDialog,
     onProposalClick,
     onProposalEdit,
@@ -206,6 +206,22 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>頻道</span>
           </button>
 
+          {/* 行程表 */}
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              setSelectedTour(tour)
+              if (onOpenTourItineraryDialog) {
+                onOpenTourItineraryDialog(tour)
+              }
+            }}
+            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            title="建立或編輯行程表"
+          >
+            <FileText size={14} />
+            <span>行程</span>
+          </button>
+
           {/* 報價單 */}
           <button
             onClick={e => {
@@ -226,7 +242,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>報價</span>
           </button>
 
-          {/* 行程表 */}
+          {/* 設計 */}
           <button
             onClick={e => {
               e.stopPropagation()
@@ -234,27 +250,14 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               if (onOpenItineraryDialog) {
                 onOpenItineraryDialog(tour)
               } else {
-                router.push(`/itinerary?tour_id=${tour.id}`)
+                router.push(`/brochure?tour_id=${tour.id}`)
               }
             }}
-            className="px-1.5 py-0.5 text-morandi-primary hover:text-morandi-primary/80 hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="行程表"
+            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            title="設計手冊或網頁行程"
           >
-            <FileText size={14} />
-            <span>行程</span>
-          </button>
-
-          {/* 手冊編輯器 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              router.push(`/brochure?tour_id=${tour.id}`)
-            }}
-            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="製作旅遊手冊"
-          >
-            <BookOpen size={14} />
-            <span>手冊</span>
+            <Palette size={14} />
+            <span>設計</span>
           </button>
 
           {/* 合約管理 */}
@@ -272,21 +275,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           >
             <FileSignature size={14} />
             <span>合約</span>
-          </button>
-
-          {/* 團確單 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              if (onOpenTourConfirmationDialog) {
-                onOpenTourConfirmationDialog(tour)
-              }
-            }}
-            className="px-1.5 py-0.5 text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-primary/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="團確單管理"
-          >
-            <ClipboardList size={14} />
-            <span>團確</span>
           </button>
 
           {/* 團控表 */}
@@ -358,9 +346,9 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       handleCreateChannel,
       onOpenQuoteDialog,
       onOpenItineraryDialog,
+      onOpenTourItineraryDialog,
       onCloseTour,
       onOpenArchiveDialog,
-      onOpenTourConfirmationDialog,
       onOpenTourControlDialog,
       onProposalClick,
       onProposalEdit,

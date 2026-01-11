@@ -114,7 +114,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-border flex items-center gap-6 relative overflow-hidden group"
+              className="bg-card rounded-xl shadow-sm p-6 md:p-8 border border-border flex items-center gap-6 relative overflow-hidden group"
             >
               {/* 裝飾圓形 */}
               <div
@@ -186,7 +186,7 @@ export function TourLeaderSectionLuxury({ data, viewMode }: TourLeaderSectionLux
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-border relative overflow-hidden group"
+              className="bg-card rounded-xl shadow-sm p-6 md:p-8 border border-border relative overflow-hidden group"
             >
               {/* 裝飾圓形 */}
               <div

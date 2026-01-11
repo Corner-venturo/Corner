@@ -13,6 +13,7 @@ import { japaneseStyleV1Attraction } from '../definitions/japanese-style-v1-attr
 import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hotel-multi'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData } from '../definitions/types'
 import type { CanvasPage } from '@/features/designer/components/types'
+import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
 
 // 備忘錄預設內容（依國家）
 export {
@@ -358,6 +359,146 @@ export function itineraryToTemplateData(itinerary: {
     meetingPlace: meetingInfo?.place || meetingInfo?.location,
     outboundFlight: outboundFlight || undefined,
     returnFlight: returnFlight || undefined,
+    dailyItineraries: dailyItineraries.length > 0 ? dailyItineraries : undefined,
+    dailyDetails: dailyDetails.length > 0 ? dailyDetails : undefined,
+  }
+}
+
+/**
+ * 從時間軸行程資料轉換為 TemplateData
+ * 用於將 proposal_packages.timeline_data 轉換為手冊可用的格式
+ */
+export function timelineToTemplateData(timeline: TimelineItineraryData): TemplateData {
+  // 轉換每日行程（給行程總覽頁用）
+  const dailyItineraries: DailyItinerary[] = (timeline.days || [])
+    .filter((day): day is TimelineDay => day != null)
+    .map((day) => ({
+      dayNumber: day.dayNumber,
+      title: day.title || '',
+      meals: {
+        breakfast: day.meals?.breakfastMenu || (day.meals?.breakfast ? '飯店早餐' : undefined),
+        lunch: day.meals?.lunchMenu || undefined,
+        dinner: day.meals?.dinnerMenu || undefined,
+      },
+      accommodation: day.accommodation,
+    }))
+
+  // 轉換每日詳細資料（給每日行程頁用）
+  const dailyDetails: DailyDetailData[] = (timeline.days || [])
+    .filter((day): day is TimelineDay => day != null)
+    .map((day) => {
+      // 建立時間軸項目（景點 + 餐食）
+      const timelineItems: Array<{ time: string; activity: string; isHighlight: boolean }> = []
+
+      // 早餐（如果有）
+      if (day.meals?.breakfast) {
+        const breakfastText = day.meals.breakfastMenu || '飯店早餐'
+        timelineItems.push({
+          time: '',
+          activity: `[早餐] ${breakfastText}`,
+          isHighlight: false,
+        })
+      }
+
+      // 從景點中取得時間軸項目
+      const attractions = day.attractions || []
+
+      // 計算午餐插入位置（約在活動的 1/3 處）
+      const lunchInsertIndex = Math.ceil(attractions.length / 3)
+
+      attractions.forEach((attraction, attrIdx) => {
+        // 在適當位置插入午餐
+        if (attrIdx === lunchInsertIndex && day.meals?.lunch) {
+          const lunchText = day.meals.lunchMenu || '當地餐廳'
+          timelineItems.push({
+            time: '',
+            activity: `[午餐] ${lunchText}`,
+            isHighlight: false,
+          })
+        }
+
+        // 判斷此景點是否為餐食
+        if (attraction.mealType === 'breakfast') {
+          timelineItems.push({
+            time: attraction.startTime || '',
+            activity: `[早餐] ${attraction.menu || attraction.name}`,
+            isHighlight: false,
+          })
+        } else if (attraction.mealType === 'lunch') {
+          timelineItems.push({
+            time: attraction.startTime || '',
+            activity: `[午餐] ${attraction.menu || attraction.name}`,
+            isHighlight: false,
+          })
+        } else if (attraction.mealType === 'dinner') {
+          timelineItems.push({
+            time: attraction.startTime || '',
+            activity: `[晚餐] ${attraction.menu || attraction.name}`,
+            isHighlight: false,
+          })
+        } else {
+          // 一般景點
+          const activityText = attraction.name || ''
+          if (activityText) {
+            timelineItems.push({
+              time: attraction.startTime || '',
+              activity: activityText,
+              isHighlight: false,
+            })
+          }
+        }
+      })
+
+      // 如果沒有活動但有午餐，直接加入
+      if (attractions.length === 0 && day.meals?.lunch) {
+        const lunchText = day.meals.lunchMenu || '當地餐廳'
+        timelineItems.push({
+          time: '',
+          activity: `[午餐] ${lunchText}`,
+          isHighlight: false,
+        })
+      }
+
+      // 晚餐（如果有且不是從景點來的）
+      const hasDinnerInAttractions = attractions.some(a => a.mealType === 'dinner')
+      if (day.meals?.dinner && !hasDinnerInAttractions) {
+        const dinnerText = day.meals.dinnerMenu || '當地餐廳'
+        timelineItems.push({
+          time: '',
+          activity: `[晚餐] ${dinnerText}`,
+          isHighlight: false,
+        })
+      }
+
+      return {
+        dayNumber: day.dayNumber,
+        date: day.date || '',
+        title: day.title || '',
+        coverImage: undefined, // 需要使用者手動上傳
+        timeline: timelineItems,
+        meals: {
+          breakfast: day.meals?.breakfastMenu || (day.meals?.breakfast ? '飯店早餐' : ''),
+          lunch: day.meals?.lunchMenu || '',
+          dinner: day.meals?.dinnerMenu || '',
+        },
+      }
+    })
+
+  // 計算日期區間
+  let travelDates = ''
+  if (timeline.startDate && timeline.days && timeline.days.length > 0) {
+    travelDates = timeline.startDate
+    const lastDay = timeline.days[timeline.days.length - 1]
+    if (lastDay?.date && lastDay.date !== timeline.startDate) {
+      travelDates += ` - ${lastDay.date}`
+    }
+  }
+
+  return {
+    mainTitle: timeline.title,
+    subtitle: timeline.subtitle,
+    travelDates: travelDates || undefined,
+    companyName: 'Corner Travel',
     dailyItineraries: dailyItineraries.length > 0 ? dailyItineraries : undefined,
     dailyDetails: dailyDetails.length > 0 ? dailyDetails : undefined,
   }

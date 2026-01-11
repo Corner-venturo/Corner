@@ -48,7 +48,7 @@ export function StatsWidget() {
               {allStats.map(stat => (
                 <label
                   key={stat.id}
-                  className="flex items-center gap-2 cursor-pointer text-xs p-2 rounded-lg hover:bg-white/50 transition-all"
+                  className="flex items-center gap-2 cursor-pointer text-xs p-2 rounded-lg hover:bg-card/50 transition-all"
                 >
                   <input
                     type="checkbox"
@@ -79,7 +79,7 @@ export function StatsWidget() {
               return (
                 <div
                   key={stat.id}
-                  className="bg-white rounded-xl p-4 border border-morandi-gold/20 hover:border-morandi-gold/20 transition-all"
+                  className="bg-card rounded-xl p-4 border border-morandi-gold/20 hover:border-morandi-gold/20 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`p-2 rounded-lg ${stat.bgColor}`}>

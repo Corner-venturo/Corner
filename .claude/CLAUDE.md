@@ -1,6 +1,6 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2026-01-04 (全面性架構審查與新組件)
+> **最後更新**: 2026-01-11 (新增日期處理規範)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
@@ -521,6 +521,68 @@ setItems(prev => [...prev, newItem])
 
 ---
 
+## 📅 日期處理規範 - 時區問題防範 (2026-01-11 新增)
+
+> **背景**: 資料庫日期字串解析時常見的時區陷阱
+
+### 問題說明
+
+資料庫存的日期字串（如 `2024-01-15`）使用 `new Date()` 或 `parseISO()` 解析時，會被解析為 **UTC 午夜**，在台灣時區可能導致日期偏差：
+
+```typescript
+// ❌ 錯誤：會被解析為 UTC 午夜
+new Date('2024-01-15')           // → 2024-01-15T00:00:00.000Z (UTC)
+parseISO('2024-01-15')           // → 2024-01-15T00:00:00.000Z (UTC)
+// 在台灣 (UTC+8) 顯示為 2024-01-15 08:00:00，可能導致日期比較錯誤
+```
+
+### ✅ 正確做法：使用統一工具
+
+```typescript
+import { parseLocalDate, toTaipeiDateString, startOfDay } from '@/lib/utils/format-date'
+
+// ✅ 解析資料庫日期字串（本地時間午夜）
+const date = parseLocalDate('2024-01-15')  // → new Date(2024, 0, 15) 本地午夜
+
+// ✅ 將 ISO 時間轉為台灣日期字串（用於 FullCalendar 等）
+const dateStr = toTaipeiDateString('2024-01-15T16:00:00.000Z')  // → "2024-01-16"
+
+// ✅ 日期比較時使用 startOfDay 消除時間影響
+if (isSameDay(startOfDay(date1), startOfDay(date2))) { ... }
+```
+
+### 可用的日期工具函式
+
+| 函式 | 用途 | 位置 |
+|------|------|------|
+| `parseLocalDate(dateStr)` | 解析日期字串為本地時間 Date | `@/lib/utils/format-date` |
+| `toTaipeiDateString(isoString)` | ISO 時間 → 台灣日期 `YYYY-MM-DD` | `@/lib/utils/format-date` |
+| `toTaipeiTimeString(isoString)` | ISO 時間 → 台灣時間 `HH:MM` | `@/lib/utils/format-date` |
+| `startOfDay(date)` | 取得日期午夜時間 | `@/lib/utils/format-date` |
+| `formatDate(date)` | 格式化為 `YYYY-MM-DD` | `@/lib/utils/format-date` |
+
+### ❌ 禁止的做法
+
+```typescript
+// ❌ 不要使用 date-fns 的 parseISO
+import { parseISO } from 'date-fns'
+const date = parseISO('2024-01-15')  // UTC 午夜，有時區問題
+
+// ❌ 不要直接 new Date 解析日期字串
+const date = new Date('2024-01-15')  // UTC 午夜，有時區問題
+
+// ❌ 不要在各組件自己實作日期解析
+function myParseDate(str) { ... }  // 應使用統一工具
+```
+
+### 開發時自問
+
+- [ ] 這個日期是從資料庫來的嗎？用 `parseLocalDate()` 解析
+- [ ] 需要比較兩個日期嗎？用 `startOfDay()` 確保只比較日期部分
+- [ ] 需要給 FullCalendar 或其他套件嗎？檢查是否需要 `toTaipeiDateString()`
+
+---
+
 ## 🎯 單一遮罩規範 (Single Overlay Pattern) - 2026-01-07 新增
 
 > **指令名稱**: `修復多重遮罩` 或 `fix-overlay`
@@ -769,6 +831,101 @@ const { data } = await supabase
 | `src/lib/supabase/admin.ts` | API 用 Supabase 單例 ⭐️ |
 | `src/lib/request-dedup.ts` | 請求去重 + SWR 快取 ⭐️ |
 | `src/lib/api-utils.ts` | API 回應快取標頭 ⭐️ |
+
+---
+
+## 🚨 頁面資料載入規範 (2026-01-11 新增)
+
+> **核心原則**：只載入頁面實際需要的資料，避免過度讀取拖慢頁面載入速度
+
+### ❌ 常見的過度讀取問題
+
+```typescript
+// ❌ 1. 載入所有資料但只用一個欄位
+const { items: tours } = useTourStore()  // 載入 50 個欄位
+const tourNames = tours.map(t => t.name)  // 只用 name
+
+// ❌ 2. 載入關聯資料做 ID→名稱轉換（實體已有 denormalized 欄位）
+const { countries, cities } = useRegionsStore()
+const destination = countries.find(c => c.id === tour.country_id)?.name
+// 但 Tour 已經有 tour.location 欄位！
+
+// ❌ 3. 頁面載入時就預載入所有 Store
+useEffect(() => {
+  fetchTours()
+  fetchOrders()
+  fetchMembers()      // 這頁面根本不用 members！
+  fetchCustomers()    // 這頁面也不用 customers！
+}, [])
+
+// ❌ 4. 計算可以在資料庫完成的統計
+const memberCount = orders
+  .filter(o => o.tour_id === tour.id)
+  .flatMap(o => members.filter(m => m.order_id === o.id))
+  .length
+// 但 Tour 已經有 tour.current_participants 欄位！
+```
+
+### ✅ 正確做法
+
+```typescript
+// ✅ 1. 使用 denormalized 欄位，避免載入關聯表
+// Tour 已存有 location, current_participants 等欄位
+const destination = tour.location  // 直接用，不需載入 regions
+const memberCount = tour.current_participants  // 直接用，不需計算
+
+// ✅ 2. 延遲載入：Dialog 開啟時才載入
+const handleOpenDialog = () => {
+  regionsStore.fetchAll()  // 需要時才載入
+  setDialogOpen(true)
+}
+
+// ✅ 3. 需要時才載入：在特定操作中動態 import
+const startCustomerMatch = async () => {
+  const { useCustomerStore } = await import('@/stores')
+  await useCustomerStore.getState().fetchAll()  // 需要時才載入
+  const customers = useCustomerStore.getState().items
+  // ...
+}
+
+// ✅ 4. 直接查詢取代遍歷 Store
+// 刪除時需要找關聯成員：直接查 Supabase 而不是遍歷所有 members
+const { data: member } = await supabase
+  .from('order_members')
+  .select('id')
+  .eq('order_id', orderId)
+  .eq('chinese_name', name)
+  .single()
+```
+
+### 頁面載入檢查清單
+
+開發新頁面或修改現有頁面時，檢查以下項目：
+
+- [ ] **是否有未使用的 Store？** 移除 `useXxxStore()` 如果該頁面不需要
+- [ ] **是否載入關聯資料做轉換？** 檢查實體是否已有 denormalized 欄位
+- [ ] **useEffect 內的 fetchAll 是否都必要？** 只保留必須的
+- [ ] **Dialog/Modal 需要的資料是否可以延遲載入？** 開啟時才 fetch
+- [ ] **計算/統計是否可以用現有欄位？** 如 `current_participants`
+
+### 已優化的頁面參考
+
+| 頁面 | 優化內容 |
+|------|---------|
+| 行事曆 | 移除 Orders/Members fetch，改用 `tour.current_participants` |
+| 行程表 | Regions 改為 Dialog 開啟時才載入 |
+| 簽證 | 移除 Members/Customers 預載入，改為需要時才載入 |
+| 旅遊團 | 移除 Regions，直接使用提案的 `destination` 欄位 |
+
+### 常見的 Denormalized 欄位
+
+| 實體 | 欄位 | 說明 |
+|------|------|------|
+| `Tour` | `location` | 目的地名稱（不需查 regions） |
+| `Tour` | `current_participants` | 團員人數（不需計算 orders/members） |
+| `Order` | `tour_name` | 團名（不需查 tours） |
+| `Proposal` | `destination` | 目的地名稱（不需查 regions） |
+| `Receipt` | `tour_name`, `order_number` | 不需查關聯表 |
 
 ---
 

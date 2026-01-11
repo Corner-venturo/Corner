@@ -81,7 +81,7 @@ function ItineraryPrintContent() {
   return (
     <div className="min-h-screen bg-morandi-container">
       {/* 列印控制列（不列印） */}
-      <div className="print:hidden sticky top-0 z-10 bg-white border-b border-border px-4 py-3 flex items-center justify-between">
+      <div className="print:hidden sticky top-0 z-10 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
         <Button variant="ghost" onClick={handleBack} className="gap-2">
           <ArrowLeft size={16} />
           返回
@@ -93,7 +93,7 @@ function ItineraryPrintContent() {
       </div>
 
       {/* A4 列印內容 */}
-      <div className="max-w-[210mm] mx-auto bg-white shadow-lg print:shadow-none print:max-w-none">
+      <div className="max-w-[210mm] mx-auto bg-card shadow-lg print:shadow-none print:max-w-none">
         <div className="p-8 print:p-6">
           {/* 標題區 */}
           <div className="border-b-2 border-morandi-gold pb-4 mb-6">
@@ -180,7 +180,7 @@ function ItineraryPrintContent() {
             </thead>
             <tbody>
               {dailyItinerary.map((day, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-morandi-container/20'}>
+                <tr key={index} className={index % 2 === 0 ? 'bg-card' : 'bg-morandi-container/20'}>
                   <td className="border border-morandi-container px-3 py-2">
                     <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>
                     <div className="text-xs text-morandi-secondary">{day.date}</div>

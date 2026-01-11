@@ -285,7 +285,7 @@ export function ReceiptDetailDialog({
 
               {/* 最新付款連結（直接從收款單取得） */}
               {receipt.link && (
-                <div className="bg-white border border-blue-300 rounded-lg p-3">
+                <div className="bg-card border border-blue-300 rounded-lg p-3">
                   <label className="text-xs font-medium text-blue-700 block mb-2">
                     付款連結（可直接複製）
                   </label>

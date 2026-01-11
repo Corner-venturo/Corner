@@ -273,7 +273,7 @@ function BlockEditorPageContent() {
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex">
           {/* 左側：區塊編輯器 */}
-          <div className="w-1/2 bg-white border-r border-border flex flex-col">
+          <div className="w-1/2 bg-card border-r border-border flex flex-col">
             <div className="h-12 bg-morandi-gold/90 text-white px-4 flex items-center justify-between border-b">
               <div className="flex items-center gap-2">
                 <Sparkles size={16} />
@@ -311,7 +311,7 @@ function BlockEditorPageContent() {
 
           {/* 右側：即時預覽 */}
           <div className="w-1/2 bg-muted flex flex-col">
-            <div className="h-12 bg-white border-b px-4 flex items-center justify-between">
+            <div className="h-12 bg-card border-b px-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-morandi-primary">即時預覽</h2>
               <div className="flex gap-1 bg-morandi-container/30 rounded p-0.5">
                 <button
@@ -339,7 +339,7 @@ function BlockEditorPageContent() {
 
             <div className="flex-1 overflow-auto p-4">
               <div
-                className={`mx-auto bg-white shadow-lg rounded-lg overflow-hidden ${
+                className={`mx-auto bg-card shadow-lg rounded-lg overflow-hidden ${
                   viewMode === 'mobile' ? 'max-w-[390px]' : 'max-w-[1200px]'
                 }`}
                 style={{ height: viewMode === 'mobile' ? '844px' : 'auto' }}

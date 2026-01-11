@@ -158,7 +158,7 @@ export function DisbursementItemList({
                     </span>
                   </td>
                   <td className="py-3 px-4 text-morandi-primary max-w-[200px] truncate">
-                    {request.tour_name || '-'}
+                    {request.request_category === 'company' ? '公司' : (request.tour_name || '-')}
                   </td>
                   <td className="py-3 px-4 text-morandi-secondary">
                     {request.created_at?.split('T')[0] || '-'}

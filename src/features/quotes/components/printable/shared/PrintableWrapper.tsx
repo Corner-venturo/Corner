@@ -151,14 +151,14 @@ export const PrintableWrapper: React.FC<PrintableWrapperProps> = ({
       <style>{PRINT_CSS}</style>
 
       <div
-        className="bg-white rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         <div className="print-controls">
           <PrintControls onClose={onClose} onPrint={onPrint} />
         </div>
 
-        <div className="bg-white p-8" id="print-content">
+        <div className="bg-card p-8" id="print-content">
           {/* 列印版本 */}
           <table className="print-only hidden w-full border-collapse">
             <thead>

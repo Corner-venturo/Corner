@@ -138,7 +138,7 @@ export function ActivitiesSection({
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white shadow-sm text-morandi-primary'
+                  ? 'bg-card shadow-sm text-morandi-primary'
                   : 'text-morandi-secondary hover:text-morandi-primary'
               }`}
               title="列表模式"
@@ -150,7 +150,7 @@ export function ActivitiesSection({
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-white shadow-sm text-morandi-primary'
+                  ? 'bg-card shadow-sm text-morandi-primary'
                   : 'text-morandi-secondary hover:text-morandi-primary'
               }`}
               title="網格預覽（快速排序）"

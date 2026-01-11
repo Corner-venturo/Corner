@@ -20,7 +20,7 @@ interface MessageListTheme {
 
 const theme: MessageListTheme = {
   colors: {
-    surface: 'bg-white'
+    surface: 'bg-card'
   },
   spacing: {
     lg: '1rem'
@@ -229,7 +229,7 @@ export function ChatMessages({
       {/* 拖曳提示覆蓋層 */}
       {isDragging && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-morandi-gold/10 border-2 border-dashed border-morandi-gold rounded-lg pointer-events-none">
-          <div className="text-center bg-white/90 p-6 rounded-xl shadow-lg">
+          <div className="text-center bg-card/90 p-6 rounded-xl shadow-lg">
             <Paperclip size={48} className="mx-auto mb-3 text-morandi-gold" />
             <p className="text-morandi-gold font-semibold text-lg">放開以上傳檔案</p>
             <p className="text-morandi-secondary text-sm mt-1">支援圖片、PDF、文件等格式</p>

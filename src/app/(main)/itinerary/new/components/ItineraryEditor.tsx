@@ -16,7 +16,7 @@ interface ItineraryEditorProps {
 
 export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPricings, onChange }: ItineraryEditorProps) {
   return (
-    <div className="w-1/2 bg-white border-r border-border flex flex-col">
+    <div className="w-1/2 bg-card border-r border-border flex flex-col">
       <div className="h-14 bg-morandi-gold/90 text-white px-6 flex items-center justify-between border-b border-border">
         <h2 className="text-lg font-semibold">編輯表單</h2>
         {/* 自動存檔狀態指示 */}
@@ -47,7 +47,7 @@ export function ItineraryEditor({ tourData, autoSaveStatus, isDirty, quoteTierPr
           )}
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="flex-1 overflow-y-auto bg-card">
         <TourForm
           data={{
             ...tourData,

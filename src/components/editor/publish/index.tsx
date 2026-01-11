@@ -167,7 +167,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 px-3 text-xs border-morandi-container bg-white"
+                className="h-8 px-3 text-xs border-morandi-container bg-card"
               >
                 <History size={14} className="mr-1.5 text-morandi-secondary" />
                 {getCurrentVersionName()}

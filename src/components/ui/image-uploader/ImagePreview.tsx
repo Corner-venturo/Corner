@@ -59,7 +59,7 @@ export function ImagePreview({
       {/* 拖放提示 */}
       {isDragOver && (
         <div className="absolute inset-0 bg-morandi-gold/30 flex items-center justify-center">
-          <div className="bg-white/90 px-4 py-2 rounded-lg text-sm font-medium text-morandi-primary">
+          <div className="bg-card/90 px-4 py-2 rounded-lg text-sm font-medium text-morandi-primary">
             放開以更換圖片
           </div>
         </div>
@@ -72,7 +72,7 @@ export function ImagePreview({
           type="button"
           onClick={onUploadClick}
           disabled={uploading}
-          className="p-2 bg-white/90 hover:bg-white rounded-full text-morandi-primary transition-colors"
+          className="p-2 bg-card/90 hover:bg-card rounded-full text-morandi-primary transition-colors"
           title="更換圖片"
         >
           {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
@@ -83,7 +83,7 @@ export function ImagePreview({
           <button
             type="button"
             onClick={onPositionClick}
-            className="p-2 bg-white/90 hover:bg-white rounded-full text-morandi-primary transition-colors"
+            className="p-2 bg-card/90 hover:bg-card rounded-full text-morandi-primary transition-colors"
             title="調整位置"
           >
             <Crop size={18} />
@@ -95,7 +95,7 @@ export function ImagePreview({
           <button
             type="button"
             onClick={onDelete}
-            className="p-2 bg-white/90 hover:bg-status-danger-bg rounded-full text-status-danger transition-colors"
+            className="p-2 bg-card/90 hover:bg-status-danger-bg rounded-full text-status-danger transition-colors"
             title="刪除圖片"
           >
             <X size={18} />

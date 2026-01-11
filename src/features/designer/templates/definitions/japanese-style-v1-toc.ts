@@ -495,29 +495,6 @@ export const japaneseStyleV1Toc: PageTemplate = {
     }
     elements.push(pageNumberElement)
 
-    // === 右下角漸層裝飾 ===
-    const gradientElement: ShapeElement = {
-      ...createBaseElement('toc-gradient', '漸層裝飾'),
-      type: 'shape',
-      x: A5_WIDTH - 200,
-      y: A5_HEIGHT - 200,
-      width: 200,
-      height: 200,
-      variant: 'rectangle',
-      fill: 'transparent',
-      gradient: {
-        type: 'radial',
-        colorStops: [
-          { offset: 0, color: COLORS.background },
-          { offset: 1, color: 'transparent' },
-        ],
-      },
-      stroke: 'transparent',
-      strokeWidth: 0,
-      cornerRadius: 100,
-    }
-    elements.push(gradientElement)
-
     return elements
   },
 }

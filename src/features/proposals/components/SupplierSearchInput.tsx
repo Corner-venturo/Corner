@@ -160,7 +160,7 @@ export function SupplierSearchInput({
       {isOpen && (searchTerm.length >= 2) && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
         >
           {suppliers.length === 0 && !loading ? (
             <div className="p-3 text-center">

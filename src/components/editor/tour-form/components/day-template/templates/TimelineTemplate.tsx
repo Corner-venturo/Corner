@@ -32,7 +32,7 @@ export function TimelineTemplate({
   uploading,
 }: TimelineTemplateProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-card rounded-xl shadow-lg overflow-hidden">
       {/* 標題區 */}
       <div className="p-6 bg-[#4a6fa5] text-white">
         <div className="flex items-center gap-4">
@@ -47,7 +47,7 @@ export function TimelineTemplate({
               onChange={v => updateField('title', v)}
               className="text-xl font-bold text-white"
               placeholder="行程標題"
-              inputClassName="bg-white/20 text-white placeholder:text-white/50"
+              inputClassName="bg-card/20 text-white placeholder:text-white/50"
             />
           </div>
         </div>

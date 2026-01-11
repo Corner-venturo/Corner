@@ -267,7 +267,7 @@ export function EditableRatesTable({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
-      <div className="rounded-lg overflow-hidden bg-white shadow-sm border border-border">
+      <div className="rounded-lg overflow-hidden bg-card shadow-sm border border-border">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse" style={{ minWidth: '1400px' }}>
             <thead className="bg-card border-b-2 border-morandi-gold/30 sticky top-0 z-10">
@@ -338,7 +338,7 @@ export function EditableRatesTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white">
+            <tbody className="bg-card">
               {orderedGroups.length === 0 && !isAdding && !isEditMode ? (
                 <tr>
                   <td colSpan={hideKKDAYColumns ? 8 : 11} className="text-center py-12 text-morandi-secondary">

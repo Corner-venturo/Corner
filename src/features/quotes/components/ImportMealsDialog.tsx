@@ -104,12 +104,14 @@ export function ImportMealsDialog({
       .filter(meal => selectedMeals.has(getMealKey(meal)))
       .map((meal, index) => ({
         id: `meal-import-${Date.now()}-${index}`,
-        name: meal.name, // 只使用餐廳名稱，不加 Day X 前綴
+        // 加上 Day X 餐別：前綴，讓需求確認單可以正確解析
+        name: `Day ${meal.day} ${meal.type}：${meal.name}`,
         quantity: 1,
         unit_price: 0,
         total: 0,
         note: '',
         is_group_cost: false,
+        day: meal.day, // 保留天數資訊
       }))
 
     onImport(itemsToImport)
@@ -179,7 +181,7 @@ export function ImportMealsDialog({
                         className={`w-full flex items-center gap-3 p-2.5 rounded-lg border text-left transition-colors ${
                           isSelected
                             ? 'bg-[var(--morandi-gold)]/10 border-[var(--morandi-gold)]'
-                            : 'bg-white border-border hover:border-border/80'
+                            : 'bg-card border-border hover:border-border/80'
                         }`}
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />

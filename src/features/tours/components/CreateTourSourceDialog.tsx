@@ -122,7 +122,7 @@ export function CreateTourSourceDialog({
               {/* 從行程表建立 */}
               <button
                 onClick={() => setStep('itinerary-list')}
-                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-white hover:bg-muted hover:border-border transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted hover:border-border transition-colors text-left"
               >
                 <div className="w-10 h-10 rounded-lg bg-status-info-bg flex items-center justify-center shrink-0">
                   <FileText className="w-5 h-5 text-status-info" />
@@ -143,7 +143,7 @@ export function CreateTourSourceDialog({
               {/* 從報價單建立 */}
               <button
                 onClick={() => setStep('quote-list')}
-                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-white hover:bg-muted hover:border-border transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted hover:border-border transition-colors text-left"
               >
                 <div className="w-10 h-10 rounded-lg bg-morandi-gold/10 flex items-center justify-center shrink-0">
                   <Calculator className="w-5 h-5 text-morandi-gold" />
@@ -191,7 +191,7 @@ export function CreateTourSourceDialog({
                     <button
                       key={itinerary.id}
                       onClick={() => handleSelectItinerary(itinerary)}
-                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-white hover:bg-muted hover:border-morandi-gold transition-colors text-left"
+                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted hover:border-morandi-gold transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded bg-status-info-bg flex items-center justify-center shrink-0">
                         <FileText className="w-4 h-4 text-status-info" />
@@ -265,7 +265,7 @@ export function CreateTourSourceDialog({
                     <button
                       key={quote.id}
                       onClick={() => handleSelectQuote(quote)}
-                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-white hover:bg-morandi-gold/10 hover:border-morandi-gold/30 transition-colors text-left"
+                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-morandi-gold/10 hover:border-morandi-gold/30 transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded bg-morandi-gold/10 flex items-center justify-center shrink-0">
                         <Calculator className="w-4 h-4 text-morandi-gold" />

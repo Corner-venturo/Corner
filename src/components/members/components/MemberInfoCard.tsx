@@ -29,7 +29,7 @@ export function MemberInfoCard({ open, member, onClose }: MemberInfoCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 z-10 bg-white/80 hover:bg-white"
+            className="absolute right-2 top-2 z-10 bg-card/80 hover:bg-card"
             onClick={onClose}
           >
             <X size={20} />

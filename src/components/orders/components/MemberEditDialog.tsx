@@ -109,7 +109,7 @@ export function MemberEditDialog({
         </div>
 
         {/* 按鈕區域 - 固定在底部 */}
-        <div className="flex-shrink-0 flex justify-end gap-3 pt-4 pb-2 border-t bg-white">
+        <div className="flex-shrink-0 flex justify-end gap-3 pt-4 pb-2 border-t bg-card">
           <Button variant="outline" className="gap-1" onClick={handleClose} disabled={isSaving}>
             <X size={16} />
             取消

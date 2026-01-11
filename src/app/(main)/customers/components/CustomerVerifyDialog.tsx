@@ -236,7 +236,7 @@ export function CustomerVerifyDialog({
                   <button
                     type="button"
                     onClick={() => imageEditor.rotateLeft()}
-                    className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
                   >
                     <RotateCcw size={16} className="text-morandi-gold" />
                     <span className="text-morandi-secondary hidden sm:inline">左轉</span>
@@ -244,7 +244,7 @@ export function CustomerVerifyDialog({
                   <button
                     type="button"
                     onClick={() => imageEditor.rotateRight()}
-                    className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
                   >
                     <RotateCw size={16} className="text-morandi-gold" />
                     <span className="text-morandi-secondary hidden sm:inline">右轉</span>
@@ -252,7 +252,7 @@ export function CustomerVerifyDialog({
                   <button
                     type="button"
                     onClick={() => imageEditor.toggleFlipH()}
-                    className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-morandi-gold/20' : ''}`}
+                    className={`p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs ${imageEditor.flipH ? 'bg-morandi-gold/20' : ''}`}
                   >
                     <FlipHorizontal size={16} className="text-morandi-gold" />
                     <span className="text-morandi-secondary hidden sm:inline">翻轉</span>
@@ -261,7 +261,7 @@ export function CustomerVerifyDialog({
                   <button
                     type="button"
                     onClick={() => imageEditor.startCrop()}
-                    className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+                    className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
                   >
                     <Crop size={16} className="text-morandi-gold" />
                     <span className="text-morandi-secondary hidden sm:inline">裁剪</span>

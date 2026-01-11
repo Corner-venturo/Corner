@@ -50,7 +50,7 @@ export const useAccommodationOperations = ({
     )
   }, [accommodationDays, setCategories])
 
-  // 住宿：新增天數（同時自動添加午餐和晚餐）
+  // 住宿：新增天數（只新增住宿，不自動帶入餐食）
   const handleAddAccommodationDay = useCallback(() => {
     const newDayCount = accommodationDays + 1
     setAccommodationDays(newDayCount)
@@ -68,37 +68,12 @@ export const useAccommodationOperations = ({
       room_type: '',
     }
 
-    // 自動新增該天的午餐和晚餐
-    const newLunchItem: CostItem = {
-      id: `meal-lunch-day${newDayCount}-${timestamp}`,
-      name: `Day ${newDayCount} 午餐 - `,
-      quantity: 1,
-      unit_price: 0,
-      total: 0,
-      note: '',
-    }
-
-    const newDinnerItem: CostItem = {
-      id: `meal-dinner-day${newDayCount}-${timestamp}`,
-      name: `Day ${newDayCount} 晚餐 - `,
-      quantity: 1,
-      unit_price: 0,
-      total: 0,
-      note: '',
-    }
-
     setCategories(prev =>
       prev.map(cat => {
         if (cat.id === 'accommodation') {
           return {
             ...cat,
             items: [...cat.items, newAccommodationItem],
-          }
-        }
-        if (cat.id === 'meals') {
-          return {
-            ...cat,
-            items: [...cat.items, newLunchItem, newDinnerItem],
           }
         }
         return cat

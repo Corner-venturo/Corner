@@ -116,8 +116,8 @@ export function RemittanceWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
-          'bg-gradient-to-br from-morandi-gold/10 via-white to-status-warning-bg'
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
+          'bg-gradient-to-br from-morandi-gold/10 via-card to-status-warning-bg'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -127,7 +127,7 @@ export function RemittanceWidget() {
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br from-morandi-gold/60 to-status-warning-bg',
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <Banknote className="w-5 h-5 drop-shadow-sm" />
@@ -143,14 +143,14 @@ export function RemittanceWidget() {
           </div>
 
           {/* 查詢表單 */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40 space-y-3">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-3">
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 block">
                   匯出國
                 </label>
                 <Select value={from} onValueChange={setFrom}>
-                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇國家" />
                   </SelectTrigger>
                   <SelectContent>
@@ -168,7 +168,7 @@ export function RemittanceWidget() {
                   收款國
                 </label>
                 <Select value={to} onValueChange={setTo}>
-                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                  <SelectTrigger className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇國家" />
                   </SelectTrigger>
                   <SelectContent>
@@ -191,7 +191,7 @@ export function RemittanceWidget() {
                   onChange={e => setAmount(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="10000"
-                  className="w-full px-2 py-2 text-xs font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                  className="w-full px-2 py-2 text-xs font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>
             </div>
@@ -240,7 +240,7 @@ export function RemittanceWidget() {
                     'rounded-xl p-3 shadow-md border transition-all',
                     index === 0
                       ? 'bg-gradient-to-br from-status-success-bg/90 to-emerald-100/90 border-morandi-green/30'
-                      : 'bg-white/70 border-white/40'
+                      : 'bg-card/70 border-border/40'
                   )}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -268,20 +268,20 @@ export function RemittanceWidget() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-white/50 rounded-lg p-2">
+                    <div className="bg-card/50 rounded-lg p-2">
                       <p className="text-xs text-morandi-secondary mb-1">手續費</p>
                       <p className="font-semibold text-xs text-status-danger">
                         -{fromCountry?.symbol}
                         {option.fee.toFixed(0)}
                       </p>
                     </div>
-                    <div className="bg-white/50 rounded-lg p-2">
+                    <div className="bg-card/50 rounded-lg p-2">
                       <p className="text-xs text-morandi-secondary mb-1">匯率</p>
                       <p className="font-semibold text-xs text-morandi-primary">
                         {option.exchangeRate.toFixed(2)}
                       </p>
                     </div>
-                    <div className="bg-white/50 rounded-lg p-2">
+                    <div className="bg-card/50 rounded-lg p-2">
                       <p className="text-xs text-morandi-secondary mb-1">實收</p>
                       <p className="font-bold text-sm text-status-success">
                         {toCountry?.symbol}

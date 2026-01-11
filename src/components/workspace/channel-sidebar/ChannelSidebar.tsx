@@ -125,7 +125,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
   const isAdmin = sidebarState.user?.permissions?.includes('admin') ?? false
 
   return (
-    <div className="w-[280px] bg-white border-r border-morandi-gold/20 flex flex-col shrink-0">
+    <div className="w-[280px] bg-card border-r border-morandi-gold/20 flex flex-col shrink-0">
       {/* Workspace header with integrated search */}
       <WorkspaceHeader
         workspaceName={sidebarState.currentWorkspace?.name || ''}
@@ -196,6 +196,7 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         channelType={channelState.newChannelType}
         channelScope={channelState.newChannelScope}
         selectedMembers={channelState.selectedMembers}
+        isCreating={channelState.isCreatingChannel}
         onChannelNameChange={channelState.setNewChannelName}
         onChannelDescriptionChange={channelState.setNewChannelDescription}
         onChannelTypeChange={channelState.setNewChannelType}
@@ -203,13 +204,20 @@ export function ChannelSidebar({ selectedChannelId, onSelectChannel }: ChannelSi
         onMembersChange={channelState.setSelectedMembers}
         onClose={channelState.resetCreateChannelDialog}
         onCreate={async () => {
-          await handlers.handleCreateChannel(
-            channelState.newChannelName,
-            channelState.newChannelDescription,
-            channelState.newChannelType,
-            channelState.newChannelScope
-          )
-          channelState.resetCreateChannelDialog()
+          // 防止重複點擊
+          if (channelState.isCreatingChannel) return
+          channelState.setIsCreatingChannel(true)
+          try {
+            await handlers.handleCreateChannel(
+              channelState.newChannelName,
+              channelState.newChannelDescription,
+              channelState.newChannelType,
+              channelState.newChannelScope
+            )
+            channelState.resetCreateChannelDialog()
+          } catch {
+            channelState.setIsCreatingChannel(false)
+          }
         }}
       />
 

@@ -10,6 +10,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Users } from 'lucide-react'
 import { TourLeadersList } from './TourLeadersList'
 import { TourLeadersDialog } from './TourLeadersDialog'
+import { LeaderAvailabilityDialog } from './LeaderAvailabilityDialog'
 import { useTourLeaderStore } from '@/stores'
 import type { TourLeader, TourLeaderFormData } from '@/types/tour-leader.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -36,6 +37,8 @@ export const TourLeadersPage: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingItem, setEditingItem] = useState<TourLeader | null>(null)
   const [formData, setFormData] = useState<TourLeaderFormData>(emptyFormData)
+  const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false)
+  const [availabilityLeader, setAvailabilityLeader] = useState<TourLeader | null>(null)
 
   const {
     items: tourLeaders,
@@ -88,6 +91,16 @@ export const TourLeadersPage: React.FC = () => {
       status: item.status || 'active',
     })
     setIsDialogOpen(true)
+  }, [])
+
+  const handleOpenAvailability = useCallback((item: TourLeader) => {
+    setAvailabilityLeader(item)
+    setIsAvailabilityDialogOpen(true)
+  }, [])
+
+  const handleCloseAvailability = useCallback(() => {
+    setIsAvailabilityDialogOpen(false)
+    setAvailabilityLeader(null)
   }, [])
 
   const handleDelete = useCallback(
@@ -183,6 +196,7 @@ export const TourLeadersPage: React.FC = () => {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onAvailability={handleOpenAvailability}
         />
       </div>
 
@@ -193,6 +207,12 @@ export const TourLeadersPage: React.FC = () => {
         formData={formData}
         onFormFieldChange={handleFormFieldChange}
         onSubmit={handleSubmit}
+      />
+
+      <LeaderAvailabilityDialog
+        isOpen={isAvailabilityDialogOpen}
+        onClose={handleCloseAvailability}
+        leader={availabilityLeader}
       />
     </div>
   )

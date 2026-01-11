@@ -91,7 +91,7 @@ export function TourHotelsSectionCollage({ data, viewMode }: TourHotelsSectionCo
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`bg-white p-3 pb-8 relative group ${hasOffset ? 'mt-8 lg:mt-0' : ''}`}
+                className={`bg-card p-3 pb-8 relative group ${hasOffset ? 'mt-8 lg:mt-0' : ''}`}
                 style={{
                   boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                 }}

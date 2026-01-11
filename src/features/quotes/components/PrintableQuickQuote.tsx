@@ -408,7 +408,7 @@ export const PrintableQuickQuote: React.FC<PrintableQuickQuoteProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* 控制按鈕 */}

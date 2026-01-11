@@ -122,7 +122,7 @@ export function DesktopActivityCarousel({
               e.stopPropagation()
               scrollToIndex(currentIndex - 1)
             }}
-            className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white hover:scale-110 z-10"
+            className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card hover:scale-110 z-10"
             aria-label="上一張圖片"
           >
             <ChevronLeft size={24} />
@@ -133,7 +133,7 @@ export function DesktopActivityCarousel({
               e.stopPropagation()
               scrollToIndex(currentIndex + 1)
             }}
-            className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white hover:scale-110 z-10"
+            className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card hover:scale-110 z-10"
             aria-label="下一張圖片"
           >
             <ChevronRight size={24} />
@@ -154,7 +154,7 @@ export function DesktopActivityCarousel({
               }}
               className={cn(
                 'h-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300',
-                currentIndex === index ? 'w-6 bg-morandi-primary/90' : 'w-2.5 bg-white/60'
+                currentIndex === index ? 'w-6 bg-morandi-primary/90' : 'w-2.5 bg-card/60'
               )}
               aria-label={`切換至第 ${index + 1} 張圖片`}
             />

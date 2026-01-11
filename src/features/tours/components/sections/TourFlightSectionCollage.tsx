@@ -80,7 +80,7 @@ function BoardingPassCard({
 
   return (
     <motion.div
-      className="relative bg-white border-2 border-black overflow-hidden"
+      className="relative bg-card border-2 border-black overflow-hidden"
       style={{
         boxShadow: '8px 8px 0px 0px rgba(0,0,0,1)',
         transform: isOutbound ? 'rotate(-1deg)' : 'rotate(1deg)',

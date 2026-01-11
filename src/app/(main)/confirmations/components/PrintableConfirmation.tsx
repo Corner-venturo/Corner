@@ -161,7 +161,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
         `}
       </style>
       <div
-        className="bg-white rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto print:max-w-full print:rounded-none print:max-h-none print:overflow-visible"
+        className="bg-card rounded-lg max-w-[1000px] w-full max-h-[90vh] overflow-y-auto print:max-w-full print:rounded-none print:max-h-none print:overflow-visible"
         onClick={e => e.stopPropagation()}
       >
         {/* 控制按鈕（列印時隱藏） */}
@@ -177,7 +177,7 @@ export const PrintableConfirmation: React.FC<PrintableConfirmationProps> = ({
         </div>
 
         {/* 列印內容 */}
-        <div className="bg-white p-8 print:p-0" id="printable-confirmation">
+        <div className="bg-card p-8 print:p-0" id="printable-confirmation">
           <table className="print-wrapper print:table hidden">
             {/* 頁首（每頁都會顯示） */}
             <thead>

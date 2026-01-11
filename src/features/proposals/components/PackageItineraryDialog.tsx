@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
@@ -768,10 +767,10 @@ export function PackageItineraryDialog({
                 <DialogTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-morandi-gold" />
                   {isEditMode ? '編輯行程表' : '建立行程表'}
+                  <span className="text-sm font-normal text-morandi-secondary">
+                    {pkg.version_name} - {proposal.title}
+                  </span>
                 </DialogTitle>
-                <DialogDescription>
-                  {pkg.version_name} - {proposal.title}
-                </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">

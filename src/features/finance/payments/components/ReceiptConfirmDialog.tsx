@@ -177,7 +177,7 @@ export function ReceiptConfirmDialog({
         </div>
 
         {/* 收款項目表格 */}
-        <div className="border border-border rounded-lg overflow-hidden bg-white mt-4">
+        <div className="border border-border rounded-lg overflow-hidden bg-card mt-4">
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
@@ -195,7 +195,7 @@ export function ReceiptConfirmDialog({
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white">
+              <tr className="bg-card">
                 <td className="py-3 px-3 border-b border-r border-border text-sm">
                   {receiptTypeLabel}
                 </td>

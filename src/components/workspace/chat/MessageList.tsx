@@ -99,7 +99,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   // Early returns 必須在所有 Hooks 之後
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white">
+      <div className="flex-1 flex items-center justify-center bg-card">
         <div className="animate-spin w-6 h-6 border-2 border-morandi-gold border-t-transparent rounded-full"></div>
       </div>
     )
@@ -110,14 +110,14 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
 
   if (hasNoContent) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white">
+      <div className="flex-1 flex items-center justify-center bg-card">
         <EmptyState channelName={channelName} channelType={channelType} />
       </div>
     )
   }
 
   return (
-    <div ref={ref} className="flex-1 bg-white" style={{ height: '100%' }}>
+    <div ref={ref} className="flex-1 bg-card" style={{ height: '100%' }}>
       <Virtuoso
         ref={virtuosoRef}
         data={allItems}

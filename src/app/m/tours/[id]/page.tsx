@@ -399,7 +399,7 @@ export default function TourDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-border sticky top-0 z-20">
+      <div className="bg-card border-b border-border sticky top-0 z-20">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -454,7 +454,7 @@ export default function TourDetailPage() {
         {activeTab === 'overview' && (
           <div className="space-y-4">
             {/* 基本資訊 */}
-            <div className="bg-white rounded-xl border border-border p-4">
+            <div className="bg-card rounded-xl border border-border p-4">
               <h3 className="font-medium text-morandi-primary mb-3">基本資訊</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3">
@@ -479,11 +479,11 @@ export default function TourDetailPage() {
 
             {/* 快速統計 */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-xl border border-border p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="text-2xl font-bold text-morandi-primary">{rooms.length}</div>
                 <div className="text-sm text-morandi-secondary">房間數</div>
               </div>
-              <div className="bg-white rounded-xl border border-border p-4">
+              <div className="bg-card rounded-xl border border-border p-4">
                 <div className="text-2xl font-bold text-morandi-primary">{vehicles.length}</div>
                 <div className="text-sm text-morandi-secondary">車輛數</div>
               </div>
@@ -495,7 +495,7 @@ export default function TourDetailPage() {
         {activeTab === 'members' && (
           <div className="space-y-3">
             {/* 成員統計 */}
-            <div className="bg-white rounded-xl border border-border p-4 flex items-center justify-between">
+            <div className="bg-card rounded-xl border border-border p-4 flex items-center justify-between">
               <span className="text-morandi-secondary">成員總數</span>
               <span className="font-bold text-morandi-primary">{members.length}</span>
             </div>
@@ -521,7 +521,7 @@ export default function TourDetailPage() {
         {activeTab === 'rooms' && (
           <div className="space-y-3">
             {rooms.map((room) => (
-              <div key={room.id} className="bg-white rounded-xl border border-border p-4">
+              <div key={room.id} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Bed size={16} className="text-morandi-secondary" />
@@ -563,7 +563,7 @@ export default function TourDetailPage() {
         {activeTab === 'vehicles' && (
           <div className="space-y-3">
             {vehicles.map((vehicle) => (
-              <div key={vehicle.id} className="bg-white rounded-xl border border-border p-4">
+              <div key={vehicle.id} className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Bus size={16} className="text-morandi-secondary" />
@@ -608,7 +608,7 @@ export default function TourDetailPage() {
         {activeTab === 'finance' && (
           <div className="space-y-4">
             {/* 財務摘要 */}
-            <div className="bg-white rounded-xl border border-border p-4">
+            <div className="bg-card rounded-xl border border-border p-4">
               <h3 className="font-medium text-morandi-primary mb-3">請款狀態</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>

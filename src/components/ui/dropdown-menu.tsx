@@ -112,7 +112,7 @@ const DropdownMenuContent = React.forwardRef<
       <div
         ref={contentRef}
         className={cn(
-          'absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-white p-1 shadow-md',
+          'absolute top-full z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-card p-1 shadow-md',
           'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2',
           align === 'start' && 'left-0',
           align === 'center' && 'left-1/2 -translate-x-1/2',

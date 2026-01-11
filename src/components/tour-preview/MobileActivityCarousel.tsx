@@ -102,7 +102,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
               <div
                 key={index}
                 onClick={() => setSelectedIndex(index)}
-                className="w-[200px] flex-shrink-0 rounded-xl overflow-hidden bg-white shadow-md cursor-pointer active:scale-[0.97] transition-transform"
+                className="w-[200px] flex-shrink-0 rounded-xl overflow-hidden bg-card shadow-md cursor-pointer active:scale-[0.97] transition-transform"
                 style={{
                   border: `1px solid ${morandiColors.border.light}`,
                 }}
@@ -235,7 +235,7 @@ export function MobileActivityCarousel({ activities, className = '' }: MobileAct
                             key={index}
                             onClick={() => setSelectedIndex(index)}
                             className={`h-2 rounded-full transition-all shadow ${
-                              index === selectedIndex ? 'w-5 bg-white' : 'w-2 bg-white/60'
+                              index === selectedIndex ? 'w-5 bg-card' : 'w-2 bg-card/60'
                             }`}
                           />
                         ))}

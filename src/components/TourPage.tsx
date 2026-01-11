@@ -79,7 +79,7 @@ export default function TourPage({ data, isPreview = false, viewMode = 'desktop'
   }, [])
 
   return (
-    <div className={viewMode === 'mobile' ? 'min-h-screen bg-muted' : 'min-h-screen bg-white'}>
+    <div className={viewMode === 'mobile' ? 'min-h-screen bg-muted' : 'min-h-screen bg-card'}>
       {/* Navigation */}
       <TourNavigation
         data={data}

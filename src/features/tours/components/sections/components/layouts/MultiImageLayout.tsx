@@ -113,7 +113,7 @@ export function MultiImageLayout({
             </>
           )}
           {!hasImage && (
-            <div className="col-span-2 aspect-video bg-white/5 flex items-center justify-center">
+            <div className="col-span-2 aspect-video bg-card/5 flex items-center justify-center">
               <MapPin className="w-12 h-12 text-white/20" />
             </div>
           )}

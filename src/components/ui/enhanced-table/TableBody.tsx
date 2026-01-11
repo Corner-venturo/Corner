@@ -50,7 +50,7 @@ export function TableBody({
             colSpan={
               columns.length + (selection ? 1 : 0) + (expandable ? 1 : 0) + (actions ? 1 : 0)
             }
-            className="py-12 px-6 text-center text-sm text-morandi-secondary align-top"
+            className="py-12 px-6 text-center text-sm text-morandi-secondary align-middle"
           >
             {emptyState || (
               <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-morandi-secondary">

@@ -63,7 +63,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
           isMobile ? 'grid-cols-1' : 'grid-cols-2'
         )}>
           {/* 費用包含 */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-morandi-container">
+          <div className="bg-card rounded-xl p-6 shadow-sm border border-morandi-container">
             <h3 className={cn(
               'font-semibold text-morandi-green mb-4 flex items-center gap-2',
               isMobile ? 'text-base' : 'text-lg'
@@ -92,7 +92,7 @@ export function TourPricingSection({ data, viewMode = 'desktop', coverStyle = 'o
           </div>
 
           {/* 費用不含 */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-morandi-container">
+          <div className="bg-card rounded-xl p-6 shadow-sm border border-morandi-container">
             <h3 className={cn(
               'font-semibold text-morandi-red mb-4 flex items-center gap-2',
               isMobile ? 'text-base' : 'text-lg'

@@ -124,13 +124,13 @@ export function WeatherWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
-          'bg-gradient-to-br from-status-info-bg via-white to-morandi-gold/5'
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
+          'bg-gradient-to-br from-status-info-bg via-card to-morandi-gold/5'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
           <div className="flex items-start gap-3">
-            <div className={cn('rounded-full p-2.5 text-white shadow-lg shadow-black/10', 'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg', 'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20')}>
+            <div className={cn('rounded-full p-2.5 text-white shadow-lg shadow-black/10', 'bg-gradient-to-br from-morandi-gold/10 to-status-info-bg', 'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20')}>
               <Cloud className="w-5 h-5 drop-shadow-sm" />
             </div>
             <div className="flex-1">
@@ -139,12 +139,12 @@ export function WeatherWidget() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-morandi-primary mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />選擇城市</label>
                 <Select value={selectedCity.name} onValueChange={handleCityChange}>
-                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                  <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                     <SelectValue placeholder="選擇城市" />
                   </SelectTrigger>
                   <SelectContent>
@@ -164,28 +164,28 @@ export function WeatherWidget() {
                   minDate={minDate}
                   maxDate={maxDate}
                   placeholder="選擇日期"
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                  className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
                 />
               </div>
             </div>
           </div>
 
           {isPending ? (
-            <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
+            <div className="flex-1 flex items-center justify-center rounded-xl bg-card/70 p-6 shadow-md border border-border/40">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-status-info mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">載入中...</p>
               </div>
             </div>
           ) : error ? (
-            <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-6 shadow-md border border-white/40">
+            <div className="flex-1 flex items-center justify-center rounded-xl bg-card/70 p-6 shadow-md border border-border/40">
               <div className="text-center">
                 <AlertCircle className="w-8 h-8 text-morandi-red mx-auto mb-2" />
                 <p className="text-xs text-morandi-secondary">{error}</p>
               </div>
             </div>
           ) : weather && weatherInfo ? (
-            <div className="flex-1 flex items-center justify-center rounded-xl bg-white/70 p-4 sm:p-5 shadow-md border border-white/40">
+            <div className="flex-1 flex items-center justify-center rounded-xl bg-card/70 p-4 sm:p-5 shadow-md border border-border/40">
               <div className="flex items-center gap-2 md:gap-4">
                 <div className="text-5xl md:text-6xl flex-shrink-0">{weatherInfo.icon}</div>
                 <div className="min-w-0">

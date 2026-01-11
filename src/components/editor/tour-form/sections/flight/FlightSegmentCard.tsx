@@ -84,7 +84,7 @@ export function FlightSegmentCard({
 
       {/* 多航段選擇器 */}
       {segments && segments.length > 0 && onSelectSegment && (
-        <div className="bg-white p-3 rounded-lg border border-morandi-gold/30 space-y-2">
+        <div className="bg-card p-3 rounded-lg border border-morandi-gold/30 space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs text-morandi-secondary">此航班有多個航段，請選擇：</p>
             {onClearSegments && (

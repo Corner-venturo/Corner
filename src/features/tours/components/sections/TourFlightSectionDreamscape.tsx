@@ -128,7 +128,7 @@ function FlightNode({
 
           {/* 航班資訊氣泡 */}
           <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 rounded-full border shadow-sm flex gap-4 items-center bg-white z-10"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 rounded-full border shadow-sm flex gap-4 items-center bg-card z-10"
             style={{ borderColor: `${DREAM.purple}33` }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -160,7 +160,7 @@ function FlightNode({
       {/* 手機版航班資訊 */}
       {isMobile && (
         <motion.div
-          className="px-6 py-3 rounded-full border shadow-sm flex gap-3 items-center bg-white"
+          className="px-6 py-3 rounded-full border shadow-sm flex gap-3 items-center bg-card"
           style={{ borderColor: `${DREAM.purple}33` }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

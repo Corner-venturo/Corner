@@ -289,7 +289,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                                           'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-all duration-200 relative whitespace-nowrap flex-shrink-0',
                                           'hover:bg-morandi-container/50',
                                           is_active
-                                            ? 'text-morandi-primary bg-white border-b-2 border-morandi-gold shadow-sm'
+                                            ? 'text-morandi-primary bg-card border-b-2 border-morandi-gold shadow-sm'
                                             : 'text-morandi-secondary hover:text-morandi-primary'
                                         )}
                                       >

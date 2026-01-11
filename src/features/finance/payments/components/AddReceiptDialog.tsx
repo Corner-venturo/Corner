@@ -471,7 +471,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               }}
               placeholder="請選擇團體..."
               emptyMessage="找不到團體"
-              className="mt-1 bg-white"
+              className="mt-1 bg-card"
             />
           </div>
 
@@ -483,7 +483,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
               value={formData.order_id}
               onValueChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
             >
-              <SelectTrigger className="mt-1 bg-white border-morandi-container/30">
+              <SelectTrigger className="mt-1 bg-card border-morandi-container/30">
                 <SelectValue
                   placeholder={
                     !formData.tour_id
@@ -518,7 +518,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
           <div className="flex-1 overflow-auto">
             {/* 項目表格 */}
-            <div className="border border-border rounded-lg overflow-hidden bg-white">
+            <div className="border border-border rounded-lg overflow-hidden bg-card">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/50">
@@ -564,7 +564,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
             </h3>
             <div className="space-y-2">
               {linkPayResults.map((result) => (
-                <div key={result.receiptNumber} className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 border border-morandi-gold/20">
+                <div key={result.receiptNumber} className="flex items-center gap-3 bg-card rounded-lg px-4 py-3 border border-morandi-gold/20">
                   <span className="text-sm font-medium text-morandi-primary min-w-[120px]">
                     {result.receiptNumber}
                   </span>

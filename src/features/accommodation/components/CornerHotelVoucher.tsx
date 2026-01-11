@@ -100,7 +100,7 @@ export const CornerHotelVoucher: React.FC<CornerHotelVoucherProps> = ({ data, la
 
   const t = labels[language]
   return (
-    <div className="p-0 bg-white text-[#4B5563] text-[11pt] leading-relaxed">
+    <div className="p-0 bg-card text-[#4B5563] text-[11pt] leading-relaxed">
       {/* 頁首 - Corner Logo + 標題 */}
       <div className="relative border-b-2 border-[#F89A1E] pb-3 mb-5">
         {/* Logo - 左上角 */}

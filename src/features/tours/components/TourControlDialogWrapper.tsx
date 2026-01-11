@@ -138,7 +138,7 @@ export function TourControlDialogWrapper({
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 flex items-center gap-3">
+        <div className="bg-card rounded-lg p-6 flex items-center gap-3">
           <Loader2 className="animate-spin text-morandi-gold" size={24} />
           <span>載入團控表資料...</span>
         </div>
@@ -150,7 +150,7 @@ export function TourControlDialogWrapper({
   if (error) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-md">
+        <div className="bg-card rounded-lg p-6 max-w-md">
           <h3 className="text-lg font-medium text-morandi-red mb-2">無法開啟團控表</h3>
           <p className="text-morandi-secondary mb-4">{error}</p>
           <button

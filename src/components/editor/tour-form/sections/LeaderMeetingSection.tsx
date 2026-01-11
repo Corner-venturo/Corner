@@ -153,7 +153,7 @@ export function LeaderMeetingSection({
         {meetingPoints.map((point, index) => (
           <div
             key={index}
-            className="bg-white p-3 rounded-lg border border-morandi-container space-y-3 relative"
+            className="bg-card p-3 rounded-lg border border-morandi-container space-y-3 relative"
           >
             <button
               type="button"

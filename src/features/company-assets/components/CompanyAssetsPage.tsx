@@ -328,7 +328,7 @@ export const CompanyAssetsPage: React.FC = () => {
             ) : previewAsset ? (
               <iframe
                 src={supabase.storage.from('company-assets').getPublicUrl(previewAsset.file_path).data.publicUrl}
-                className="w-full h-[55vh] bg-white"
+                className="w-full h-[55vh] bg-card"
               />
             ) : null}
           </div>

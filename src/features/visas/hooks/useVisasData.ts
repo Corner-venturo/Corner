@@ -1,8 +1,9 @@
-import { useVisaStore, useTourStore, useOrderStore, useMemberStore } from '@/stores'
+import { useVisaStore, useTourStore, useOrderStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
 import { useMemo, useCallback } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
+import { supabase } from '@/lib/supabase/client'
 
 /**
  * 簽證資料管理 Hook
@@ -12,7 +13,6 @@ export function useVisasData() {
   const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisaFromStore } = useVisaStore()
   const { items: tours, create: addTour, fetchAll: fetchTours } = useTourStore()
   const { items: orders, create: addOrder, update: updateOrder, delete: deleteOrder } = useOrderStore()
-  const { items: members, delete: deleteMember } = useMemberStore()
   const { user } = useAuthStore()
 
   // 權限檢查（暫時開放給所有人）
@@ -34,20 +34,25 @@ export function useVisasData() {
       return
     }
 
-    const { order_id, applicant_name, fee, cost } = visa
+    const { order_id, applicant_name, fee } = visa
 
     try {
       // 1. 刪除簽證
       await deleteVisaFromStore(visaId)
 
       // 2. 找到並刪除對應的訂單成員（按申請人姓名比對）
+      // 🔧 優化：直接查詢 Supabase，不需要預載入所有 members
       if (order_id && applicant_name) {
-        const memberToDelete = members.find(
-          m => m.order_id === order_id &&
-               ((m as typeof m & { chinese_name?: string }).chinese_name === applicant_name || m.name === applicant_name)
-        )
+        const { data: memberToDelete } = await supabase
+          .from('order_members')
+          .select('id')
+          .eq('order_id', order_id)
+          .or(`chinese_name.eq.${applicant_name},name.eq.${applicant_name}`)
+          .limit(1)
+          .single()
+
         if (memberToDelete) {
-          await deleteMember(memberToDelete.id)
+          await supabase.from('order_members').delete().eq('id', memberToDelete.id)
         }
       }
 
@@ -82,14 +87,13 @@ export function useVisasData() {
       logger.error('刪除簽證失敗:', error)
       toast.error('刪除簽證失敗')
     }
-  }, [visas, orders, members, deleteVisaFromStore, deleteMember, deleteOrder, updateOrder])
+  }, [visas, orders, deleteVisaFromStore, deleteOrder, updateOrder])
 
   return {
     // 資料
     visas,
     tours,
     orders,
-    members,
     user,
 
     // 權限

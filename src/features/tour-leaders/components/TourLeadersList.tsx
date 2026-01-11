@@ -8,7 +8,7 @@ import React from 'react'
 import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Calendar } from 'lucide-react'
 import type { TourLeader } from '@/types/tour-leader.types'
 
 interface TourLeadersListProps {
@@ -16,6 +16,7 @@ interface TourLeadersListProps {
   loading?: boolean
   onEdit?: (item: TourLeader) => void
   onDelete?: (item: TourLeader) => void
+  onAvailability?: (item: TourLeader) => void
 }
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -28,6 +29,7 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
   loading = false,
   onEdit,
   onDelete,
+  onAvailability,
 }) => {
   const columns: TableColumn[] = [
     {
@@ -136,6 +138,20 @@ export const TourLeadersList: React.FC<TourLeadersListProps> = ({
         const item = row as TourLeader
         return (
           <div className="flex items-center gap-1">
+            {onAvailability && (
+              <Button
+                variant="ghost"
+                size="iconSm"
+                onClick={e => {
+                  e.stopPropagation()
+                  onAvailability(item)
+                }}
+                className="text-morandi-gold hover:bg-morandi-gold/10"
+                title="檔期管理"
+              >
+                <Calendar size={16} />
+              </Button>
+            )}
             {onEdit && (
               <Button
                 variant="ghost"

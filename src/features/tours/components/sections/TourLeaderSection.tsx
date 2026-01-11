@@ -35,7 +35,7 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
   }
 
   return (
-    <section id="contact" className={viewMode === 'mobile' ? 'bg-white pt-6 pb-8' : 'bg-white pt-8 pb-16'}>
+    <section id="contact" className={viewMode === 'mobile' ? 'bg-card pt-6 pb-8' : 'bg-card pt-8 pb-16'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -57,8 +57,8 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             viewport={{ once: true }}
             className={
               viewMode === 'mobile'
-                ? 'bg-white rounded-xl shadow-md p-5 border border-border'
-                : 'bg-white rounded-2xl shadow-lg p-8 border border-border'
+                ? 'bg-card rounded-xl shadow-md p-5 border border-border'
+                : 'bg-card rounded-2xl shadow-lg p-8 border border-border'
             }
           >
             <h3
@@ -99,8 +99,8 @@ export function TourLeaderSection({ data, viewMode, coverStyle = 'original' }: T
             viewport={{ once: true }}
             className={
               viewMode === 'mobile'
-                ? 'bg-white rounded-xl shadow-md p-5 border border-border'
-                : 'bg-white rounded-2xl shadow-lg p-8 border border-border'
+                ? 'bg-card rounded-xl shadow-md p-5 border border-border'
+                : 'bg-card rounded-2xl shadow-lg p-8 border border-border'
             }
           >
             <h3

@@ -37,7 +37,7 @@ export function RecommendationsSection({
             type="text"
             value={rec}
             onChange={e => updateRecommendation(dayIndex, recIndex, e.target.value)}
-            className="flex-1 px-2 py-1 border rounded text-sm bg-white"
+            className="flex-1 px-2 py-1 border rounded text-sm bg-card"
             placeholder="天神商圈購物"
           />
           <button

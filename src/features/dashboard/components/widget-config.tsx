@@ -29,6 +29,7 @@ export const AVAILABLE_WIDGETS: Array<Omit<WidgetConfig, 'id'> & { id: string }>
     icon: Sparkles as unknown,
     component: ManifestationWidget,
     span: 1,
+    requiredPermission: 'super_admin_only',
   },
   {
     id: 'flight',

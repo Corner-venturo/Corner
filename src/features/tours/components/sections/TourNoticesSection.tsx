@@ -39,7 +39,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
         )}>
           {/* 提醒事項 */}
           {hasNotices && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
                 title="提醒事項"
                 subtitle="NOTICES"
@@ -68,7 +68,7 @@ export function TourNoticesSection({ data, viewMode = 'desktop', coverStyle = 'o
 
           {/* 取消政策 */}
           {hasCancellation && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
               <SectionTitle
                 title="取消政策"
                 subtitle="CANCELLATION"

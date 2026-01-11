@@ -10,7 +10,7 @@ export function PreviewContainer({ formData }: PreviewContainerProps) {
   return (
     <div className="w-1/2 bg-muted flex flex-col">
       {/* 標題列 */}
-      <div className="h-14 bg-white border-b px-6 flex items-center justify-between">
+      <div className="h-14 bg-card border-b px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
           <span className="text-sm text-morandi-secondary">
@@ -21,7 +21,7 @@ export function PreviewContainer({ formData }: PreviewContainerProps) {
 
       {/* 預覽容器 */}
       <div className="flex-1 overflow-y-auto p-8 bg-[#F9F8F6]">
-        <div className="max-w-[21cm] mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="max-w-[21cm] mx-auto bg-card rounded-lg shadow-lg overflow-hidden">
           {formData.type === 'accommodation' ? (
             <AccommodationPreview formData={formData} />
           ) : (

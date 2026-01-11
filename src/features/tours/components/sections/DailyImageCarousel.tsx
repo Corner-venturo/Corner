@@ -100,7 +100,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
         <div className="relative mb-6 sm:mb-8 mt-4 sm:mt-6">
           <div
             className={cn(
-              "overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/60 bg-white shadow-lg ring-1 ring-morandi-border/20",
+              "overflow-hidden rounded-[20px] sm:rounded-[28px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20",
               allTourImages.length >= 4 && "cursor-pointer"
             )}
             onClick={handleImageClick}
@@ -152,7 +152,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 key={`${getImageUrl(image)}-${index}`}
                 data-card
                 className={cn(
-                  "flex-shrink-0 overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/60 bg-white shadow-lg ring-1 ring-morandi-border/20 transition-all duration-300",
+                  "flex-shrink-0 overflow-hidden rounded-[16px] sm:rounded-[20px] border border-white/60 bg-card shadow-lg ring-1 ring-morandi-border/20 transition-all duration-300",
                   allTourImages.length >= 4 && "cursor-pointer",
                   index === currentIndex ? "scale-100 opacity-100" : "scale-[0.98] opacity-80"
                 )}
@@ -192,7 +192,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 e.stopPropagation()
                 scrollToIndex(currentIndex - 1)
               }}
-              className="absolute left-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
+              className="absolute left-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card z-10"
               aria-label="上一張圖片"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -203,7 +203,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 e.stopPropagation()
                 scrollToIndex(currentIndex + 1)
               }}
-              className="absolute right-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-white z-10"
+              className="absolute right-0 top-1/2 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-morandi-primary shadow-lg ring-1 ring-black/5 transition hover:bg-card z-10"
               aria-label="下一張圖片"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -224,7 +224,7 @@ export function DailyImageCarousel({ images, title, allTourImages = [] }: DailyI
                 }}
                 className={cn(
                   'h-2.5 rounded-full border border-morandi-primary/30 transition-all duration-300',
-                  currentIndex === index ? 'w-6 bg-morandi-primary/90' : 'w-2.5 bg-white/60'
+                  currentIndex === index ? 'w-6 bg-morandi-primary/90' : 'w-2.5 bg-card/60'
                 )}
                 aria-label={`切換至第 ${index + 1} 張圖片`}
               />

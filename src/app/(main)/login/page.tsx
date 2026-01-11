@@ -69,10 +69,20 @@ export default function LoginPage() {
 
       const result = await validateLogin(username.trim(), password, trimmedCode, rememberMe)
 
+      logger.log('🔐 Login result:', result)
+
       if (result.success) {
-        const redirectPath = getRedirectPath()
-        router.push(redirectPath)
+        // 如果需要首次設定（修改密碼或上傳頭像），導向設定頁
+        if (result.needsSetup) {
+          logger.log('➡️ Redirecting to /settings?setup=true')
+          router.push('/settings?setup=true')
+        } else {
+          const redirectPath = getRedirectPath()
+          logger.log('➡️ Redirecting to:', redirectPath)
+          router.push(redirectPath)
+        }
       } else {
+        logger.log('❌ Login failed:', result.message)
         setError(result.message || '帳號或密碼錯誤')
       }
     } catch (error) {
@@ -100,7 +110,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-morandi-light via-white to-morandi-container/20">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+      <div className="bg-card p-8 rounded-xl shadow-lg max-w-md w-full">
         {/* Logo 區域 */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-morandi-gold rounded-full mb-4">

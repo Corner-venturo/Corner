@@ -49,7 +49,7 @@ export function ThreadPanel({
   }
 
   return (
-    <div className="w-80 border-l border-border bg-white flex flex-col h-full">
+    <div className="w-80 border-l border-border bg-card flex flex-col h-full">
       {/* 標題列 */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">

@@ -224,13 +224,13 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
           {/* Meta Info Bar */}
           <div className="flex flex-wrap items-center gap-6 text-sm">
             {safeData.country && (
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-card/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 <MapPin size={16} className="text-[#c9aa7c]" />
                 <span>{safeData.country} · {safeData.city}</span>
               </div>
             )}
             {days > 0 && (
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-card/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 <Calendar size={16} className="text-[#c9aa7c]" />
                 <span>{days} 天 {Math.max(0, days - 1)} 夜</span>
               </div>
@@ -247,7 +247,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
 
       {/* ==================== Highlights Section (響應式佈局) ==================== */}
       {safeData.highlightSpots.length > 0 && (
-        <section className="py-16 px-6 bg-white">
+        <section className="py-16 px-6 bg-card">
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
@@ -334,7 +334,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
                       </div>
 
                       {/* Day Content Card */}
-                      <div className="bg-white rounded-2xl overflow-hidden border border-[#e8e5e0] hover:border-[#c9aa7c]/40 transition-all duration-300 shadow-sm hover:shadow-md">
+                      <div className="bg-card rounded-2xl overflow-hidden border border-[#e8e5e0] hover:border-[#c9aa7c]/40 transition-all duration-300 shadow-sm hover:shadow-md">
                         {/* Route Header */}
                         <div className="p-6 pb-4 border-b border-[#f0ede8]">
                           <h3 className="text-lg md:text-xl font-bold text-[#3a3633] leading-relaxed">
@@ -400,7 +400,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
 
       {/* ==================== Sights Detail Section (可展開式) ==================== */}
       {safeData.sights.length > 0 && (
-        <section className="py-16 px-6 bg-white">
+        <section className="py-16 px-6 bg-card">
           <div className="max-w-5xl mx-auto">
             {/* Section Header */}
             <div className="text-center mb-12">
@@ -516,7 +516,7 @@ export function GeminiItineraryPreview({ data }: GeminiItineraryPreviewProps) {
             {/* Flight Cards */}
             <div className="space-y-6">
               {safeData.flightOptions.map((flight, index) => (
-                <div key={index} className="bg-white rounded-2xl overflow-hidden border border-[#e8e5e0] shadow-sm">
+                <div key={index} className="bg-card rounded-2xl overflow-hidden border border-[#e8e5e0] shadow-sm">
                   {/* Airline Header */}
                   <div className="px-6 py-4 bg-gradient-to-r from-[#3a3633] to-[#4a4643] flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#c9aa7c] flex items-center justify-center">

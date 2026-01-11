@@ -97,6 +97,23 @@ function getCurrentWorkspaceId(): string | null {
 }
 
 /**
+ * 取得當前使用者的員工 ID（用於追蹤 created_by, updated_by）
+ */
+function getCurrentEmployeeId(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const authStorage = localStorage.getItem('auth-storage')
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage)
+      return parsed?.state?.user?.id || null
+    }
+  } catch {
+    // 忽略
+  }
+  return null
+}
+
+/**
  * 建立 Store 工廠函數
  *
  * @example
@@ -243,12 +260,20 @@ export function createStore<T extends BaseEntity>(
         // 生成 UUID（如果未提供）
         const id = (data as Record<string, unknown>).id || generateUUID()
 
+        // 取得當前員工 ID（用於追蹤）
+        const currentEmployeeId = getCurrentEmployeeId()
+
         // 生成 code（如果有 prefix）
         const insertData: Record<string, unknown> = {
           ...data,
           id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+        }
+
+        // 自動填入 created_by（如果資料有這個欄位且未提供）
+        if (currentEmployeeId && !(data as Record<string, unknown>).created_by) {
+          insertData.created_by = currentEmployeeId
         }
 
         // 只有啟用 workspaceScoped 的表才自動注入 workspace_id
@@ -373,9 +398,17 @@ export function createStore<T extends BaseEntity>(
       try {
         set({ loading: true, error: null })
 
-        const updateData = {
+        // 取得當前員工 ID（用於追蹤）
+        const currentEmployeeId = getCurrentEmployeeId()
+
+        const updateData: Record<string, unknown> = {
           ...data,
           updated_at: new Date().toISOString(),
+        }
+
+        // 自動填入 updated_by（如果資料有這個欄位）
+        if (currentEmployeeId) {
+          updateData.updated_by = currentEmployeeId
         }
 
         const { data: updatedItem, error } = await dynamicFrom(tableName)

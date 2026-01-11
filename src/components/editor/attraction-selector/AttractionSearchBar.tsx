@@ -53,7 +53,7 @@ export function AttractionSearchBar({
       <div className="flex gap-2 flex-wrap">
         {/* 國家選擇 */}
         <Select value={selectedCountryId || '__all__'} onValueChange={onCountryChange}>
-          <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-white min-w-[120px]">
+          <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
             <SelectValue placeholder="全部國家" />
           </SelectTrigger>
           <SelectContent>
@@ -69,7 +69,7 @@ export function AttractionSearchBar({
         {/* 城市選擇 */}
         {selectedCountryId && cities.length > 0 && (
           <Select value={selectedCityId || '__all__'} onValueChange={onCityChange}>
-            <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-white min-w-[120px]">
+            <SelectTrigger className="h-9 px-3 border-morandi-container rounded-lg text-sm bg-card min-w-[120px]">
               <SelectValue placeholder="全部城市" />
             </SelectTrigger>
             <SelectContent>

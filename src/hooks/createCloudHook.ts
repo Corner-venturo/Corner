@@ -92,6 +92,10 @@ const WORKSPACE_SCOPED_TABLES = [
   // ✅ 2026-01-05: 提案系統
   'proposals',
   'proposal_packages',
+  // ✅ 2026-01-11: 跨公司需求系統
+  'leader_availability',
+  'request_responses',
+  'request_response_items',
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）

@@ -397,11 +397,11 @@ export function TourControlFormDialog({
   if (!pkg) return null
 
   // 樣式類
-  const labelClass = "border border-black bg-gray-100 px-2 py-1.5 font-medium text-center text-sm whitespace-nowrap"
-  const valueClass = "border border-black px-1 py-0.5 bg-white"
-  const headerClass = "border border-black bg-gray-50 px-2 py-1.5 text-center font-medium text-sm"
+  const labelClass = "border border-black bg-morandi-container px-2 py-1.5 font-medium text-center text-sm whitespace-nowrap"
+  const valueClass = "border border-black px-1 py-0.5 bg-card"
+  const headerClass = "border border-black bg-background px-2 py-1.5 text-center font-medium text-sm"
   const inputClass = "h-7 border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-morandi-gold text-sm"
-  const sectionLabelClass = "border border-black bg-gray-200 px-2 py-1.5 font-bold text-center text-sm align-middle whitespace-nowrap"
+  const sectionLabelClass = "border border-black bg-morandi-container px-2 py-1.5 font-bold text-center text-sm align-middle whitespace-nowrap"
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -474,13 +474,13 @@ export function TourControlFormDialog({
                   <td className={labelClass} rowSpan={2}>計劃窗口</td>
                   <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">名稱:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">名稱:</span>
                       <Input value={formData.planningContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, planningContact: { ...prev.planningContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="名稱" />
                     </div>
                   </td>
                   <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">地址:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">地址:</span>
                       <Input value={formData.planningContact?.address || ''} onChange={(e) => setFormData((prev) => ({ ...prev, planningContact: { ...prev.planningContact, address: e.target.value } }))} className={inputClass + " flex-1"} placeholder="地址" />
                     </div>
                   </td>
@@ -488,13 +488,13 @@ export function TourControlFormDialog({
                 <tr>
                   <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">標案聯絡人:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">標案聯絡人:</span>
                       <Input value={formData.bidContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, bidContact: { ...prev.bidContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="姓名" />
                     </div>
                   </td>
                   <td className={valueClass}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">行程聯絡人:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">行程聯絡人:</span>
                       <Input value={formData.itineraryContact?.name || ''} onChange={(e) => setFormData((prev) => ({ ...prev, itineraryContact: { ...prev.itineraryContact, name: e.target.value } }))} className={inputClass + " flex-1"} placeholder="姓名" />
                       <Input value={formData.itineraryContact?.phone || ''} onChange={(e) => setFormData((prev) => ({ ...prev, itineraryContact: { ...prev.itineraryContact, name: prev.itineraryContact?.name || '', phone: e.target.value } }))} className={inputClass + " w-28"} placeholder="電話" />
                     </div>
@@ -516,13 +516,13 @@ export function TourControlFormDialog({
                     <div className="flex items-center gap-2 text-sm flex-wrap py-0.5">
                       <span className="font-medium">每車領隊</span>
                       <div className="flex items-center gap-1">
-                        <Input type="number" value={formData.pax?.perBus?.total ?? formData.pax?.total ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, total: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-12 border border-gray-300 bg-white text-center rounded text-sm" />
-                        <span className="text-gray-500 text-xs">人 =</span>
+                        <Input type="number" value={formData.pax?.perBus?.total ?? formData.pax?.total ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, total: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-12 border border-border bg-card text-center rounded text-sm" />
+                        <span className="text-morandi-secondary text-xs">人 =</span>
                       </div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">公司業務:</span><Input type="number" value={formData.pax?.perBus?.business ?? formData.pax?.business ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, business: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">總領:</span><Input type="number" value={formData.pax?.perBus?.leader ?? formData.pax?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">護士:</span><Input type="number" value={formData.pax?.perBus?.nurse ?? formData.pax?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">領隊:</span><Input type="number" value={formData.pax?.perBus?.tourLeader ?? formData.pax?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">公司業務:</span><Input type="number" value={formData.pax?.perBus?.business ?? formData.pax?.business ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, business: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">總領:</span><Input type="number" value={formData.pax?.perBus?.leader ?? formData.pax?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">護士:</span><Input type="number" value={formData.pax?.perBus?.nurse ?? formData.pax?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">領隊:</span><Input type="number" value={formData.pax?.perBus?.tourLeader ?? formData.pax?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, perBus: { ...prev.pax?.perBus, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
                     </div>
                   </td>
                 </tr>
@@ -531,9 +531,9 @@ export function TourControlFormDialog({
                   <td className={valueClass}>
                     <div className="flex items-center gap-2 text-sm flex-wrap py-0.5">
                       <span className="font-medium">公司領團:</span>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">總領:</span><Input type="number" value={formData.pax?.company?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">護士:</span><Input type="number" value={formData.pax?.company?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
-                      <div className="flex items-center gap-0.5"><span className="text-gray-500 text-xs">領隊:</span><Input type="number" value={formData.pax?.company?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-gray-300 bg-white text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">總領:</span><Input type="number" value={formData.pax?.company?.leader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, leader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">護士:</span><Input type="number" value={formData.pax?.company?.nurse ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, nurse: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
+                      <div className="flex items-center gap-0.5"><span className="text-morandi-secondary text-xs">領隊:</span><Input type="number" value={formData.pax?.company?.tourLeader ?? ''} onChange={(e) => setFormData((prev) => ({ ...prev, pax: { ...prev.pax, total: prev.pax?.total || 0, company: { ...prev.pax?.company, tourLeader: e.target.value ? parseInt(e.target.value) : undefined } } }))} className="h-6 w-10 border border-border bg-card text-center rounded text-sm" /></div>
                     </div>
                   </td>
                 </tr>
@@ -560,19 +560,19 @@ export function TourControlFormDialog({
                     )}
                     <td className={valueClass} colSpan={2}>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500 shrink-0">遊覽車{index + 1}:</span>
+                        <span className="text-xs text-morandi-secondary shrink-0">遊覽車{index + 1}:</span>
                         <Input value={bus.name} onChange={(e) => updateBusCompany(index, 'name', e.target.value)} className={inputClass + " flex-1"} placeholder="車行名稱" />
                       </div>
                     </td>
                     <td className={valueClass}>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500 shrink-0">聯絡人:</span>
+                        <span className="text-xs text-morandi-secondary shrink-0">聯絡人:</span>
                         <Input value={bus.contact || ''} onChange={(e) => updateBusCompany(index, 'contact', e.target.value)} className={inputClass + " flex-1"} />
                       </div>
                     </td>
                     <td className={valueClass}>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500 shrink-0">確認時間:</span>
+                        <span className="text-xs text-morandi-secondary shrink-0">確認時間:</span>
                         <Input value={bus.confirmTime || ''} onChange={(e) => updateBusCompany(index, 'confirmTime', e.target.value)} className={inputClass + " flex-1"} />
                       </div>
                     </td>
@@ -581,7 +581,7 @@ export function TourControlFormDialog({
                         <Plus size={12} />新增
                       </Button>
                     </td>
-                    <td className="border border-black text-center bg-white">
+                    <td className="border border-black text-center bg-card">
                       {(formData.busCompanies || []).length > 1 && (
                         <button onClick={() => removeBusCompany(index)} className="text-red-400 hover:text-red-600 p-0.5">
                           <Trash2 size={12} />
@@ -594,7 +594,7 @@ export function TourControlFormDialog({
                 <tr>
                   <td className={valueClass} colSpan={6}>
                     <div className="flex items-center gap-2 py-0.5">
-                      <span className="text-xs text-gray-500 shrink-0">航班:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">航班:</span>
                       <span className="text-xs shrink-0">去</span>
                       <Input value={formData.outboundFlight?.flightNumber || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, flightNumber: e.target.value } }))} className={inputClass + " w-16"} placeholder="航班" />
                       <span className="text-xs">/</span>
@@ -604,9 +604,9 @@ export function TourControlFormDialog({
                       <Input value={formData.outboundFlight?.arrivalTime || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, arrivalTime: e.target.value } }))} className={inputClass + " w-14"} placeholder="抵達" />
                       <span className="text-xs">:</span>
                       <Input value={formData.outboundFlight?.departure || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, departure: e.target.value } }))} className={inputClass + " w-20"} placeholder="出發地" />
-                      <span className="text-gray-400">/</span>
+                      <span className="text-morandi-muted">/</span>
                       <Input value={formData.outboundFlight?.arrival || ''} onChange={(e) => setFormData((prev) => ({ ...prev, outboundFlight: { ...prev.outboundFlight, arrival: e.target.value } }))} className={inputClass + " w-20"} placeholder="目的地" />
-                      <span className="text-gray-400 mx-1">|</span>
+                      <span className="text-morandi-muted mx-1">|</span>
                       <span className="text-xs shrink-0">回</span>
                       <Input value={formData.returnFlight?.flightNumber || ''} onChange={(e) => setFormData((prev) => ({ ...prev, returnFlight: { ...prev.returnFlight, flightNumber: e.target.value } }))} className={inputClass + " w-16"} placeholder="航班" />
                       <span className="text-xs">/</span>
@@ -621,13 +621,13 @@ export function TourControlFormDialog({
                 <tr>
                   <td className={valueClass} colSpan={2}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">外團:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">外團:</span>
                       <Input value={formData.externalTour || ''} onChange={(e) => setFormData((prev) => ({ ...prev, externalTour: e.target.value }))} className={inputClass + " flex-1"} placeholder="外團資訊" />
                     </div>
                   </td>
                   <td className={valueClass} colSpan={4}>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-500 shrink-0">遊覽車聯繫:</span>
+                      <span className="text-xs text-morandi-secondary shrink-0">遊覽車聯繫:</span>
                       <Input value={formData.busContact || ''} onChange={(e) => setFormData((prev) => ({ ...prev, busContact: e.target.value }))} className={inputClass + " flex-1"} placeholder="聯繫資訊" />
                     </div>
                   </td>
@@ -668,7 +668,7 @@ export function TourControlFormDialog({
               <tbody>
                 {(formData.hotels || []).length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-morandi-muted text-sm">
                       尚無飯店資料，請點擊「新增飯店」
                     </td>
                   </tr>
@@ -696,7 +696,7 @@ export function TourControlFormDialog({
                       <td className={valueClass}>
                         <Input value={hotel.remarks || ''} onChange={(e) => updateHotel(index, 'remarks', e.target.value)} className={inputClass} />
                       </td>
-                      <td className="border border-black text-center bg-white">
+                      <td className="border border-black text-center bg-card">
                         <button onClick={() => removeHotel(index)} className="text-red-400 hover:text-red-600 p-0.5">
                           <Trash2 size={12} />
                         </button>
@@ -740,7 +740,7 @@ export function TourControlFormDialog({
               <tbody>
                 {(formData.attractions || []).length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                    <td colSpan={8} className="border border-black px-3 py-3 text-center text-morandi-muted text-sm">
                       尚無景點門票
                     </td>
                   </tr>
@@ -768,7 +768,7 @@ export function TourControlFormDialog({
                       <td className={valueClass}>
                         <Input value={attraction.remarks || ''} onChange={(e) => updateAttraction(index, 'remarks', e.target.value)} className={inputClass} />
                       </td>
-                      <td className="border border-black text-center bg-white">
+                      <td className="border border-black text-center bg-card">
                         <button onClick={() => removeAttraction(index)} className="text-red-400 hover:text-red-600 p-0.5">
                           <Trash2 size={12} />
                         </button>
@@ -806,7 +806,7 @@ export function TourControlFormDialog({
               <tbody>
                 {(formData.meals || []).length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="border border-black px-3 py-3 text-center text-gray-400 text-sm">
+                    <td colSpan={5} className="border border-black px-3 py-3 text-center text-morandi-muted text-sm">
                       尚無餐食資料
                     </td>
                   </tr>
@@ -825,7 +825,7 @@ export function TourControlFormDialog({
                       <td className={valueClass}>
                         <Input value={meal.dinner || ''} onChange={(e) => updateMeal(index, 'dinner', e.target.value)} className={inputClass} />
                       </td>
-                      <td className="border border-black text-center bg-white">
+                      <td className="border border-black text-center bg-card">
                         <button onClick={() => removeMeal(index)} className="text-red-400 hover:text-red-600 p-0.5">
                           <Trash2 size={12} />
                         </button>
@@ -855,7 +855,7 @@ export function TourControlFormDialog({
         )}
 
         {/* 底部按鈕 */}
-        <div className="flex justify-end gap-2 pt-3 border-t border-gray-300">
+        <div className="flex justify-end gap-2 pt-3 border-t border-border">
           <Button variant="outline" onClick={onClose} className="gap-1.5 h-8 text-sm">
             <X size={14} />關閉
           </Button>

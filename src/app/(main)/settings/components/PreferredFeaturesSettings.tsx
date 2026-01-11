@@ -217,7 +217,7 @@ export function PreferredFeaturesSettings() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-border overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       <div className="p-6 border-b border-border bg-morandi-container/10">
         <div className="flex items-start justify-between">
           <div>
@@ -301,7 +301,7 @@ export function PreferredFeaturesSettings() {
                       canSelect ? 'cursor-pointer' : 'cursor-not-allowed opacity-50',
                       isSelected
                         ? 'border-morandi-gold bg-morandi-gold/10'
-                        : 'border-border bg-white hover:border-morandi-gold/50'
+                        : 'border-border bg-card hover:border-morandi-gold/50'
                     )}
                   >
                     <div className="flex items-start gap-3">

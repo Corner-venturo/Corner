@@ -28,6 +28,7 @@ export function EnhancedTable<T extends RowData = RowData>({
   selection,
   expandable,
   actions,
+  actionsWidth,
   rowClassName,
   striped = false,
   hoverable = true,
@@ -187,6 +188,7 @@ export function EnhancedTable<T extends RowData = RowData>({
             showFilters={showFilters}
             selection={typedSelection}
             actions={typedActions}
+            actionsWidth={actionsWidth}
             allVisibleSelected={allVisibleSelected}
             someVisibleSelected={someVisibleSelected}
             onSort={handleSortWrapper}

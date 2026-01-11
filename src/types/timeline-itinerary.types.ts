@@ -54,6 +54,7 @@ export interface TimelineDay {
   title?: string  // 每日大標題（如：台北市區觀光）
   attractions: TimelineAttraction[]
   meals: TimelineDayMeals  // 每日餐食統計
+  accommodation?: string   // 當晚住宿飯店名稱
 }
 
 /**

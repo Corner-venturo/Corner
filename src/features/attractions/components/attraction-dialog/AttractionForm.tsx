@@ -57,7 +57,7 @@ export function AttractionForm({
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           placeholder="景點簡介..."
-          className="w-full px-3 py-2 border border-border rounded-md bg-white text-sm min-h-[80px]"
+          className="w-full px-3 py-2 border border-border rounded-md bg-card text-sm min-h-[80px]"
         />
       </div>
 
@@ -219,7 +219,7 @@ export function AttractionForm({
           value={formData.notes}
           onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
           placeholder="內部使用備註..."
-          className="w-full px-3 py-2 border border-border rounded-md bg-white text-sm min-h-[60px]"
+          className="w-full px-3 py-2 border border-border rounded-md bg-card text-sm min-h-[60px]"
         />
       </div>
 

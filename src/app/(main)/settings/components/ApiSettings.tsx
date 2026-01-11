@@ -147,7 +147,7 @@ export function ApiSettings() {
 
                       {/* API Key 值 */}
                       <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono text-morandi-primary bg-white px-2 py-1 rounded border flex-1 overflow-hidden">
+                        <code className="text-xs font-mono text-morandi-primary bg-card px-2 py-1 rounded border flex-1 overflow-hidden">
                           {showKeys[config.envKey] ? config.value : maskValue(config.value)}
                         </code>
 

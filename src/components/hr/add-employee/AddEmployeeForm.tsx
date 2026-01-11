@@ -78,7 +78,7 @@ export function AddEmployeeForm({ onSubmit, onCancel }: AddEmployeeFormProps) {
               value={formData.workspace_id || ''}
               onValueChange={value => setFormData({ ...formData, workspace_id: value })}
             >
-              <SelectTrigger className="bg-white">
+              <SelectTrigger className="bg-card">
                 <SelectValue placeholder="請選擇辦公室" />
               </SelectTrigger>
               <SelectContent>

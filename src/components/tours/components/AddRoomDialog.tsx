@@ -9,8 +9,9 @@ import { BedDouble, Plus, Trash2, X, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { generateUUID } from '../hooks/room-utils'
-import { format, addDays, parseISO } from 'date-fns'
+import { format, addDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { parseLocalDate } from '@/lib/utils/format-date'
 
 interface NewRoomRow {
   id: string
@@ -58,13 +59,10 @@ export function AddRoomDialog({
 
   const getNightDate = (nightNumber: number): string => {
     if (!tour?.departure_date) return ''
-    try {
-      const startDate = parseISO(tour.departure_date)
-      const nightDate = addDays(startDate, nightNumber - 1)
-      return format(nightDate, 'M/d (EEE)', { locale: zhTW })
-    } catch {
-      return ''
-    }
+    const startDate = parseLocalDate(tour.departure_date)
+    if (!startDate) return ''
+    const nightDate = addDays(startDate, nightNumber - 1)
+    return format(nightDate, 'M/d (EEE)', { locale: zhTW })
   }
 
   const resetForm = () => {

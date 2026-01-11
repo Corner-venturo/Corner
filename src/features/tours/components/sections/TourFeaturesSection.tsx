@@ -84,7 +84,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
   }
 
   return (
-    <section className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-white' : 'pt-8 pb-16 bg-white'}>
+    <section className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-card' : 'pt-8 pb-16 bg-card'}>
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <SectionTitle
           title="行程特色"
@@ -306,8 +306,8 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
                                 }}
                                 className={`h-2 rounded-full transition-all ${
                                   dotIndex === currentImgIndex
-                                    ? 'w-4 bg-white'
-                                    : 'w-2 bg-white/50'
+                                    ? 'w-4 bg-card'
+                                    : 'w-2 bg-card/50'
                                 }`}
                               />
                             ))}
@@ -373,7 +373,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToPrev}
-                className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute left-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
               </button>
@@ -400,7 +400,7 @@ export function TourFeaturesSection({ data, viewMode, coverStyle = 'original', f
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToNext}
-                className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute right-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
               </button>

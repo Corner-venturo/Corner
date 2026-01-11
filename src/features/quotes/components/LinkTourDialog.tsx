@@ -104,7 +104,7 @@ export function LinkTourDialog({
               {/* 關聯現有旅遊團 */}
               <button
                 onClick={() => setStep('tour-list')}
-                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-white hover:bg-muted hover:border-border transition-colors text-left"
+                className="w-full flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted hover:border-border transition-colors text-left"
               >
                 <div className="w-10 h-10 rounded-lg bg-status-info-bg flex items-center justify-center shrink-0">
                   <Link className="w-5 h-5 text-status-info" />
@@ -152,7 +152,7 @@ export function LinkTourDialog({
                     <button
                       key={tour.id}
                       onClick={() => handleLinkExisting(tour as Tour)}
-                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-white hover:bg-muted hover:border-morandi-gold transition-colors text-left"
+                      className="w-full flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted hover:border-morandi-gold transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded bg-[var(--morandi-gold)]/20 flex items-center justify-center shrink-0">
                         <Plane className="w-4 h-4 text-[var(--morandi-gold)]" />

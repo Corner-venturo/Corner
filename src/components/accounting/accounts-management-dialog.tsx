@@ -94,7 +94,7 @@ export function AccountsManagementDialog({
             return (
               <div
                 key={account.id}
-                className="p-4 rounded-xl bg-white/60 border border-[#E8E4E0] hover:border-[#B8A99A] transition-all"
+                className="p-4 rounded-xl bg-card/60 border border-[#E8E4E0] hover:border-[#B8A99A] transition-all"
               >
                 <div className="flex items-start gap-3">
                   {/* 圖標 */}

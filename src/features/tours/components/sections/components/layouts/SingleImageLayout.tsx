@@ -135,7 +135,7 @@ export function SingleImageLayout({
             {day.activities.slice(0, 4).map((activity, actIdx) => (
               <span
                 key={actIdx}
-                className="px-3 py-1 text-sm border border-white/20 text-white/70 hover:bg-white hover:text-black transition-colors cursor-pointer"
+                className="px-3 py-1 text-sm border border-white/20 text-white/70 hover:bg-card hover:text-black transition-colors cursor-pointer"
               >
                 {activity.title}
               </span>

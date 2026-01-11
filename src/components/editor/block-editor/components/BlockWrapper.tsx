@@ -86,7 +86,7 @@ export function BlockWrapper({
   return (
     <div
       className={`
-        border rounded-lg bg-white transition-all
+        border rounded-lg bg-card transition-all
         ${isSelected ? 'border-morandi-gold ring-1 ring-morandi-gold/20' : 'border-border'}
         ${!block.meta.visible ? 'opacity-60' : ''}
       `}

@@ -153,7 +153,7 @@ export default function PNRsPage() {
                   {row.segments.map((seg: FlightSegment, idx: number) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 text-sm text-morandi-primary bg-white px-3 py-2 rounded-lg border border-border"
+                      className="flex items-center gap-2 text-sm text-morandi-primary bg-card px-3 py-2 rounded-lg border border-border"
                     >
                       <Plane size={12} className="text-morandi-sky" />
                       {formatSegment(seg)}

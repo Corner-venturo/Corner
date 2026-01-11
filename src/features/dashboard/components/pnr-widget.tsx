@@ -170,8 +170,8 @@ export function PNRWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
-          'bg-gradient-to-br from-amber-50 via-white to-orange-50'
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
+          'bg-gradient-to-br from-amber-50 via-card to-orange-50'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -181,7 +181,7 @@ export function PNRWidget() {
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br from-morandi-gold/20 to-amber-100/60',
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <FileText className="w-5 h-5 drop-shadow-sm text-morandi-gold" />
@@ -203,7 +203,7 @@ export function PNRWidget() {
           </div>
 
           {/* Input Area */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40 space-y-3">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-3">
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-semibold text-morandi-primary flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" />
@@ -212,7 +212,7 @@ export function PNRWidget() {
               <div className="flex gap-1.5">
                 <button
                   onClick={handlePaste}
-                  className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-morandi-secondary hover:text-morandi-primary transition-all"
+                  className="p-1.5 rounded-lg bg-card/80 hover:bg-card text-morandi-secondary hover:text-morandi-primary transition-all"
                   title="從剪貼簿貼上"
                 >
                   <Clipboard className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ export function PNRWidget() {
                 {rawPNR && (
                   <button
                     onClick={handleClear}
-                    className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-morandi-secondary hover:text-morandi-red transition-all"
+                    className="p-1.5 rounded-lg bg-card/80 hover:bg-card text-morandi-secondary hover:text-morandi-red transition-all"
                     title="清除"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -238,7 +238,7 @@ RP/TPEW123ML/...   FUM2GY
 1.CHEN/WILLIAM MR
 2  BR 116 Y 15JAN 4 TPECTS HK2  0930 1405
 TK TL20JAN/1200`}
-              className="w-full h-24 px-3 py-2.5 text-xs font-mono border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/40 resize-none"
+              className="w-full h-24 px-3 py-2.5 text-xs font-mono border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/40 resize-none"
             />
             <button
               onClick={handleParse}
@@ -281,10 +281,10 @@ TK TL20JAN/1200`}
 
           {/* Parsed Result */}
           {parsedPNR && !error && (
-            <div className="flex-1 rounded-xl bg-white/70 shadow-md border border-white/40 overflow-hidden flex flex-col">
+            <div className="flex-1 rounded-xl bg-card/70 shadow-md border border-border/40 overflow-hidden flex flex-col">
               {/* Result Header */}
               <div
-                className="px-4 py-3 bg-white/50 border-b border-white/40 flex items-center justify-between cursor-pointer"
+                className="px-4 py-3 bg-card/50 border-b border-border/40 flex items-center justify-between cursor-pointer"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 <div className="flex items-center gap-2">
@@ -297,7 +297,7 @@ TK TL20JAN/1200`}
                         e.stopPropagation()
                         handleCopyLocator()
                       }}
-                      className="p-1 rounded hover:bg-white/50 text-morandi-secondary hover:text-morandi-primary transition-all"
+                      className="p-1 rounded hover:bg-card/50 text-morandi-secondary hover:text-morandi-primary transition-all"
                       title="複製訂位代號"
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ TK TL20JAN/1200`}
                         'rounded-lg p-3',
                         isUrgent(parsedPNR.ticketingDeadline)
                           ? 'bg-status-danger-bg/50'
-                          : 'bg-white/50'
+                          : 'bg-card/50'
                       )}
                     >
                       <div className="flex items-center gap-2 mb-1">
@@ -373,7 +373,7 @@ TK TL20JAN/1200`}
 
                   {/* Passengers */}
                   {parsedPNR.passengers.length > 0 && (
-                    <div className="rounded-lg bg-white/50 p-3">
+                    <div className="rounded-lg bg-card/50 p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
@@ -413,7 +413,7 @@ TK TL20JAN/1200`}
 
                   {/* Flight Segments */}
                   {parsedPNR.segments.length > 0 && (
-                    <div className="rounded-lg bg-white/50 p-3">
+                    <div className="rounded-lg bg-card/50 p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Plane className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
@@ -424,7 +424,7 @@ TK TL20JAN/1200`}
                         {parsedPNR.segments.map((seg, idx) => (
                           <div
                             key={idx}
-                            className="bg-white/60 rounded-lg px-3 py-2.5"
+                            className="bg-card/60 rounded-lg px-3 py-2.5"
                           >
                             {/* 航班號與狀態 */}
                             <div className="flex items-center justify-between mb-2">
@@ -475,7 +475,7 @@ TK TL20JAN/1200`}
                             </div>
                             {/* 時間 */}
                             {(seg.departureTime || seg.arrivalTime) && (
-                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/50 text-xs text-morandi-secondary">
+                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50 text-xs text-morandi-secondary">
                                 {seg.departureTime && (
                                   <span>出發 {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}</span>
                                 )}
@@ -492,7 +492,7 @@ TK TL20JAN/1200`}
 
                   {/* SSR */}
                   {parsedPNR.specialRequests.length > 0 && (
-                    <div className="rounded-lg bg-white/50 p-3">
+                    <div className="rounded-lg bg-card/50 p-3">
                       <div className="flex items-center gap-2 mb-2">
                         <Info className="w-3.5 h-3.5 text-morandi-secondary" />
                         <span className="text-xs font-semibold text-morandi-primary">
@@ -511,7 +511,7 @@ TK TL20JAN/1200`}
                           return (
                             <div
                               key={idx}
-                              className="flex items-center gap-2 text-xs bg-white/60 rounded-lg px-2.5 py-2"
+                              className="flex items-center gap-2 text-xs bg-card/60 rounded-lg px-2.5 py-2"
                             >
                               <Icon className="w-3.5 h-3.5 text-morandi-secondary flex-shrink-0" />
                               <span className="font-bold text-morandi-primary">
@@ -551,7 +551,7 @@ TK TL20JAN/1200`}
                         </>
                       ) : isSaving ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-border/30 border-t-white rounded-full animate-spin" />
                           儲存中...
                         </>
                       ) : (

@@ -20,7 +20,7 @@ export function useEmployeeForm(onSubmit: () => void) {
     english_name: '',
     display_name: '',
     chinese_name: '',
-    defaultPassword: 'venturo123',
+    defaultPassword: '00000000',
     roles: [],
     personal_info: {
       national_id: '',
@@ -108,6 +108,7 @@ export function useEmployeeForm(onSubmit: () => void) {
         contracts: [],
         permissions: ['settings'],
         status: 'active' as const,
+        must_change_password: true, // 新員工首次登入需要修改密碼
       }
 
       const newEmployee = await addUser(dbEmployeeData)

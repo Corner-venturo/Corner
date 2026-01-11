@@ -129,7 +129,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
   return (
     <div className="overflow-hidden bg-card">
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-sm border-collapse min-w-[1200px] bg-white rounded-lg overflow-hidden shadow-sm">
+        <table className="w-full text-sm border-collapse min-w-[1200px] bg-card rounded-lg overflow-hidden shadow-sm">
           <thead className="bg-card sticky top-0 border-b-2 border-morandi-gold/20">
             <tr>
               <th className="w-[30px] py-2.5 px-4 text-xs font-medium text-morandi-secondary border border-morandi-gold/20"></th>
@@ -177,7 +177,7 @@ export const MemberTable: React.FC<MemberTableProps> = ({
           <tbody>
             {members.map((member, index) => {
               const orderIndex = tourOrders.findIndex(order => order.id === member.order_id)
-              const bgColor = orderIndex % 2 === 0 ? 'bg-white' : 'bg-status-info-bg'
+              const bgColor = orderIndex % 2 === 0 ? 'bg-card' : 'bg-status-info-bg'
 
               return (
                 <MemberRow

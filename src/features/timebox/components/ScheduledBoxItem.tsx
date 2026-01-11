@@ -157,8 +157,8 @@ function ScheduledBoxItem({
             onClick={handleQuickComplete}
             className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-all ${
               scheduledBox.completed
-                ? 'bg-white/30 hover:bg-white/50'
-                : 'bg-white/20 hover:bg-white/40'
+                ? 'bg-card/30 hover:bg-card/50'
+                : 'bg-card/20 hover:bg-card/40'
             }`}
             title={scheduledBox.completed ? '取消完成' : '標記完成'}
           >
@@ -175,8 +175,8 @@ function ScheduledBoxItem({
           }}
           className={`absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize rounded-b-lg transition-colors ${
             isResizing
-              ? 'bg-white/50'
-              : 'bg-transparent group-hover:bg-white/20'
+              ? 'bg-card/50'
+              : 'bg-transparent group-hover:bg-card/20'
           }`}
           title="拖曳調整時長"
         />

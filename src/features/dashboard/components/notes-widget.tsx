@@ -51,7 +51,7 @@ export function NotesWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80 bg-gradient-to-br from-morandi-gold/10 via-white to-status-warning-bg flex flex-col">
+      <div className="h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80 bg-gradient-to-br from-morandi-gold/10 via-card to-status-warning-bg flex flex-col">
         <div className="p-5 pb-3 flex-shrink-0">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-start gap-3">
@@ -59,7 +59,7 @@ export function NotesWidget() {
                 className={cn(
                   'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                   'bg-gradient-to-br from-morandi-gold/60 to-status-warning-bg/60',
-                  'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                  'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
                 )}
               >
                 <Clipboard className="w-5 h-5 drop-shadow-sm" />
@@ -83,8 +83,8 @@ export function NotesWidget() {
                 className={cn(
                   'group relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
                   activeTabId === tab.id
-                    ? 'bg-white/80 text-morandi-gold shadow-md border border-white/60 scale-105'
-                    : 'bg-white/50 text-morandi-muted hover:bg-white/70 hover:text-morandi-primary border border-white/40'
+                    ? 'bg-card/80 text-morandi-gold shadow-md border border-border/60 scale-105'
+                    : 'bg-card/50 text-morandi-muted hover:bg-card/70 hover:text-morandi-primary border border-border/40'
                 )}
               >
                 {isEditingTab === tab.id ? (
@@ -97,7 +97,7 @@ export function NotesWidget() {
                       if (e.key === 'Enter') renameTab(tab.id, editingName)
                       if (e.key === 'Escape') setIsEditingTab(null)
                     }}
-                    className="w-20 px-2 py-0.5 bg-white border border-morandi-gold/30 rounded-md outline-none text-xs"
+                    className="w-20 px-2 py-0.5 bg-card border border-morandi-gold/30 rounded-md outline-none text-xs"
                     autoFocus
                   />
                 ) : (
@@ -139,7 +139,7 @@ export function NotesWidget() {
             {tabs.length < MAX_TABS && (
               <button
                 onClick={addTab}
-                className="p-1.5 rounded-lg bg-white/50 border border-white/40 text-morandi-muted hover:bg-white/80 hover:text-morandi-gold hover:border-white/60 transition-all shadow-sm"
+                className="p-1.5 rounded-lg bg-card/50 border border-border/40 text-morandi-muted hover:bg-card/80 hover:text-morandi-gold hover:border-border/60 transition-all shadow-sm"
                 title="新增分頁"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export function NotesWidget() {
           <textarea
             value={activeTab.content}
             onChange={e => updateContent(activeTab.id, e.target.value)}
-            className="w-full h-full p-4 border border-white/60 rounded-xl resize-none bg-white/90 hover:bg-white hover:border-white/80 hover:shadow-md focus:bg-white transition-all outline-none font-mono text-sm leading-relaxed shadow-sm backdrop-blur-sm"
+            className="w-full h-full p-4 border border-border/60 rounded-xl resize-none bg-card/90 hover:bg-card hover:border-border/80 hover:shadow-md focus:bg-card transition-all outline-none font-mono text-sm leading-relaxed shadow-sm backdrop-blur-sm"
             placeholder="在這裡寫下你的筆記..."
           />
           <p className="text-xs text-morandi-secondary/90 mt-2.5 font-medium flex items-center gap-2">

@@ -29,7 +29,7 @@ export function TimerWidget() {
 
   return (
     <div className="h-full">
-      <div className="h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80 bg-gradient-to-br from-muted via-white to-status-info-bg">
+      <div className="h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80 bg-gradient-to-br from-muted via-card to-status-info-bg">
         <div className="p-5 space-y-4 h-full flex flex-col">
           {/* Header with Icon */}
           <div className="flex items-start gap-3">
@@ -37,7 +37,7 @@ export function TimerWidget() {
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br from-morandi-container/60 to-status-info-bg',
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <Clock className="w-5 h-5 drop-shadow-sm" />
@@ -53,7 +53,7 @@ export function TimerWidget() {
           </div>
 
           {/* Timer Display */}
-          <div className="rounded-xl bg-white/70 p-8 shadow-md border border-white/40 flex-1 flex items-center justify-center">
+          <div className="rounded-xl bg-card/70 p-8 shadow-md border border-border/40 flex-1 flex items-center justify-center">
             <div className="text-center w-full">
               <div className="text-5xl font-mono font-bold text-morandi-primary tracking-wider drop-shadow-sm">
                 {formatTime(seconds)}
@@ -81,7 +81,7 @@ export function TimerWidget() {
               className={cn(
                 'flex-1 rounded-xl transition-all duration-200 font-semibold',
                 isRunning
-                  ? 'bg-white/90 border-2 border-white/60 text-morandi-primary hover:bg-white hover:shadow-md'
+                  ? 'bg-card/90 border-2 border-border/60 text-morandi-primary hover:bg-card hover:shadow-md'
                   : 'bg-morandi-gold text-white hover:bg-morandi-gold-hover shadow-md hover:shadow-lg'
               )}
               onClick={() => setIsRunning(!isRunning)}
@@ -95,7 +95,7 @@ export function TimerWidget() {
                 setSeconds(0)
                 setIsRunning(false)
               }}
-              className="bg-white/90 border-2 border-white/60 hover:bg-status-danger-bg hover:text-status-danger hover:border-status-danger hover:shadow-md transition-all rounded-xl font-semibold"
+              className="bg-card/90 border-2 border-border/60 hover:bg-status-danger-bg hover:text-status-danger hover:border-status-danger hover:shadow-md transition-all rounded-xl font-semibold"
             >
               重設
             </Button>

@@ -21,15 +21,20 @@ import {
   Undo2,
 } from 'lucide-react'
 import { useCanvasEditor } from '@/features/designer/hooks/useCanvasEditor'
-import { generatePageFromTemplate, itineraryToTemplateData, proposalToTemplateData, styleSeries } from '@/features/designer/templates/engine'
+import { generatePageFromTemplate, itineraryToTemplateData, proposalToTemplateData, timelineToTemplateData, styleSeries } from '@/features/designer/templates/engine'
 import { StaticCanvas } from 'fabric'
 import { renderPageOnCanvas } from '@/features/designer/components/core/renderer'
 import { createPortal } from 'react-dom'
 import type { TemplateData, DailyItinerary, MealIconType, DailyDetailData, TimelineItem, MemoSettings, MemoItem, CountryCode, HotelData, AttractionData } from '@/features/designer/templates/definitions/types'
 import { getMemoSettingsByCountry, calculateMemoPageCount, getMemoItemsForPage, countryNames } from '@/features/designer/templates/engine'
 import { useItineraries, useProposals, useProposalPackages } from '@/hooks/cloud-hooks'
+import type { TimelineItineraryData } from '@/types/timeline-itinerary.types'
 import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
-import { BookOpen, FileImage, ChevronDown, ChevronUp, Plus, Minus, ClipboardList, Check, Globe, Hotel, PanelLeft, X, Home, List, Calendar, FileText } from 'lucide-react'
+import { BookOpen, FileImage, ChevronDown, ChevronUp, Plus, Minus, ClipboardList, Check, Globe, Hotel, PanelLeft, X, Home, List, Calendar, FileText, Layers, Image, Type, Palette, Settings, Clock, Utensils, MapPin, Info, Plane, Cloud, Sun } from 'lucide-react'
+import { CollapsiblePanel } from '@/components/designer'
+import { ImageAdjustmentsPanel } from '@/features/designer/components/ImageAdjustmentsPanel'
+import type { ImageAdjustments } from '@/features/designer/components/types'
+import { DEFAULT_IMAGE_ADJUSTMENTS } from '@/features/designer/components/types'
 
 // 頁面類型：cover, toc, itinerary, daily-0, daily-1..., memo-0, memo-1..., hotel-0, hotel-1..., 或 attraction-0, attraction-1...
 type PageType = 'cover' | 'toc' | 'itinerary' | `daily-${number}` | `memo-${number}` | `hotel-${number}` | `attraction-${number}`
@@ -92,7 +97,10 @@ const MEAL_ICON_OPTIONS: Array<{ value: MealIconType; label: string }> = [
   { value: 'flight_class', label: '✈️ 機上' },
 ]
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+import { ImagePositionEditor, type ImagePositionSettings } from '@/components/ui/image-position-editor'
+import { Move } from 'lucide-react'
 import type { Json } from '@/lib/supabase/types'
 import { useAuthStore } from '@/stores/auth-store'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -103,6 +111,7 @@ function DesignerPageContent() {
   const tourId = searchParams.get('tour_id')
   const proposalId = searchParams.get('proposal_id')
   const itineraryId = searchParams.get('itinerary_id')
+  const packageId = searchParams.get('package_id') // 時間軸行程表用
 
   // 使用者資訊
   const { user } = useAuthStore()
@@ -118,6 +127,7 @@ function DesignerPageContent() {
     itinerary: null,
   }) // 每種頁面類型的 Canvas 資料（包含 daily-0, daily-1...）
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
+  const [showPositionEditor, setShowPositionEditor] = useState(false) // 圖片位置編輯器
   const [isLoading, setIsLoading] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [expandedDays, setExpandedDays] = useState<number[]>([0]) // 預設展開第一天
@@ -143,6 +153,19 @@ function DesignerPageContent() {
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const [draftId, setDraftId] = useState<string | null>(null) // Supabase 草稿 ID
   const [isLoadedFromDraft, setIsLoadedFromDraft] = useState(false) // 是否從草稿載入（防止被行程表資料覆蓋）
+  const [pendingDraft, setPendingDraft] = useState<{
+    id: string
+    name: string
+    updated_at: string
+    style_id: string
+    template_data: Json
+    trip_days: number
+    memo_settings: Json
+    hotels: Json
+    attractions: Json
+    country_code: string | null
+    edited_elements: Json
+  } | null>(null) // 發現的草稿（等待用戶選擇是否載入）
   // 手動編輯的元素（格式: { "pageType:elementId": elementData }）
   const [editedElements, setEditedElements] = useState<Record<string, CanvasElement>>({})
 
@@ -218,10 +241,16 @@ function DesignerPageContent() {
     setSelectedStyleId(styleId)
     setIsLoading(true)
 
-    // 取得出發日期（優先順序：行程表 > 提案）
+    // 取得出發日期（優先順序：套件 > 行程表 > 提案）
     let departureDate: string | undefined
 
-    if (itineraryId && itineraries.length > 0) {
+    // 檢查是否使用 package_id（時間軸行程表）
+    const targetPackage = packageId ? proposalPackages.find((pkg) => pkg.id === packageId) : null
+    if (targetPackage?.start_date) {
+      departureDate = targetPackage.start_date
+    }
+
+    if (!departureDate && itineraryId && itineraries.length > 0) {
       const itinerary = itineraries.find((i) => i.id === itineraryId)
       departureDate = itinerary?.departure_date || undefined
     }
@@ -254,15 +283,35 @@ function DesignerPageContent() {
       })),
     }
 
+    // 如果有指定套件 package_id 且有時間軸資料，使用時間軸行程表
+    if (packageId && targetPackage?.itinerary_type === 'timeline' && targetPackage?.timeline_data) {
+      const timelineData = targetPackage.timeline_data as TimelineItineraryData
+      const templateDataFromTimeline = timelineToTemplateData(timelineData)
+      data = { ...data, ...templateDataFromTimeline }
+
+      // 從時間軸資料更新 tripDays
+      if (templateDataFromTimeline.dailyDetails && templateDataFromTimeline.dailyDetails.length > 0) {
+        setTripDays(templateDataFromTimeline.dailyDetails.length)
+      }
+
+      // 重新計算日期（確保每天都有日期）
+      if (data.dailyDetails) {
+        const newDailyDates = calculateDailyDates(targetPackage.start_date || timelineData.startDate || undefined, data.dailyDetails.length)
+        data.dailyDetails = data.dailyDetails.map((day, i) => ({
+          ...day,
+          date: day.date || newDailyDates[i] || '',
+        }))
+      }
+    }
     // 如果有指定行程表，使用該行程表的資料
-    if (itineraryId && itineraries.length > 0) {
+    else if (itineraryId && itineraries.length > 0) {
       const itinerary = itineraries.find((i) => i.id === itineraryId)
       if (itinerary) {
         const itineraryData = itineraryToTemplateData(itinerary)
         data = { ...data, ...itineraryData }
 
-        // 如果行程表有更多天數，更新 tripDays
-        if (itineraryData.dailyDetails && itineraryData.dailyDetails.length > tripDays) {
+        // 從行程表資料更新 tripDays
+        if (itineraryData.dailyDetails && itineraryData.dailyDetails.length > 0) {
           setTripDays(itineraryData.dailyDetails.length)
         }
 
@@ -330,13 +379,66 @@ function DesignerPageContent() {
     setPages(newPages)
     setCurrentPageType('cover')
     setIsLoading(false)
-  }, [itineraryId, itineraries, proposalId, proposals, proposalPackages, tripDays, calculateDailyDates])
+  }, [itineraryId, itineraries, proposalId, proposals, proposalPackages, tripDays, calculateDailyDates, packageId])
 
   // 當資料載入後，自動更新已選擇的範本（修復資料載入時機問題）
   // 注意：如果是從草稿載入，跳過此邏輯以保留草稿資料
   useEffect(() => {
     // 如果從草稿載入，跳過從行程表重新生成頁面
     if (isLoadedFromDraft) return
+
+    // 如果已選擇風格且有指定套件（時間軸行程表）
+    if (selectedStyleId && packageId && proposalPackages.length > 0) {
+      const pkg = proposalPackages.find((p) => p.id === packageId)
+      if (pkg?.itinerary_type === 'timeline' && pkg?.timeline_data && templateData) {
+        const style = styleSeries.find((s) => s.id === selectedStyleId)
+        if (style) {
+          const timelineData = pkg.timeline_data as TimelineItineraryData
+          const itineraryData = timelineToTemplateData(timelineData)
+
+          // 從時間軸資料更新 tripDays
+          const itineraryDays = itineraryData.dailyDetails?.length || tripDays
+          if (itineraryDays !== tripDays) {
+            setTripDays(itineraryDays)
+          }
+
+          // 計算每天日期
+          const dailyDates = calculateDailyDates(pkg.start_date || timelineData.startDate || undefined, itineraryDays)
+
+          const newData = { ...templateData, ...itineraryData }
+          // 確保 dailyDetails 有正確的日期
+          if (newData.dailyDetails) {
+            newData.dailyDetails = newData.dailyDetails.map((day, i) => ({
+              ...day,
+              date: day.date || dailyDates[i] || '',
+            }))
+          } else {
+            newData.dailyDetails = Array.from({ length: itineraryDays }, (_, i) => ({
+              dayNumber: i + 1,
+              date: dailyDates[i] || '',
+              title: '',
+              coverImage: undefined,
+              timeline: [],
+              meals: { breakfast: '', lunch: '', dinner: '' },
+            }))
+          }
+          setTemplateData(newData)
+
+          const pageDays = Math.max(tripDays, itineraryDays)
+          const newPages: Record<string, CanvasPage | null> = {
+            cover: generatePageFromTemplate(style.templates.cover, newData),
+            toc: generatePageFromTemplate(style.templates.toc, newData),
+            itinerary: generatePageFromTemplate(style.templates.itinerary, newData),
+          }
+          for (let i = 0; i < pageDays; i++) {
+            const dailyData = { ...newData, currentDayIndex: i }
+            newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+          }
+          setPages(newPages)
+          return // 已處理，不需繼續
+        }
+      }
+    }
 
     // 如果已選擇風格且有指定行程表，當行程表資料載入後重新生成頁面
     if (selectedStyleId && itineraryId && itineraries.length > 0) {
@@ -346,9 +448,9 @@ function DesignerPageContent() {
         if (style) {
           const itineraryData = itineraryToTemplateData(itinerary)
 
-          // 如果行程表有更多天數，更新 tripDays
+          // 從行程表資料更新 tripDays
           const itineraryDays = itineraryData.dailyDetails?.length || tripDays
-          if (itineraryDays > tripDays) {
+          if (itineraryDays !== tripDays) {
             setTripDays(itineraryDays)
           }
 
@@ -388,7 +490,7 @@ function DesignerPageContent() {
         }
       }
     }
-  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft])
+  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages])
 
   // 當天數變更時，重新生成每日行程頁面
   useEffect(() => {
@@ -423,12 +525,33 @@ function DesignerPageContent() {
       newDetails = newDetails.slice(0, tripDays)
     }
 
-    const newData = { ...templateData, dailyDetails: newDetails }
+    // 同步更新 dailyItineraries（給總覽頁用）
+    const currentItineraries = templateData.dailyItineraries || []
+    let newItineraries = [...currentItineraries]
+    // 如果天數增加，補充空項目
+    while (newItineraries.length < tripDays) {
+      const newIndex = newItineraries.length
+      newItineraries.push({
+        dayNumber: newIndex + 1,
+        title: newDetails[newIndex]?.title || '',
+        meals: newDetails[newIndex]?.meals || { breakfast: '', lunch: '', dinner: '' },
+        accommodation: '',
+      })
+    }
+    // 如果天數減少，截斷
+    if (newItineraries.length > tripDays) {
+      newItineraries = newItineraries.slice(0, tripDays)
+    }
+
+    const newData = { ...templateData, dailyDetails: newDetails, dailyItineraries: newItineraries }
     setTemplateData(newData)
 
-    // 重新生成所有每日頁面
+    // 重新生成所有每日頁面和總覽頁
     setPages((prevPages) => {
       const updatedPages = { ...prevPages }
+      // 重新生成總覽頁
+      updatedPages.itinerary = generatePageFromTemplate(style.templates.itinerary, newData)
+      // 重新生成每日頁面
       for (let i = 0; i < tripDays; i++) {
         const pageData = { ...newData, currentDayIndex: i }
         updatedPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, pageData)
@@ -462,28 +585,26 @@ function DesignerPageContent() {
 
   // 元素狀態更新
   const updateElement = useCallback((elementId: string, updates: Partial<CanvasElement>) => {
+    // 使用 functional update 來避免 stale closure 問題
     setPages((prevPages) => {
       const currentPage = prevPages[currentPageType]
       if (!currentPage) return prevPages
+
+      const element = currentPage.elements.find((el) => el.id === elementId)
+      if (!element) return prevPages
+
+      const updatedElement = { ...element, ...updates } as CanvasElement
       const updatedElements = currentPage.elements.map((el) =>
-        el.id === elementId ? ({ ...el, ...updates } as CanvasElement) : el
+        el.id === elementId ? updatedElement : el
       )
+
+      // 同時更新 editedElements（使用最新的元素資料）
+      const key = `${currentPageType}:${elementId}`
+      setEditedElements((prev) => ({ ...prev, [key]: updatedElement }))
+
       return { ...prevPages, [currentPageType]: { ...currentPage, elements: updatedElements } }
     })
-
-    // 追蹤手動編輯的元素
-    setEditedElements((prev) => {
-      const key = `${currentPageType}:${elementId}`
-      // 取得目前頁面的該元素完整資料
-      const currentPage = pages[currentPageType]
-      if (!currentPage) return prev
-      const element = currentPage.elements.find((el) => el.id === elementId)
-      if (!element) return prev
-      // 合併更新後的完整元素
-      const updatedElement = { ...element, ...updates } as CanvasElement
-      return { ...prev, [key]: updatedElement }
-    })
-  }, [currentPageType, pages])
+  }, [currentPageType])
 
   const addElement = useCallback((newElement: CanvasElement) => {
     setPages((prevPages) => {
@@ -717,12 +838,22 @@ function DesignerPageContent() {
 
     setIsSavingDraft(true)
     try {
+      // 除錯：檢查 RLS 函數返回的 workspace
+      const { data: dbWorkspace } = await supabase.rpc('get_current_user_workspace')
+      console.log('儲存草稿除錯:', {
+        frontendWorkspaceId: workspaceId,
+        dbWorkspace: dbWorkspace,
+        userId: userId,
+        match: workspaceId === dbWorkspace,
+      })
+
       const draftPayload = {
         workspace_id: workspaceId,
         user_id: userId,
         tour_id: tourId || null,
         proposal_id: proposalId || null,
         itinerary_id: itineraryId || null,
+        package_id: packageId || null,
         name: templateData.mainTitle || '未命名草稿',
         style_id: selectedStyleId,
         template_data: templateData as unknown as Json,
@@ -743,28 +874,79 @@ function DesignerPageContent() {
 
         if (error) throw error
       } else {
-        // 建立新草稿（或更新已存在的）
-        const { data, error } = await supabase
-          .from('designer_drafts')
-          .upsert(draftPayload, {
-            onConflict: tourId ? 'tour_id' : proposalId ? 'proposal_id' : itineraryId ? 'itinerary_id' : undefined,
-          })
-          .select('id')
-          .single()
+        // 先查詢是否已有草稿（優先順序：packageId > tourId > proposalId > itineraryId）
+        let existingDraftId: string | null = null
 
-        if (error) throw error
-        if (data) setDraftId(data.id)
+        if (packageId) {
+          const { data: existing } = await supabase
+            .from('designer_drafts')
+            .select('id')
+            .eq('package_id', packageId)
+            .maybeSingle()
+          existingDraftId = existing?.id ?? null
+        } else if (tourId) {
+          const { data: existing } = await supabase
+            .from('designer_drafts')
+            .select('id')
+            .eq('tour_id', tourId)
+            .maybeSingle()
+          existingDraftId = existing?.id ?? null
+        } else if (proposalId) {
+          const { data: existing } = await supabase
+            .from('designer_drafts')
+            .select('id')
+            .eq('proposal_id', proposalId)
+            .maybeSingle()
+          existingDraftId = existing?.id ?? null
+        } else if (itineraryId) {
+          const { data: existing } = await supabase
+            .from('designer_drafts')
+            .select('id')
+            .eq('itinerary_id', itineraryId)
+            .maybeSingle()
+          existingDraftId = existing?.id ?? null
+        }
+
+        if (existingDraftId) {
+          // 更新現有草稿
+          const { error } = await supabase
+            .from('designer_drafts')
+            .update(draftPayload)
+            .eq('id', existingDraftId)
+
+          if (error) throw error
+          setDraftId(existingDraftId)
+        } else {
+          // 建立新草稿
+          const { data, error } = await supabase
+            .from('designer_drafts')
+            .insert(draftPayload)
+            .select('id')
+            .single()
+
+          if (error) throw error
+          if (data) setDraftId(data.id)
+        }
       }
 
       setLastSavedAt(new Date())
       await alert('草稿已儲存', 'success', '已儲存')
     } catch (error) {
-      console.error('儲存草稿失敗:', error)
-      await alert('無法儲存草稿，請稍後再試', 'error', '儲存失敗')
+      // 詳細記錄錯誤
+      const err = error as { message?: string; code?: string; details?: string; hint?: string }
+      logger.error('儲存草稿失敗:', {
+        message: err?.message,
+        code: err?.code,
+        details: err?.details,
+        hint: err?.hint,
+        raw: JSON.stringify(error),
+      })
+      const errorMsg = err?.message || err?.hint || '未知錯誤'
+      await alert(`無法儲存草稿: ${errorMsg}`, 'error', '儲存失敗')
     } finally {
       setIsSavingDraft(false)
     }
-  }, [templateData, selectedStyleId, tripDays, memoSettings, hotels, attractions, selectedCountryCode, editedElements, workspaceId, userId, tourId, proposalId, itineraryId, draftId])
+  }, [templateData, selectedStyleId, tripDays, memoSettings, hotels, attractions, selectedCountryCode, editedElements, workspaceId, userId, packageId, tourId, proposalId, itineraryId, draftId])
 
   // 從 Supabase 載入草稿
   const loadDraft = useCallback(async (draft: {
@@ -881,7 +1063,7 @@ function DesignerPageContent() {
       }
       return true
     } catch (error) {
-      console.error('載入草稿失敗:', error)
+      logger.error('載入草稿失敗:', error)
     }
     return false
   }, [])
@@ -897,7 +1079,10 @@ function DesignerPageContent() {
           .select('*')
           .eq('workspace_id', workspaceId)
 
-        if (tourId) {
+        // 優先順序：packageId > tourId > proposalId > itineraryId
+        if (packageId) {
+          query = query.eq('package_id', packageId)
+        } else if (tourId) {
           query = query.eq('tour_id', tourId)
         } else if (proposalId) {
           query = query.eq('proposal_id', proposalId)
@@ -913,18 +1098,28 @@ function DesignerPageContent() {
 
         if (drafts && drafts.length > 0) {
           const draft = drafts[0]
-          const savedTime = new Date(draft.updated_at).toLocaleString('zh-TW')
-          if (window.confirm(`發現未完成的草稿（儲存於 ${savedTime}）\n\n是否要載入草稿繼續編輯？`)) {
-            await loadDraft(draft)
-          }
+          // 設定 pendingDraft 狀態，讓 UI 顯示草稿卡片
+          setPendingDraft({
+            id: draft.id,
+            name: draft.name,
+            updated_at: draft.updated_at,
+            style_id: draft.style_id,
+            template_data: draft.template_data,
+            trip_days: draft.trip_days,
+            memo_settings: draft.memo_settings,
+            hotels: draft.hotels,
+            attractions: draft.attractions,
+            country_code: draft.country_code,
+            edited_elements: draft.edited_elements,
+          })
         }
       } catch (error) {
-        console.error('檢查草稿失敗:', error)
+        logger.error('檢查草稿失敗:', error)
       }
     }
 
     checkForDraft()
-  }, [workspaceId, tourId, proposalId, itineraryId, selectedStyleId, loadDraft])
+  }, [workspaceId, packageId, tourId, proposalId, itineraryId, selectedStyleId, loadDraft])
 
   const handleAddImageClick = useCallback(() => {
     const url = prompt('請輸入圖片網址：')
@@ -1871,6 +2066,53 @@ function DesignerPageContent() {
           />
         </header>
 
+        {/* 發現草稿時顯示載入卡片 */}
+        {pendingDraft && (
+          <div className="mx-8 mt-6 p-4 bg-card border border-morandi-gold/30 rounded-xl shadow-sm">
+            <div className="flex items-center gap-4">
+              {/* 書本圖標 */}
+              <div className="flex-shrink-0 w-12 h-12 bg-morandi-gold/10 rounded-lg flex items-center justify-center">
+                <BookOpen size={24} className="text-morandi-gold" />
+              </div>
+              {/* 草稿資訊 */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-morandi-primary truncate">{pendingDraft.name}</h3>
+                <p className="text-sm text-morandi-secondary">
+                  上次編輯：{new Date(pendingDraft.updated_at).toLocaleString('zh-TW', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+              {/* 操作按鈕 */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPendingDraft(null)}
+                  className="text-morandi-secondary hover:text-morandi-primary"
+                >
+                  重新開始
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-1"
+                  onClick={() => {
+                    loadDraft(pendingDraft)
+                    setPendingDraft(null)
+                  }}
+                >
+                  <BookOpen size={14} />
+                  載入草稿
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 範本選擇區 - 靠左對齊 */}
         <div className="flex-1 overflow-auto p-8">
           <div className="flex flex-wrap gap-6">
@@ -2172,49 +2414,6 @@ function DesignerPageContent() {
                 </div>
               </div>
 
-              {/* 飯店介紹 */}
-              <div>
-                <h4 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider px-2 mb-2 flex items-center gap-2">
-                  <Hotel size={12} />
-                  飯店介紹
-                  {hotels.length > 0 && <span className="ml-auto text-morandi-muted font-normal normal-case">{hotels.length} 間</span>}
-                </h4>
-                <div className="space-y-1">
-                  {hotels.length > 0 ? (
-                    <>
-                      {hotels.map((hotel, i) => (
-                        <button
-                          key={`hotel-${i}`}
-                          onClick={() => { handleSwitchPage(`hotel-${i}` as PageType); setShowPageDrawer(false) }}
-                          className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
-                            currentPageType === `hotel-${i}`
-                              ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
-                              : 'text-morandi-secondary hover:bg-morandi-container/50 hover:text-morandi-primary'
-                          )}
-                        >
-                          <span className="w-6 h-6 rounded bg-morandi-container/70 flex items-center justify-center text-xs font-bold">
-                            {4 + tripDays + i}
-                          </span>
-                          <Hotel size={14} />
-                          {hotel.nameZh || `飯店 ${i + 1}`}
-                          {currentPageType === `hotel-${i}` && <Check size={14} className="ml-auto" />}
-                        </button>
-                      ))}
-                    </>
-                  ) : (
-                    <p className="text-xs text-morandi-muted px-3 py-2">尚未新增飯店</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => { handleAddHotel(); setShowPageDrawer(false) }}
-                  className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 rounded-lg border border-dashed border-morandi-gold/50 text-xs text-morandi-gold hover:bg-morandi-gold/5 transition-colors"
-                >
-                  <Plus size={12} />
-                  新增飯店
-                </button>
-              </div>
-
               {/* 景點介紹 */}
               <div>
                 <h4 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider px-2 mb-2 flex items-center gap-2">
@@ -2237,7 +2436,7 @@ function DesignerPageContent() {
                           }`}
                         >
                           <span className="w-6 h-6 rounded bg-morandi-container/70 flex items-center justify-center text-xs font-bold">
-                            {4 + tripDays + hotels.length + pageIdx}
+                            {4 + tripDays + pageIdx}
                           </span>
                           <ImageIcon size={14} />
                           景點 {pageIdx * 2 + 1}{attractions[pageIdx * 2 + 1] ? ` - ${pageIdx * 2 + 2}` : ''}
@@ -2255,6 +2454,49 @@ function DesignerPageContent() {
                 >
                   <Plus size={12} />
                   新增景點
+                </button>
+              </div>
+
+              {/* 飯店介紹 */}
+              <div>
+                <h4 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider px-2 mb-2 flex items-center gap-2">
+                  <Hotel size={12} />
+                  飯店介紹
+                  {hotels.length > 0 && <span className="ml-auto text-morandi-muted font-normal normal-case">{hotels.length} 間</span>}
+                </h4>
+                <div className="space-y-1">
+                  {hotels.length > 0 ? (
+                    <>
+                      {hotels.map((hotel, i) => (
+                        <button
+                          key={`hotel-${i}`}
+                          onClick={() => { handleSwitchPage(`hotel-${i}` as PageType); setShowPageDrawer(false) }}
+                          className={cn(
+                            'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
+                            currentPageType === `hotel-${i}`
+                              ? 'bg-morandi-gold/10 text-morandi-gold font-medium'
+                              : 'text-morandi-secondary hover:bg-morandi-container/50 hover:text-morandi-primary'
+                          )}
+                        >
+                          <span className="w-6 h-6 rounded bg-morandi-container/70 flex items-center justify-center text-xs font-bold">
+                            {4 + tripDays + Math.ceil(attractions.length / 2) + i}
+                          </span>
+                          <Hotel size={14} />
+                          {hotel.nameZh || `飯店 ${i + 1}`}
+                          {currentPageType === `hotel-${i}` && <Check size={14} className="ml-auto" />}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <p className="text-xs text-morandi-muted px-3 py-2">尚未新增飯店</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => { handleAddHotel(); setShowPageDrawer(false) }}
+                  className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 rounded-lg border border-dashed border-morandi-gold/50 text-xs text-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                >
+                  <Plus size={12} />
+                  新增飯店
                 </button>
               </div>
 
@@ -2332,250 +2574,267 @@ function DesignerPageContent() {
       {/* 主內容區 - 左側屬性，右側預覽 */}
       <div className="flex-1 flex overflow-hidden">
         {/* 左側：屬性面板 */}
-        <aside className="w-[400px] flex-none overflow-y-auto border-r border-border bg-card p-6 flex flex-col gap-6">
-          {/* 標題 */}
-          <div>
-            <h2 className="text-xl font-bold text-morandi-primary">
-              {currentPageType === 'cover' && '封面設定'}
-              {currentPageType === 'toc' && '目錄設定'}
-              {currentPageType === 'itinerary' && '行程總覽設定'}
-              {isDailyPage(currentPageType) && `Day ${getDayIndex(currentPageType) + 1} 設定`}
-              {isMemoPage(currentPageType) && `備忘錄設定`}
-              {isHotelPage(currentPageType) && `飯店介紹設定`}
-              {isAttractionPage(currentPageType) && `景點介紹設定`}
-            </h2>
-            <p className="text-sm text-morandi-secondary mt-1">
-              編輯內容會即時更新到預覽中
-            </p>
-          </div>
-
+        <aside className="w-[320px] flex-none overflow-y-auto border-r border-border bg-background" style={{ contain: 'layout style' }}>
           {/* 目錄專屬欄位 */}
           {currentPageType === 'toc' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                目錄頁面
-              </h3>
-
-              <div className="p-4 bg-morandi-container/30 rounded-lg">
-                <p className="text-sm text-morandi-secondary mb-3">
-                  目錄會自動根據您的手冊內容生成，包含：
+            <CollapsiblePanel title="目錄內容" icon={List} defaultOpen>
+              <div className="p-3 bg-morandi-container/30 rounded-lg">
+                <p className="text-xs text-morandi-secondary mb-2">
+                  目錄會自動根據手冊內容生成：
                 </p>
-                <ul className="text-xs text-morandi-secondary space-y-1.5">
+                <ul className="text-xs text-morandi-secondary space-y-1">
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-morandi-gold" />
+                    <span className="w-1 h-1 rounded-full bg-morandi-gold" />
                     行程總覽（航班、集合資訊）
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-morandi-gold" />
+                    <span className="w-1 h-1 rounded-full bg-morandi-gold" />
                     每日行程（共 {tripDays} 天）
                   </li>
                   {hotels.length > 0 && (
                     <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-morandi-gold" />
+                      <span className="w-1 h-1 rounded-full bg-morandi-gold" />
                       住宿介紹（共 {hotels.length} 間）
                     </li>
                   )}
                   {memoSettings && (
                     <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-morandi-gold" />
+                      <span className="w-1 h-1 rounded-full bg-morandi-gold" />
                       旅遊提醒（共 {memoPageCount} 頁）
                     </li>
                   )}
                   <li className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-morandi-gold" />
+                    <span className="w-1 h-1 rounded-full bg-morandi-gold" />
                     旅行筆記
                   </li>
                 </ul>
               </div>
-
-              <p className="text-xs text-morandi-secondary">
+              <p className="text-[10px] text-morandi-muted mt-2">
                 頁碼會根據各章節的頁數自動計算
               </p>
-            </div>
+            </CollapsiblePanel>
           )}
 
           {/* 封面專屬欄位 */}
           {currentPageType === 'cover' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                封面資訊
-              </h3>
+            <CollapsiblePanel title="封面設定" icon={Home} defaultOpen maxHeight={500}>
+              <div className="space-y-4">
+                {/* 封面圖片 */}
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-morandi-primary">封面圖片</span>
+                  {templateData?.coverImage ? (
+                    <div className="relative group">
+                      <img
+                        src={templateData.coverImage}
+                        alt="封面圖片"
+                        className="w-full h-32 object-cover rounded-lg border border-border"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <button
+                          onClick={handleCoverUpload}
+                          className="px-2 py-1 bg-card rounded text-xs font-medium text-morandi-primary"
+                        >
+                          更換
+                        </button>
+                        <button
+                          onClick={() => {
+                            const newData = { ...templateData, coverImage: undefined }
+                            setTemplateData(newData)
+                            const style = styleSeries.find((s) => s.id === selectedStyleId)
+                            if (style) {
+                              setPages((prev) => ({
+                                ...prev,
+                                cover: generatePageFromTemplate(style.templates.cover, newData),
+                                toc: generatePageFromTemplate(style.templates.toc, newData),
+                              }))
+                            }
+                          }}
+                          className="px-2 py-1 bg-morandi-red text-white rounded text-xs font-medium"
+                        >
+                          移除
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={handleCoverUpload}
+                      className="group flex items-center justify-center w-full h-24 border border-dashed border-border rounded-lg hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors cursor-pointer"
+                    >
+                      <div className="flex flex-col items-center">
+                        <ImageIcon size={20} className="text-morandi-secondary mb-1 group-hover:text-morandi-gold" />
+                        <p className="text-xs text-morandi-secondary">點擊上傳封面圖片</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              {/* 公司名稱 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">公司名稱</span>
-                <input
-                  type="text"
-                  value={templateData?.companyName || ''}
-                  onChange={(e) => handleTemplateDataChange('companyName', e.target.value)}
-                  placeholder="例：Corner Travel"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
+                {/* 公司名稱 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">公司名稱</span>
+                  <input
+                    type="text"
+                    value={templateData?.companyName || ''}
+                    onChange={(e) => handleTemplateDataChange('companyName', e.target.value)}
+                    placeholder="例：Corner Travel"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 目的地 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">目的地</span>
-                <input
-                  type="text"
-                  value={templateData?.destination || ''}
-                  onChange={(e) => handleTemplateDataChange('destination', e.target.value)}
-                  placeholder="例：京都, 日本"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
+                {/* 目的地 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">目的地</span>
+                  <input
+                    type="text"
+                    value={templateData?.destination || ''}
+                    onChange={(e) => handleTemplateDataChange('destination', e.target.value)}
+                    placeholder="例：京都, 日本"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 主標題 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">主標題</span>
-                <input
-                  type="text"
-                  value={templateData?.mainTitle || ''}
-                  onChange={(e) => handleTemplateDataChange('mainTitle', e.target.value)}
-                  placeholder="例：春日京阪遊"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
+                {/* 主標題 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">主標題</span>
+                  <input
+                    type="text"
+                    value={templateData?.mainTitle || ''}
+                    onChange={(e) => handleTemplateDataChange('mainTitle', e.target.value)}
+                    placeholder="例：春日京阪遊"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 副標題 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">副標題</span>
-                <input
-                  type="text"
-                  value={templateData?.subtitle || ''}
-                  onChange={(e) => handleTemplateDataChange('subtitle', e.target.value)}
-                  placeholder="例：Travel Handbook"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
+                {/* 副標題 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">副標題</span>
+                  <input
+                    type="text"
+                    value={templateData?.subtitle || ''}
+                    onChange={(e) => handleTemplateDataChange('subtitle', e.target.value)}
+                    placeholder="例：Travel Handbook"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 旅遊日期 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">旅遊日期</span>
-                <input
-                  type="text"
-                  value={templateData?.travelDates || ''}
-                  onChange={(e) => handleTemplateDataChange('travelDates', e.target.value)}
-                  placeholder="例：2024/04/10 - 2024/04/15"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
+                {/* 旅遊日期 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">旅遊日期</span>
+                  <input
+                    type="text"
+                    value={templateData?.travelDates || ''}
+                    onChange={(e) => handleTemplateDataChange('travelDates', e.target.value)}
+                    placeholder="例：2024/04/10 - 2024/04/15"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 團號 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">團號</span>
-                <input
-                  type="text"
-                  value={templateData?.tourCode || ''}
-                  onChange={(e) => handleTemplateDataChange('tourCode', e.target.value)}
-                  placeholder="例：KIX240410A"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-            </div>
+                {/* 團號 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">團號</span>
+                  <input
+                    type="text"
+                    value={templateData?.tourCode || ''}
+                    onChange={(e) => handleTemplateDataChange('tourCode', e.target.value)}
+                    placeholder="例：KIX240410A"
+                    className="w-full px-2 py-1.5 rounded border border-border bg-background focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
+              </div>
+            </CollapsiblePanel>
           )}
 
           {/* 行程總覽專屬欄位 */}
           {currentPageType === 'itinerary' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                集合資訊
-              </h3>
+            <CollapsiblePanel title="集合資訊" icon={Calendar} defaultOpen>
+              <div className="space-y-3">
+                {/* 集合時間 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">集合時間</span>
+                  <input
+                    type="text"
+                    value={templateData?.meetingTime || ''}
+                    onChange={(e) => handleTemplateDataChange('meetingTime', e.target.value)}
+                    placeholder="例：07:30"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              {/* 集合時間 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">集合時間</span>
-                <input
-                  type="text"
-                  value={templateData?.meetingTime || ''}
-                  onChange={(e) => handleTemplateDataChange('meetingTime', e.target.value)}
-                  placeholder="例：07:30"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-
-              {/* 集合地點 */}
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">集合地點</span>
-                <input
-                  type="text"
-                  value={templateData?.meetingPlace || ''}
-                  onChange={(e) => handleTemplateDataChange('meetingPlace', e.target.value)}
-                  placeholder="例：桃園機場第二航廈"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-            </div>
+                {/* 集合地點 */}
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">集合地點</span>
+                  <input
+                    type="text"
+                    value={templateData?.meetingPlace || ''}
+                    onChange={(e) => handleTemplateDataChange('meetingPlace', e.target.value)}
+                    placeholder="例：桃園機場第二航廈"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
+              </div>
+            </CollapsiblePanel>
           )}
 
           {/* 領隊資訊 */}
           {currentPageType === 'itinerary' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                領隊資訊
-              </h3>
+            <CollapsiblePanel title="領隊資訊" icon={Type}>
+              <div className="space-y-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">領隊姓名</span>
+                  <input
+                    type="text"
+                    value={templateData?.leaderName || ''}
+                    onChange={(e) => handleTemplateDataChange('leaderName', e.target.value)}
+                    placeholder="例：王小明"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">領隊姓名</span>
-                <input
-                  type="text"
-                  value={templateData?.leaderName || ''}
-                  onChange={(e) => handleTemplateDataChange('leaderName', e.target.value)}
-                  placeholder="例：王小明"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">領隊電話</span>
-                <input
-                  type="text"
-                  value={templateData?.leaderPhone || ''}
-                  onChange={(e) => handleTemplateDataChange('leaderPhone', e.target.value)}
-                  placeholder="例：0912-345-678"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-            </div>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">領隊電話</span>
+                  <input
+                    type="text"
+                    value={templateData?.leaderPhone || ''}
+                    onChange={(e) => handleTemplateDataChange('leaderPhone', e.target.value)}
+                    placeholder="例：0912-345-678"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
+              </div>
+            </CollapsiblePanel>
           )}
 
           {/* 航班資訊 */}
           {currentPageType === 'itinerary' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                航班資訊
-              </h3>
+            <CollapsiblePanel title="航班資訊" icon={FileText}>
+              <div className="space-y-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">去程航班</span>
+                  <input
+                    type="text"
+                    value={templateData?.outboundFlight || ''}
+                    onChange={(e) => handleTemplateDataChange('outboundFlight', e.target.value)}
+                    placeholder="例：JL802 08:40 (TPE) ▶ 12:10 (KIX)"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
 
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">去程航班</span>
-                <input
-                  type="text"
-                  value={templateData?.outboundFlight || ''}
-                  onChange={(e) => handleTemplateDataChange('outboundFlight', e.target.value)}
-                  placeholder="例：JL802 08:40 (TPE) ▶ 12:10 (KIX)"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-morandi-primary">回程航班</span>
-                <input
-                  type="text"
-                  value={templateData?.returnFlight || ''}
-                  onChange={(e) => handleTemplateDataChange('returnFlight', e.target.value)}
-                  placeholder="例：JL805 18:20 (KIX) ▶ 20:30 (TPE)"
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                />
-              </label>
-            </div>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-morandi-primary">回程航班</span>
+                  <input
+                    type="text"
+                    value={templateData?.returnFlight || ''}
+                    onChange={(e) => handleTemplateDataChange('returnFlight', e.target.value)}
+                    placeholder="例：JL805 18:20 (KIX) ▶ 20:30 (TPE)"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card focus:ring-1 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-xs"
+                  />
+                </label>
+              </div>
+            </CollapsiblePanel>
           )}
 
           {/* 每日行程編輯 */}
           {currentPageType === 'itinerary' && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                每日行程
-              </h3>
+            <CollapsiblePanel title="每日行程" icon={List} badge={tripDays} defaultOpen>
               {Array.from({ length: 5 }, (_, i) => {
                 const dayData = templateData?.dailyItineraries?.[i] || {
                   dayNumber: i + 1,
@@ -2687,63 +2946,7 @@ function DesignerPageContent() {
                   </div>
                 )
               })}
-            </div>
-          )}
-
-          {/* 封面圖片上傳 */}
-          {currentPageType === 'cover' && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                封面圖片
-              </h3>
-              {templateData?.coverImage ? (
-                <div className="relative group">
-                  <img
-                    src={templateData.coverImage}
-                    alt="封面圖片"
-                    className="w-full h-40 object-cover rounded-xl border border-border"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
-                    <button
-                      onClick={handleCoverUpload}
-                      className="px-3 py-1.5 bg-card rounded text-sm font-medium text-morandi-primary"
-                    >
-                      更換圖片
-                    </button>
-                    <button
-                      onClick={() => {
-                        const newData = { ...templateData, coverImage: undefined }
-                        setTemplateData(newData)
-                        const style = styleSeries.find((s) => s.id === selectedStyleId)
-                        if (style) {
-                          setPages((prev) => ({
-                            ...prev,
-                            cover: generatePageFromTemplate(style.templates.cover, newData),
-                            toc: generatePageFromTemplate(style.templates.toc, newData),
-                          }))
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-morandi-red text-white rounded text-sm font-medium"
-                    >
-                      移除
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  onClick={handleCoverUpload}
-                  className="group relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border rounded-xl hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors cursor-pointer"
-                >
-                  <div className="flex flex-col items-center justify-center">
-                    <ImageIcon size={32} className="text-morandi-secondary mb-2 group-hover:text-morandi-gold transition-colors" />
-                    <p className="text-sm text-morandi-secondary">
-                      <span className="font-semibold text-morandi-gold">點擊上傳</span> 或拖放檔案
-                    </p>
-                    <p className="text-xs text-morandi-muted mt-1">支援 PNG, JPG (最大 5MB)</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            </CollapsiblePanel>
           )}
 
           {/* 每日行程專屬欄位 */}
@@ -2760,11 +2963,7 @@ function DesignerPageContent() {
             return (
               <>
                 {/* 基本資訊 */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    基本資訊
-                  </h3>
-
+                <CollapsiblePanel title="基本資訊" icon={Info} defaultOpen>
                   {/* 日期 */}
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-medium text-morandi-primary">日期</span>
@@ -2777,7 +2976,7 @@ function DesignerPageContent() {
                   </label>
 
                   {/* 當日標題 */}
-                  <label className="flex flex-col gap-1.5">
+                  <label className="flex flex-col gap-1.5 mt-4">
                     <span className="text-sm font-medium text-morandi-primary">當日標題</span>
                     <input
                       type="text"
@@ -2787,14 +2986,16 @@ function DesignerPageContent() {
                       className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
                     />
                   </label>
-                </div>
+                </CollapsiblePanel>
 
                 {/* 時間軸 */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-border pb-2">
-                    <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider">
-                      時間軸
-                    </h3>
+                <CollapsiblePanel
+                  title="時間軸"
+                  icon={Clock}
+                  badge={dayDetail.timeline.length || undefined}
+                  defaultOpen
+                >
+                  <div className="flex justify-end mb-3">
                     <button
                       onClick={() => handleAddTimelineItem(dayIndex)}
                       className="flex items-center gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
@@ -2879,53 +3080,48 @@ function DesignerPageContent() {
                       ))}
                     </div>
                   )}
-                </div>
+                </CollapsiblePanel>
 
                 {/* 餐食資訊 */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    餐食資訊
-                  </h3>
+                <CollapsiblePanel title="餐食資訊" icon={Utensils}>
+                  <div className="space-y-4">
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">早餐</span>
+                      <input
+                        type="text"
+                        value={dayDetail.meals.breakfast || ''}
+                        onChange={(e) => handleDailyDetailChange(dayIndex, 'breakfast', e.target.value)}
+                        placeholder="例：飯店內享用"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      />
+                    </label>
 
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">早餐</span>
-                    <input
-                      type="text"
-                      value={dayDetail.meals.breakfast || ''}
-                      onChange={(e) => handleDailyDetailChange(dayIndex, 'breakfast', e.target.value)}
-                      placeholder="例：飯店內享用"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                    />
-                  </label>
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">午餐</span>
+                      <input
+                        type="text"
+                        value={dayDetail.meals.lunch || ''}
+                        onChange={(e) => handleDailyDetailChange(dayIndex, 'lunch', e.target.value)}
+                        placeholder="例：當地特色餐廳"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      />
+                    </label>
 
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">午餐</span>
-                    <input
-                      type="text"
-                      value={dayDetail.meals.lunch || ''}
-                      onChange={(e) => handleDailyDetailChange(dayIndex, 'lunch', e.target.value)}
-                      placeholder="例：當地特色餐廳"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                    />
-                  </label>
-
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">晚餐</span>
-                    <input
-                      type="text"
-                      value={dayDetail.meals.dinner || ''}
-                      onChange={(e) => handleDailyDetailChange(dayIndex, 'dinner', e.target.value)}
-                      placeholder="例：自理"
-                      className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
-                    />
-                  </label>
-                </div>
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">晚餐</span>
+                      <input
+                        type="text"
+                        value={dayDetail.meals.dinner || ''}
+                        onChange={(e) => handleDailyDetailChange(dayIndex, 'dinner', e.target.value)}
+                        placeholder="例：自理"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border bg-card focus:ring-2 focus:ring-morandi-gold/50 focus:border-morandi-gold outline-none transition-all text-sm"
+                      />
+                    </label>
+                  </div>
+                </CollapsiblePanel>
 
                 {/* 當日封面圖片 */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    當日封面圖片
-                  </h3>
+                <CollapsiblePanel title="當日封面圖片" icon={ImageIcon}>
                   {dayDetail.coverImage ? (
                     <div className="relative">
                       <img
@@ -2954,7 +3150,7 @@ function DesignerPageContent() {
                       </div>
                     </div>
                   )}
-                </div>
+                </CollapsiblePanel>
               </>
             )
           })()}
@@ -2967,11 +3163,7 @@ function DesignerPageContent() {
             return (
               <>
                 {/* 國家選擇 */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    {memoSettings.title}
-                  </h3>
-
+                <CollapsiblePanel title={memoSettings.title} icon={Globe} defaultOpen>
                   <div className="flex items-center gap-2 p-3 bg-morandi-container/30 rounded-lg">
                     <Globe size={16} className="text-morandi-gold" />
                     <span className="text-sm font-medium text-morandi-primary">
@@ -2984,14 +3176,15 @@ function DesignerPageContent() {
                       移除備忘錄
                     </button>
                   </div>
-                </div>
+                </CollapsiblePanel>
 
                 {/* 當前頁面內容提示 */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    {isWeatherPage ? '天氣與資訊' : `提醒項目 (頁 ${pageIndex + 1})`}
-                  </h3>
-
+                <CollapsiblePanel
+                  title={isWeatherPage ? '天氣與資訊' : `提醒項目 (頁 ${pageIndex + 1})`}
+                  icon={isWeatherPage ? Cloud : ClipboardList}
+                  badge={isWeatherPage ? undefined : pageItems.length}
+                  defaultOpen
+                >
                   {isWeatherPage ? (
                     <p className="text-sm text-morandi-secondary">
                       此頁顯示季節天氣資訊與緊急聯絡方式
@@ -3009,132 +3202,144 @@ function DesignerPageContent() {
                       ))}
                     </div>
                   )}
-                </div>
+                </CollapsiblePanel>
 
                 {/* 項目選擇（禮儀類） */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    禮儀提醒
-                  </h3>
-                  {memoSettings.items
-                    .filter((item) => item.category === 'etiquette')
-                    .map((item) => (
-                      <label
-                        key={item.id}
-                        className="flex items-start gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
-                      >
-                        <button
-                          onClick={() => handleToggleMemoItem(item.id)}
-                          className={cn(
-                            'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5',
-                            item.enabled
-                              ? 'bg-morandi-gold border-morandi-gold text-white'
-                              : 'border-border'
-                          )}
+                <CollapsiblePanel
+                  title="禮儀提醒"
+                  icon={Check}
+                  badge={memoSettings.items.filter((item) => item.category === 'etiquette' && item.enabled).length || undefined}
+                >
+                  <div className="space-y-2">
+                    {memoSettings.items
+                      .filter((item) => item.category === 'etiquette')
+                      .map((item) => (
+                        <label
+                          key={item.id}
+                          className="flex items-start gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
                         >
-                          {item.enabled && <Check size={10} />}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-morandi-primary truncate">
-                            {item.titleZh || item.title}
-                          </p>
-                        </div>
-                      </label>
-                    ))}
-                </div>
+                          <button
+                            onClick={() => handleToggleMemoItem(item.id)}
+                            className={cn(
+                              'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5',
+                              item.enabled
+                                ? 'bg-morandi-gold border-morandi-gold text-white'
+                                : 'border-border'
+                            )}
+                          >
+                            {item.enabled && <Check size={10} />}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-morandi-primary truncate">
+                              {item.titleZh || item.title}
+                            </p>
+                          </div>
+                        </label>
+                      ))}
+                  </div>
+                </CollapsiblePanel>
 
                 {/* 項目選擇（航班類） */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    航班行李
-                  </h3>
-                  {memoSettings.items
-                    .filter((item) => item.category === 'flight')
-                    .map((item) => (
-                      <label
-                        key={item.id}
-                        className="flex items-start gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
-                      >
-                        <button
-                          onClick={() => handleToggleMemoItem(item.id)}
-                          className={cn(
-                            'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5',
-                            item.enabled
-                              ? 'bg-morandi-gold border-morandi-gold text-white'
-                              : 'border-border'
-                          )}
+                <CollapsiblePanel
+                  title="航班行李"
+                  icon={Plane}
+                  badge={memoSettings.items.filter((item) => item.category === 'flight' && item.enabled).length || undefined}
+                >
+                  <div className="space-y-2">
+                    {memoSettings.items
+                      .filter((item) => item.category === 'flight')
+                      .map((item) => (
+                        <label
+                          key={item.id}
+                          className="flex items-start gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
                         >
-                          {item.enabled && <Check size={10} />}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-morandi-primary truncate">
-                            {item.titleZh || item.title}
-                          </p>
-                        </div>
-                      </label>
-                    ))}
-                </div>
+                          <button
+                            onClick={() => handleToggleMemoItem(item.id)}
+                            className={cn(
+                              'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5',
+                              item.enabled
+                                ? 'bg-morandi-gold border-morandi-gold text-white'
+                                : 'border-border'
+                            )}
+                          >
+                            {item.enabled && <Check size={10} />}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-morandi-primary truncate">
+                              {item.titleZh || item.title}
+                            </p>
+                          </div>
+                        </label>
+                      ))}
+                  </div>
+                </CollapsiblePanel>
 
                 {/* 季節選擇 */}
                 {memoSettings.seasons && memoSettings.seasons.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                      季節天氣
-                    </h3>
-                    {memoSettings.seasons.map((season) => (
-                      <label
-                        key={season.season}
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
-                      >
-                        <button
-                          onClick={() => handleToggleSeason(season.season)}
-                          className={cn(
-                            'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
-                            season.enabled
-                              ? 'bg-morandi-gold border-morandi-gold text-white'
-                              : 'border-border'
-                          )}
+                  <CollapsiblePanel
+                    title="季節天氣"
+                    icon={Sun}
+                    badge={memoSettings.seasons.filter((s) => s.enabled).length || undefined}
+                  >
+                    <div className="space-y-2">
+                      {memoSettings.seasons.map((season) => (
+                        <label
+                          key={season.season}
+                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
                         >
-                          {season.enabled && <Check size={10} />}
-                        </button>
-                        <span className="text-sm text-morandi-primary">
-                          {season.season === 'spring' && '🌸 春季'}
-                          {season.season === 'summer' && '☀️ 夏季'}
-                          {season.season === 'autumn' && '🍂 秋季'}
-                          {season.season === 'winter' && '❄️ 冬季'}
-                          <span className="text-xs text-morandi-secondary ml-1">({season.months})</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                          <button
+                            onClick={() => handleToggleSeason(season.season)}
+                            className={cn(
+                              'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
+                              season.enabled
+                                ? 'bg-morandi-gold border-morandi-gold text-white'
+                                : 'border-border'
+                            )}
+                          >
+                            {season.enabled && <Check size={10} />}
+                          </button>
+                          <span className="text-sm text-morandi-primary">
+                            {season.season === 'spring' && '🌸 春季'}
+                            {season.season === 'summer' && '☀️ 夏季'}
+                            {season.season === 'autumn' && '🍂 秋季'}
+                            {season.season === 'winter' && '❄️ 冬季'}
+                            <span className="text-xs text-morandi-secondary ml-1">({season.months})</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </CollapsiblePanel>
                 )}
 
                 {/* 資訊項目選擇 */}
                 {memoSettings.infoItems && memoSettings.infoItems.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                      額外資訊
-                    </h3>
-                    {memoSettings.infoItems.map((item) => (
-                      <label
-                        key={item.id}
-                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
-                      >
-                        <button
-                          onClick={() => handleToggleInfoItem(item.id)}
-                          className={cn(
-                            'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
-                            item.enabled
-                              ? 'bg-morandi-gold border-morandi-gold text-white'
-                              : 'border-border'
-                          )}
+                  <CollapsiblePanel
+                    title="額外資訊"
+                    icon={Info}
+                    badge={memoSettings.infoItems.filter((i) => i.enabled).length || undefined}
+                  >
+                    <div className="space-y-2">
+                      {memoSettings.infoItems.map((item) => (
+                        <label
+                          key={item.id}
+                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-container/30 cursor-pointer"
                         >
-                          {item.enabled && <Check size={10} />}
-                        </button>
-                        <span className="text-sm text-morandi-primary">{item.title}</span>
-                      </label>
-                    ))}
-                  </div>
+                          <button
+                            onClick={() => handleToggleInfoItem(item.id)}
+                            className={cn(
+                              'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0',
+                              item.enabled
+                                ? 'bg-morandi-gold border-morandi-gold text-white'
+                                : 'border-border'
+                            )}
+                          >
+                            {item.enabled && <Check size={10} />}
+                          </button>
+                          <span className="text-sm text-morandi-primary">{item.title}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </CollapsiblePanel>
                 )}
 
                 {/* 頁數提示 */}
@@ -3157,125 +3362,123 @@ function DesignerPageContent() {
 
             return (
               <>
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    飯店資訊
-                  </h3>
-
-                  {/* 飯店主圖 */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-morandi-primary">主圖</label>
-                    {hotel.image ? (
-                      <div className="relative group">
-                        <img
-                          src={hotel.image}
-                          alt="飯店主圖"
-                          className="w-full h-32 object-cover rounded-lg border border-border"
-                        />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => hotelCoverInputRef.current?.click()}
-                            className="px-3 py-1.5 bg-card rounded text-sm font-medium text-morandi-primary"
-                          >
-                            更換
-                          </button>
-                          <button
-                            onClick={() => handleUpdateHotel(hotelIndex, 'image', undefined)}
-                            className="px-3 py-1.5 bg-morandi-red text-white rounded text-sm font-medium"
-                          >
-                            移除
-                          </button>
+                <CollapsiblePanel title="飯店資訊" icon={Hotel} defaultOpen>
+                  <div className="space-y-4">
+                    {/* 飯店主圖 */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-morandi-primary">主圖</label>
+                      {hotel.image ? (
+                        <div className="relative group">
+                          <img
+                            src={hotel.image}
+                            alt="飯店主圖"
+                            className="w-full h-32 object-cover rounded-lg border border-border"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => hotelCoverInputRef.current?.click()}
+                              className="px-3 py-1.5 bg-card rounded text-sm font-medium text-morandi-primary"
+                            >
+                              更換
+                            </button>
+                            <button
+                              onClick={() => handleUpdateHotel(hotelIndex, 'image', undefined)}
+                              className="px-3 py-1.5 bg-morandi-red text-white rounded text-sm font-medium"
+                            >
+                              移除
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => hotelCoverInputRef.current?.click()}
-                        disabled={uploadingHotelIndex === hotelIndex}
-                        className="w-full h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
-                      >
-                        {uploadingHotelIndex === hotelIndex ? (
-                          <Loader2 size={24} className="animate-spin text-morandi-gold" />
-                        ) : (
-                          <>
-                            <ImageIcon size={24} className="text-morandi-secondary" />
-                            <span className="text-sm text-morandi-secondary">點擊上傳飯店圖片</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                    <input
-                      ref={hotelCoverInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleHotelImageUpload(e, hotelIndex)}
-                    />
+                      ) : (
+                        <button
+                          onClick={() => hotelCoverInputRef.current?.click()}
+                          disabled={uploadingHotelIndex === hotelIndex}
+                          className="w-full h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-morandi-gold hover:bg-morandi-gold/5 transition-colors"
+                        >
+                          {uploadingHotelIndex === hotelIndex ? (
+                            <Loader2 size={24} className="animate-spin text-morandi-gold" />
+                          ) : (
+                            <>
+                              <ImageIcon size={24} className="text-morandi-secondary" />
+                              <span className="text-sm text-morandi-secondary">點擊上傳飯店圖片</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                      <input
+                        ref={hotelCoverInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleHotelImageUpload(e, hotelIndex)}
+                      />
+                    </div>
+
+                    {/* 飯店中文名稱 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
+                      <input
+                        type="text"
+                        value={hotel.nameZh || ''}
+                        onChange={(e) => handleUpdateHotel(hotelIndex, 'nameZh', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="例：星野集團 界 由布院"
+                      />
+                    </label>
+
+                    {/* 飯店英文名稱 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
+                      <input
+                        type="text"
+                        value={hotel.nameEn || ''}
+                        onChange={(e) => handleUpdateHotel(hotelIndex, 'nameEn', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="例：Hoshino Resorts KAI Yufuin"
+                      />
+                    </label>
+
+                    {/* 地點 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">地點</span>
+                      <input
+                        type="text"
+                        value={hotel.location || ''}
+                        onChange={(e) => handleUpdateHotel(hotelIndex, 'location', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="例：大分縣由布市湯布院町川上"
+                      />
+                    </label>
+
+                    {/* 描述 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">特色描述</span>
+                      <textarea
+                        value={hotel.description || ''}
+                        onChange={(e) => handleUpdateHotel(hotelIndex, 'description', e.target.value)}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
+                        rows={4}
+                        placeholder="輸入飯店特色與描述..."
+                      />
+                    </label>
+
+                    {/* 標籤 */}
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-sm font-medium text-morandi-primary">設施標籤</span>
+                      <input
+                        type="text"
+                        value={(hotel.tags || []).join('、')}
+                        onChange={(e) => {
+                          const tags = e.target.value.split(/[、,，]/).map((t) => t.trim()).filter(Boolean)
+                          handleUpdateHotel(hotelIndex, 'tags', tags)
+                        }}
+                        className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                        placeholder="以頓號分隔，如：露天溫泉、懷石料理、隈研吾設計"
+                      />
+                      <p className="text-xs text-morandi-secondary">用頓號（、）或逗號分隔多個標籤</p>
+                    </label>
                   </div>
-
-                  {/* 飯店中文名稱 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
-                    <input
-                      type="text"
-                      value={hotel.nameZh || ''}
-                      onChange={(e) => handleUpdateHotel(hotelIndex, 'nameZh', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="例：星野集團 界 由布院"
-                    />
-                  </label>
-
-                  {/* 飯店英文名稱 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
-                    <input
-                      type="text"
-                      value={hotel.nameEn || ''}
-                      onChange={(e) => handleUpdateHotel(hotelIndex, 'nameEn', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="例：Hoshino Resorts KAI Yufuin"
-                    />
-                  </label>
-
-                  {/* 地點 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">地點</span>
-                    <input
-                      type="text"
-                      value={hotel.location || ''}
-                      onChange={(e) => handleUpdateHotel(hotelIndex, 'location', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="例：大分縣由布市湯布院町川上"
-                    />
-                  </label>
-
-                  {/* 描述 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">特色描述</span>
-                    <textarea
-                      value={hotel.description || ''}
-                      onChange={(e) => handleUpdateHotel(hotelIndex, 'description', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
-                      rows={4}
-                      placeholder="輸入飯店特色與描述..."
-                    />
-                  </label>
-
-                  {/* 標籤 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">設施標籤</span>
-                    <input
-                      type="text"
-                      value={(hotel.tags || []).join('、')}
-                      onChange={(e) => {
-                        const tags = e.target.value.split(/[、,，]/).map((t) => t.trim()).filter(Boolean)
-                        handleUpdateHotel(hotelIndex, 'tags', tags)
-                      }}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="以頓號分隔，如：露天溫泉、懷石料理、隈研吾設計"
-                    />
-                    <p className="text-xs text-morandi-secondary">用頓號（、）或逗號分隔多個標籤</p>
-                  </label>
-                </div>
+                </CollapsiblePanel>
 
                 {/* 刪除飯店按鈕 */}
                 <div className="pt-4 border-t border-border">
@@ -3303,130 +3506,27 @@ function DesignerPageContent() {
 
             return (
               <>
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                    景點 {attraction1Index + 1}
-                  </h3>
-
-                  {/* 景點1圖片 */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-morandi-primary">圖片</label>
-                    {attraction1.image ? (
-                      <div className="relative group">
-                        <img
-                          src={attraction1.image}
-                          alt="景點圖片"
-                          className="w-full h-24 object-cover rounded-lg border border-border"
-                        />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => attractionImageInputRef.current?.click()}
-                            className="px-2 py-1 bg-card rounded text-xs"
-                          >
-                            更換
-                          </button>
-                          <button
-                            onClick={() => handleUpdateAttraction(attraction1Index, 'image', undefined)}
-                            className="px-2 py-1 bg-morandi-red text-white rounded text-xs"
-                          >
-                            移除
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setUploadingAttractionIndex(attraction1Index)
-                          attractionImageInputRef.current?.click()
-                        }}
-                        className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-morandi-gold transition-colors"
-                      >
-                        {uploadingAttractionIndex === attraction1Index ? (
-                          <Loader2 size={24} className="animate-spin text-morandi-gold" />
-                        ) : (
-                          <>
-                            <ImageIcon size={24} className="text-morandi-secondary" />
-                            <span className="text-xs text-morandi-secondary mt-1">點擊上傳圖片</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-
-                  {/* 景點1中文名稱 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
-                    <input
-                      type="text"
-                      value={attraction1.nameZh || ''}
-                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameZh', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="例：金閣寺"
-                    />
-                  </label>
-
-                  {/* 景點1英文名稱 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
-                    <input
-                      type="text"
-                      value={attraction1.nameEn || ''}
-                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameEn', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                      placeholder="例：Kinkaku-ji"
-                    />
-                  </label>
-
-                  {/* 景點1描述 */}
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-morandi-primary">介紹文字</span>
-                    <textarea
-                      value={attraction1.description || ''}
-                      onChange={(e) => handleUpdateAttraction(attraction1Index, 'description', e.target.value)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
-                      rows={3}
-                      placeholder="輸入景點介紹..."
-                    />
-                  </label>
-
-                  {/* 刪除景點1按鈕 */}
-                  <button
-                    onClick={() => handleRemoveAttraction(attraction1Index)}
-                    className="w-full px-3 py-1.5 text-xs text-morandi-red border border-morandi-red rounded-lg hover:bg-morandi-red hover:text-white transition-colors"
-                  >
-                    刪除此景點
-                  </button>
-                </div>
-
-                {/* 景點2（如果存在） */}
-                {attraction2 && (
-                  <div className="space-y-4 mt-6 pt-6 border-t border-border">
-                    <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2">
-                      景點 {attraction2Index + 1}
-                    </h3>
-
-                    {/* 景點2圖片 */}
+                <CollapsiblePanel title={`景點 ${attraction1Index + 1}`} icon={MapPin} defaultOpen>
+                  <div className="space-y-4">
+                    {/* 景點1圖片 */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-morandi-primary">圖片</label>
-                      {attraction2.image ? (
+                      {attraction1.image ? (
                         <div className="relative group">
                           <img
-                            src={attraction2.image}
+                            src={attraction1.image}
                             alt="景點圖片"
                             className="w-full h-24 object-cover rounded-lg border border-border"
                           />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                             <button
-                              onClick={() => {
-                                setUploadingAttractionIndex(attraction2Index)
-                                attractionImageInputRef.current?.click()
-                              }}
+                              onClick={() => attractionImageInputRef.current?.click()}
                               className="px-2 py-1 bg-card rounded text-xs"
                             >
                               更換
                             </button>
                             <button
-                              onClick={() => handleUpdateAttraction(attraction2Index, 'image', undefined)}
+                              onClick={() => handleUpdateAttraction(attraction1Index, 'image', undefined)}
                               className="px-2 py-1 bg-morandi-red text-white rounded text-xs"
                             >
                               移除
@@ -3436,12 +3536,12 @@ function DesignerPageContent() {
                       ) : (
                         <button
                           onClick={() => {
-                            setUploadingAttractionIndex(attraction2Index)
+                            setUploadingAttractionIndex(attraction1Index)
                             attractionImageInputRef.current?.click()
                           }}
                           className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-morandi-gold transition-colors"
                         >
-                          {uploadingAttractionIndex === attraction2Index ? (
+                          {uploadingAttractionIndex === attraction1Index ? (
                             <Loader2 size={24} className="animate-spin text-morandi-gold" />
                           ) : (
                             <>
@@ -3453,50 +3553,149 @@ function DesignerPageContent() {
                       )}
                     </div>
 
-                    {/* 景點2中文名稱 */}
+                    {/* 景點1中文名稱 */}
                     <label className="flex flex-col gap-1.5">
                       <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
                       <input
                         type="text"
-                        value={attraction2.nameZh || ''}
-                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameZh', e.target.value)}
+                        value={attraction1.nameZh || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameZh', e.target.value)}
                         className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                        placeholder="例：清水寺"
+                        placeholder="例：金閣寺"
                       />
                     </label>
 
-                    {/* 景點2英文名稱 */}
+                    {/* 景點1英文名稱 */}
                     <label className="flex flex-col gap-1.5">
                       <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
                       <input
                         type="text"
-                        value={attraction2.nameEn || ''}
-                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameEn', e.target.value)}
+                        value={attraction1.nameEn || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction1Index, 'nameEn', e.target.value)}
                         className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
-                        placeholder="例：Kiyomizu-dera"
+                        placeholder="例：Kinkaku-ji"
                       />
                     </label>
 
-                    {/* 景點2描述 */}
+                    {/* 景點1描述 */}
                     <label className="flex flex-col gap-1.5">
                       <span className="text-sm font-medium text-morandi-primary">介紹文字</span>
                       <textarea
-                        value={attraction2.description || ''}
-                        onChange={(e) => handleUpdateAttraction(attraction2Index, 'description', e.target.value)}
+                        value={attraction1.description || ''}
+                        onChange={(e) => handleUpdateAttraction(attraction1Index, 'description', e.target.value)}
                         className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
                         rows={3}
                         placeholder="輸入景點介紹..."
                       />
                     </label>
 
-                    {/* 刪除景點2按鈕 */}
+                    {/* 刪除景點1按鈕 */}
                     <button
-                      onClick={() => handleRemoveAttraction(attraction2Index)}
+                      onClick={() => handleRemoveAttraction(attraction1Index)}
                       className="w-full px-3 py-1.5 text-xs text-morandi-red border border-morandi-red rounded-lg hover:bg-morandi-red hover:text-white transition-colors"
                     >
                       刪除此景點
                     </button>
                   </div>
+                </CollapsiblePanel>
+
+                {/* 景點2（如果存在） */}
+                {attraction2 && (
+                  <CollapsiblePanel title={`景點 ${attraction2Index + 1}`} icon={MapPin} defaultOpen>
+                    <div className="space-y-4">
+                      {/* 景點2圖片 */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-morandi-primary">圖片</label>
+                        {attraction2.image ? (
+                          <div className="relative group">
+                            <img
+                              src={attraction2.image}
+                              alt="景點圖片"
+                              className="w-full h-24 object-cover rounded-lg border border-border"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setUploadingAttractionIndex(attraction2Index)
+                                  attractionImageInputRef.current?.click()
+                                }}
+                                className="px-2 py-1 bg-card rounded text-xs"
+                              >
+                                更換
+                              </button>
+                              <button
+                                onClick={() => handleUpdateAttraction(attraction2Index, 'image', undefined)}
+                                className="px-2 py-1 bg-morandi-red text-white rounded text-xs"
+                              >
+                                移除
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setUploadingAttractionIndex(attraction2Index)
+                              attractionImageInputRef.current?.click()
+                            }}
+                            className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center hover:border-morandi-gold transition-colors"
+                          >
+                            {uploadingAttractionIndex === attraction2Index ? (
+                              <Loader2 size={24} className="animate-spin text-morandi-gold" />
+                            ) : (
+                              <>
+                                <ImageIcon size={24} className="text-morandi-secondary" />
+                                <span className="text-xs text-morandi-secondary mt-1">點擊上傳圖片</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* 景點2中文名稱 */}
+                      <label className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-morandi-primary">中文名稱</span>
+                        <input
+                          type="text"
+                          value={attraction2.nameZh || ''}
+                          onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameZh', e.target.value)}
+                          className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                          placeholder="例：清水寺"
+                        />
+                      </label>
+
+                      {/* 景點2英文名稱 */}
+                      <label className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-morandi-primary">英文名稱</span>
+                        <input
+                          type="text"
+                          value={attraction2.nameEn || ''}
+                          onChange={(e) => handleUpdateAttraction(attraction2Index, 'nameEn', e.target.value)}
+                          className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none"
+                          placeholder="例：Kiyomizu-dera"
+                        />
+                      </label>
+
+                      {/* 景點2描述 */}
+                      <label className="flex flex-col gap-1.5">
+                        <span className="text-sm font-medium text-morandi-primary">介紹文字</span>
+                        <textarea
+                          value={attraction2.description || ''}
+                          onChange={(e) => handleUpdateAttraction(attraction2Index, 'description', e.target.value)}
+                          className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-morandi-gold outline-none resize-none"
+                          rows={3}
+                          placeholder="輸入景點介紹..."
+                        />
+                      </label>
+
+                      {/* 刪除景點2按鈕 */}
+                      <button
+                        onClick={() => handleRemoveAttraction(attraction2Index)}
+                        className="w-full px-3 py-1.5 text-xs text-morandi-red border border-morandi-red rounded-lg hover:bg-morandi-red hover:text-white transition-colors"
+                      >
+                        刪除此景點
+                      </button>
+                    </div>
+                  </CollapsiblePanel>
                 )}
 
                 {/* 景點圖片上傳 input */}
@@ -3517,7 +3716,7 @@ function DesignerPageContent() {
         </aside>
 
         {/* 中間：預覽區 */}
-        <section className="flex-1 overflow-hidden bg-morandi-container/30 relative">
+        <section className="flex-1 overflow-hidden bg-morandi-container/30 relative" style={{ contain: 'layout style' }}>
           {/* 背景點陣圖案 */}
           <div
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -3527,19 +3726,28 @@ function DesignerPageContent() {
             }}
           />
 
-          {/* 可滾動的預覽容器 - 靠左對齊像書本 */}
-          <div className="absolute inset-0 overflow-auto flex items-center justify-start p-8">
-            {/* A5 預覽 - 固定尺寸 559x794 */}
+          {/* 可滾動的預覽容器 - 置中對齊 */}
+          <div className="absolute inset-0 overflow-auto flex items-center justify-center p-8">
+            {/* 縮放包裝器 */}
             <div
-              className="relative bg-card shadow-xl rounded-sm flex-shrink-0"
               style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: 'center',
                 width: 559,
                 height: 794,
-                transform: `scale(${zoom})`,
-                transformOrigin: 'center center',
+                flexShrink: 0,
               }}
             >
-              <canvas ref={canvasRef} />
+              {/* A5 預覽 - 固定尺寸 559x794 */}
+              <div
+                className="relative bg-card shadow-xl rounded-sm"
+                style={{
+                  width: 559,
+                  height: 794,
+                }}
+              >
+                <canvas ref={canvasRef} />
+              </div>
             </div>
           </div>
 
@@ -3567,49 +3775,367 @@ function DesignerPageContent() {
           </div>
         </section>
 
-        {/* 右側：圖層面板 */}
-        <aside className="w-[240px] flex-none overflow-y-auto border-l border-border bg-card p-4">
-          <h3 className="text-xs font-bold text-morandi-secondary uppercase tracking-wider border-b border-border pb-2 mb-3">
-            圖層 ({page.elements.length})
-          </h3>
-          <div className="space-y-1">
-            {[...page.elements]
-              .sort((a, b) => b.zIndex - a.zIndex)
-              .map((el) => (
-                <div
-                  key={el.id}
-                  className={cn(
-                    'flex items-center gap-2 p-2 rounded-lg text-xs cursor-pointer transition-colors',
-                    selectedElementId === el.id
-                      ? 'bg-morandi-gold/20 text-morandi-primary'
-                      : 'hover:bg-morandi-container/50 text-morandi-secondary'
-                  )}
-                  onClick={() => setSelectedElementId(el.id)}
-                >
-                  <span className="flex-1 truncate">{el.name}</span>
-                  <button
-                    className="p-1 hover:bg-card rounded"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleElementVisibility(el.id)
-                    }}
+        {/* 右側：圖層與屬性面板 */}
+        <aside className="w-[280px] flex-none overflow-y-auto border-l border-border bg-background" style={{ contain: 'layout style' }}>
+          {/* 圖層面板 */}
+          <CollapsiblePanel
+            title="圖層"
+            icon={Layers}
+            badge={page.elements.length}
+            defaultOpen
+          >
+            <div className="space-y-1">
+              {[...page.elements]
+                .sort((a, b) => b.zIndex - a.zIndex)
+                .map((el) => (
+                  <div
+                    key={el.id}
+                    className={cn(
+                      'flex items-center gap-2 p-2 rounded-lg text-xs cursor-pointer transition-colors',
+                      selectedElementId === el.id
+                        ? 'bg-morandi-gold/20 text-morandi-primary'
+                        : 'hover:bg-morandi-container/50 text-morandi-secondary'
+                    )}
+                    onClick={() => setSelectedElementId(el.id)}
                   >
-                    {el.visible ? <Eye size={12} /> : <EyeOff size={12} />}
-                  </button>
-                  <button
-                    className="p-1 hover:bg-card rounded"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleElementLock(el.id)
-                    }}
-                  >
-                    {el.locked ? <Lock size={12} /> : <Unlock size={12} />}
-                  </button>
+                    <span className="flex-1 truncate">{el.name}</span>
+                    <button
+                      className="p-1 hover:bg-card rounded"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleElementVisibility(el.id)
+                      }}
+                    >
+                      {el.visible ? <Eye size={12} /> : <EyeOff size={12} />}
+                    </button>
+                    <button
+                      className="p-1 hover:bg-card rounded"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleElementLock(el.id)
+                      }}
+                    >
+                      {el.locked ? <Lock size={12} /> : <Unlock size={12} />}
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </CollapsiblePanel>
+
+          {/* 元素屬性面板（選取元素時顯示） */}
+          {selectedElementId && (
+            <CollapsiblePanel
+              title="屬性"
+              icon={Settings}
+              defaultOpen
+            >
+              <div className="space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-morandi-secondary">ID</span>
+                  <span className="text-morandi-primary font-mono truncate max-w-[120px]">{selectedElementId}</span>
                 </div>
-              ))}
-          </div>
+                {(() => {
+                  const el = page.elements.find(e => e.id === selectedElementId)
+                  if (!el) return null
+                  return (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-morandi-secondary">類型</span>
+                        <span className="text-morandi-primary">{el.type}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-morandi-secondary">位置</span>
+                        <span className="text-morandi-primary">{Math.round(el.x)}, {Math.round(el.y)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-morandi-secondary">尺寸</span>
+                        <span className="text-morandi-primary">{Math.round(el.width)} x {Math.round(el.height)}</span>
+                      </div>
+                    </>
+                  )
+                })()}
+              </div>
+            </CollapsiblePanel>
+          )}
+
+          {/* 圖片調整面板（選取圖片元素時顯示） */}
+          {selectedElementId && (() => {
+            const el = page.elements.find(e => e.id === selectedElementId)
+            if (!el || el.type !== 'image') return null
+            const imageEl = el as import('@/features/designer/components/types').ImageElement
+            return (
+              <CollapsiblePanel
+                title="圖片調整"
+                icon={Image}
+                defaultOpen
+              >
+                <div className="space-y-4">
+                  {/* 位置調整按鈕 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
+                      位置與縮放
+                    </label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                      onClick={() => setShowPositionEditor(true)}
+                    >
+                      <Move size={14} />
+                      調整圖片位置
+                    </Button>
+                    {imageEl.position && imageEl.position.scale !== 1 && (
+                      <p className="text-[10px] text-morandi-secondary text-center">
+                        目前縮放: {Math.round(imageEl.position.scale * 100)}%
+                      </p>
+                    )}
+                  </div>
+
+                  {/* 色彩調整 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
+                      色彩調整
+                    </label>
+                    <ImageAdjustmentsPanel
+                      adjustments={imageEl.adjustments || DEFAULT_IMAGE_ADJUSTMENTS}
+                      onChange={(newAdjustments) => {
+                        updateElement(selectedElementId, { adjustments: newAdjustments })
+                      }}
+                    />
+                  </div>
+                </div>
+              </CollapsiblePanel>
+            )
+          })()}
+
+          {/* 文字編輯面板（選取文字元素時顯示） */}
+          {selectedElementId && (() => {
+            const el = page.elements.find(e => e.id === selectedElementId)
+            if (!el || el.type !== 'text') return null
+            const textEl = el as import('@/features/designer/components/types').TextElement
+            return (
+              <CollapsiblePanel
+                title="文字編輯"
+                icon={Type}
+                defaultOpen
+              >
+                <div className="space-y-4">
+                  {/* 文字內容 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
+                      內容
+                    </label>
+                    <textarea
+                      value={textEl.content}
+                      onChange={(e) => updateElement(selectedElementId, { content: e.target.value })}
+                      className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold resize-none"
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* 字型設定 */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
+                      字型
+                    </h4>
+
+                    {/* 字型選擇 */}
+                    <div className="space-y-1">
+                      <span className="text-xs text-morandi-secondary">字型</span>
+                      <select
+                        value={textEl.style.fontFamily}
+                        onChange={(e) => updateElement(selectedElementId, {
+                          style: { ...textEl.style, fontFamily: e.target.value }
+                        })}
+                        className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                      >
+                        <option value="Noto Sans TC">Noto Sans TC</option>
+                        <option value="Noto Serif TC">Noto Serif TC</option>
+                        <option value="Zen Old Mincho">Zen Old Mincho</option>
+                      </select>
+                    </div>
+
+                    {/* 字級與粗細 */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <span className="text-xs text-morandi-secondary">字級</span>
+                        <input
+                          type="number"
+                          value={textEl.style.fontSize}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, fontSize: Number(e.target.value) }
+                          })}
+                          className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                          min={8}
+                          max={200}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-morandi-secondary">粗細</span>
+                        <select
+                          value={textEl.style.fontWeight}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, fontWeight: e.target.value as 'normal' | 'bold' }
+                          })}
+                          className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                        >
+                          <option value="normal">正常</option>
+                          <option value="bold">粗體</option>
+                          <option value="300">細</option>
+                          <option value="500">中</option>
+                          <option value="700">粗</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 對齊與顏色 */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
+                      樣式
+                    </h4>
+
+                    {/* 對齊 */}
+                    <div className="space-y-1">
+                      <span className="text-xs text-morandi-secondary">對齊</span>
+                      <div className="flex gap-1">
+                        {(['left', 'center', 'right'] as const).map((align) => (
+                          <button
+                            key={align}
+                            onClick={() => updateElement(selectedElementId, {
+                              style: { ...textEl.style, textAlign: align }
+                            })}
+                            className={cn(
+                              'flex-1 py-1.5 text-xs rounded border transition-colors',
+                              textEl.style.textAlign === align
+                                ? 'bg-morandi-gold text-white border-morandi-gold'
+                                : 'border-border hover:bg-morandi-container/50'
+                            )}
+                          >
+                            {align === 'left' ? '左' : align === 'center' ? '中' : '右'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 顏色 */}
+                    <div className="space-y-1">
+                      <span className="text-xs text-morandi-secondary">顏色</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={textEl.style.color}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, color: e.target.value }
+                          })}
+                          className="w-8 h-8 rounded border border-border cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={textEl.style.color}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, color: e.target.value }
+                          })}
+                          className="flex-1 px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 行高與字距 */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <span className="text-xs text-morandi-secondary">行高</span>
+                        <input
+                          type="number"
+                          value={textEl.style.lineHeight}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, lineHeight: Number(e.target.value) }
+                          })}
+                          className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                          step={0.1}
+                          min={0.5}
+                          max={3}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-morandi-secondary">字距</span>
+                        <input
+                          type="number"
+                          value={textEl.style.letterSpacing}
+                          onChange={(e) => updateElement(selectedElementId, {
+                            style: { ...textEl.style, letterSpacing: Number(e.target.value) }
+                          })}
+                          className="w-full px-2 py-1.5 text-xs rounded border border-border bg-background focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                          step={0.5}
+                          min={-5}
+                          max={20}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CollapsiblePanel>
+            )
+          })()}
+
+          {/* 快速操作面板 */}
+          <CollapsiblePanel
+            title="快速操作"
+            icon={Palette}
+          >
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={addTextElement}
+                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:bg-morandi-container/50 transition-colors"
+              >
+                <Text size={16} className="text-morandi-secondary" />
+                <span className="text-[10px] text-morandi-secondary">文字</span>
+              </button>
+              <button
+                onClick={addRectangle}
+                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:bg-morandi-container/50 transition-colors"
+              >
+                <Square size={16} className="text-morandi-secondary" />
+                <span className="text-[10px] text-morandi-secondary">矩形</span>
+              </button>
+              <button
+                onClick={addCircle}
+                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:bg-morandi-container/50 transition-colors"
+              >
+                <Circle size={16} className="text-morandi-secondary" />
+                <span className="text-[10px] text-morandi-secondary">圓形</span>
+              </button>
+              <button
+                onClick={() => coverInputRef.current?.click()}
+                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:bg-morandi-container/50 transition-colors"
+              >
+                <ImageIcon size={16} className="text-morandi-secondary" />
+                <span className="text-[10px] text-morandi-secondary">圖片</span>
+              </button>
+            </div>
+          </CollapsiblePanel>
         </aside>
       </div>
+
+      {/* 圖片位置編輯器 */}
+      {selectedElementId && showPositionEditor && (() => {
+        const el = page?.elements.find(e => e.id === selectedElementId)
+        if (!el || el.type !== 'image') return null
+        const imageEl = el as import('@/features/designer/components/types').ImageElement
+        return (
+          <ImagePositionEditor
+            open={showPositionEditor}
+            onClose={() => setShowPositionEditor(false)}
+            imageSrc={imageEl.src}
+            currentPosition={imageEl.position}
+            aspectRatio={imageEl.width / imageEl.height}
+            title="調整圖片位置"
+            onConfirm={(newPosition: ImagePositionSettings) => {
+              updateElement(selectedElementId, { position: newPosition })
+            }}
+          />
+        )
+      })()}
 
       {/* 列印預覽 Portal */}
       {showPrintPreview && typeof document !== 'undefined' && createPortal(

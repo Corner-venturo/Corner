@@ -85,7 +85,7 @@ export function EditRoomDialog({ open, onOpenChange, room, onSave }: EditRoomDia
             <select
               value={editRoomData.room_type}
               onChange={e => setEditRoomData(prev => ({ ...prev, room_type: e.target.value }))}
-              className="w-full h-10 px-3 border border-input rounded-md bg-white text-sm"
+              className="w-full h-10 px-3 border border-input rounded-md bg-card text-sm"
             >
               {ROOM_TYPES.map(type => (
                 <option key={type.value} value={type.value}>{type.label}</option>

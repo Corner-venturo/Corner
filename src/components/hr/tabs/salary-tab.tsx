@@ -104,7 +104,7 @@ export const SalaryTab = forwardRef<{ handleSave: () => void }, SalaryTabProps>(
             {salaryHistory.map((record, index: number) => (
               <div
                 key={index}
-                className="flex justify-between items-center p-3 bg-white rounded border"
+                className="flex justify-between items-center p-3 bg-card rounded border"
               >
                 <div>
                   <CurrencyCell amount={record.base_salary} className="font-medium text-morandi-primary" />

@@ -148,7 +148,7 @@ export function TourItinerarySection({
   return (
     <section
       id="itinerary"
-      className={viewMode === 'mobile' ? 'bg-white pt-4 pb-8' : 'bg-white pt-8 pb-16'}
+      className={viewMode === 'mobile' ? 'bg-card pt-4 pb-8' : 'bg-card pt-8 pb-16'}
     >
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <motion.div
@@ -176,7 +176,7 @@ export function TourItinerarySection({
                   className={
                     viewMode === 'mobile'
                       ? 'relative py-6 border-b border-morandi-container/30 last:border-b-0'
-                      : 'relative overflow-hidden rounded-[36px] border border-morandi-container/30 bg-white/95 p-8 shadow-lg backdrop-blur-sm'
+                      : 'relative overflow-hidden rounded-[36px] border border-morandi-container/30 bg-card/95 p-8 shadow-lg backdrop-blur-sm'
                   }
                 >
                   {/* 日式和風風格的標題區塊 */}

@@ -70,7 +70,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
 
             {/* 標籤 */}
             <div
-              className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white border shadow-sm"
+              className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-card border shadow-sm"
               style={{ borderColor: `${LUXURY.secondary}30` }}
             >
               <span
@@ -155,7 +155,7 @@ export function TourHeroLuxury({ data, viewMode }: TourHeroLuxuryProps) {
 
               {/* 出發日期卡片 */}
               <div
-                className="absolute bottom-6 right-6 bg-white/95 backdrop-blur p-5 rounded-lg shadow-lg max-w-xs"
+                className="absolute bottom-6 right-6 bg-card/95 backdrop-blur p-5 rounded-lg shadow-lg max-w-xs"
                 style={{ borderLeft: `4px solid ${LUXURY.secondary}` }}
               >
                 <div className="flex items-center gap-3 mb-2">

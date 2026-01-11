@@ -110,7 +110,7 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.rotateLeft()}
-              className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
             >
               <RotateCcw size={16} className="text-morandi-gold" />
               <span className="text-morandi-secondary hidden sm:inline">左轉</span>
@@ -118,7 +118,7 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.rotateRight()}
-              className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
             >
               <RotateCw size={16} className="text-morandi-gold" />
               <span className="text-morandi-secondary hidden sm:inline">右轉</span>
@@ -126,7 +126,7 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.toggleFlipH()}
-              className={`p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs ${
+              className={`p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs ${
                 imageEditor.flipH ? 'bg-status-info-bg' : ''
               }`}
             >
@@ -137,7 +137,7 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.startCrop()}
-              className="p-2 hover:bg-white rounded-md flex items-center gap-1 text-xs"
+              className="p-2 hover:bg-card rounded-md flex items-center gap-1 text-xs"
             >
               <Crop size={16} className="text-morandi-blue" />
               <span className="text-morandi-secondary hidden sm:inline">裁剪</span>
@@ -176,7 +176,7 @@ export function PassportSection({
             <button
               type="button"
               onClick={() => imageEditor.cancelCrop()}
-              className="px-3 py-1 text-xs text-morandi-secondary hover:bg-white rounded-md"
+              className="px-3 py-1 text-xs text-morandi-secondary hover:bg-card rounded-md"
             >
               取消
             </button>

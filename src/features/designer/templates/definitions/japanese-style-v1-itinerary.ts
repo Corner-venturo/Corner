@@ -317,7 +317,9 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
       elements.push(flightDivider)
 
       // 計算航班顯示的起始 X 位置（居中對齊）
-      const flightStartX = 100
+      // 假設航班資訊寬度約 400px，置中計算
+      const flightContentWidth = 400
+      const flightStartX = (A5_WIDTH - flightContentWidth) / 2
 
       if (data.outboundFlight) {
         // 去程標籤框
@@ -527,6 +529,7 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
       const dayNum = CHINESE_NUMERALS[i] || `${i + 1}`
 
       // 天數標記（中文數字）- font-serif text-lg font-medium
+      // 使用 Noto Serif TC 確保繁體中文數字正確顯示
       const dayLabel: TextElement = {
         id: `el-day-${i + 1}-label`,
         type: 'text',
@@ -542,7 +545,7 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
         visible: true,
         content: dayNum,
         style: {
-          fontFamily: 'Zen Old Mincho',
+          fontFamily: 'Noto Serif TC',
           fontSize: 18,
           fontWeight: '500',
           fontStyle: 'normal',

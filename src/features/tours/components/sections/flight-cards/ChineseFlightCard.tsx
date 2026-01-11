@@ -91,7 +91,7 @@ export function ChineseFlightCard({
               <span className={`font-bold text-[#2c2623] tracking-wide ${isMobile ? 'text-sm' : 'text-lg'}`}>
                 {flight?.airline || '--'} {flight?.flightNumber || '--'}
               </span>
-              <span className={`px-2 py-0.5 rounded-full border border-[#2c2623]/10 text-[#756d66] bg-white/50 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+              <span className={`px-2 py-0.5 rounded-full border border-[#2c2623]/10 text-[#756d66] bg-card/50 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
                 {labelText}
               </span>
             </div>
@@ -104,7 +104,7 @@ export function ChineseFlightCard({
         </div>
 
         {/* 日期 */}
-        <div className={`flex items-center gap-1 text-[#2c2623]/70 bg-white/40 rounded-md border border-[#2c2623]/5 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'}`}>
+        <div className={`flex items-center gap-1 text-[#2c2623]/70 bg-card/40 rounded-md border border-[#2c2623]/5 ${isMobile ? 'px-2 py-0.5' : 'px-3 py-1'}`}>
           <Calendar className={isMobile ? 'w-3 h-3' : 'w-4 h-4'} />
           <span className={`font-medium tracking-widest ${isMobile ? 'text-[10px]' : 'text-sm'}`}>
             {flight?.departureDate || '--/--'}
@@ -156,7 +156,7 @@ export function ChineseFlightCard({
             </svg>
 
             {/* 中央飛機圖標 - 全部朝上 */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border border-[#2c2623]/15 rounded-full flex items-center justify-center shadow-sm z-10">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-card border border-[#2c2623]/15 rounded-full flex items-center justify-center shadow-sm z-10">
               <Plane className="w-5 h-5 text-[#2c2623] -rotate-90" />
             </div>
 

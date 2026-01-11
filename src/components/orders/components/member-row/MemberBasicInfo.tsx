@@ -83,7 +83,7 @@ export function MemberBasicInfo({
       {/* 中文姓名 - 凍結欄位（使用實色背景避免內容穿透） */}
       <td className={cn(
         "border border-morandi-gold/20 px-2 py-1 sticky left-[40px] z-10",
-        isEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-[#fde8e8]' : 'bg-[#f5f3f0]')
+        isEditMode ? 'bg-card' : (member.customer_verification_status === 'unverified' ? 'bg-[#fde8e8]' : 'bg-[#f5f3f0]')
       )}>
         {isEditMode ? (
           <input
@@ -149,7 +149,7 @@ export function MemberBasicInfo({
 
       {/* 身份（領隊勾選） */}
       {showIdentityColumn && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-center", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="checkbox"
@@ -168,7 +168,7 @@ export function MemberBasicInfo({
 
       {/* 護照拼音 */}
       {cv.passport_name && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"
@@ -195,7 +195,7 @@ export function MemberBasicInfo({
 
       {/* 出生年月日 */}
       {cv.birth_date && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"
@@ -215,7 +215,7 @@ export function MemberBasicInfo({
 
       {/* 性別 */}
       {cv.gender && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1 text-xs text-center", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <select
               value={member.gender || ''}
@@ -238,7 +238,7 @@ export function MemberBasicInfo({
 
       {/* 身分證號 */}
       {cv.id_number && (
-        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-white" : "bg-muted")}>
+        <td className={cn("border border-morandi-gold/20 px-2 py-1", isEditMode ? "bg-card" : "bg-muted")}>
           {isEditMode ? (
             <input
               type="text"

@@ -102,7 +102,7 @@ export function TourFeaturesSectionArt({ data, viewMode }: TourFeaturesSectionAr
                 className="group"
               >
                 <div
-                  className="border-2 bg-white overflow-hidden transition-transform duration-300 hover:-translate-y-2 h-full flex flex-col"
+                  className="border-2 bg-card overflow-hidden transition-transform duration-300 hover:-translate-y-2 h-full flex flex-col"
                   style={{
                     borderColor: colors.ink,
                     boxShadow: brutalistShadow,

@@ -56,7 +56,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
 
   const cellClass = (bg?: string) => cn(
     "border border-morandi-gold/20 px-2 py-1",
-    bg || (isAllEditMode ? "bg-white" : "bg-muted")
+    bg || (isAllEditMode ? "bg-card" : "bg-muted")
   )
 
   const inputClass = "w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
@@ -87,7 +87,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         </td>
       )}
 
-      <td className={cellClass(isAllEditMode ? 'bg-white' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted'))}>
+      <td className={cellClass(isAllEditMode ? 'bg-card' : (member.customer_verification_status === 'unverified' ? 'bg-status-danger-bg' : 'bg-muted'))}>
         {isAllEditMode ? (
           <input
             type="text"
@@ -183,11 +183,11 @@ export function MemberTableRow(props: MemberTableRowProps) {
         <input type="text" value={member.special_meal || ''} onChange={e => onFieldChange(member.id, 'special_meal', e.target.value)} onCompositionStart={onCompositionStart} onCompositionEnd={e => handleCompositionEnd(e, v => onFieldChange(member.id, 'special_meal', v))} onKeyDown={e => onKeyDown(e, index, 'special_meal')} data-member={member.id} data-field="special_meal" className={inputClass} />
       </td>
 
-      <td className={cn(cellClass(), "bg-white")}>
+      <td className={cn(cellClass(), "bg-card")}>
         <input type="text" inputMode="numeric" value={member.total_payable || ''} onChange={e => onNumberInput(member.id, 'total_payable', e.target.value)} className={inputClass} />
       </td>
 
-      <td className={cn(cellClass(), "bg-white")}>
+      <td className={cn(cellClass(), "bg-card")}>
         <input type="text" inputMode="numeric" value={member.deposit_amount || ''} onChange={e => onNumberInput(member.id, 'deposit_amount', e.target.value)} className={inputClass} />
       </td>
 
@@ -195,7 +195,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         {((member.total_payable || 0) - (member.deposit_amount || 0)).toLocaleString()}
       </td>
 
-      <td className={cn(cellClass(), "bg-white")}>
+      <td className={cn(cellClass(), "bg-card")}>
         <input type="text" value={member.remarks || ''} onChange={e => onFieldChange(member.id, 'remarks', e.target.value)} onCompositionStart={onCompositionStart} onCompositionEnd={e => handleCompositionEnd(e, v => onFieldChange(member.id, 'remarks', v))} className={inputClass} />
       </td>
 
@@ -217,7 +217,7 @@ export function MemberTableRow(props: MemberTableRowProps) {
         </td>
       ))}
 
-      <td className={cn(cellClass(), "bg-white text-center")}>
+      <td className={cn(cellClass(), "bg-card text-center")}>
         <div className="flex items-center justify-center gap-1">
           {member.customer_verification_status === 'unverified' && (
             <button onClick={() => onOpenEdit(member, 'verify')} className="text-status-warning hover:text-morandi-gold transition-colors p-1" title="待驗證 - 點擊驗證">

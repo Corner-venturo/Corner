@@ -1,0 +1,258 @@
+/**
+ * SupplierRequestsPage - 供應商需求收件匣
+ *
+ * 顯示所有發送給此供應商的需求單
+ */
+
+'use client'
+
+import React, { useState, useCallback } from 'react'
+import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { EnhancedTable, type TableColumn } from '@/components/ui/enhanced-table'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  ClipboardList,
+  Send,
+  Eye,
+  Clock,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react'
+import { useSupplierRequests, type SupplierRequest } from '../hooks/useSupplierRequests'
+import { SupplierResponseDialog } from './SupplierResponseDialog'
+import { cn } from '@/lib/utils'
+
+// 回覆狀態配置
+const RESPONSE_STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+  pending: {
+    label: '待回覆',
+    variant: 'outline',
+    icon: <Clock className="h-3 w-3" />,
+  },
+  responded: {
+    label: '已回覆',
+    variant: 'secondary',
+    icon: <Send className="h-3 w-3" />,
+  },
+  accepted: {
+    label: '已確認',
+    variant: 'default',
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
+  rejected: {
+    label: '已拒絕',
+    variant: 'destructive',
+    icon: <XCircle className="h-3 w-3" />,
+  },
+}
+
+// 類別配置
+const CATEGORY_CONFIG: Record<string, string> = {
+  transport: '交通（派車）',
+  guide: '領隊',
+  hotel: '住宿',
+  restaurant: '餐食',
+  activity: '門票/活動',
+  other: '其他',
+}
+
+export function SupplierRequestsPage() {
+  const { requests, isLoading, refetch } = useSupplierRequests()
+  const [selectedRequest, setSelectedRequest] = useState<SupplierRequest | null>(null)
+  const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false)
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+
+  // 過濾需求
+  const filteredRequests = requests.filter(r => {
+    if (filterStatus === 'all') return true
+    return r.response_status === filterStatus
+  })
+
+  // 處理回覆
+  const handleRespond = useCallback((request: SupplierRequest) => {
+    setSelectedRequest(request)
+    setIsResponseDialogOpen(true)
+  }, [])
+
+  // 關閉回覆 Dialog
+  const handleCloseResponseDialog = useCallback(() => {
+    setIsResponseDialogOpen(false)
+    setSelectedRequest(null)
+  }, [])
+
+  // 回覆成功後重新載入
+  const handleResponseSuccess = useCallback(() => {
+    refetch()
+    handleCloseResponseDialog()
+  }, [refetch, handleCloseResponseDialog])
+
+  // 表格欄位定義
+  const columns: TableColumn[] = [
+    {
+      key: 'response_status',
+      label: '狀態',
+      width: '100px',
+      render: (value) => {
+        const status = String(value || 'pending')
+        const config = RESPONSE_STATUS_CONFIG[status]
+        return (
+          <Badge variant={config?.variant || 'outline'} className="gap-1">
+            {config?.icon}
+            {config?.label || status}
+          </Badge>
+        )
+      },
+    },
+    {
+      key: 'category',
+      label: '類別',
+      width: '120px',
+      render: (value) => (
+        <span className="text-morandi-primary">
+          {CATEGORY_CONFIG[String(value)] || String(value)}
+        </span>
+      ),
+    },
+    {
+      key: 'tour_name',
+      label: '團名/專案',
+      render: (value, row) => {
+        const request = row as SupplierRequest
+        return (
+          <div>
+            <div className="font-medium text-morandi-primary">
+              {String(value || request.tour_code || '未命名')}
+            </div>
+            {request.title && (
+              <div className="text-xs text-morandi-secondary">{request.title}</div>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      key: 'service_date',
+      label: '服務日期',
+      width: '180px',
+      render: (value, row) => {
+        const request = row as SupplierRequest
+        const startDate = value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'
+        const endDate = request.service_date_end
+          ? new Date(request.service_date_end).toLocaleDateString('zh-TW')
+          : null
+        return (
+          <span className="text-morandi-primary">
+            {startDate}
+            {endDate && endDate !== startDate && ` ~ ${endDate}`}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'quantity',
+      label: '數量',
+      width: '80px',
+      render: (value) => (
+        <span className="font-medium text-morandi-primary">{String(value || 1)}</span>
+      ),
+    },
+    {
+      key: 'created_at',
+      label: '收到時間',
+      width: '120px',
+      render: (value) => (
+        <span className="text-morandi-secondary text-sm">
+          {value ? new Date(String(value)).toLocaleDateString('zh-TW') : '-'}
+        </span>
+      ),
+    },
+  ]
+
+  return (
+    <div className="h-full flex flex-col">
+      <ResponsiveHeader
+        title="需求收件匣"
+        icon={ClipboardList}
+        breadcrumb={[
+          { label: '首頁', href: '/' },
+          { label: '供應商首頁', href: '/supplier' },
+          { label: '需求收件匣', href: '/supplier/requests' },
+        ]}
+      />
+
+      {/* 篩選 Tabs */}
+      <div className="px-4 py-2 border-b border-border bg-card flex gap-2">
+        {[
+          { value: 'all', label: '全部', count: requests.length },
+          { value: 'pending', label: '待回覆', count: requests.filter(r => r.response_status === 'pending').length },
+          { value: 'responded', label: '已回覆', count: requests.filter(r => r.response_status === 'responded').length },
+          { value: 'accepted', label: '已確認', count: requests.filter(r => r.response_status === 'accepted').length },
+        ].map(tab => (
+          <Button
+            key={tab.value}
+            variant={filterStatus === tab.value ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setFilterStatus(tab.value)}
+            className={cn(
+              filterStatus === tab.value && 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+            )}
+          >
+            {tab.label}
+            {tab.count > 0 && (
+              <span className={cn(
+                'ml-1.5 px-1.5 py-0.5 rounded-full text-xs',
+                filterStatus === tab.value
+                  ? 'bg-white/20'
+                  : 'bg-morandi-container'
+              )}>
+                {tab.count}
+              </span>
+            )}
+          </Button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        <EnhancedTable
+          className="min-h-full"
+          columns={columns}
+          data={filteredRequests}
+          loading={isLoading}
+          actions={(row) => {
+            const request = row as SupplierRequest
+            const isPending = request.response_status === 'pending'
+            return (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="iconSm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleRespond(request)
+                  }}
+                  className={cn(
+                    isPending
+                      ? 'text-morandi-gold hover:bg-morandi-gold/10'
+                      : 'text-morandi-secondary hover:bg-morandi-container/50'
+                  )}
+                  title={isPending ? '回覆' : '查看'}
+                >
+                  {isPending ? <Send size={16} /> : <Eye size={16} />}
+                </Button>
+              </div>
+            )
+          }}
+        />
+      </div>
+
+      {/* 回覆 Dialog */}
+      <SupplierResponseDialog
+        isOpen={isResponseDialogOpen}
+        onClose={handleCloseResponseDialog}
+        request={selectedRequest}
+        onSuccess={handleResponseSuccess}
+      />
+    </div>
+  )
+}

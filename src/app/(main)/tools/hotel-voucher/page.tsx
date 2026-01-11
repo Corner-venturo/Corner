@@ -239,7 +239,7 @@ export default function HotelVoucherPage() {
           id="hotel-voucher-printable"
         >
           {/* 控制面板 - 只在螢幕上顯示 */}
-          <div className="print:hidden sticky top-0 bg-white border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
+          <div className="print:hidden sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
             <div className="flex gap-2 flex-wrap">
               <Button
                 size="sm"

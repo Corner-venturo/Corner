@@ -190,7 +190,7 @@ export function AssignmentSection({ todo, onUpdate, readOnly = false }: Assignme
                     router.push(`${basePath}?highlight=${item.id}`)
                   }
                 }}
-                className="bg-white/60 border border-morandi-gold/20 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/20 transition-all font-medium"
+                className="bg-card/60 border border-morandi-gold/20 text-morandi-primary text-xs px-2 py-1 rounded-lg hover:bg-morandi-gold/10 hover:border-morandi-gold/20 transition-all font-medium"
               >
                 {item.title}
               </button>

@@ -48,7 +48,7 @@ export function PaymentCard({ payment, onClick, className }: PaymentCardProps) {
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border border-border shadow-sm p-4',
+        'bg-card rounded-xl border border-border shadow-sm p-4',
         onClick && 'cursor-pointer hover:border-morandi-gold/50',
         className
       )}

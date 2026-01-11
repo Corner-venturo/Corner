@@ -29,6 +29,8 @@ export const QuotesPage: React.FC = () => {
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null)
 
   // 載入資料
+  // TODO: 優化：目前載入所有 tours 再過濾有報價單的
+  // 未來可改為只查詢有報價單的 tours（使用 JOIN 或子查詢）
   React.useEffect(() => {
     fetchTours()
     fetchQuotes()

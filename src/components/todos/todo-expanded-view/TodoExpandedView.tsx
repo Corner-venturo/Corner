@@ -39,7 +39,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
   return (
     <Dialog open={!!todo} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-[1000px] lg:max-w-[1400px] max-h-[95vh] sm:max-h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[600px] max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 gap-0">
         <VisuallyHidden>
           <DialogTitle>{todo.title || '待辦事項詳情'}</DialogTitle>
         </VisuallyHidden>
@@ -53,8 +53,8 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
         {/* 主要內容區 */}
         <div className="flex flex-col lg:flex-row flex-1 overflow-hidden pt-2">
-          {/* 左半部：詳情資料 */}
-          <div className="w-full lg:w-1/2 px-4 sm:px-6 py-3 sm:py-4 border-b lg:border-b-0 lg:border-r border-border flex flex-col overflow-y-auto">
+          {/* 詳情資料（快速功能區暫時關閉，改為全寬） */}
+          <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex flex-col overflow-y-auto">
             {/* 標題與星級 */}
             <div className="mb-4 bg-card border border-border rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between gap-4">
@@ -90,21 +90,44 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
 
             {/* 備註區 - 即使唯讀也可以留言 */}
             <NotesSection todo={todo} onUpdate={onUpdate} />
+
+            {/* 快速操作按鈕 */}
+            {canEdit && (
+              <div className="flex gap-2 mt-4">
+                <Button
+                  onClick={() => {
+                    onUpdate({ status: 'completed', completed: true })
+                    onClose()
+                  }}
+                  className="flex-1 bg-gradient-to-r from-morandi-gold to-status-warning hover:from-morandi-gold/90 hover:to-status-warning/90 text-white shadow-md hover:shadow-lg transition-all gap-2"
+                >
+                  <Check size={16} />
+                  標記完成
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newDeadline = new Date()
+                    newDeadline.setDate(newDeadline.getDate() + 7)
+                    onUpdate({ deadline: formatDate(newDeadline) })
+                  }}
+                  className="flex-1 border-morandi-container/50 hover:bg-morandi-container/20 hover:border-morandi-gold/20 shadow-sm transition-all gap-2"
+                >
+                  <Calendar size={16} />
+                  延期一週
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* 右半部：快速功能 */}
+          {/* 右半部：快速功能（暫時關閉）
           <div className="w-full lg:w-1/2 px-4 sm:px-6 py-3 sm:py-4 flex flex-col overflow-y-auto">
-            {/* 快速功能分頁 - 唯讀模式隱藏 */}
             {canEdit && (
               <>
                 <QuickActionsSection activeTab={activeTab} onTabChange={setActiveTab} />
-
-                {/* 分頁內容 */}
                 <div className="flex-1 bg-card border border-border rounded-xl p-4 overflow-y-auto shadow-sm">
                   <QuickActionContent activeTab={activeTab} todo={todo} onUpdate={onUpdate} />
                 </div>
-
-                {/* 快速操作按鈕 */}
                 <div className="flex gap-2 mt-4">
                   <Button
                     onClick={() => {
@@ -131,8 +154,6 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
                 </div>
               </>
             )}
-
-            {/* 唯讀模式顯示提示 */}
             {!canEdit && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center text-morandi-secondary">
@@ -143,6 +164,7 @@ export function TodoExpandedView({ todo, onUpdate, onClose }: TodoExpandedViewPr
               </div>
             )}
           </div>
+          */}
         </div>
       </DialogContent>
     </Dialog>

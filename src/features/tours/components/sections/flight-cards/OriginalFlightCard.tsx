@@ -16,7 +16,7 @@ export function OriginalFlightCard({
       initial={{ opacity: 0, x: isOutbound ? -20 : 20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-2xl shadow-lg p-6 border border-morandi-gold/20"
+      className="bg-card rounded-2xl shadow-lg p-6 border border-morandi-gold/20"
     >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-12 h-12 bg-gradient-to-br from-morandi-gold to-morandi-gold/80 rounded-xl flex items-center justify-center shadow-lg">

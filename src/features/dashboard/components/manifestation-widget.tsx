@@ -43,7 +43,7 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       title: '開啟你的顯化旅程',
       message: '今天就與願望對話，為內在點亮第一束光。',
       accent: 'from-morandi-red/30 to-morandi-gold/20',
-      gradient: 'bg-gradient-to-br from-morandi-red/10 via-white to-morandi-gold/10',
+      gradient: 'bg-gradient-to-br from-morandi-red/10 via-card to-morandi-gold/10',
       icon: icons.empty,
       showAction: true,
     }
@@ -54,7 +54,7 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       title: '🌸 今日已完成顯化練習',
       message: '讓願望在靜心中成長。',
       accent: 'from-morandi-gold/40 to-morandi-gold/20',
-      gradient: 'bg-gradient-to-br from-morandi-gold/10 via-white to-morandi-container/20',
+      gradient: 'bg-gradient-to-br from-morandi-gold/10 via-card to-morandi-container/20',
       icon: icons.complete,
       showAction: false,
     }
@@ -65,7 +65,7 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       title: '🍃 今天還沒與願望對話呢',
       message: '要不要花 3 分鐘？把心再次帶回自己。',
       accent: 'from-morandi-green/40 to-morandi-container/40',
-      gradient: 'bg-gradient-to-br from-morandi-green/10 via-white to-morandi-container/20',
+      gradient: 'bg-gradient-to-br from-morandi-green/10 via-card to-morandi-container/20',
       icon: icons.day1,
       showAction: true,
     }
@@ -76,7 +76,7 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
       title: '🌙 願望還在等你',
       message: '它還記得你昨天的心，也相信你會回來。',
       accent: 'from-morandi-secondary/40 to-morandi-muted/40',
-      gradient: 'bg-gradient-to-br from-morandi-secondary/10 via-white to-morandi-muted/10',
+      gradient: 'bg-gradient-to-br from-morandi-secondary/10 via-card to-morandi-muted/10',
       icon: icons.day2,
       showAction: true,
     }
@@ -86,7 +86,7 @@ const getReminderView = (snapshot: ManifestationReminderSnapshot): ReminderView 
     title: '🔔 能量回呼',
     message: '距離上次顯化已過 3 日，請回到呼吸與心願。',
     accent: 'from-morandi-primary/30 to-morandi-secondary/30',
-    gradient: 'bg-gradient-to-br from-morandi-primary/5 via-white to-morandi-secondary/10',
+    gradient: 'bg-gradient-to-br from-morandi-primary/5 via-card to-morandi-secondary/10',
     icon: icons.recall,
     showAction: true,
   }
@@ -187,7 +187,7 @@ export function ManifestationWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
           view.gradient
         )}
       >
@@ -198,7 +198,7 @@ export function ManifestationWidget() {
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br',
                 view.accent,
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               {view.icon}
@@ -213,7 +213,7 @@ export function ManifestationWidget() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40">
             <div className="flex items-center justify-between text-xs text-morandi-secondary font-medium">
               <span>{lastDateDisplay}</span>
               <span className="px-2.5 py-1 bg-morandi-gold/10 text-morandi-gold rounded-full font-semibold">
@@ -233,7 +233,7 @@ export function ManifestationWidget() {
                         'h-12 w-full rounded-full border transition-all duration-300 shadow-sm',
                         completed
                           ? 'bg-gradient-to-b from-morandi-gold via-morandi-gold/80 to-morandi-gold/70 border-morandi-gold/90 shadow-morandi-gold/30 scale-105'
-                          : 'bg-white/90 border-morandi-secondary/20 hover:border-morandi-secondary/30'
+                          : 'bg-card/90 border-morandi-secondary/20 hover:border-morandi-secondary/30'
                       )}
                     />
                     <span
@@ -250,7 +250,7 @@ export function ManifestationWidget() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/50 p-3 border border-white/30">
+          <div className="rounded-xl bg-card/50 p-3 border border-border/30">
             <p className="text-xs text-morandi-secondary/90 leading-relaxed font-medium">
               {getWeeklyMessage(snapshot.history)}
             </p>

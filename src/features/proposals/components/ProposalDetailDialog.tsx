@@ -16,6 +16,7 @@ import { TimelineItineraryDialog } from './TimelineItineraryDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import type { Proposal, ProposalStatus, ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
 
 // 狀態配色
@@ -111,6 +112,12 @@ export function ProposalDetailDialog({
         .eq('id', timelinePackage.id)
 
       if (error) throw error
+
+      // 如果有關聯報價單，同步餐食和住宿資料
+      if (timelinePackage.quote_id) {
+        await syncTimelineToQuote(timelinePackage.quote_id, timelineData)
+      }
+
       handlePackagesChange()
     } catch (error) {
       logger.error('儲存時間軸資料失敗:', error)

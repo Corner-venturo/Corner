@@ -184,8 +184,8 @@ export function FlightWidget() {
     <div className="h-full">
       <div
         className={cn(
-          'h-full rounded-2xl border border-white/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-white/80',
-          'bg-gradient-to-br from-status-info-bg via-white to-indigo-50'
+          'h-full rounded-2xl border border-border/70 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:border-border/80',
+          'bg-gradient-to-br from-status-info-bg via-card to-indigo-50'
         )}
       >
         <div className="p-5 space-y-4 h-full flex flex-col">
@@ -195,7 +195,7 @@ export function FlightWidget() {
               className={cn(
                 'rounded-full p-2.5 text-white shadow-lg shadow-black/10',
                 'bg-gradient-to-br from-morandi-gold/10 to-indigo-100/60',
-                'ring-2 ring-white/50 ring-offset-1 ring-offset-white/20'
+                'ring-2 ring-border/50 ring-offset-1 ring-offset-background/20'
               )}
             >
               <Plane className="w-5 h-5 drop-shadow-sm" />
@@ -211,14 +211,14 @@ export function FlightWidget() {
           </div>
 
           {/* 查詢模式切換 */}
-          <div className="flex rounded-xl bg-white/50 p-1 gap-1">
+          <div className="flex rounded-xl bg-card/50 p-1 gap-1">
             <button
               onClick={() => setSearchMode('flight')}
               className={cn(
                 'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5',
                 searchMode === 'flight'
-                  ? 'bg-white shadow-sm text-morandi-primary'
-                  : 'text-morandi-secondary hover:bg-white/50'
+                  ? 'bg-card shadow-sm text-morandi-primary'
+                  : 'text-morandi-secondary hover:bg-card/50'
               )}
             >
               <Plane className="w-3.5 h-3.5" />
@@ -229,8 +229,8 @@ export function FlightWidget() {
               className={cn(
                 'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5',
                 searchMode === 'airport'
-                  ? 'bg-white shadow-sm text-morandi-primary'
-                  : 'text-morandi-secondary hover:bg-white/50'
+                  ? 'bg-card shadow-sm text-morandi-primary'
+                  : 'text-morandi-secondary hover:bg-card/50'
               )}
             >
               <Building2 className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export function FlightWidget() {
           </div>
 
           {/* 查詢表單 */}
-          <div className="rounded-xl bg-white/70 p-3.5 shadow-md border border-white/40 space-y-3">
+          <div className="rounded-xl bg-card/70 p-3.5 shadow-md border border-border/40 space-y-3">
             {searchMode === 'flight' ? (
               /* 航班號查詢表單 */
               <div>
@@ -253,7 +253,7 @@ export function FlightWidget() {
                   onChange={e => setFlightNumber(toHalfWidth(e.target.value).toUpperCase())}
                   onKeyPress={handleKeyPress}
                   placeholder="例如: BR191, CI100"
-                  className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
+                  className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
                 />
               </div>
             ) : (
@@ -265,7 +265,7 @@ export function FlightWidget() {
                     出發機場
                   </label>
                   <Select value={airportCode} onValueChange={setAirportCode}>
-                    <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm">
+                    <SelectTrigger className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm">
                       <SelectValue placeholder="選擇機場" />
                     </SelectTrigger>
                     <SelectContent>
@@ -288,7 +288,7 @@ export function FlightWidget() {
                     onChange={e => setDestinationFilter(toHalfWidth(e.target.value).toUpperCase())}
                     onKeyPress={handleKeyPress}
                     placeholder="例如: NRT, Tokyo"
-                    className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
+                    className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm placeholder:text-morandi-secondary/50"
                   />
                 </div>
               </>
@@ -304,7 +304,7 @@ export function FlightWidget() {
                 value={queryDate}
                 onChange={(date) => setQueryDate(date)}
                 placeholder="選擇日期"
-                className="w-full px-3 py-2.5 text-sm font-medium border border-white/60 rounded-xl bg-white/90 hover:bg-white focus:bg-white transition-all outline-none shadow-sm backdrop-blur-sm"
+                className="w-full px-3 py-2.5 text-sm font-medium border border-border/60 rounded-xl bg-card/90 hover:bg-card focus:bg-card transition-all outline-none shadow-sm backdrop-blur-sm"
               />
             </div>
 
@@ -344,7 +344,7 @@ export function FlightWidget() {
 
           {/* 航班號查詢結果 */}
           {flightData && !error && (
-            <div className="flex-1 rounded-xl bg-white/70 p-4 shadow-md border border-white/40 overflow-auto space-y-3">
+            <div className="flex-1 rounded-xl bg-card/70 p-4 shadow-md border border-border/40 overflow-auto space-y-3">
               {/* 航班號與狀態 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -364,7 +364,7 @@ export function FlightWidget() {
               </div>
 
               {/* 航線資訊 */}
-              <div className="bg-white/50 rounded-lg p-3 space-y-2">
+              <div className="bg-card/50 rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex-1">
                     <p className="text-xs text-morandi-secondary mb-1">出發</p>
@@ -395,7 +395,7 @@ export function FlightWidget() {
 
               {/* 時間與航廈資訊 */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/50 rounded-lg p-2.5">
+                <div className="bg-card/50 rounded-lg p-2.5">
                   <div className="flex items-center gap-1.5 mb-1">
                     <PlaneTakeoff className="w-3 h-3 text-morandi-secondary" />
                     <p className="text-xs text-morandi-secondary">起飛</p>
@@ -410,7 +410,7 @@ export function FlightWidget() {
                     </p>
                   )}
                 </div>
-                <div className="bg-white/50 rounded-lg p-2.5">
+                <div className="bg-card/50 rounded-lg p-2.5">
                   <div className="flex items-center gap-1.5 mb-1">
                     <PlaneLanding className="w-3 h-3 text-morandi-secondary" />
                     <p className="text-xs text-morandi-secondary">降落</p>
@@ -428,7 +428,7 @@ export function FlightWidget() {
 
               {/* 機型 */}
               {flightData.aircraft && (
-                <div className="bg-white/50 rounded-lg p-2.5">
+                <div className="bg-card/50 rounded-lg p-2.5">
                   <p className="text-xs text-morandi-secondary mb-1">機型</p>
                   <p className="font-semibold text-sm text-morandi-primary">
                     {flightData.aircraft}
@@ -440,9 +440,9 @@ export function FlightWidget() {
 
           {/* 機場航班列表結果 */}
           {airportFlights.length > 0 && !error && (
-            <div className="flex-1 rounded-xl bg-white/70 shadow-md border border-white/40 overflow-hidden flex flex-col">
+            <div className="flex-1 rounded-xl bg-card/70 shadow-md border border-border/40 overflow-hidden flex flex-col">
               {/* 標題列 */}
-              <div className="px-4 py-2.5 bg-white/50 border-b border-white/40 flex items-center justify-between">
+              <div className="px-4 py-2.5 bg-card/50 border-b border-border/40 flex items-center justify-between">
                 <p className="text-xs font-semibold text-morandi-primary">
                   {airportCode} 出發航班
                 </p>
@@ -454,7 +454,7 @@ export function FlightWidget() {
               {/* 航班列表 */}
               <div className="flex-1 overflow-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-white/30 sticky top-0">
+                  <thead className="bg-card/30 sticky top-0">
                     <tr>
                       <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">時間</th>
                       <th className="px-3 py-2 text-left font-semibold text-morandi-secondary">航班</th>
@@ -464,7 +464,7 @@ export function FlightWidget() {
                   </thead>
                   <tbody className="divide-y divide-white/30">
                     {airportFlights.map((flight, idx) => (
-                      <tr key={`${flight.flightNumber}-${idx}`} className="hover:bg-white/30">
+                      <tr key={`${flight.flightNumber}-${idx}`} className="hover:bg-card/30">
                         <td className="px-3 py-2 font-medium text-morandi-primary">
                           {flight.scheduledTime}
                         </td>

@@ -175,7 +175,7 @@ export function DateInput({
   return (
     <div
       className={cn(
-        'flex items-center h-10 w-full rounded-md border border-input bg-white px-3 text-sm transition-colors',
+        'flex items-center h-10 w-full rounded-md border border-input bg-card px-3 text-sm transition-colors',
         'focus-within:outline-none focus-within:border-morandi-gold',
         disabled && 'cursor-not-allowed opacity-50',
         className

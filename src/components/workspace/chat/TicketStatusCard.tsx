@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Plane, Users, Check, AlertTriangle, HelpCircle, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { parseLocalDate } from '@/lib/utils/format-date'
 
 // 類型定義
 interface MemberStatus {
@@ -49,13 +50,11 @@ interface TicketStatusCardProps {
 }
 
 // 格式化日期
-function formatDate(dateStr: string | null, formatStr = 'MM/dd'): string {
+function formatDateDisplay(dateStr: string | null, formatStr = 'MM/dd'): string {
   if (!dateStr) return '-'
-  try {
-    return format(parseISO(dateStr), formatStr, { locale: zhTW })
-  } catch {
-    return dateStr
-  }
+  const date = parseLocalDate(dateStr)
+  if (!date) return dateStr
+  return format(date, formatStr, { locale: zhTW })
 }
 
 // 單一團卡片
@@ -118,7 +117,7 @@ function TourCard({ tour }: { tour: TourData }) {
   })
 
   return (
-    <div className="border border-morandi-container rounded-lg overflow-hidden bg-white">
+    <div className="border border-morandi-container rounded-lg overflow-hidden bg-card">
       {/* 卡片標題 */}
       <div className="px-3 py-2.5 bg-gradient-to-r from-morandi-container/40 to-morandi-container/20">
         <div className="flex items-center justify-between">
@@ -129,7 +128,7 @@ function TourCard({ tour }: { tour: TourData }) {
           </div>
           <div className="flex items-center gap-2 text-xs text-morandi-secondary">
             <Calendar size={12} />
-            <span>{formatDate(tour.departure_date)} 出發</span>
+            <span>{formatDateDisplay(tour.departure_date)} 出發</span>
           </div>
         </div>
 
@@ -160,7 +159,7 @@ function TourCard({ tour }: { tour: TourData }) {
           {tour.earliest_deadline && (
             <div className="flex items-center gap-1 text-morandi-secondary ml-auto">
               <span className="text-xs">DL:</span>
-              <span className="font-medium text-morandi-primary">{formatDate(tour.earliest_deadline)}</span>
+              <span className="font-medium text-morandi-primary">{formatDateDisplay(tour.earliest_deadline)}</span>
             </div>
           )}
         </div>
@@ -291,7 +290,7 @@ export function TicketStatusCard({ tours, summary, generatedAt }: TicketStatusCa
         <span className="font-medium text-morandi-primary">開票狀態提醒</span>
         {generatedAt && (
           <span className="text-xs text-morandi-secondary">
-            {formatDate(generatedAt, 'MM/dd HH:mm')}
+            {formatDateDisplay(generatedAt, 'MM/dd HH:mm')}
           </span>
         )}
       </div>

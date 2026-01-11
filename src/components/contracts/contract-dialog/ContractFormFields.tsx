@@ -104,7 +104,7 @@ export function ContractFormFields({
               </button>
 
               {showMemberDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-border rounded-lg shadow-lg z-50 max-h-72 overflow-hidden flex flex-col">
+                <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-lg z-50 max-h-72 overflow-hidden flex flex-col">
                   {/* 標題列 */}
                   <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-morandi-container/30">
                     <span className="text-xs text-morandi-secondary">選擇簽約旅客</span>

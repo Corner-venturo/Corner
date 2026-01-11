@@ -5,7 +5,8 @@ import { supabase } from '@/lib/supabase/client'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
-import { differenceInDays, parseISO } from 'date-fns'
+import { differenceInDays } from 'date-fns'
+import { parseLocalDate } from '@/lib/utils/format-date'
 
 interface NightRoomConfig {
   hotel_name: string
@@ -36,14 +37,11 @@ export function useRoomConfig({ tour, tourId, rooms, assignments, reload }: UseR
   // 計算行程天數
   const tourNights = useMemo(() => {
     if (!tour?.departure_date || !tour?.return_date) return 0
-    try {
-      const startDate = parseISO(tour.departure_date)
-      const endDate = parseISO(tour.return_date)
-      const days = differenceInDays(endDate, startDate) + 1
-      return Math.max(days - 1, 0)
-    } catch {
-      return 0
-    }
+    const startDate = parseLocalDate(tour.departure_date)
+    const endDate = parseLocalDate(tour.return_date)
+    if (!startDate || !endDate) return 0
+    const days = differenceInDays(endDate, startDate) + 1
+    return Math.max(days - 1, 0)
   }, [tour?.departure_date, tour?.return_date])
 
   const maxNight = tourNights > 0 ? tourNights : Math.max(...[...new Set(rooms.map(r => r.night_number))], 1)

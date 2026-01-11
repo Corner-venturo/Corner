@@ -59,7 +59,7 @@ export function FlightStyleSelector({
                 'relative flex flex-col items-start p-2.5 rounded-lg border-2 transition-all text-left',
                 isSelected
                   ? 'border-morandi-gold bg-morandi-gold/10'
-                  : 'border-transparent bg-white hover:border-border'
+                  : 'border-transparent bg-card hover:border-border'
               )}
             >
               {/* 預覽圖（如果有） */}

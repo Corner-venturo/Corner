@@ -27,7 +27,7 @@ export function EditorContent({
 }: EditorContentProps) {
   return (
     <div
-      className="flex-1 overflow-y-auto bg-white relative"
+      className="flex-1 overflow-y-auto bg-card relative"
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -47,7 +47,7 @@ export function EditorContent({
 
       {/* Upload progress */}
       {uploadProgress !== null && (
-        <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 border border-border z-50">
+        <div className="absolute bottom-4 right-4 bg-card rounded-lg shadow-lg p-4 border border-border z-50">
           <div className="flex items-center gap-3">
             <div className="animate-spin">
               <ImageIcon size={20} className="text-morandi-gold" />

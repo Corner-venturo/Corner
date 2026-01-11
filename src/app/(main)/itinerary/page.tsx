@@ -48,9 +48,8 @@ export default function ItineraryPage() {
     }
   }, [isSuperAdmin])
 
-  useEffect(() => {
-    regionsStore.fetchAll()
-  }, [])
+  // 🔧 優化：移除無條件 fetchAll，改為 Dialog 開啟時才載入
+  // regionsStore.fetchAll() 移到 CreateItineraryDialog 內
 
   // Custom hooks
   const pageState = useItineraryPageState()
@@ -104,8 +103,10 @@ export default function ItineraryPage() {
   // 打開新增行程對話框
   const handleOpenTypeSelect = useCallback(() => {
     formState.resetForm()
+    // 🔧 優化：只在對話框開啟時才載入 regions（延遲載入）
+    regionsStore.fetchAll()
     pageState.setIsTypeSelectOpen(true)
-  }, [formState, pageState])
+  }, [formState, pageState, regionsStore])
 
   // 建立行程
   const handleCreateItinerary = useCallback(async () => {
@@ -434,7 +435,7 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
           </div>
           {/* 多航段選擇器 */}
           {flightSearch.outboundSegments.length > 0 && (
-            <div className="bg-white p-2 rounded border border-morandi-gold/30 space-y-1">
+            <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
                 <button
@@ -497,7 +498,7 @@ function FlightInputSection({ formState, flightSearch }: FlightInputSectionProps
           </div>
           {/* 多航段選擇器 */}
           {flightSearch.returnSegments.length > 0 && (
-            <div className="bg-white p-2 rounded border border-morandi-gold/30 space-y-1">
+            <div className="bg-card p-2 rounded border border-morandi-gold/30 space-y-1">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] text-morandi-secondary">此航班有多個航段，請選擇：</p>
                 <button

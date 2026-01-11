@@ -70,7 +70,7 @@ export function TourFlightSectionLuxury({ data, viewMode }: TourFlightSectionLux
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white rounded-2xl shadow-lg border overflow-hidden relative"
+          className="bg-card rounded-2xl shadow-lg border overflow-hidden relative"
           style={{ borderColor: '#f0f0f0' }}
         >
           {/* 左側強調線 */}

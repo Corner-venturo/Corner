@@ -230,7 +230,7 @@ export function TourConfirmationSheet({ tourId }: TourConfirmationSheetProps) {
       case '餐食':
         return <UtensilsCrossed size={14} className="text-orange-600" />
       default:
-        return <Package size={14} className="text-gray-600" />
+        return <Package size={14} className="text-morandi-secondary" />
     }
   }
 

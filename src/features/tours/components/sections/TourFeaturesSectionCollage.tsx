@@ -92,7 +92,7 @@ function PolaroidCard({
 
       {/* 主拍立得卡片 */}
       <div
-        className="relative bg-white p-3 pb-14"
+        className="relative bg-card p-3 pb-14"
         style={{
           boxShadow: '8px 8px 0px 0px rgba(0,0,0,0.9)',
         }}
@@ -127,7 +127,7 @@ function PolaroidCard({
 
           {/* Day 標籤 */}
           <div
-            className="absolute bottom-2 right-2 bg-white px-2 py-1 text-xs font-bold shadow-md"
+            className="absolute bottom-2 right-2 bg-card px-2 py-1 text-xs font-bold shadow-md"
             style={{ fontFamily: "'Space Mono', monospace" }}
           >
             #{String(index + 1).padStart(2, '0')}
@@ -180,7 +180,7 @@ function DiptychCard({
     >
       {/* 畫框外框 */}
       <div
-        className="bg-white p-6"
+        className="bg-card p-6"
         style={{
           boxShadow: `
             0 0 0 12px #ffffff,
@@ -233,7 +233,7 @@ function DiptychCard({
 
           {/* Day 標籤 */}
           <div
-            className="absolute bottom-8 right-8 bg-white px-2 py-1 text-xs font-bold shadow-md"
+            className="absolute bottom-8 right-8 bg-card px-2 py-1 text-xs font-bold shadow-md"
             style={{ fontFamily: "'Space Mono', monospace" }}
           >
             #{String(index + 1).padStart(2, '0')}
@@ -322,14 +322,14 @@ function FrameCard({
             className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
           />
         ) : (
-          <div className="w-full h-full bg-white flex items-center justify-center text-4xl">
+          <div className="w-full h-full bg-card flex items-center justify-center text-4xl">
             {feature.icon || '🎫'}
           </div>
         )}
 
         {/* 貼紙 */}
         <div
-          className="absolute -top-2 -right-2 w-12 h-12 rounded-full bg-white flex items-center justify-center text-2xl shadow-lg"
+          className="absolute -top-2 -right-2 w-12 h-12 rounded-full bg-card flex items-center justify-center text-2xl shadow-lg"
           style={{ transform: 'rotate(15deg)' }}
         >
           {stickerEmoji}
@@ -387,7 +387,7 @@ function RecipeCard({
       viewport={{ once: true }}
       transition={{ delay: index * 0.08 }}
       whileHover={{ y: -4 }}
-      className="group cursor-pointer bg-white relative top-0 hover:-top-2 transition-all duration-300"
+      className="group cursor-pointer bg-card relative top-0 hover:-top-2 transition-all duration-300"
       style={{
         boxShadow: '0 15px 30px -10px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,0,0,0.1)',
       }}
@@ -601,7 +601,7 @@ export function TourFeaturesSectionCollage({
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToPrev}
-                className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute left-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
               </button>
@@ -629,7 +629,7 @@ export function TourFeaturesSectionCollage({
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToNext}
-                className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute right-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
               </button>

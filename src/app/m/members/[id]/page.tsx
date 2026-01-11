@@ -135,7 +135,7 @@ export default function MemberDetailPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-border sticky top-0 z-10">
+      <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => router.back()}
@@ -161,7 +161,7 @@ export default function MemberDetailPage() {
 
       <div className="p-4 space-y-4">
         {/* 基本資料 */}
-        <section className="bg-white rounded-xl border border-border p-4">
+        <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <User size={18} className="text-morandi-gold" />
             基本資料
@@ -179,7 +179,7 @@ export default function MemberDetailPage() {
         </section>
 
         {/* 護照資料 */}
-        <section className="bg-white rounded-xl border border-border p-4">
+        <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <CreditCard size={18} className="text-morandi-gold" />
             護照資料
@@ -193,7 +193,7 @@ export default function MemberDetailPage() {
 
         {/* 團體資訊 */}
         {member.tour && (
-          <section className="bg-white rounded-xl border border-border p-4">
+          <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <Plane size={18} className="text-morandi-gold" />
               團體資訊
@@ -215,7 +215,7 @@ export default function MemberDetailPage() {
 
         {/* 住宿資訊 */}
         {(member.hotel_1_name || member.hotel_2_name) && (
-          <section className="bg-white rounded-xl border border-border p-4">
+          <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <Building size={18} className="text-morandi-gold" />
               住宿資訊
@@ -242,7 +242,7 @@ export default function MemberDetailPage() {
         )}
 
         {/* 財務資訊 */}
-        <section className="bg-white rounded-xl border border-border p-4">
+        <section className="bg-card rounded-xl border border-border p-4">
           <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
             <DollarSign size={18} className="text-morandi-gold" />
             財務資訊
@@ -278,7 +278,7 @@ export default function MemberDetailPage() {
 
         {/* 特殊需求 */}
         {(member.special_meal || member.remarks) && (
-          <section className="bg-white rounded-xl border border-border p-4">
+          <section className="bg-card rounded-xl border border-border p-4">
             <h2 className="font-bold text-morandi-primary mb-3 flex items-center gap-2">
               <FileText size={18} className="text-morandi-gold" />
               特殊需求

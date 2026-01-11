@@ -34,7 +34,7 @@ export function SingleImageTemplate({
   uploading,
 }: SingleImageTemplateProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-card rounded-xl shadow-lg overflow-hidden">
       {/* 大圖區域 */}
       <div className="relative h-64">
         <UploadableImage
@@ -58,7 +58,7 @@ export function SingleImageTemplate({
             onChange={v => updateField('title', v)}
             className="text-2xl font-bold text-white"
             placeholder="行程標題"
-            inputClassName="bg-white/20 text-white placeholder:text-white/50"
+            inputClassName="bg-card/20 text-white placeholder:text-white/50"
           />
         </div>
       </div>

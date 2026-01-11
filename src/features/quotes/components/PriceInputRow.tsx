@@ -43,7 +43,7 @@ export const PriceInputRow: React.FC<PriceInputRowProps> = ({
           onChange={e => onPriceChange(e.target.value)}
           disabled={isReadOnly}
           className={cn(
-            'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+            'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
             isReadOnly && 'cursor-not-allowed opacity-60'
           )}
         />

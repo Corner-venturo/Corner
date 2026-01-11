@@ -43,15 +43,16 @@ export default function VisasPage() {
   } = useVisasData()
 
   // 載入資料
+  // 🔧 優化：移除不必要的 Members/Customers 預載入
+  // - Customers: useCustomerMatch.startCustomerMatch 會在需要時載入
+  // - Members: deleteVisaWithCascade 改為直接查詢
   useEffect(() => {
     const loadData = async () => {
-      const { useVisaStore, useOrderStore, useMemberStore, useCustomerStore } = await import('@/stores')
+      const { useVisaStore, useOrderStore } = await import('@/stores')
       await Promise.all([
         useVisaStore.getState().fetchAll(),
         fetchTours(),
         useOrderStore.getState().fetchAll(),
-        useMemberStore.getState().fetchAll(),
-        useCustomerStore.getState().fetchAll(),
       ])
     }
     loadData()

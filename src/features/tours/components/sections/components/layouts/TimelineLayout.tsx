@@ -41,7 +41,7 @@ export function TimelineLayout({
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 普通卡片 */}
           <div
-            className="flex-1 p-6 flex flex-col justify-center border border-white/10 hover:bg-white/10 transition-colors"
+            className="flex-1 p-6 flex flex-col justify-center border border-white/10 hover:bg-card/10 transition-colors"
             style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
           >
             <div className="flex items-center gap-4 mb-2">
@@ -104,7 +104,7 @@ export function TimelineLayout({
       className="max-w-7xl mx-auto px-4 lg:px-12 mb-8"
     >
       <div
-        className="min-w-[300px] lg:min-w-[400px] border border-white/10 p-8 hover:bg-white/10 transition-colors cursor-pointer group"
+        className="min-w-[300px] lg:min-w-[400px] border border-white/10 p-8 hover:bg-card/10 transition-colors cursor-pointer group"
         style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
       >
         {/* 頂部日期 */}
@@ -154,7 +154,7 @@ export function TimelineLayout({
           </div>
         )}
         {!hasImage && (
-          <div className="h-40 overflow-hidden mb-6 bg-white/5 flex items-center justify-center">
+          <div className="h-40 overflow-hidden mb-6 bg-card/5 flex items-center justify-center">
             <MapPin className="w-8 h-8 text-white/20" />
           </div>
         )}

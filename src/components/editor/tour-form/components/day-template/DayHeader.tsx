@@ -52,7 +52,7 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
       </div>
 
       {/* 風格選擇器 */}
-      <div className="px-6 py-3 border-b bg-white flex items-center gap-2">
+      <div className="px-6 py-3 border-b bg-card flex items-center gap-2">
         <span className="text-sm text-morandi-secondary mr-2">展示風格：</span>
         <div className="flex items-center bg-muted rounded-lg p-1">
           {styleOptions.map(option => (
@@ -62,8 +62,8 @@ export function DayHeader({ dayIndex, currentStyle, onStyleChange, onSave, onClo
               onClick={() => onStyleChange(option.value)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${
                 currentStyle === option.value
-                  ? 'bg-white shadow-sm'
-                  : 'hover:bg-white/50'
+                  ? 'bg-card shadow-sm'
+                  : 'hover:bg-card/50'
               }`}
               style={{
                 color: currentStyle === option.value ? option.color : undefined,

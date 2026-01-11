@@ -50,9 +50,9 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
   }, [viewMode])
 
   return (
-    <div className="w-1/2 bg-white flex flex-col">
+    <div className="w-1/2 bg-card flex flex-col">
       {/* 標題列 */}
-      <div className="h-14 bg-white border-b px-6 flex items-center justify-between">
+      <div className="h-14 bg-card border-b px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-morandi-primary">即時預覽</h2>
           <div className="flex gap-2 bg-morandi-container/30 rounded-lg p-1">
@@ -97,7 +97,7 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
                   </div>
 
                   <div
-                    className="bg-white rounded-[37px] overflow-hidden relative"
+                    className="bg-card rounded-[37px] overflow-hidden relative"
                     style={{
                       width: '390px',
                       height: '844px',
@@ -121,7 +121,7 @@ export function ItineraryPreview({ tourData }: ItineraryPreviewProps) {
               </div>
             ) : (
               <div
-                className="bg-white shadow-lg rounded-lg overflow-hidden"
+                className="bg-card shadow-lg rounded-lg overflow-hidden"
                 style={{
                   width: '1200px',
                   height: '800px',

@@ -35,7 +35,7 @@ export function ImageGalleryModal({
           {imageGallery.images.length > 1 && (
             <button
               onClick={onPrev}
-              className="absolute left-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              className="absolute left-4 z-10 w-12 h-12 rounded-full bg-card/10 hover:bg-card/20 flex items-center justify-center transition-colors"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8 text-white" />
@@ -82,7 +82,7 @@ export function ImageGalleryModal({
           {imageGallery.images.length > 1 && (
             <button
               onClick={onNext}
-              className="absolute right-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              className="absolute right-4 z-10 w-12 h-12 rounded-full bg-card/10 hover:bg-card/20 flex items-center justify-center transition-colors"
               aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8 text-white" />

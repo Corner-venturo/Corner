@@ -279,7 +279,7 @@ export function ItineraryVersionPicker({
                             onBlur={() => handleSaveRename(itinerary)}
                             onKeyDown={e => handleKeyDown(e, itinerary)}
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 text-sm bg-white border border-morandi-primary rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-morandi-primary"
+                            className="flex-1 text-sm bg-card border border-morandi-primary rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-morandi-primary"
                           />
                         ) : (
                           <span className="text-sm text-morandi-primary truncate">

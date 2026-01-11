@@ -8,6 +8,7 @@ import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { supabase } from '@/lib/supabase/client'
+import { compressAvatarImage } from '@/lib/image-utils'
 
 interface AccountSettingsProps {
   user: {
@@ -55,19 +56,23 @@ export function AccountSettings({
       return
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      await alertWarning('檔案大小不能超過 5MB')
+    // 放寬原始檔案大小限制（因為會自動壓縮）
+    if (file.size > 10 * 1024 * 1024) {
+      await alertWarning('檔案大小不能超過 10MB')
       return
     }
 
     setAvatarUploading(true)
     try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.employee_number}_${Date.now()}.${fileExt}`
+      // 自動壓縮圖片（最大 400px，目標 200KB）
+      const compressedFile = await compressAvatarImage(file)
+      logger.log(`圖片壓縮完成: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`)
+
+      const fileName = `${user.employee_number}_${Date.now()}.jpg`
       const filePath = `avatars/${fileName}`
 
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', compressedFile)
       formData.append('bucket', 'user-avatars')
       formData.append('path', filePath)
 
@@ -244,7 +249,7 @@ export function AccountSettings({
               <div>
                 <h3 className="font-medium mb-1">個人頭像</h3>
                 <p className="text-sm text-morandi-secondary">點擊相機圖示更換頭像</p>
-                <p className="text-xs text-morandi-muted mt-1">支援 JPG、PNG、GIF、WebP，最大 5MB</p>
+                <p className="text-xs text-morandi-muted mt-1">支援 JPG、PNG、GIF、WebP（自動壓縮）</p>
               </div>
             </div>
           </div>

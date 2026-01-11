@@ -1,6 +1,6 @@
 /**
  * 應用初始化腳本
- * 在應用啟動時自動初始化本地資料庫並刷新使用者權限
+ * 在應用啟動時自動初始化並確保 Auth 同步
  */
 
 'use client'
@@ -8,12 +8,16 @@
 import { logger } from '@/lib/utils/logger'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
+import { initAuthSync } from '@/lib/auth/auth-sync'
 
 export function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const init = async () => {
       try {
         logger.log('🚀 AppInitializer: Starting initialization...')
+
+        // 初始化 Auth 同步系統（設定監聽器）
+        initAuthSync()
 
         // 等待 auth-store hydration 完成
         const authStore = useAuthStore.getState()

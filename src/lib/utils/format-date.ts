@@ -331,3 +331,126 @@ export function formatDateISO(date: Date | null | undefined): string {
     return ''
   }
 }
+
+// ============================================================
+// 日期解析工具（避免時區問題）
+// ============================================================
+
+/**
+ * 將日期字串解析為本地時間的 Date 物件（午夜）
+ *
+ * 重要：這是解決時區問題的標準方法！
+ *
+ * 問題：new Date('2024-01-15') 或 parseISO('2024-01-15') 會被解析為 UTC 午夜
+ *       在台灣時區 (UTC+8) 會變成 2024-01-15 08:00，可能導致日期比較錯誤
+ *
+ * 解決：使用 new Date(year, month-1, day) 建立本地時間的日期物件
+ *
+ * @param dateStr - 日期字串，支援以下格式：
+ *   - "2024-01-15" (純日期)
+ *   - "2024-01-15T00:00:00" (含時間)
+ *   - "2024-01-15T00:00:00.000Z" (ISO 格式)
+ * @returns 本地時間午夜的 Date 物件，或 null（解析失敗時）
+ *
+ * @example
+ * parseLocalDate('2024-01-15') // → new Date(2024, 0, 15) 本地午夜
+ * parseLocalDate('2024-01-15T08:30:00') // → new Date(2024, 0, 15) 本地午夜
+ */
+export function parseLocalDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr) return null
+
+  try {
+    // 只取日期部分 YYYY-MM-DD（忽略時間部分）
+    const datePart = dateStr.split('T')[0]
+    const parts = datePart.split('-')
+    if (parts.length !== 3) return null
+
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10)
+    const day = parseInt(parts[2], 10)
+
+    // 驗證數值合理性
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null
+    if (month < 1 || month > 12 || day < 1 || day > 31) return null
+
+    // 使用 new Date(year, month-1, day) 建立本地時間日期
+    const date = new Date(year, month - 1, day)
+    return isNaN(date.getTime()) ? null : date
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 從 ISO 時間字串取得台灣時區的日期字串 (YYYY-MM-DD)
+ *
+ * 用途：將含時間的 ISO 字串轉為純日期字串，確保使用台灣時區
+ * 常用於 FullCalendar 的全天事件
+ *
+ * @param isoString - ISO 格式時間字串，如 "2024-01-15T16:00:00.000Z"
+ * @returns YYYY-MM-DD 格式的日期字串（台灣時區）
+ *
+ * @example
+ * // UTC 2024-01-15 16:00 = 台灣 2024-01-16 00:00
+ * toTaipeiDateString('2024-01-15T16:00:00.000Z') // → "2024-01-16"
+ */
+export function toTaipeiDateString(isoString: string | null | undefined): string {
+  if (!isoString) return ''
+
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return isoString
+
+    // 使用 sv-SE locale 取得 YYYY-MM-DD 格式，指定台北時區
+    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
+  } catch {
+    return isoString
+  }
+}
+
+/**
+ * 從 ISO 時間字串取得台灣時區的時間字串 (HH:MM)
+ *
+ * @param isoString - ISO 格式時間字串
+ * @param options - 選項
+ * @param options.skipMidnight - 是否跳過午夜時間（回傳空字串）
+ * @returns HH:MM 格式的時間字串
+ */
+export function toTaipeiTimeString(
+  isoString: string | null | undefined,
+  options: { skipMidnight?: boolean } = {}
+): string {
+  if (!isoString) return ''
+
+  try {
+    const date = new Date(isoString)
+    if (isNaN(date.getTime())) return ''
+
+    const timeStr = date.toLocaleTimeString('zh-TW', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Taipei',
+    })
+
+    // 如果是午夜且設定跳過，回傳空字串
+    if (options.skipMidnight && timeStr === '00:00') return ''
+
+    return timeStr
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * 取得日期的開始時間（午夜 00:00:00.000）
+ * 用於日期比較時消除時間影響
+ *
+ * @param date - Date 物件
+ * @returns 該日期午夜的 Date 物件
+ */
+export function startOfDay(date: Date): Date {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  return result
+}

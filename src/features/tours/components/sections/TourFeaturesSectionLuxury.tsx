@@ -178,7 +178,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToPrev}
-                className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute left-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronLeft size={28} />
               </button>
@@ -205,7 +205,7 @@ export function TourFeaturesSectionLuxury({ data, viewMode }: TourFeaturesSectio
             {lightboxImages.length > 1 && (
               <button
                 onClick={goToNext}
-                className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                className="absolute right-4 w-12 h-12 bg-card/10 hover:bg-card/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
               >
                 <ChevronRight size={28} />
               </button>
@@ -289,7 +289,7 @@ function FeatureCard({
 
         {/* 標籤 */}
         <div
-          className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1"
+          className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm px-3 py-1"
           style={{ borderLeft: `2px solid ${tagColor}` }}
         >
           <span

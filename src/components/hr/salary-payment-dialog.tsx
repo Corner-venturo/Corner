@@ -205,7 +205,7 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
                     key={employee.id}
                     className={cn(
                       'flex items-center gap-3 p-3 rounded border transition-colors',
-                      isSelected ? 'bg-morandi-gold/10 border-morandi-gold' : 'bg-white border-border'
+                      isSelected ? 'bg-morandi-gold/10 border-morandi-gold' : 'bg-card border-border'
                     )}
                   >
                     <Checkbox

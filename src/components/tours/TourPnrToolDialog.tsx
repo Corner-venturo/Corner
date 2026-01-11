@@ -755,7 +755,7 @@ export function TourPnrToolDialog({
                           {/* 航班基本資訊 */}
                           <div className={cn(
                             "flex items-center gap-3 p-2 text-sm",
-                            isProblematicStatus ? "bg-red-50" : "bg-white"
+                            isProblematicStatus ? "bg-red-50" : "bg-card"
                           )}>
                             <span className="font-medium">
                               {getAirlineName(seg.airline) || seg.airline} {seg.flightNumber}
@@ -779,7 +779,7 @@ export function TourPnrToolDialog({
                                 ? "bg-red-100 text-red-700"
                                 : seg.status === 'HK' || seg.status === 'RR'
                                   ? "bg-green-100 text-green-700"
-                                  : "bg-gray-100 text-gray-600"
+                                  : "bg-morandi-container text-morandi-secondary"
                             )}>
                               {statusLabel}
                             </span>

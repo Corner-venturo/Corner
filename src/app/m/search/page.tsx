@@ -8,7 +8,7 @@ export default function MobileSearchPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 py-3">
+      <div className="bg-card border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
             href="/m"

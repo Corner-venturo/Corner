@@ -36,7 +36,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
           type="text"
           value={item.name}
           onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
           placeholder="房型名稱"
         />
       </td>
@@ -51,7 +51,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             const val = e.target.value.trim()
             handleUpdateItem(categoryId, item.id, 'quantity', val === '' ? null : Number(val) || 0)
           }}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
           placeholder="人數"
         />
       </td>
@@ -66,7 +66,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             const val = e.target.value.trim()
             handleUpdateItem(categoryId, item.id, 'unit_price', val === '' ? null : Number(val) || 0)
           }}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
           placeholder="單價"
         />
       </td>
@@ -83,7 +83,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             type="text"
             value={item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
-            className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-white"
+            className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-card"
             placeholder="備註"
           />
           <button

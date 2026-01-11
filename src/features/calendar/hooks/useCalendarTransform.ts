@@ -1,6 +1,6 @@
 'use client'
 
-import { formatDate } from '@/lib/utils/format-date'
+import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useCallback } from 'react'
 import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useEmployeeStore, useAuthStore } from '@/stores'
@@ -21,45 +21,15 @@ interface CalendarEvent {
 }
 
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
-// 正確轉換成台灣時區顯示
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
   if (allDay) return ''
-  if (!isoString) return ''
-
-  try {
-    // 使用 Date 物件正確解析 ISO 時間並轉換成台灣時區
-    const date = new Date(isoString)
-    if (isNaN(date.getTime())) return ''
-
-    // 使用 toLocaleTimeString 取得台灣時區的時間
-    const timeStr = date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Taipei',
-    })
-
-    // 如果是 00:00 就不顯示（可能是全天事件）
-    if (timeStr === '00:00') return ''
-
-    return timeStr
-  } catch {
-    return ''
-  }
+  return toTaipeiTimeString(isoString, { skipMidnight: true })
 }
 
-// 🔧 修正：從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
+// 從 ISO 時間字串取得台灣時區的日期（YYYY-MM-DD）
 // 用於全天事件，避免 FullCalendar 時區轉換問題
 const getDateInTaipei = (isoString: string): string => {
-  if (!isoString) return ''
-  try {
-    const date = new Date(isoString)
-    if (isNaN(date.getTime())) return isoString
-    // 使用 sv-SE locale 取得 YYYY-MM-DD 格式
-    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
-  } catch {
-    return isoString
-  }
+  return toTaipeiDateString(isoString) || isoString
 }
 
 /**

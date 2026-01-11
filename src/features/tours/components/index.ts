@@ -8,3 +8,6 @@ export { DeleteConfirmDialog } from './DeleteConfirmDialog'
 export { TourConfirmationWizard } from './TourConfirmationWizard'
 export { TourUnlockDialog } from './TourUnlockDialog'
 export { TourClosingDialog } from './TourClosingDialog'
+
+// Tour Itinerary
+export { TourItineraryDialog } from './TourItineraryDialog'

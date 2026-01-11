@@ -112,7 +112,7 @@ export function ConversationChat({
   return (
     <div className="flex flex-col h-full">
       {/* 標題列 */}
-      <div className="h-14 px-4 border-b border-border/50 flex items-center gap-3 shrink-0 bg-white">
+      <div className="h-14 px-4 border-b border-border/50 flex items-center gap-3 shrink-0 bg-card">
         <div
           className={cn(
             'w-10 h-10 rounded-full flex items-center justify-center',
@@ -156,7 +156,7 @@ export function ConversationChat({
       </div>
 
       {/* 輸入區 */}
-      <div className="p-4 border-t border-border/50 bg-white shrink-0">
+      <div className="p-4 border-t border-border/50 bg-card shrink-0">
         {!detail.conversation.is_open ? (
           <div className="text-center text-sm text-morandi-secondary py-2">
             對話尚未開啟，無法發送訊息
@@ -266,7 +266,7 @@ function MessageBubble({
             'px-3 py-2 rounded-lg text-sm',
             isEmployee
               ? 'bg-morandi-gold text-white rounded-tr-none'
-              : 'bg-white border border-border/50 rounded-tl-none'
+              : 'bg-card border border-border/50 rounded-tl-none'
           )}
         >
           {message.content}

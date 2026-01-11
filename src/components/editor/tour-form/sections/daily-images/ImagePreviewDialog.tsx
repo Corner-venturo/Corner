@@ -225,10 +225,10 @@ export function ImagePositionEditor({
           />
           {/* 網格線 */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/20" />
-            <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/20" />
-            <div className="absolute top-1/3 left-0 right-0 h-px bg-white/20" />
-            <div className="absolute top-2/3 left-0 right-0 h-px bg-white/20" />
+            <div className="absolute left-1/3 top-0 bottom-0 w-px bg-card/20" />
+            <div className="absolute left-2/3 top-0 bottom-0 w-px bg-card/20" />
+            <div className="absolute top-1/3 left-0 right-0 h-px bg-card/20" />
+            <div className="absolute top-2/3 left-0 right-0 h-px bg-card/20" />
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ export function ImagePositionEditor({
             className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
               position === preset.value
                 ? 'bg-morandi-gold text-white border-morandi-gold'
-                : 'bg-white text-morandi-secondary border-morandi-container hover:border-morandi-gold'
+                : 'bg-card text-morandi-secondary border-morandi-container hover:border-morandi-gold'
             }`}
           >
             {preset.label}

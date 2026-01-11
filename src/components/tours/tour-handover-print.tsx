@@ -51,7 +51,7 @@ export function TourHandoverPrint({
   }
 
   return (
-    <div className="bg-white p-8 max-w-[210mm] mx-auto print:p-0">
+    <div className="bg-card p-8 max-w-[210mm] mx-auto print:p-0">
       <style jsx global>{`
         @media print {
           body {

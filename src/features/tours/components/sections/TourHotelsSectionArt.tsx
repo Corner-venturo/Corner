@@ -196,7 +196,7 @@ export function TourHotelsSectionArt({ data, viewMode }: TourHotelsSectionArtPro
                 className="group"
               >
                 <div
-                  className="border-2 bg-white overflow-hidden transition-transform duration-300 hover:-translate-y-2"
+                  className="border-2 bg-card overflow-hidden transition-transform duration-300 hover:-translate-y-2"
                   style={{
                     borderColor: colors.ink,
                     boxShadow: brutalistShadow,

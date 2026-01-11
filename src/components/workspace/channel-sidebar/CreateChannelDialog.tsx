@@ -15,6 +15,7 @@ interface CreateChannelDialogProps {
   channelType: 'public' | 'private'
   channelScope?: 'workspace' | 'company' // 新增：頻道範圍
   selectedMembers: string[] // 新增：選中的成員 ID
+  isCreating?: boolean // 新增：是否正在建立中（防止重複點擊）
   onChannelNameChange: (name: string) => void
   onChannelDescriptionChange: (desc: string) => void
   onChannelTypeChange: (type: 'public' | 'private') => void
@@ -31,6 +32,7 @@ export function CreateChannelDialog({
   channelType,
   channelScope = 'workspace',
   selectedMembers,
+  isCreating = false,
   onChannelNameChange,
   onChannelDescriptionChange,
   onChannelTypeChange,
@@ -260,15 +262,19 @@ export function CreateChannelDialog({
         </div>
 
         <div className="flex gap-2 mt-4 justify-end border-t border-morandi-gold/10 pt-4">
-          <button className="btn-morandi-secondary !py-1.5 !px-3 text-sm" onClick={onClose}>
+          <button
+            className="btn-morandi-secondary !py-1.5 !px-3 text-sm"
+            onClick={onClose}
+            disabled={isCreating}
+          >
             取消
           </button>
           <button
             className="btn-morandi-primary !py-1.5 !px-3 text-sm"
             onClick={onCreate}
-            disabled={!channelName.trim() || selectedMembers.length === 0}
+            disabled={!channelName.trim() || selectedMembers.length === 0 || isCreating}
           >
-            建立
+            {isCreating ? '建立中...' : '建立'}
           </button>
         </div>
       </div>

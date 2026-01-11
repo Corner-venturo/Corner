@@ -216,7 +216,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
             onChange={e => setQuoteName(e.target.value)}
             disabled={isReadOnly}
             className={cn(
-              'text-lg font-bold text-morandi-primary bg-transparent border-0 focus:outline-none focus:bg-white px-2 py-1 rounded w-[180px]',
+              'text-lg font-bold text-morandi-primary bg-transparent border-0 focus:outline-none focus:bg-card px-2 py-1 rounded w-[180px]',
               isReadOnly && 'cursor-not-allowed opacity-60'
             )}
             placeholder="輸入團體名稱"

@@ -145,7 +145,7 @@ export function TourItinerarySectionLuxury({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden group"
+                  className="bg-card rounded-2xl shadow-lg overflow-hidden group"
                   style={{ borderColor: '#f0f0f0' }}
                 >
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'lg:grid-cols-12'} h-full`}>
@@ -175,7 +175,7 @@ export function TourItinerarySectionLuxury({
                           const dateDisplay = formatDateShort(day.date) || calculateDayDate(data.departureDate, numericDay)
                           return dateDisplay ? (
                             <span
-                              className="inline-block px-3 py-1.5 mb-3 bg-white/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest"
+                              className="inline-block px-3 py-1.5 mb-3 bg-card/10 backdrop-blur-sm rounded text-xs font-medium tracking-widest"
                             >
                               {dateDisplay}
                             </span>
@@ -468,7 +468,7 @@ export function TourItinerarySectionLuxury({
                           </h5>
                           {day.accommodation ? (
                             <div
-                              className="bg-white p-4 shadow-sm rounded-md border"
+                              className="bg-card p-4 shadow-sm rounded-md border"
                               style={{ borderColor: '#f0f0f0' }}
                             >
                               {/* 續住標示 */}

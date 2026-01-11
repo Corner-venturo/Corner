@@ -55,7 +55,7 @@ export function CardGridLayout({
               onClick={() => onImageClick(allImages, 0, day.title)}
             />
           ) : (
-            <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+            <div className="absolute inset-0 bg-card/5 flex items-center justify-center">
               <MapPin className="w-16 h-16 text-white/20" />
             </div>
           )}

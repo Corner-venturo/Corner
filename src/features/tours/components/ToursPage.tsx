@@ -9,7 +9,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useRegionsStore } from '@/stores'
+// 🔧 優化：移除 useRegionsStore import（不再需要載入 countries/cities）
 import { useOrdersListSlim, useQuotesListSlim, useItinerariesListSlim } from '@/hooks/useListSlim'
 import { useDialog } from '@/hooks/useDialog'
 import { useTourOperations } from '../hooks/useTourOperations'
@@ -26,10 +26,10 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { ArchiveReasonDialog } from './ArchiveReasonDialog'
 import { LinkItineraryToTourDialog } from './LinkItineraryToTourDialog'
 import { LinkDocumentsToTourDialog } from './LinkDocumentsToTourDialog'
+import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { logger } from '@/lib/utils/logger'
-import { TourConfirmationDialog } from './TourConfirmationDialog'
 import { TourControlDialogWrapper } from './TourControlDialogWrapper'
 import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
@@ -59,7 +59,6 @@ export const ToursPage: React.FC = () => {
   const router = useRouter()
   const { user } = useAuthStore()
 
-  const [tourConfirmationDialogTour, setTourConfirmationDialogTour] = useState<Tour | null>(null)
   const [tourControlDialogTour, setTourControlDialogTour] = useState<Tour | null>(null)
   const [proposalDialogOpen, setProposalDialogOpen] = useState(false)
   const [proposalEditDialogOpen, setProposalEditDialogOpen] = useState(false)
@@ -72,16 +71,13 @@ export const ToursPage: React.FC = () => {
   const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
   const { items: proposals, fetchAll: refreshProposals } = useProposals()
   const { items: proposalPackages, fetchAll: refreshProposalPackages } = useProposalPackages()
-  const { countries, cities, fetchAll: fetchRegions } = useRegionsStore()
+  // 🔧 優化：移除 useRegionsStore，不需要載入 countries/cities
+  // 提案和旅遊團都有 destination/location 欄位，不需要 ID→名稱轉換
   const { dialog, closeDialog, openDialog } = useDialog()
 
-  // 載入地區資料（只在首次載入時執行）
-  useEffect(() => {
-    if (countries.length === 0) {
-      fetchRegions()
-    }
-     
-  }, [])
+  // 🔧 優化：移除無條件載入 regions
+  // 提案已有 destination 欄位，不需要 country_id/city_id 轉換
+  // 如果未來需要 regions，可以在 TourForm 開啟時才載入
 
   const {
     filteredTours,
@@ -101,6 +97,9 @@ export const ToursPage: React.FC = () => {
     itineraryDialogTour,
     openItineraryDialog,
     closeItineraryDialog,
+    tourItineraryDialogTour,
+    openTourItineraryDialog,
+    closeTourItineraryDialog,
     quoteDialogTour,
     openQuoteDialog,
     closeQuoteDialog,
@@ -344,11 +343,9 @@ export const ToursPage: React.FC = () => {
     onOpenItineraryDialog: openItineraryDialog,
     onOpenQuoteDialog: openQuoteDialog,
     onOpenContractDialog: openContractDialog,
+    onOpenTourItineraryDialog: openTourItineraryDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
-    onOpenTourConfirmationDialog: (tour: Tour) => {
-      setTourConfirmationDialogTour(tour)
-    },
     onOpenTourControlDialog: (tour: Tour) => {
       setTourControlDialogTour(tour)
     },
@@ -361,16 +358,8 @@ export const ToursPage: React.FC = () => {
     onProposalDelete: handleDeleteProposal,
   })
 
-  // 取得國家/城市名稱的輔助函數
-  const getDestinationName = useMemo(() => {
-    return (countryId?: string | null, cityId?: string | null) => {
-      const country = countries.find(c => c.id === countryId)
-      const city = cities.find(c => c.id === cityId)
-      if (city && country) return `${country.name} ${city.name}`
-      if (country) return country.name
-      return '-'
-    }
-  }, [countries, cities])
+  // 🔧 優化：移除 getDestinationName，直接使用提案的 destination 欄位
+  // 不再需要 countries/cities ID→名稱轉換
 
   // 將提案轉換為 Tour 格式，用於「全部」頁籤整合顯示
   const combinedTours = useMemo(() => {
@@ -399,8 +388,8 @@ export const ToursPage: React.FC = () => {
       departure_date: p.expected_start_date || null,
       return_date: null,
       status: '提案',
-      // 目的地顯示（國家/城市）
-      destination: getDestinationName(p.country_id, p.main_city_id),
+      // 🔧 優化：直接使用提案的 destination 欄位，不需要 ID→名稱轉換
+      destination: p.destination || '-',
       // 標記這是提案，用於 click handler 區分
       __isProposal: true,
       __originalProposal: p,
@@ -408,7 +397,7 @@ export const ToursPage: React.FC = () => {
 
     // 提案置頂
     return [...proposalsAsTours, ...filteredTours]
-  }, [activeStatusTab, filteredTours, proposals, searchQuery, getDestinationName])
+  }, [activeStatusTab, filteredTours, proposals, searchQuery])
 
   // 點擊整列打開詳情浮動視窗
   const handleRowClick = useCallback((row: unknown) => {
@@ -588,6 +577,15 @@ export const ToursPage: React.FC = () => {
         />
       )}
 
+      {/* 行程表選擇對話框 */}
+      {tourItineraryDialogTour && (
+        <TourItineraryDialog
+          isOpen={!!tourItineraryDialogTour}
+          onClose={closeTourItineraryDialog}
+          tour={tourItineraryDialogTour}
+        />
+      )}
+
       {contractDialogState.tour && (
         <ContractDialog
           isOpen={contractDialogState.isOpen}
@@ -613,13 +611,6 @@ export const ToursPage: React.FC = () => {
           onSuccess={closeClosingDialog}
         />
       )}
-
-      {/* 團確單對話框 */}
-      <TourConfirmationDialog
-        open={!!tourConfirmationDialogTour}
-        tour={tourConfirmationDialogTour}
-        onClose={() => setTourConfirmationDialogTour(null)}
-      />
 
       {/* 團控表對話框 */}
       {tourControlDialogTour && (

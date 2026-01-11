@@ -67,7 +67,7 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
 
       {/* 入住退房資訊 */}
       {(data.checkInDate || data.checkOutDate) && (
-        <div className="grid grid-cols-4 gap-4 mb-6 bg-white border border-morandi-cream-dark rounded-md overflow-hidden">
+        <div className="grid grid-cols-4 gap-4 mb-6 bg-card border border-morandi-cream-dark rounded-md overflow-hidden">
           <div className="p-5 text-center border-r border-morandi-cream">
             <div className="text-xs text-morandi-secondary font-semibold mb-2">入住</div>
             <div className="text-lg font-semibold text-morandi-primary mb-1">
@@ -104,7 +104,7 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
       {/* 房型資訊 */}
       {data.roomType && (
         <div className="mb-6">
-          <h2 className="text-base font-semibold text-morandi-primary mb-4 p-3 bg-gradient-to-r from-morandi-cream to-white border-l-4 border-morandi-gold rounded">
+          <h2 className="text-base font-semibold text-morandi-primary mb-4 p-3 bg-gradient-to-r from-morandi-cream to-card border-l-4 border-morandi-gold rounded">
             房型資訊
           </h2>
           <div className="bg-morandi-cream-light border border-morandi-cream-dark rounded-md p-5">
@@ -138,7 +138,7 @@ export function AccommodationPreview({ formData }: AccommodationPreviewProps) {
       {/* 餐點資訊 */}
       {data.meals && data.meals.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-base font-semibold text-morandi-primary mb-4 p-3 bg-gradient-to-r from-morandi-cream to-white border-l-4 border-morandi-gold rounded">
+          <h2 className="text-base font-semibold text-morandi-primary mb-4 p-3 bg-gradient-to-r from-morandi-cream to-card border-l-4 border-morandi-gold rounded">
             餐點資訊
           </h2>
           <ul className="space-y-2">

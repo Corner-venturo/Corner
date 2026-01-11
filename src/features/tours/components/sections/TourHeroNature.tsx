@@ -138,7 +138,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                 isMobile ? 'bottom-4 left-4' : 'bottom-6 left-6'
               }`}>
                 {/* 位置標籤 */}
-                <div className={`flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-white/50 rounded-full ${
+                <div className={`flex items-center gap-2 bg-card/80 backdrop-blur-sm border border-white/50 rounded-full ${
                   isMobile ? 'px-3 py-1.5' : 'px-4 py-2'
                 }`}>
                   <MapPin size={isMobile ? 14 : 18} className="text-[#30abe8]" />
@@ -148,7 +148,7 @@ export function TourHeroNature({ data, viewMode }: TourHeroNatureProps) {
                 </div>
                 {/* Tagline 標籤 */}
                 {data.tagline && (
-                  <div className={`bg-white/80 backdrop-blur-sm border border-white/50 rounded-full ${
+                  <div className={`bg-card/80 backdrop-blur-sm border border-white/50 rounded-full ${
                     isMobile ? 'px-3 py-1.5' : 'px-4 py-2'
                   }`}>
                     <span className={`font-medium tracking-wider text-[#2c3e50] ${isMobile ? 'text-[10px]' : 'text-xs'}`}>

@@ -60,7 +60,7 @@ export function TourPriceTiersSection({ data, viewMode = 'desktop', coverStyle =
   const count = priceTiers.length
 
   return (
-    <section className={cn('py-12 bg-white', isMobile && 'py-8')}>
+    <section className={cn('py-12 bg-card', isMobile && 'py-8')}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           title="價格方案"

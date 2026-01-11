@@ -171,7 +171,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
                   'p-3 rounded-xl transition-all flex items-center space-x-3 text-left',
                   isSelected
                     ? 'bg-gradient-to-r from-[#F9F8F6] to-[#F9F8F6] shadow-sm'
-                    : 'bg-white/40 hover:bg-white/60'
+                    : 'bg-card/40 hover:bg-card/60'
                 )}
               >
                 <div
@@ -210,7 +210,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder={`輸入${selectedAccountType?.label}名稱`}
-          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+          className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 
@@ -230,7 +230,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
             onKeyDown={handleKeyDown}
             {...compositionProps}
             placeholder="0"
-            className="pl-12 border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+            className="pl-12 border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
             step="1"
           />
         </div>
@@ -256,7 +256,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
               onKeyDown={handleKeyDown}
               {...compositionProps}
               placeholder="50000"
-              className="pl-12 border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+              className="pl-12 border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
               min="0"
               step="1000"
             />
@@ -295,7 +295,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
           onKeyDown={handleKeyDown}
           {...compositionProps}
           placeholder="輸入帳戶備註（選填）"
-          className="border-[#E8E4E0] bg-white/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
+          className="border-[#E8E4E0] bg-card/60 focus:border-[#B8A99A] focus:ring-[#B8A99A]/20"
         />
       </div>
 

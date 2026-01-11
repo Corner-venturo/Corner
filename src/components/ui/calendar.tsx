@@ -268,10 +268,10 @@ export function Calendar({
                 'py-1.5 focus:z-10',
                 // 背景色
                 day.isCurrentMonth
-                  ? 'bg-white'
-                  : 'bg-morandi-light/30',
+                  ? 'bg-card'
+                  : 'bg-morandi-container/30',
                 // Hover 效果
-                !isDisabled && 'hover:bg-morandi-light/50',
+                !isDisabled && 'hover:bg-accent',
                 // 文字顏色
                 day.isCurrentMonth && !day.isSelected && !day.isToday
                   ? 'text-morandi-primary'
@@ -298,9 +298,9 @@ export function Calendar({
                 dateTime={day.date.toISOString()}
                 className={cn(
                   'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
-                  // 選中狀態的背景
-                  day.isSelected && !day.isToday && 'bg-morandi-primary text-white',
-                  day.isSelected && day.isToday && 'bg-morandi-gold text-white',
+                  // 選中狀態的背景 - 使用 gold 確保深色模式也能看清
+                  day.isSelected && !day.isToday && 'bg-morandi-gold text-white',
+                  day.isSelected && day.isToday && 'bg-morandi-gold text-white ring-2 ring-morandi-gold/30',
                   // 範圍起點/終點
                   day.isRangeStart && 'bg-morandi-gold text-white',
                   day.isRangeEnd && 'bg-morandi-gold text-white'

@@ -143,15 +143,15 @@ export default function ResetDBPage() {
             <h3 className="font-semibold mb-2">將清空以下資料庫</h3>
             <div className="space-y-1 text-sm">
               <div>
-                1. <code className="bg-white px-2 py-1 rounded border">VenturoOfflineDB</code>
+                1. <code className="bg-card px-2 py-1 rounded border">VenturoOfflineDB</code>
                 <span className="text-status-success ml-2">✓ 當前使用</span>
               </div>
               <div>
-                2. <code className="bg-white px-2 py-1 rounded border">venturo-db</code>
+                2. <code className="bg-card px-2 py-1 rounded border">venturo-db</code>
                 <span className="text-morandi-secondary ml-2">(舊資料庫)</span>
               </div>
               <div className="mt-2 text-morandi-secondary">
-                重建後版本：<code className="bg-white px-2 py-1 rounded border">v6 (46 個表格)</code>
+                重建後版本：<code className="bg-card px-2 py-1 rounded border">v6 (46 個表格)</code>
               </div>
             </div>
           </div>

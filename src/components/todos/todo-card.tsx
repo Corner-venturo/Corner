@@ -63,7 +63,7 @@ export function TodoCard({
         // 共享待辦使用淺藍色背景
         isShared
           ? 'bg-status-info-bg border-status-info/30 hover:bg-status-info-bg hover:border-status-info'
-          : 'bg-white border-morandi-gold/20 hover:border-morandi-gold/40',
+          : 'bg-card border-morandi-gold/20 hover:border-morandi-gold/40',
         // 已完成的待辦透明度降低
         isCompleted && 'opacity-60'
       )}

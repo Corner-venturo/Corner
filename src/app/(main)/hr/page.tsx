@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { useWorkspaceChannels } from '@/stores/workspace'
+import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
@@ -17,20 +18,26 @@ import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { ConfirmDialog } from '@/components/dialog/confirm-dialog'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
+import { generateCompanyPaymentRequestCode } from '@/stores/utils/code-generator'
+import { useAuthStore } from '@/stores/auth-store'
+import { toast } from 'sonner'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
   const { workspaces, loadWorkspaces: fetchWorkspaces } = useWorkspaceChannels()
+  const { items: paymentRequests, create: createPaymentRequest, fetchAll: fetchPaymentRequests } = usePaymentRequestStore()
+  const { create: createPaymentRequestItem } = usePaymentRequestItemStore()
+  const currentUser = useAuthStore(state => state.user)
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isSalaryPaymentDialogOpen, setIsSalaryPaymentDialogOpen] = useState(false)
   const { confirm, confirmDialogProps } = useConfirmDialog()
 
-  // 初始化時載入員工和工作空間資料（只執行一次）
+  // 初始化時載入員工、工作空間、請款單資料（只執行一次）
   useEffect(() => {
     fetchAll()
     fetchWorkspaces()
-     
+    fetchPaymentRequests()
   }, [])
 
   const getStatusLabel = (status: Employee['status']) => {
@@ -81,7 +88,6 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      const { toast } = await import('sonner')
       toast.error('離職處理失敗，請稍後再試')
     }
   }
@@ -116,7 +122,6 @@ export default function HRPage() {
         setExpandedEmployee(null)
       }
     } catch (err) {
-      const { toast } = await import('sonner')
       toast.error('刪除員工失敗，請稍後再試')
     }
   }
@@ -267,9 +272,57 @@ export default function HRPage() {
 
   // Handle salary payment submission
   const handleSalaryPaymentSubmit = async (data: SalaryPaymentData) => {
-    // TODO: 創建薪資請款單
-    logger.log('建立薪資請款：', data)
-    // 這裡之後要實作創建請款單的邏輯
+    try {
+      // 計算總金額
+      const totalAmount = data.employee_salaries.reduce((sum, s) => sum + s.amount, 0)
+
+      // 生成公司請款編號
+      const code = generateCompanyPaymentRequestCode('SAL', data.request_date, paymentRequests)
+
+      // 建立一張薪資請款單
+      const newRequest = await createPaymentRequest({
+        code,
+        request_number: code,
+        request_date: data.request_date,
+        request_type: '薪資',
+        request_category: 'company', // 公司請款
+        expense_type: 'SAL', // 薪資
+        amount: totalAmount,
+        is_special_billing: data.is_special_billing,
+        note: data.note || `${data.employee_salaries.length} 位員工薪資`,
+        status: 'pending',
+        created_by: currentUser?.id,
+        created_by_name: currentUser?.display_name || currentUser?.chinese_name,
+      })
+
+      // 為每位員工建立請款項目
+      if (newRequest?.id) {
+        for (let i = 0; i < data.employee_salaries.length; i++) {
+          const salary = data.employee_salaries[i]
+          const itemNumber = `${code}-${String.fromCharCode(65 + i)}` // A, B, C...
+
+          await createPaymentRequestItem({
+            request_id: newRequest.id,
+            item_number: itemNumber,
+            category: '其他' as const,
+            supplier_id: salary.employee_id,
+            supplier_name: salary.employee_name,
+            description: `${salary.employee_name} 薪資`,
+            unit_price: salary.amount,
+            quantity: 1,
+            subtotal: salary.amount,
+            sort_order: i,
+          })
+        }
+      }
+
+      await fetchPaymentRequests()
+      toast.success(`已建立薪資請款單（${data.employee_salaries.length} 位員工，共 NT$ ${totalAmount.toLocaleString()}）`)
+      logger.log('建立薪資請款成功：', data)
+    } catch (error) {
+      logger.error('建立薪資請款失敗：', error)
+      toast.error('建立薪資請款失敗，請稍後再試')
+    }
   }
 
   return (

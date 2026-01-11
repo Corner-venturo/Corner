@@ -5,8 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Hotel, Check, Plus, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { format, addDays, differenceInDays, parseISO } from 'date-fns'
+import { format, addDays, differenceInDays } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
+import { parseLocalDate } from '@/lib/utils/format-date'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { toast } from 'sonner'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
@@ -72,25 +73,19 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange }: T
 
   const tourNights = useMemo(() => {
     if (!tour?.departure_date || !tour?.return_date) return 0
-    try {
-      const startDate = parseISO(tour.departure_date)
-      const endDate = parseISO(tour.return_date)
-      const days = differenceInDays(endDate, startDate) + 1
-      return Math.max(days - 1, 0)
-    } catch {
-      return 0
-    }
+    const startDate = parseLocalDate(tour.departure_date)
+    const endDate = parseLocalDate(tour.return_date)
+    if (!startDate || !endDate) return 0
+    const days = differenceInDays(endDate, startDate) + 1
+    return Math.max(days - 1, 0)
   }, [tour?.departure_date, tour?.return_date])
 
   const getNightDate = (nightNumber: number): string => {
     if (!tour?.departure_date) return ''
-    try {
-      const startDate = parseISO(tour.departure_date)
-      const nightDate = addDays(startDate, nightNumber - 1)
-      return format(nightDate, 'M/d (EEE)', { locale: zhTW })
-    } catch {
-      return ''
-    }
+    const startDate = parseLocalDate(tour.departure_date)
+    if (!startDate) return ''
+    const nightDate = addDays(startDate, nightNumber - 1)
+    return format(nightDate, 'M/d (EEE)', { locale: zhTW })
   }
 
   const maxNight = tourNights > 0 ? tourNights : Math.max(...[...new Set(rooms.map(r => r.night_number))], 1)

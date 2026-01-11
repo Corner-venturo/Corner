@@ -44,7 +44,7 @@ export function MessageInput({ channel }: MessageInputProps) {
   }
 
   return (
-    <div className="p-4 border-t bg-white">
+    <div className="p-4 border-t bg-card">
       <div className="relative">
         <input
           type="text"

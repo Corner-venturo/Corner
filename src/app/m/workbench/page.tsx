@@ -74,7 +74,7 @@ export default function MobileWorkbenchPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 py-3">
+      <div className="bg-card border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
             href="/m"
@@ -100,7 +100,7 @@ export default function MobileWorkbenchPage() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex flex-col items-center p-3 rounded-xl bg-white border border-border
+                    className="flex flex-col items-center p-3 rounded-xl bg-card border border-border
                                hover:border-morandi-gold/50 hover:shadow-sm transition-all"
                   >
                     <div className={cn('p-2.5 rounded-xl', item.color)}>

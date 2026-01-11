@@ -271,13 +271,13 @@ export function AttractionsMap({
   return (
     <div className="absolute inset-0">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-[2000]">
+        <div className="absolute inset-0 flex items-center justify-center bg-card/80 z-[2000]">
           <Loader2 size={24} className="animate-spin text-morandi-secondary" />
         </div>
       )}
       <div ref={containerRef} className="w-full h-full" style={{ minHeight: '400px' }} />
       {nearbyAttractions.length > 0 && (
-        <div className="absolute bottom-3 left-3 text-xs bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-morandi-primary">
+        <div className="absolute bottom-3 left-3 text-xs bg-card/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm z-[1000] text-morandi-primary">
           {radiusKm}km 內 {nearbyAttractions.length} 個景點
         </div>
       )}

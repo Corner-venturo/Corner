@@ -239,7 +239,7 @@ export function AttractionSelector({
               // 地圖區域
               <>
                 {/* 地圖標題 */}
-                <div className="px-4 py-3 bg-white border-b border-border flex items-center justify-between">
+                <div className="px-4 py-3 bg-card border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MapPin size={18} className="text-status-danger" />
                     <span className="font-medium text-morandi-primary">{selectedMapAttraction?.name}</span>

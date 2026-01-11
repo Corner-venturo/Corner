@@ -1,8 +1,10 @@
 'use client'
 
-import { useTourStore } from '@/stores'
+import { useTourStore, useAuthStore } from '@/stores'
 import { tourService } from '../services/tour.service'
+import { createTourChannel } from '../services/tour-channel.service'
 import { Tour } from '@/stores/types'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 簡化版 Tours Hook（與其他模組接口統一）
@@ -18,7 +20,32 @@ export const useTours = () => {
     tours: tourStore.items,
 
     // ========== Tour CRUD 操作 ==========
-    createTour: tourStore.create,
+    /**
+     * 建立旅遊團並自動建立專屬頻道
+     */
+    createTour: async (data: Parameters<typeof tourStore.create>[0]) => {
+      // 1. 建立旅遊團
+      const newTour = await tourStore.create(data)
+
+      // 2. 自動建立頻道（異步執行，不阻塞返回）
+      const user = useAuthStore.getState().user
+      if (user && newTour) {
+        // 背景執行，不等待結果
+        createTourChannel(newTour as unknown as Tour, user.id)
+          .then(result => {
+            if (result.success) {
+              logger.log(`[useTours] 已為 ${newTour.code} 建立頻道`)
+            } else {
+              logger.warn(`[useTours] 建立頻道失敗: ${result.error}`)
+            }
+          })
+          .catch(error => {
+            logger.error('[useTours] 建立頻道時發生錯誤:', error)
+          })
+      }
+
+      return newTour
+    },
 
     updateTour: tourStore.update,
 

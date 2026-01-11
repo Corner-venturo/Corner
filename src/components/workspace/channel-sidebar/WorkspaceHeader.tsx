@@ -76,7 +76,7 @@ export function WorkspaceHeader({
           {/* 搜尋按鈕/輸入框 */}
           <div className="relative flex items-center">
             {isSearchExpanded ? (
-              <div className="flex items-center bg-white border border-border rounded-md overflow-hidden">
+              <div className="flex items-center bg-card border border-border rounded-md overflow-hidden">
                 <Search size={14} className="ml-2 text-morandi-secondary" />
                 <input
                   ref={searchInputRef}

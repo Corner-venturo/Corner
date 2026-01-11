@@ -54,6 +54,18 @@
   --input-bg: #ffffff;
   --input-text: #3a3633;
   --input-placeholder: #b8b2aa;
+
+  /* Shadcn 標準變數（按鈕等組件使用） */
+  --primary: #c9aa7c;
+  --primary-foreground: #ffffff;
+  --secondary: #e8e5e0;
+  --secondary-foreground: #3a3633;
+  --destructive: #c08374;
+  --destructive-foreground: #ffffff;
+  --muted: #e8e5e0;
+  --muted-foreground: #8b8680;
+  --ring: #c9aa7c;
+  --input: #d4c4b0;
 }
 
 /* Discord 風格深色主題 */
@@ -91,6 +103,30 @@
   --input-bg: rgba(47, 49, 54, 0.5);
   --input-text: #dcddde;
   --input-placeholder: #72767d;
+
+  /* 語義顏色系統（深色主題） */
+  --status-info: #5865f2;           /* 資訊 - Discord 紫藍 */
+  --status-info-bg: rgba(88, 101, 242, 0.15);
+  --status-success: #3ba55d;        /* 成功 - 綠色 */
+  --status-success-bg: rgba(59, 165, 93, 0.15);
+  --status-warning: #faa61a;        /* 警告 - 橙色 */
+  --status-warning-bg: rgba(250, 166, 26, 0.15);
+  --status-danger: #ed4245;         /* 危險 - 紅色 */
+  --status-danger-bg: rgba(237, 66, 69, 0.15);
+  --status-neutral: #72767d;        /* 中性 - 灰色 */
+  --status-neutral-bg: rgba(114, 118, 125, 0.15);
+
+  /* Shadcn 標準變數（按鈕等組件使用） */
+  --primary: #5865f2;
+  --primary-foreground: #ffffff;
+  --secondary: #4f545c;
+  --secondary-foreground: #dcddde;
+  --destructive: #ed4245;
+  --destructive-foreground: #ffffff;
+  --muted: #2f3136;
+  --muted-foreground: #b9bbbe;
+  --ring: #5865f2;
+  --input: #202225;
 }
 
 /* 深色主題的純色背景（Discord 風格不用漸層） */
@@ -245,7 +281,18 @@
   --color-accent-foreground: var(--accent-foreground);
 
   /* 表單元素顏色映射 */
-  --color-input: var(--input-border);
+  --color-input: var(--input);
+
+  /* Shadcn 標準變數映射 */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ring: var(--ring);
 
   /* 莫蘭迪色系 */
   --color-morandi-primary: var(--morandi-primary);

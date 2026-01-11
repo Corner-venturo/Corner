@@ -152,7 +152,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
               value={intention}
               onChange={(e) => setIntention(e.target.value)}
               placeholder="今天我想要專注在..."
-              className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-white focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
+              className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
             />
           </div>
 
@@ -170,7 +170,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
                   value={gratitude}
                   onChange={(e) => handleGratitudeChange(index, e.target.value)}
                   placeholder={`感恩 ${index + 1}...`}
-                  className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-white focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
                 />
               ))}
             </div>
@@ -187,7 +187,7 @@ export default function DailyManifestationPanel({ className }: DailyManifestatio
               value={magicPhrase}
               onChange={(e) => setMagicPhrase(e.target.value)}
               placeholder="我值得擁有美好的一切..."
-              className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-white focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
+              className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card focus:ring-2 focus:ring-morandi-gold/30 focus:border-morandi-gold outline-none transition-all"
             />
           </div>
 

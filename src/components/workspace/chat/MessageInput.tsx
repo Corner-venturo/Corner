@@ -366,7 +366,7 @@ export function MessageInput({
   return (
     <div
       className={cn(
-        'p-4 border-t border-morandi-gold/20 bg-white shrink-0 transition-colors',
+        'p-4 border-t border-morandi-gold/20 bg-card shrink-0 transition-colors',
         isDragging && 'bg-morandi-gold/10 border-morandi-gold'
       )}
       onDragOver={handleDragOver}
@@ -424,7 +424,7 @@ export function MessageInput({
               }
             }}
             placeholder={isDisabled ? "只有管理員才能在此頻道發言" : `傳送訊息給 ${displayChannelName}...`}
-            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-white border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
+            className="w-full min-h-[40px] max-h-[120px] px-3 py-2 pr-10 bg-card border border-morandi-container rounded-md resize-none text-sm focus:outline-none focus:border-morandi-gold transition-colors disabled:bg-muted disabled:cursor-not-allowed"
             rows={1}
             style={{
               height: 'auto',

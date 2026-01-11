@@ -130,7 +130,7 @@ export function TourForm({ data, onChange, quoteTierPricings }: TourFormProps) {
   return (
     <div ref={containerRef}>
       {/* 快速導覽列 */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-morandi-container/30 px-4 py-2">
+      <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-morandi-container/30 px-4 py-2">
         <div className="flex items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -159,7 +159,7 @@ export function TourForm({ data, onChange, quoteTierPricings }: TourFormProps) {
 
                   {/* 下拉選單 */}
                   {showDayNav && hasDays && (
-                    <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-morandi-container/30 p-2 z-50 min-w-[200px]">
+                    <div className="absolute top-full left-0 mt-1 bg-card rounded-lg shadow-lg border border-morandi-container/30 p-2 z-50 min-w-[200px]">
                       <div className="grid grid-cols-5 gap-1">
                         {dayLabels.map((label, index) => {
                           const day = data.dailyItinerary?.[index]

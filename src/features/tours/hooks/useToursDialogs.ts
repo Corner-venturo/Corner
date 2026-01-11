@@ -22,10 +22,15 @@ export interface UseToursDialogsReturn {
   openQuoteDialog: (tour: Tour, mode?: 'manage' | 'confirm') => void
   closeQuoteDialog: () => void
 
-  // Itinerary Dialog
+  // Itinerary Dialog (for design)
   itineraryDialogTour: Tour | null
   openItineraryDialog: (tour: Tour) => void
   closeItineraryDialog: () => void
+
+  // Tour Itinerary Dialog (for selecting itinerary type)
+  tourItineraryDialogTour: Tour | null
+  openTourItineraryDialog: (tour: Tour) => void
+  closeTourItineraryDialog: () => void
 
   // Contract Dialog
   contractDialogState: ContractDialogState
@@ -69,8 +74,11 @@ export function useToursDialogs(): UseToursDialogsReturn {
   const [quoteDialogTour, setQuoteDialogTour] = useState<Tour | null>(null)
   const [quoteDialogMode, setQuoteDialogMode] = useState<'manage' | 'confirm'>('manage')
 
-  // Itinerary Dialog
+  // Itinerary Dialog (for design)
   const [itineraryDialogTour, setItineraryDialogTour] = useState<Tour | null>(null)
+
+  // Tour Itinerary Dialog (for selecting itinerary type)
+  const [tourItineraryDialogTour, setTourItineraryDialogTour] = useState<Tour | null>(null)
 
   // Contract Dialog
   const [contractDialogState, setContractDialogState] = useState<ContractDialogState>({
@@ -112,6 +120,9 @@ export function useToursDialogs(): UseToursDialogsReturn {
 
   const openItineraryDialog = useCallback((tour: Tour) => setItineraryDialogTour(tour), [])
   const closeItineraryDialog = useCallback(() => setItineraryDialogTour(null), [])
+
+  const openTourItineraryDialog = useCallback((tour: Tour) => setTourItineraryDialogTour(tour), [])
+  const closeTourItineraryDialog = useCallback(() => setTourItineraryDialogTour(null), [])
 
   const openContractDialog = useCallback((tour: Tour) => {
     const mode = tour.contract_template ? 'edit' : 'create'
@@ -161,6 +172,9 @@ export function useToursDialogs(): UseToursDialogsReturn {
     itineraryDialogTour,
     openItineraryDialog,
     closeItineraryDialog,
+    tourItineraryDialogTour,
+    openTourItineraryDialog,
+    closeTourItineraryDialog,
     contractDialogState,
     openContractDialog,
     closeContractDialog,

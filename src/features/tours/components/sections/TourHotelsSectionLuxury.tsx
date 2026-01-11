@@ -176,8 +176,8 @@ function SingleHotelLayout({ hotel }: { hotel: HotelInfo }) {
                   }}
                   className={`w-2 h-2 rounded-full transition-all ${
                     idx === currentIndex
-                      ? 'bg-white w-6'
-                      : 'bg-white/50 hover:bg-white/80'
+                      ? 'bg-card w-6'
+                      : 'bg-card/50 hover:bg-card/80'
                   }`}
                   aria-label={`切換到第 ${idx + 1} 張圖片`}
                 />
@@ -329,8 +329,8 @@ function HotelCard({
                   }}
                   className={`w-1.5 h-1.5 rounded-full transition-all ${
                     idx === currentIndex
-                      ? 'bg-white w-4'
-                      : 'bg-white/50 hover:bg-white/80'
+                      ? 'bg-card w-4'
+                      : 'bg-card/50 hover:bg-card/80'
                   }`}
                   aria-label={`切換到第 ${idx + 1} 張圖片`}
                 />

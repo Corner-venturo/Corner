@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'
 import {
@@ -10,6 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useAuthStore } from '@/stores/auth-store'
 import type { WidgetType } from '../types'
 import { AVAILABLE_WIDGETS } from './widget-config'
 
@@ -19,13 +21,32 @@ interface WidgetSettingsDialogProps {
 }
 
 export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSettingsDialogProps) {
+  const { user } = useAuthStore()
+  const userRoles = user?.roles || []
+
+  // 是否為超級管理員
+  const isSuperAdmin = userRoles.includes('super_admin')
+
+  // 過濾可見的 widgets
+  const visibleWidgets = useMemo(() => {
+    return AVAILABLE_WIDGETS.filter(widget => {
+      // 沒有權限限制的 widget 所有人都看得到
+      if (!widget.requiredPermission) return true
+      // super_admin_only 只有超級管理員看得到
+      if (widget.requiredPermission === 'super_admin_only') {
+        return isSuperAdmin
+      }
+      return true
+    })
+  }, [isSuperAdmin])
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 bg-white border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
+          className="gap-2 bg-card border-morandi-gold/20 hover:border-morandi-gold transition-all rounded-xl"
         >
           <Settings className="h-4 w-4" />
           小工具設定
@@ -37,12 +58,12 @@ export function WidgetSettingsDialog({ activeWidgets, onToggleWidget }: WidgetSe
           <p className="text-sm text-morandi-muted mt-1">勾選你想在首頁顯示的小工具</p>
         </DialogHeader>
         <div className="space-y-2 py-4">
-          {AVAILABLE_WIDGETS.map(widget => {
+          {visibleWidgets.map(widget => {
             const Icon = widget.icon as React.ComponentType<{ className?: string }>
             return (
               <div
                 key={widget.id}
-                className="flex items-center space-x-3 p-4 rounded-xl border border-morandi-gold/20 bg-white hover:border-morandi-gold cursor-pointer transition-all shadow-sm"
+                className="flex items-center space-x-3 p-4 rounded-xl border border-morandi-gold/20 bg-card hover:border-morandi-gold cursor-pointer transition-all shadow-sm"
                 onClick={() => onToggleWidget(widget.id as WidgetType)}
               >
                 <Checkbox

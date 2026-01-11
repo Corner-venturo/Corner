@@ -89,7 +89,7 @@ function ImageCarousel({ images, hotelName }: { images: string[]; hotelName: str
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
+              index === currentIndex ? 'bg-card' : 'bg-card/50'
             }`}
           />
         ))}
@@ -128,7 +128,7 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
   }
 
   return (
-    <section className="bg-white pt-8 pb-16">
+    <section className="bg-card pt-8 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -153,7 +153,7 @@ export function TourHotelsSection({ data, viewMode, coverStyle = 'original' }: T
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden border border-border"
+                className="bg-card rounded-2xl shadow-lg overflow-hidden border border-border"
               >
                 <ImageCarousel images={images} hotelName={hotel.name || '飯店'} />
                 <div className="p-6">

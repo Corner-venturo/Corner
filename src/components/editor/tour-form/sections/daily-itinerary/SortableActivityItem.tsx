@@ -58,7 +58,7 @@ export function SortableActivityItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white/90 p-3 rounded-lg border border-morandi-container"
+      className="bg-card/90 p-3 rounded-lg border border-morandi-container"
     >
       <div className="flex gap-3">
         {/* 拖曳把手 */}

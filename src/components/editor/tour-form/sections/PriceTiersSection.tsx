@@ -163,7 +163,7 @@ export function PriceTiersSection({ data, onChange, quoteTierPricings }: PriceTi
             {priceTiers.map((tier, index) => (
               <div
                 key={index}
-                className="p-4 border border-morandi-container rounded-lg bg-white space-y-3"
+                className="p-4 border border-morandi-container rounded-lg bg-card space-y-3"
               >
                 {/* 標題列 */}
                 <div className="flex items-center justify-between">

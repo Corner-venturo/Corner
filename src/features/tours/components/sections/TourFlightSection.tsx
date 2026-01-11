@@ -194,7 +194,7 @@ export function TourFlightSection({ data, viewMode, coverStyle = 'original' }: T
   return (
     <section
       id="flight"
-      className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-white' : 'pt-8 pb-16 bg-white'}
+      className={viewMode === 'mobile' ? 'pt-4 pb-8 bg-card' : 'pt-8 pb-16 bg-card'}
     >
       <div className={viewMode === 'mobile' ? 'px-4' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}>
         <div

@@ -315,7 +315,7 @@ export default function ManifestationNotebook() {
                     'h-6 w-full rounded-full border transition-all',
                     completed
                       ? 'bg-morandi-gold border-morandi-gold'
-                      : 'bg-white border-morandi-container'
+                      : 'bg-card border-morandi-container'
                   )}
                 />
                 <span className={cn(
@@ -417,7 +417,7 @@ export default function ManifestationNotebook() {
                     'w-full p-3 rounded-lg border text-left transition-all hover:shadow-md',
                     completed
                       ? 'bg-morandi-gold/5 border-morandi-gold/30'
-                      : 'bg-white border-border hover:border-morandi-gold/50'
+                      : 'bg-card border-border hover:border-morandi-gold/50'
                   )}
                 >
                   <div className="flex items-start gap-3">
@@ -597,7 +597,7 @@ export default function ManifestationNotebook() {
                       key={record.id}
                       className={cn(
                         'p-3 rounded-lg border',
-                        isToday ? 'bg-morandi-gold/5 border-morandi-gold/30' : 'bg-white border-border'
+                        isToday ? 'bg-morandi-gold/5 border-morandi-gold/30' : 'bg-card border-border'
                       )}
                     >
                       <div className="flex items-center justify-between mb-2">

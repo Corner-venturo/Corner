@@ -134,7 +134,7 @@ export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   if (!isOpen) return null
 
   return (
-    <div className="w-64 border-l border-border bg-white flex flex-col shrink-0">
+    <div className="w-64 border-l border-border bg-card flex flex-col shrink-0">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-medium text-morandi-primary">成員列表</h3>

@@ -51,7 +51,7 @@ export function DayCard({
   return (
     <div
       id={`day-${dayIndex}`}
-      className="p-6 border border-morandi-container rounded-xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-white to-morandi-container/10 shadow-sm"
+      className="p-6 border border-morandi-container rounded-xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-card to-morandi-container/10 shadow-sm"
     >
       {/* Day 標籤與控制按鈕 */}
       <div className="flex justify-between items-center">

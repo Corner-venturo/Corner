@@ -133,7 +133,7 @@ export function HotelSelector({
           />
 
           {/* 飯店列表 */}
-          <div className="flex-1 overflow-y-auto border border-morandi-container/50 rounded-xl bg-white">
+          <div className="flex-1 overflow-y-auto border border-morandi-container/50 rounded-xl bg-card">
             <HotelList
               hotels={filteredHotels}
               loading={loading}

@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { CostCategory, CostItem } from '@/features/quotes/types'
+import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
 
 // 每日行程類型
 interface DailyMeals {
@@ -103,6 +104,57 @@ function convertDailyItineraryToAccommodation(dailyItinerary: DailyItineraryDay[
         unit_price: 0,
         total: 0,
         day: dayNum,
+      })
+    }
+  }
+
+  return items
+}
+
+/**
+ * 將時間軸行程的餐食資訊轉換為報價單的 meals 分類格式
+ */
+function convertTimelineToMeals(days: TimelineDay[]): CostItem[] {
+  const items: CostItem[] = []
+
+  for (const day of days) {
+    const dayNum = day.dayNumber
+
+    // 從 attractions 中找餐食
+    for (const attr of day.attractions) {
+      if (attr.mealType && attr.mealType !== 'none' && attr.name) {
+        const mealLabel = attr.mealType === 'breakfast' ? '早餐' :
+                          attr.mealType === 'lunch' ? '午餐' : '晚餐'
+        items.push({
+          id: generateUUID(),
+          name: `Day${dayNum} ${mealLabel}：${attr.name}`,
+          quantity: 1,
+          unit_price: 0,
+          total: 0,
+          day: dayNum,
+        })
+      }
+    }
+  }
+
+  return items
+}
+
+/**
+ * 將時間軸行程的住宿資訊轉換為報價單的 accommodation 分類格式
+ */
+function convertTimelineToAccommodation(days: TimelineDay[]): CostItem[] {
+  const items: CostItem[] = []
+
+  for (const day of days) {
+    if (day.accommodation) {
+      items.push({
+        id: generateUUID(),
+        name: day.accommodation,
+        quantity: 1,
+        unit_price: 0,
+        total: 0,
+        day: day.dayNumber,
       })
     }
   }
@@ -283,5 +335,129 @@ export async function syncItineraryToQuote(
     }
   } catch (error) {
     logger.error('同步行程表到報價單失敗:', error)
+  }
+}
+
+/**
+ * 同步時間軸行程資料到關聯的報價單
+ * - 更新 meals 分類（餐食）- 從 attractions 的 mealType 提取
+ * - 更新 accommodation 分類（住宿）- 從每日的 accommodation 欄位提取
+ *
+ * @param quoteId 報價單 ID
+ * @param timelineData 時間軸行程資料
+ */
+export async function syncTimelineToQuote(
+  quoteId: string,
+  timelineData: TimelineItineraryData
+): Promise<void> {
+  try {
+    if (!timelineData.days || timelineData.days.length === 0) {
+      logger.log('時間軸行程無每日資料，跳過同步')
+      return
+    }
+
+    // 1. 取得報價單現有的 categories
+    const { data: quote } = await quotesDb()
+      .select('categories')
+      .eq('id', quoteId)
+      .single()
+
+    if (!quote) {
+      logger.warn('找不到報價單:', quoteId)
+      return
+    }
+
+    const existingCategories = (quote.categories as CostCategory[]) || []
+
+    // 2. 轉換餐食和住宿資料
+    const newMealsItems = convertTimelineToMeals(timelineData.days)
+    const newAccommodationItems = convertTimelineToAccommodation(timelineData.days)
+
+    // 3. 更新 categories，保留其他分類和現有價格資訊
+    const updatedCategories = existingCategories.map(cat => {
+      if (cat.id === 'meals') {
+        // 合併現有的價格資訊到新項目
+        const itemsWithPrices = newMealsItems.map(newItem => {
+          // 嘗試找到相同位置（Day+餐別）的舊項目以保留價格
+          const match = newItem.name.match(/Day(\d+)\s*(早餐|午餐|晚餐)/)
+          if (match) {
+            const dayNum = match[1]
+            const mealType = match[2]
+            const existingItem = cat.items.find(
+              old => old.name.startsWith(`Day${dayNum} ${mealType}`)
+            )
+            if (existingItem) {
+              return {
+                ...newItem,
+                unit_price: existingItem.unit_price,
+                total: existingItem.total,
+              }
+            }
+          }
+          return newItem
+        })
+        return {
+          ...cat,
+          items: itemsWithPrices,
+          total: itemsWithPrices.reduce((sum, item) => sum + item.total, 0),
+        }
+      }
+      if (cat.id === 'accommodation') {
+        // 住宿：保留現有價格資訊
+        const itemsWithPrices = newAccommodationItems.map(newItem => {
+          // 嘗試找到相同天數的舊項目以保留價格
+          const existingItem = cat.items.find(old => old.day === newItem.day)
+          if (existingItem) {
+            return {
+              ...newItem,
+              unit_price: existingItem.unit_price,
+              total: existingItem.total,
+              room_type: existingItem.room_type,
+            }
+          }
+          return newItem
+        })
+        return {
+          ...cat,
+          items: itemsWithPrices,
+          total: itemsWithPrices.reduce((sum, item) => sum + item.total, 0),
+        }
+      }
+      return cat
+    })
+
+    // 4. 如果 categories 中沒有 meals 或 accommodation，則新增
+    if (!updatedCategories.find(c => c.id === 'meals') && newMealsItems.length > 0) {
+      updatedCategories.push({
+        id: 'meals',
+        name: '餐飲',
+        items: newMealsItems,
+        total: 0,
+      })
+    }
+    if (!updatedCategories.find(c => c.id === 'accommodation') && newAccommodationItems.length > 0) {
+      updatedCategories.push({
+        id: 'accommodation',
+        name: '住宿',
+        items: newAccommodationItems,
+        total: 0,
+      })
+    }
+
+    // 5. 更新報價單
+    const { error } = await quotesDb()
+      .update({
+        categories: updatedCategories,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', quoteId)
+
+    if (error) {
+      logger.error('更新報價單 categories 失敗:', error)
+    } else {
+      logger.log('已同步時間軸行程到報價單:', quoteId)
+    }
+  } catch (error) {
+    logger.error('同步時間軸行程到報價單失敗:', error)
   }
 }

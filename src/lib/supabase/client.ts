@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr'
 import { Database } from './types'
-import { POLLING_INTERVALS } from '@/lib/constants/timeouts'
 
 // ============================================
 // 原有的 singleton client (給 stores 使用)
@@ -16,19 +15,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   },
-  global: {
-    fetch: typeof window !== 'undefined'
-      ? (url, options = {}) => {
-          const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), POLLING_INTERVALS.OCCASIONAL)
-
-          return fetch(url, {
-            ...options,
-            signal: controller.signal,
-          }).finally(() => clearTimeout(timeoutId))
-        }
-      : undefined,
-  },
+  // 暫時移除自定義 fetch wrapper 來測試是否是 signal 衝突問題
 })
 
 // ============================================

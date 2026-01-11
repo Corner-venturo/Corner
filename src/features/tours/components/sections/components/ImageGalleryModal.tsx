@@ -41,14 +41,14 @@ export function ImageGalleryModal({
             <>
               <button
                 onClick={onPrev}
-                className="absolute left-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-white hover:text-black"
+                className="absolute left-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-card hover:text-black"
                 aria-label="Previous image"
               >
                 <ChevronLeft className="w-6 h-6 text-white" />
               </button>
               <button
                 onClick={onNext}
-                className="absolute right-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-white hover:text-black"
+                className="absolute right-6 z-10 w-12 h-12 flex items-center justify-center border border-white transition-colors hover:bg-card hover:text-black"
                 aria-label="Next image"
               >
                 <ChevronRight className="w-6 h-6 text-white" />
@@ -83,8 +83,8 @@ export function ImageGalleryModal({
                   onClick={() => onSelectIndex(idx)}
                   className={`w-2 h-2 transition-all ${
                     idx === imageGallery.currentIndex
-                      ? 'bg-white w-8'
-                      : 'bg-white/30 hover:bg-white/50'
+                      ? 'bg-card w-8'
+                      : 'bg-card/30 hover:bg-card/50'
                   }`}
                   aria-label={`View image ${idx + 1}`}
                 />

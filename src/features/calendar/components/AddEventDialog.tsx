@@ -67,7 +67,7 @@ const parseTimeRange = (value: string): { start: string; end: string | null } =>
 }
 
 // 輸入框樣式
-const inputClassName = "w-full px-4 py-2.5 rounded-lg border border-[#E8E4E0] bg-white text-[#333333] placeholder:text-[#333333]/30 focus:outline-none focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] transition-shadow text-sm shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+const inputClassName = "w-full px-4 py-2.5 rounded-lg border border-[#E8E4E0] bg-card text-[#333333] placeholder:text-[#333333]/30 focus:outline-none focus:ring-1 focus:ring-[#B8A99A] focus:border-[#B8A99A] transition-shadow text-sm shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
 
 export function AddEventDialog({
   dialog,
@@ -195,7 +195,7 @@ export function AddEventDialog({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-lg border border-[#E8E4E0] text-[#333333] bg-white hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
+            className="px-6 py-2.5 rounded-lg border border-[#E8E4E0] text-[#333333] bg-card hover:bg-[#F9F8F6] transition-colors text-sm font-medium"
           >
             取消
           </button>

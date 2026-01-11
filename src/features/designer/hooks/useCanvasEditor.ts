@@ -32,12 +32,9 @@ export function useCanvasEditor({
   const [zoom, setZoomState] = useState(1)
   const [isCanvasReady, setIsCanvasReady] = useState(false)
 
-  // 縮放控制
+  // 縮放控制（只更新狀態，實際縮放由外層 CSS transform 處理）
   const setZoom = useCallback((newZoom: number) => {
-    const fabricCanvas = fabricCanvasRef.current
-    if (!fabricCanvas) return
     const clampedZoom = Math.max(0.25, Math.min(newZoom, 3))
-    fabricCanvas.setZoom(clampedZoom)
     setZoomState(clampedZoom)
   }, [])
 
@@ -136,17 +133,22 @@ export function useCanvasEditor({
     }
   }, [page?.width, page?.height, page?.backgroundColor, onElementChange, onSelect, onPlaceholderClick])
 
-  // 當 page 變更時重新渲染
+  // 當 page 變更時重新渲染（包含 elements 變更）
   useEffect(() => {
     const fabricCanvas = fabricCanvasRef.current
     if (!fabricCanvas || !page) return
+
+    // 確保 canvas 尺寸正確
+    if (fabricCanvas.width !== page.width || fabricCanvas.height !== page.height) {
+      fabricCanvas.setDimensions({ width: page.width, height: page.height })
+    }
 
     renderPageOnCanvas(fabricCanvas, page, {
       isEditable: true,
       canvasWidth: page.width,
       canvasHeight: page.height,
     })
-  }, [page])
+  }, [page, page?.elements, page?.elements?.length])
 
   // 新增文字元素
   const addTextElement = useCallback(() => {

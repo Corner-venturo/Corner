@@ -23,7 +23,7 @@ export function MessageView({ channel }: MessageViewProps) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Channel Header */}
-      <div className="p-4 border-b bg-white shadow-sm z-10">
+      <div className="p-4 border-b bg-card shadow-sm z-10">
         <h3 className="font-bold text-xl">#{channel.name}</h3>
         {channel.description && <p className="text-morandi-secondary text-sm">{channel.description}</p>}
       </div>

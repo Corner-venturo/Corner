@@ -78,7 +78,7 @@ function BlobLeftLayout({
       className={`flex flex-col lg:flex-row w-full min-h-[70vh] relative overflow-hidden group ${isMobile ? 'py-8' : 'py-0'}`}
     >
       {/* 左側文字 */}
-      <div className={`lg:w-[40%] ${isMobile ? 'px-4' : 'p-12 lg:p-24'} flex flex-col justify-center bg-white/20 backdrop-blur-sm relative z-10 order-2 lg:order-1`}>
+      <div className={`lg:w-[40%] ${isMobile ? 'px-4' : 'p-12 lg:p-24'} flex flex-col justify-center bg-card/20 backdrop-blur-sm relative z-10 order-2 lg:order-1`}>
         <div
           className="absolute top-10 left-10 text-xs font-bold tracking-[0.5em] uppercase"
           style={{ color: DREAM.purple, fontFamily: "'Cormorant Garamond', serif" }}
@@ -199,7 +199,7 @@ function BlobRightLayout({
         {/* 中間文字 */}
         <div className={`lg:col-span-4 ${isMobile ? '' : 'lg:col-start-5'} text-center relative z-20 py-12`}>
           <div
-            className="inline-block border rounded-full px-6 py-2 mb-6 bg-white/40 backdrop-blur"
+            className="inline-block border rounded-full px-6 py-2 mb-6 bg-card/40 backdrop-blur"
             style={{ borderColor: `${DREAM.text}33`, fontFamily: "'Space Mono', monospace" }}
           >
             <span className="text-xs tracking-[0.3em] uppercase">Day {String(dayNum).padStart(2, '0')} • {dateFormatted}</span>
@@ -243,7 +243,7 @@ function BlobRightLayout({
             </div>
             {day.activities?.[0]?.title && (
               <div
-                className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-white/30 backdrop-blur-md border border-white/40 shadow-lg"
+                className="absolute -bottom-6 -right-6 p-4 rounded-xl z-10 rotate-3 bg-card/30 backdrop-blur-md border border-white/40 shadow-lg"
               >
                 <span style={{ fontFamily: "'Cinzel', serif", fontSize: '1.5rem', color: DREAM.accent }}>
                   {day.activities[0].title}
@@ -261,7 +261,7 @@ function BlobRightLayout({
             </div>
             {day.activities?.[1]?.title && (
               <div
-                className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-white/30 backdrop-blur-md border border-white/40 shadow-lg"
+                className="absolute top-12 -left-12 p-6 rounded-full w-32 h-32 flex items-center justify-center z-10 animate-pulse bg-card/30 backdrop-blur-md border border-white/40 shadow-lg"
               >
                 <span style={{ fontFamily: "'La Belle Aurore', cursive", fontSize: '1.25rem', textAlign: 'center', lineHeight: 1.2 }}>
                   {day.activities[1].title}
@@ -360,7 +360,7 @@ function FullHeroLayout({
         {/* 景點卡片 */}
         {day.activities && day.activities.length > 0 && (
           <div
-            className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-2 gap-12'} text-left p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] border transition-colors bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20`}
+            className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-2 gap-12'} text-left p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] border transition-colors bg-card/10 backdrop-blur-md border-white/20 hover:bg-card/20`}
             style={{ color: DREAM.text }}
           >
             {day.activities.slice(0, 2).map((activity, i) => (
@@ -476,7 +476,7 @@ function GlassCardLayout({
               <div
                 key={actualIndex}
                 ref={el => { dayRefs.current[actualIndex] = el }}
-                className={`${isMobile ? 'w-[280px]' : 'w-[350px] lg:w-[450px]'} aspect-[3/4] rounded-[3rem] p-8 flex flex-col relative group hover:-translate-y-4 transition-transform duration-500 bg-white/60 backdrop-blur-lg shadow-lg border border-white/60`}
+                className={`${isMobile ? 'w-[280px]' : 'w-[350px] lg:w-[450px]'} aspect-[3/4] rounded-[3rem] p-8 flex flex-col relative group hover:-translate-y-4 transition-transform duration-500 bg-card/60 backdrop-blur-lg shadow-lg border border-white/60`}
               >
                 {/* Day 標籤 */}
                 <div

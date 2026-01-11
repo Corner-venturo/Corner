@@ -23,6 +23,7 @@ interface TableHeaderProps<T extends RowData = RowData> {
   showFilters: boolean
   selection?: SelectionConfig<T>
   actions?: (row: T) => React.ReactNode
+  actionsWidth?: string
   allVisibleSelected: boolean
   someVisibleSelected: boolean
   onSort: (columnKey: string) => void
@@ -39,6 +40,7 @@ export function TableHeader({
   showFilters,
   selection,
   actions,
+  actionsWidth = '100px',
   allVisibleSelected,
   someVisibleSelected,
   onSort,
@@ -119,9 +121,9 @@ export function TableHeader({
           </th>
         ))}
 
-        {/* Actions column - 固定 50% 寬度 */}
+        {/* Actions column */}
         {actions && (
-          <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: '50%' }}>
+          <th className="text-left py-2.5 px-4 text-xs relative" style={{ width: actionsWidth }}>
             <span className="font-medium text-morandi-secondary">操作</span>
           </th>
         )}

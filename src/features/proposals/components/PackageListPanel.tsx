@@ -26,6 +26,7 @@ import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import {
   createPackage,
   updatePackage,
@@ -373,6 +374,12 @@ export function PackageListPanel({
           .eq('id', selectedPackage.id)
 
         if (error) throw error
+
+        // 如果有關聯報價單，同步餐食和住宿資料
+        if (selectedPackage.quote_id) {
+          await syncTimelineToQuote(selectedPackage.quote_id, timelineData)
+        }
+
         onPackagesChange()
       } catch (error) {
         logger.error('儲存時間軸資料失敗:', error)
@@ -403,8 +410,8 @@ export function PackageListPanel({
                 <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">目的地</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">日期</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">人數</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">文件</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary">操作</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-morandi-secondary">操作</th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-morandi-secondary"></th>
               </tr>
             </thead>
             <tbody>
@@ -448,73 +455,78 @@ export function PackageListPanel({
                     </span>
                   </td>
 
-                  {/* 文件狀態 */}
+                  {/* 操作按鈕 */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      {/* 行程表下拉選單 - 快速行程表 / 時間軸行程表 */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`p-1.5 rounded transition-colors ${
-                              pkg.itinerary_id || pkg.itinerary_type === 'timeline'
-                                ? 'text-morandi-green hover:bg-morandi-green/10'
-                                : 'text-morandi-secondary hover:bg-morandi-container/80'
-                            }`}
-                            title="行程表"
-                          >
-                            <FileText size={16} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-44">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (pkg.itinerary_type === 'timeline') {
-                                void alert('已使用時間軸行程表，無法切換', 'info')
-                                return
-                              }
-                              // 使用父組件的回調（單一遮罩模式）或內部狀態
-                              if (onOpenItineraryDialog) {
-                                onOpenItineraryDialog(pkg)
-                              } else {
-                                openItineraryDialog(pkg)
-                              }
-                            }}
-                            className={`gap-2 cursor-pointer ${
-                              pkg.itinerary_type === 'timeline' ? 'opacity-50' : ''
-                            }`}
-                          >
-                            <Zap size={16} className={pkg.itinerary_id && pkg.itinerary_type !== 'timeline' ? 'text-morandi-green' : 'text-morandi-secondary'} />
-                            <span>快速行程表</span>
-                            {pkg.itinerary_id && pkg.itinerary_type !== 'timeline' && (
-                              <Check size={14} className="ml-auto text-morandi-green" />
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (pkg.itinerary_id && pkg.itinerary_type !== 'timeline') {
-                                void alert('已使用快速行程表，無法切換', 'info')
-                                return
-                              }
-                              // 使用父組件的回調（單一遮罩模式）或內部狀態
+                      {/* 行程表按鈕 - 已建立則直接打開，否則顯示下拉選單 */}
+                      {pkg.itinerary_id || pkg.itinerary_type === 'timeline' ? (
+                        // 已建立行程表：直接點擊打開編輯
+                        <button
+                          onClick={() => {
+                            if (pkg.itinerary_type === 'timeline') {
+                              // 時間軸行程表
                               if (onOpenTimelineDialog) {
                                 onOpenTimelineDialog(pkg)
                               } else {
                                 setSelectedPackage(pkg)
                                 setTimelineDialogOpen(true)
                               }
-                            }}
-                            className={`gap-2 cursor-pointer ${
-                              pkg.itinerary_id && pkg.itinerary_type !== 'timeline' ? 'opacity-50' : ''
-                            }`}
-                          >
-                            <Clock size={16} className={pkg.itinerary_type === 'timeline' ? 'text-morandi-green' : 'text-morandi-secondary'} />
-                            <span>時間軸行程表</span>
-                            {pkg.itinerary_type === 'timeline' && (
-                              <Check size={14} className="ml-auto text-morandi-green" />
-                            )}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            } else {
+                              // 快速行程表
+                              if (onOpenItineraryDialog) {
+                                onOpenItineraryDialog(pkg)
+                              } else {
+                                openItineraryDialog(pkg)
+                              }
+                            }
+                          }}
+                          className="p-1.5 rounded transition-colors text-morandi-green hover:bg-morandi-green/10"
+                          title={pkg.itinerary_type === 'timeline' ? '編輯時間軸行程表' : '編輯快速行程表'}
+                        >
+                          <FileText size={16} />
+                        </button>
+                      ) : (
+                        // 未建立行程表：顯示下拉選單讓用戶選擇類型
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="p-1.5 rounded transition-colors text-morandi-secondary hover:bg-morandi-container/80"
+                              title="建立行程表"
+                            >
+                              <FileText size={16} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-44">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (onOpenItineraryDialog) {
+                                  onOpenItineraryDialog(pkg)
+                                } else {
+                                  openItineraryDialog(pkg)
+                                }
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Zap size={16} className="text-morandi-secondary" />
+                              <span>快速行程表</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (onOpenTimelineDialog) {
+                                  onOpenTimelineDialog(pkg)
+                                } else {
+                                  setSelectedPackage(pkg)
+                                  setTimelineDialogOpen(true)
+                                }
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Clock size={16} className="text-morandi-secondary" />
+                              <span>時間軸行程表</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                       {/* 簡易行程預覽 - 只有快速行程表才能用 */}
                       <button
                         onClick={() => {
@@ -595,19 +607,23 @@ export function PackageListPanel({
                       {/* 手冊設計 */}
                       <button
                         onClick={() => {
-                          if (pkg.itinerary_id) {
+                          if (pkg.itinerary_type === 'timeline' && pkg.timeline_data) {
+                            // 時間軸行程表：使用 package_id
+                            router.push(`/brochure?package_id=${pkg.id}`)
+                          } else if (pkg.itinerary_id) {
+                            // 快速行程表：使用 itinerary_id
                             router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
                           } else {
                             void alert('請先建立行程表', 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id
+                          pkg.itinerary_id || (pkg.itinerary_type === 'timeline' && pkg.timeline_data)
                             ? 'text-morandi-primary hover:bg-morandi-container/80'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
                         title="手冊設計"
-                        disabled={!pkg.itinerary_id}
+                        disabled={!pkg.itinerary_id && !(pkg.itinerary_type === 'timeline' && pkg.timeline_data)}
                       >
                         <BookMarked size={16} />
                       </button>

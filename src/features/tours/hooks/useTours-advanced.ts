@@ -11,10 +11,14 @@ import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-ge
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
+import { logger } from '@/lib/utils/logger'
+import { useAuthStore } from '@/stores/auth-store'
 
 const TOURS_KEY = 'tours'
 
 // Supabase fetcher
+// 注意：此函數只在 SWR key 有效時才會被調用（已通過 auth 檢查）
+// 不要在這裡調用 getSession()，它會導致掛起
 async function fetchTours(): Promise<Tour[]> {
   const { data, error } = await supabase
     .from('tours')
@@ -22,6 +26,7 @@ async function fetchTours(): Promise<Tour[]> {
     .order('departure_date', { ascending: false })
 
   if (error) {
+    logger.error('❌ Error fetching tours:', error.message)
     throw new Error(error.message)
   }
 
@@ -29,8 +34,17 @@ async function fetchTours(): Promise<Tour[]> {
 }
 
 export function useTours(params?: PageRequest): UseEntityResult<Tour> {
+  // 等待 auth 準備好才開始查詢
+  const user = useAuthStore(state => state.user)
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+  const hasHydrated = useAuthStore(state => state._hasHydrated)
+
+  // 如果還沒登入，不發起查詢（SWR key 為 null 時不會 fetch）
+  // 但必須等 hydration 完成後才判斷
+  const swrKey = hasHydrated && isAuthenticated && user?.id ? TOURS_KEY : null
+
   const { data: allTours = [], error, isLoading } = useSWR<Tour[]>(
-    TOURS_KEY,
+    swrKey,
     fetchTours,
     {
       revalidateOnFocus: true,
@@ -158,10 +172,14 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     await mutate(TOURS_KEY)
   }
 
+  // 如果還沒 hydrate 或還沒認證，視為 loading 狀態
+  // 但如果已 hydrate 且未認證，就不應該是 loading（應該跳轉登入頁）
+  const effectiveLoading = !hasHydrated || (!swrKey && isAuthenticated) || isLoading
+
   return {
     data: paginatedTours,
     totalCount: processedTours.length,
-    loading: isLoading,
+    loading: effectiveLoading,
     error: error?.message || null,
     actions: {
       create: createTour,

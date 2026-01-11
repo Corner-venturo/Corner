@@ -51,7 +51,7 @@ export function TodoCard({ todo, onToggle, onClick, className }: TodoCardProps) 
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border border-border shadow-sm p-4',
+        'bg-card rounded-xl border border-border shadow-sm p-4',
         isCompleted && 'opacity-60',
         className
       )}

@@ -126,7 +126,7 @@ export default function MobileHomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 py-4">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-morandi-primary">
@@ -172,7 +172,7 @@ export default function MobileHomePage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-border p-6 text-center text-morandi-secondary">
+            <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
               今日無出發團
             </div>
           )}
@@ -204,7 +204,7 @@ export default function MobileHomePage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-border p-6 text-center text-morandi-secondary">
+            <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
               今日無返程團
             </div>
           )}
@@ -236,7 +236,7 @@ export default function MobileHomePage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-border p-6 text-center text-morandi-secondary">
+            <div className="bg-card rounded-xl border border-border p-6 text-center text-morandi-secondary">
               <ClipboardList size={24} className="mx-auto mb-2 text-morandi-muted" />
               沒有緊急待辦事項
             </div>

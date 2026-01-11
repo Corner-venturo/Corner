@@ -19,6 +19,12 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   Plus,
   FileText,
   Calculator,
@@ -26,6 +32,8 @@ import {
   ExternalLink,
   Unlink,
   Eye,
+  Zap,
+  Clock,
 } from 'lucide-react'
 import { useQuoteStore, useTourStore } from '@/stores'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
@@ -36,6 +44,7 @@ import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.ty
 import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
+import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
 import { toast } from 'sonner'
 
@@ -74,6 +83,10 @@ export function LinkDocumentsToTourDialog({
 
   // 行程表對話框狀態
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
+  const [isCreatingPackage, setIsCreatingPackage] = useState(false)
+
+  // 動態建立的 proposal_package（用於沒有 proposal 的旅遊團）
+  const [dynamicPackage, setDynamicPackage] = useState<ProposalPackage | null>(null)
 
   // 載入資料
   useEffect(() => {
@@ -84,11 +97,13 @@ export function LinkDocumentsToTourDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  // 取得 tour 關聯的 proposal_package（透過 proposal_package_id）
+  // 取得 tour 關聯的 proposal_package（透過 proposal_package_id 或動態建立的）
   const tourProposalPackage = useMemo(() => {
+    // 優先使用動態建立的 package
+    if (dynamicPackage) return dynamicPackage
     if (!tour.proposal_package_id) return null
     return proposalPackages.find(p => p.id === tour.proposal_package_id) || null
-  }, [tour, proposalPackages])
+  }, [tour, proposalPackages, dynamicPackage])
 
   // 檢查行程表類型
   const itineraryType = useMemo(() => {
@@ -199,6 +214,88 @@ export function LinkDocumentsToTourDialog({
     router.push(`/quotes/${quote.id}`)
   }
 
+  // 為旅遊團建立或取得 proposal_package
+  const getOrCreatePackageForTour = async (): Promise<ProposalPackage | null> => {
+    // 如果已有 package，直接返回
+    if (tourProposalPackage) return tourProposalPackage
+
+    setIsCreatingPackage(true)
+    try {
+      // 計算天數
+      let days = 5
+      if (tour.departure_date && tour.return_date) {
+        const start = new Date(tour.departure_date)
+        const end = new Date(tour.return_date)
+        days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      }
+
+      // 建立新的 proposal_package
+      const newPackageData = {
+        id: crypto.randomUUID(),
+        proposal_id: null, // 獨立 package，不屬於任何提案
+        version_name: tour.name || '行程版本',
+        version_number: 1,
+        days,
+        start_date: tour.departure_date || null,
+        end_date: tour.return_date || null,
+        group_size: tour.max_participants || null,
+        country_id: null,
+        main_city_id: null,
+        destination: tour.location || null,
+        is_selected: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      // 使用 type assertion 因為這是獨立 package（不屬於任何提案）
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: newPackage, error } = await (supabase as any)
+        .from('proposal_packages')
+        .insert(newPackageData)
+        .select()
+        .single()
+
+      if (error) {
+        logger.error('建立 proposal_package 失敗:', error)
+        toast.error('建立行程表失敗')
+        return null
+      }
+
+      // 更新旅遊團關聯
+      const { error: updateError } = await supabase
+        .from('tours')
+        .update({ proposal_package_id: newPackage.id })
+        .eq('id', tour.id)
+
+      if (updateError) {
+        logger.error('更新旅遊團關聯失敗:', updateError)
+      }
+
+      setDynamicPackage(newPackage as ProposalPackage)
+      return newPackage as ProposalPackage
+    } catch (err) {
+      logger.error('建立 package 錯誤:', err)
+      toast.error('建立行程表失敗')
+      return null
+    } finally {
+      setIsCreatingPackage(false)
+    }
+  }
+
+  // 選擇行程表類型（快速行程表）
+  const handleSelectTimelineItinerary = async () => {
+    const pkg = await getOrCreatePackageForTour()
+    if (pkg) {
+      setTimelineDialogOpen(true)
+    }
+  }
+
+  // 選擇行程表類型（網頁行程表）
+  const handleSelectWebItinerary = async () => {
+    onClose()
+    router.push(`/itinerary/new?tour_id=${tour.id}`)
+  }
+
   // 開啟行程表對話框
   const handleOpenItineraryDialog = () => {
     setTimelineDialogOpen(true)
@@ -226,6 +323,12 @@ export function LinkDocumentsToTourDialog({
         .eq('id', tourProposalPackage.id)
 
       if (error) throw error
+
+      // 如果有關聯報價單，同步餐食和住宿資料
+      if (tourProposalPackage.quote_id) {
+        await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
+      }
+
       fetchProposalPackages()
     } catch (error) {
       logger.error('儲存時間軸資料失敗:', error)
@@ -251,30 +354,53 @@ export function LinkDocumentsToTourDialog({
 
             <div className="grid grid-cols-3 gap-4 mt-4 flex-1 min-h-0 overflow-hidden">
               {/* ========== 行程 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4 text-morandi-gold" />
                     <span className="font-medium text-sm text-morandi-primary">行程</span>
                   </div>
-                  <button
-                    onClick={() => {
-                      onClose()
-                      router.push(`/itinerary/new?tour_id=${tour.id}`)
-                    }}
-                    className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                    title="新增行程表"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                  {/* 新增行程表下拉選單 */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        disabled={isCreatingPackage}
+                        className="p-1 text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors disabled:opacity-50"
+                        title="新增行程表"
+                      >
+                        {isCreatingPackage ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Plus className="w-4 h-4" />
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        onClick={handleSelectTimelineItinerary}
+                        className="gap-2 cursor-pointer"
+                      >
+                        <Zap size={16} className="text-morandi-gold" />
+                        <span>快速行程表</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleSelectWebItinerary}
+                        className="gap-2 cursor-pointer"
+                      >
+                        <Clock size={16} className="text-morandi-secondary" />
+                        <span>網頁行程表</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <div className="flex-1 overflow-auto mt-2">
                   {hasTimelineData ? (
+                    // 已有快速行程表
                     <button
                       onClick={handleOpenItineraryDialog}
                       className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
                     >
-                      <Eye className="w-3.5 h-3.5 text-morandi-gold" />
+                      <Zap className="w-3.5 h-3.5 text-morandi-gold" />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-morandi-primary">快速行程表</div>
                         <div className="text-[10px] text-morandi-secondary">
@@ -282,16 +408,39 @@ export function LinkDocumentsToTourDialog({
                         </div>
                       </div>
                     </button>
+                  ) : itineraryType === 'simple' || tourProposalPackage?.itinerary_id ? (
+                    // 已有網頁行程表
+                    <button
+                      onClick={() => {
+                        onClose()
+                        const itineraryId = tourProposalPackage?.itinerary_id
+                        if (itineraryId) {
+                          router.push(`/itinerary/new?itinerary_id=${itineraryId}`)
+                        } else {
+                          router.push(`/itinerary/new?tour_id=${tour.id}`)
+                        }
+                      }}
+                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
+                    >
+                      <Clock className="w-3.5 h-3.5 text-morandi-secondary" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-morandi-primary">網頁行程表</div>
+                        <div className="text-[10px] text-morandi-secondary">
+                          點擊編輯
+                        </div>
+                      </div>
+                    </button>
                   ) : (
+                    // 尚未建立行程表
                     <div className="text-xs text-morandi-secondary text-center py-4">
-                      尚未建立
+                      點擊 + 選擇行程表類型
                     </div>
                   )}
                 </div>
               </div>
 
               {/* ========== 報價 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-morandi-gold" />
@@ -352,7 +501,7 @@ export function LinkDocumentsToTourDialog({
               </div>
 
               {/* ========== 快速報價單 ========== */}
-              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-white overflow-hidden">
+              <div className="flex flex-col p-3 rounded-lg border border-morandi-container bg-card overflow-hidden">
                 <div className="flex items-center justify-between pb-2 border-b border-morandi-container/50 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-morandi-primary" />

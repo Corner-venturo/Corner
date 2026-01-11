@@ -54,7 +54,7 @@ export default function MobileProfilePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-border px-4 py-3">
+      <div className="bg-card border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
             href="/m"
@@ -68,7 +68,7 @@ export default function MobileProfilePage() {
 
       {/* 使用者資訊卡片 */}
       <div className="p-4">
-        <div className="bg-white rounded-xl border border-border p-4">
+        <div className="bg-card rounded-xl border border-border p-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-morandi-gold/20 flex items-center justify-center">
               <span className="text-2xl font-bold text-morandi-gold">
@@ -97,7 +97,7 @@ export default function MobileProfilePage() {
             <h3 className="text-sm font-medium text-morandi-secondary mb-2 px-1">
               {section.title}
             </h3>
-            <div className="bg-white rounded-xl border border-border overflow-hidden">
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
               {section.items.map((item, index) => {
                 const Icon = item.icon
                 return (
