@@ -16,6 +16,15 @@ import { RequestItem } from '../types'
 import { PaymentItemCategory, CompanyExpenseType, EXPENSE_TYPE_CONFIG } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
+import type { UserRole } from '@/lib/rbac-config'
+
+/**
+ * 可以建立公司請款的角色
+ * - super_admin: 超級管理員
+ * - admin: 管理員（包含人資）
+ * - accountant: 會計
+ */
+const COMPANY_PAYMENT_ROLES: UserRole[] = ['super_admin', 'admin', 'accountant']
 
 interface AddRequestDialogProps {
   open: boolean
@@ -65,6 +74,12 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   } = useRequestForm()
 
   const { generateRequestCode, generateCompanyRequestCode, createRequest } = useRequestOperations()
+
+  // 檢查用戶是否有公司請款權限
+  const canCreateCompanyPayment = useMemo(() => {
+    if (!currentUser?.roles) return false
+    return currentUser.roles.some(role => COMPANY_PAYMENT_ROLES.includes(role as UserRole))
+  }, [currentUser?.roles])
 
   // 從需求單帶入的狀態
   const [importFromRequests, setImportFromRequests] = useState(false)
@@ -254,37 +269,39 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* 請款類別切換 */}
-          <div className="flex gap-2 p-1 bg-morandi-container/30 rounded-lg w-fit">
-            <Button
-              type="button"
-              variant={formData.request_category === 'tour' ? 'default' : 'ghost'}
-              className={cn(
-                'gap-2',
-                formData.request_category === 'tour'
-                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                  : 'text-morandi-secondary hover:text-morandi-primary'
-              )}
-              onClick={() => setFormData(prev => ({ ...prev, request_category: 'tour', expense_type: '' }))}
-            >
-              <Users size={16} />
-              團體請款
-            </Button>
-            <Button
-              type="button"
-              variant={formData.request_category === 'company' ? 'default' : 'ghost'}
-              className={cn(
-                'gap-2',
-                formData.request_category === 'company'
-                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
-                  : 'text-morandi-secondary hover:text-morandi-primary'
-              )}
-              onClick={() => setFormData(prev => ({ ...prev, request_category: 'company', tour_id: '', order_id: '' }))}
-            >
-              <Briefcase size={16} />
-              公司請款
-            </Button>
-          </div>
+          {/* 請款類別切換 - 只有有權限的用戶才能看到 */}
+          {canCreateCompanyPayment && (
+            <div className="flex gap-2 p-1 bg-morandi-container/30 rounded-lg w-fit">
+              <Button
+                type="button"
+                variant={formData.request_category === 'tour' ? 'default' : 'ghost'}
+                className={cn(
+                  'gap-2',
+                  formData.request_category === 'tour'
+                    ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
+                )}
+                onClick={() => setFormData(prev => ({ ...prev, request_category: 'tour', expense_type: '' }))}
+              >
+                <Users size={16} />
+                團體請款
+              </Button>
+              <Button
+                type="button"
+                variant={formData.request_category === 'company' ? 'default' : 'ghost'}
+                className={cn(
+                  'gap-2',
+                  formData.request_category === 'company'
+                    ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                    : 'text-morandi-secondary hover:text-morandi-primary'
+                )}
+                onClick={() => setFormData(prev => ({ ...prev, request_category: 'company', tour_id: '', order_id: '' }))}
+              >
+                <Briefcase size={16} />
+                公司請款
+              </Button>
+            </div>
+          )}
 
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
