@@ -20,10 +20,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       .single()
 
     if (itinerary) {
-      // LINE 預覽標題：團號 + 團名（如 "CNX250128A 清邁經典五日遊"）
-      const title = itinerary.tour_code && itinerary.title
-        ? `${itinerary.tour_code} ${itinerary.title}`
-        : itinerary.tour_code || itinerary.title || '行程表'
+      // LINE 預覽標題：只顯示團名
+      const title = itinerary.title || '行程表'
       const description = itinerary.description || `${itinerary.title || '行程'} - 詳細行程資訊`
 
       return {
