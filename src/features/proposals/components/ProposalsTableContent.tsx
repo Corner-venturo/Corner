@@ -5,16 +5,14 @@ import {
   Edit2,
   Trash2,
   Archive,
-  ChevronDown,
-  ChevronRight,
 } from 'lucide-react'
-import { useProposals, useProposalPackages, useCustomers } from '@/hooks/cloud-hooks'
+import { useProposals, useProposalPackages } from '@/hooks/cloud-hooks'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { DateCell, ActionCell, NumberCell, TextCell } from '@/components/table-cells'
+import { DateCell, ActionCell } from '@/components/table-cells'
 import { ProposalDialog } from './ProposalDialog'
-import { PackageListPanel } from './PackageListPanel'
+import { ProposalDetailDialog } from './ProposalDetailDialog'
 import { ArchiveProposalDialog } from './ArchiveProposalDialog'
 import { updateProposal, archiveProposal } from '@/services/proposal.service'
 import type {
@@ -51,12 +49,9 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
     fetchAll: refreshProposals,
   } = useProposals()
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
-  const { items: customers } = useCustomers()
-
-  // 展開狀態
-  const [expandedProposals, setExpandedProposals] = useState<string[]>([])
 
   // 對話框狀態
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
@@ -88,23 +83,10 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
     [allPackages]
   )
 
-  // 取得客戶名稱
-  const getCustomerName = useCallback(
-    (customerId: string | null | undefined): string => {
-      if (!customerId) return ''
-      const customer = customers.find(c => c.id === customerId)
-      return customer?.name || ''
-    },
-    [customers]
-  )
-
-  // 切換展開/收合
-  const toggleExpand = useCallback((proposalId: string) => {
-    setExpandedProposals(prev =>
-      prev.includes(proposalId)
-        ? prev.filter(id => id !== proposalId)
-        : [...prev, proposalId]
-    )
+  // 開啟詳情對話框
+  const openDetailDialog = useCallback((proposal: Proposal) => {
+    setSelectedProposal(proposal)
+    setDetailDialogOpen(true)
   }, [])
 
   // 處理更新提案
@@ -194,73 +176,50 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
     setArchiveDialogOpen(true)
   }, [])
 
-  // 表格欄位定義
+  // 表格欄位定義（與旅遊團一致）
   const columns: TableColumn<Proposal>[] = useMemo(
     () => [
       {
         key: 'code',
-        label: '提案編號',
+        label: '團號',
         sortable: true,
         width: '110px',
         render: (_, proposal) => (
-          <span className="font-mono text-sm text-morandi-gold">{proposal.code}</span>
+          <span className="text-sm text-morandi-primary">{proposal.code || ''}</span>
         ),
       },
       {
-        key: 'destination',
-        label: '目的地',
+        key: 'title',
+        label: '旅遊團名稱',
         sortable: true,
-        width: '100px',
+        width: '180px',
         render: (_, proposal) => (
-          <span className="font-mono font-medium">{proposal.destination || '-'}</span>
+          <span className="text-sm text-morandi-primary">{proposal.title || ''}</span>
         ),
       },
       {
         key: 'expected_start_date',
         label: '出發日期',
         sortable: true,
-        width: '110px',
+        width: '100px',
         render: (_, proposal) => (
           <DateCell date={proposal.expected_start_date} showIcon={false} />
         ),
       },
       {
-        key: 'title',
-        label: '提案名稱',
+        key: 'destination',
+        label: '目的地',
         sortable: true,
-        render: (_, proposal) => (
-          <TextCell text={proposal.title || '-'} />
-        ),
-      },
-      {
-        key: 'customer_name',
-        label: '客戶',
-        sortable: true,
-        width: '120px',
-        render: (_, proposal) => (
-          <TextCell
-            text={
-              proposal.customer_name ||
-              getCustomerName(proposal.customer_id) ||
-              '-'
-            }
-          />
-        ),
-      },
-      {
-        key: 'package_count',
-        label: '套件數',
         width: '80px',
-        render: (_, proposal) => {
-          const count = getProposalPackages(proposal.id).length
-          return <NumberCell value={count} suffix="個" />
-        },
+        render: (_, proposal) => (
+          <span className="text-sm text-morandi-secondary">{proposal.destination || '-'}</span>
+        ),
       },
       {
         key: 'status',
         label: '狀態',
         sortable: true,
-        width: '90px',
+        width: '80px',
         render: (_, proposal) => (
           <span
             className={`px-2 py-1 rounded text-sm font-medium ${STATUS_COLORS[proposal.status]}`}
@@ -270,26 +229,18 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
         ),
       },
     ],
-    [getProposalPackages, getCustomerName]
+    []
   )
 
   // 渲染操作按鈕
   const renderActions = useCallback(
     (proposal: Proposal) => {
-      const isExpanded = expandedProposals.includes(proposal.id)
-      const packageCount = getProposalPackages(proposal.id).length
-
       const actions: Array<{
         icon: typeof Edit2
         label: string
         onClick: () => void
         variant?: 'default' | 'danger' | 'success' | 'warning'
       }> = [
-        {
-          icon: isExpanded ? ChevronDown : ChevronRight,
-          label: isExpanded ? '收合' : `展開 (${packageCount})`,
-          onClick: () => toggleExpand(proposal.id),
-        },
         {
           icon: Edit2,
           label: '編輯',
@@ -318,21 +269,7 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
 
       return <ActionCell actions={actions} />
     },
-    [openEditDialog, openArchiveDialog, handleDeleteProposal, expandedProposals, getProposalPackages, toggleExpand]
-  )
-
-  // 渲染展開內容（套件列表）
-  const renderExpanded = useCallback(
-    (proposal: Proposal) => {
-      return (
-        <PackageListPanel
-          proposal={proposal}
-          packages={getProposalPackages(proposal.id)}
-          onPackagesChange={() => refreshPackages()}
-        />
-      )
-    },
-    [getProposalPackages, refreshPackages]
+    [openEditDialog, openArchiveDialog, handleDeleteProposal]
   )
 
   return (
@@ -340,15 +277,22 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
       <EnhancedTable
         data={filteredProposals}
         columns={columns}
-        onRowClick={proposal => toggleExpand(proposal.id)}
+        onRowClick={proposal => openDetailDialog(proposal)}
         actions={(proposal) => renderActions(proposal)}
-        expandable={{
-          expanded: expandedProposals,
-          onExpand: toggleExpand,
-          renderExpanded,
-        }}
+        actionsWidth="50%"
         bordered
         emptyMessage="尚無提案資料"
+      />
+
+      {/* 提案詳細對話框 */}
+      <ProposalDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={(open) => {
+          setDetailDialogOpen(open)
+          if (!open) setSelectedProposal(null)
+        }}
+        proposal={selectedProposal}
+        onPackagesChange={() => refreshPackages()}
       />
 
       {/* 編輯提案對話框 */}
