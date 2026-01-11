@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -60,37 +60,18 @@ export function PackageDialog({
   const [newCity, setNewCity] = useState('')
   const [newAirportCode, setNewAirportCode] = useState('')
 
-  // 新增時優先使用 basePackage 的資料，否則使用 proposal 的資料
-  const initialFormData: FormData = useMemo(() => {
-    // 如果有 basePackage，用它的資料作為預設值
-    if (basePackage) {
-      return {
-        version_name: '', // 版本名稱需要使用者自己填
-        country: basePackage.country_id || proposal.country_id || '',
-        airport_code: basePackage.main_city_id || proposal.main_city_id || '',
-        start_date: basePackage.start_date || proposal.expected_start_date || '',
-        end_date: basePackage.end_date || proposal.expected_end_date || '',
-        days: basePackage.days || null,
-        nights: basePackage.nights || null,
-        group_size: basePackage.group_size || proposal.group_size || null,
-        notes: '', // 備註不繼承，避免混淆
-      }
-    }
-    // 沒有 basePackage 時，使用 proposal 的資料
-    return {
-      version_name: '',
-      country: proposal.country_id || '',
-      airport_code: proposal.main_city_id || '',
-      start_date: proposal.expected_start_date || '',
-      end_date: proposal.expected_end_date || '',
-      days: null,
-      nights: null,
-      group_size: proposal.group_size || null,
-      notes: '',
-    }
-  }, [proposal, basePackage])
-
-  const [formData, setFormData] = useState<FormData>(initialFormData)
+  // 初始表單狀態（空白，會在 dialog 開啟時由 useEffect 設定）
+  const [formData, setFormData] = useState<FormData>({
+    version_name: '',
+    country: '',
+    airport_code: '',
+    start_date: '',
+    end_date: '',
+    days: null,
+    nights: null,
+    group_size: null,
+    notes: '',
+  })
   const [submitting, setSubmitting] = useState(false)
 
   // 取得啟用的國家列表（從 useRegionsStore）
@@ -116,24 +97,44 @@ export function PackageDialog({
       }))
   }, [formData.country, destinations])
 
-  // 初始化表單資料
+  // 追蹤 dialog 是否剛開啟（用於避免重複初始化）
+  const prevOpenRef = useRef(false)
+
+  // 初始化表單資料 - 只在 dialog 從關閉變為開啟時重置
   useEffect(() => {
-    if (mode === 'edit' && pkg) {
-      setFormData({
-        version_name: pkg.version_name || '',
-        country: pkg.country_id || '',    // 存放國家名稱
-        airport_code: pkg.main_city_id || '',  // 存放機場代碼
-        start_date: pkg.start_date || '',
-        end_date: pkg.end_date || '',
-        days: pkg.days || null,
-        nights: pkg.nights || null,
-        group_size: pkg.group_size || null,
-        notes: pkg.notes || '',
-      })
-    } else {
-      setFormData(initialFormData)
+    const wasOpen = prevOpenRef.current
+    prevOpenRef.current = open
+
+    // 只在 dialog 剛開啟時設定表單（false → true）
+    if (!wasOpen && open) {
+      if (mode === 'edit' && pkg) {
+        setFormData({
+          version_name: pkg.version_name || '',
+          country: pkg.country_id || '',    // 存放國家名稱
+          airport_code: pkg.main_city_id || '',  // 存放機場代碼
+          start_date: pkg.start_date || '',
+          end_date: pkg.end_date || '',
+          days: pkg.days || null,
+          nights: pkg.nights || null,
+          group_size: pkg.group_size || null,
+          notes: pkg.notes || '',
+        })
+      } else if (mode === 'create') {
+        // 新增模式：使用 basePackage 或 proposal 的資料
+        setFormData({
+          version_name: '',
+          country: (basePackage?.country_id || proposal.country_id) || '',
+          airport_code: (basePackage?.main_city_id || proposal.main_city_id) || '',
+          start_date: (basePackage?.start_date || proposal.expected_start_date) || '',
+          end_date: (basePackage?.end_date || proposal.expected_end_date) || '',
+          days: basePackage?.days || null,
+          nights: basePackage?.nights || null,
+          group_size: (basePackage?.group_size || proposal.group_size) || null,
+          notes: '',
+        })
+      }
     }
-  }, [mode, pkg, open, initialFormData])
+  }, [open, mode, pkg, basePackage, proposal])
 
   // 當國家改變時，清空機場代碼
   const handleCountryChange = (country: string) => {
