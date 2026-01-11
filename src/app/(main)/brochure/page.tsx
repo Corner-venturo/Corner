@@ -303,6 +303,57 @@ function DesignerPageContent() {
         }))
       }
     }
+    // 如果有指定套件 package_id 但不是時間軸類型（simple 類型），使用套件的 days 欄位
+    else if (packageId && targetPackage) {
+      // 計算旅程天數（優先順序：套件天數 > 套件日期計算）
+      let packageTripDays = tripDays
+      if (targetPackage.days && targetPackage.days > 0) {
+        packageTripDays = targetPackage.days
+      } else if (targetPackage.start_date && targetPackage.end_date) {
+        const start = new Date(targetPackage.start_date)
+        const end = new Date(targetPackage.end_date)
+        const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+        if (diffDays > 0) packageTripDays = diffDays
+      }
+
+      // 更新天數
+      if (packageTripDays !== tripDays) {
+        setTripDays(packageTripDays)
+        // 重新初始化每日詳細資料
+        const newDailyDates = calculateDailyDates(targetPackage.start_date || undefined, packageTripDays)
+        data.dailyDetails = Array.from({ length: packageTripDays }, (_, i) => ({
+          dayNumber: i + 1,
+          date: newDailyDates[i] || '',
+          title: '',
+          coverImage: undefined,
+          timeline: [],
+          meals: { breakfast: '', lunch: '', dinner: '' },
+        }))
+      }
+
+      // 從套件的關聯提案取得基本資訊
+      if (targetPackage.proposal_id && proposals.length > 0) {
+        const proposal = proposals.find((p) => p.id === targetPackage.proposal_id)
+        if (proposal) {
+          const proposalData = proposalToTemplateData({
+            title: proposal.title,
+            code: proposal.code,
+            destination: proposal.destination,
+            expected_start_date: proposal.expected_start_date,
+            expected_end_date: proposal.expected_end_date,
+            customer_name: proposal.customer_name,
+            group_size: proposal.group_size,
+            package: {
+              version_name: targetPackage.version_name,
+              start_date: targetPackage.start_date,
+              end_date: targetPackage.end_date,
+              days: targetPackage.days,
+            },
+          })
+          data = { ...data, ...proposalData }
+        }
+      }
+    }
     // 如果有指定行程表，使用該行程表的資料
     else if (itineraryId && itineraries.length > 0) {
       const itinerary = itineraries.find((i) => i.id === itineraryId)
@@ -334,6 +385,43 @@ function DesignerPageContent() {
         const packages = proposalPackages.filter((pkg) => pkg.proposal_id === proposalId)
         const latestPackage = packages.sort((a, b) => (b.version_number || 0) - (a.version_number || 0))[0]
 
+        // 計算旅程天數（優先順序：套件天數 > 套件日期計算 > 提案日期計算）
+        let proposalTripDays = tripDays
+        if (latestPackage?.days && latestPackage.days > 0) {
+          // 直接使用套件定義的天數
+          proposalTripDays = latestPackage.days
+        } else if (latestPackage?.start_date && latestPackage?.end_date) {
+          // 從套件日期計算
+          const start = new Date(latestPackage.start_date)
+          const end = new Date(latestPackage.end_date)
+          const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+          if (diffDays > 0) proposalTripDays = diffDays
+        } else if (proposal.expected_start_date && proposal.expected_end_date) {
+          // 從提案預期日期計算
+          const start = new Date(proposal.expected_start_date)
+          const end = new Date(proposal.expected_end_date)
+          const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+          if (diffDays > 0) proposalTripDays = diffDays
+        }
+
+        // 更新天數（如果有從提案計算出）
+        if (proposalTripDays !== tripDays) {
+          setTripDays(proposalTripDays)
+          // 重新初始化每日詳細資料
+          const newDailyDates = calculateDailyDates(
+            latestPackage?.start_date || proposal.expected_start_date || undefined,
+            proposalTripDays
+          )
+          data.dailyDetails = Array.from({ length: proposalTripDays }, (_, i) => ({
+            dayNumber: i + 1,
+            date: newDailyDates[i] || '',
+            title: '',
+            coverImage: undefined,
+            timeline: [],
+            meals: { breakfast: '', lunch: '', dinner: '' },
+          }))
+        }
+
         const proposalData = proposalToTemplateData({
           title: proposal.title,
           code: proposal.code,
@@ -352,9 +440,13 @@ function DesignerPageContent() {
         data = { ...data, ...proposalData }
         // 重新計算日期
         if (data.dailyDetails) {
+          const finalDates = calculateDailyDates(
+            latestPackage?.start_date || proposal.expected_start_date || undefined,
+            data.dailyDetails.length
+          )
           data.dailyDetails = data.dailyDetails.map((day, i) => ({
             ...day,
-            date: day.date || dailyDates[i] || '',
+            date: day.date || finalDates[i] || '',
           }))
         }
       }
@@ -362,6 +454,9 @@ function DesignerPageContent() {
 
     // 儲存範本資料
     setTemplateData(data)
+
+    // 計算實際要生成的天數（使用 dailyDetails 的長度，因為已根據提案/行程更新）
+    const actualTripDays = data.dailyDetails?.length || tripDays
 
     // 生成所有頁面
     const newPages: Record<string, CanvasPage | null> = {
@@ -371,7 +466,7 @@ function DesignerPageContent() {
     }
 
     // 生成每日行程頁面
-    for (let i = 0; i < tripDays; i++) {
+    for (let i = 0; i < actualTripDays; i++) {
       const dailyData = { ...data, currentDayIndex: i }
       newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
     }

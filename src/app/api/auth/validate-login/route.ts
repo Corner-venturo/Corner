@@ -22,11 +22,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdminClient()
 
-    // 1. 查詢 workspace（大小寫不敏感）
+    // 統一轉小寫查詢
+    const normalizedCode = code.toLowerCase().trim()
+
+    // 1. 查詢 workspace（用小寫比對）
     const { data: workspace, error: wsError } = await supabase
       .from('workspaces')
       .select('id, code')
-      .ilike('code', code)
+      .eq('code', normalizedCode)
       .maybeSingle()
 
     if (wsError) {
@@ -38,17 +41,17 @@ export async function POST(request: NextRequest) {
     }
 
     if (!workspace) {
-      // 檢查是否是 supplier code
+      // 檢查是否是 supplier code（大小寫都查）
       const { data: supplier } = await supabase
         .from('suppliers')
         .select('id, code, name')
-        .eq('code', code.toUpperCase())
+        .or(`code.eq.${normalizedCode},code.eq.${code.toUpperCase()}`)
         .eq('is_active', true)
         .maybeSingle()
 
       if (supplier) {
         return NextResponse.json(
-          { success: false, message: '廠商登入功能開發中' },
+          { success: false, message: `🏭 ${supplier.name}\n廠商登入功能開發中` },
           { status: 400 }
         )
       }
