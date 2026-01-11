@@ -38,28 +38,7 @@ export function WorkspacesManagePage() {
 
       if (wsError) throw wsError
 
-      // 取得每個 workspace 的員工數量
-      const { data: employeeCounts, error: empError } = await supabase
-        .from('employees')
-        .select('workspace_id')
-
-      if (empError) throw empError
-
-      // 計算員工數量
-      const countMap = new Map<string, number>()
-      employeeCounts?.forEach((emp) => {
-        if (emp.workspace_id) {
-          countMap.set(emp.workspace_id, (countMap.get(emp.workspace_id) || 0) + 1)
-        }
-      })
-
-      // 合併資料
-      const workspacesWithCount: WorkspaceWithDetails[] = (workspacesData || []).map((ws) => ({
-        ...ws,
-        employee_count: countMap.get(ws.id) || 0,
-      }))
-
-      setWorkspaces(workspacesWithCount)
+      setWorkspaces(workspacesData || [])
     } catch (error) {
       logger.error('載入公司列表失敗:', error)
       await alert('載入公司列表失敗', 'error')
@@ -82,8 +61,14 @@ export function WorkspacesManagePage() {
 
   // 刪除公司
   const handleDelete = useCallback(async (workspace: WorkspaceWithDetails) => {
-    if (workspace.employee_count && workspace.employee_count > 0) {
-      await alert(`無法刪除「${workspace.name}」，此公司還有 ${workspace.employee_count} 位員工`, 'error')
+    // 檢查是否有員工
+    const { count } = await supabase
+      .from('employees')
+      .select('id', { count: 'exact', head: true })
+      .eq('workspace_id', workspace.id)
+
+    if (count && count > 0) {
+      await alert(`無法刪除「${workspace.name}」，此公司還有 ${count} 位員工`, 'error')
       return
     }
 
@@ -136,14 +121,6 @@ export function WorkspacesManagePage() {
         <span className="text-sm text-morandi-secondary">
           {row.type ? WORKSPACE_TYPE_LABELS[row.type as keyof typeof WORKSPACE_TYPE_LABELS] || row.type : '-'}
         </span>
-      ),
-    },
-    {
-      key: 'employee_count',
-      label: '員工人數',
-      width: '100',
-      render: (_: unknown, row: WorkspaceWithDetails) => (
-        <span className="text-sm text-morandi-primary">{row.employee_count || 0} 人</span>
       ),
     },
     {

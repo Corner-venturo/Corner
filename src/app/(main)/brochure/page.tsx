@@ -146,6 +146,7 @@ function DesignerPageContent() {
   const [attractions, setAttractions] = useState<AttractionData[]>([]) // 景點列表
   const attractionImageInputRef = useRef<HTMLInputElement>(null) // 景點圖片上傳
   const [uploadingAttractionIndex, setUploadingAttractionIndex] = useState<number | null>(null)
+  const uploadingAttractionIndexRef = useRef<number | null>(null) // 用於同步傳遞 index（避免 state race condition）
   // 頁面導航抽屜
   const [showPageDrawer, setShowPageDrawer] = useState(false)
   // 儲存草稿狀態
@@ -582,10 +583,118 @@ function DesignerPageContent() {
             newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
           }
           setPages(newPages)
+          return // 已處理
         }
       }
     }
-  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages])
+
+    // 如果已選擇風格且有指定套件（simple 類型），當套件資料載入後重新生成頁面
+    if (selectedStyleId && packageId && proposalPackages.length > 0 && templateData) {
+      const pkg = proposalPackages.find((p) => p.id === packageId)
+      // 只處理非 timeline 類型（timeline 已在上面處理）
+      if (pkg && pkg.itinerary_type !== 'timeline') {
+        const style = styleSeries.find((s) => s.id === selectedStyleId)
+        if (style) {
+          // 計算天數
+          let packageDays = tripDays
+          if (pkg.days && pkg.days > 0) {
+            packageDays = pkg.days
+          } else if (pkg.start_date && pkg.end_date) {
+            const start = new Date(pkg.start_date)
+            const end = new Date(pkg.end_date)
+            const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+            if (diffDays > 0) packageDays = diffDays
+          }
+
+          // 如果天數不同，更新
+          if (packageDays !== tripDays) {
+            setTripDays(packageDays)
+
+            const dailyDates = calculateDailyDates(pkg.start_date || undefined, packageDays)
+            const newData = {
+              ...templateData,
+              dailyDetails: Array.from({ length: packageDays }, (_, i) => ({
+                dayNumber: i + 1,
+                date: dailyDates[i] || '',
+                title: '',
+                coverImage: undefined,
+                timeline: [],
+                meals: { breakfast: '', lunch: '', dinner: '' },
+              })),
+            }
+            setTemplateData(newData)
+
+            const newPages: Record<string, CanvasPage | null> = {
+              cover: generatePageFromTemplate(style.templates.cover, newData),
+              toc: generatePageFromTemplate(style.templates.toc, newData),
+              itinerary: generatePageFromTemplate(style.templates.itinerary, newData),
+            }
+            for (let i = 0; i < packageDays; i++) {
+              const dailyData = { ...newData, currentDayIndex: i }
+              newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+            }
+            setPages(newPages)
+            return // 已處理
+          }
+        }
+      }
+    }
+
+    // 如果已選擇風格且有指定提案，當提案套件資料載入後重新生成頁面
+    if (selectedStyleId && proposalId && proposals.length > 0 && proposalPackages.length > 0 && templateData) {
+      const proposal = proposals.find((p) => p.id === proposalId)
+      if (proposal) {
+        const packages = proposalPackages.filter((pkg) => pkg.proposal_id === proposalId)
+        const latestPackage = packages.sort((a, b) => (b.version_number || 0) - (a.version_number || 0))[0]
+
+        if (latestPackage) {
+          const style = styleSeries.find((s) => s.id === selectedStyleId)
+          if (style) {
+            // 計算天數
+            let proposalDays = tripDays
+            if (latestPackage.days && latestPackage.days > 0) {
+              proposalDays = latestPackage.days
+            } else if (latestPackage.start_date && latestPackage.end_date) {
+              const start = new Date(latestPackage.start_date)
+              const end = new Date(latestPackage.end_date)
+              const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+              if (diffDays > 0) proposalDays = diffDays
+            }
+
+            // 如果天數不同，更新
+            if (proposalDays !== tripDays) {
+              setTripDays(proposalDays)
+
+              const dailyDates = calculateDailyDates(latestPackage.start_date || proposal.expected_start_date || undefined, proposalDays)
+              const newData = {
+                ...templateData,
+                dailyDetails: Array.from({ length: proposalDays }, (_, i) => ({
+                  dayNumber: i + 1,
+                  date: dailyDates[i] || '',
+                  title: '',
+                  coverImage: undefined,
+                  timeline: [],
+                  meals: { breakfast: '', lunch: '', dinner: '' },
+                })),
+              }
+              setTemplateData(newData)
+
+              const newPages: Record<string, CanvasPage | null> = {
+                cover: generatePageFromTemplate(style.templates.cover, newData),
+                toc: generatePageFromTemplate(style.templates.toc, newData),
+                itinerary: generatePageFromTemplate(style.templates.itinerary, newData),
+              }
+              for (let i = 0; i < proposalDays; i++) {
+                const dailyData = { ...newData, currentDayIndex: i }
+                newPages[`daily-${i}`] = generatePageFromTemplate(style.templates.daily, dailyData)
+              }
+              setPages(newPages)
+            }
+          }
+        }
+      }
+    }
+  }, [selectedStyleId, itineraryId, itineraries, tripDays, calculateDailyDates, isLoadedFromDraft, packageId, proposalPackages, proposalId, proposals, templateData])
 
   // 當天數變更時，重新生成每日行程頁面
   useEffect(() => {
@@ -1886,9 +1995,7 @@ function DesignerPageContent() {
         [`hotel-${hotels.length}`]: generatePageFromTemplate(style.templates.hotel, pageData),
       }))
     }
-
-    // 切換到新飯店頁面
-    setCurrentPageType(`hotel-${hotels.length}`)
+    // 不自動跳轉，讓使用者點擊列表項目才跳轉
   }, [selectedStyleId, hotels, templateData])
 
   // 刪除飯店頁面
@@ -2016,9 +2123,7 @@ function DesignerPageContent() {
         [`attraction-${pageIndex}`]: generatePageFromTemplate(style.templates.attraction, pageData),
       }))
     }
-
-    // 切換到該景點所在的頁面
-    setCurrentPageType(`attraction-${pageIndex}`)
+    // 不自動跳轉，讓使用者點擊列表項目才跳轉
   }, [selectedStyleId, attractions, templateData])
 
   // 刪除景點
@@ -2544,7 +2649,7 @@ function DesignerPageContent() {
                   )}
                 </div>
                 <button
-                  onClick={() => { handleAddAttraction(); setShowPageDrawer(false) }}
+                  onClick={handleAddAttraction}
                   className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 rounded-lg border border-dashed border-morandi-gold/50 text-xs text-morandi-gold hover:bg-morandi-gold/5 transition-colors"
                 >
                   <Plus size={12} />
@@ -2587,7 +2692,7 @@ function DesignerPageContent() {
                   )}
                 </div>
                 <button
-                  onClick={() => { handleAddHotel(); setShowPageDrawer(false) }}
+                  onClick={handleAddHotel}
                   className="w-full flex items-center justify-center gap-1.5 mt-2 py-2 rounded-lg border border-dashed border-morandi-gold/50 text-xs text-morandi-gold hover:bg-morandi-gold/5 transition-colors"
                 >
                   <Plus size={12} />
@@ -3615,7 +3720,11 @@ function DesignerPageContent() {
                           />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                             <button
-                              onClick={() => attractionImageInputRef.current?.click()}
+                              onClick={() => {
+                                uploadingAttractionIndexRef.current = attraction1Index
+                                setUploadingAttractionIndex(attraction1Index)
+                                attractionImageInputRef.current?.click()
+                              }}
                               className="px-2 py-1 bg-card rounded text-xs"
                             >
                               更換
@@ -3631,6 +3740,7 @@ function DesignerPageContent() {
                       ) : (
                         <button
                           onClick={() => {
+                            uploadingAttractionIndexRef.current = attraction1Index
                             setUploadingAttractionIndex(attraction1Index)
                             attractionImageInputRef.current?.click()
                           }}
@@ -3711,6 +3821,7 @@ function DesignerPageContent() {
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                               <button
                                 onClick={() => {
+                                  uploadingAttractionIndexRef.current = attraction2Index
                                   setUploadingAttractionIndex(attraction2Index)
                                   attractionImageInputRef.current?.click()
                                 }}
@@ -3729,6 +3840,7 @@ function DesignerPageContent() {
                         ) : (
                           <button
                             onClick={() => {
+                              uploadingAttractionIndexRef.current = attraction2Index
                               setUploadingAttractionIndex(attraction2Index)
                               attractionImageInputRef.current?.click()
                             }}
@@ -3800,8 +3912,10 @@ function DesignerPageContent() {
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => {
-                    if (uploadingAttractionIndex !== null) {
-                      handleAttractionImageUpload(e, uploadingAttractionIndex)
+                    // 使用 ref 來避免 state race condition
+                    const index = uploadingAttractionIndexRef.current
+                    if (index !== null) {
+                      handleAttractionImageUpload(e, index)
                     }
                   }}
                 />
