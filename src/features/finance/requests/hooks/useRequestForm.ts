@@ -24,8 +24,10 @@ export function useRequestForm() {
   }, [])  
 
   const [formData, setFormData] = useState<RequestFormData>({
+    request_category: 'tour', // 預設團體請款
     tour_id: '',
     order_id: '',
+    expense_type: '', // 公司請款時使用
     request_date: '',
     note: '',
     is_special_billing: false,
@@ -143,8 +145,10 @@ export function useRequestForm() {
   // Reset form
   const resetForm = useCallback(() => {
     setFormData({
+      request_category: 'tour',
       tour_id: '',
       order_id: '',
+      expense_type: '',
       request_date: '',
       note: '',
       is_special_billing: false,

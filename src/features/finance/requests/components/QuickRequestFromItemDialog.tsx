@@ -30,7 +30,7 @@ const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
   'activity': { icon: '🎫', color: 'text-purple-600' },
   '餐食': { icon: '🍽️', color: 'text-orange-600' },
   'meal': { icon: '🍽️', color: 'text-orange-600' },
-  '其他': { icon: '📦', color: 'text-gray-600' },
+  '其他': { icon: '📦', color: 'text-morandi-secondary' },
 }
 
 function getCategoryConfig(category: string) {
@@ -93,8 +93,10 @@ export function QuickRequestFromItemDialog({
     try {
       await createRequest(
         {
+          request_category: 'tour',
           tour_id: item.tourId,
           order_id: '',
+          expense_type: '',
           request_date: requestDate,
           note: note || `${item.category} - ${item.title}`,
           is_special_billing: false,

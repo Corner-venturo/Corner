@@ -3,6 +3,40 @@
 // ============================
 
 // === 請款單管理系統 ===
+
+// 請款類別
+export type PaymentRequestCategory = 'tour' | 'company'
+
+// 公司費用類型
+export type CompanyExpenseType =
+  | 'SAL' // 薪資
+  | 'ENT' // 公關費用
+  | 'TRV' // 差旅費用
+  | 'OFC' // 辦公費用
+  | 'UTL' // 水電費
+  | 'RNT' // 租金
+  | 'EQP' // 設備
+  | 'MKT' // 行銷費用
+  | 'ADV' // 廣告費用
+  | 'TRN' // 培訓費用
+
+// 費用類型配置
+export const EXPENSE_TYPE_CONFIG: Record<
+  CompanyExpenseType,
+  { name: string; prefix: string }
+> = {
+  SAL: { name: '薪資', prefix: 'SAL' },
+  ENT: { name: '公關費用', prefix: 'ENT' },
+  TRV: { name: '差旅費用', prefix: 'TRV' },
+  OFC: { name: '辦公費用', prefix: 'OFC' },
+  UTL: { name: '水電費', prefix: 'UTL' },
+  RNT: { name: '租金', prefix: 'RNT' },
+  EQP: { name: '設備', prefix: 'EQP' },
+  MKT: { name: '行銷費用', prefix: 'MKT' },
+  ADV: { name: '廣告費用', prefix: 'ADV' },
+  TRN: { name: '培訓費用', prefix: 'TRN' },
+}
+
 // === 請款單（當前簡化版 - 符合資料庫實際結構）===
 export interface PaymentRequest {
   id: string
@@ -15,6 +49,8 @@ export interface PaymentRequest {
   tour_name?: string | null // 團名（快照）
   request_date: string // 請款日期 (YYYY-MM-DD)
   request_type: string // 請款類型（例：員工代墊、供應商支出）
+  request_category?: PaymentRequestCategory // 請款類別（團體/公司）
+  expense_type?: CompanyExpenseType | null // 公司費用類型（公司請款時使用）
   amount: number // 總金額
   supplier_id?: string | null
   supplier_name?: string | null

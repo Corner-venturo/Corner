@@ -1,18 +1,19 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Plus, X, FileInput, Check, Building2 } from 'lucide-react'
+import { Plus, X, FileInput, Check, Building2, Briefcase, Users } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RequestDateInput } from './RequestDateInput'
+import { ExpenseTypeSelector } from './ExpenseTypeSelector'
 import { CurrencyCell } from '@/components/table-cells'
 import { EditableRequestItemList } from './RequestItemList'
 import { useRequestForm } from '../hooks/useRequestForm'
 import { useRequestOperations } from '../hooks/useRequestOperations'
 import { useTourRequestItems } from '../hooks/useTourRequestItems'
 import { RequestItem } from '../types'
-import { PaymentItemCategory } from '@/stores/types'
+import { PaymentItemCategory, CompanyExpenseType, EXPENSE_TYPE_CONFIG } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
 
@@ -39,7 +40,7 @@ const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = {
   'activity': { icon: '🎫', color: 'text-purple-600' },
   '餐食': { icon: '🍽️', color: 'text-orange-600' },
   'meal': { icon: '🍽️', color: 'text-orange-600' },
-  '其他': { icon: '📦', color: 'text-gray-600' },
+  '其他': { icon: '📦', color: 'text-morandi-secondary' },
 }
 
 function getCategoryConfig(category: string) {
@@ -63,7 +64,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     currentUser,
   } = useRequestForm()
 
-  const { generateRequestCode, createRequest } = useRequestOperations()
+  const { generateRequestCode, generateCompanyRequestCode, createRequest } = useRequestOperations()
 
   // 從需求單帶入的狀態
   const [importFromRequests, setImportFromRequests] = useState(false)
@@ -143,7 +144,18 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   // 取得選中的旅遊團以預覽編號
   const selectedTour = tours.find(t => t.id === formData.tour_id)
-  const previewCode = selectedTour ? generateRequestCode(selectedTour.code) : '請先選擇旅遊團'
+
+  // 根據請款類別預覽編號
+  const previewCode = useMemo(() => {
+    if (formData.request_category === 'company') {
+      if (!formData.expense_type || !formData.request_date) {
+        return '請選擇費用類型和日期'
+      }
+      return generateCompanyRequestCode(formData.expense_type as CompanyExpenseType, formData.request_date)
+    } else {
+      return selectedTour ? generateRequestCode(selectedTour.code) : '請先選擇旅遊團'
+    }
+  }, [formData.request_category, formData.expense_type, formData.request_date, selectedTour, generateRequestCode, generateCompanyRequestCode])
 
   // 轉換為 Combobox 選項格式
   const tourOptions = tours.map(tour => ({
@@ -165,42 +177,62 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   const handleSubmit = async () => {
     try {
-      // 找到選中的旅遊團和訂單資訊
-      // 注意：使用完整的 tours 列表查找，而不是 filteredTours（搜尋過濾後可能找不到）
-      const selectedTour = tours.find(t => t.id === formData.tour_id)
-      const selectedOrder = orders.find(o => o.id === formData.order_id)
-
-      if (!selectedTour) {
-        logger.error('找不到選擇的旅遊團:', formData.tour_id)
-        return
-      }
+      const isCompanyRequest = formData.request_category === 'company'
 
       // 判斷使用需求單項目還是手動輸入項目
       let itemsToSubmit = requestItems
 
-      if (importFromRequests && selectedRequestCount > 0) {
-        // 從需求單帶入：將選中的需求單項目轉換為請款項目
-        itemsToSubmit = tourRequestItems
-          .filter(item => selectedRequestItems[item.id]?.selected)
-          .map(item => ({
-            id: Math.random().toString(36).substr(2, 9),
-            category: item.category as PaymentItemCategory,
-            supplier_id: item.supplierId,
-            supplierName: item.supplierName,
-            description: item.title,
-            unit_price: selectedRequestItems[item.id]?.amount || 0,
-            quantity: 1,
-          }))
+      if (isCompanyRequest) {
+        // 公司請款
+        if (!formData.expense_type) {
+          logger.error('公司請款必須選擇費用類型')
+          return
+        }
+
+        await createRequest(
+          formData,
+          itemsToSubmit,
+          '', // 公司請款無團名
+          '', // 公司請款無團號
+          undefined,
+          currentUser?.display_name || currentUser?.chinese_name || ''
+        )
+      } else {
+        // 團體請款
+        // 找到選中的旅遊團和訂單資訊
+        const selectedTour = tours.find(t => t.id === formData.tour_id)
+        const selectedOrder = orders.find(o => o.id === formData.order_id)
+
+        if (!selectedTour) {
+          logger.error('找不到選擇的旅遊團:', formData.tour_id)
+          return
+        }
+
+        if (importFromRequests && selectedRequestCount > 0) {
+          // 從需求單帶入：將選中的需求單項目轉換為請款項目
+          itemsToSubmit = tourRequestItems
+            .filter(item => selectedRequestItems[item.id]?.selected)
+            .map(item => ({
+              id: Math.random().toString(36).substr(2, 9),
+              category: item.category as PaymentItemCategory,
+              supplier_id: item.supplierId,
+              supplierName: item.supplierName,
+              description: item.title,
+              unit_price: selectedRequestItems[item.id]?.amount || 0,
+              quantity: 1,
+            }))
+        }
+
+        await createRequest(
+          formData,
+          itemsToSubmit,
+          selectedTour.name || '',
+          selectedTour.code || '',
+          selectedOrder?.order_number ?? undefined,
+          currentUser?.display_name || currentUser?.chinese_name || ''
+        )
       }
 
-      await createRequest(
-        formData,
-        itemsToSubmit,
-        selectedTour.name || '',
-        selectedTour.code || '',
-        selectedOrder?.order_number ?? undefined,
-        currentUser?.display_name || currentUser?.chinese_name || '' // 請款人姓名
-      )
       resetForm()
       setImportFromRequests(false)
       setSelectedRequestItems({})
@@ -222,36 +254,82 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* 請款類別切換 */}
+          <div className="flex gap-2 p-1 bg-morandi-container/30 rounded-lg w-fit">
+            <Button
+              type="button"
+              variant={formData.request_category === 'tour' ? 'default' : 'ghost'}
+              className={cn(
+                'gap-2',
+                formData.request_category === 'tour'
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary'
+              )}
+              onClick={() => setFormData(prev => ({ ...prev, request_category: 'tour', expense_type: '' }))}
+            >
+              <Users size={16} />
+              團體請款
+            </Button>
+            <Button
+              type="button"
+              variant={formData.request_category === 'company' ? 'default' : 'ghost'}
+              className={cn(
+                'gap-2',
+                formData.request_category === 'company'
+                  ? 'bg-morandi-gold hover:bg-morandi-gold-hover text-white'
+                  : 'text-morandi-secondary hover:text-morandi-primary'
+              )}
+              onClick={() => setFormData(prev => ({ ...prev, request_category: 'company', tour_id: '', order_id: '' }))}
+            >
+              <Briefcase size={16} />
+              公司請款
+            </Button>
+          </div>
+
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">選擇旅遊團 *</label>
-                <Combobox
-                  options={tourOptions}
-                  value={formData.tour_id}
-                  onChange={value => {
-                    setFormData(prev => ({
-                      ...prev,
-                      tour_id: value,
-                      order_id: '',
-                    }))
-                  }}
-                  placeholder="搜尋團號或團名..."
-                  className="mt-1"
-                />
-              </div>
+            {formData.request_category === 'tour' ? (
+              <>
+                {/* 團體請款：選擇旅遊團和訂單 */}
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">選擇旅遊團 *</label>
+                  <Combobox
+                    options={tourOptions}
+                    value={formData.tour_id}
+                    onChange={value => {
+                      setFormData(prev => ({
+                        ...prev,
+                        tour_id: value,
+                        order_id: '',
+                      }))
+                    }}
+                    placeholder="搜尋團號或團名..."
+                    className="mt-1"
+                  />
+                </div>
 
-              <div>
-                <label className="text-sm font-medium text-morandi-primary">選擇訂單（可選）</label>
-                <Combobox
-                  options={orderOptions}
-                  value={formData.order_id}
-                  onChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
-                  placeholder={!formData.tour_id ? '請先選擇旅遊團' : '搜尋訂單...'}
-                  disabled={!formData.tour_id}
-                  className="mt-1"
+                <div>
+                  <label className="text-sm font-medium text-morandi-primary">選擇訂單（可選）</label>
+                  <Combobox
+                    options={orderOptions}
+                    value={formData.order_id}
+                    onChange={value => setFormData(prev => ({ ...prev, order_id: value }))}
+                    placeholder={!formData.tour_id ? '請先選擇旅遊團' : '搜尋訂單...'}
+                    disabled={!formData.tour_id}
+                    className="mt-1"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* 公司請款：選擇費用類型 */}
+                <ExpenseTypeSelector
+                  value={formData.expense_type as CompanyExpenseType | ''}
+                  onChange={value => setFormData(prev => ({ ...prev, expense_type: value }))}
                 />
-              </div>
+                <div />
+              </>
+            )}
 
               <RequestDateInput
                 value={formData.request_date}
@@ -275,8 +353,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
               </div>
           </div>
 
-          {/* 從需求單帶入選項 */}
-          {formData.tour_id && (
+          {/* 從需求單帶入選項 - 只在團體請款時顯示 */}
+          {formData.request_category === 'tour' && formData.tour_id && (
             <div className="flex items-center gap-2 p-3 bg-morandi-container/30 rounded-lg">
               <Checkbox
                 id="import-from-requests"
@@ -294,7 +372,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           )}
 
           {/* 需求單項目列表 或 手動輸入列表 */}
-          {importFromRequests ? (
+          {formData.request_category === 'tour' && importFromRequests ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-morandi-primary">
@@ -326,7 +404,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                           key={item.id}
                           className={cn(
                             'flex items-start gap-3 p-4 border-b border-border last:border-b-0',
-                            isSelected ? 'bg-morandi-gold/5' : 'bg-white'
+                            isSelected ? 'bg-morandi-gold/5' : 'bg-card'
                           )}
                         >
                           <Checkbox
@@ -401,14 +479,15 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
             <Button
               onClick={handleSubmit}
               disabled={
-                !formData.tour_id ||
-                (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
+                formData.request_category === 'company'
+                  ? !formData.expense_type || !formData.request_date || requestItems.length === 0
+                  : !formData.tour_id || (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
               }
               className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
             >
               <Plus size={16} />
-              新增請款單 (共 {importFromRequests ? selectedRequestCount : requestItems.length} 項，
-              <CurrencyCell amount={importFromRequests ? selectedRequestTotal : total_amount} className="inline" />)
+              新增請款單 (共 {formData.request_category === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length} 項，
+              <CurrencyCell amount={formData.request_category === 'tour' && importFromRequests ? selectedRequestTotal : total_amount} className="inline" />)
             </Button>
           </div>
         </div>

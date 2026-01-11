@@ -62,6 +62,8 @@ export type {
 // 財務相關型別
 export type {
   PaymentRequest,
+  PaymentRequestCategory,
+  CompanyExpenseType,
   PaymentItemCategory,
   PaymentRequestItem,
   TourAllocation,
@@ -72,6 +74,9 @@ export type {
   Visa,
   VendorCost,
 } from './types/finance.types'
+
+// 財務常數
+export { EXPENSE_TYPE_CONFIG } from './types/finance.types'
 
 // 客戶群組相關型別
 export type {

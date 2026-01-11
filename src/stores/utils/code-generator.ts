@@ -38,6 +38,11 @@
  * PR{6位數}
  * 例如：PR000001, PR000002...
  * 注意：提案無團號，永遠為草稿狀態。使用 PR 前綴避免與出納單 P{日期} 衝突
+ *
+ * === 公司請款單編號格式 ===
+ * {費用類型}-{YYYYMM}-{3位數}
+ * 例如：SAL-202501-001 (2025年1月第1張薪資請款單)
+ * 費用類型：SAL(薪資), ENT(公關), TRV(差旅), OFC(辦公), UTL(水電), RNT(租金), EQP(設備), MKT(行銷), ADV(廣告), TRN(培訓)
  */
 
 import { logger } from '@/lib/utils/logger'
@@ -423,4 +428,44 @@ export function generateProposalCode(
 
   const nextNumber = (maxNumber + 1).toString().padStart(6, '0')
   return `P${nextNumber}`
+}
+
+/**
+ * 生成公司請款單編號
+ *
+ * @param expenseType - 費用類型代碼（如 SAL, ENT, TRV）
+ * @param requestDate - 請款日期 (ISO 8601 格式)
+ * @param existingPaymentRequests - 現有請款單列表
+ * @returns 公司請款單編號（如 SAL-202501-001）
+ *
+ * @example
+ * generateCompanyPaymentRequestCode('SAL', '2025-01-28', existingPaymentRequests)
+ * // => 'SAL-202501-001', 'SAL-202501-002'...
+ */
+export function generateCompanyPaymentRequestCode(
+  expenseType: string,
+  requestDate: string,
+  existingPaymentRequests: { code?: string }[]
+): string {
+  const date = new Date(requestDate)
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+
+  // 格式：SAL-202501-001 (費用類型-年月-序號)
+  const prefix = `${expenseType}-${year}${month}-`
+
+  let maxNumber = 0
+  existingPaymentRequests.forEach(pr => {
+    const code = pr.code
+    if (code?.startsWith(prefix)) {
+      const numberPart = code.substring(prefix.length)
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(3, '0')
+  return `${prefix}${nextNumber}`
 }

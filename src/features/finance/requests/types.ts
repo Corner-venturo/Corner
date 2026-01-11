@@ -1,8 +1,14 @@
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
+import {
+  PaymentRequestCategory,
+  CompanyExpenseType,
+} from '@/stores/types/finance.types'
 
 export interface RequestFormData {
-  tour_id: string
-  order_id: string
+  request_category: PaymentRequestCategory // 請款類別（團體/公司）
+  tour_id: string // 團體請款使用
+  order_id: string // 團體請款使用
+  expense_type: CompanyExpenseType | '' // 公司請款使用
   request_date: string
   note: string
   is_special_billing: boolean
