@@ -1,6 +1,6 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2026-01-11 (新增 VENTURO_VISION.md)
+> **最後更新**: 2026-01-12 (資料庫命名規範大重建)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
@@ -71,6 +71,15 @@ Read /Users/williamchien/Projects/SITEMAP.md
 |------|------|
 | `docs/ARCHITECTURE_STANDARDS.md` | 五層架構、資料隔離、權限控制 |
 | `docs/CODE_REVIEW_CHECKLIST.md` | 程式碼審查清單 |
+
+### 4. 資料庫規範（2026-01-12 大重建）
+| 文件 | 內容 |
+|------|------|
+| `docs/DATABASE_DESIGN_STANDARDS.md` | 命名規範、Workspace 隔離、表格分類 |
+| `docs/DATABASE_AUDIT_REPORT.md` | 所有表格審計、修復記錄 |
+| `docs/DATABASE_RECONSTRUCTION_2026-01-12.md` | **重要！** 2026-01-12 大重建完整記錄 |
+
+**⚠️ 資料庫命名已統一為 snake_case，不使用 humps 轉換！**
 
 **⚠️ 避免 AI 斷裂感：開發新頁面前，務必先閱讀 UI 規範！**
 
@@ -1518,6 +1527,31 @@ src/types/                                 - 業務類型定義
 ---
 
 ## 🗄️ 資料庫操作規範 (Supabase)
+
+### 🚨 資料庫命名規範（2026-01-12 大重建後）
+
+**已完成的統一規範：**
+- ✅ 所有表格名稱：`snake_case`（如 `tour_requests`）
+- ✅ 所有欄位名稱：`snake_case`（如 `created_at`）
+- ✅ 所有業務表格：必須有 `workspace_id`
+- ✅ TypeScript 類型：直接使用 `snake_case`（不使用 humps 轉換）
+
+**新增表格時必須遵守：**
+```sql
+CREATE TABLE public.new_table (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- 業務欄位（snake_case）...
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by TEXT,
+  updated_by TEXT
+);
+```
+
+**詳細規範文件：**
+- `docs/DATABASE_DESIGN_STANDARDS.md` - 完整設計規範
+- `docs/DATABASE_RECONSTRUCTION_2026-01-12.md` - 重建記錄
 
 ### ⚠️ 絕對規則：永遠使用 Supabase CLI
 **禁止以下做法**：

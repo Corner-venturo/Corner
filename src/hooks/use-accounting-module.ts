@@ -4,7 +4,7 @@
  */
 
 import { useMemo } from 'react'
-import { useWorkspaceModuleStore } from '@/stores/workspace-module-store'
+import { useWorkspaceModules } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 
 /**
@@ -25,8 +25,7 @@ import { useAuthStore } from '@/stores/auth-store'
  */
 export function useAccountingModule() {
   const user = useAuthStore((state) => state.user)
-  const modules = useWorkspaceModuleStore((state) => state.items)
-  const loading = useWorkspaceModuleStore((state) => state.loading)
+  const { items: modules, loading } = useWorkspaceModules()
 
   const result = useMemo(() => {
     if (!user?.workspace_id) {
@@ -87,8 +86,7 @@ export function useAccountingModule() {
  */
 export function useModule(moduleName: 'accounting' | 'inventory' | 'bi_analytics') {
   const user = useAuthStore((state) => state.user)
-  const modules = useWorkspaceModuleStore((state) => state.items)
-  const loading = useWorkspaceModuleStore((state) => state.loading)
+  const { items: modules, loading } = useWorkspaceModules()
 
   const result = useMemo(() => {
     if (!user?.workspace_id) {

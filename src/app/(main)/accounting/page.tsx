@@ -42,7 +42,7 @@ import { toast } from 'sonner'
 
 export default function AccountingPage() {
   const router = useRouter()
-  const { accounts, stats, categories, transactions, addTransaction, initialize } =
+  const { accounts, stats, categories, transactions, createTransaction, initialize } =
     useAccountingStore()
   const [isAccountsManagementOpen, setIsAccountsManagementOpen] = useState(false)
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false)
@@ -118,7 +118,7 @@ export default function AccountingPage() {
         date: today,
       }
 
-      addTransaction(transactionData)
+      createTransaction(transactionData)
 
       // 清空表單並顯示成功提示
       setQuickAmount('')
@@ -131,7 +131,7 @@ export default function AccountingPage() {
     } catch (error) {
       toast.error('記帳失敗，請稍後再試')
     }
-  }, [quickAmount, quickCategory, quickAccount, categories, accounts, today, addTransaction])
+  }, [quickAmount, quickCategory, quickAccount, categories, accounts, today, createTransaction])
 
   // 分類快速選擇
   const handleQuickCategorySelect = useCallback((category_id: string) => {

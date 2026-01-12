@@ -11,7 +11,7 @@ import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
 import { logger } from '@/lib/utils/logger'
-import { useEmployeeStore } from '@/stores'
+import { useEmployees } from '@/data'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -71,7 +71,7 @@ export function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
-  const employees = useEmployeeStore(state => state.items)
+  const { items: employees } = useEmployees()
 
   const isAnnouncementChannel = !!channel.is_announcement
   const isDisabled = isAnnouncementChannel && !isAdmin

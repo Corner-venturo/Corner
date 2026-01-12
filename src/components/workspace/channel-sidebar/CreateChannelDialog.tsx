@@ -5,8 +5,9 @@
 import { useState, useEffect } from 'react'
 import { Hash, Lock, Check, Globe, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useEmployeeStore, useWorkspaceStore } from '@/stores'
+import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
+import { useEmployees } from '@/data'
 
 interface CreateChannelDialogProps {
   isOpen: boolean
@@ -42,23 +43,18 @@ export function CreateChannelDialog({
   onCreate,
 }: CreateChannelDialogProps) {
   const { user } = useAuthStore()
-  const employees = useEmployeeStore(state => state.items)
+  const { items: employees } = useEmployees()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // 檢查是否為超級管理員
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
-  // 載入員工列表和工作空間
+  // 載入工作空間資料（employees 由 SWR 自動載入）
   useEffect(() => {
-    if (isOpen) {
-      if (employees.length === 0) {
-        useEmployeeStore.getState().fetchAll()
-      }
-      if (isSuperAdmin && workspaces.length === 0) {
-        loadWorkspaces()
-      }
+    if (isOpen && isSuperAdmin && workspaces.length === 0) {
+      loadWorkspaces()
     }
-  }, [isOpen, employees.length, isSuperAdmin, workspaces.length, loadWorkspaces])
+  }, [isOpen, isSuperAdmin, workspaces.length, loadWorkspaces])
 
   // 根據範圍顯示員工列表
   const displayEmployees = channelScope === 'company'

@@ -5,7 +5,7 @@ import { InputIME } from '@/components/ui/input-ime'
 import { TimeInput } from '@/components/ui/time-input'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2 } from 'lucide-react'
-import { useRegionsStore } from '@/stores'
+import { useCountries, useCities } from '@/data'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // 使用與 Preview 相同的型別定義
@@ -59,21 +59,10 @@ interface PrintItineraryFormProps {
 }
 
 export function PrintItineraryForm({ data, onChange }: PrintItineraryFormProps) {
-  const { countries, cities, fetchCountries, fetchCitiesByCountry } = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
 
-  // 載入國家和城市資料
-  useEffect(() => {
-    fetchCountries()
-  }, [fetchCountries])
-
-  useEffect(() => {
-    if (data.country) {
-      const country = countries.find(c => c.name === data.country)
-      if (country) {
-        fetchCitiesByCountry(country.id)
-      }
-    }
-  }, [data.country, countries, fetchCitiesByCountry])
+  // SWR 自動載入國家和城市資料
 
   const updateField = <K extends keyof PrintItineraryData>(field: K, value: PrintItineraryData[K]) => {
     onChange({ ...data, [field]: value })

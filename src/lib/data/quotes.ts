@@ -3,9 +3,12 @@
  *
  * 將所有 Quotes 相關的 Supabase 查詢封裝在此，
  * 實現 UI 與資料邏輯的徹底分離。
+ *
+ * 🔒 安全修復 2026-01-12：所有查詢都會自動過濾 workspace_id
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import type { Quote, Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -17,6 +20,7 @@ export interface GetPaginatedQuotesParams {
   page?: number
   limit?: number
   status?: string
+  workspaceId?: string  // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedQuotesResult {
@@ -36,17 +40,31 @@ export interface QuotesPageData {
 
 /**
  * 取得分頁報價單列表
+ * 🔒 自動過濾 workspace_id
  */
 export async function getPaginatedQuotes({
   page = 1,
   limit = 20,
   status,
+  workspaceId,
 }: GetPaginatedQuotesParams = {}): Promise<PaginatedQuotesResult> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getPaginatedQuotes: 未登入')
+      return { quotes: [], count: 0 }
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   let query = supabase
     .from('quotes')
     .select('*', { count: 'exact' })
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   // 狀態篩選
@@ -72,12 +90,25 @@ export async function getPaginatedQuotes({
 
 /**
  * 取得報價單頁面所需的所有資料（包含關聯的 Tours）
+ * 🔒 自動過濾 workspace_id
  */
 export async function getQuotesPageData({
   page = 1,
   limit = 20,
   status,
+  workspaceId,
 }: GetPaginatedQuotesParams = {}): Promise<QuotesPageData> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getQuotesPageData: 未登入')
+      return { quotes: [], tours: [], count: 0 }
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   // 並行查詢報價單和旅遊團
@@ -87,6 +118,7 @@ export async function getQuotesPageData({
       let query = supabase
         .from('quotes')
         .select('*', { count: 'exact' })
+        .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
         .order('created_at', { ascending: false })
 
       if (status && status !== 'all') {
@@ -102,6 +134,7 @@ export async function getQuotesPageData({
     supabase
       .from('tours')
       .select('*')
+      .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
       .neq('closing_status', 'closed')
       .order('departure_date', { ascending: false })
       .limit(100),
@@ -124,14 +157,27 @@ export async function getQuotesPageData({
 
 /**
  * 根據 ID 取得單一報價單
+ * 🔒 自動過濾 workspace_id
  */
-export async function getQuoteById(id: string): Promise<Quote | null> {
+export async function getQuoteById(id: string, workspaceId?: string): Promise<Quote | null> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getQuoteById: 未登入')
+      return null
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('quotes')
     .select('*')
     .eq('id', id)
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .single()
 
   if (error) {

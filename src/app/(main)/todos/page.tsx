@@ -15,7 +15,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { useTodos } from '@/hooks/useTodos'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployees } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { alertError } from '@/lib/ui/alert-dialog'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
@@ -556,8 +556,7 @@ function AddTodoForm({
   }) => void
   onCancel: () => void
 }) {
-  const { items: users, fetchAll: loadUsersFromDatabase } = useUserStore()
-  const [isLoadingUsers, _setIsLoadingUsers] = useState(false)
+  const { items: users, loading: isLoadingUsers } = useEmployees()
   const [formData, setFormData] = useState({
     title: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,
@@ -572,20 +571,6 @@ function AddTodoForm({
     )[],
     is_public: false,
   })
-
-  // 當點擊或聚焦指派選單時，才載入員工資料
-  const handleAssigneeDropdownFocus = async () => {
-    if (users.length === 0 && !isLoadingUsers) {
-      _setIsLoadingUsers(true)
-      try {
-        await loadUsersFromDatabase()
-      } catch (error) {
-        logger.error('載入員工資料失敗:', error)
-      } finally {
-        _setIsLoadingUsers(false)
-      }
-    }
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -632,7 +617,6 @@ function AddTodoForm({
         <Select
           value={formData.assignee || '__none__'}
           onValueChange={value => setFormData({ ...formData, assignee: value === '__none__' ? '' : value })}
-          onOpenChange={open => open && handleAssigneeDropdownFocus()}
           disabled={isLoadingUsers}
         >
           <SelectTrigger className="w-full">

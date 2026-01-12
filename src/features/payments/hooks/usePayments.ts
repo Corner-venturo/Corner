@@ -1,22 +1,22 @@
-import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
+import { usePaymentRequests, useDisbursementOrders, invalidateDisbursementOrders } from '@/data'
 import { paymentRequestService } from '../services/payment-request.service'
 import { disbursementOrderService } from '../services/disbursement-order.service'
 import { PaymentRequest, PaymentRequestItem, DisbursementOrder } from '@/stores/types'
-import { BaseEntity } from '@/types'
 
 /**
  * Payments Hook - 統一財務操作接口
  *
- * 使用新的 Service 層架構
+ * 使用 @/data 的 SWR hooks + Service 層業務邏輯
  */
 export const usePayments = () => {
-  const paymentRequestStore = usePaymentRequestStore()
-  const disbursementOrderStore = useDisbursementOrderStore()
+  // 使用 @/data 的 SWR hooks（自動載入）
+  const { items: payment_requests } = usePaymentRequests()
+  const { items: disbursement_orders } = useDisbursementOrders()
 
   return {
     // ========== 資料 ==========
-    payment_requests: paymentRequestStore.items,
-    disbursement_orders: disbursementOrderStore.items,
+    payment_requests,
+    disbursement_orders,
 
     // ========== PaymentRequest CRUD 操作 ==========
     createPaymentRequest: async (
@@ -33,8 +33,9 @@ export const usePayments = () => {
       return await paymentRequestService.delete(id)
     },
 
+    // SWR 自動載入，不需要手動 fetchAll
     loadPaymentRequests: async () => {
-      return await paymentRequestStore.fetchAll()
+      // 已由 SWR 自動處理
     },
 
     // ========== PaymentRequestItem 操作 ==========
@@ -81,16 +82,16 @@ export const usePayments = () => {
       return await paymentRequestService.calculateTotalAmount(requestId)
     },
 
-    getItemsByCategory: (requestId: string, category: PaymentRequestItem['category']) => {
-      return paymentRequestService.getItemsByCategory(requestId, category)
+    getItemsByCategory: async (requestId: string, category: PaymentRequestItem['category']) => {
+      return await paymentRequestService.getItemsByCategory(requestId, category)
     },
 
-    getPendingRequests: () => {
-      return paymentRequestService.getPendingRequests()
+    getPendingRequests: async () => {
+      return await paymentRequestService.getPendingRequests()
     },
 
-    getProcessingRequests: () => {
-      return paymentRequestService.getProcessingRequests()
+    getProcessingRequests: async () => {
+      return await paymentRequestService.getProcessingRequests()
     },
 
     // ========== DisbursementOrder CRUD 操作 ==========
@@ -107,7 +108,7 @@ export const usePayments = () => {
     },
 
     loadDisbursementOrders: async () => {
-      return await disbursementOrderStore.fetchAll()
+      await invalidateDisbursementOrders()
     },
 
     // ========== DisbursementOrder 業務邏輯 ==========

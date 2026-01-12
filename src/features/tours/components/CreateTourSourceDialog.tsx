@@ -22,7 +22,7 @@ import {
   MapPin,
   Calendar,
 } from 'lucide-react'
-import { useItineraryStore, useQuoteStore } from '@/stores'
+import { useItineraries, useQuotes } from '@/data'
 import type { Itinerary, Quote } from '@/stores/types'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -45,16 +45,8 @@ export function CreateTourSourceDialog({
   onSelectQuote,
 }: CreateTourSourceDialogProps) {
   const [step, setStep] = useState<DialogStep>('select')
-  const { items: itineraries, fetchAll: fetchItineraries, loading: loadingItineraries } = useItineraryStore()
-  const { items: quotes, fetchAll: fetchQuotes, loading: loadingQuotes } = useQuoteStore()
-
-  // 載入資料
-  useEffect(() => {
-    if (isOpen) {
-      fetchItineraries()
-      fetchQuotes()
-    }
-  }, [isOpen, fetchItineraries, fetchQuotes])
+  const { items: itineraries, loading: loadingItineraries } = useItineraries()
+  const { items: quotes, loading: loadingQuotes } = useQuotes()
 
   // 重置狀態
   useEffect(() => {

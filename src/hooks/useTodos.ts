@@ -10,6 +10,7 @@ import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Todo } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
+import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 
 // Supabase Insert 類型
 type TodoInsert = Database['public']['Tables']['todos']['Insert']
@@ -36,23 +37,7 @@ function generateUUID(): string {
   })
 }
 
-/**
- * 取得當前使用者的 workspace_id
- * 從 localStorage 讀取 auth-store 的值
- */
-function getCurrentWorkspaceId(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const authData = localStorage.getItem('auth-storage')
-    if (authData) {
-      const parsed = JSON.parse(authData)
-      return parsed?.state?.user?.workspace_id || null
-    }
-  } catch {
-    // 忽略解析錯誤
-  }
-  return null
-}
+// 使用 @/lib/workspace-helpers 的 getCurrentWorkspaceId
 
 // ===== 主要 Hook =====
 export function useTodos() {
@@ -119,6 +104,7 @@ export function useTodos() {
       const insertData: TodoInsert = {
         ...newTodo,
         workspace_id,
+        created_by_legacy: newTodo.creator, // 必填欄位：員工 ID
         related_items: newTodo.related_items as unknown as TodoInsert['related_items'],
         sub_tasks: newTodo.sub_tasks as unknown as TodoInsert['sub_tasks'],
         notes: newTodo.notes as unknown as TodoInsert['notes'],

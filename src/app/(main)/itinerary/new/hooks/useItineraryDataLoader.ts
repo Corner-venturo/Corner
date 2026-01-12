@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useTourStore, useRegionsStore, useQuoteStore } from '@/stores'
-import { useItineraries } from '@/hooks/cloud-hooks'
+import { useTours, useItineraries, useQuotes, invalidateItineraries, useCountries, useCities } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { formatDateTW, formatDateCompactPadded } from '@/lib/utils/format-date'
@@ -39,10 +38,11 @@ export function useItineraryDataLoader({
     ? JSON.parse(searchParams.get('activities') || '[]')
     : []
 
-  const { items: tours } = useTourStore()
-  const { items: itineraries, fetchAll: refetchItineraries } = useItineraries()
-  const { items: quotes } = useQuoteStore()
-  const { countries, cities } = useRegionsStore()
+  const { items: tours } = useTours()
+  const { items: itineraries } = useItineraries()
+  const { items: quotes } = useQuotes()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
 
   const hasInitializedRef = useRef(false)
   const lastIdRef = useRef<string | null>(null)
@@ -216,7 +216,7 @@ export function useItineraryDataLoader({
               const itinerary = data as unknown as Itinerary
               loadItineraryData(itinerary)
               // 重新整理 SWR 快取
-              refetchItineraries()
+              void invalidateItineraries()
             } else {
               logger.warn('[ItineraryDataLoader] 找不到行程表:', itineraryId)
               setLoading(false)
@@ -388,7 +388,7 @@ export function useItineraryDataLoader({
     isFromQuote,
     daysFromQuote,
     loadItineraryData,
-    refetchItineraries,
+    invalidateItineraries,
     setTourData,
     setLoading,
   ])

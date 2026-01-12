@@ -11,7 +11,7 @@ import { PrintableConfirmation } from '../components/PrintableConfirmation'
 import { ImportPNRDialog } from '../components/ImportPNRDialog'
 import { Button } from '@/components/ui/button'
 import { Printer, Upload, X, Save } from 'lucide-react'
-import { useConfirmationStore } from '@/stores/confirmation-store'
+import { useConfirmations, updateConfirmation } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import type {
   ConfirmationFormData,
@@ -30,9 +30,7 @@ export default function EditConfirmationPage() {
   const params = useParams()
   const id = params.id as string
 
-  const confirmations = useConfirmationStore(state => state.items)
-  const update = useConfirmationStore(state => state.update)
-  const fetchAll = useConfirmationStore(state => state.fetchAll)
+  const { items: confirmations, loading: isLoadingConfirmations } = useConfirmations()
   const currentUser = useAuthStore(state => state.user)
 
   const [formData, setFormData] = useState<ConfirmationFormData>({
@@ -44,21 +42,12 @@ export default function EditConfirmationPage() {
   })
 
   const [isSaving, setIsSaving] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   useEffect(() => {
-    const loadConfirmation = async () => {
-      await fetchAll()
-      setIsLoading(false)
-    }
-    loadConfirmation()
-  }, [fetchAll])
-
-  useEffect(() => {
-    if (!isLoading) {
+    if (!isLoadingConfirmations) {
       const confirmation = confirmations.find(c => c.id === id)
       if (confirmation) {
         setFormData({
@@ -74,7 +63,7 @@ export default function EditConfirmationPage() {
         setNotFound(true)
       }
     }
-  }, [id, confirmations, isLoading])
+  }, [id, confirmations, isLoadingConfirmations])
 
   const handleTypeChange = (type: ConfirmationType) => {
     setFormData({
@@ -99,7 +88,7 @@ export default function EditConfirmationPage() {
 
     setIsSaving(true)
     try {
-      await update(id, {
+      await updateConfirmation(id, {
         type: formData.type,
         booking_number: formData.booking_number,
         confirmation_number: formData.confirmation_number,
@@ -173,7 +162,7 @@ export default function EditConfirmationPage() {
 
   const currentConfirmation = confirmations.find(c => c.id === id)
 
-  if (isLoading) {
+  if (isLoadingConfirmations) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-morandi-secondary">載入中...</div>

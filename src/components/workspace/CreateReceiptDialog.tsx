@@ -7,8 +7,7 @@ import { DollarSign, Calendar, X, Save } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useReceiptOrderStore } from '@/stores'
-import type { CreateInput } from '@/stores/core/types'
+import { createReceiptOrder } from '@/data'
 import type { ReceiptOrder } from '@/types'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -36,7 +35,6 @@ interface CreateReceiptDialogProps {
 }
 
 export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateReceiptDialogProps) {
-  const { create: createReceipt } = useReceiptOrderStore()
 
   const [receiptDate, setReceiptDate] = useState(getTodayString())
   const [paymentMethod, setPaymentMethod] = useState<'現金' | '匯款' | '刷卡' | '支票'>('匯款')
@@ -60,9 +58,9 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
         amount: parseFloat(amount),
         notes: note,
         handled_by: null,
-      } as unknown as CreateInput<ReceiptOrder>
+      }
 
-      const receipt = await createReceipt(receiptData)
+      const receipt = await createReceiptOrder(receiptData as Omit<ReceiptOrder, 'id' | 'created_at' | 'updated_at'>)
       onSuccess(receipt.id)
       onClose()
     } catch (error) {

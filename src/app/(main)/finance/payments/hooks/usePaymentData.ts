@@ -4,7 +4,8 @@
 
 import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
-import { useOrderStore, useReceiptStore, useLinkPayLogStore, useAuthStore, useTourStore, useEmployeeStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { useOrders, useTours, useEmployees, useReceipts, createReceipt, updateReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
@@ -20,12 +21,12 @@ const RECEIPT_TYPES = {
 } as const
 
 export function usePaymentData() {
-  const { items: orders } = useOrderStore()
-  const { items: receipts, create: createReceipt, update: updateReceipt, fetchAll: fetchReceipts } = useReceiptStore()
-  const { items: linkpayLogs } = useLinkPayLogStore()
-  const { items: tours } = useTourStore()
+  const { items: orders } = useOrders()
+  const { items: receipts } = useReceipts()
+  const { items: linkpayLogs } = useLinkPayLogs()
+  const { items: tours } = useTours()
   const { user } = useAuthStore()
-  const { items: employees } = useEmployeeStore()
+  const { items: employees } = useEmployees()
   const { hasAccounting, isExpired } = useAccountingModule()
 
   // 過濾可用訂單（未收款或部分收款）
@@ -97,11 +98,15 @@ export function usePaymentData() {
         workspace_id: user.workspace_id || '',
         order_id: selectedOrderId,
         tour_id: selectedOrder?.tour_id || null, // 直接關聯團號
+        customer_id: selectedOrder?.customer_id || null, // 付款人
         order_number: selectedOrder?.order_number || '',
         tour_name: selectedOrder?.tour_name || '',
         receipt_date: item.transaction_date,
+        payment_date: item.transaction_date,
+        payment_method: ['transfer', 'cash', 'card', 'check', 'linkpay'][item.receipt_type] || 'transfer',
         receipt_type: item.receipt_type,
         receipt_amount: item.amount,
+        amount: item.amount,
         actual_amount: 0, // 待會計確認
         status: '0', // 待確認
         receipt_account: item.receipt_account || null,
@@ -175,7 +180,7 @@ export function usePaymentData() {
     }
 
     // 重新載入資料
-    await fetchReceipts()
+    await invalidateReceipts()
   }
 
   // 確認收款（更新實收金額和狀態，異常時記錄備註並通知建立者）
@@ -229,7 +234,7 @@ export function usePaymentData() {
     }
 
     // 重新載入資料
-    await fetchReceipts()
+    await invalidateReceipts()
   }
 
   return {
@@ -238,7 +243,7 @@ export function usePaymentData() {
     availableOrders,
     linkpayLogs,
     user,
-    fetchReceipts,
+    invalidateReceipts,
     handleCreateReceipt,
     handleConfirmReceipt,
   }

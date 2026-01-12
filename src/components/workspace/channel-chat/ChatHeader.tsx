@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Badge } from '@/components/ui/badge'
 import { Users, MapPin, CircleDollarSign, ExternalLink, MessageCircle, Megaphone } from 'lucide-react'
-import { useQuoteStore } from '@/stores'
+import { useQuotes } from '@/data'
 import { cn } from '@/lib/utils'
 import type { ChatMode, TravelerConversationType } from './useTravelerMode'
 import { stripHtml } from '@/lib/utils/string-utils'
@@ -36,14 +36,7 @@ export function ChatHeader({
   isConversationOpen = false,
 }: ChatHeaderProps) {
   const router = useRouter()
-  const { items: quotes, fetchAll: fetchQuotes } = useQuoteStore()
-
-  // 載入報價單
-  useEffect(() => {
-    if (tourId) {
-      fetchQuotes()
-    }
-  }, [tourId, fetchQuotes])
+  const { items: quotes } = useQuotes()
 
   // 篩選該旅遊團的報價單
   const linkedQuotes = useMemo(() => {

@@ -20,6 +20,7 @@ type ChannelGroupEntity = Omit<ChannelGroup, 'created_at' | 'updated_at'> & Base
  */
 export const useChannelGroupStore = createStore<ChannelGroupEntity>({
   tableName: 'channel_groups',
+  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
 })
 
 /**

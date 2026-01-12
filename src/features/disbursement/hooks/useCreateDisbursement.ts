@@ -8,7 +8,11 @@
 import { getTodayString, formatDate } from '@/lib/utils/format-date'
 import { useState, useMemo, useCallback } from 'react'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
-import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
+import {
+  useDisbursementOrders,
+  updatePaymentRequest as updatePaymentRequestApi,
+  invalidateDisbursementOrders,
+} from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -55,9 +59,8 @@ interface UseCreateDisbursementProps {
 }
 
 export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateDisbursementProps) {
-  // Stores
-  const { items: disbursement_orders, fetchAll: fetchDisbursementOrders } = useDisbursementOrderStore()
-  const { update: updatePaymentRequest } = usePaymentRequestStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: disbursement_orders } = useDisbursementOrders()
   const user = useAuthStore(state => state.user)
 
   // 狀態
@@ -170,11 +173,11 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
 
       // 更新請款單狀態為 approved（已確認，已加入出納單）
       for (const id of selectedRequestIds) {
-        await updatePaymentRequest(id, { status: 'approved' })
+        await updatePaymentRequestApi(id, { status: 'approved' })
       }
 
-      // 重新載入出納單列表
-      await fetchDisbursementOrders()
+      // 重新載入出納單列表（SWR 快取失效）
+      await invalidateDisbursementOrders()
 
       await alert(`出納單 ${orderNumber} 建立成功`, 'success')
 
@@ -192,9 +195,8 @@ export function useCreateDisbursement({ pendingRequests, onSuccess }: UseCreateD
     selectedRequestIds,
     selectedAmount,
     disbursement_orders,
+    disbursementDate,
     user,
-    fetchDisbursementOrders,
-    updatePaymentRequest,
     onSuccess,
   ])
 

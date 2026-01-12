@@ -102,13 +102,13 @@ export function useTourDestinations() {
       }
 
       try {
+        // tour_destinations 是全域共用表，沒有 workspace_id 欄位
         const { data, error } = await supabase
           .from('tour_destinations')
           .insert({
             country: countryName.trim(),
             city: cityName.trim(),
             airport_code: airportCode.trim().toUpperCase(),
-            workspace_id: user.workspace_id,
           })
           .select()
           .single()

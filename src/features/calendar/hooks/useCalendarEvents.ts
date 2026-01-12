@@ -5,13 +5,10 @@ import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import {
   useCalendarStore,
-  useCalendarEventStore,
-  useEmployeeStore,
-  useTourStore,
-  useCustomerStore,
   useAuthStore,
   useWorkspaceStore,
 } from '@/stores'
+import { useTours, useCustomers, useEmployees, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { useCalendarFilters } from './useCalendarFilters'
@@ -32,12 +29,12 @@ const getDateInTaipei = (isoString: string): string => {
 }
 
 export function useCalendarEvents() {
-  const { items: tours, fetchAll: fetchTours } = useTourStore()
-  const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
+  const { items: tours } = useTours()
+  const { items: customers } = useCustomers()
   const { settings } = useCalendarStore()
-  const { items: calendarEvents, fetchAll: fetchCalendarEvents } = useCalendarEventStore()
+  const { items: calendarEvents, refresh: refreshCalendarEvents } = useCalendarEventList()
   const { user } = useAuthStore()
-  const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
+  const { items: employees } = useEmployees()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // Workspace 篩選狀態（只有超級管理員能用）
@@ -70,19 +67,16 @@ export function useCalendarEvents() {
         roles: user?.roles,
         isSuperAdmin,
       })
-      // 載入所有行事曆需要的資料
+      // 所有行事曆需要的資料
       // 🔧 優化：移除 fetchOrders/fetchMembers，改用 tour.current_participants
-      fetchCalendarEvents()
-      fetchEmployees()
-      fetchTours()
-      fetchCustomers() // 用於客戶生日顯示
+      // 🔧 tours, customers, employees, calendarEvents 由 SWR 自動載入
 
       // 顯示載入的資料數量（除錯用）
       setTimeout(() => {
         logger.log('[Calendar] 資料載入完成，tours 數量:', tours?.length || 0)
       }, 2000)
     }
-  }, [fetchCalendarEvents, fetchEmployees, fetchTours, fetchCustomers, user, isSuperAdmin, tours?.length])
+  }, [user, isSuperAdmin, tours?.length])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -93,8 +87,8 @@ export function useCalendarEvents() {
         { event: '*', schema: 'public', table: 'calendar_events' },
         (payload) => {
           logger.log('[Calendar] Realtime 收到更新:', payload.eventType)
-          // 重新抓取資料
-          fetchCalendarEvents()
+          // 重新抓取資料（使用 SWR invalidate）
+          invalidateCalendarEvents()
         }
       )
       .subscribe()
@@ -102,7 +96,7 @@ export function useCalendarEvents() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [fetchCalendarEvents])
+  }, [])
 
   // 根據類型取得顏色 - 使用莫蘭迪配色
   const getEventColor = useCallback((type: string, status?: string) => {

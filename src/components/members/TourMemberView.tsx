@@ -3,7 +3,7 @@
 import React, { forwardRef, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Member } from '@/stores/types';
 import { useMembers } from '@/hooks/use-members'; // Generic useMembers hook
-import { useOrderStore, useTourStore } from '@/stores'; // To get orders and tour details
+import { useOrders, useTours } from '@/data' // To get orders and tour details
 import { MemberTable } from '@/components/members/MemberTable';
 import { DataSheetColumn } from '@/components/shared/react-datasheet-wrapper';
 import { ImageIcon, AlertTriangle } from 'lucide-react';
@@ -29,8 +29,8 @@ interface EditingMember extends Omit<Member, 'id' | 'created_at' | 'updated_at'>
 
 export const TourMemberView = forwardRef<TourMemberViewRef, TourMemberViewProps>(
   ({ tourId }, ref) => {
-    const { items: allOrders, fetchAll: fetchAllOrders } = useOrderStore();
-    const { items: allTours, fetchAll: fetchAllTours } = useTourStore();
+    const { items: allOrders } = useOrders()
+    const { items: allTours } = useTours()
     
     // Fetch all members using the generic useMembers hook
     // We pass no orderId/tourId to useMembers here to get all members, and filter locally
@@ -47,11 +47,7 @@ export const TourMemberView = forwardRef<TourMemberViewRef, TourMemberViewProps>
     const [tableMembers, setTableMembers] = useState<EditingMember[]>([]);
     const [isEditMode, setIsEditMode] = useState(false); // Tour member view might have its own edit mode
 
-    // Fetch necessary data
-    useEffect(() => {
-      fetchAllOrders();
-      fetchAllTours();
-    }, [fetchAllOrders, fetchAllTours]);
+    // SWR 自動處理資料載入，不需要手動 fetch
 
     // Filter members based on tourId
     const membersForTour = useMemo(() => {

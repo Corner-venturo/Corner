@@ -36,7 +36,7 @@ import {
   SSRCategory,
 } from '@/lib/pnr-parser'
 import { useReferenceData } from '@/lib/pnr/use-reference-data'
-import { usePNRStore } from '@/stores/pnrs-store'
+import { createPNR } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import type { PNR } from '@/types/pnr.types'
@@ -60,7 +60,6 @@ export function PNRWidget() {
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  const { create: createPNR } = usePNRStore()
   const { user } = useAuthStore()
 
   // 載入參考資料

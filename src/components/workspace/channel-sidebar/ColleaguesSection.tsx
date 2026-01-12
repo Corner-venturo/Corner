@@ -8,8 +8,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ChevronDown, ChevronRight, User, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useEmployeeStore, useWorkspaceStore } from '@/stores'
+import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
+import { useEmployees } from '@/data'
 
 // 系統機器人的固定 ID
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -28,21 +29,17 @@ export function ColleaguesSection({
   selectedMemberId,
 }: ColleaguesSectionProps) {
   const { user } = useAuthStore()
-  const employees = useEmployeeStore(state => state.items)
-  const fetchEmployees = useEmployeeStore(state => state.fetchAll)
+  const { items: employees } = useEmployees()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   const [expandedOffices, setExpandedOffices] = useState<Record<string, boolean>>({})
 
-  // 載入資料
+  // 載入 workspaces 資料（employees 由 SWR 自動載入）
   useEffect(() => {
-    if (employees.length === 0) {
-      fetchEmployees()
-    }
     if (workspaces.length === 0) {
       loadWorkspaces()
     }
-  }, [employees.length, workspaces.length, fetchEmployees, loadWorkspaces])
+  }, [workspaces.length, loadWorkspaces])
 
   // 按辦公室分組員工（排除自己和機器人）
   const employeesByOffice = useMemo(() => {

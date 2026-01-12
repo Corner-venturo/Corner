@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
-import { generateProposalCode, generateTourCode, generateOrderCode } from '@/stores/utils/code-generator'
+import { generateProposalCode } from '@/stores/utils/code-generator'
 import { logger } from '@/lib/utils/logger'
 import type {
   Proposal,
@@ -25,16 +25,9 @@ import type {
 // These tables exist in the database but TypeScript types haven't been regenerated yet
  
 const proposalsDb = () => (supabase as any).from('proposals')
- 
 const packagesDb = () => (supabase as any).from('proposal_packages')
- 
-const toursDb = () => (supabase as any).from('tours')
- 
 const quotesDb = () => (supabase as any).from('quotes')
- 
 const itinerariesDb = () => (supabase as any).from('itineraries')
- 
-const ordersDb = () => (supabase as any).from('orders')
 
 /**
  * 建立提案
@@ -182,7 +175,7 @@ export async function createPackage(
     nights = days - 1
   }
 
-  // 3. 建立套件
+  // 3. 建立套件（proposal_packages 沒有 workspace_id 欄位，透過 proposal_id 關聯）
   const packageData = {
     ...data,
     version_number: versionNumber,
@@ -192,7 +185,6 @@ export async function createPackage(
     is_active: true,
     created_by: userId,
     updated_by: userId,
-    workspace_id: workspaceId,
   }
 
   const { data: pkg, error } = await packagesDb()
@@ -338,189 +330,44 @@ export async function deletePackage(id: string): Promise<void> {
 
 /**
  * 將提案轉為正式旅遊團
+ * 注意：此功能需要 server-side 執行以繞過 RLS，因此透過 API route 呼叫
  */
 export async function convertToTour(
   data: ConvertToTourData,
   workspaceId: string,
   userId: string
 ): Promise<ConvertToTourResult> {
-  const { proposal_id, package_id, city_code, departure_date, tour_name, contact_person, contact_phone } = data
+  const response = await fetch('/api/proposals/convert-to-tour', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include', // 確保帶上認證 cookies
+    body: JSON.stringify({
+      ...data,
+      workspace_id: workspaceId,
+      user_id: userId,
+    }),
+  })
 
-  // 1. 取得提案
-  const { data: proposalData, error: proposalError } = await proposalsDb()
-    .select('*')
-    .eq('id', proposal_id)
-    .single()
-
-  if (proposalError || !proposalData) {
-    throw new Error('找不到提案')
+  // 檢查是否被重定向到登入頁（認證問題）
+  if (response.redirected || response.url.includes('/login')) {
+    throw new Error('登入逾時，請重新登入')
   }
 
-  const proposal = proposalData as unknown as Proposal
-
-  if (proposal.status === 'converted') {
-    throw new Error('此提案已經轉為旅遊團')
+  // 檢查 content-type 是否為 JSON
+  const contentType = response.headers.get('content-type')
+  if (!contentType?.includes('application/json')) {
+    throw new Error('伺服器回應格式錯誤')
   }
 
-  // 2. 取得套件
-  const { data: pkgData, error: pkgError } = await packagesDb()
-    .select('*')
-    .eq('id', package_id)
-    .single()
+  const result = await response.json()
 
-  if (pkgError || !pkgData) {
-    throw new Error('找不到團體套件')
+  if (!response.ok) {
+    throw new Error(result.error || '轉開團失敗')
   }
 
-  const pkg = pkgData as unknown as ProposalPackage
-
-  // 3. 生成團號
-  const { data: existingTours } = await supabase
-    .from('tours')
-    .select('code')
-    .like('code', `${city_code}%`)
-
-  const tourCode = generateTourCode('', city_code, departure_date, existingTours || [])
-
-  // 4. 建立 Tour
-  // 計算回程日期：如果套件沒有 end_date，用 departure_date + days 計算
-  const daysCount = pkg.days || 1
-  const depDate = new Date(pkg.start_date || departure_date)
-  const returnDateValue = pkg.end_date || new Date(depDate.getTime() + (daysCount - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
-  // 注意：proposal_packages 的 country_id 存的是國家名稱，main_city_id 存的是機場代碼
-  // 但 tours 表的 country_id/main_city_id 是 FK 到 countries/cities 表的 UUID
-  // 為了簡化，這裡先設為 null，旅遊團的目的地資訊改存在 location 欄位
-
-  const tourData = {
-    id: crypto.randomUUID(),
-    code: tourCode,
-    name: tour_name || proposal.title,
-    location: pkg.destination || proposal.destination || `${pkg.country_id || ''} ${pkg.main_city_id || ''}`.trim(),
-    country_id: null, // 暫不轉換，避免 FK 錯誤
-    main_city_id: null, // 暫不轉換，避免 FK 錯誤
-    departure_date: pkg.start_date || departure_date,
-    return_date: returnDateValue,
-    status: '進行中',
-    max_participants: pkg.group_size || proposal.group_size,
-    current_participants: 0,
-    contract_status: 'pending',
-    workspace_id: workspaceId,
-    // 關聯提案套件（保留行程類型和資料）
-    proposal_package_id: package_id,
-    // 財務欄位預設值
-    profit: 0,
-    total_cost: 0,
-    total_revenue: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-
-  logger.log('準備建立旅遊團:', JSON.stringify(tourData, null, 2))
-
-  const { data: newTour, error: tourError } = await toursDb()
-    .insert(tourData)
-    .select()
-    .single()
-
-  if (tourError) {
-    logger.error('建立旅遊團失敗:', JSON.stringify(tourError, null, 2))
-    logger.error('tourData:', JSON.stringify(tourData, null, 2))
-    const errorMsg = tourError.message || tourError.code || tourError.details || tourError.hint || JSON.stringify(tourError)
-    throw new Error(`建立旅遊團失敗: ${errorMsg}`)
-  }
-
-  // 5. 更新套件的報價單和行程表，關聯到新 Tour
-  if (pkg.quote_id) {
-    await supabase
-      .from('quotes')
-      .update({ tour_id: newTour.id })
-      .eq('id', pkg.quote_id)
-  }
-
-  if (pkg.itinerary_id) {
-    await supabase
-      .from('itineraries')
-      .update({ tour_id: newTour.id, tour_code: tourCode })
-      .eq('id', pkg.itinerary_id)
-  }
-
-  // 5.1 更新套件的需求單，關聯到新 Tour（提案階段建立的需求單帶入開團後）
-  await supabase
-    .from('tour_requests')
-    .update({
-      tour_id: newTour.id,
-      tour_code: tourCode,
-      tour_name: tour_name || proposal.title,
-    })
-    .eq('proposal_package_id', package_id)
-
-  logger.log('已將需求單關聯到旅遊團:', { tourId: newTour.id, packageId: package_id })
-
-  // 6. 更新提案狀態
-  await proposalsDb()
-    .update({
-      status: 'converted',
-      selected_package_id: package_id,
-      converted_tour_id: newTour.id,
-      converted_at: new Date().toISOString(),
-      converted_by: userId,
-      updated_by: userId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', proposal_id)
-
-  // 7. 標記套件為選定
-  await packagesDb()
-    .update({ is_selected: true })
-    .eq('id', package_id)
-
-  // 8. 自動建立第一筆訂單
-  const orderCode = generateOrderCode(tourCode, [])
-  const orderData = {
-    id: crypto.randomUUID(),
-    order_number: orderCode,
-    code: tourCode,
-    tour_id: newTour.id,
-    tour_name: tour_name || proposal.title,
-    contact_person: contact_person || proposal.customer_name || '待填寫',
-    contact_phone: contact_phone || proposal.customer_phone || null,
-    customer_id: proposal.customer_id || null,
-    sales_person: null,
-    assistant: null,
-    member_count: pkg.group_size || proposal.group_size || 0,
-    payment_status: 'unpaid',
-    status: 'pending',
-    total_amount: 0,
-    paid_amount: 0,
-    remaining_amount: 0,
-    notes: `從提案 ${proposal.code} 轉開團自動建立`,
-    workspace_id: workspaceId,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-
-  const { data: newOrder, error: orderError } = await ordersDb()
-    .insert(orderData)
-    .select()
-    .single()
-
-  if (orderError) {
-    // 訂單建立失敗不阻斷流程，僅記錄警告
-    logger.warn('自動建立訂單失敗:', JSON.stringify(orderError, null, 2))
-  } else {
-    logger.log('自動建立訂單成功:', { orderCode: newOrder.order_number })
-  }
-
-  logger.log('提案轉團成功:', { proposalId: proposal_id, tourCode })
-
-  return {
-    tour_id: newTour.id,
-    tour_code: tourCode,
-    quote_id: pkg.quote_id || undefined,
-    itinerary_id: pkg.itinerary_id || undefined,
-    order_id: newOrder?.id,
-  }
+  return result.data
 }
 
 // ============================================

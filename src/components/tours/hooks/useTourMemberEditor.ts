@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { Tour } from '@/stores/types'
-import { useOrderStore, useMemberStore } from '@/stores'
+import { useOrders, useMembers, createMember, updateMember, deleteMember } from '@/data'
 import { getGenderFromIdNumber, calculateAge } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -44,13 +44,8 @@ export function useTourMemberEditor(
   triggerAdd?: boolean,
   onTriggerAddComplete?: () => void
 ) {
-  const { items: orders } = useOrderStore()
-  const {
-    items: members,
-    create: addMember,
-    update: updateMember,
-    delete: deleteMember,
-  } = useMemberStore()
+  const { items: orders } = useOrders()
+  const { items: members } = useMembers()
 
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
@@ -291,7 +286,7 @@ export function useTourMemberEditor(
         assigned_room: assignedRoom,
       }
 
-      const newMember = await addMember(convertedData as unknown as Parameters<typeof addMember>[0])
+      const newMember = await createMember(convertedData as unknown as Parameters<typeof createMember>[0])
 
       const updatedMembers = [...tableMembers]
       updatedMembers[index] = { ...member, id: newMember.id, isNew: false }
@@ -317,7 +312,7 @@ export function useTourMemberEditor(
         assigned_room: assignedRoom,
       }
 
-      await updateMember(member.id, convertedData)
+      await updateMember(member.id, convertedData as Parameters<typeof updateMember>[1])
     }
   }
 

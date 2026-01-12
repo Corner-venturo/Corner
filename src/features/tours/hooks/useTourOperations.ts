@@ -10,7 +10,7 @@ import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
 import type { Order } from '@/types'
 import type { Quote } from '@/stores/types'
-import { useRegionsStore } from '@/stores'
+import { useCountries, useCities, updateCountry, updateCity } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 
 interface TourActions {
@@ -38,7 +38,24 @@ interface UseTourOperationsParams {
 
 export function useTourOperations(params: UseTourOperationsParams) {
   const router = useRouter()
-  const { incrementCountryUsage, incrementCityUsage } = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
+
+  // Helper functions to increment usage count (replaces store methods)
+  const incrementCountryUsage = async (countryName: string) => {
+    const country = countries.find(c => c.name === countryName)
+    if (!country) return
+    const newCount = (country.usage_count || 0) + 1
+    await updateCountry(country.id, { usage_count: newCount })
+  }
+
+  const incrementCityUsage = async (cityName: string) => {
+    const city = cities.find(c => c.name === cityName)
+    if (!city) return
+    const newCount = (city.usage_count || 0) + 1
+    await updateCity(city.id, { usage_count: newCount })
+  }
+
   const {
     actions,
     addOrder,

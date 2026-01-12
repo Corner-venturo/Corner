@@ -1,5 +1,23 @@
-// src/hooks/cloud-hooks.ts
-// 所有模組的純雲端 SWR Hooks
+'use client'
+
+/**
+ * Cloud Hooks - 向後相容層
+ *
+ * 這個檔案保留舊的 API 向後相容性。
+ *
+ * 新代碼推薦使用 @/data：
+ * ```typescript
+ * // ✅ 新架構（推薦）
+ * import { useTours, useTour, createTour, updateTour } from '@/data'
+ * const { items, loading } = useTours()
+ * const { item } = useTour(id)
+ * await createTour({ ... })
+ *
+ * // ⚠️ 舊架構（向後相容）
+ * import { useTours } from '@/hooks/cloud-hooks'
+ * const { items, isLoading, create, update } = useTours()
+ * ```
+ */
 
 import { createCloudHook } from './createCloudHook'
 import type {
@@ -84,7 +102,7 @@ export const useEmployees = createCloudHook<Employee>('employees', {
 
 // ===== 待辦與簽證 =====
 
-// 待辦事項 (已有獨立的 useTodos.ts，這裡保持相容)
+// 待辦事項
 export const useTodosCloud = createCloudHook<Todo>('todos', {
   orderBy: { column: 'created_at', ascending: false },
 })
@@ -124,7 +142,6 @@ export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>('cus
 })
 
 // ===== 提案系統 =====
-// Note: Using type assertion until migration is applied and types are regenerated
 
 // 提案
 export const useProposals = createCloudHook<Proposal>('proposals' as 'notes', {
@@ -135,3 +152,170 @@ export const useProposals = createCloudHook<Proposal>('proposals' as 'notes', {
 export const useProposalPackages = createCloudHook<ProposalPackage>('proposal_packages' as 'notes', {
   orderBy: { column: 'version_number', ascending: true },
 })
+
+// ===== 新架構 re-exports =====
+// 這些是從 @/data 導出的新架構 hooks，提供更好的關注點分離
+
+export {
+  // Tours
+  useTour,
+  useToursPaginated,
+  useTourDictionary,
+  createTour,
+  updateTour,
+  deleteTour,
+  invalidateTours,
+
+  // Orders
+  useOrder,
+  useOrdersPaginated,
+  useOrderDictionary,
+  createOrder,
+  updateOrder,
+  deleteOrder,
+  invalidateOrders,
+
+  // Members
+  useMember,
+  useMembersPaginated,
+  useMemberDictionary,
+  createMember,
+  updateMember,
+  deleteMember,
+  invalidateMembers,
+
+  // Customers
+  useCustomer,
+  useCustomersPaginated,
+  useCustomerDictionary,
+  createCustomer,
+  updateCustomer,
+  deleteCustomer,
+  invalidateCustomers,
+
+  // Quotes
+  useQuote,
+  useQuotesPaginated,
+  useQuoteDictionary,
+  createQuote,
+  updateQuote,
+  deleteQuote,
+  invalidateQuotes,
+
+  // Itineraries
+  useItinerary,
+  useItinerariesPaginated,
+  useItineraryDictionary,
+  createItinerary,
+  updateItinerary,
+  deleteItinerary,
+  invalidateItineraries,
+
+  // Proposals
+  useProposal,
+  useProposalsPaginated,
+  useProposalDictionary,
+  createProposal,
+  updateProposal,
+  deleteProposal,
+  invalidateProposals,
+
+  // Proposal Packages
+  useProposalPackage,
+  useProposalPackagesPaginated,
+  useProposalPackageDictionary,
+  createProposalPackage,
+  updateProposalPackage,
+  deleteProposalPackage,
+  invalidateProposalPackages,
+
+  // Payment Requests
+  usePaymentRequest,
+  usePaymentRequestsPaginated,
+  usePaymentRequestDictionary,
+  createPaymentRequest,
+  updatePaymentRequest,
+  deletePaymentRequest,
+  invalidatePaymentRequests,
+
+  // Receipt Orders
+  useReceiptOrder,
+  useReceiptOrdersPaginated,
+  useReceiptOrderDictionary,
+  createReceiptOrder,
+  updateReceiptOrder,
+  deleteReceiptOrder,
+  invalidateReceiptOrders,
+
+  // Disbursement Orders
+  useDisbursementOrder,
+  useDisbursementOrdersPaginated,
+  useDisbursementOrderDictionary,
+  createDisbursementOrder,
+  updateDisbursementOrder,
+  deleteDisbursementOrder,
+  invalidateDisbursementOrders,
+
+  // Employees
+  useEmployee,
+  useEmployeesPaginated,
+  useEmployeeDictionary,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+  invalidateEmployees,
+
+  // Visas
+  useVisa,
+  useVisasPaginated,
+  useVisaDictionary,
+  createVisa,
+  updateVisa,
+  deleteVisa,
+  invalidateVisas,
+
+  // Todos
+  useTodo,
+  useTodosPaginated,
+  useTodoDictionary,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  invalidateTodos,
+
+  // Suppliers
+  useSupplier,
+  useSuppliersPaginated,
+  useSupplierDictionary,
+  createSupplier,
+  updateSupplier,
+  deleteSupplier,
+  invalidateSuppliers,
+
+  // Customer Groups
+  useCustomerGroup,
+  useCustomerGroupsPaginated,
+  useCustomerGroupDictionary,
+  createCustomerGroup,
+  updateCustomerGroup,
+  deleteCustomerGroup,
+  invalidateCustomerGroups,
+
+  // Customer Group Members
+  useCustomerGroupMember,
+  useCustomerGroupMembersPaginated,
+  useCustomerGroupMemberDictionary,
+  createCustomerGroupMember,
+  updateCustomerGroupMember,
+  deleteCustomerGroupMember,
+  invalidateCustomerGroupMembers,
+
+  // Airport Images
+  useAirportImage,
+  useAirportImagesPaginated,
+  useAirportImageDictionary,
+  createAirportImage,
+  updateAirportImage,
+  deleteAirportImage,
+  invalidateAirportImages,
+} from '@/data'

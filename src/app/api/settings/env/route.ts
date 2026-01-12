@@ -1,16 +1,20 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
+import { errorResponse } from '@/lib/api/response'
 
 /**
  * API 設定資訊端點
- * 提供環境變數的安全檢視（僅顯示是否設定，不暴露完整值）
+ * 🔒 安全修復 2026-01-12：
+ * - 需要管理員權限
+ * - 只顯示是否已設定，不暴露實際值
  */
 
 interface ApiConfig {
   name: string
   description: string
   envKey: string
-  value: string
+  isConfigured: boolean  // 改為只顯示是否已設定
   docsUrl?: string
   consoleUrl?: string
   usageInfo?: string
@@ -50,16 +54,28 @@ async function getGeminiUsage(): Promise<string | undefined> {
 }
 
 export async function GET() {
+  // 🔒 安全檢查：需要登入
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return errorResponse('請先登入', 401)
+  }
+
+  // TODO: 未來可加入管理員權限檢查
+  // if (!isAdmin(auth.data.employeeId)) {
+  //   return errorResponse('需要管理員權限', 403)
+  // }
+
   const googleVisionUsage = await getGoogleVisionUsage()
   const geminiUsage = await getGeminiUsage()
 
+  // 🔒 安全修復：只顯示是否已設定，不暴露實際值
   const configs: ApiConfig[] = [
     // Supabase
     {
       name: 'Supabase URL',
       description: 'Supabase 專案的 API 端點',
       envKey: 'NEXT_PUBLIC_SUPABASE_URL',
-      value: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      isConfigured: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       consoleUrl: 'https://supabase.com/dashboard',
       docsUrl: 'https://supabase.com/docs',
       category: 'database',
@@ -68,7 +84,7 @@ export async function GET() {
       name: 'Supabase Anon Key',
       description: '公開 API 金鑰，用於前端查詢（受 RLS 保護）',
       envKey: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-      value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      isConfigured: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       consoleUrl: 'https://supabase.com/dashboard/project/_/settings/api',
       category: 'database',
     },
@@ -76,7 +92,7 @@ export async function GET() {
       name: 'Supabase Service Role Key',
       description: '服務角色金鑰，用於後端管理操作（繞過 RLS）',
       envKey: 'SUPABASE_SERVICE_ROLE_KEY',
-      value: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+      isConfigured: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       consoleUrl: 'https://supabase.com/dashboard/project/_/settings/api',
       category: 'database',
     },
@@ -84,7 +100,7 @@ export async function GET() {
       name: 'Supabase Access Token',
       description: 'Personal Access Token，用於 CLI 操作和 Migration',
       envKey: 'SUPABASE_ACCESS_TOKEN',
-      value: 'sbp_94746ae5e9ecc9d270d27006ba5ed1d0da0bbaf0',
+      isConfigured: !!process.env.SUPABASE_ACCESS_TOKEN,
       consoleUrl: 'https://supabase.com/dashboard/account/tokens',
       category: 'database',
     },
@@ -94,7 +110,7 @@ export async function GET() {
       name: 'OCR.space API Key',
       description: '護照 OCR 辨識服務（MRZ 解析）',
       envKey: 'OCR_SPACE_API_KEY',
-      value: process.env.OCR_SPACE_API_KEY || '',
+      isConfigured: !!process.env.OCR_SPACE_API_KEY,
       consoleUrl: 'https://ocr.space/ocrapi/freekey',
       docsUrl: 'https://ocr.space/OCRAPI',
       usageInfo: '免費額度：25,000 次/月',
@@ -104,7 +120,7 @@ export async function GET() {
       name: 'Google Vision API Key',
       description: '中文文字辨識服務（護照中文名字）',
       envKey: 'GOOGLE_VISION_API_KEY',
-      value: process.env.GOOGLE_VISION_API_KEY || '',
+      isConfigured: !!process.env.GOOGLE_VISION_API_KEY,
       consoleUrl: 'https://console.cloud.google.com/apis/credentials',
       docsUrl: 'https://cloud.google.com/vision/docs',
       usageInfo: googleVisionUsage || '免費額度：1,000 次/月（限制 980 次）',
@@ -116,7 +132,7 @@ export async function GET() {
       name: 'Gemini API Key',
       description: 'Google Gemini AI 文字理解與結構化辨識',
       envKey: 'GEMINI_API_KEY',
-      value: process.env.GEMINI_API_KEY || '',
+      isConfigured: !!process.env.GEMINI_API_KEY,
       consoleUrl: 'https://aistudio.google.com/app/apikey',
       docsUrl: 'https://ai.google.dev/docs',
       usageInfo: geminiUsage || '免費額度：60 次/分鐘（每日約 1,500 次）',
@@ -128,40 +144,40 @@ export async function GET() {
       name: 'AeroDataBox API Key',
       description: '航班查詢與機場時刻表服務（RapidAPI）',
       envKey: 'AERODATABOX_API_KEY',
-      value: process.env.AERODATABOX_API_KEY || '',
+      isConfigured: !!process.env.AERODATABOX_API_KEY,
       consoleUrl: 'https://rapidapi.com/aedbx-aedbx/api/aerodatabox',
       docsUrl: 'https://aerodatabox.com/',
       usageInfo: '免費額度：300 次/月',
       category: 'flight',
     },
 
-    // 應用設定
+    // 應用設定（這些是公開設定，可以顯示值）
     {
       name: 'App URL',
       description: '應用程式的公開網址',
       envKey: 'NEXT_PUBLIC_APP_URL',
-      value: process.env.NEXT_PUBLIC_APP_URL || '',
+      isConfigured: !!process.env.NEXT_PUBLIC_APP_URL,
       category: 'other',
     },
     {
       name: 'App Name',
       description: '應用程式名稱',
       envKey: 'NEXT_PUBLIC_APP_NAME',
-      value: process.env.NEXT_PUBLIC_APP_NAME || '',
+      isConfigured: !!process.env.NEXT_PUBLIC_APP_NAME,
       category: 'other',
     },
     {
       name: '啟用 Supabase',
       description: '是否連接雲端資料庫',
       envKey: 'NEXT_PUBLIC_ENABLE_SUPABASE',
-      value: process.env.NEXT_PUBLIC_ENABLE_SUPABASE || 'false',
+      isConfigured: process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true',
       category: 'other',
     },
     {
       name: 'Debug 模式',
       description: '是否顯示除錯訊息',
       envKey: 'NEXT_PUBLIC_DEBUG_MODE',
-      value: process.env.NEXT_PUBLIC_DEBUG_MODE || 'false',
+      isConfigured: process.env.NEXT_PUBLIC_DEBUG_MODE === 'true',
       category: 'other',
     },
   ]

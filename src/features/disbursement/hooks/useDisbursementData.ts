@@ -4,8 +4,16 @@
  */
 
 import { formatDate } from '@/lib/utils/format-date'
-import { useMemo, useCallback, useEffect } from 'react'
-import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
+import { useMemo, useCallback } from 'react'
+import {
+  usePaymentRequests,
+  useDisbursementOrders,
+  usePaymentRequestItems,
+  updatePaymentRequest as updatePaymentRequestApi,
+  createDisbursementOrder as createDisbursementOrderApi,
+  updateDisbursementOrder as updateDisbursementOrderApi,
+  deleteDisbursementOrder as deleteDisbursementOrderApi,
+} from '@/data'
 import { PaymentRequest, DisbursementOrder } from '../types'
 
 // 計算下一個週四
@@ -45,30 +53,10 @@ function generateDisbursementNumber(existingOrders: DisbursementOrder[], disburs
 }
 
 export function useDisbursementData() {
-  // 連接真實的 stores
-  const {
-    items: payment_requests,
-    fetchAll: fetchPaymentRequests,
-    update: updatePaymentRequest
-  } = usePaymentRequestStore()
-
-  const {
-    items: disbursement_orders,
-    fetchAll: fetchDisbursementOrders,
-    create: createOrder,
-    update: updateOrder,
-    delete: deleteOrder
-  } = useDisbursementOrderStore()
-
-  const { items: requestItems, fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
-
-  // 初始化載入資料
-  useEffect(() => {
-    fetchPaymentRequests()
-    fetchDisbursementOrders()
-    fetchRequestItems()
-
-  }, [])
+  // 使用 @/data hooks（SWR 自動載入，不需手動 fetchAll）
+  const { items: payment_requests } = usePaymentRequests()
+  const { items: disbursement_orders } = useDisbursementOrders()
+  const { items: requestItems } = usePaymentRequestItems()
 
   // 🔧 優化：建立 Map 避免 N+1 查詢
   const paymentRequestMap = useMemo(() => {
@@ -158,12 +146,13 @@ export function useDisbursementData() {
   const addToCurrentDisbursementOrder = useCallback(async (requestIds: string[]) => {
     if (currentOrder) {
       // 已有本週出納單，更新它
-      const newIds = [...new Set([...currentOrder.payment_request_ids, ...requestIds])]
+      const existingIds = currentOrder.payment_request_ids || []
+      const newIds = [...new Set([...existingIds, ...requestIds])]
       const newAmount = payment_requests
         .filter(r => newIds.includes(r.id))
         .reduce((sum, r) => sum + (r.amount || 0), 0)
 
-      await updateOrder(currentOrder.id, {
+      await updateDisbursementOrderApi(currentOrder.id, {
         payment_request_ids: newIds,
         amount: newAmount,
       })
@@ -175,86 +164,88 @@ export function useDisbursementData() {
 
       const disbursementDateStr = formatDate(nextThursday)
 
-      await createOrder({
+      await createDisbursementOrderApi({
         order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
         disbursement_date: disbursementDateStr,
         payment_request_ids: requestIds,
         amount: amount,
         status: 'pending',
-      } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
+      })
     }
 
     // 更新請款單狀態為 processing
     for (const id of requestIds) {
-      await updatePaymentRequest(id, { status: 'processing' })
+      await updatePaymentRequestApi(id, { status: 'processing' })
     }
-  }, [currentOrder, payment_requests, disbursement_orders, nextThursday, createOrder, updateOrder, updatePaymentRequest])
+  }, [currentOrder, payment_requests, disbursement_orders, nextThursday])
 
   // 從出納單移除請款單
   const removeFromDisbursementOrder = useCallback(async (orderId: string, requestId: string) => {
     const order = disbursement_orders.find(o => o.id === orderId)
     if (!order) return
 
-    const newIds = order.payment_request_ids.filter(id => id !== requestId)
+    const existingIds = order.payment_request_ids || []
+    const newIds = existingIds.filter(id => id !== requestId)
     const newAmount = payment_requests
       .filter(r => newIds.includes(r.id))
       .reduce((sum, r) => sum + (r.amount || 0), 0)
 
     if (newIds.length === 0) {
       // 沒有請款單了，刪除出納單
-      await deleteOrder(orderId)
+      await deleteDisbursementOrderApi(orderId)
     } else {
-      await updateOrder(orderId, {
+      await updateDisbursementOrderApi(orderId, {
         payment_request_ids: newIds,
         amount: newAmount,
       })
     }
 
     // 將請款單狀態改回 pending
-    await updatePaymentRequest(requestId, { status: 'pending' })
-  }, [disbursement_orders, payment_requests, updateOrder, deleteOrder, updatePaymentRequest])
+    await updatePaymentRequestApi(requestId, { status: 'pending' })
+  }, [disbursement_orders, payment_requests])
 
   // 確認出帳
   const confirmDisbursementOrder = useCallback(async (orderId: string, confirmedBy: string) => {
     const order = disbursement_orders.find(o => o.id === orderId)
     if (!order) return
 
-    await updateOrder(orderId, {
+    await updateDisbursementOrderApi(orderId, {
       status: 'confirmed',
       confirmed_by: confirmedBy,
       confirmed_at: new Date().toISOString(),
     })
 
     // 更新所有請款單狀態為 paid
-    for (const requestId of order.payment_request_ids) {
-      await updatePaymentRequest(requestId, {
+    const requestIds = order.payment_request_ids || []
+    for (const requestId of requestIds) {
+      await updatePaymentRequestApi(requestId, {
         status: 'paid',
         paid_at: new Date().toISOString(),
       })
     }
-  }, [disbursement_orders, updateOrder, updatePaymentRequest])
+  }, [disbursement_orders])
 
   // 建立新出納單
-  const createDisbursementOrder = useCallback(async (requestIds: string[]) => {
+  const createNewDisbursementOrder = useCallback(async (requestIds: string[]) => {
     const amount = payment_requests
       .filter(r => requestIds.includes(r.id))
       .reduce((sum, r) => sum + (r.amount || 0), 0)
 
     const disbursementDateStr = formatDate(nextThursday)
 
-    await createOrder({
+    await createDisbursementOrderApi({
       order_number: generateDisbursementNumber(disbursement_orders, disbursementDateStr),
       disbursement_date: disbursementDateStr,
       payment_request_ids: requestIds,
       amount: amount,
       status: 'pending',
-    } as Omit<DisbursementOrder, 'id' | 'created_at' | 'updated_at'>)
+    })
 
     // 更新請款單狀態為 processing
     for (const id of requestIds) {
-      await updatePaymentRequest(id, { status: 'processing' })
+      await updatePaymentRequestApi(id, { status: 'processing' })
     }
-  }, [payment_requests, disbursement_orders, nextThursday, createOrder, updatePaymentRequest])
+  }, [payment_requests, disbursement_orders, nextThursday])
 
   return {
     payment_requests,
@@ -268,7 +259,7 @@ export function useDisbursementData() {
     addToCurrentDisbursementOrder,
     removeFromDisbursementOrder,
     confirmDisbursementOrder,
-    createDisbursementOrder,
+    createDisbursementOrder: createNewDisbursementOrder,
     generateDisbursementNumber: () => generateDisbursementNumber(disbursement_orders),
   }
 }

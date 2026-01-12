@@ -12,6 +12,7 @@ import { useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
+import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Database } from '@/lib/supabase/types'
 import type { QueueStats, QueueType, QueueStatus } from '@/types/pnr.types'
 
@@ -39,22 +40,7 @@ export type {
   PnrAiQuery,
 }
 
-// =====================================================
-// Helper: 取得當前 workspace
-// =====================================================
-function getCurrentWorkspaceId(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const authData = localStorage.getItem('auth-storage')
-    if (authData) {
-      const parsed = JSON.parse(authData)
-      return parsed?.state?.user?.workspace_id || null
-    }
-  } catch {
-    // 忽略
-  }
-  return null
-}
+// 使用 @/lib/workspace-helpers 的 getCurrentWorkspaceId
 
 // =====================================================
 // 票價歷史 Hook

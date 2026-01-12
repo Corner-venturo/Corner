@@ -1,7 +1,7 @@
 'use client'
 
 import { Hash, Bot, MessageCircle } from 'lucide-react'
-import { useEmployeeStore } from '@/stores'
+import { useEmployees } from '@/data'
 import { useMemo } from 'react'
 
 // 系統機器人 ID
@@ -13,7 +13,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ channelName, channelType }: EmptyStateProps) {
-  const employees = useEmployeeStore(state => state.items)
+  const { items: employees } = useEmployees()
 
   // 解析 DM 頻道名稱，取得對方名字
   const displayInfo = useMemo(() => {

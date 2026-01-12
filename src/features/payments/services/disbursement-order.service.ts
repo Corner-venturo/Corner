@@ -1,31 +1,63 @@
 import { formatDate } from '@/lib/utils/format-date'
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
-import { useDisbursementOrderStore, usePaymentRequestStore } from '@/stores'
+import { supabase } from '@/lib/supabase/client'
+import {
+  invalidateDisbursementOrders,
+  invalidatePaymentRequests,
+} from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 
 class DisbursementOrderService extends BaseService<DisbursementOrder> {
   protected resourceName = 'disbursement_orders'
 
+  // 使用 Supabase 直接查詢取代 store
+  private cachedItems: DisbursementOrder[] = []
+
   protected getStore = (): StoreOperations<DisbursementOrder> => {
-    const store = useDisbursementOrderStore.getState()
     return {
-      getAll: () => store.items,
-      getById: (id: string) => store.items.find(o => o.id === id),
+      getAll: () => this.cachedItems,
+      getById: (id: string) => this.cachedItems.find(o => o.id === id),
       add: async (order: DisbursementOrder) => {
-        // 移除系統自動生成的欄位
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData)
-        return result as DisbursementOrder
+        const { data, error } = await supabase
+          .from('disbursement_orders')
+          .insert(createData)
+          .select()
+          .single()
+        if (error) throw new Error(error.message)
+        await invalidateDisbursementOrders()
+        return data as unknown as DisbursementOrder
       },
       update: async (id: string, data: Partial<DisbursementOrder>) => {
-        await store.update(id, data)
+        const { error } = await supabase
+          .from('disbursement_orders')
+          .update(data)
+          .eq('id', id)
+        if (error) throw new Error(error.message)
+        await invalidateDisbursementOrders()
       },
       delete: async (id: string) => {
-        await store.delete(id)
+        const { error } = await supabase
+          .from('disbursement_orders')
+          .delete()
+          .eq('id', id)
+        if (error) throw new Error(error.message)
+        await invalidateDisbursementOrders()
       },
     }
+  }
+
+  // 載入快取資料
+  private async loadItems(): Promise<DisbursementOrder[]> {
+    const { data, error } = await supabase
+      .from('disbursement_orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    this.cachedItems = (data || []) as unknown as DisbursementOrder[]
+    return this.cachedItems
   }
 
   protected validate(data: Partial<DisbursementOrder>): void {
@@ -72,12 +104,29 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
   /**
    * 取得當週出納單（待處理）
    */
+  async getCurrentWeekOrderAsync(): Promise<DisbursementOrder | null> {
+    const nextThursday = this.getNextThursday()
+    const { data, error } = await supabase
+      .from('disbursement_orders')
+      .select('*')
+      .eq('disbursement_date', nextThursday)
+      .eq('status', 'pending')
+      .single()
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(error.message)
+    }
+    return data as unknown as DisbursementOrder | null
+  }
+
+  /**
+   * 取得當週出納單（待處理）- 同步版本（使用快取）
+   * @deprecated 建議使用 getCurrentWeekOrderAsync
+   */
   getCurrentWeekOrder(): DisbursementOrder | null {
     const nextThursday = this.getNextThursday()
-    const store = useDisbursementOrderStore.getState()
-
     return (
-      store.items.find(
+      this.cachedItems.find(
         order => order.disbursement_date === nextThursday && order.status === 'pending'
       ) || null
     )
@@ -90,18 +139,24 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     // 取得 workspace_id（RLS 必須）
     const workspaceId = getRequiredWorkspaceId()
 
-    // 計算總金額
-    const paymentRequestStore = usePaymentRequestStore.getState()
-    const totalAmount = paymentRequestIds.reduce((sum, requestId) => {
-      const request = paymentRequestStore.items.find(r => r.id === requestId)
-      return sum + (request?.amount ?? 0)
-    }, 0)
+    // 從 Supabase 取得請款單並計算總金額
+    const { data: requests, error: reqError } = await supabase
+      .from('payment_requests')
+      .select('id, amount')
+      .in('id', paymentRequestIds)
+    if (reqError) throw new Error(reqError.message)
 
-    // 生成出納單編號
+    const totalAmount = (requests || []).reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
+
+    // 從 Supabase 取得同日期的出納單數量生成編號
     const disbursementDate = this.getNextThursday()
-    const store = useDisbursementOrderStore.getState()
-    const existingOrders = store.items.filter(o => o.disbursement_date === disbursementDate)
-    const orderNumber = `P${disbursementDate.replace(/-/g, '').slice(2)}${String.fromCharCode(65 + existingOrders.length)}`
+    const { data: existingOrders, error: ordError } = await supabase
+      .from('disbursement_orders')
+      .select('id')
+      .eq('disbursement_date', disbursementDate)
+    if (ordError) throw new Error(ordError.message)
+
+    const orderNumber = `P${disbursementDate.replace(/-/g, '').slice(2)}${String.fromCharCode(65 + (existingOrders?.length || 0))}`
 
     const orderData = {
       workspace_id: workspaceId,
@@ -151,7 +206,8 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     })
 
     // 更新所有關聯請款單狀態為 confirmed
-    for (const requestId of order.payment_request_ids) {
+    const requestIds = order.payment_request_ids || []
+    for (const requestId of requestIds) {
       await this.updatePaymentRequestStatus(requestId, 'confirmed')
     }
   }
@@ -169,13 +225,17 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       throw new Error('只能修改待處理的出納單')
     }
 
-    // 計算新的總金額
-    const paymentRequestStore = usePaymentRequestStore.getState()
-    const newRequestIds = [...order.payment_request_ids, ...requestIds]
-    const newTotalAmount = newRequestIds.reduce((sum, requestId) => {
-      const request = paymentRequestStore.items.find(r => r.id === requestId)
-      return sum + (request?.amount ?? 0)
-    }, 0)
+    // 從 Supabase 取得請款單並計算總金額
+    const existingIds = order.payment_request_ids || []
+    const newRequestIds = [...existingIds, ...requestIds]
+
+    const { data: requests, error } = await supabase
+      .from('payment_requests')
+      .select('id, amount')
+      .in('id', newRequestIds)
+    if (error) throw new Error(error.message)
+
+    const newTotalAmount = (requests || []).reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
 
     // 更新出納單
     await this.update(orderId, {
@@ -204,12 +264,19 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     }
 
     // 計算新的總金額
-    const paymentRequestStore = usePaymentRequestStore.getState()
-    const newRequestIds = order.payment_request_ids.filter(id => id !== requestId)
-    const newTotalAmount = newRequestIds.reduce((sum, reqId) => {
-      const request = paymentRequestStore.items.find(r => r.id === reqId)
-      return sum + (request?.amount ?? 0)
-    }, 0)
+    const existingIds = order.payment_request_ids || []
+    const newRequestIds = existingIds.filter(id => id !== requestId)
+
+    // 從 Supabase 取得請款單並計算總金額
+    let newTotalAmount = 0
+    if (newRequestIds.length > 0) {
+      const { data: requests, error } = await supabase
+        .from('payment_requests')
+        .select('id, amount')
+        .in('id', newRequestIds)
+      if (error) throw new Error(error.message)
+      newTotalAmount = (requests || []).reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
+    }
 
     // 更新出納單
     await this.update(orderId, {
@@ -241,43 +308,86 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
   // ========== Helper 方法 ==========
 
   /**
-   * 更新請款單狀態（私有方法）
+   * 更新請款單狀態（私有方法）- 使用 Supabase 直接查詢
    */
   private async updatePaymentRequestStatus(
     requestId: string,
     status: PaymentRequest['status']
   ): Promise<void> {
-    const store = usePaymentRequestStore.getState()
-    await store.update(requestId, {
-      status,
-      updated_at: this.now(),
-    })
+    const { error } = await supabase
+      .from('payment_requests')
+      .update({
+        status,
+        updated_at: this.now(),
+      })
+      .eq('id', requestId)
+    if (error) throw new Error(error.message)
+    await invalidatePaymentRequests()
   }
 
   // ========== Query 方法 ==========
 
   /**
-   * 取得待處理出納單
+   * 取得待處理出納單（非同步）
+   */
+  async getPendingOrdersAsync(): Promise<DisbursementOrder[]> {
+    const { data, error } = await supabase
+      .from('disbursement_orders')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    return (data || []) as unknown as DisbursementOrder[]
+  }
+
+  /**
+   * 取得待處理出納單（同步版本，使用快取）
+   * @deprecated 建議使用 getPendingOrdersAsync
    */
   getPendingOrders(): DisbursementOrder[] {
-    const store = useDisbursementOrderStore.getState()
-    return store.items.filter(o => o.status === 'pending')
+    return this.cachedItems.filter(o => o.status === 'pending')
   }
 
   /**
-   * 取得已確認出納單
+   * 取得已確認出納單（非同步）
+   */
+  async getConfirmedOrdersAsync(): Promise<DisbursementOrder[]> {
+    const { data, error } = await supabase
+      .from('disbursement_orders')
+      .select('*')
+      .eq('status', 'confirmed')
+      .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    return (data || []) as unknown as DisbursementOrder[]
+  }
+
+  /**
+   * 取得已確認出納單（同步版本，使用快取）
+   * @deprecated 建議使用 getConfirmedOrdersAsync
    */
   getConfirmedOrders(): DisbursementOrder[] {
-    const store = useDisbursementOrderStore.getState()
-    return store.items.filter(o => o.status === 'confirmed')
+    return this.cachedItems.filter(o => o.status === 'confirmed')
   }
 
   /**
-   * 按日期取得出納單
+   * 按日期取得出納單（非同步）
+   */
+  async getOrdersByDateAsync(date: string): Promise<DisbursementOrder[]> {
+    const { data, error } = await supabase
+      .from('disbursement_orders')
+      .select('*')
+      .eq('disbursement_date', date)
+      .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message)
+    return (data || []) as unknown as DisbursementOrder[]
+  }
+
+  /**
+   * 按日期取得出納單（同步版本，使用快取）
+   * @deprecated 建議使用 getOrdersByDateAsync
    */
   getOrdersByDate(date: string): DisbursementOrder[] {
-    const store = useDisbursementOrderStore.getState()
-    return store.items.filter(o => o.disbursement_date === date)
+    return this.cachedItems.filter(o => o.disbursement_date === date)
   }
 }
 

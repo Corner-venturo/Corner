@@ -12,12 +12,13 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Plus } from 'lucide-react'
-import { useCompanyStore, useAuthStore, type Company } from '@/stores'
+import { useAuthStore, type Company } from '@/stores'
+import { useCompanies, createCompany, updateCompany } from '@/data'
 import { useCompanyColumns } from './components/CompanyTableColumns'
 import { CompanyFormDialog } from './components/CompanyFormDialog'
 import { CompanyDetailDialog } from './components/CompanyDetailDialog'
@@ -25,7 +26,7 @@ import type { CreateCompanyData } from '@/types/company.types'
 import { alert } from '@/lib/ui/alert-dialog'
 
 export default function CompaniesPage() {
-  const { items: companies, fetchAll, create, update } = useCompanyStore()
+  const { items: companies } = useCompanies()
   const { user } = useAuthStore()
   const workspaceId = user?.workspace_id || ''
 
@@ -33,13 +34,6 @@ export default function CompaniesPage() {
   const [editingCompany, setEditingCompany] = useState<Company | undefined>(undefined)
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
-
-  // 載入企業客戶資料
-  useEffect(() => {
-    if (workspaceId) {
-      fetchAll()
-    }
-  }, [workspaceId, fetchAll])
 
   // 查看企業詳情
   const handleViewDetail = (company: Company) => {
@@ -52,7 +46,7 @@ export default function CompaniesPage() {
     if (!selectedCompany) return
 
     try {
-      await update(selectedCompany.id, data)
+      await updateCompany(selectedCompany.id, data)
       // 更新 selectedCompany 以反映變更
       setSelectedCompany({ ...selectedCompany, ...data } as Company)
       await alert('企業客戶更新成功', 'success')
@@ -65,7 +59,7 @@ export default function CompaniesPage() {
   // 新增企業客戶
   const handleCreate = async (data: CreateCompanyData) => {
     try {
-      await create(data as Parameters<typeof create>[0])
+      await createCompany(data as Parameters<typeof createCompany>[0])
       setIsDialogOpen(false)
       await alert('企業客戶新增成功', 'success')
     } catch (error) {
@@ -79,7 +73,7 @@ export default function CompaniesPage() {
     if (!editingCompany) return
 
     try {
-      await update(editingCompany.id, data)
+      await updateCompany(editingCompany.id, data)
       setEditingCompany(undefined)
       setIsDialogOpen(false)
       await alert('企業客戶更新成功', 'success')

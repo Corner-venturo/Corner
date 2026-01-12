@@ -13,8 +13,8 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { TourPreview } from '@/components/editor/TourPreview'
 import { PublishButton } from '@/components/editor/PublishButton'
 import { Button } from '@/components/ui/button'
-import { useItineraryStore, useAuthStore } from '@/stores'
-import { useItineraries } from '@/hooks/cloud-hooks'
+import { useAuthStore } from '@/stores'
+import { useItineraries, createItinerary, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import { Cloud, CloudOff, Sparkles } from 'lucide-react'
 import { logger } from '@/lib/utils/logger'
@@ -30,7 +30,6 @@ function BlockEditorPageContent() {
   const itineraryId = searchParams.get('itinerary_id')
 
   const { items: itineraries } = useItineraries()
-  const { create: createItinerary, update: updateItinerary } = useItineraryStore()
   const { user } = useAuthStore()
 
   // 區塊狀態

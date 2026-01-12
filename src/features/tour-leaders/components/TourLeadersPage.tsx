@@ -5,13 +5,13 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Users } from 'lucide-react'
 import { TourLeadersList } from './TourLeadersList'
 import { TourLeadersDialog } from './TourLeadersDialog'
 import { LeaderAvailabilityDialog } from './LeaderAvailabilityDialog'
-import { useTourLeaderStore } from '@/stores'
+import { useTourLeaders, createTourLeader, updateTourLeader, deleteTourLeader } from '@/data'
 import type { TourLeader, TourLeaderFormData } from '@/types/tour-leader.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -40,18 +40,8 @@ export const TourLeadersPage: React.FC = () => {
   const [isAvailabilityDialogOpen, setIsAvailabilityDialogOpen] = useState(false)
   const [availabilityLeader, setAvailabilityLeader] = useState<TourLeader | null>(null)
 
-  const {
-    items: tourLeaders,
-    loading,
-    create,
-    update,
-    delete: deleteItem,
-    fetchAll,
-  } = useTourLeaderStore()
-
-  useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
+  // SWR 自動載入資料，不需要手動 fetchAll
+  const { items: tourLeaders, loading } = useTourLeaders()
 
   // 過濾資料
   const filteredItems = tourLeaders.filter(item => {
@@ -112,14 +102,14 @@ export const TourLeadersPage: React.FC = () => {
       if (!confirmed) return
 
       try {
-        await deleteItem(item.id)
+        await deleteTourLeader(item.id)
         await alert('領隊已刪除', 'success')
       } catch (error) {
         logger.error('Delete TourLeader Error:', error)
         await alert('刪除失敗，請稍後再試', 'error')
       }
     },
-    [deleteItem]
+    []
   )
 
   const handleCloseDialog = useCallback(() => {
@@ -159,10 +149,10 @@ export const TourLeadersPage: React.FC = () => {
       }
 
       if (isEditMode && editingItem) {
-        await update(editingItem.id, data)
+        await updateTourLeader(editingItem.id, data)
         await alert('領隊資料更新成功', 'success')
       } else {
-        await create(data as Parameters<typeof create>[0])
+        await createTourLeader(data)
         await alert('領隊資料建立成功', 'success')
       }
       handleCloseDialog()
@@ -170,7 +160,7 @@ export const TourLeadersPage: React.FC = () => {
       logger.error('Save TourLeader Error:', error)
       await alert('儲存失敗，請稍後再試', 'error')
     }
-  }, [formData, isEditMode, editingItem, create, update, handleCloseDialog])
+  }, [formData, isEditMode, editingItem, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">

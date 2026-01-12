@@ -9,7 +9,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { Printer, ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useItineraryStore, useTourStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { useItineraries, useTours } from '@/data'
 import { formatDateTW } from '@/lib/utils/format-date'
 import type { Itinerary, Tour } from '@/stores/types'
 
@@ -18,22 +19,21 @@ function ItineraryPrintContent() {
   const router = useRouter()
   const itineraryId = searchParams.get('itinerary_id')
 
-  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
-  const { items: tours, fetchAll: fetchTours } = useTourStore()
+  const { items: itineraries } = useItineraries()
+  const { items: tours } = useTours()
   const { user } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [tour, setTour] = useState<Tour | null>(null)
 
+  // SWR 自動載入資料
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      await Promise.all([fetchItineraries(), fetchTours()])
+    // 等待 SWR 資料載入
+    if (itineraries.length > 0 || tours.length > 0) {
       setLoading(false)
     }
-    loadData()
-  }, [fetchItineraries, fetchTours])
+  }, [itineraries, tours])
 
   useEffect(() => {
     if (!loading && itineraryId) {

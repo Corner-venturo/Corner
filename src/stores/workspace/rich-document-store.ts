@@ -31,6 +31,7 @@ export const useRichDocumentStore = createStore<RichDocumentEntity>({
   tableName: 'rich_documents',
   enableSupabase: true,
   fastInsert: true,
+  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
 })
 
 /**

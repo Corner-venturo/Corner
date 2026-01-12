@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback } from 'react'
-import { useCustomerStore } from '@/stores'
 import { Member } from '@/stores/types'
 import type { Customer } from '@/types/customer.types'
 import { logger } from '@/lib/utils/logger'
@@ -139,8 +138,10 @@ export function usePassportUpload({
           .map((m) => [`${m.name}|${m.birthday}`, m.id])
       )
 
-      await useCustomerStore.getState().fetchAll()
-      const freshCustomers = useCustomerStore.getState().items
+      const { invalidateCustomers } = await import('@/data')
+      const { supabase } = await import('@/lib/supabase/client')
+      await invalidateCustomers()
+      const { data: freshCustomers } = await supabase.from('customers').select('*')
 
       for (let i = 0; i < result.results.length; i++) {
         const item = result.results[i]
@@ -231,7 +232,7 @@ export function usePassportUpload({
         if (national_id) existingIdNumberMap.set(national_id, newMember.id)
         if (nameBirthKey) existingNameBirthMap.set(nameBirthKey, newMember.id)
 
-        const existingCustomer = freshCustomers.find(
+        const existingCustomer = (freshCustomers || []).find(
           (c) =>
             (passport_number && c.passport_number === passport_number) ||
             (national_id && c.national_id === national_id) ||
@@ -245,7 +246,8 @@ export function usePassportUpload({
           await updateMember(newMember.id, { customer_id: existingCustomer.id })
           if (passport_image_url) {
             if (!existingCustomer.passport_image_url) {
-              await useCustomerStore.getState().update(existingCustomer.id, { passport_image_url })
+              const { updateCustomer } = await import('@/data')
+              await updateCustomer(existingCustomer.id, { passport_image_url })
             } else {
               customersToUpdate.push({
                 customer: existingCustomer,
@@ -309,9 +311,10 @@ export function usePassportUpload({
         )
 
         if (shouldUpdateCustomers) {
+          const { updateCustomer } = await import('@/data')
           for (const item of customersToUpdate) {
             try {
-              await useCustomerStore.getState().update(item.customer.id, {
+              await updateCustomer(item.customer.id, {
                 passport_image_url: item.newPassportUrl,
                 passport_number:
                   (item.ocrData.passport_number as string) || item.customer.passport_number,

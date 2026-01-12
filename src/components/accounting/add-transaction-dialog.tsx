@@ -23,7 +23,7 @@ type TransactionType = 'income' | 'expense'
 type Step = 'selectType' | 'selectCategory' | 'enterDetails'
 
 export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogProps) {
-  const { accounts, categories, addTransaction, addCategory } = useAccountingStore()
+  const { accounts, categories, createTransaction, createCategory } = useAccountingStore()
   const [step, setStep] = useState<Step>('selectType')
   const [transactionType, setTransactionType] = useState<TransactionType>('expense')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -75,7 +75,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
       date: formData.date,
     }
 
-    await addTransaction(transactionData)
+    await createTransaction(transactionData)
     resetForm()
     onClose()
   }
@@ -110,7 +110,7 @@ export function AddTransactionDialog({ isOpen, onClose }: AddTransactionDialogPr
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return
 
-    const newCategory = await addCategory({
+    const newCategory = await createCategory({
       name: newCategoryName.trim(),
       type: transactionType,
       color: transactionType === 'expense' ? '#C89B9B' : '#7B9B7E',

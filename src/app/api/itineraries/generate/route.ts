@@ -6,10 +6,11 @@
  * 使用規則引擎，不呼叫外部 AI 服務
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { generateItinerary, type GenerateItineraryRequest } from '@/lib/itinerary-generator'
+import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import type { Attraction } from '@/features/attractions/types'
 
 interface RequestBody {
@@ -31,31 +32,19 @@ export async function POST(request: NextRequest) {
 
     // 2. 驗證必要參數
     if (!body.cityId) {
-      return NextResponse.json(
-        { error: '請提供城市 ID' },
-        { status: 400 }
-      )
+      return errorResponse('請提供城市 ID', 400, ErrorCode.MISSING_FIELD)
     }
 
     if (!body.numDays || body.numDays < 1 || body.numDays > 30) {
-      return NextResponse.json(
-        { error: '天數必須在 1-30 天之間' },
-        { status: 400 }
-      )
+      return errorResponse('天數必須在 1-30 天之間', 400, ErrorCode.VALIDATION_ERROR)
     }
 
     if (!body.departureDate) {
-      return NextResponse.json(
-        { error: '請提供出發日期' },
-        { status: 400 }
-      )
+      return errorResponse('請提供出發日期', 400, ErrorCode.MISSING_FIELD)
     }
 
     if (!body.outboundFlight?.arrivalTime || !body.returnFlight?.departureTime) {
-      return NextResponse.json(
-        { error: '請提供航班時間資訊' },
-        { status: 400 }
-      )
+      return errorResponse('請提供航班時間資訊', 400, ErrorCode.MISSING_FIELD)
     }
 
     // 3. 查詢該城市的景點
@@ -96,10 +85,7 @@ export async function POST(request: NextRequest) {
 
     if (attractionsError) {
       logger.error('查詢景點失敗:', attractionsError)
-      return NextResponse.json(
-        { error: '查詢景點資料失敗' },
-        { status: 500 }
-      )
+      return errorResponse('查詢景點資料失敗', 500, ErrorCode.DATABASE_ERROR)
     }
 
     // 4. 查詢城市資訊（用於顯示）
@@ -131,21 +117,15 @@ export async function POST(request: NextRequest) {
     )
 
     // 7. 返回結果
-    return NextResponse.json({
-      success: result.success,
-      data: {
-        dailyItinerary: result.dailyItinerary,
-        city: city?.name || '未知城市',
-        stats: result.stats,
-      },
+    return successResponse({
+      dailyItinerary: result.dailyItinerary,
+      city: city?.name || '未知城市',
+      stats: result.stats,
       warnings: result.warnings,
     })
 
   } catch (error) {
     logger.error('生成行程失敗:', error)
-    return NextResponse.json(
-      { error: '生成行程失敗，請稍後再試' },
-      { status: 500 }
-    )
+    return errorResponse('生成行程失敗，請稍後再試', 500, ErrorCode.INTERNAL_ERROR)
   }
 }

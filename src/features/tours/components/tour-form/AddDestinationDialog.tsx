@@ -52,7 +52,15 @@ export function AddDestinationDialog({
             <label className="text-sm font-medium text-morandi-primary">機場代碼 (IATA)</label>
             <Input
               value={newAirportCode}
-              onChange={e => setNewAirportCode(e.target.value.toUpperCase().slice(0, 3))}
+              onChange={e => {
+                // 轉換全形為半形，只保留英文字母
+                const halfWidth = e.target.value
+                  .replace(/[Ａ-Ｚａ-ｚ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+                  .replace(/[^A-Za-z]/g, '')
+                  .toUpperCase()
+                  .slice(0, 3)
+                setNewAirportCode(halfWidth)
+              }}
               placeholder="例如: CNX, BKK, NRT"
               className="mt-1 font-mono uppercase"
               maxLength={3}

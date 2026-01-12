@@ -35,7 +35,7 @@ import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { useRegionsStore, type City } from '@/stores/region-store'
+import { useCities, type City } from '@/data'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { toast } from 'sonner'
 
@@ -110,7 +110,7 @@ export function PackageItineraryDialog({
   const [aiCityId, setAiCityId] = useState<string>('')
   const [aiArrivalTime, setAiArrivalTime] = useState('11:00')
   const [aiDepartureTime, setAiDepartureTime] = useState('14:00')
-  const { cities, loading: citiesLoading, fetchAll: fetchRegions } = useRegionsStore()
+  const { items: cities, loading: citiesLoading } = useCities()
   const showAiGenerate = isFeatureAvailable('ai_suggest', currentUser?.workspace_code)
 
   // 追蹤是否已初始化每日行程（防止無限迴圈）
@@ -432,9 +432,7 @@ export function PackageItineraryDialog({
 
   // 打開 AI 排行程對話框
   const openAiDialog = useCallback(() => {
-    if (cities.length === 0) {
-      fetchRegions()
-    }
+    // SWR 自動載入 cities，不需要手動 fetch
     // 嘗試根據目的地找到城市 ID
     if (pkg.destination && cities.length > 0) {
       const matchedCity = cities.find(
@@ -445,7 +443,7 @@ export function PackageItineraryDialog({
       }
     }
     setAiDialogOpen(true)
-  }, [cities, fetchRegions, pkg.destination])
+  }, [cities, pkg.destination])
 
   // AI 排行程生成
   const handleAiGenerate = useCallback(async () => {

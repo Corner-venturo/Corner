@@ -3,10 +3,9 @@
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
-import { useCustomerStore } from '@/stores'
+import { useCustomers, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import { useImageEditor } from '@/hooks'
-import type { CreateCustomerData } from '@/types/customer.types'
 
 interface OrderMember {
   id: string
@@ -62,7 +61,7 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
   const [isSaving, setIsSaving] = useState(false)
 
   const imageEditor = useImageEditor()
-  const { items: customers } = useCustomerStore()
+  const { items: customers } = useCustomers()
 
   // 打開編輯/驗證彈窗
   const openEditDialog = (member: OrderMember, mode: 'verify' | 'edit') => {
@@ -91,8 +90,6 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
     setIsSaving(true)
 
     try {
-      const customerStore = useCustomerStore.getState()
-
       // 1. 更新 order_members
       // 空字串轉 null（日期欄位不接受空字串）
       const memberUpdateData: Record<string, unknown> = {
@@ -141,9 +138,6 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
 
         if (customerError) {
           logger.error('更新顧客失敗:', customerError)
-        } else {
-          // 更新 store
-          await customerStore.fetchAll()
         }
       } else if (editFormData.chinese_name || editFormData.passport_number || editFormData.id_number) {
         // 2b. 沒有關聯顧客但有填寫資料，嘗試比對或建立新顧客
@@ -191,23 +185,22 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           logger.info(`✅ 已關聯現有顧客: ${existingCustomer.name}`)
         } else {
           // 沒找到，建立新顧客
-          const newCustomerData: CreateCustomerData = {
+          const newCustomer = await createCustomer({
             name: editFormData.chinese_name || '',
             passport_romanization: editFormData.passport_name || '',
-            passport_number: passportNumber || undefined,
-            passport_expiry_date: editFormData.passport_expiry || undefined,
-            national_id: idNumber || undefined,
-            date_of_birth: birthDate || undefined,
-            gender: editFormData.gender || undefined,
+            passport_number: passportNumber || null,
+            passport_expiry_date: editFormData.passport_expiry || null,
+            national_id: idNumber || null,
+            date_of_birth: birthDate || null,
+            gender: editFormData.gender || null,
             phone: '',
             is_vip: false,
             is_active: true,
             total_spent: 0,
             total_orders: 0,
             verification_status: 'verified',
-          }
-
-          const newCustomer = await customerStore.create(newCustomerData as Parameters<typeof customerStore.create>[0])
+            member_type: 'member',
+          })
 
           if (newCustomer) {
             newCustomerId = newCustomer.id
@@ -218,9 +211,6 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
             logger.info(`✅ 已建立新顧客: ${newCustomer.name}`)
           }
         }
-
-        // 更新 store
-        await customerStore.fetchAll()
       }
 
       // 3. 更新本地狀態（儲存後即為已驗證）

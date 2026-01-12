@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Tour, TourAddOn } from '@/stores/types'
-import { useTourAddOnStore } from '@/stores'
+import { useTourAddOns, createTourAddOn, updateTourAddOn, deleteTourAddOn } from '@/data'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Trash2, ShoppingCart } from 'lucide-react'
@@ -20,12 +20,7 @@ export const TourAddOns = React.memo(function TourAddOns({
   triggerAdd,
   onTriggerAddComplete,
 }: TourAddOnsProps) {
-  const {
-    items: tour_add_ons,
-    create: addTourAddOn,
-    update: updateTourAddOn,
-    delete: deleteTourAddOn,
-  } = useTourAddOnStore()
+  const { items: tour_add_ons } = useTourAddOns()
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [newAddOn, setNewAddOn] = useState({
     name: '',
@@ -44,29 +39,29 @@ export const TourAddOns = React.memo(function TourAddOns({
   // 獲取此旅遊團的加購項目
   const addOns = tour_add_ons.filter((addOn: TourAddOn) => addOn.tour_id === tour.id)
 
-  const handleAddNew = () => {
+  const handleAddNew = async () => {
     if (!newAddOn.name.trim()) return
 
-    addTourAddOn({
+    await createTourAddOn({
       tour_id: tour.id,
       name: newAddOn.name,
       price: newAddOn.price,
       description: newAddOn.description,
       is_active: true,
-    })
+    } as Parameters<typeof createTourAddOn>[0])
 
     setNewAddOn({ name: '', price: 0, description: '' })
     setIsAddingNew(false)
   }
 
-  const handleDelete = (id: string) => {
-    deleteTourAddOn(id)
+  const handleDelete = async (id: string) => {
+    await deleteTourAddOn(id)
   }
 
-  const toggleActive = (id: string) => {
+  const toggleActive = async (id: string) => {
     const addOn = addOns.find(item => item.id === id)
     if (addOn) {
-      updateTourAddOn(id, { is_active: !addOn.is_active })
+      await updateTourAddOn(id, { is_active: !addOn.is_active })
     }
   }
 

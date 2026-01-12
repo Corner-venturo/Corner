@@ -15,7 +15,7 @@ import { Save, FilePlus, History, Trash2, Files } from 'lucide-react'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useItineraryStore } from '@/stores'
+import { updateItinerary } from '@/data'
 import { usePublish } from './hooks/usePublish'
 import { PublishDialog } from './PublishDialog'
 import { PublishPreview } from './PublishPreview'
@@ -39,7 +39,6 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [showSaveAsNewDialog, setShowSaveAsNewDialog] = useState(false)
   const [hoveredVersionIndex, setHoveredVersionIndex] = useState<number | null>(null)
-  const { update } = useItineraryStore()
 
   const {
     saving,
@@ -91,7 +90,7 @@ export function PublishButton({ data, currentVersionIndex, onVersionChange, onVe
 
     try {
       const updatedRecords = versionRecords.filter((_, i) => i !== index)
-      await update(data.id, { version_records: updatedRecords })
+      await updateItinerary(data.id, { version_records: updatedRecords })
 
       if (currentVersionIndex === index) {
         onVersionChange(-1)

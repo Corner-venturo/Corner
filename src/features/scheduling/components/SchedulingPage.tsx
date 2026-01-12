@@ -14,7 +14,18 @@ import { Button } from '@/components/ui/button'
 import { RequirementGanttChart } from './RequirementGanttChart'
 import { VehicleScheduleDialog } from './VehicleScheduleDialog'
 import { LeaderScheduleDialog } from './LeaderScheduleDialog'
-import { useFleetVehicleStore, useFleetScheduleStore, useLeaderScheduleStore, useTourLeaderStore } from '@/stores'
+import {
+  useFleetVehicles,
+  useFleetSchedules,
+  useLeaderSchedules,
+  useTourLeaders,
+  createFleetSchedule,
+  updateFleetSchedule,
+  deleteFleetSchedule,
+  createLeaderSchedule,
+  updateLeaderSchedule,
+  deleteLeaderSchedule,
+} from '@/data'
 import { useLeaderAvailability } from '@/stores/leader-availability-store'
 import { useSupplierResponses } from '../hooks/useSupplierResponses'
 import type { FleetVehicle, FleetSchedule, LeaderSchedule, FleetScheduleFormData, LeaderScheduleFormData } from '@/types/fleet.types'
@@ -113,23 +124,11 @@ export const SchedulingPage: React.FC = () => {
   const [editingLeaderSchedule, setEditingLeaderSchedule] = useState<LeaderSchedule | null>(null)
   const [leaderFormData, setLeaderFormData] = useState<LeaderScheduleFormData>(emptyLeaderScheduleForm)
 
-  // Stores
-  const { items: vehicles, fetchAll: fetchVehicles } = useFleetVehicleStore()
-  const {
-    items: vehicleSchedules,
-    fetchAll: fetchVehicleSchedules,
-    create: createVehicleSchedule,
-    update: updateVehicleSchedule,
-    delete: deleteVehicleSchedule,
-  } = useFleetScheduleStore()
-  const {
-    items: leaderSchedules,
-    fetchAll: fetchLeaderSchedules,
-    create: createLeaderSchedule,
-    update: updateLeaderSchedule,
-    delete: deleteLeaderSchedule,
-  } = useLeaderScheduleStore()
-  const { items: leaders, fetchAll: fetchLeaders } = useTourLeaderStore()
+  // Data hooks
+  const { items: vehicles } = useFleetVehicles()
+  const { items: vehicleSchedules } = useFleetSchedules()
+  const { items: leaderSchedules } = useLeaderSchedules()
+  const { items: leaders } = useTourLeaders()
 
   // 領隊可用檔期
   const { items: leaderAvailability } = useLeaderAvailability()
@@ -195,12 +194,8 @@ export const SchedulingPage: React.FC = () => {
   }, [activeTab, fetchRequests])
 
   useEffect(() => {
-    fetchVehicles()
-    fetchVehicleSchedules()
-    fetchLeaders()
-    fetchLeaderSchedules()
     fetchRequests()
-  }, [fetchVehicles, fetchVehicleSchedules, fetchLeaders, fetchLeaderSchedules, fetchRequests])
+  }, [fetchRequests])
 
   // 計算當前視圖的日期範圍
   const dateRange = useMemo(() => {
@@ -291,13 +286,13 @@ export const SchedulingPage: React.FC = () => {
     if (!confirmed) return
 
     try {
-      await deleteVehicleSchedule(schedule.id)
+      await deleteFleetSchedule(schedule.id)
       await alert('調度已刪除', 'success')
     } catch (error) {
       logger.error('刪除車輛調度失敗:', error)
       await alert('刪除失敗', 'error')
     }
-  }, [deleteVehicleSchedule])
+  }, [])
 
   const handleVehicleFormChange = useCallback(<K extends keyof FleetScheduleFormData>(
     field: K,
@@ -340,10 +335,10 @@ export const SchedulingPage: React.FC = () => {
       }
 
       if (vehicleEditMode && editingVehicleSchedule) {
-        await updateVehicleSchedule(editingVehicleSchedule.id, data)
+        await updateFleetSchedule(editingVehicleSchedule.id, data)
         await alert('調度更新成功', 'success')
       } else {
-        await createVehicleSchedule(data as Parameters<typeof createVehicleSchedule>[0])
+        await createFleetSchedule(data as Parameters<typeof createFleetSchedule>[0])
         await alert('調度建立成功', 'success')
       }
       setVehicleDialogOpen(false)
@@ -352,7 +347,7 @@ export const SchedulingPage: React.FC = () => {
       logger.error('儲存車輛調度失敗:', error)
       await alert('儲存失敗', 'error')
     }
-  }, [vehicleFormData, vehicleEditMode, editingVehicleSchedule, createVehicleSchedule, updateVehicleSchedule, checkVehicleConflict])
+  }, [vehicleFormData, vehicleEditMode, editingVehicleSchedule, checkVehicleConflict])
 
   // ========== 領隊調度操作 ==========
   const handleAddLeaderSchedule = useCallback((leaderId: string, date: string) => {
@@ -383,7 +378,7 @@ export const SchedulingPage: React.FC = () => {
     setLeaderDialogOpen(true)
   }, [])
 
-  const handleDeleteLeaderSchedule = useCallback(async (schedule: LeaderSchedule) => {
+  const handleDeleteLeaderScheduleItem = useCallback(async (schedule: LeaderSchedule) => {
     const confirmed = await confirm(`確定要刪除此調度嗎？\n${schedule.tour_name || '未命名行程'}`, {
       title: '刪除調度',
       type: 'warning',
@@ -397,7 +392,7 @@ export const SchedulingPage: React.FC = () => {
       logger.error('刪除領隊調度失敗:', error)
       await alert('刪除失敗', 'error')
     }
-  }, [deleteLeaderSchedule])
+  }, [])
 
   const handleLeaderFormChange = useCallback(<K extends keyof LeaderScheduleFormData>(
     field: K,
@@ -449,7 +444,7 @@ export const SchedulingPage: React.FC = () => {
       logger.error('儲存領隊調度失敗:', error)
       await alert('儲存失敗', 'error')
     }
-  }, [leaderFormData, leaderEditMode, editingLeaderSchedule, createLeaderSchedule, updateLeaderSchedule, checkLeaderConflict])
+  }, [leaderFormData, leaderEditMode, editingLeaderSchedule, checkLeaderConflict])
 
   return (
     <div className="h-full flex flex-col">

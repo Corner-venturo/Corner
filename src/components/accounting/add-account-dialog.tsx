@@ -67,7 +67,7 @@ const predefinedColors = [
 ]
 
 export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
-  const { addAccount } = useAccountingStore()
+  const { createAccount } = useAccountingStore()
   const [formData, setFormData] = useState<{
     name: string
     type: AccountType
@@ -114,7 +114,7 @@ export function AddAccountDialog({ isOpen, onClose }: AddAccountDialogProps) {
       }),
     }
 
-    await addAccount(accountData)
+    await createAccount(accountData)
     resetForm()
     onClose()
   }

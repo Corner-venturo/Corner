@@ -1,6 +1,5 @@
-import { Tour } from '@/stores/types'
-import { useQuotes } from '@/features/quotes/hooks/useQuotes'
-import { useOrderStore } from '@/stores'
+import { Tour, Quote } from '@/stores/types'
+import { useQuotes, useOrders } from '@/data'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 
@@ -11,13 +10,13 @@ interface TourOverviewTabProps {
 }
 
 export function TourOverviewTab({ tour }: TourOverviewTabProps) {
-  const { quotes } = useQuotes()
-  const { items: orders } = useOrderStore()
+  const { items: quotes } = useQuotes()
+  const { items: orders } = useOrders()
 
   // Find tour's quote (approved or latest)
   const tourQuote =
-    quotes.find(quote => quote.tour_id === tour.id && quote.status === 'approved') ||
-    quotes.find(quote => quote.tour_id === tour.id)
+    quotes.find((quote: Quote) => quote.tour_id === tour.id && quote.status === 'approved') ||
+    quotes.find((quote: Quote) => quote.tour_id === tour.id)
 
   // Calculate tour order info
   const tourOrders = orders.filter(order => order.tour_id === tour.id)

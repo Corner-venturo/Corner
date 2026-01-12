@@ -7,7 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
+import {
+  usePaymentRequests,
+  createPaymentRequest as createPaymentRequestApi,
+  createPaymentRequestItem,
+  invalidatePaymentRequests,
+} from '@/data'
 import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
@@ -28,8 +33,8 @@ type EmployeeTab = 'active' | 'terminated' | 'bot'
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
   const { workspaces, loadWorkspaces: fetchWorkspaces } = useWorkspaceChannels()
-  const { items: paymentRequests, create: createPaymentRequest, fetchAll: fetchPaymentRequests } = usePaymentRequestStore()
-  const { create: createPaymentRequestItem } = usePaymentRequestItemStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: paymentRequests } = usePaymentRequests()
   const currentUser = useAuthStore(state => state.user)
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -42,11 +47,10 @@ export default function HRPage() {
     return currentUser?.roles?.includes('super_admin') || currentUser?.roles?.includes('admin')
   }, [currentUser?.roles])
 
-  // 初始化時載入員工、工作空間、請款單資料（只執行一次）
+  // 初始化時載入員工、工作空間資料（請款單由 SWR 自動載入）
   useEffect(() => {
     fetchAll()
     fetchWorkspaces()
-    fetchPaymentRequests()
   }, [])
 
   // 根據 Tab 過濾員工
@@ -327,7 +331,7 @@ export default function HRPage() {
       const code = generateCompanyPaymentRequestCode('SAL', data.request_date, paymentRequests)
 
       // 建立一張薪資請款單
-      const newRequest = await createPaymentRequest({
+      const newRequest = await createPaymentRequestApi({
         code,
         request_number: code,
         request_date: data.request_date,
@@ -359,11 +363,12 @@ export default function HRPage() {
             quantity: 1,
             subtotal: salary.amount,
             sort_order: i,
-          })
+          } as Parameters<typeof createPaymentRequestItem>[0])
         }
       }
 
-      await fetchPaymentRequests()
+      // SWR 快取失效，自動重新載入
+      await invalidatePaymentRequests()
       toast.success(`已建立薪資請款單（${data.employee_salaries.length} 位員工，共 NT$ ${totalAmount.toLocaleString()}）`)
       logger.log('建立薪資請款成功：', data)
     } catch (error) {

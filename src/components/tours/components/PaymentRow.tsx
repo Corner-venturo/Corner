@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Payment } from '@/stores/types'
-import { Order } from '@/types'
+import type { Order } from '@/stores/types'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, TrendingDown, CreditCard, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'

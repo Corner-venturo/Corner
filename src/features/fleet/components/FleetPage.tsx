@@ -5,7 +5,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Bus, Users, Wrench } from 'lucide-react'
@@ -13,7 +13,16 @@ import { FleetVehicleList } from './FleetVehicleList'
 import { FleetVehicleDialog } from './FleetVehicleDialog'
 import { FleetDriverList } from './FleetDriverList'
 import { FleetDriverDialog } from './FleetDriverDialog'
-import { useFleetVehicleStore, useFleetDriverStore } from '@/stores'
+import {
+  useFleetVehicles,
+  useFleetDrivers,
+  createFleetVehicle,
+  updateFleetVehicle,
+  deleteFleetVehicle,
+  createFleetDriver,
+  updateFleetDriver,
+  deleteFleetDriver,
+} from '@/data'
 import type {
   FleetVehicle,
   FleetVehicleFormData,
@@ -78,17 +87,12 @@ export const FleetPage: React.FC = () => {
   const [editingDriver, setEditingDriver] = useState<FleetDriver | null>(null)
   const [driverFormData, setDriverFormData] = useState<FleetDriverFormData>(emptyDriverFormData)
 
-  // Stores
-  const vehicleStore = useFleetVehicleStore()
-  const driverStore = useFleetDriverStore()
-
-  useEffect(() => {
-    vehicleStore.fetchAll()
-    driverStore.fetchAll()
-  }, [vehicleStore.fetchAll, driverStore.fetchAll])
+  // Data hooks
+  const { items: vehicles, loading: vehiclesLoading } = useFleetVehicles()
+  const { items: drivers, loading: driversLoading } = useFleetDrivers()
 
   // 過濾車輛
-  const filteredVehicles = vehicleStore.items.filter(item => {
+  const filteredVehicles = vehicles.filter(item => {
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
     return (
@@ -99,7 +103,7 @@ export const FleetPage: React.FC = () => {
   })
 
   // 過濾司機
-  const filteredDrivers = driverStore.items.filter(item => {
+  const filteredDrivers = drivers.filter(item => {
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
     return (
@@ -150,14 +154,14 @@ export const FleetPage: React.FC = () => {
       if (!confirmed) return
 
       try {
-        await vehicleStore.delete(item.id)
+        await deleteFleetVehicle(item.id)
         await alert('車輛已刪除', 'success')
       } catch (error) {
         logger.error('Delete FleetVehicle Error:', error)
         await alert('刪除失敗，請稍後再試', 'error')
       }
     },
-    [vehicleStore]
+    []
   )
 
   const handleCloseVehicleDialog = useCallback(() => {
@@ -206,10 +210,10 @@ export const FleetPage: React.FC = () => {
       }
 
       if (isVehicleEditMode && editingVehicle) {
-        await vehicleStore.update(editingVehicle.id, data)
+        await updateFleetVehicle(editingVehicle.id, data)
         await alert('車輛資料更新成功', 'success')
       } else {
-        await vehicleStore.create(data as Parameters<typeof vehicleStore.create>[0])
+        await createFleetVehicle(data as Parameters<typeof createFleetVehicle>[0])
         await alert('車輛資料建立成功', 'success')
       }
       handleCloseVehicleDialog()
@@ -217,7 +221,7 @@ export const FleetPage: React.FC = () => {
       logger.error('Save FleetVehicle Error:', error)
       await alert('儲存失敗，請稍後再試', 'error')
     }
-  }, [vehicleFormData, isVehicleEditMode, editingVehicle, vehicleStore, handleCloseVehicleDialog])
+  }, [vehicleFormData, isVehicleEditMode, editingVehicle, handleCloseVehicleDialog])
 
   // ========== 司機操作 ==========
   const handleOpenAddDriver = useCallback(() => {
@@ -255,14 +259,14 @@ export const FleetPage: React.FC = () => {
       if (!confirmed) return
 
       try {
-        await driverStore.delete(item.id)
+        await deleteFleetDriver(item.id)
         await alert('司機已刪除', 'success')
       } catch (error) {
         logger.error('Delete FleetDriver Error:', error)
         await alert('刪除失敗，請稍後再試', 'error')
       }
     },
-    [driverStore]
+    []
   )
 
   const handleCloseDriverDialog = useCallback(() => {
@@ -296,10 +300,10 @@ export const FleetPage: React.FC = () => {
       }
 
       if (isDriverEditMode && editingDriver) {
-        await driverStore.update(editingDriver.id, data)
+        await updateFleetDriver(editingDriver.id, data)
         await alert('司機資料更新成功', 'success')
       } else {
-        await driverStore.create(data as Parameters<typeof driverStore.create>[0])
+        await createFleetDriver(data as Parameters<typeof createFleetDriver>[0])
         await alert('司機資料建立成功', 'success')
       }
       handleCloseDriverDialog()
@@ -307,7 +311,7 @@ export const FleetPage: React.FC = () => {
       logger.error('Save FleetDriver Error:', error)
       await alert('儲存失敗，請稍後再試', 'error')
     }
-  }, [driverFormData, isDriverEditMode, editingDriver, driverStore, handleCloseDriverDialog])
+  }, [driverFormData, isDriverEditMode, editingDriver, handleCloseDriverDialog])
 
   // 根據當前 Tab 決定新增按鈕行為
   const handleAdd = useCallback(() => {
@@ -347,14 +351,14 @@ export const FleetPage: React.FC = () => {
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
               >
                 <Bus size={16} className="mr-2" />
-                車輛 ({vehicleStore.items.length})
+                車輛 ({vehicles.length})
               </TabsTrigger>
               <TabsTrigger
                 value="drivers"
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-morandi-gold rounded-none px-1 pb-2"
               >
                 <Users size={16} className="mr-2" />
-                司機 ({driverStore.items.length})
+                司機 ({drivers.length})
               </TabsTrigger>
               <TabsTrigger
                 value="logs"
@@ -369,8 +373,8 @@ export const FleetPage: React.FC = () => {
           <TabsContent value="vehicles" className="flex-1 overflow-auto mt-0 p-0">
             <FleetVehicleList
               items={filteredVehicles}
-              drivers={driverStore.items}
-              loading={vehicleStore.loading}
+              drivers={drivers}
+              loading={vehiclesLoading}
               onEdit={handleEditVehicle}
               onDelete={handleDeleteVehicle}
             />
@@ -379,7 +383,7 @@ export const FleetPage: React.FC = () => {
           <TabsContent value="drivers" className="flex-1 overflow-auto mt-0 p-0">
             <FleetDriverList
               items={filteredDrivers}
-              loading={driverStore.loading}
+              loading={driversLoading}
               onEdit={handleEditDriver}
               onDelete={handleDeleteDriver}
             />
@@ -401,7 +405,7 @@ export const FleetPage: React.FC = () => {
         formData={vehicleFormData}
         onFormFieldChange={handleVehicleFormFieldChange}
         onSubmit={handleVehicleSubmit}
-        drivers={driverStore.items}
+        drivers={drivers}
       />
 
       {/* 司機對話框 */}

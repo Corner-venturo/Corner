@@ -25,7 +25,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
-import { useCustomerStore } from '@/stores'
+import { useCustomers } from '@/data'
 import { TourRoomManager } from '@/components/tours/tour-room-manager'
 import { TourVehicleManager } from '@/components/tours/tour-vehicle-manager'
 import {
@@ -122,7 +122,7 @@ export function OrderMembersExpandable({
   const mode = propMode || (orderId ? 'order' : 'tour')
 
   // Hooks
-  const { items: customers } = useCustomerStore()
+  const { items: customers } = useCustomers()
   const membersData = useOrderMembersData({ orderId, tourId, workspaceId, mode })
   const roomVehicle = useRoomVehicleAssignments({ tourId })
   const customerMatch = useCustomerMatch(customers, membersData.members, membersData.setMembers)

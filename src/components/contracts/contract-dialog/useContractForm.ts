@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Tour, ContractTemplate } from '@/types/tour.types'
 import { Order, Member } from '@/types/order.types'
-import { useTourStore, useOrderStore, useItineraryStore, useQuoteStore } from '@/stores'
+import { useTours, updateTour, useOrders, useItineraries, useQuotes } from '@/data'
 import { prepareContractData, ContractData } from '@/lib/contract-utils'
 import { alert, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
@@ -27,10 +27,9 @@ interface OrderMember {
 }
 
 export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
-  const { update: updateTour } = useTourStore()
-  const { items: orders, fetchAll: fetchOrders, loading: ordersLoading } = useOrderStore()
-  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
-  const { items: quotes } = useQuoteStore()
+  const { items: orders, loading: ordersLoading } = useOrders()
+  const { items: itineraries } = useItineraries()
+  const { items: quotes } = useQuotes()
 
   const [selectedTemplate, setSelectedTemplate] = useState<ContractTemplate | ''>('')
   const [contractNotes, setContractNotes] = useState('')
@@ -107,15 +106,6 @@ export function useContractForm({ tour, mode, isOpen }: UseContractFormProps) {
       }))
     }
   }, [selectedMemberId, selectedMember])
-
-  // 對話框開啟時載入資料
-  useEffect(() => {
-    if (isOpen) {
-      // 每次開啟都重新載入，確保資料最新
-      void fetchOrders()
-      void fetchItineraries()
-    }
-  }, [isOpen, fetchOrders, fetchItineraries])
 
   // 當訂單載入完成後，載入成員資料
   useEffect(() => {

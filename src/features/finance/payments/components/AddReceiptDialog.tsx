@@ -77,25 +77,22 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setCopiedLink(null)
 
     const initialize = async () => {
-      const { useTourStore, useOrderStore } = await import('@/stores')
+      const { invalidateTours, invalidateOrders } = await import('@/data')
+      const { supabase } = await import('@/lib/supabase/client')
 
-      // 確保資料已載入
-      const tourStore = useTourStore.getState()
-      const orderStore = useOrderStore.getState()
+      // 確保 SWR 快取已載入
+      await Promise.all([
+        invalidateTours(),
+        invalidateOrders(),
+      ])
 
-      if (tourStore.items.length === 0) {
-        await tourStore.fetchAll()
-      }
-      if (orderStore.items.length === 0) {
-        await orderStore.fetchAll()
-      }
-
-      // 重新取得最新的 store 狀態
-      const orders = useOrderStore.getState().items
-
-      // 如果有預設訂單 ID，找到對應的團 ID
+      // 如果有預設訂單 ID，直接查詢該訂單取得團 ID
       if (defaultOrderId) {
-        const order = orders.find(o => o.id === defaultOrderId)
+        const { data: order } = await supabase
+          .from('orders')
+          .select('tour_id')
+          .eq('id', defaultOrderId)
+          .single()
         const tourId = order?.tour_id || defaultTourId || ''
         setFormData({
           tour_id: tourId,
@@ -145,10 +142,11 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
     try {
       // 實作儲存邏輯
-      const { useReceiptStore, useAuthStore } = await import('@/stores')
+      const { useAuthStore } = await import('@/stores')
+      const { createReceipt, updateReceipt } = await import('@/data')
       const { generateReceiptNumber } = await import('@/lib/utils/receipt-number-generator')
+      const { supabase } = await import('@/lib/supabase/client')
 
-      const receiptStore = useReceiptStore.getState()
       const authStore = useAuthStore.getState()
       const user = authStore.user
 
@@ -167,12 +165,27 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
       // 為每個收款項目建立收款單
       const newLinkPayResults: LinkPayResult[] = []
 
+      // 查詢已存在的收款單編號（用於生成編號）
+      const { data: existingReceipts } = await supabase
+        .from('receipts')
+        .select('receipt_number')
+        .like('receipt_number', `${tourCode}-R%`)
+
+      // 追蹤本次新建的收款單編號
+      const createdReceiptNumbers: string[] = []
+
       for (const item of paymentItems) {
         // 生成收款單號（新格式：{團號}-R{2位數}）
+        // 合併已存在的和本次新建的收款單
+        const allExistingReceipts = [
+          ...(existingReceipts || []),
+          ...createdReceiptNumbers.map(rn => ({ receipt_number: rn }))
+        ]
         const receiptNumber = generateReceiptNumber(
           tourCode,
-          receiptStore.items.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`))
+          allExistingReceipts.filter(r => r.receipt_number?.startsWith(`${tourCode}-R`))
         )
+        createdReceiptNumbers.push(receiptNumber)
 
         // 建立收款單
         // 收款方式轉換為 payment_method 字串（符合資料庫 CHECK 約束）
@@ -186,7 +199,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
 
         // 建立收款單
-        await receiptStore.create({
+        const createdReceipt = await createReceipt({
           receipt_number: receiptNumber,
           workspace_id: user.workspace_id,
           order_id: formData.order_id,
@@ -221,7 +234,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
           deleted_at: null,
           link: null,
           linkpay_order_number: null,
-        } as Parameters<typeof receiptStore.create>[0])
+        })
 
         // 如果是 LinkPay，呼叫 API 產生付款連結
         if (item.receipt_type === RECEIPT_TYPES.LINK_PAY) {
@@ -246,9 +259,8 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
                 link: data.data.payment_link
               })
               // 更新收款單的 link 欄位
-              const createdReceipt = receiptStore.items.find(r => r.receipt_number === receiptNumber)
-              if (createdReceipt) {
-                await receiptStore.update(createdReceipt.id, { link: data.data.payment_link })
+              if (createdReceipt?.id) {
+                await updateReceipt(createdReceipt.id, { link: data.data.payment_link })
               }
             }
           } catch (linkPayError) {
@@ -544,7 +556,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
                       order_number: selectedOrder.order_number || undefined,
                       tour_name: selectedOrder.tour_name || undefined,
                       contact_person: selectedOrder.contact_person || undefined,
-                      contact_email: selectedOrder.contact_email || undefined,
+                      contact_email: (selectedOrder as { contact_email?: string }).contact_email || undefined,
                     } : undefined}
                   />
                 ))}

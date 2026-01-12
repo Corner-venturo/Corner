@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { ChevronLeft, ChevronRight, TrendingUp, Receipt, Users } from 'lucide-react'
-import { useReceiptOrderStore } from '@/stores'
+import { useReceiptOrders } from '@/data'
 import { ReceiptOrder } from '@/types'
 
 // 取得當前年月
@@ -111,22 +111,17 @@ function StatCard({
 
 export default function MonthlyIncomeReportPage() {
   const [selectedMonth, setSelectedMonth] = useState(getCurrentYearMonth())
-  const receiptOrderStore = useReceiptOrderStore()
-
-  // 載入數據
-  useEffect(() => {
-    receiptOrderStore.fetchAll()
-  }, [])
+  const { items: receiptOrders } = useReceiptOrders()
 
   // 篩選該月份的數據
   const { startDate, endDate } = getMonthRange(selectedMonth)
 
   const filteredReceiptOrders = useMemo(() => {
-    return receiptOrderStore.items.filter(ro => {
+    return receiptOrders.filter(ro => {
       const receiptDate = ro.receipt_date
       return receiptDate >= startDate && receiptDate <= endDate
     })
-  }, [receiptOrderStore.items, startDate, endDate])
+  }, [receiptOrders, startDate, endDate])
 
   // 計算統計數據
   const stats = useMemo(() => {

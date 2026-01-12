@@ -17,7 +17,7 @@ import {
 import { Plus, Save, X } from 'lucide-react'
 import { PaymentItemForm } from './PaymentItemForm'
 import { Combobox } from '@/components/ui/combobox'
-import { useTourStore } from '@/stores'
+import { useTours } from '@/data'
 import { CurrencyCell } from '@/components/table-cells'
 import type { ReceiptItem, Order } from '@/stores'
 
@@ -42,7 +42,7 @@ export function CreateReceiptDialog({
   availableOrders,
   onSubmit,
 }: CreateReceiptDialogProps) {
-  const { items: tours } = useTourStore()
+  const { items: tours } = useTours()
   const [selectedTourId, setSelectedTourId] = useState('')
   const [selectedOrderId, setSelectedOrderId] = useState('')
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([

@@ -1,6 +1,13 @@
 'use client'
 
-import { useTourStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import {
+  useTours as useToursData,
+  createTour as createTourApi,
+  updateTour as updateTourApi,
+  deleteTour as deleteTourApi,
+  invalidateTours,
+} from '@/data'
 import { tourService } from '../services/tour.service'
 import { createTourChannel } from '../services/tour-channel.service'
 import { Tour } from '@/stores/types'
@@ -8,24 +15,26 @@ import { logger } from '@/lib/utils/logger'
 
 /**
  * 簡化版 Tours Hook（與其他模組接口統一）
+ * 使用 @/data hooks（SWR 自動載入）
  *
  * 使用範例：
- * const { tours, orders, createTour, updateTour } = useTours();
+ * const { tours, createTour, updateTour } = useTours();
  */
 export const useTours = () => {
-  const tourStore = useTourStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: tours } = useToursData()
 
   return {
     // ========== 資料 ==========
-    tours: tourStore.items,
+    tours,
 
     // ========== Tour CRUD 操作 ==========
     /**
      * 建立旅遊團並自動建立專屬頻道
      */
-    createTour: async (data: Parameters<typeof tourStore.create>[0]) => {
+    createTour: async (data: Parameters<typeof createTourApi>[0]) => {
       // 1. 建立旅遊團
-      const newTour = await tourStore.create(data)
+      const newTour = await createTourApi(data)
 
       // 2. 自動建立頻道（異步執行，不阻塞返回）
       const user = useAuthStore.getState().user
@@ -47,11 +56,11 @@ export const useTours = () => {
       return newTour
     },
 
-    updateTour: tourStore.update,
+    updateTour: updateTourApi,
 
-    deleteTour: tourStore.delete,
+    deleteTour: deleteTourApi,
 
-    loadTours: tourStore.fetchAll,
+    loadTours: invalidateTours,
 
     // ========== 業務方法（來自 Service） ==========
     generateTourCode: async (location: string, date: Date, isSpecial?: boolean) => {

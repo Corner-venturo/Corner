@@ -6,6 +6,7 @@ import { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
+import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Member } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 
@@ -16,22 +17,7 @@ type MemberInsert = Database['public']['Tables']['members']['Insert']
 const SWR_KEY = 'members'
 const ORDERS_SWR_KEY = 'orders'
 
-/**
- * 取得當前使用者的 workspace_id
- */
-function getCurrentWorkspaceId(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const authData = localStorage.getItem('auth-storage')
-    if (authData) {
-      const parsed = JSON.parse(authData)
-      return parsed?.state?.user?.workspace_id || null
-    }
-  } catch {
-    // 忽略解析錯誤
-  }
-  return null
-}
+// 使用 @/lib/workspace-helpers 的 getCurrentWorkspaceId
 
 /**
  * 同步更新訂單的 member_count

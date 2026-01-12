@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Tour, FlightInfo } from '@/stores/types'
 import type { Json } from '@/lib/supabase/types'
-import { useRegionsStore } from '@/stores'
+import { useCountries, useCities } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
@@ -38,12 +38,18 @@ const emptyFlightInfo: FlightInfo = {
 }
 
 export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: () => void, onSuccess?: (updatedTour: Tour) => void) {
-  const { countries, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
   const [submitting, setSubmitting] = useState(false)
   const [availableCities, setAvailableCities] = useState<Array<{ id: string; code: string; name: string }>>([])
   const initializedRef = useRef(false)
   const [loadingOutbound, setLoadingOutbound] = useState(false)
   const [loadingReturn, setLoadingReturn] = useState(false)
+
+  // Helper function to get cities by country (replaces getCitiesByCountry)
+  const getCitiesByCountry = useCallback((countryId: string) => {
+    return cities.filter(c => c.country_id === countryId)
+  }, [cities])
 
   const [formData, setFormData] = useState<EditFormData>({
     name: '',
@@ -58,12 +64,7 @@ export function useTourEditDialog(tour: Tour | null, isOpen: boolean, onClose: (
     enable_checkin: false,
   })
 
-  // 載入國家/城市資料
-  useEffect(() => {
-    if (isOpen && countries.length === 0) {
-      fetchRegions()
-    }
-  }, [isOpen, countries.length, fetchRegions])
+  // SWR 自動載入國家/城市資料，不需要手動 fetch
 
   // 重置 initialized 狀態
   useEffect(() => {

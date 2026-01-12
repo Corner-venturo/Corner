@@ -7,7 +7,7 @@ import { FileSpreadsheet, Upload, X, Check, AlertCircle, ArrowLeft } from 'lucid
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useMemberStore, useCustomerStore } from '@/stores'
+import { useMembers, useCustomers, createMember, createCustomer } from '@/data'
 import { toast } from 'sonner'
 import * as XLSX from 'xlsx'
 import { logger } from '@/lib/utils/logger'
@@ -48,9 +48,9 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
   const [excelData, setExcelData] = useState<ParsedRow[]>([])
   const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([])
 
-  // Stores
-  const memberStore = useMemberStore()
-  const { items: customers, create: createCustomer } = useCustomerStore()
+  // 使用統一資料層
+  const { items: members } = useMembers()
+  const { items: customers } = useCustomers()
 
   // 處理檔案上傳
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +148,7 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
       return
     }
 
-    const existingMembers = memberStore.items.filter(m => m.order_id === orderId)
+    const existingMembers = members.filter(m => m.order_id === orderId)
     let importedCount = 0
     let skippedCount = 0
 
@@ -223,7 +223,7 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
       }
 
       // 新增成員
-      await memberStore.create({
+      await createMember({
         order_id: orderId,
         name: memberData.name,
         name_en: memberData.name_en || '',
@@ -236,7 +236,7 @@ export function MemberExcelImport({ orderId, onImportComplete }: MemberExcelImpo
         reservation_code: '',
         add_ons: [],
         refunds: [],
-      } as unknown as Parameters<typeof memberStore.create>[0])
+      } as unknown as Parameters<typeof createMember>[0])
 
       importedCount++
     }

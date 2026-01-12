@@ -29,6 +29,7 @@ type PersonalCanvasEntity = PersonalCanvas &
  */
 export const usePersonalCanvasStore = createStore<PersonalCanvasEntity>({
   tableName: 'personal_canvases',
+  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
 })
 
 /**

@@ -7,7 +7,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { CurrencyCell } from '@/components/table-cells'
-import { useVendorCostStore, useVisaStore } from '@/stores'
+import { useVendorCosts, createVendorCost, updateVendorCost, updateVisa } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
 
@@ -29,15 +29,7 @@ export function SubmitVisaDialog({
   const [costs, setCosts] = React.useState<Record<string, number>>({})
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
-  const vendorCosts = useVendorCostStore(state => state.items)
-  const createVendorCost = useVendorCostStore(state => state.create)
-  const updateVendorCost = useVendorCostStore(state => state.update)
-  const updateVisa = useVisaStore(state => state.update)
-
-  // 載入代辦商成本資料
-  React.useEffect(() => {
-    useVendorCostStore.getState().fetchAll()
-  }, [])
+  const { items: vendorCosts } = useVendorCosts()
 
   // 取得所有代辦商名稱（從歷史記錄）
   const vendorList = React.useMemo(() => {
@@ -117,7 +109,7 @@ export function SubmitVisaDialog({
               vendor_name: vendor,
               visa_type: visaType,
               cost,
-            })
+            } as Parameters<typeof createVendorCost>[0])
           } catch (err) {
             logger.error('代辦商成本建立失敗:', err)
           }

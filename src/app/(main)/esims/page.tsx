@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { StatusCell, ActionCell } from '@/components/table-cells'
-import { useEsimStore } from '@/stores/esim-store'
+import { useEsims, deleteEsim } from '@/data'
 import { STATUS_CONFIG } from '@/lib/status-config'
 import { Button } from '@/components/ui/button'
 import type { Esim } from '@/types/esim.types'
@@ -15,15 +15,10 @@ import { confirm } from '@/lib/ui/alert-dialog'
 
 export default function EsimsPage() {
   const router = useRouter()
-  const { items, delete: remove, fetchAll: fetchEsims } = useEsimStore()
+  const { items } = useEsims()
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [search, setSearch] = useState('')
-
-  // 載入資料
-  useEffect(() => {
-    fetchEsims()
-  }, [])
 
   // 簡單的客戶端過濾
   const filteredItems = (items || []).filter((item: Esim) => {
@@ -45,7 +40,7 @@ export default function EsimsPage() {
     })
     if (confirmed) {
       try {
-        await remove(id)
+        await deleteEsim(id)
       } catch (error) {
         const { alert } = await import('@/lib/ui/alert-dialog')
         await alert('刪除失敗，請稍後再試', 'error')

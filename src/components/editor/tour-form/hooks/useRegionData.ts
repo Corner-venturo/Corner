@@ -1,5 +1,5 @@
 import React from 'react'
-import { useRegionsStore } from '@/stores'
+import { useCountries, useCities } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { CityOption } from '../types'
 
@@ -19,7 +19,8 @@ import { CityOption } from '../types'
  * 4. ✅ 添加錯誤處理和日誌
  */
 export function useRegionData(data: { country?: string }) {
-  const { countries, cities, fetchAll } = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
 
   // 狀態管理
   const [selectedCountry, setSelectedCountry] = React.useState<string>(data.country || '')
@@ -29,14 +30,13 @@ export function useRegionData(data: { country?: string }) {
   const hasFetchedRef = React.useRef(false)
   const isInitializedRef = React.useRef(false)
 
-  // 📦 階段1：懶載入 regions 資料（只執行一次）
+  // 📦 階段1：SWR 自動載入 regions 資料
   React.useEffect(() => {
-    if (countries.length === 0 && !hasFetchedRef.current) {
+    if (countries.length > 0 && !hasFetchedRef.current) {
       hasFetchedRef.current = true
-      logger.log('[useRegionData] 開始載入國家和城市資料')
-      fetchAll()
+      logger.log('[useRegionData] 國家和城市資料已載入（SWR）')
     }
-  }, [countries.length, fetchAll])
+  }, [countries.length])
 
   // 📦 階段2：當 countries 載入完成後，初始化 country code
   React.useEffect(() => {

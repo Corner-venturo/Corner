@@ -2,10 +2,26 @@ import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
-// POST /api/auth/admin-reset-password - 管理員重置會員密碼
+/**
+ * 管理員重置會員密碼
+ * 🔒 安全修復 2026-01-12：需要已登入用戶（未來應限制為管理員）
+ */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：需要已登入用戶
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
+    // TODO: 未來應檢查是否為管理員
+    // const isAdmin = await checkIsAdmin(auth.data.employeeId)
+    // if (!isAdmin) {
+    //   return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)
+    // }
+
     const { email, new_password } = await request.json()
 
     if (!email || !new_password) {

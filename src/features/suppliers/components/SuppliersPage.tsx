@@ -5,12 +5,17 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Building2 } from 'lucide-react'
 import { SuppliersList } from './SuppliersList'
 import { SuppliersDialog } from './SuppliersDialog'
-import { useSupplierStore } from '@/stores'
+import {
+  useSuppliers,
+  createSupplier,
+  updateSupplier,
+  deleteSupplier as deleteSupplierApi,
+} from '@/data'
 import type { Supplier } from '@/types/supplier.types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 
@@ -20,12 +25,7 @@ export const SuppliersPage: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
 
-  const { items: suppliers, create, update, delete: deleteSupplier, fetchAll: fetchSuppliers } = useSupplierStore()
-
-  // 載入資料
-  useEffect(() => {
-    fetchSuppliers()
-  }, [fetchSuppliers])
+  const { items: suppliers } = useSuppliers()
 
   // 簡化的表單狀態
   const [formData, setFormData] = useState({
@@ -70,13 +70,13 @@ export const SuppliersPage: React.FC = () => {
     if (!confirmed) return
 
     try {
-      await deleteSupplier(supplier.id)
+      await deleteSupplierApi(supplier.id)
       await alert('供應商已刪除', 'success')
     } catch (error) {
       logger.error('❌ Delete Supplier Error:', error)
       await alert('刪除失敗，請稍後再試', 'error')
     }
-  }, [deleteSupplier])
+  }, [])
 
   const handleCloseDialog = useCallback(() => {
     setIsAddDialogOpen(false)
@@ -101,7 +101,7 @@ export const SuppliersPage: React.FC = () => {
     try {
       if (isEditMode && editingSupplier) {
         // 更新模式
-        await update(editingSupplier.id, {
+        await updateSupplier(editingSupplier.id, {
           name: formData.name,
           bank_name: formData.bank_name,
           bank_account: formData.bank_account,
@@ -110,13 +110,13 @@ export const SuppliersPage: React.FC = () => {
         await alert('供應商更新成功', 'success')
       } else {
         // 新增模式
-        await create({
+        await createSupplier({
           name: formData.name,
-          bank_name: formData.bank_name,
-          bank_account: formData.bank_account,
-          notes: formData.note,
+          bank_name: formData.bank_name || null,
+          bank_account: formData.bank_account || null,
+          notes: formData.note || null,
           type: 'other', // 預設型別
-        } as Parameters<typeof create>[0])
+        })
         await alert('供應商建立成功', 'success')
       }
       handleCloseDialog()
@@ -124,7 +124,7 @@ export const SuppliersPage: React.FC = () => {
       logger.error('❌ Save Supplier Error:', error)
       await alert('儲存失敗，請稍後再試', 'error')
     }
-  }, [formData, isEditMode, editingSupplier, create, update, handleCloseDialog])
+  }, [formData, isEditMode, editingSupplier, handleCloseDialog])
 
   return (
     <div className="h-full flex flex-col">

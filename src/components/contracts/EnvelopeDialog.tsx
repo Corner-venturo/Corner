@@ -14,7 +14,7 @@ import {
 import type { Tour } from '@/types/tour.types'
 type EnvelopeRecord = any
 import { useAuthStore } from '@/stores/auth-store'
-import { useTourStore, useQuoteStore } from '@/stores'
+import { useTours, updateTour, useQuotes } from '@/data'
 import { generateUUID } from '@/lib/utils/uuid'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -26,8 +26,7 @@ interface EnvelopeDialogProps {
 
 export function EnvelopeDialog({ isOpen, onClose, tour }: EnvelopeDialogProps) {
   const { user } = useAuthStore()
-  const { update: updateTour } = useTourStore()
-  const { items: quotes } = useQuoteStore()
+  const { items: quotes } = useQuotes()
   const [recipient, setRecipient] = useState('')
   const [recipientAddress, setRecipientAddress] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')

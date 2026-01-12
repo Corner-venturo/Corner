@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
-import { useUserStore } from '@/stores/user-store'
+import { updateEmployee } from '@/data'
 import { Check, Star, Info, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -53,7 +53,6 @@ const AVAILABLE_FEATURES: FeatureOption[] = [
 
 export function PreferredFeaturesSettings() {
   const { user, setUser } = useAuthStore()
-  const { update: updateUser } = useUserStore()
 
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
@@ -99,7 +98,7 @@ export function PreferredFeaturesSettings() {
     setIsSaving(true)
     try {
       // 更新資料庫
-      await updateUser(user.id, { preferred_features: features })
+      await updateEmployee(user.id, { preferred_features: features })
 
       // 顯示儲存成功訊息
       setShowSavedMessage(true)
@@ -110,7 +109,7 @@ export function PreferredFeaturesSettings() {
     } finally {
       setIsSaving(false)
     }
-  }, [user, updateUser])
+  }, [user])
 
   // 處理點擊（立即更新 UI，延遲儲存資料庫）
   const handleToggleFeature = (featureId: string) => {

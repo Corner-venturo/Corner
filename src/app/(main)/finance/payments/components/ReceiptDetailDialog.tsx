@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useReceiptStore, useOrderStore, useLinkPayLogStore } from '@/stores'
+import { useOrders, updateOrder, useReceipts, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs, invalidateLinkPayLogs } from '@/data'
 import { CheckCircle, Edit2, DollarSign, User, FileText, CreditCard, Link2, ExternalLink, Copy, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
@@ -45,10 +45,9 @@ export function ReceiptDetailDialog({
   receipt,
   onSuccess,
 }: ReceiptDetailDialogProps) {
-  const { update: updateReceipt, delete: deleteReceipt, fetchAll: fetchReceipts } = useReceiptStore()
-  const { items: orders, update: updateOrder } = useOrderStore()
-  const { items: receipts } = useReceiptStore()
-  const { items: allLinkPayLogs, fetchAll: fetchLinkPayLogs } = useLinkPayLogStore()
+  const { items: receipts } = useReceipts()
+  const { items: orders } = useOrders()
+  const { items: allLinkPayLogs } = useLinkPayLogs()
 
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -69,13 +68,6 @@ export function ReceiptDetailDialog({
       setIsEditing(false)
     }
   }, [receipt])
-
-  // 載入 LinkPay 記錄
-  useEffect(() => {
-    if (open && receipt && Number(receipt.receipt_type) === ReceiptType.LINK_PAY) {
-      fetchLinkPayLogs()
-    }
-  }, [open, receipt, fetchLinkPayLogs])
 
   if (!receipt) return null
 
@@ -131,7 +123,7 @@ export function ReceiptDetailDialog({
         }
       }
 
-      await fetchReceipts()
+      await invalidateReceipts()
       await alert('收款確認成功', 'success')
       onOpenChange(false)
       onSuccess?.()
@@ -154,7 +146,7 @@ export function ReceiptDetailDialog({
     setIsSubmitting(true)
     try {
       await deleteReceipt(receipt.id)
-      await fetchReceipts()
+      await invalidateReceipts()
       await alert('收款單已刪除', 'success')
       onOpenChange(false)
       onSuccess?.()
@@ -175,7 +167,7 @@ export function ReceiptDetailDialog({
         note: note,
       })
 
-      await fetchReceipts()
+      await invalidateReceipts()
       await alert('儲存成功', 'success')
       setIsEditing(false)
       onSuccess?.()
@@ -464,7 +456,7 @@ export function ReceiptDetailDialog({
         onClose={() => setShowLinkPayDialog(false)}
         receipt={receipt}
         onSuccess={() => {
-          fetchLinkPayLogs()
+          invalidateLinkPayLogs()
           onSuccess?.()
         }}
       />

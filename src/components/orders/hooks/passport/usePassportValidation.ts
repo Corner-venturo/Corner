@@ -10,9 +10,8 @@
 
 import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { useCustomerStore } from '@/stores'
+import { createCustomer, invalidateCustomers } from '@/data'
 import { logger } from '@/lib/utils/logger'
-import type { CreateCustomerData } from '@/types/customer.types'
 
 interface CustomerData {
   name?: string
@@ -158,10 +157,10 @@ export function usePassportValidation(): UsePassportValidationReturn {
       const canSyncCustomer = isValidIdNumber || isValidPassport
 
       if (newMember && canSyncCustomer) {
-        await useCustomerStore.getState().fetchAll()
-        const freshCustomers = useCustomerStore.getState().items
+        await invalidateCustomers()
+        const { data: freshCustomers } = await supabase.from('customers').select('*')
 
-        const existingCustomer = freshCustomers.find(c => {
+        const existingCustomer = (freshCustomers || []).find(c => {
           if (isValidPassport && c.passport_number === passportNumber) return true
           if (isValidIdNumber && c.national_id === idNumber) return true
           // 也比對姓名+生日（作為輔助比對，但不會因為這個而建立新顧客）
@@ -195,18 +194,16 @@ export function usePassportValidation(): UsePassportValidationReturn {
           matchedCustomer = true
         } else {
           // 護照辨識自動建立客戶
-          const customerStore = useCustomerStore.getState()
-          // 使用 Partial 類型，讓 store 處理必填欄位的預設值
-          const customerInput: Partial<CreateCustomerData> & { name: string; phone: string } = {
+          const createdCustomer = await createCustomer({
             name: customerData.name || '',
-            english_name: customerData.english_name || '',
-            passport_number: passportNumber,
-            passport_romanization: customerData.passport_romanization || '',
-            passport_expiry_date: customerData.passport_expiry_date || undefined,
-            passport_image_url: passportImageUrl,
-            national_id: idNumber,
-            date_of_birth: birthDate || undefined,
-            gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : undefined,
+            english_name: customerData.english_name || null,
+            passport_number: passportNumber || null,
+            passport_romanization: customerData.passport_romanization || null,
+            passport_expiry_date: customerData.passport_expiry_date || null,
+            passport_image_url: passportImageUrl || null,
+            national_id: idNumber || null,
+            date_of_birth: birthDate || null,
+            gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
             phone: '',
             member_type: 'potential', // 護照建立的客戶預設為潛在客戶
             is_vip: false,
@@ -214,9 +211,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
             total_spent: 0,
             total_orders: 0,
             verification_status: 'unverified',
-          }
-          // Store 的 create 方法會自動填入 workspace_id 等必填欄位
-          const createdCustomer = await customerStore.create(customerInput as Parameters<typeof customerStore.create>[0])
+          })
 
           if (createdCustomer) {
             await supabase

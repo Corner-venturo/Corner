@@ -3,7 +3,7 @@
 import { QuickAddForm } from './quick-add/QuickAddForm'
 import { QuickAddPreview } from './quick-add/QuickAddPreview'
 import { useQuickAdd } from './quick-add/hooks/useQuickAdd'
-import { useCustomerStore } from '@/stores'
+import { createCustomer } from '@/data'
 
 interface MemberQuickAddProps {
   orderId: string
@@ -12,8 +12,6 @@ interface MemberQuickAddProps {
 }
 
 export function MemberQuickAdd({ orderId, departureDate, onMembersAdded }: MemberQuickAddProps) {
-  const { create: createCustomer } = useCustomerStore()
-
   const {
     mode,
     setMode,

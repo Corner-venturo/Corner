@@ -40,7 +40,7 @@ import {
   SSRCategory,
 } from '@/lib/pnr-parser'
 import { useReferenceData } from '@/lib/pnr/use-reference-data'
-import { usePNRStore } from '@/stores/pnrs-store'
+import { createPNR } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 import type { OrderMember } from '@/components/orders/order-member.types'
@@ -163,7 +163,6 @@ export function TourPnrToolDialog({
   const [passengerMatches, setPassengerMatches] = useState<PassengerMatch[]>([])
   const [segmentEdits, setSegmentEdits] = useState<Record<number, SegmentEditData>>({})
 
-  const { create: createPNR } = usePNRStore()
   const { user } = useAuthStore()
 
   // 載入參考資料

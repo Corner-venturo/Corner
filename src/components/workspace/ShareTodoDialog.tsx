@@ -10,8 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useTodoStore } from '@/stores'
-import { useUserStore } from '@/stores/user-store'
+import { useTodos, updateTodo, useEmployees } from '@/data'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Send, CheckCircle2, AlertCircle, Search, X, Share2 } from 'lucide-react'
@@ -29,8 +28,8 @@ interface ShareTodoDialogProps {
 }
 
 export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDialogProps) {
-  const { items: todos, update } = useTodoStore()
-  const { items: employees, fetchAll } = useUserStore()
+  const { items: todos } = useTodos()
+  const { items: employees } = useEmployees()
   const { sendMessage } = useWorkspaceChat()
   const { user } = useAuthStore()
 
@@ -38,13 +37,6 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
   const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // 載入員工資料
-  useEffect(() => {
-    if (employees.length === 0) {
-      void fetchAll()
-    }
-  }, [employees.length, fetchAll])
 
   const selectedTodo = todos.find(t => t.id === selectedTodoId)
 
@@ -66,7 +58,7 @@ export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDial
     try {
       // 1. 如果選擇了指派對象，先更新代辦事項
       if (selectedAssignee && selectedAssignee !== selectedTodo.assignee) {
-        await update(selectedTodo.id, { assignee: selectedAssignee })
+        await updateTodo(selectedTodo.id, { assignee: selectedAssignee })
       }
 
       // 2. 建立訊息內容

@@ -10,7 +10,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Calculator, FileText, Calendar, MapPin, Users, LayoutList, CheckCircle, XCircle } from 'lucide-react'
 import { DocumentVersionPicker } from '@/components/documents'
-import { useTourStore, useQuoteStore } from '@/stores'
+import { useTours, useQuotes } from '@/data'
 import type { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/utils/format-date'
@@ -21,20 +21,12 @@ const STATUS_TABS = [
 ]
 
 export const QuotesPage: React.FC = () => {
-  const { items: tours, loading: toursLoading, fetchAll: fetchTours } = useTourStore()
-  const { items: quotes, loading: quotesLoading, fetchAll: fetchQuotes } = useQuoteStore()
+  const { items: tours, loading: toursLoading } = useTours()
+  const { items: quotes, loading: quotesLoading } = useQuotes()
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null)
-
-  // 載入資料
-  // TODO: 優化：目前載入所有 tours 再過濾有報價單的
-  // 未來可改為只查詢有報價單的 tours（使用 JOIN 或子查詢）
-  React.useEffect(() => {
-    fetchTours()
-    fetchQuotes()
-  }, [fetchTours, fetchQuotes])
 
   // 計算每個團的報價單數量
   const tourQuoteCounts = useMemo(() => {

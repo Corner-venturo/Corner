@@ -5,7 +5,7 @@ import { formatDate } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useMemo } from 'react'
 import { Plus, X } from 'lucide-react'
-import { useTourStore, usePaymentRequestStore } from '@/stores'
+import { useTours, createPaymentRequest as createPaymentRequestApi } from '@/data'
 import { useWorkspaceWidgets, AdvanceItem } from '@/stores/workspace-store'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -36,8 +36,7 @@ export function CreatePaymentRequestDialog({
   onOpenChange,
   onSuccess,
 }: CreatePaymentRequestDialogProps) {
-  const { items: tours } = useTourStore()
-  const { create: createPaymentRequest } = usePaymentRequestStore()
+  const { items: tours } = useTours()
   const { processAdvanceItem } = useWorkspaceWidgets()
 
   const itemsArray = useMemo(() => (Array.isArray(items) ? items : [items]), [items])
@@ -78,18 +77,19 @@ export function CreatePaymentRequestDialog({
     }
 
     try {
-      const paymentRequest = await createPaymentRequest({
+      const paymentRequest = await createPaymentRequestApi({
         code: '',
         request_number: '',
         tour_id: selectedTourId,
         request_type: category || '員工代墊',
+        request_date: requestDate,
         amount: totalAmount,
         supplier_name: supplier,
         status: 'pending',
         note: itemsArray.map((item, i) =>
           `${i + 1}. ${item.name} - ${item.description} (NT$ ${item.amount.toLocaleString()})`
         ).join('\n'),
-      } as Parameters<typeof createPaymentRequest>[0])
+      })
 
       // 更新代墊項目狀態
       for (const item of itemsArray) {

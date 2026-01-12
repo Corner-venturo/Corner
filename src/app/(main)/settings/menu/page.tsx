@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
-import { useUserStore } from '@/stores/user-store'
+import { updateEmployee } from '@/data'
 import { MENU_ITEMS, MENU_CATEGORIES, getMenuItemsByCategory } from '@/constants/menu-items'
 import type { MenuItem } from '@/constants/menu-items'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -14,7 +14,6 @@ import { Save, RotateCcw } from 'lucide-react'
 
 export default function MenuSettingsPage() {
   const { user } = useAuthStore()
-  const { update: updateUser } = useUserStore()
   const [hiddenMenuItems, setHiddenMenuItems] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
@@ -42,7 +41,7 @@ export default function MenuSettingsPage() {
 
     setIsSaving(true)
     try {
-      await updateUser(user.id, {
+      await updateEmployee(user.id, {
         hidden_menu_items: hiddenMenuItems,
       })
       await alert('選單設定已儲存', 'success')

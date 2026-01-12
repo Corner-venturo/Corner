@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { useTourStore, useOrderStore } from '@/stores'
+import { useTours, deleteOrder } from '@/data'
 import { ChevronDown, BarChart3, CreditCard, Users, Plus, User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -33,10 +33,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
   className,
 }: ExpandableOrderTableProps) {
   const router = useRouter()
-  const tourStore = useTourStore()
-  const tours = tourStore.items
-  const orderStore = useOrderStore()
-  const deleteOrder = orderStore.delete
+  const { items: tours } = useTours()
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
   const [expandedOrders, setExpandedOrders] = useState<string[]>([])
   const [activeTabs, setActiveTabs] = useState<Record<string, string>>({})

@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { logger } from '@/lib/utils/logger'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Tour, Payment } from '@/stores/types'
-import { useOrderStore, useReceiptStore } from '@/stores'
+import { useOrders, useReceipts, createReceipt, invalidateReceipts } from '@/data'
 import type { Receipt, ReceiptType } from '@/types/receipt.types'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
@@ -30,8 +30,8 @@ export function useTourPayments({
   triggerAdd,
   onTriggerAddComplete,
 }: UseTourPaymentsProps) {
-  const { items: orders } = useOrderStore()
-  const { items: receipts, create: createReceipt, fetchAll: fetchReceipts } = useReceiptStore()
+  const { items: orders } = useOrders()
+  const { items: receipts } = useReceipts()
   const { issueInvoice, isLoading: isInvoiceLoading } = useTravelInvoiceStore()
   const { toast } = useToast()
 
@@ -224,7 +224,7 @@ export function useTourPayments({
       }
 
       await createReceipt(receiptData as Receipt)
-      await fetchReceipts()
+      await invalidateReceipts()
 
       // 同步更新 tour 的財務數據
       await updateTourFinancials()

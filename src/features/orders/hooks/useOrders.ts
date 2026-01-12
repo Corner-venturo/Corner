@@ -1,24 +1,30 @@
 'use client'
 
-import { useOrderStore } from '@/stores'
+import {
+  useOrders as useOrdersData,
+  createOrder as createOrderData,
+  updateOrder as updateOrderData,
+  deleteOrder as deleteOrderData,
+  invalidateOrders,
+} from '@/data'
 import { orderService } from '../services/order.service'
 import { addMembersToTourChannel } from '@/features/tours/services/tour-channel.service'
 import { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
-export const useOrders = () => {
-  const store = useOrderStore()
+export const useOrdersFeature = () => {
+  const { items: orders } = useOrdersData()
 
   return {
     // ========== 資料 ==========
-    orders: store.items,
+    orders,
 
     // ========== CRUD 操作 ==========
     /**
      * 建立訂單並自動將業務和助理加入旅遊團頻道
      */
     createOrder: async (data: Omit<Order, 'id' | 'created_at' | 'updated_at'>) => {
-      const newOrder = await store.create(data as Parameters<typeof store.create>[0])
+      const newOrder = await createOrderData(data as Parameters<typeof createOrderData>[0])
 
       // 自動將業務和助理加入旅遊團頻道（背景執行）
       if (newOrder && newOrder.tour_id) {
@@ -54,15 +60,15 @@ export const useOrders = () => {
     },
 
     updateOrder: async (id: string, data: Partial<Order>) => {
-      return await store.update(id, data)
+      return await updateOrderData(id, data)
     },
 
     deleteOrder: async (id: string) => {
-      return await store.delete(id)
+      return await deleteOrderData(id)
     },
 
     loadOrders: async () => {
-      return await store.fetchAll()
+      await invalidateOrders()
     },
 
     // ========== 業務方法 ==========
@@ -91,3 +97,6 @@ export const useOrders = () => {
     },
   }
 }
+
+// 向後兼容：保留原有 export 名稱
+export const useOrders = useOrdersFeature

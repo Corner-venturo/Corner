@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
-import { useRegionsStore } from '@/stores'
+import { useCountries } from '@/data'
 import { useTourDestinations } from '@/features/tours/hooks/useTourDestinations'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
@@ -44,16 +44,12 @@ export function PackageDialog({
   basePackage,
   onSubmit,
 }: PackageDialogProps) {
-  // 國家用 useRegionsStore
-  const { countries, fetchAll: fetchRegions } = useRegionsStore()
+  // 國家用 useCountries (SWR 自動載入)
+  const { items: countries } = useCountries()
   // 機場代碼用 useTourDestinations
   const { destinations, addDestination, loading: destinationsLoading } = useTourDestinations()
 
-  useEffect(() => {
-    if (open && countries.length === 0) {
-      fetchRegions()
-    }
-  }, [open, countries.length, fetchRegions])
+  // SWR 自動載入，不需要手動 fetchAll
 
   // 新增機場代碼狀態
   const [showAddNew, setShowAddNew] = useState(false)
@@ -283,7 +279,14 @@ export function PackageDialog({
                 />
                 <Input
                   value={newAirportCode}
-                  onChange={e => setNewAirportCode(e.target.value.toUpperCase())}
+                  onChange={e => {
+                    // 轉換全形為半形，只保留英文字母
+                    const halfWidth = e.target.value
+                      .replace(/[Ａ-Ｚａ-ｚ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+                      .replace(/[^A-Za-z]/g, '')
+                      .toUpperCase()
+                    setNewAirportCode(halfWidth)
+                  }}
                   placeholder="代碼（如：NRT）"
                   maxLength={4}
                 />

@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useTourStore, useSupplierStore } from '@/stores'
+import { useTours, useSuppliers } from '@/data'
 import { usePayments } from '@/features/payments/hooks/usePayments'
 import { Plus, Trash2, Receipt, AlertCircle, Search, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -58,8 +58,8 @@ const requestCategories: { value: PaymentItemCategory; label: string }[] = [
 ]
 
 export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocateRequestDialogProps) {
-  const { items: tours } = useTourStore()
-  const { items: suppliers } = useSupplierStore()
+  const { items: tours } = useTours()
+  const { items: suppliers } = useSuppliers()
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
 
   const [requestDate, setRequestDate] = useState(getTodayString())

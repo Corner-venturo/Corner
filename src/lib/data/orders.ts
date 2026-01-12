@@ -3,9 +3,12 @@
  *
  * 將所有 Orders 相關的 Supabase 查詢封裝在此，
  * 實現 UI 與資料邏輯的徹底分離。
+ *
+ * 🔒 安全修復 2026-01-12：所有查詢都會自動過濾 workspace_id
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -18,6 +21,7 @@ export interface GetPaginatedOrdersParams {
   limit?: number
   status?: string
   tourId?: string
+  workspaceId?: string  // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedOrdersResult {
@@ -31,18 +35,32 @@ export interface PaginatedOrdersResult {
 
 /**
  * 取得分頁訂單列表
+ * 🔒 自動過濾 workspace_id
  */
 export async function getPaginatedOrders({
   page = 1,
   limit = 15,
   status,
   tourId,
+  workspaceId,
 }: GetPaginatedOrdersParams = {}): Promise<PaginatedOrdersResult> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getPaginatedOrders: 未登入')
+      return { orders: [], count: 0 }
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   let query = supabase
     .from('orders')
     .select('*', { count: 'exact' })
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   // 可選篩選條件
@@ -72,14 +90,27 @@ export async function getPaginatedOrders({
 
 /**
  * 根據 ID 取得單一訂單
+ * 🔒 自動過濾 workspace_id
  */
-export async function getOrderById(id: string): Promise<Order | null> {
+export async function getOrderById(id: string, workspaceId?: string): Promise<Order | null> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getOrderById: 未登入')
+      return null
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('orders')
     .select('*')
     .eq('id', id)
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -92,14 +123,27 @@ export async function getOrderById(id: string): Promise<Order | null> {
 
 /**
  * 根據 Tour ID 取得所有訂單
+ * 🔒 自動過濾 workspace_id
  */
-export async function getOrdersByTourId(tourId: string): Promise<Order[]> {
+export async function getOrdersByTourId(tourId: string, workspaceId?: string): Promise<Order[]> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getOrdersByTourId: 未登入')
+      return []
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('orders')
     .select('*')
     .eq('tour_id', tourId)
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .order('created_at', { ascending: false })
 
   if (error) {

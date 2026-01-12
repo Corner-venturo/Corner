@@ -110,7 +110,7 @@ export function CurrentOrderList({
             {currentOrder.order_number}
           </h3>
           <p className="text-sm text-morandi-secondary">
-            出帳日期：{currentOrder.disbursement_date} • {currentOrder.payment_request_ids.length}{' '}
+            出帳日期：{currentOrder.disbursement_date} • {(currentOrder.payment_request_ids || []).length}{' '}
             筆請款單
           </p>
         </div>

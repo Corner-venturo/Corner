@@ -8,8 +8,7 @@ import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useEsimStore } from '@/stores/esim-store'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useEsims, createEsim, createOrder, invalidateTours } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useTours } from '@/features/tours/hooks/useTours'
 import { tourService } from '@/features/tours/services/tour.service'
@@ -46,8 +45,7 @@ interface EsimCreateDialogProps {
 
 export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) {
   const router = useRouter()
-  const { items: esims, create } = useEsimStore()
-  const { create: createOrder } = useOrderStore()
+  const { items: esims } = useEsims()
   const { user } = useAuthStore()
   const { tours } = useTours()
 
@@ -102,10 +100,9 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
     if (open && !hasInitialized) {
       const init = async () => {
         try {
-          // 1. 先載入團號資料
-          const tourStore = useTourStore.getState()
-          if (tourStore.items.length === 0) {
-            await tourStore.fetchAll()
+          // 1. 確保 SWR 快取已載入（如果需要強制刷新）
+          if (tours.length === 0) {
+            await invalidateTours()
           }
 
           // 2. 取得或建立網卡專用團
@@ -125,7 +122,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
     if (!open) {
       setHasInitialized(false)
     }
-  }, [open, hasInitialized])
+  }, [open, hasInitialized, tours.length])
 
   // ✅ 當團號改變時，載入該團的訂單
   useEffect(() => {
@@ -307,7 +304,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
         // TODO: 實作 maxNumberGetDbNumber 或使用簡單的遞增邏輯
         const invoiceNumber = `I${finalGroupCode}${String(Date.now()).slice(-4)}`
 
-        await create({
+        await createEsim({
           esim_number: esimNumber,
           group_code: finalGroupCode,
           order_number: targetOrderNumber || undefined,
@@ -318,7 +315,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           email: item.email,
           note: item.note || '',
           status: 0,
-        } as unknown as Parameters<typeof create>[0])
+        } as unknown as Parameters<typeof createEsim>[0])
 
         // TODO: 調用 FastMove API 下單，並傳入 invoiceNumber
         // FastMove API 會自動產生請款單，請款日期為「下個月第一個週四」

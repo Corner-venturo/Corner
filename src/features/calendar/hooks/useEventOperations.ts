@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { EventClickArg, EventDropArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
-import { useCalendarEventStore } from '@/stores'
+import { useCalendarEvents, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { FullCalendarEvent } from '@/features/calendar/types'
@@ -32,7 +32,7 @@ const initialEditEventState: EditEventDialogState = {
 export function useEventOperations() {
   const router = useRouter()
   const { user } = useAuthStore()
-  const { items: calendarEvents, create: addEvent, update: updateEvent, delete: deleteEvent } = useCalendarEventStore()
+  const { items: calendarEvents } = useCalendarEvents()
 
   const [eventDetailDialog, setEventDetailDialog] = useState<{
     open: boolean
@@ -101,7 +101,7 @@ export function useEventOperations() {
         workspace_id: user.workspace_id
       })
 
-      await addEvent({
+      await createCalendarEvent({
         title: newEvent.title,
         description: newEvent.description,
         start: startDateTime,
@@ -111,7 +111,7 @@ export function useEventOperations() {
         visibility: newEvent.visibility,
         owner_id: user.id,
         created_by: user.id,
-      })
+      } as Parameters<typeof createCalendarEvent>[0])
 
       // 重置表單
       setNewEvent(initialNewEventState)
@@ -153,7 +153,7 @@ export function useEventOperations() {
   // 刪除事項
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      await deleteEvent(eventId)
+      await deleteCalendarEvent(eventId)
       setEventDetailDialog({ open: false, event: null })
     } catch (error) {
       logger.error('刪除事件失敗:', error)
@@ -252,7 +252,7 @@ export function useEventOperations() {
           : `${endDate}T23:59:00${tzOffset}`
       }
 
-      await updateEvent(editEventDialog.eventId, {
+      await updateCalendarEvent(editEventDialog.eventId, {
         title: editEventDialog.title,
         description: editEventDialog.description,
         start: startDateTime,
@@ -358,7 +358,7 @@ export function useEventOperations() {
         isAllDay,
       })
 
-      await updateEvent(eventId, {
+      await updateCalendarEvent(eventId, {
         start: startDateTime,
         end: endDateTime,
         all_day: isAllDay,

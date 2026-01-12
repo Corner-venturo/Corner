@@ -4,12 +4,11 @@
  */
 
 import { useCallback } from 'react'
-import { useAttractionStore } from '@/stores/attraction-store'
+import { updateAttraction } from '@/data'
 import { Attraction } from '../types'
 import { logger } from '@/lib/utils/logger'
 
 export function useAttractionsReorder() {
-  const { update: updateAttraction } = useAttractionStore()
 
   /**
    * 批量更新景點順序
@@ -33,7 +32,7 @@ export function useAttractionsReorder() {
       logger.error('批量更新景點排序失敗:', error)
       throw error
     }
-  }, [updateAttraction])
+  }, [])
 
   /**
    * 更新單個景點的順序
@@ -47,7 +46,7 @@ export function useAttractionsReorder() {
       logger.error('更新景點順序失敗:', error)
       throw error
     }
-  }, [updateAttraction])
+  }, [])
 
   /**
    * 上移景點
@@ -72,7 +71,7 @@ export function useAttractionsReorder() {
       logger.error('上移景點失敗:', error)
       throw error
     }
-  }, [updateAttraction])
+  }, [])
 
   /**
    * 下移景點
@@ -97,7 +96,7 @@ export function useAttractionsReorder() {
       logger.error('下移景點失敗:', error)
       throw error
     }
-  }, [updateAttraction])
+  }, [])
 
   return {
     reorderAttractions,

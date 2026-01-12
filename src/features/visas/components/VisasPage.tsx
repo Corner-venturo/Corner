@@ -19,7 +19,7 @@ import { VisasList } from './VisasList'
 import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
 import { SubmitVisaDialog } from './SubmitVisaDialog'
-import { EditVisaDialog } from './EditVisaDialog'
+import { VisaDialog } from './VisaDialog'
 import { ReturnDocumentsDialog } from './ReturnDocumentsDialog'
 import { BatchPickupDialog } from './BatchPickupDialog'
 import { CustomerMatchDialog, AddCustomerFormDialog } from './CustomerMatchDialog'
@@ -48,11 +48,11 @@ export default function VisasPage() {
   // - Members: deleteVisaWithCascade 改為直接查詢
   useEffect(() => {
     const loadData = async () => {
-      const { useVisaStore, useOrderStore } = await import('@/stores')
+      const { invalidateVisas, invalidateOrders } = await import('@/data')
       await Promise.all([
-        useVisaStore.getState().fetchAll(),
+        invalidateVisas(),
         fetchTours(),
-        useOrderStore.getState().fetchAll(),
+        invalidateOrders(),
       ])
     }
     loadData()
@@ -485,7 +485,7 @@ export default function VisasPage() {
       />
 
       {/* 編輯對話框 */}
-      <EditVisaDialog
+      <VisaDialog
         open={isEditDialogOpen}
         onClose={() => {
           setIsEditDialogOpen(false)

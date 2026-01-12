@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
-import { useQuoteStore } from '@/stores'
+import { useQuotes, createQuote, updateQuote, deleteQuote } from '@/data'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
@@ -85,7 +85,7 @@ export function DocumentVersionPicker({
   nested = false,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
-  const { items: quotes, fetchAll, create, update, delete: deleteQuote, loading } = useQuoteStore()
+  const { items: quotes, loading } = useQuotes()
   const [isCreatingStandard, setIsCreatingStandard] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
@@ -102,13 +102,6 @@ export function DocumentVersionPicker({
   const [itineraryType, setItineraryType] = useState<'simple' | 'timeline' | null>(null)
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
-
-  // 載入報價單資料
-  useEffect(() => {
-    if (isOpen) {
-      fetchAll()
-    }
-  }, [isOpen, fetchAll])
 
   // 載入行程表資料（點擊按鈕後才載入）
   const loadProposalPackageData = async () => {
@@ -272,7 +265,7 @@ export function DocumentVersionPicker({
       const code = generateCode('TP', {}, quotes)
       const originalName = currentQuote.customer_name || currentQuote.name || '未命名'
 
-      const newQuote = await create({
+      const newQuote = await createQuote({
         code,
         name: currentQuote.name,
         customer_name: `${originalName} (副本)`,
@@ -281,7 +274,7 @@ export function DocumentVersionPicker({
         tour_id: tour.id,
         categories: currentQuote.categories,
         group_size: currentQuote.group_size,
-      })
+      } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
@@ -301,7 +294,7 @@ export function DocumentVersionPicker({
 
       const code = generateCode('TP', {}, quotes)
 
-      const newQuote = await create({
+      const newQuote = await createQuote({
         code,
         name: tour.name,
         customer_name: '未命名報價單',
@@ -310,7 +303,7 @@ export function DocumentVersionPicker({
         tour_id: tour.id,
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
-      })
+      } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
@@ -369,7 +362,7 @@ export function DocumentVersionPicker({
       const code = generateCode('TP', {}, quotes)
       const originalName = quote.customer_name || quote.name || '未命名'
 
-      const newQuote = await create({
+      const newQuote = await createQuote({
         code,
         name: quote.name,
         customer_name: `${originalName} (副本)`,
@@ -378,7 +371,7 @@ export function DocumentVersionPicker({
         tour_id: tour.id,
         categories: quote.categories,
         group_size: quote.group_size,
-      })
+      } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
@@ -406,7 +399,7 @@ export function DocumentVersionPicker({
     }
 
     try {
-      await update(quote.id, { customer_name: editingName.trim() })
+      await updateQuote(quote.id, { customer_name: editingName.trim() })
     } catch (error) {
       logger.error('更新名稱失敗:', error)
     }

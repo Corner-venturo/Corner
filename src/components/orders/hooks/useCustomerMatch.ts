@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
-import type { Customer } from '@/types'
+import type { Customer } from '@/types/customer.types'
 
 interface OrderMember {
   id: string

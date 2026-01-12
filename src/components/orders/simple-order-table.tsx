@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { useOrderStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { deleteOrder } from '@/data'
 import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
@@ -31,8 +32,6 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   onQuickPaymentRequest,
 }: SimpleOrderTableProps) {
   const router = useRouter()
-  const orderStore = useOrderStore()
-  const deleteOrder = orderStore.delete
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 

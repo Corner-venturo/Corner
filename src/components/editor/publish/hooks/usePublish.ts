@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { useItineraryStore, useAuthStore } from '@/stores'
-import { useTours } from '@/hooks/cloud-hooks'
+import { useAuthStore } from '@/stores'
+import { useTours, createItinerary, updateItinerary } from '@/data'
 import type { TourFormData } from '@/components/editor/tour-form/types'
 import type { ItineraryVersionRecord } from '@/stores/types'
 import { generateUUID } from '@/lib/utils/uuid'
@@ -38,7 +38,6 @@ export function usePublish({
   const [versionNote, setVersionNote] = useState('')
   const [newFileName, setNewFileName] = useState('')
   const [copied, setCopied] = useState(false)
-  const { create, update } = useItineraryStore()
   const { user } = useAuthStore()
   const { items: tours } = useTours()
   const router = useRouter()
@@ -141,7 +140,7 @@ export function usePublish({
             }
             updatedRecords = [firstVersion]
           }
-          await update(data.id, { ...convertedData, version_records: updatedRecords })
+          await updateItinerary(data.id, { ...convertedData, version_records: updatedRecords })
           onVersionRecordsChange?.(updatedRecords)
         } else {
           const updatedRecords = [...versionRecords]
@@ -154,7 +153,7 @@ export function usePublish({
             meeting_info: data.meetingInfo as { time: string; location: string } | undefined,
             hotels: data.hotels,
           }
-          await update(data.id, { version_records: updatedRecords })
+          await updateItinerary(data.id, { version_records: updatedRecords })
           onVersionRecordsChange?.(updatedRecords)
         }
 
@@ -176,11 +175,11 @@ export function usePublish({
           created_at: new Date().toISOString(),
         }
 
-        const newItinerary = await create({
+        const newItinerary = await createItinerary({
           ...convertedData,
           created_by: user?.id || undefined,
           version_records: [firstVersion],
-        } as Parameters<typeof create>[0])
+        } as Parameters<typeof createItinerary>[0])
 
         if (newItinerary?.id) {
           router.replace(`/itinerary/new?itinerary_id=${newItinerary.id}`)
@@ -217,7 +216,7 @@ export function usePublish({
       }
 
       const updatedRecords = [...versionRecords, newVersion]
-      await update(data.id, { version_records: updatedRecords })
+      await updateItinerary(data.id, { version_records: updatedRecords })
       onVersionRecordsChange?.(updatedRecords)
 
       // 同步餐食/住宿資料到關聯的報價單
@@ -241,12 +240,12 @@ export function usePublish({
     try {
       const convertedData = convertData()
 
-      const newItinerary = await create({
+      const newItinerary = await createItinerary({
         ...convertedData,
         title: newFileName || `${stripHtml(data.title) || '行程表'} (複本)`,
         created_by: user?.id || undefined,
         version_records: [],
-      } as Parameters<typeof create>[0])
+      } as Parameters<typeof createItinerary>[0])
 
       if (newItinerary?.id) {
         setNewFileName('')

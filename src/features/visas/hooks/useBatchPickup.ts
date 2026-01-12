@@ -285,14 +285,18 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
         // 如果勾選更新顧客資訊，更新 CRM
         if (item.updateCustomer && item.ocrResult.success && item.ocrResult.customer) {
           try {
-            const { useCustomerStore } = await import('@/stores')
-            const customers = useCustomerStore.getState().items
-            const updateCustomer = useCustomerStore.getState().update
+            const { updateCustomer } = await import('@/data')
+            const { supabase } = await import('@/lib/supabase/client')
 
             // 找到對應的顧客（用姓名比對）
             const visa = pendingVisas.find(v => v.id === item.manualVisaId)
             if (visa) {
-              const customer = customers.find(c => c.name === visa.applicant_name)
+              const { data: customer } = await supabase
+                .from('customers')
+                .select('*')
+                .eq('name', visa.applicant_name)
+                .single()
+
               if (customer) {
                 await updateCustomer(customer.id, {
                   passport_number: item.ocrResult.customer.passport_number || customer.passport_number,

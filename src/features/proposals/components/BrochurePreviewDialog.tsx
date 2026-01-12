@@ -19,7 +19,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Printer, Loader2, History, ChevronDown } from 'lucide-react'
-import { useItineraryStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { invalidateItineraries } from '@/data'
 import { formatDateTW } from '@/lib/utils/format-date'
 import { supabase } from '@/lib/supabase/client'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
@@ -35,7 +36,6 @@ export function BrochurePreviewDialog({
   onClose,
   itineraryId,
 }: BrochurePreviewDialogProps) {
-  const { fetchAll } = useItineraryStore()
   const { user } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
@@ -90,9 +90,9 @@ export function BrochurePreviewDialog({
       }
 
       loadData()
-      fetchAll() // 同時更新 SWR 快取
+      invalidateItineraries() // 同時更新 SWR 快取
     }
-  }, [isOpen, itineraryId, fetchAll])
+  }, [isOpen, itineraryId])
 
   const handlePrint = () => {
     // 開新視窗列印

@@ -9,7 +9,8 @@ import { useCategoryOperations } from '@/features/quotes/hooks/useCategoryOperat
 import { useQuoteCalculations } from '@/features/quotes/hooks/useQuoteCalculations'
 import { useQuoteActions } from '@/features/quotes/hooks/useQuoteActions'
 import { useSyncOperations } from './hooks/useSyncOperations'
-import { useItineraryStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { useItineraries, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import type { QuoteConfirmationStatus } from '@/types/quote.types'
 import {
@@ -75,8 +76,8 @@ export default function QuoteDetailPage() {
     router,
   } = quoteState
 
-  // Itinerary store for sync
-  const { items: itineraries, update: updateItinerary } = useItineraryStore()
+  // Itinerary data for sync
+  const { items: itineraries } = useItineraries()
 
   // Auth store for staff info
   const { user } = useAuthStore()
@@ -244,8 +245,8 @@ export default function QuoteDetailPage() {
       tour_id: tour.id
     })
     // 更新旅遊團的 quote_id
-    const { useTourStore } = await import('@/stores')
-    useTourStore.getState().update(tour.id, { quote_id: quote.id })
+    const { updateTour } = await import('@/data')
+    await updateTour(tour.id, { quote_id: quote.id })
     toast.success(`已關聯旅遊團：${tour.code}`)
   }, [quote, updateQuote])
 

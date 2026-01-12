@@ -85,7 +85,7 @@ interface AccountingStore {
 
   // 帳戶管理
   fetchAccounts: () => Promise<void>
-  addAccount: (
+  createAccount: (
     account: Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>
   ) => Promise<Account | null>
   updateAccount: (id: string, account: Partial<Account>) => Promise<Account | null>
@@ -93,7 +93,7 @@ interface AccountingStore {
 
   // 分類管理
   fetchCategories: () => Promise<void>
-  addCategory: (
+  createCategory: (
     category: Omit<TransactionCategory, 'id' | 'created_at'>
   ) => Promise<TransactionCategory | null>
   updateCategory: (id: string, category: Partial<TransactionCategory>) => Promise<TransactionCategory | null>
@@ -101,7 +101,7 @@ interface AccountingStore {
 
   // 交易記錄
   fetchTransactions: (page?: number) => Promise<void>
-  addTransaction: (
+  createTransaction: (
     transaction: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>
   ) => Promise<string | null>
   updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>
@@ -152,14 +152,14 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addAccount: async accountData => {
+  createAccount: async accountData => {
     const user = useAuthStore.getState().user
     if (!user) {
-      logger.error('[addAccount] 用戶未登入')
+      logger.error('[createAccount] 用戶未登入')
       return null
     }
 
-    logger.log('[addAccount] 準備插入資料:', { ...accountData, user_id: user.id })
+    logger.log('[createAccount] 準備插入資料:', { ...accountData, user_id: user.id })
 
     const { data, error } = await supabase
       .from('accounting_accounts')
@@ -171,12 +171,12 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
       .single()
 
     if (error) {
-      logger.error('[addAccount] Supabase 錯誤:', error)
+      logger.error('[createAccount] Supabase 錯誤:', error)
       return null
     }
 
     if (data) {
-      logger.log('[addAccount] 成功建立帳戶:', data)
+      logger.log('[createAccount] 成功建立帳戶:', data)
       set(state => ({ accounts: [...state.accounts, data as Account] }))
       get().calculateStats()
       return data as Account
@@ -241,7 +241,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addCategory: async categoryData => {
+  createCategory: async categoryData => {
     const { data, error } = await supabase
       .from('accounting_categories')
       .insert({
@@ -318,7 +318,7 @@ export const useAccountingStore = create<AccountingStore>((set, get) => ({
     }
   },
 
-  addTransaction: async transactionData => {
+  createTransaction: async transactionData => {
     const user = useAuthStore.getState().user
     if (!user) return null
 

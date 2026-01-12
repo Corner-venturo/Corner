@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
-import { useRegionsStore } from '@/stores/region-store'
+import { useCountries, useCities } from '@/data'
 
 interface DestinationSelectorProps {
   countryCode: string
@@ -35,28 +35,23 @@ export function DestinationSelector({
   onCustomCityCodeChange,
   showCustomFields = true,
 }: DestinationSelectorProps) {
-  const regionStore = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
   const [availableCities, setAvailableCities] = useState<
     Array<{ id: string; code: string; name: string }>
   >([])
 
-  // 載入地區資料（只在需要時載入）
-  useEffect(() => {
-    // ✅ 只在 countries 為空時才載入，避免重複請求
-    if (!regionStore.countries || regionStore.countries.length === 0) {
-      regionStore.fetchAll()
-    }
-  }, [])
+  // SWR auto-fetches, no need for manual fetchAll()
 
   // 取得啟用的國家列表
-  const activeCountries = (regionStore.countries || [])
+  const activeCountries = (countries || [])
     .filter(r => r.is_active)
     .map(r => ({ id: r.id, code: r.code || r.id, name: r.name }))
 
   // 根據國家 ID 取得主要城市列表（只顯示有機場的主要城市）
   const getCitiesByCountryId = (countryId: string) => {
-    return regionStore.getCitiesByCountry(countryId)
-      .filter(c => c.is_active && c.is_major) // 只顯示主要城市
+    return cities
+      .filter(c => c.country_id === countryId && c.is_active && c.is_major)
       .map(c => ({ id: c.id, code: c.airport_code || c.id, name: c.name }))
   }
 

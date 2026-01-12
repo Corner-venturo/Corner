@@ -28,6 +28,7 @@ type MessageEntity = Omit<Message, 'edited_at'> &
  */
 export const useMessageStore = createStore<MessageEntity>({
   tableName: 'messages',
+  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
 })
 
 /**

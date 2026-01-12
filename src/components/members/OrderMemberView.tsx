@@ -6,7 +6,7 @@ import { MemberTable } from '@/components/members/MemberTable'
 import { Button } from '@/components/ui/button'
 import { ImageIcon, AlertTriangle, Edit3, Save, Upload } from 'lucide-react'
 import { CustomerVerifyDialog } from '@/app/(main)/customers/components/CustomerVerifyDialog'
-import { useCustomerStore } from '@/stores'
+import { updateCustomer } from '@/data'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { useMemberView } from './hooks/useMemberView'
 import { usePassportUpload } from './hooks/usePassportUpload'
@@ -265,8 +265,7 @@ export const OrderMemberView = forwardRef<MemberTableRef, MemberTableProps>(
           onOpenChange={setShowVerifyDialog}
           customer={verifyCustomer}
           onUpdate={async (id, data) => {
-            const customerStore = useCustomerStore.getState()
-            await customerStore.update(id, data)
+            await updateCustomer(id, data)
             refetchMembers()
           }}
         />

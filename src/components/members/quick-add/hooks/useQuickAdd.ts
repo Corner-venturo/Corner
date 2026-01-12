@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useMemberStore, useCustomerStore } from '@/stores'
+import { useMembers, useCustomers, createMember, updateMember, createCustomer } from '@/data'
 import type { Customer } from '@/types/customer.types'
 import type { Member } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
@@ -86,13 +86,13 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
   const [pendingMember, setPendingMember] = useState<ParsedMember | null>(null)
   const [matchedCustomers, setMatchedCustomers] = useState<Customer[]>([])
 
-  const memberStore = useMemberStore()
-  const { items: customers, create: createCustomer } = useCustomerStore()
+  const { items: members } = useMembers()
+  const { items: customers } = useCustomers()
 
   // 過濾掉已經在這個訂單裡的顧客
-  const existingIds = memberStore.items
+  const existingIds = members
     .filter(m => m.order_id === orderId)
-    .flatMap(m => [m.national_id, m.passport_number, m.id_number].filter(Boolean))
+    .flatMap(m => [m.passport_number, m.id_number].filter(Boolean))
   const availableCustomers = customers.filter(c =>
     !existingIds.includes(c.national_id ?? '') &&
     !existingIds.includes(c.passport_number ?? '')
@@ -130,7 +130,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
 
   // 新增成員 + 自動新增到顧客資料庫
   const addMemberAndCustomer = async (parsed: ParsedMember, confirmedCustomerId?: string, passportFile?: File) => {
-    const existingOrderMembers = memberStore.items.filter(m => m.order_id === orderId)
+    const existingOrderMembers = members.filter(m => m.order_id === orderId)
     const duplicateInOrder = existingOrderMembers.find(
       m =>
         (parsed.passport_number && m.passport_number === parsed.passport_number) ||
@@ -194,7 +194,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
       }
     }
 
-    const newMember = await memberStore.create({
+    const newMember = await createMember({
       order_id: orderId,
       name: parsed.name,
       name_en: parsed.name_en,
@@ -207,14 +207,14 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
       reservation_code: '',
       add_ons: [],
       refunds: [],
-    } as unknown as Parameters<typeof memberStore.create>[0])
+    } as unknown as Parameters<typeof createMember>[0])
 
     if (passportFile && newMember?.id) {
       const passportUrl = await uploadPassportImage(passportFile, newMember.id)
       if (passportUrl) {
-        await memberStore.update(newMember.id, {
+        await updateMember(newMember.id, {
           passport_image_url: passportUrl,
-        } as unknown as Parameters<typeof memberStore.update>[1])
+        } as unknown as Parameters<typeof updateMember>[1])
       }
     }
   }
@@ -228,7 +228,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
     setIsUploading(true)
 
     try {
-      const existingMembers = memberStore.items.filter(m => m.order_id === orderId)
+      const existingMembers = members.filter(m => m.order_id === orderId)
 
       interface ParsedResult {
         parsed: ParsedMember
@@ -279,7 +279,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
         if (matchedMember) {
           const passportUrl = await uploadPassportImage(file, matchedMember.id)
 
-          await memberStore.update(matchedMember.id, {
+          await updateMember(matchedMember.id, {
             name_en: parsed.name_en || matchedMember.name_en,
             passport_number: parsed.passport_number || matchedMember.passport_number,
             passport_expiry: parsed.passport_expiry || matchedMember.passport_expiry,
@@ -287,7 +287,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
             birthday: parsed.birthday || matchedMember.birthday,
             gender: parsed.gender || matchedMember.gender,
             ...(passportUrl && { passport_image_url: passportUrl }),
-          } as Parameters<typeof memberStore.update>[1])
+          } as Parameters<typeof updateMember>[1])
 
           updatedCount++
         } else {
@@ -332,7 +332,7 @@ export function useQuickAdd(orderId: string, onMembersAdded?: () => void) {
       refunds: [],
     }
 
-    await memberStore.create(memberData as unknown as Parameters<typeof memberStore.create>[0])
+    await createMember(memberData as unknown as Parameters<typeof createMember>[0])
     toast.success(`已新增成員：${selectedCustomer.name}`)
     setSelectedCustomer(null)
     setMode(null)

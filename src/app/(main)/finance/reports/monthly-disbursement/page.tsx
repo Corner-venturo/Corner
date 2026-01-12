@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { ContentContainer } from '@/components/layout/content-container'
 import { Card } from '@/components/ui/card'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell, StatusCell } from '@/components/table-cells'
 import { ChevronLeft, ChevronRight, FileDown, Receipt, Wallet } from 'lucide-react'
-import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
+import { usePaymentRequests, useDisbursementOrders } from '@/data'
 import { PaymentRequest, DisbursementOrder } from '@/stores/types'
 import { EXPENSE_TYPE_CONFIG, CompanyExpenseType } from '@/stores/types/finance.types'
 
@@ -103,31 +103,27 @@ function StatCard({
 
 export default function MonthlyDisbursementReportPage() {
   const [selectedMonth, setSelectedMonth] = useState(getCurrentYearMonth())
-  const paymentRequestStore = usePaymentRequestStore()
-  const disbursementOrderStore = useDisbursementOrderStore()
-
-  // 載入數據
-  useEffect(() => {
-    paymentRequestStore.fetchAll()
-    disbursementOrderStore.fetchAll()
-  }, [])
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: paymentRequests } = usePaymentRequests()
+  const { items: disbursementOrders } = useDisbursementOrders()
 
   // 篩選該月份的數據
   const { startDate, endDate } = getMonthRange(selectedMonth)
 
   const filteredPaymentRequests = useMemo(() => {
-    return paymentRequestStore.items.filter(pr => {
+    return paymentRequests.filter(pr => {
       const requestDate = pr.request_date
       return requestDate >= startDate && requestDate <= endDate
     })
-  }, [paymentRequestStore.items, startDate, endDate])
+  }, [paymentRequests, startDate, endDate])
 
   const filteredDisbursementOrders = useMemo(() => {
-    return disbursementOrderStore.items.filter(d => {
+    return disbursementOrders.filter(d => {
       const disbursementDate = d.disbursement_date
+      if (!disbursementDate) return false
       return disbursementDate >= startDate && disbursementDate <= endDate
     })
-  }, [disbursementOrderStore.items, startDate, endDate])
+  }, [disbursementOrders, startDate, endDate])
 
   // 計算統計數據
   const stats = useMemo(() => {

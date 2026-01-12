@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useOrderStore, useReceiptOrderStore } from '@/stores'
+import { useOrders, createReceiptOrder } from '@/data'
 import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/types'
 import { Plus, Trash2, DollarSign, AlertCircle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -42,8 +42,7 @@ const paymentMethods = [
 ]
 
 export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogProps) {
-  const { items: orders } = useOrderStore()
-  const { create: createReceiptOrder } = useReceiptOrderStore()
+  const { items: orders } = useOrders()
 
   const [receiptDate, setReceiptDate] = useState(getTodayString())
   const [note, setNote] = useState('')

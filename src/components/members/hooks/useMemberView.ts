@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useCustomerStore } from '@/stores'
+import { useCustomers } from '@/data'
 import { Member } from '@/stores/types'
 import { useMembers } from '@/hooks/use-members'
 import type { Customer } from '@/types/customer.types'
@@ -41,7 +41,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
 
   // 顧客匹配對話框
-  const { items: customers, fetchAll: fetchCustomers } = useCustomerStore()
+  const { items: customers } = useCustomers()
   const [showMatchDialog, setShowMatchDialog] = useState(false)
   const [matchedCustomers, setMatchedCustomers] = useState<Customer[]>([])
   const [matchType, setMatchType] = useState<'name' | 'id_number'>('name')
@@ -70,11 +70,7 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
   const saveTimersRef = useRef<Map<number, NodeJS.Timeout>>(new Map())
   const DEBOUNCE_DELAY = 800 // 800ms debounce
 
-  // 載入顧客資料 (僅執行一次)
-  useEffect(() => {
-    fetchCustomers()
-   
-  }, [])
+  // SWR 自動載入顧客資料
 
   // 初始化表格成員
   useEffect(() => {

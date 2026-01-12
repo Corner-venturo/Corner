@@ -161,6 +161,9 @@ export interface ProposalPackage {
   created_at: string
   updated_at: string
 
+  // Workspace 隔離
+  workspace_id?: string | null  // ✅ 2026-01-12: 添加 workspace 隔離
+
   // 關聯資料（查詢時 JOIN）
   quote?: {
     id: string

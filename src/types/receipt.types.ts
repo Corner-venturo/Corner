@@ -12,13 +12,17 @@ export interface Receipt {
   workspace_id: string
   order_id: string | null
   tour_id: string | null // 直接關聯團號，方便查詢
+  customer_id: string | null // 付款人（客戶）ID
   order_number: string | null
   tour_name: string | null
 
   // 收款資訊
   receipt_date: string // ISO date
+  payment_date: string // 付款日期（資料庫必填欄位）
+  payment_method: string // 付款方式（資料庫用 string: transfer/cash/card/check/linkpay）
   receipt_type: ReceiptType // 0:匯款 1:現金 2:刷卡 3:支票 4:LinkPay
   receipt_amount: number // 應收金額
+  amount: number // 金額（與 receipt_amount 同義）
   actual_amount: number // 實收金額
   status: string // '0':待確認 '1':已確認 '2':異常（資料庫存字串）
 

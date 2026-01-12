@@ -116,18 +116,24 @@ export interface TourAllocation {
 // === 出納單管理系統 ===
 export interface DisbursementOrder {
   id: string
-  order_number: string // CD-2024001
-  disbursement_date: string // 出帳日期 (預設本週四)
-  payment_request_ids: string[] // 關聯的請款單ID陣列
+  order_number: string | null // CD-2024001
+  disbursement_date: string | null // 出帳日期 (預設本週四)
+  payment_request_ids: string[] | null // 關聯的請款單ID陣列
   amount: number // 總金額 (自動加總)
-  status: 'pending' | 'confirmed' | 'paid' | 'cancelled' // 待確認、已確認、已付款、已取消
-  note?: string // 出納備註
-  created_by: string // 建立者ID
-  confirmed_by?: string // 確認者ID
-  confirmed_at?: string // 確認時間
-  paid_at?: string // 付款時間
-  created_at: string
-  updated_at: string
+  status: string | null // pending, confirmed, paid, cancelled
+  note?: string | null // 出納備註
+  notes?: string | null // 出納備註（資料庫實際欄位名）
+  code?: string | null // 出納單代碼
+  created_by?: string | null // 建立者ID
+  confirmed_by?: string | null // 確認者ID
+  confirmed_at?: string | null // 確認時間
+  handled_by?: string | null // 經手人ID
+  handled_at?: string | null // 經手時間
+  payment_method?: string | null // 付款方式
+  paid_at?: string | null // 付款時間
+  workspace_id?: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 // === 收款單管理系統 ===

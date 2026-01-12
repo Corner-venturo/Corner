@@ -1,5 +1,7 @@
-import { useVisaStore, useTourStore, useOrderStore } from '@/stores'
+import { useTours, createTour, invalidateTours } from '@/data'
+import { useVisas, createVisa, updateVisa as updateVisaData, deleteVisa as deleteVisaData } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
+import { useOrders, createOrder, updateOrder, deleteOrder as deleteOrderData } from '@/data'
 import { useMemo, useCallback } from 'react'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
@@ -10,9 +12,9 @@ import { supabase } from '@/lib/supabase/client'
  * 負責取得和操作簽證、團號、訂單資料
  */
 export function useVisasData() {
-  const { items: visas, create: addVisa, update: updateVisa, delete: deleteVisaFromStore } = useVisaStore()
-  const { items: tours, create: addTour, fetchAll: fetchTours } = useTourStore()
-  const { items: orders, create: addOrder, update: updateOrder, delete: deleteOrder } = useOrderStore()
+  const { items: visas } = useVisas()
+  const { items: tours, loading: loadingTours } = useTours()
+  const { items: orders } = useOrders()
   const { user } = useAuthStore()
 
   // 權限檢查（暫時開放給所有人）
@@ -38,7 +40,7 @@ export function useVisasData() {
 
     try {
       // 1. 刪除簽證
-      await deleteVisaFromStore(visaId)
+      await deleteVisaData(visaId)
 
       // 2. 找到並刪除對應的訂單成員（按申請人姓名比對）
       // 🔧 優化：直接查詢 Supabase，不需要預載入所有 members
@@ -63,7 +65,7 @@ export function useVisasData() {
 
         if (remainingVisas.length === 0 && targetOrder) {
           // 訂單下沒有其他簽證了，刪除整張訂單
-          await deleteOrder(order_id)
+          await deleteOrderData(order_id)
           toast.success('已刪除簽證及相關訂單')
         } else if (targetOrder) {
           // 還有其他簽證，更新訂單金額
@@ -87,7 +89,7 @@ export function useVisasData() {
       logger.error('刪除簽證失敗:', error)
       toast.error('刪除簽證失敗')
     }
-  }, [visas, orders, deleteVisaFromStore, deleteOrder, updateOrder])
+  }, [visas, orders])
 
   return {
     // 資料
@@ -100,15 +102,15 @@ export function useVisasData() {
     canManageVisas,
 
     // 簽證操作
-    addVisa,
-    updateVisa,
+    addVisa: createVisa,
+    updateVisa: updateVisaData,
     deleteVisa: deleteVisaWithCascade, // 使用帶連動刪除的版本
 
     // 團號操作
-    addTour,
-    fetchTours,
+    addTour: createTour,
+    fetchTours: invalidateTours,
 
     // 訂單操作
-    addOrder,
+    addOrder: createOrder,
   }
 }

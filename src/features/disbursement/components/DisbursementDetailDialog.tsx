@@ -17,7 +17,12 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Check, FileText, Plus, X, Trash2 } from 'lucide-react'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
-import { usePaymentRequestStore, useDisbursementOrderStore } from '@/stores'
+import {
+  usePaymentRequests,
+  updatePaymentRequest as updatePaymentRequestApi,
+  updateDisbursementOrder as updateDisbursementOrderApi,
+  invalidateDisbursementOrders,
+} from '@/data'
 import { cn } from '@/lib/utils'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementPrintDialog } from './DisbursementPrintDialog'
@@ -42,9 +47,8 @@ export function DisbursementDetailDialog({
   open,
   onOpenChange,
 }: DisbursementDetailDialogProps) {
-  // Stores
-  const { items: payment_requests, update: updatePaymentRequest } = usePaymentRequestStore()
-  const { update: updateDisbursement, fetchAll: fetchDisbursementOrders } = useDisbursementOrderStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: payment_requests } = usePaymentRequests()
 
   // 列印對話框狀態
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
@@ -62,9 +66,10 @@ export function DisbursementDetailDialog({
 
   // 取得可追加的待處理請款單（pending 狀態且不在此出納單中）
   const availableRequests = useMemo(() => {
-    if (!order?.payment_request_ids) return []
+    const currentIds = order?.payment_request_ids || []
+    if (currentIds.length === 0) return payment_requests.filter(r => r.status === 'pending')
     return payment_requests.filter(
-      r => r.status === 'pending' && !order.payment_request_ids.includes(r.id)
+      r => r.status === 'pending' && !currentIds.includes(r.id)
     )
   }, [order, payment_requests])
 
@@ -81,7 +86,8 @@ export function DisbursementDetailDialog({
 
     try {
       // 計算新的請款單 ID 陣列和金額
-      const newRequestIds = [...order.payment_request_ids, ...selectedToAdd]
+      const existingIds = order.payment_request_ids || []
+      const newRequestIds = [...existingIds, ...selectedToAdd]
       const addedAmount = selectedToAdd.reduce((sum, id) => {
         const req = payment_requests.find(r => r.id === id)
         return sum + (req?.amount || 0)
@@ -89,18 +95,18 @@ export function DisbursementDetailDialog({
       const newAmount = (order.amount || 0) + addedAmount
 
       // 更新出納單
-      await updateDisbursement(order.id, {
+      await updateDisbursementOrderApi(order.id, {
         payment_request_ids: newRequestIds,
         amount: newAmount,
       })
 
       // 更新追加的請款單狀態為 approved
       for (const id of selectedToAdd) {
-        await updatePaymentRequest(id, { status: 'approved' })
+        await updatePaymentRequestApi(id, { status: 'approved' })
       }
 
-      // 重新載入
-      await fetchDisbursementOrders()
+      // SWR 快取失效，自動重新載入
+      await invalidateDisbursementOrders()
 
       await alert(`已追加 ${selectedToAdd.length} 筆請款單`, 'success')
       setIsAddingMode(false)
@@ -131,20 +137,21 @@ export function DisbursementDetailDialog({
 
     try {
       // 計算新的請款單 ID 陣列和金額
-      const newRequestIds = order.payment_request_ids.filter(id => id !== requestId)
+      const existingIds = order.payment_request_ids || []
+      const newRequestIds = existingIds.filter(id => id !== requestId)
       const newAmount = (order.amount || 0) - (request.amount || 0)
 
       // 更新出納單
-      await updateDisbursement(order.id, {
+      await updateDisbursementOrderApi(order.id, {
         payment_request_ids: newRequestIds,
         amount: newAmount,
       })
 
       // 將請款單狀態改回 pending
-      await updatePaymentRequest(requestId, { status: 'pending' })
+      await updatePaymentRequestApi(requestId, { status: 'pending' })
 
-      // 重新載入
-      await fetchDisbursementOrders()
+      // SWR 快取失效，自動重新載入
+      await invalidateDisbursementOrders()
 
       await alert('已移除請款單', 'success')
     } catch (error) {
@@ -163,14 +170,15 @@ export function DisbursementDetailDialog({
 
     try {
       // 更新出納單狀態
-      await updateDisbursement(order.id, {
+      await updateDisbursementOrderApi(order.id, {
         status: 'paid',
         confirmed_at: new Date().toISOString(),
       })
 
       // 更新所有請款單狀態為 paid
-      for (const requestId of order.payment_request_ids) {
-        await updatePaymentRequest(requestId, {
+      const requestIds = order.payment_request_ids || []
+      for (const requestId of requestIds) {
+        await updatePaymentRequestApi(requestId, {
           status: 'paid',
           paid_at: new Date().toISOString(),
         })

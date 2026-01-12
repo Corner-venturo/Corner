@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
-import { useRegionsStore } from '@/stores/region-store'
+import { useCountries, useCities } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
@@ -16,9 +16,8 @@ export function useItineraryList() {
   const { items: tours } = useTours()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
-  const regionsStore = useRegionsStore()
-  const countries = regionsStore.countries
-  const cities = regionsStore.cities
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
 
   // 檢查是否為超級管理員
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
@@ -35,10 +34,7 @@ export function useItineraryList() {
     }
   }, [isSuperAdmin])
 
-  // 載入地區資料（只執行一次）
-  useEffect(() => {
-    regionsStore.fetchAll()
-  }, [])
+  // SWR 自動載入地區資料，不需要手動 fetchAll
 
   // 根據 ID 取得國家名稱
   const getCountryName = useCallback((countryId?: string) => {

@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { FileText, Eye, RotateCcw, Search } from 'lucide-react'
-import { ResponsiveHeader } from '@/components/layout/responsive-header'
+import { useState } from 'react'
+import { Eye, RotateCcw } from 'lucide-react'
 import { EnhancedTable, type Column } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { useJournalVouchers } from '../hooks'
 import { VoucherDetailDialog } from './VoucherDetailDialog'
@@ -21,19 +19,9 @@ const statusConfig: Record<VoucherStatus, { label: string; variant: 'default' | 
 
 export function VouchersPage() {
   const { items: vouchers, isLoading, fetchAll } = useJournalVouchers()
-  const [searchTerm, setSearchTerm] = useState('')
   const [selectedVoucher, setSelectedVoucher] = useState<JournalVoucher | null>(null)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [showReverseDialog, setShowReverseDialog] = useState(false)
-
-  const filteredVouchers = useMemo(() => {
-    if (!searchTerm) return vouchers
-    const term = searchTerm.toLowerCase()
-    return vouchers.filter(v =>
-      v.voucher_no.toLowerCase().includes(term) ||
-      v.memo?.toLowerCase().includes(term)
-    )
-  }, [vouchers, searchTerm])
 
   const handleViewDetail = (voucher: JournalVoucher) => {
     setSelectedVoucher(voucher)
@@ -129,28 +117,10 @@ export function VouchersPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <ResponsiveHeader
-        title="會計傳票"
-        icon={FileText}
-        badge={filteredVouchers.length}
-      />
-
-      <div className="p-4 border-b">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="搜尋傳票編號或摘要..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-      </div>
-
       <div className="flex-1 overflow-auto">
         <EnhancedTable
           columns={columns}
-          data={filteredVouchers}
+          data={vouchers}
           isLoading={isLoading}
           emptyMessage="尚無傳票資料"
         />

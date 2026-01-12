@@ -1,7 +1,7 @@
 'use client'
 
-import { usePNRStore } from '@/stores/pnrs-store'
-import { useEffect, useState, useMemo } from 'react'
+import { usePNRs } from '@/data'
+import { useState, useMemo } from 'react'
 import { Input } from '@/components/ui/input'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
@@ -21,13 +21,9 @@ interface PNR {
 }
 
 export default function PNRsPage() {
-  const { items: pnrs, fetchAll, loading } = usePNRStore()
+  const { items: pnrs, loading } = usePNRs()
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedIds, setExpandedIds] = useState<string[]>([])
-
-  useEffect(() => {
-    fetchAll()
-  }, [fetchAll])
 
   const filteredPNRs = useMemo(() => {
     if (!searchTerm) return pnrs

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { Tour } from '@/stores/types'
-import { useOrderStore, useMemberStore, useTourAddOnStore, usePaymentRequestStore } from '@/stores'
+import { useOrders, useMembers, usePaymentRequests, updateMember, useTourAddOns } from '@/data'
 import type { PaymentRequestItem } from '@/stores/types'
 
 // 擴展 PaymentRequest 型別以包含 items
@@ -65,10 +65,10 @@ export const TourOperations = React.memo(function TourOperations({
   orderFilter,
   extraFields,
 }: TourOperationsProps) {
-  const { items: orders } = useOrderStore()
-  const { items: members, update: updateMember } = useMemberStore()
-  const { items: tourAddOns } = useTourAddOnStore()
-  const { items: paymentRequests } = usePaymentRequestStore()
+  const { items: orders } = useOrders()
+  const { items: members } = useMembers()
+  const { items: tourAddOns } = useTourAddOns()
+  const { items: paymentRequests } = usePaymentRequests()
   const [tableMembers, setTableMembers] = useState<EditingMember[]>([])
   const [roomOptions, setRoomOptions] = useState<RoomOption[]>([])
 

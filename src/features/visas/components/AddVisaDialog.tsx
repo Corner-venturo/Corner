@@ -85,13 +85,10 @@ export function AddVisaDialog({
       const init = async () => {
         try {
           const { tourService } = await import('@/features/tours/services/tour.service')
-          const { useTourStore } = await import('@/stores')
+          const { invalidateTours } = await import('@/data')
 
-          // 1. 先載入團號資料
-          const tourStore = useTourStore.getState()
-          if (tourStore.items.length === 0) {
-            await tourStore.fetchAll()
-          }
+          // 1. 確保 SWR 快取已載入
+          await invalidateTours()
 
           // 2. 取得或建立簽證專用團
           const visaTour = await tourService.getOrCreateVisaTour()

@@ -3,7 +3,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
-import { useUserStore, useAuthStore } from '@/stores'
+import { useEmployees } from '@/data'
+import { useAuthStore } from '@/stores'
 import { User, UserPlus, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,23 +23,19 @@ interface MemberSidebarProps {
 export function MemberSidebar({ isOpen }: MemberSidebarProps) {
   const { selectedChannel, currentWorkspace } = useWorkspaceChannels()
   const { items: channelMembers, fetchAll: fetchChannelMembers, create: addMember } = useChannelMemberStore()
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
+  const { items: employees } = useEmployees()
   const { user } = useAuthStore()
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false)
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isAdding, setIsAdding] = useState(false)
 
-  // 載入頻道成員和員工資料
+  // 載入頻道成員資料
   useEffect(() => {
     if (isOpen) {
       fetchChannelMembers()
-      if (employees.length === 0) {
-        fetchEmployees()
-      }
     }
-     
-  }, [isOpen])
+  }, [isOpen, fetchChannelMembers])
 
   // 計算當前頻道的成員（含員工資料）
   const members = useMemo(() => {

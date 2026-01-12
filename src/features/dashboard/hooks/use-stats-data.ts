@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useTourStore, useOrderStore } from '@/stores'
+import { useTours, useOrders } from '@/data'
 import type { StatConfig, StatType } from '../types'
 import { CheckSquare, TrendingUp, Briefcase, Calendar } from 'lucide-react'
 
 export function useStatsData() {
-  const { items: tours } = useTourStore()
-  const { items: orders } = useOrderStore()
+  const { items: tours } = useTours()
+  const { items: orders } = useOrders()
 
   return useMemo(() => {
     // 過濾掉特殊團

@@ -13,7 +13,12 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Tour } from '@/stores/types'
-import { useTourStore, usePaymentRequestStore, useOrderStore } from '@/stores'
+import {
+  usePaymentRequests,
+  useOrders,
+  updateTour,
+  createPaymentRequest as createPaymentRequestApi,
+} from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import { generateTourClosingPDF } from '@/lib/pdf/tour-closing-pdf'
@@ -39,9 +44,9 @@ export function TourClosingDialog({
   const [salesBonusPercent, setSalesBonusPercent] = useState(5) // 業務獎金 %
   const [opBonusPercent, setOpBonusPercent] = useState(3) // OP 獎金 %
 
-  const { update: updateTour } = useTourStore()
-  const { create: createPaymentRequest, items: paymentRequests } = usePaymentRequestStore()
-  const { items: orders } = useOrderStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: paymentRequests } = usePaymentRequests()
+  const { items: orders } = useOrders()
 
   // 計算團的總收入（從訂單）
   const tourOrders = useMemo(() => {
@@ -105,7 +110,7 @@ export function TourClosingDialog({
 
       // 1. 產生業務獎金請款單
       if (salesBonus > 0) {
-        await createPaymentRequest({
+        await createPaymentRequestApi({
           code: `${tour.code}-B01`,
           request_number: `${tour.code}-B01`,
           tour_id: tour.id,
@@ -121,7 +126,7 @@ export function TourClosingDialog({
 
       // 2. 產生 OP 獎金請款單
       if (opBonus > 0) {
-        await createPaymentRequest({
+        await createPaymentRequestApi({
           code: `${tour.code}-B02`,
           request_number: `${tour.code}-B02`,
           tour_id: tour.id,

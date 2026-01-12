@@ -3,7 +3,8 @@
 import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useCallback } from 'react'
-import { useTourStore, useOrderStore, useMemberStore, useCustomerStore, useEmployeeStore, useAuthStore } from '@/stores'
+import { useTours, useOrders, useMembers, useCustomers, useEmployees } from '@/data'
+import { useAuthStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
 
@@ -41,11 +42,11 @@ const getDateInTaipei = (isoString: string): string => {
  * 4. Members/Customers → Birthday Events
  */
 export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
-  const { items: tours } = useTourStore()
-  const { items: orders } = useOrderStore()
-  const { items: members } = useMemberStore()
-  const { items: customers } = useCustomerStore()
-  const { items: employees } = useEmployeeStore()
+  const { items: tours } = useTours()
+  const { items: orders } = useOrders()
+  const { items: members } = useMembers()
+  const { items: customers } = useCustomers()
+  const { items: employees } = useEmployees()
   const { user } = useAuthStore()
 
   // 根據類型取得顏色 - 使用莫蘭迪配色

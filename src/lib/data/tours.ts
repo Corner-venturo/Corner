@@ -3,9 +3,12 @@
  *
  * 將所有 Tours 相關的 Supabase 查詢封裝在此，
  * 實現 UI 與資料邏輯的徹底分離。
+ *
+ * 🔒 安全修復 2026-01-12：所有查詢都會自動過濾 workspace_id
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import type { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -17,6 +20,7 @@ export interface GetPaginatedToursParams {
   page?: number
   limit?: number
   status?: string // 'all' | 'archived' | 'draft' | 'active' | 'pending_close' | etc.
+  workspaceId?: string  // 可選，若未提供則從 session 取得
 }
 
 export interface PaginatedToursResult {
@@ -30,6 +34,7 @@ export interface PaginatedToursResult {
 
 /**
  * 取得分頁旅遊團列表
+ * 🔒 自動過濾 workspace_id
  *
  * 狀態篩選邏輯：
  * - 'all': 所有未結案的旅遊團
@@ -40,12 +45,25 @@ export async function getPaginatedTours({
   page = 1,
   limit = 20,
   status = 'all',
+  workspaceId,
 }: GetPaginatedToursParams = {}): Promise<PaginatedToursResult> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getPaginatedTours: 未登入')
+      return { tours: [], count: 0 }
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   let query = supabase
     .from('tours')
     .select('*', { count: 'exact' })
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .order('departure_date', { ascending: false })
 
   // 狀態篩選
@@ -78,14 +96,27 @@ export async function getPaginatedTours({
 
 /**
  * 根據 ID 取得單一旅遊團
+ * 🔒 自動過濾 workspace_id
  */
-export async function getTourById(id: string): Promise<Tour | null> {
+export async function getTourById(id: string, workspaceId?: string): Promise<Tour | null> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getTourById: 未登入')
+      return null
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('tours')
     .select('*')
     .eq('id', id)
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .single()
 
   if (error) {
@@ -98,13 +129,26 @@ export async function getTourById(id: string): Promise<Tour | null> {
 
 /**
  * 取得未結案的旅遊團列表（用於下拉選單）
+ * 🔒 自動過濾 workspace_id
  */
-export async function getActiveToursForSelect(limit = 100): Promise<Tour[]> {
+export async function getActiveToursForSelect(limit = 100, workspaceId?: string): Promise<Tour[]> {
+  // 🔒 取得 workspace_id
+  let wsId = workspaceId
+  if (!wsId) {
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      logger.error('getActiveToursForSelect: 未登入')
+      return []
+    }
+    wsId = auth.data.workspaceId
+  }
+
   const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('tours')
     .select('*')
+    .eq('workspace_id', wsId)  // 🔒 Workspace 過濾
     .neq('closing_status', 'closed')
     .order('departure_date', { ascending: false })
     .limit(limit)

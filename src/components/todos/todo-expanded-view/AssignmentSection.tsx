@@ -6,23 +6,15 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { FileText, X, UserCheck } from 'lucide-react'
 import { AssignmentSectionProps } from './types'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployees } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { DatePicker } from '@/components/ui/date-picker'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
   const router = useRouter()
-  const { items: employees, fetchAll } = useUserStore()
+  const { items: employees } = useEmployees()
   const { user } = useAuthStore()
   const [assigneeName, setAssigneeName] = useState<string>('')
-
-  // 載入員工資料
-  useEffect(() => {
-    if (employees.length === 0) {
-      void fetchAll()
-    }
-     
-  }, [employees.length])
 
   // 更新指派者名稱
   useEffect(() => {

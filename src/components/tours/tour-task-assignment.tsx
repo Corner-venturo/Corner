@@ -15,7 +15,7 @@ import {
 import { StarRating } from '@/components/ui/star-rating'
 import { EnhancedTable } from '@/components/ui/enhanced-table'
 import { Tour, Todo } from '@/stores/types'
-import { useTodoStore } from '@/stores'
+import { useTodos, createTodo } from '@/data'
 import { taskTemplates, calculateDeadlineFromDeparture } from '@/lib/task-templates'
 import { cn } from '@/lib/utils'
 import { Plus, Eye, Calendar, User, CheckCircle, Clock } from 'lucide-react'
@@ -34,7 +34,7 @@ const employees = [
 
 export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
   const router = useRouter()
-  const { items: todos, create: addTodo } = useTodoStore()
+  const { items: todos } = useTodos()
   const [selectedTemplate, setSelectedTemplate] = useState('__custom__')
   const [taskForm, setTaskForm] = useState({
     title: '',
@@ -97,7 +97,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
     }
   }
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     if (!taskForm.title.trim() || !taskForm.assignee) return
 
     const sub_tasks = taskForm.sub_tasks
@@ -135,7 +135,7 @@ export function TourTaskAssignment({ tour }: TourTaskAssignmentProps) {
       enabled_quick_actions: [],
     }
 
-    addTodo(newTodo as unknown as Parameters<typeof addTodo>[0])
+    await createTodo(newTodo as Omit<Todo, 'id' | 'created_at' | 'updated_at'>)
 
     // 重置表單
     setTaskForm({

@@ -53,7 +53,12 @@ export function DisbursementPrintDialog({
     const fetchData = async () => {
       setLoading(true)
       try {
-        const requestIds = order.payment_request_ids
+        const requestIds = order.payment_request_ids || []
+        if (requestIds.length === 0) {
+          setPaymentRequests([])
+          setPaymentRequestItems([])
+          return
+        }
 
         // 取得請款單
         const { data: requests } = await supabase

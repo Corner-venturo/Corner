@@ -8,8 +8,7 @@ import {
   extractImportantDates,
   isUrgent,
 } from '@/lib/pnr-parser'
-import { usePNRStore } from '@/stores/pnrs-store'
-import { useCalendarEventStore } from '@/stores'
+import { createPNR, createCalendarEvent } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { toast } from 'sonner'
@@ -27,8 +26,6 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
   const [parsedData, setParsedData] = useState<ReturnType<typeof parseAmadeusPNR> | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
 
-  const { create: createPNR } = usePNRStore()
-  const { create: createCalendarEvent } = useCalendarEventStore()
   const { user } = useAuthStore()
   const { currentWorkspace } = useWorkspaceChannels()
 
@@ -163,7 +160,7 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
           owner_id: user.id,
           workspace_id: currentWorkspace.id,
           created_by: user.id,
-        })
+        } as Parameters<typeof createCalendarEvent>[0])
       }
 
       // 儲存 PNR 記錄

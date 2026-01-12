@@ -5,10 +5,10 @@
 
 'use client'
 
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { Bot } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useEmployeeStore } from '@/stores'
+import { useEmployees } from '@/data'
 
 // 系統機器人的固定 ID
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -22,15 +22,7 @@ export function BotSection({
   onSelectBot,
   selectedBotId,
 }: BotSectionProps) {
-  const employees = useEmployeeStore(state => state.items)
-  const fetchEmployees = useEmployeeStore(state => state.fetchAll)
-
-  // 載入員工資料
-  useEffect(() => {
-    if (employees.length === 0) {
-      fetchEmployees()
-    }
-  }, [employees.length, fetchEmployees])
+  const { items: employees } = useEmployees()
 
   // 找到機器人
   const bot = useMemo(() => {

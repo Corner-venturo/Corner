@@ -2,7 +2,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTourStore, useOrderStore, useItineraryStore } from '@/stores'
+import { useTours, useItineraries, useOrders, createTour } from '@/data'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing, CostItem } from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
@@ -12,10 +12,10 @@ export const useQuoteState = () => {
   const params = useParams()
   const router = useRouter()
   const { quotes, updateQuote, loadQuotes } = useQuotes()
-  const { items: tours, create: addTour } = useTourStore()
-  const { items: orders } = useOrderStore()
+  const { items: tours } = useTours()
+  const { items: orders } = useOrders()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
-  const { items: itineraries, fetchAll: fetchItineraries } = useItineraryStore()
+  const { items: itineraries } = useItineraries()
 
   const quote_id = params.id as string
   const quote = quotes.find(q => q.id === quote_id)
@@ -48,12 +48,7 @@ export const useQuoteState = () => {
     return tourOrders.reduce((sum, order) => sum + (order.member_count || 0), 0)
   }, [relatedTour, orders])
 
-  // 載入行程表（如果報價單有 itinerary_id）
-  useEffect(() => {
-    if (itineraries.length === 0) {
-      fetchItineraries()
-    }
-  }, [])
+  // SWR 自動載入行程表
 
   // 找到關聯的行程表（優先用 itinerary_id，備援用 proposal_package_id）
   const linkedItinerary = useMemo(() => {
@@ -447,7 +442,7 @@ export const useQuoteState = () => {
     notFound,
     hasLoaded,
     updateQuote,
-    addTour,
+    addTour: createTour,
     router,
   }
 }

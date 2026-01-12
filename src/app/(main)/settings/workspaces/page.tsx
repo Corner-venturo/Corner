@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useWorkspaceChannels } from '@/stores/workspace'
-import { useEmployeeStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { useEmployees } from '@/data'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -19,7 +20,7 @@ import { logger } from '@/lib/utils/logger'
  */
 export default function WorkspacesPage() {
   const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace, createChannel } = useWorkspaceChannels()
-  const employeeStore = useEmployeeStore()
+  const { items: employees } = useEmployees()
   const { user } = useAuthStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({
@@ -27,20 +28,14 @@ export default function WorkspacesPage() {
     description: '',
   })
 
-  // 載入資料
-  const loadData = useCallback(() => {
-    loadWorkspaces()
-    employeeStore.fetchAll()
-  }, [loadWorkspaces, employeeStore])
-
-  // 載入 workspaces 和 employees 資料
+  // 載入 workspaces 資料（employees 由 SWR 自動載入）
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    loadWorkspaces()
+  }, [loadWorkspaces])
 
   // 計算每個 workspace 的員工數
   const getEmployeeCount = (workspaceId: string) => {
-    return (employeeStore.items || []).filter(emp => emp.workspace_id === workspaceId).length
+    return (employees || []).filter(emp => emp.workspace_id === workspaceId).length
   }
 
   const handleCreate = async () => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { logger } from '@/lib/utils/logger'
-import React, { useEffect, useRef, lazy, Suspense } from 'react'
+import React, { useEffect, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployees } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
@@ -63,7 +63,7 @@ export function QuickActionsSection({ activeTab, onTabChange }: QuickActionsSect
 }
 
 export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: QuickActionContentProps) {
-  const { items: employees, fetchAll } = useUserStore()
+  const { items: employees } = useEmployees()
   const { user: currentUser } = useAuthStore()
   const [shareData, setShareData] = React.useState({
     targetUserId: '',
@@ -108,20 +108,6 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
     }
   }, [shareData, todo, onUpdate])
 
-  // 使用 ref 建立穩定的函數參考
-  const fetchAllRef = useRef(fetchAll)
-
-  // 更新 ref 當 fetchAll 改變時
-  useEffect(() => {
-    fetchAllRef.current = fetchAll
-  }, [fetchAll])
-
-  // 只在共享分頁時載入員工資料
-  useEffect(() => {
-    if (activeTab === 'share' && employees.length === 0) {
-      fetchAllRef.current()
-    }
-  }, [activeTab, employees.length])
 
   // 只在收款分頁時載入團體和訂單資料
   useEffect(() => {
@@ -129,17 +115,13 @@ export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: Quick
       if (activeTab === 'receipt') {
         setIsLoadingReceipt(true)
         try {
-          const { useTourStore, useOrderStore } = await import('@/stores')
-          const tourStore = useTourStore.getState()
-          const orderStore = useOrderStore.getState()
+          const { invalidateTours, invalidateOrders } = await import('@/data')
 
-          // 只在資料為空時才載入
-          if (tourStore.items.length === 0) {
-            await tourStore.fetchAll()
-          }
-          if (orderStore.items.length === 0) {
-            await orderStore.fetchAll()
-          }
+          // SWR 快取失效，確保資料已載入
+          await Promise.all([
+            invalidateTours(),
+            invalidateOrders(),
+          ])
         } catch (error) {
           logger.error('載入收款資料失敗:', error)
         } finally {

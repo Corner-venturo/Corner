@@ -1,5 +1,6 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { useOrderStore } from '@/stores'
+import { invalidateOrders } from '@/data'
 import { ValidationError } from '@/core/errors/app-errors'
 import { Order, PaymentStatus } from '@/types/order.types'
 import { BaseEntity } from '@/core/types/common'
@@ -7,6 +8,7 @@ import { BaseEntity } from '@/core/types/common'
 class OrderService extends BaseService<Order & BaseEntity> {
   protected resourceName = 'orders'
 
+  // 使用 Store 提供同步讀取，搭配 invalidateOrders 確保 SWR 快取同步
   protected getStore = (): StoreOperations<Order & BaseEntity> => {
     const store = useOrderStore.getState()
     return {
@@ -14,14 +16,17 @@ class OrderService extends BaseService<Order & BaseEntity> {
       getById: (id: string) => store.items.find(o => o.id === id) as (Order & BaseEntity) | undefined,
       add: async (order: Order & BaseEntity) => {
         const { id, created_at, updated_at, ...createData } = order
-        const result = await store.create(createData as Parameters<typeof store.create>[0])
+        const result = await store.create(createData as unknown as Parameters<typeof store.create>[0])
+        await invalidateOrders()
         return result as Order & BaseEntity
       },
       update: async (id: string, data: Partial<Order>) => {
-        await store.update(id, data)
+        await store.update(id, data as unknown as Parameters<typeof store.update>[1])
+        await invalidateOrders()
       },
       delete: async (id: string) => {
         await store.delete(id)
+        await invalidateOrders()
       },
     }
   }

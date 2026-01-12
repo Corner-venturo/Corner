@@ -672,10 +672,10 @@ export type Database = {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
-          author_id: string
           channel_id: string
           created_at: string | null
           created_by: string | null
+          created_by_legacy_author: string
           id: string
           updated_at: string | null
         }
@@ -683,10 +683,10 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
-          author_id?: string
           channel_id: string
           created_at?: string | null
           created_by?: string | null
+          created_by_legacy_author?: string
           id?: string
           updated_at?: string | null
         }
@@ -694,10 +694,10 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
-          author_id?: string
           channel_id?: string
           created_at?: string | null
           created_by?: string | null
+          created_by_legacy_author?: string
           id?: string
           updated_at?: string | null
         }
@@ -1246,9 +1246,9 @@ export type Database = {
           _deleted: boolean | null
           _needs_sync: boolean | null
           _synced_at: string | null
-          author_id: string | null
           content: string
           created_at: string | null
+          created_by: string | null
           id: string
           is_pinned: boolean | null
           priority: number | null
@@ -1261,9 +1261,9 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
-          author_id?: string | null
           content: string
           created_at?: string | null
+          created_by?: string | null
           id?: string
           is_pinned?: boolean | null
           priority?: number | null
@@ -1276,9 +1276,9 @@ export type Database = {
           _deleted?: boolean | null
           _needs_sync?: boolean | null
           _synced_at?: string | null
-          author_id?: string | null
           content?: string
           created_at?: string | null
+          created_by?: string | null
           id?: string
           is_pinned?: boolean | null
           priority?: number | null
@@ -1290,7 +1290,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "bulletins_author_id_fkey"
-            columns: ["author_id"]
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
@@ -3272,6 +3272,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           employee_number: string
+          employee_type: string | null
           english_name: string | null
           hidden_menu_items: string[] | null
           id: string
@@ -3303,6 +3304,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           employee_number: string
+          employee_type?: string | null
           english_name?: string | null
           hidden_menu_items?: string[] | null
           id?: string
@@ -3334,6 +3336,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           employee_number?: string
+          employee_type?: string | null
           english_name?: string | null
           hidden_menu_items?: string[] | null
           id?: string
@@ -4480,7 +4483,7 @@ export type Database = {
           cover_template_id: string | null
           created_at: string
           created_by: string | null
-          creator_user_id: string | null
+          created_by_legacy_user_id: string | null
           daily_itinerary: Json | null
           daily_template_id: string | null
           departure_date: string | null
@@ -4550,7 +4553,7 @@ export type Database = {
           cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
-          creator_user_id?: string | null
+          created_by_legacy_user_id?: string | null
           daily_itinerary?: Json | null
           daily_template_id?: string | null
           departure_date?: string | null
@@ -4620,7 +4623,7 @@ export type Database = {
           cover_template_id?: string | null
           created_at?: string
           created_by?: string | null
-          creator_user_id?: string | null
+          created_by_legacy_user_id?: string | null
           daily_itinerary?: Json | null
           daily_template_id?: string | null
           departure_date?: string | null
@@ -4874,7 +4877,7 @@ export type Database = {
           },
         ]
       }
-      Itinerary_Permissions: {
+      itinerary_permissions: {
         Row: {
           created_at: string | null
           id: number
@@ -5873,11 +5876,11 @@ export type Database = {
           _synced_at: string | null
           attachments: Json | null
           author: Json | null
-          author_id: string | null
           channel_id: string
           content: string
           created_at: string | null
           created_by: string | null
+          created_by_legacy_author: string | null
           edited_at: string | null
           id: string
           is_pinned: boolean | null
@@ -5896,11 +5899,11 @@ export type Database = {
           _synced_at?: string | null
           attachments?: Json | null
           author?: Json | null
-          author_id?: string | null
           channel_id: string
           content: string
           created_at?: string | null
           created_by?: string | null
+          created_by_legacy_author?: string | null
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
@@ -5919,11 +5922,11 @@ export type Database = {
           _synced_at?: string | null
           attachments?: Json | null
           author?: Json | null
-          author_id?: string | null
           channel_id?: string
           content?: string
           created_at?: string | null
           created_by?: string | null
+          created_by_legacy_author?: string | null
           edited_at?: string | null
           id?: string
           is_pinned?: boolean | null
@@ -5939,7 +5942,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "messages_author_id_fkey"
-            columns: ["author_id"]
+            columns: ["created_by_legacy_author"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
@@ -6723,56 +6726,56 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          created_at: string | null
           created_by: string | null
-          createdat: string | null
           id: string
           notes: string | null
-          orderid: string | null
+          order_id: string | null
           payer: string | null
-          paymentdate: string
-          paymentnumber: string
-          paymenttype: string | null
-          receivedby: string | null
+          payment_date: string
+          payment_number: string
+          payment_type: string | null
+          received_by: string | null
           status: string | null
-          tourid: string | null
+          tour_id: string | null
+          updated_at: string | null
           updated_by: string | null
-          updatedat: string | null
           workspace_id: string | null
         }
         Insert: {
           amount: number
+          created_at?: string | null
           created_by?: string | null
-          createdat?: string | null
           id?: string
           notes?: string | null
-          orderid?: string | null
+          order_id?: string | null
           payer?: string | null
-          paymentdate: string
-          paymentnumber: string
-          paymenttype?: string | null
-          receivedby?: string | null
+          payment_date: string
+          payment_number: string
+          payment_type?: string | null
+          received_by?: string | null
           status?: string | null
-          tourid?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
           updated_by?: string | null
-          updatedat?: string | null
           workspace_id?: string | null
         }
         Update: {
           amount?: number
+          created_at?: string | null
           created_by?: string | null
-          createdat?: string | null
           id?: string
           notes?: string | null
-          orderid?: string | null
+          order_id?: string | null
           payer?: string | null
-          paymentdate?: string
-          paymentnumber?: string
-          paymenttype?: string | null
-          receivedby?: string | null
+          payment_date?: string
+          payment_number?: string
+          payment_type?: string | null
+          received_by?: string | null
           status?: string | null
-          tourid?: string | null
+          tour_id?: string | null
+          updated_at?: string | null
           updated_by?: string | null
-          updatedat?: string | null
           workspace_id?: string | null
         }
         Relationships: [
@@ -8263,51 +8266,51 @@ export type Database = {
       price_list_items: {
         Row: {
           category: string | null
-          createdat: string | null
+          created_at: string | null
           currency: string | null
           id: string
-          itemcode: string
-          itemname: string
-          minimumorder: number | null
+          item_code: string
+          item_name: string
+          minimum_order: number | null
           notes: string | null
-          supplierid: string | null
+          supplier_id: string | null
           unit: string | null
-          unitprice: number | null
-          updatedat: string | null
-          validfrom: string | null
-          validuntil: string | null
+          unit_price: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
         }
         Insert: {
           category?: string | null
-          createdat?: string | null
+          created_at?: string | null
           currency?: string | null
           id?: string
-          itemcode: string
-          itemname: string
-          minimumorder?: number | null
+          item_code: string
+          item_name: string
+          minimum_order?: number | null
           notes?: string | null
-          supplierid?: string | null
+          supplier_id?: string | null
           unit?: string | null
-          unitprice?: number | null
-          updatedat?: string | null
-          validfrom?: string | null
-          validuntil?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Update: {
           category?: string | null
-          createdat?: string | null
+          created_at?: string | null
           currency?: string | null
           id?: string
-          itemcode?: string
-          itemname?: string
-          minimumorder?: number | null
+          item_code?: string
+          item_name?: string
+          minimum_order?: number | null
           notes?: string | null
-          supplierid?: string | null
+          supplier_id?: string | null
           unit?: string | null
-          unitprice?: number | null
-          updatedat?: string | null
-          validfrom?: string | null
-          validuntil?: string | null
+          unit_price?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
@@ -8486,6 +8489,7 @@ export type Database = {
           updated_by: string | null
           version_name: string
           version_number: number
+          workspace_id: string | null
         }
         Insert: {
           confirmed_requirements?: Json | null
@@ -8514,6 +8518,7 @@ export type Database = {
           updated_by?: string | null
           version_name: string
           version_number: number
+          workspace_id?: string | null
         }
         Update: {
           confirmed_requirements?: Json | null
@@ -8542,6 +8547,7 @@ export type Database = {
           updated_by?: string | null
           version_name?: string
           version_number?: number
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -8549,6 +8555,13 @@ export type Database = {
             columns: ["proposal_id"]
             isOneToOne: false
             referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposal_packages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -8682,31 +8695,31 @@ export type Database = {
       }
       quote_categories: {
         Row: {
-          createdat: string | null
+          created_at: string | null
           id: string
           items: Json | null
           name: string
-          quoteid: string | null
+          quote_id: string | null
           subtotal: number | null
-          updatedat: string | null
+          updated_at: string | null
         }
         Insert: {
-          createdat?: string | null
+          created_at?: string | null
           id?: string
           items?: Json | null
           name: string
-          quoteid?: string | null
+          quote_id?: string | null
           subtotal?: number | null
-          updatedat?: string | null
+          updated_at?: string | null
         }
         Update: {
-          createdat?: string | null
+          created_at?: string | null
           id?: string
           items?: Json | null
           name?: string
-          quoteid?: string | null
+          quote_id?: string | null
           subtotal?: number | null
-          updatedat?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -8910,30 +8923,30 @@ export type Database = {
       }
       quote_versions: {
         Row: {
-          changenote: string | null
-          createdat: string | null
-          createdby: string | null
+          change_note: string | null
+          created_at: string | null
+          created_by: string | null
           data: Json
           id: string
-          quoteid: string | null
+          quote_id: string | null
           version: number
         }
         Insert: {
-          changenote?: string | null
-          createdat?: string | null
-          createdby?: string | null
+          change_note?: string | null
+          created_at?: string | null
+          created_by?: string | null
           data: Json
           id?: string
-          quoteid?: string | null
+          quote_id?: string | null
           version: number
         }
         Update: {
-          changenote?: string | null
-          createdat?: string | null
-          createdby?: string | null
+          change_note?: string | null
+          created_at?: string | null
+          created_by?: string | null
           data?: Json
           id?: string
-          quoteid?: string | null
+          quote_id?: string | null
           version?: number
         }
         Relationships: []
@@ -9256,27 +9269,27 @@ export type Database = {
       receipt_payment_items: {
         Row: {
           amount: number
-          createdat: string | null
+          created_at: string | null
           id: string
-          itemname: string
+          item_name: string
           notes: string | null
-          receiptid: string | null
+          receipt_id: string | null
         }
         Insert: {
           amount: number
-          createdat?: string | null
+          created_at?: string | null
           id?: string
-          itemname: string
+          item_name: string
           notes?: string | null
-          receiptid?: string | null
+          receipt_id?: string | null
         }
         Update: {
           amount?: number
-          createdat?: string | null
+          created_at?: string | null
           id?: string
-          itemname?: string
+          item_name?: string
           notes?: string | null
-          receiptid?: string | null
+          receipt_id?: string | null
         }
         Relationships: []
       }
@@ -9708,6 +9721,7 @@ export type Database = {
           resource_type: string
           response_id: string
           unit_price: number | null
+          workspace_id: string | null
         }
         Insert: {
           available_end_date?: string | null
@@ -9723,6 +9737,7 @@ export type Database = {
           resource_type: string
           response_id: string
           unit_price?: number | null
+          workspace_id?: string | null
         }
         Update: {
           available_end_date?: string | null
@@ -9738,6 +9753,7 @@ export type Database = {
           resource_type?: string
           response_id?: string
           unit_price?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -9745,6 +9761,13 @@ export type Database = {
             columns: ["response_id"]
             isOneToOne: false
             referencedRelation: "request_responses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_response_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -11198,7 +11221,7 @@ export type Database = {
           completed: boolean | null
           created_at: string | null
           created_by: string | null
-          creator: string
+          created_by_legacy: string
           deadline: string | null
           enabled_quick_actions: string[] | null
           id: string
@@ -11220,7 +11243,7 @@ export type Database = {
           completed?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          creator: string
+          created_by_legacy: string
           deadline?: string | null
           enabled_quick_actions?: string[] | null
           id?: string
@@ -11242,7 +11265,7 @@ export type Database = {
           completed?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          creator?: string
+          created_by_legacy?: string
           deadline?: string | null
           enabled_quick_actions?: string[] | null
           id?: string
@@ -11269,7 +11292,7 @@ export type Database = {
           },
           {
             foreignKeyName: "todos_creator_fkey"
-            columns: ["creator"]
+            columns: ["created_by_legacy"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
@@ -11293,6 +11316,7 @@ export type Database = {
           quantity: number | null
           tour_id: string | null
           updated_at: string | null
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -11303,6 +11327,7 @@ export type Database = {
           quantity?: number | null
           tour_id?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -11313,6 +11338,7 @@ export type Database = {
           quantity?: number | null
           tour_id?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -11327,6 +11353,13 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_addons_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -11826,7 +11859,7 @@ export type Database = {
           },
         ]
       }
-      Tour_Expenses: {
+      tour_expenses: {
         Row: {
           actual_amount: number
           created_at: string | null
@@ -12045,46 +12078,46 @@ export type Database = {
       }
       tour_refunds: {
         Row: {
-          createdat: string | null
+          created_at: string | null
           id: string
-          memberid: string | null
+          member_id: string | null
           notes: string | null
-          orderid: string | null
-          processedby: string | null
-          processingstatus: string | null
-          refundamount: number
-          refunddate: string | null
-          refundreason: string
-          tourid: string | null
-          updatedat: string | null
+          order_id: string | null
+          processed_by: string | null
+          processing_status: string | null
+          refund_amount: number
+          refund_date: string | null
+          refund_reason: string
+          tour_id: string | null
+          updated_at: string | null
         }
         Insert: {
-          createdat?: string | null
+          created_at?: string | null
           id?: string
-          memberid?: string | null
+          member_id?: string | null
           notes?: string | null
-          orderid?: string | null
-          processedby?: string | null
-          processingstatus?: string | null
-          refundamount: number
-          refunddate?: string | null
-          refundreason: string
-          tourid?: string | null
-          updatedat?: string | null
+          order_id?: string | null
+          processed_by?: string | null
+          processing_status?: string | null
+          refund_amount: number
+          refund_date?: string | null
+          refund_reason: string
+          tour_id?: string | null
+          updated_at?: string | null
         }
         Update: {
-          createdat?: string | null
+          created_at?: string | null
           id?: string
-          memberid?: string | null
+          member_id?: string | null
           notes?: string | null
-          orderid?: string | null
-          processedby?: string | null
-          processingstatus?: string | null
-          refundamount?: number
-          refunddate?: string | null
-          refundreason?: string
-          tourid?: string | null
-          updatedat?: string | null
+          order_id?: string | null
+          processed_by?: string | null
+          processing_status?: string | null
+          refund_amount?: number
+          refund_date?: string | null
+          refund_reason?: string
+          tour_id?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

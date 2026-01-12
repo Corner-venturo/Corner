@@ -2,13 +2,14 @@ import { formatDate } from '@/lib/utils/format-date'
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-import { useTourStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
 import { generateTourCode as generateTourCodeUtil } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
 import { BaseEntity } from '@/core/types/common'
 import { supabase } from '@/lib/supabase/client'
+import { invalidateTours } from '@/data'
+import { useTourStore } from '@/stores'
 
 interface TourFinancialSummary {
   total_revenue: number
@@ -20,22 +21,26 @@ interface TourFinancialSummary {
 class TourService extends BaseService<Tour & BaseEntity> {
   protected resourceName = 'tours'
 
+  // 使用 Store 提供同步讀取，搭配 invalidateTours 確保 SWR 快取同步
   protected getStore = (): StoreOperations<Tour & BaseEntity> => {
     const store = useTourStore.getState()
     return {
-      getAll: () => store.items as unknown as (Tour & BaseEntity)[],
-      getById: (id: string) => store.items.find(t => t.id === id) as unknown as (Tour & BaseEntity) | undefined,
+      getAll: () => store.items as (Tour & BaseEntity)[],
+      getById: (id: string) => store.items.find(t => t.id === id) as (Tour & BaseEntity) | undefined,
       add: async (tour: Tour & BaseEntity) => {
-        // Type assertion needed due to Store CreateInput type requirements
+        // Store.create 內部會處理類型轉換，這裡使用 unknown 轉換避免類型差異
         const result = await store.create(tour as unknown as Parameters<typeof store.create>[0])
-        return (result || tour) as Tour & BaseEntity
+        await invalidateTours()
+        return result as Tour & BaseEntity | undefined
       },
-      update: async (id: string, data: Partial<Tour>) => {
-        // Type assertion needed due to Store type compatibility
-        await store.update(id, data as Parameters<typeof store.update>[1])
+      update: async (id: string, data: Partial<Tour & BaseEntity>) => {
+        // Store.update 內部會處理類型轉換，這裡使用 unknown 轉換避免類型差異
+        await store.update(id, data as unknown as Parameters<typeof store.update>[1])
+        await invalidateTours()
       },
       delete: async (id: string) => {
         await store.delete(id)
+        await invalidateTours()
       },
     }
   }
@@ -293,9 +298,8 @@ class TourService extends BaseService<Tour & BaseEntity> {
               .single()
 
             if (!updateError && updated) {
-              // 重新載入 tours
-              const tourStore = useTourStore.getState()
-              await tourStore.fetchAll()
+              // SWR 快取失效，自動重新載入
+              await invalidateTours()
               return updated as Tour
             }
           } else {
@@ -375,9 +379,8 @@ class TourService extends BaseService<Tour & BaseEntity> {
               .single()
 
             if (!updateError && updated) {
-              // 重新載入 tours
-              const tourStore = useTourStore.getState()
-              await tourStore.fetchAll()
+              // SWR 快取失效，自動重新載入
+              await invalidateTours()
               return updated as Tour
             }
           } else {

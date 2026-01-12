@@ -11,7 +11,12 @@ interface ChangePasswordRequest {
   new_password: string
 }
 
-// POST /api/auth/change-password - 用戶自行更改密碼
+/**
+ * 用戶自行更改密碼
+ * 🔒 安全說明 2026-01-12：此 API 透過驗證目前密碼來確認身份
+ * 因為用戶可能在首次登入被要求更改密碼，此時尚未完成認證流程
+ * 所以不使用 getServerAuth()，而是透過 current_password 驗證
+ */
 export async function POST(request: NextRequest) {
   try {
     const body: ChangePasswordRequest = await request.json()

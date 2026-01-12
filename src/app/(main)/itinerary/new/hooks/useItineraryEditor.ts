@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useItineraryStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { createItinerary, updateItinerary } from '@/data'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type {
@@ -73,7 +74,6 @@ export function useItineraryEditor() {
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1)
   const [quoteTierPricings, setQuoteTierPricings] = useState<TierPricing[]>([])
 
-  const { create: createItinerary, update: updateItinerary } = useItineraryStore()
   const { user } = useAuthStore()
   const tourDataRef = useRef(tourData)
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)

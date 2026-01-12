@@ -1,26 +1,23 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useTours } from '@/features/tours/hooks/useTours'
 import { useOrders } from '@/features/orders/hooks/useOrders'
-import { useSupplierStore, useEmployeeStore, useAuthStore } from '@/stores'
+import { useSuppliers, useEmployees } from '@/data'
+import { useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
   const { tours, loadTours } = useTours()
   const { orders, loadOrders } = useOrders()
-  const supplierStore = useSupplierStore()
-  const employeeStore = useEmployeeStore()
-  const suppliers = supplierStore.items
-  const employees = employeeStore.items
+  const { items: suppliers } = useSuppliers()
+  const { items: employees } = useEmployees()
 
   // 獲取當前登入用戶
   const currentUser = useAuthStore(state => state.user)
 
-  // 載入所需資料
+  // 載入所需資料（SWR hooks 會自動載入 suppliers 和 employees）
   useEffect(() => {
     loadTours()
     loadOrders()
-    supplierStore.fetchAll()
-    employeeStore.fetchAll()
   }, [])  
 
   const [formData, setFormData] = useState<RequestFormData>({

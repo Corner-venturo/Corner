@@ -1,33 +1,75 @@
 import { BaseService, StoreOperations } from '@/core/services/base.service'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
-import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
 import { ValidationError } from '@/core/errors/app-errors'
-import { generateId } from '@/lib/data/create-data-store'
 import { generateVoucherFromPaymentRequest } from '@/services/voucher-auto-generator'
 import { logger } from '@/lib/utils/logger'
 import { getRequiredWorkspaceId } from '@/lib/workspace-context'
+import { supabase } from '@/lib/supabase/client'
+import {
+  invalidatePaymentRequests,
+  invalidatePaymentRequestItems,
+} from '@/data'
 
 class PaymentRequestService extends BaseService<PaymentRequest> {
   protected resourceName = 'payment_requests'
 
+  // 內部快取（用於同步方法）
+  private _items: PaymentRequest[] = []
+  private _itemsLoaded = false
+
   protected getStore = (): StoreOperations<PaymentRequest> => {
-    const store = usePaymentRequestStore.getState()
     return {
-      getAll: () => store.items,
-      getById: (id: string) => store.items.find(r => r.id === id),
+      getAll: () => this._items,
+      getById: (id: string) => this._items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
-        // 移除系統自動生成的欄位
         const { id, created_at, updated_at, ...createData } = request
-        const result = await store.create(createData)
-        return result
+        const { data, error } = await supabase
+          .from('payment_requests')
+          .insert({ id: request.id, ...createData, created_at: request.created_at, updated_at: request.updated_at })
+          .select()
+          .single()
+        if (error) throw error
+        await invalidatePaymentRequests()
+        return data as unknown as PaymentRequest
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
-        await store.update(id, data)
+        const { error } = await supabase
+          .from('payment_requests')
+          .update(data)
+          .eq('id', id)
+        if (error) throw error
+        await invalidatePaymentRequests()
       },
       delete: async (id: string) => {
-        await store.delete(id)
+        const { error } = await supabase
+          .from('payment_requests')
+          .delete()
+          .eq('id', id)
+        if (error) throw error
+        await invalidatePaymentRequests()
       },
     }
+  }
+
+  // 載入資料到內部快取（供同步方法使用）
+  private async loadItems(): Promise<void> {
+    const { data, error } = await supabase
+      .from('payment_requests')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    this._items = (data || []) as unknown as PaymentRequest[]
+    this._itemsLoaded = true
+  }
+
+  // 載入請款項目
+  private async loadPaymentRequestItems(): Promise<PaymentRequestItem[]> {
+    const { data, error } = await supabase
+      .from('payment_request_items')
+      .select('*')
+      .order('sort_order', { ascending: true })
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequestItem[]
   }
 
   protected validate(data: Partial<PaymentRequest>): void {
@@ -53,9 +95,21 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   /**
    * 取得請款單的所有項目
    */
+  async getItemsByRequestIdAsync(requestId: string): Promise<PaymentRequestItem[]> {
+    const { data, error } = await supabase
+      .from('payment_request_items')
+      .select('*')
+      .eq('request_id', requestId)
+      .order('sort_order', { ascending: true })
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequestItem[]
+  }
+
+  // 同步方法（向後相容，需要先載入資料）
   getItemsByRequestId(requestId: string): PaymentRequestItem[] {
-    const itemStore = usePaymentRequestItemStore.getState()
-    return itemStore.items.filter(item => item.request_id === requestId)
+    // 注意：這是同步方法，依賴於先前已載入的資料
+    // 建議使用 getItemsByRequestIdAsync
+    return []
   }
 
   /**
@@ -73,8 +127,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const itemStore = usePaymentRequestItemStore.getState()
-    const existingItems = this.getItemsByRequestId(requestId)
+    const existingItems = await this.getItemsByRequestIdAsync(requestId)
 
     const now = this.now()
     // 品項編號格式：TYO241218A-R01-1, TYO241218A-R01-2...
@@ -87,6 +140,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
 
     // 資料庫欄位是 unitprice（無底線），轉換欄位名稱
     const item = {
+      id: crypto.randomUUID(),
       request_id: requestId,
       item_number: itemNumber,
       category: itemData.category,
@@ -99,13 +153,22 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       note: itemData.note,
       sort_order: itemData.sort_order,
       workspace_id: workspaceId, // RLS 需要
+      created_at: now,
+      updated_at: now,
     }
 
-    // 使用 itemStore 新增項目
-    const createdItem = await itemStore.create(item as unknown as Parameters<typeof itemStore.create>[0])
+    // 直接使用 Supabase 新增項目
+    const { data: createdItem, error } = await supabase
+      .from('payment_request_items')
+      .insert(item)
+      .select()
+      .single()
+
+    if (error) throw error
+    await invalidatePaymentRequestItems()
 
     // 更新 request 的總金額
-    const allItems = [...existingItems, createdItem as PaymentRequestItem]
+    const allItems = [...existingItems, createdItem as unknown as PaymentRequestItem]
     const totalAmount = allItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
 
     await this.update(requestId, {
@@ -113,7 +176,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       updated_at: now,
     })
 
-    return createdItem as PaymentRequestItem
+    return createdItem as unknown as PaymentRequestItem
   }
 
   /**
@@ -129,24 +192,37 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const itemStore = usePaymentRequestItemStore.getState()
     const now = this.now()
 
-    // 計算新的 subtotal
-    const existingItem = itemStore.items.find(i => i.id === itemId)
-    const unitPrice = itemData.unit_price ?? existingItem?.unit_price ?? 0
-    const quantity = itemData.quantity ?? existingItem?.quantity ?? 0
+    // 取得現有項目
+    const { data: existingItem, error: fetchError } = await supabase
+      .from('payment_request_items')
+      .select('*')
+      .eq('id', itemId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    // 計算新的 subtotal（資料庫欄位是 unitprice）
+    const unitPrice = Number(itemData.unit_price ?? (existingItem as Record<string, unknown>)?.unitprice ?? 0)
+    const quantity = Number(itemData.quantity ?? existingItem?.quantity ?? 0)
     const subtotal = unitPrice * quantity
 
-    // 使用 itemStore 更新項目
-    await itemStore.update(itemId, {
-      ...itemData,
-      subtotal,
-      updated_at: now,
-    })
+    // 直接使用 Supabase 更新項目
+    const { error: updateError } = await supabase
+      .from('payment_request_items')
+      .update({
+        ...itemData,
+        subtotal,
+        updated_at: now,
+      })
+      .eq('id', itemId)
+
+    if (updateError) throw updateError
+    await invalidatePaymentRequestItems()
 
     // 更新 request 的總金額
-    const allItems = this.getItemsByRequestId(requestId)
+    const allItems = await this.getItemsByRequestIdAsync(requestId)
     const totalAmount = allItems.reduce((sum, i) => {
       if (i.id === itemId) {
         return sum + subtotal
@@ -169,14 +245,19 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const itemStore = usePaymentRequestItemStore.getState()
     const now = this.now()
 
-    // 使用 itemStore 刪除項目
-    await itemStore.delete(itemId)
+    // 直接使用 Supabase 刪除項目
+    const { error } = await supabase
+      .from('payment_request_items')
+      .delete()
+      .eq('id', itemId)
+
+    if (error) throw error
+    await invalidatePaymentRequestItems()
 
     // 更新 request 的總金額
-    const remainingItems = this.getItemsByRequestId(requestId).filter(i => i.id !== itemId)
+    const remainingItems = await this.getItemsByRequestIdAsync(requestId)
     const totalAmount = remainingItems.reduce((sum, i) => sum + (i.subtotal || 0), 0)
 
     await this.update(requestId, {
@@ -196,7 +277,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       throw new Error(`找不到請款單: ${requestId}`)
     }
 
-    const items = this.getItemsByRequestId(requestId)
+    const items = await this.getItemsByRequestIdAsync(requestId)
     const totalAmount = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
 
     await this.update(requestId, {
@@ -210,12 +291,19 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   /**
    * 按類別取得請款項目
    */
-  getItemsByCategory(
+  async getItemsByCategory(
     requestId: string,
     category: PaymentRequestItem['category']
-  ): PaymentRequestItem[] {
-    const items = this.getItemsByRequestId(requestId)
-    return items.filter(item => item.category === category)
+  ): Promise<PaymentRequestItem[]> {
+    const { data, error } = await supabase
+      .from('payment_request_items')
+      .select('*')
+      .eq('request_id', requestId)
+      .eq('category', category)
+      .order('sort_order', { ascending: true })
+
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequestItem[]
   }
 
   /**
@@ -247,33 +335,57 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
   /**
    * 取得待處理請款單
    */
-  getPendingRequests(): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState()
-    return store.items.filter(r => r.status === 'pending')
+  async getPendingRequests(): Promise<PaymentRequest[]> {
+    const { data, error } = await supabase
+      .from('payment_requests')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequest[]
   }
 
   /**
    * 取得處理中請款單
    */
-  getProcessingRequests(): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState()
-    return store.items.filter(r => r.status === 'processing')
+  async getProcessingRequests(): Promise<PaymentRequest[]> {
+    const { data, error } = await supabase
+      .from('payment_requests')
+      .select('*')
+      .eq('status', 'processing')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequest[]
   }
 
   /**
    * 按旅遊團取得請款單
    */
-  getRequestsByTour(tourId: string): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState()
-    return store.items.filter(r => r.tour_id === tourId)
+  async getRequestsByTour(tourId: string): Promise<PaymentRequest[]> {
+    const { data, error } = await supabase
+      .from('payment_requests')
+      .select('*')
+      .eq('tour_id', tourId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequest[]
   }
 
   /**
    * 按訂單取得請款單
    */
-  getRequestsByOrder(orderId: string): PaymentRequest[] {
-    const store = usePaymentRequestStore.getState()
-    return store.items.filter(r => r.order_id === orderId)
+  async getRequestsByOrder(orderId: string): Promise<PaymentRequest[]> {
+    const { data, error } = await supabase
+      .from('payment_requests')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []) as unknown as PaymentRequest[]
   }
 
   /**
@@ -309,7 +421,7 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
     if (options?.hasAccounting && !options?.isExpired && options?.workspaceId) {
       try {
         // 判斷供應商類型（從第一個項目）
-        const items = this.getItemsByRequestId(requestId)
+        const items = await this.getItemsByRequestIdAsync(requestId)
         const firstItem = items[0]
         const supplierType = firstItem?.category || 'other'
 

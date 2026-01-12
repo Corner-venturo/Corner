@@ -5,7 +5,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useTravelInvoiceStore, TravelInvoiceItem, BuyerInfo } from '@/stores/useTravelInvoiceStore'
-import { useOrderStore, useTourStore } from '@/stores'
+import { useOrders, useTours, invalidateOrders, invalidateTours } from '@/data'
 import type { Order } from '@/types/order.types'
 import type { Tour } from '@/types/tour.types'
 import { confirm } from '@/lib/ui/alert-dialog'
@@ -30,8 +30,8 @@ export function useInvoiceDialog({
 }: UseInvoiceDialogProps) {
   const { toast } = useToast()
   const { issueInvoice, invoices, isLoading, fetchInvoices } = useTravelInvoiceStore()
-  const { items: allOrders, fetchAll: fetchOrders, loading: ordersLoading } = useOrderStore()
-  const { items: allTours, fetchAll: fetchTours, loading: toursLoading } = useTourStore()
+  const { items: allOrders, loading: ordersLoading } = useOrders()
+  const { items: allTours, loading: toursLoading } = useTours()
 
   const [dataLoaded, setDataLoaded] = useState(false)
   const [selectedTourId, setSelectedTourId] = useState<string>(defaultTourId || '')
@@ -56,15 +56,15 @@ export function useInvoiceDialog({
     return `${orderNumber}-${existingCount + 1}`
   }
 
-  // 載入資料
+  // 載入資料 (SWR 自動處理 tours/orders，只需手動 fetch invoices)
   useEffect(() => {
     if (open) {
       setDataLoaded(false)
-      Promise.all([fetchTours(), fetchOrders(), fetchInvoices()]).then(() => {
+      Promise.all([invalidateTours(), invalidateOrders(), fetchInvoices()]).then(() => {
         setDataLoaded(true)
       })
     }
-  }, [open, fetchTours, fetchOrders, fetchInvoices])
+  }, [open, fetchInvoices])
 
   // 當選擇訂單時，自動帶入資料
   useEffect(() => {

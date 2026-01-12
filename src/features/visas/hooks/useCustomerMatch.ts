@@ -146,10 +146,9 @@ export function useCustomerMatch() {
   // 儲存新客戶
   const handleSaveNewCustomer = async () => {
     try {
-      const { useCustomerStore } = await import('@/stores')
-      const addCustomer = useCustomerStore.getState().create
+      const { createCustomer } = await import('@/data')
 
-      await addCustomer({
+      await createCustomer({
         name: newCustomerForm.name,
         phone: newCustomerForm.phone || null,
         email: newCustomerForm.email || null,
@@ -162,7 +161,11 @@ export function useCustomerMatch() {
         gender: newCustomerForm.gender || null,
         notes: newCustomerForm.notes || null,
         source: 'other',
-      } as Parameters<typeof addCustomer>[0])
+        member_type: 'member',
+        verification_status: 'unverified',
+        is_vip: false,
+        is_active: true,
+      })
 
       toast.success(`已新增「${newCustomerForm.name}」到 CRM`)
       setShowAddCustomerForm(false)
@@ -189,14 +192,18 @@ export function useCustomerMatch() {
 
   // 開始客戶比對流程
   const startCustomerMatch = async (peopleToCheck: Array<{ name: string; phone: string }>) => {
-    const { useCustomerStore } = await import('@/stores')
-    // 🔧 優化：在需要時才載入客戶資料（延遲載入）
-    await useCustomerStore.getState().fetchAll()
-    const customers = useCustomerStore.getState().items
+    // 取得所有要比對的姓名
+    const namesToMatch = peopleToCheck.map(p => p.name)
+
+    // 直接從 Supabase 查詢符合姓名的客戶
+    const { data: matchedCustomers } = await supabase
+      .from('customers')
+      .select('id, name, phone, date_of_birth, national_id')
+      .in('name', namesToMatch)
 
     // 為每個人找同名的客戶
     const pendingList = peopleToCheck.map(person => {
-      const matched = customers
+      const matched = (matchedCustomers || [])
         .filter(c => c.name === person.name)
         .map(c => ({
           id: c.id,

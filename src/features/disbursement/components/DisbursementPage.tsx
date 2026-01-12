@@ -10,13 +10,19 @@
 
 'use client'
 
-import { useCallback, useState, useEffect, useMemo } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Eye, Trash2 } from 'lucide-react'
-import { usePaymentRequestStore, useDisbursementOrderStore, usePaymentRequestItemStore } from '@/stores'
+import {
+  usePaymentRequests,
+  useDisbursementOrders,
+  deleteDisbursementOrder as deleteDisbursementOrderApi,
+  invalidatePaymentRequests,
+  invalidateDisbursementOrders,
+} from '@/data'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { DisbursementOrder, PaymentRequest } from '@/stores/types'
 import { cn } from '@/lib/utils'
@@ -34,19 +40,9 @@ const DISBURSEMENT_STATUS = {
 }
 
 export function DisbursementPage() {
-  // Stores
-  const {
-    items: disbursement_orders,
-    fetchAll: fetchDisbursementOrders,
-    delete: deleteDisbursementOrder,
-  } = useDisbursementOrderStore()
-
-  const {
-    items: payment_requests,
-    fetchAll: fetchPaymentRequests,
-  } = usePaymentRequestStore()
-
-  const { fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: disbursement_orders } = useDisbursementOrders()
+  const { items: payment_requests } = usePaymentRequests()
 
   // 狀態
   const [searchTerm, setSearchTerm] = useState('')
@@ -56,13 +52,7 @@ export function DisbursementPage() {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
   const [printOrder, setPrintOrder] = useState<DisbursementOrder | null>(null)
 
-  // 初始化載入資料
-  useEffect(() => {
-    fetchDisbursementOrders()
-    fetchPaymentRequests()
-    fetchRequestItems()
-     
-  }, [])
+  // SWR 自動載入資料，無需 useEffect
 
   // 取得待出帳的請款單（狀態為 pending，且尚未加入任何出納單）
   const pendingRequests = useMemo(() => {
@@ -203,20 +193,23 @@ export function DisbursementPage() {
     if (!confirmed) return
 
     try {
-      await deleteDisbursementOrder(order.id)
+      await deleteDisbursementOrderApi(order.id)
       await alert('出納單已刪除', 'success')
     } catch (error) {
       logger.error('刪除出納單失敗:', error)
       await alert('刪除出納單失敗', 'error')
     }
-  }, [deleteDisbursementOrder])
+  }, [])
 
   // 新增出納單成功後
-  const handleCreateSuccess = useCallback(() => {
+  const handleCreateSuccess = useCallback(async () => {
     setIsCreateDialogOpen(false)
-    fetchDisbursementOrders()
-    fetchPaymentRequests()
-  }, [fetchDisbursementOrders, fetchPaymentRequests])
+    // SWR 快取失效，自動重新載入
+    await Promise.all([
+      invalidateDisbursementOrders(),
+      invalidatePaymentRequests(),
+    ])
+  }, [])
 
   // 計算統計數據
   const thisMonthOrders = useMemo(() => {

@@ -1,0 +1,32 @@
+'use client'
+
+/**
+ * Suppliers Entity
+ */
+
+import { createEntityHook } from '../core/createEntityHook'
+import { CACHE_PRESETS } from '../core/types'
+import type { Supplier } from '@/stores/types'
+
+export const supplierEntity = createEntityHook<Supplier>('suppliers', {
+  list: {
+    select: '*',
+    orderBy: { column: 'name', ascending: true },
+  },
+  slim: {
+    select: 'id,name,category,contact_name,phone,email',
+  },
+  detail: { select: '*' },
+  cache: CACHE_PRESETS.low,
+})
+
+export const useSuppliers = supplierEntity.useList
+export const useSuppliersSlim = supplierEntity.useListSlim
+export const useSupplier = supplierEntity.useDetail
+export const useSuppliersPaginated = supplierEntity.usePaginated
+export const useSupplierDictionary = supplierEntity.useDictionary
+
+export const createSupplier = supplierEntity.create
+export const updateSupplier = supplierEntity.update
+export const deleteSupplier = supplierEntity.delete
+export const invalidateSuppliers = supplierEntity.invalidate

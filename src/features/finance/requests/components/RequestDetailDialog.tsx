@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Pencil, X, Save } from 'lucide-react'
-import { usePaymentRequestStore, usePaymentRequestItemStore, useTourStore, useSupplierStore } from '@/stores'
+import { useTours, useSuppliers, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
@@ -28,10 +28,9 @@ interface RequestDetailDialogProps {
 }
 
 export function RequestDetailDialog({ request, open, onOpenChange }: RequestDetailDialogProps) {
-  const { delete: deleteRequest } = usePaymentRequestStore()
-  const { items: requestItems, fetchAll: fetchRequestItems } = usePaymentRequestItemStore()
-  const { items: tours } = useTourStore()
-  const { items: suppliers } = useSupplierStore()
+  const { items: requestItems, refresh: refreshRequestItems } = usePaymentRequestItems()
+  const { items: tours } = useTours()
+  const { items: suppliers } = useSuppliers()
 
   // 編輯模式狀態
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
@@ -49,9 +48,9 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   // 載入請款項目
   useEffect(() => {
     if (open && request) {
-      fetchRequestItems()
+      refreshRequestItems()
     }
-  }, [open, request, fetchRequestItems])
+  }, [open, request, refreshRequestItems])
 
   // 重置編輯狀態
   useEffect(() => {
@@ -94,7 +93,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     }
 
     try {
-      await deleteRequest(request.id)
+      await deletePaymentRequestApi(request.id)
       await alert('請款單已刪除', 'success')
       onOpenChange(false)
     } catch (error) {
@@ -123,7 +122,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
         sort_order: items.length + 1,
       })
 
-      await fetchRequestItems()
+      await refreshRequestItems()
       setIsAddingItem(false)
       setNewItem({
         category: '其他',
@@ -160,7 +159,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
         ...editItem,
         supplier_name: selectedSupplier?.name || editItem.supplier_name,
       })
-      await fetchRequestItems()
+      await refreshRequestItems()
       setEditingItemId(null)
     } catch (error) {
       logger.error('更新項目失敗:', error)
@@ -178,7 +177,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
     try {
       await paymentRequestService.deleteItem(request.id, itemId)
-      await fetchRequestItems()
+      await refreshRequestItems()
     } catch (error) {
       logger.error('刪除項目失敗:', error)
       await alert('刪除項目失敗', 'error')

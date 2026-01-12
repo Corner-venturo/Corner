@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Plus, Calculator, Loader2, ExternalLink } from 'lucide-react'
-import { useQuoteStore } from '@/stores'
+import { useQuotes, createQuote } from '@/data'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
@@ -40,15 +40,8 @@ export function LinkQuoteToTourDialog({
   tour,
 }: LinkQuoteToTourDialogProps) {
   const router = useRouter()
-  const { items: quotes, fetchAll, create, loading } = useQuoteStore()
+  const { items: quotes, loading } = useQuotes()
   const [isCreating, setIsCreating] = useState(false)
-
-  // 載入報價單資料
-  useEffect(() => {
-    if (isOpen) {
-      fetchAll()
-    }
-  }, [isOpen, fetchAll])
 
   // 已關聯此旅遊團的報價單
   const linkedQuotes = useMemo(() => {
@@ -62,7 +55,7 @@ export function LinkQuoteToTourDialog({
 
       const code = generateCode('TP', {}, quotes)
 
-      const newQuote = await create({
+      const newQuote = await createQuote({
         code,
         name: tour.name,
         quote_type: 'standard',
@@ -71,7 +64,7 @@ export function LinkQuoteToTourDialog({
         customer_name: '',
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
-      })
+      } as Parameters<typeof createQuote>[0])
 
 
       if (newQuote?.id) {

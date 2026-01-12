@@ -35,7 +35,7 @@ import {
   Zap,
   Clock,
 } from 'lucide-react'
-import { useQuoteStore, useTourStore } from '@/stores'
+import { useQuotes, useTours, useOrders, createQuote, updateQuote, invalidateQuotes } from '@/data'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
@@ -46,7 +46,9 @@ import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
+import type { Proposal } from '@/types/proposal.types'
 
 interface LinkDocumentsToTourDialogProps {
   isOpen: boolean
@@ -61,17 +63,14 @@ export function LinkDocumentsToTourDialog({
 }: LinkDocumentsToTourDialogProps) {
   const router = useRouter()
 
-  // 報價單 Store
-  const {
-    items: quotes,
-    fetchAll: fetchQuotes,
-    create: createQuote,
-    update: updateQuote,
-    loading: loadingQuotes,
-  } = useQuoteStore()
+  // 報價單
+  const { items: quotes, loading: loadingQuotes } = useQuotes()
 
-  // 旅遊團 Store（用於查詢報價單連結的旅遊團名稱）
-  const { items: tours } = useTourStore()
+  // 旅遊團（用於查詢報價單連結的旅遊團名稱）
+  const { items: tours } = useTours()
+
+  // 訂單（用於取得業務人員）
+  const { items: orders } = useOrders()
 
   // Proposal Packages（用於取得 timeline_data）
   const { items: proposalPackages, fetchAll: fetchProposalPackages } = useProposalPackages()
@@ -83,6 +82,7 @@ export function LinkDocumentsToTourDialog({
 
   // 行程表對話框狀態
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
+  const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
   const [isCreatingPackage, setIsCreatingPackage] = useState(false)
 
   // 動態建立的 proposal_package（用於沒有 proposal 的旅遊團）
@@ -91,7 +91,7 @@ export function LinkDocumentsToTourDialog({
   // 載入資料
   useEffect(() => {
     if (isOpen) {
-      fetchQuotes()
+      // SWR 自動處理 quotes 載入
       fetchProposalPackages()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,6 +117,28 @@ export function LinkDocumentsToTourDialog({
            typeof tourProposalPackage.timeline_data === 'object' &&
            Object.keys(tourProposalPackage.timeline_data).length > 0
   }, [itineraryType, tourProposalPackage])
+
+  // 取得 tour 關聯的第一筆訂單的業務人員
+  const tourSalesPerson = useMemo(() => {
+    const firstOrder = orders.find(o => o.tour_id === tour.id)
+    return firstOrder?.sales_person || null
+  }, [orders, tour.id])
+
+  // 為 PackageItineraryDialog 建立模擬 Proposal 物件
+  const fakeProposal = useMemo((): Proposal => ({
+    id: tour.id,
+    code: tour.code || '',
+    title: tour.name,
+    status: 'converted' as const,
+    destination: tour.location || null,
+    country_id: tour.country_id || null,
+    main_city_id: tour.main_city_id || null,
+    expected_start_date: tour.departure_date || null,
+    expected_end_date: tour.return_date || null,
+    created_at: tour.created_at || new Date().toISOString(),
+    updated_at: tour.updated_at || new Date().toISOString(),
+    workspace_id: tour.workspace_id || '',
+  }), [tour])
 
   // ========== 報價單相關 ==========
 
@@ -150,7 +172,9 @@ export function LinkDocumentsToTourDialog({
         tour_id: tour.id,
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
-      } as Omit<Quote, 'id' | 'created_at' | 'updated_at'>)
+        // 從訂單取得業務人員
+        handler_name: tourSalesPerson || undefined,
+      } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
@@ -179,7 +203,9 @@ export function LinkDocumentsToTourDialog({
         tour_code: tour.code || '',
         issue_date: new Date().toISOString().split('T')[0],
         group_size: tour.max_participants || 20,
-      } as Omit<Quote, 'id' | 'created_at' | 'updated_at'>)
+        // 從訂單取得業務人員
+        handler_name: tourSalesPerson || undefined,
+      } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
@@ -201,7 +227,7 @@ export function LinkDocumentsToTourDialog({
         tour_id: undefined,
         status: 'proposed',
       })
-      await fetchQuotes()
+      // SWR 自動 revalidate
     } catch (error) {
       logger.error('斷開連結失敗:', error)
     } finally {
@@ -291,15 +317,27 @@ export function LinkDocumentsToTourDialog({
     }
   }
 
+  // 選擇行程表類型（快速行程表 - PackageItineraryDialog）
+  const handleSelectSimpleItinerary = async () => {
+    const pkg = await getOrCreatePackageForTour()
+    if (pkg) {
+      setPackageItineraryDialogOpen(true)
+    }
+  }
+
   // 選擇行程表類型（網頁行程表）
   const handleSelectWebItinerary = async () => {
     onClose()
     router.push(`/itinerary/new?tour_id=${tour.id}`)
   }
 
-  // 開啟行程表對話框
+  // 開啟行程表對話框（根據類型選擇）
   const handleOpenItineraryDialog = () => {
-    setTimelineDialogOpen(true)
+    if (itineraryType === 'timeline') {
+      setTimelineDialogOpen(true)
+    } else {
+      setPackageItineraryDialogOpen(true)
+    }
   }
 
   // 關閉行程表對話框
@@ -338,7 +376,7 @@ export function LinkDocumentsToTourDialog({
   }, [tourProposalPackage, fetchProposalPackages])
 
   // 主對話框開啟時，子對話框應關閉
-  const mainDialogOpen = isOpen && !timelineDialogOpen
+  const mainDialogOpen = isOpen && !timelineDialogOpen && !packageItineraryDialogOpen
 
   return (
     <>
@@ -381,6 +419,13 @@ export function LinkDocumentsToTourDialog({
                         onClick={handleSelectTimelineItinerary}
                         className="gap-2 cursor-pointer"
                       >
+                        <Clock size={16} className="text-morandi-gold" />
+                        <span>時間軸行程表</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleSelectSimpleItinerary}
+                        className="gap-2 cursor-pointer"
+                      >
                         <Zap size={16} className="text-morandi-gold" />
                         <span>快速行程表</span>
                       </DropdownMenuItem>
@@ -388,7 +433,7 @@ export function LinkDocumentsToTourDialog({
                         onClick={handleSelectWebItinerary}
                         className="gap-2 cursor-pointer"
                       >
-                        <Clock size={16} className="text-morandi-secondary" />
+                        <FileText size={16} className="text-morandi-secondary" />
                         <span>網頁行程表</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -396,6 +441,20 @@ export function LinkDocumentsToTourDialog({
                 </div>
                 <div className="flex-1 overflow-auto mt-2">
                   {hasTimelineData ? (
+                    // 已有時間軸行程表
+                    <button
+                      onClick={handleOpenItineraryDialog}
+                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
+                    >
+                      <Clock className="w-3.5 h-3.5 text-morandi-gold" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-morandi-primary">時間軸行程表</div>
+                        <div className="text-[10px] text-morandi-secondary">
+                          {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
+                        </div>
+                      </div>
+                    </button>
+                  ) : itineraryType === 'simple' ? (
                     // 已有快速行程表
                     <button
                       onClick={handleOpenItineraryDialog}
@@ -405,11 +464,11 @@ export function LinkDocumentsToTourDialog({
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-morandi-primary">快速行程表</div>
                         <div className="text-[10px] text-morandi-secondary">
-                          {(tourProposalPackage?.timeline_data as TimelineItineraryData)?.days?.length || 0} 天
+                          點擊編輯
                         </div>
                       </div>
                     </button>
-                  ) : itineraryType === 'simple' || tourProposalPackage?.itinerary_id ? (
+                  ) : tourProposalPackage?.itinerary_id ? (
                     // 已有網頁行程表
                     <button
                       onClick={() => {
@@ -423,7 +482,7 @@ export function LinkDocumentsToTourDialog({
                       }}
                       className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-morandi-gold/5 transition-colors text-left"
                     >
-                      <Clock className="w-3.5 h-3.5 text-morandi-secondary" />
+                      <FileText className="w-3.5 h-3.5 text-morandi-secondary" />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-morandi-primary">網頁行程表</div>
                         <div className="text-[10px] text-morandi-secondary">
@@ -573,6 +632,19 @@ export function LinkDocumentsToTourDialog({
           onClose={handleCloseTimelineDialog}
           pkg={tourProposalPackage}
           onSave={handleSaveTimeline}
+        />
+      )}
+
+      {/* 快速行程表對話框 */}
+      {tourProposalPackage && (
+        <PackageItineraryDialog
+          isOpen={packageItineraryDialogOpen}
+          onClose={() => setPackageItineraryDialogOpen(false)}
+          pkg={tourProposalPackage}
+          proposal={fakeProposal}
+          onItineraryCreated={() => {
+            fetchProposalPackages()
+          }}
         />
       )}
 

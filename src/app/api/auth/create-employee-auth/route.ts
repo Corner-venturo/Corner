@@ -1,15 +1,24 @@
 /**
  * 建立員工 Supabase Auth 帳號的 API Route
  * 使用 Service Role Key 建立 Supabase Auth 用戶
+ *
+ * 🔒 安全修復 2026-01-12：需要已登入用戶才能建立新帳號
  */
 
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：需要已登入用戶才能建立新帳號
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入才能建立員工帳號', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const { employee_number, password, workspace_code } = await request.json()
 
     if (!employee_number || !password) {

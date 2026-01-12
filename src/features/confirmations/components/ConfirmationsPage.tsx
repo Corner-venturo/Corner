@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { FileCheck, FileText, CheckCircle, Send, XCircle } from 'lucide-react'
 import { ConfirmationsList } from './ConfirmationsList'
-import { useConfirmationStore } from '@/stores/confirmation-store'
+import { useConfirmations, createConfirmation, deleteConfirmation } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -29,9 +29,7 @@ export const ConfirmationsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const confirmations = useConfirmationStore(state => state.items)
-  const create = useConfirmationStore(state => state.create)
-  const remove = useConfirmationStore(state => state.delete)
+  const { items: confirmations } = useConfirmations()
 
   // 過濾確認單
   const filteredConfirmations = confirmations.filter(conf => {
@@ -59,7 +57,7 @@ export const ConfirmationsPage: React.FC = () => {
 
     // 直接創建一個空白確認單並跳轉
     try {
-      const newConf = await create({
+      const newConf = await createConfirmation({
         workspace_id: auth.workspaceId,
         type: 'flight', // 預設航班，可在編輯頁修改
         booking_number: '',
@@ -86,7 +84,7 @@ export const ConfirmationsPage: React.FC = () => {
       type: 'warning',
     })
     if (confirmed) {
-      await remove(id)
+      await deleteConfirmation(id)
     }
   }
 

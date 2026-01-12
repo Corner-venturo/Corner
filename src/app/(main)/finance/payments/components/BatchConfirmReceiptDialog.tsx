@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useReceiptStore, useOrderStore } from '@/stores'
+import { useOrders, updateOrder, useReceipts, updateReceipt, invalidateReceipts } from '@/data'
 import { CheckCircle, AlertCircle, DollarSign, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -47,8 +47,8 @@ export function BatchConfirmReceiptDialog({
   onOpenChange,
   onSuccess,
 }: BatchConfirmReceiptDialogProps) {
-  const { items: receipts, update: updateReceipt, fetchAll: fetchReceipts } = useReceiptStore()
-  const { items: orders, update: updateOrder } = useOrderStore()
+  const { items: receipts } = useReceipts()
+  const { items: orders } = useOrders()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmItems, setConfirmItems] = useState<Map<string, ConfirmItem>>(new Map())
 
@@ -183,7 +183,7 @@ export function BatchConfirmReceiptDialog({
         }
       }
 
-      await fetchReceipts()
+      await invalidateReceipts()
 
       await alert(`成功確認 ${selectedItems.length} 筆收款單`, 'success')
       onOpenChange(false)

@@ -172,32 +172,32 @@ export const useWidgetsStore = () => {
     // Shared Order List 操作
     // ============================================
     shareOrderList: async (channelId: string, orderIds: string[], currentUserId: string) => {
-      const { useOrderStore } = await import('../index')
-      const allOrders = useOrderStore.getState().items
+      const { supabase } = await import('@/lib/supabase/client')
 
-      const orders = orderIds
-        .map(orderId => {
-          const order = allOrders.find(o => o.id === orderId)
-          if (!order) return null
+      // 批量查詢指定 ID 的訂單
+      const { data: fetchedOrders } = await supabase
+        .from('orders')
+        .select('id, order_number, contact_person, total_amount, paid_amount')
+        .in('id', orderIds)
 
-          const totalCost = order.total_amount || 0
-          const collected = order.paid_amount || 0
-          const gap = totalCost - collected
-          const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0
+      const orders = (fetchedOrders || []).map(order => {
+        const totalCost = order.total_amount || 0
+        const collected = order.paid_amount || 0
+        const gap = totalCost - collected
+        const collectionRate = totalCost > 0 ? (collected / totalCost) * 100 : 0
 
-          return {
-            id: order.id,
-            order_number: order.order_number,
-            contact_person: order.contact_person || '',
-            total_amount: totalCost,
-            paid_amount: collected,
-            gap,
-            collection_rate: collectionRate,
-            invoice_status: 'not_invoiced' as const,
-            receipt_status: 'not_received' as const,
-          }
-        })
-        .filter((order): order is NonNullable<typeof order> => order !== null)
+        return {
+          id: order.id,
+          order_number: order.order_number,
+          contact_person: order.contact_person || '',
+          total_amount: totalCost,
+          paid_amount: collected,
+          gap,
+          collection_rate: collectionRate,
+          invoice_status: 'not_invoiced' as const,
+          receipt_status: 'not_received' as const,
+        }
+      })
 
       const newList: SharedOrderList = {
         id: uuidv4(),

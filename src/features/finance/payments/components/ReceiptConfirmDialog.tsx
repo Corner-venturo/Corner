@@ -14,8 +14,9 @@ import { useToast } from '@/components/ui/use-toast'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import { RECEIPT_TYPE_OPTIONS } from '../types'
-import { useAuthStore, useReceiptStore } from '@/stores'
-import type { Receipt } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { deleteReceipt } from '@/data'
+import type { Receipt } from '@/types/receipt.types'
 
 interface ReceiptConfirmDialogProps {
   open: boolean
@@ -34,7 +35,6 @@ export function ReceiptConfirmDialog({
 }: ReceiptConfirmDialogProps) {
   const { toast } = useToast()
   const { user } = useAuthStore()
-  const { delete: deleteReceipt } = useReceiptStore()
   const [isConfirming, setIsConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showAbnormalInput, setShowAbnormalInput] = useState(false)

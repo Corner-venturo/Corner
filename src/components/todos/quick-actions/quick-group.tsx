@@ -11,8 +11,7 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
-import { useTourStore, useOrderStore, useRegionsStore } from '@/stores'
-import { useUserStore } from '@/stores/user-store'
+import { createTour, createOrder, useCountries, useCities, updateCountry, updateCity, useEmployees } from '@/data'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -21,10 +20,24 @@ interface QuickGroupProps {
 }
 
 export function QuickGroup({ onSubmit }: QuickGroupProps) {
-  const tourStore = useTourStore()
-  const orderStore = useOrderStore()
-  const { incrementCountryUsage, incrementCityUsage, countries, cities } = useRegionsStore()
-  const { items: employees } = useUserStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
+  const { items: employees } = useEmployees()
+
+  // Helper functions to increment usage count (replaces store methods)
+  const incrementCountryUsage = async (countryName: string) => {
+    const country = countries.find(c => c.name === countryName)
+    if (!country) return
+    const newCount = (country.usage_count || 0) + 1
+    await updateCountry(country.id, { usage_count: newCount })
+  }
+
+  const incrementCityUsage = async (cityName: string) => {
+    const city = cities.find(c => c.name === cityName)
+    if (!city) return
+    const newCount = (city.usage_count || 0) + 1
+    await updateCity(city.id, { usage_count: newCount })
+  }
   const workspaceId = useWorkspaceId()
   const [submitting, setSubmitting] = useState(false)
 
@@ -98,7 +111,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
         profit: 0,
       }
 
-      const createdTour = await tourStore.create(tourData as unknown as Parameters<typeof tourStore.create>[0])
+      const createdTour = await createTour(tourData as unknown as Parameters<typeof createTour>[0])
 
       // 更新國家和城市的使用次數（讓常用的排在前面）
       if (newTour.countryCode !== '__custom__') {
@@ -132,7 +145,7 @@ export function QuickGroup({ onSubmit }: QuickGroupProps) {
           payment_status: 'unpaid' as const,
         }
 
-        await orderStore.create(orderData as unknown as Parameters<typeof orderStore.create>[0])
+        await createOrder(orderData as unknown as Parameters<typeof createOrder>[0])
       }
 
       // 重置表單

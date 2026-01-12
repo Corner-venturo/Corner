@@ -15,7 +15,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
-import { useCustomerStore } from '@/stores'
 import type { OrderMember } from '../order-member.types'
 
 interface UseOrderMembersDataParams {
@@ -52,8 +51,7 @@ export function useOrderMembersData({
   const [selectedOrderIdForAdd, setSelectedOrderIdForAdd] = useState<string | null>(null)
   const [showOrderSelectDialog, setShowOrderSelectDialog] = useState(false)
 
-  // ========== 顧客 Store ==========
-  const { fetchAll: fetchCustomers } = useCustomerStore()
+  // ========== 顧客資料由 SWR 自動載入 ==========
 
   /**
    * 載入旅遊團出發/回程日期
@@ -262,9 +260,8 @@ export function useOrderMembersData({
   useEffect(() => {
     loadMembers()
     loadTourDepartureDate()
-    // 載入顧客資料（用於編輯模式搜尋）
-    fetchCustomers()
-  }, [orderId, tourId, mode, loadMembers, loadTourDepartureDate, fetchCustomers])
+    // 顧客資料由 SWR 自動載入（用於編輯模式搜尋）
+  }, [orderId, tourId, mode, loadMembers, loadTourDepartureDate])
 
   return {
     // 成員資料

@@ -3,7 +3,6 @@
 import { logger } from '@/lib/utils/logger'
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { useRegionsStore } from '@/stores'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
 import { useAttractionsFilters } from '../../hooks/useAttractionsFilters'
 import { useAttractionsDialog } from '../../hooks/useAttractionsDialog'
@@ -13,7 +12,7 @@ import { SortableAttractionsList } from '../SortableAttractionsList'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
-import type { Country, City } from '@/stores/region-store'
+import type { Country, City } from '@/data'
 
 // Dynamic import for large dialog component (807 lines)
 const AttractionsDialog = dynamic(
@@ -110,16 +109,44 @@ export default function AttractionsTab({
     selectedCity: '', // 不再使用城市篩選
   })
 
-  const { countries, regions, cities, fetchCountries } = useRegionsStore()
-  const regionsLoadedRef = useRef(false)
+  // 使用 SWR 載入地區資料供對話框使用
+  // 動態 import 避免 SSR 問題
+  interface Region {
+    id: string
+    country_id: string
+    name: string
+    name_en?: string
+    description?: string
+    display_order: number
+    is_active: boolean
+    workspace_id?: string
+    created_at: string
+    updated_at: string
+  }
 
-  // 載入國家/地區/城市資料供對話框使用（只執行一次）
+  const [regionsData, setRegionsData] = useState<{
+    countries: Country[]
+    regions: Region[]
+    cities: City[]
+  }>({ countries: [], regions: [], cities: [] })
+
   useEffect(() => {
-    if (!regionsLoadedRef.current) {
-      regionsLoadedRef.current = true
-      fetchCountries()
+    const loadRegions = async () => {
+      const [countriesRes, regionsRes, citiesRes] = await Promise.all([
+        supabase.from('countries').select('*'),
+        supabase.from('regions').select('*'),
+        supabase.from('cities').select('*'),
+      ])
+      setRegionsData({
+        countries: (countriesRes.data || []) as Country[],
+        regions: (regionsRes.data || []) as Region[],
+        cities: (citiesRes.data || []) as City[],
+      })
     }
-  }, [fetchCountries])
+    loadRegions()
+  }, [])
+
+  const { countries, regions, cities } = regionsData
 
   const getRegionsByCountry = (countryId: string) => {
     return regions.filter(r => r.country_id === countryId)

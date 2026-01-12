@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { InputIME } from '@/components/ui/input-ime'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Sparkles, Loader2, ImageIcon } from 'lucide-react'
-import { useRegionsStore } from '@/stores'
+import { useCountries, useCities } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -62,29 +62,13 @@ interface GeminiItineraryFormProps {
 }
 
 export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps) {
-  const { countries, cities, fetchCountries, fetchCitiesByCountry } = useRegionsStore()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
   const [generatingDescription, setGeneratingDescription] = useState<number | null>(null)
   const [generatingSightDesc, setGeneratingSightDesc] = useState<number | null>(null)
   const [generatingImage, setGeneratingImage] = useState<string | null>(null)
 
-  // 載入國家資料（只執行一次）
-  useEffect(() => {
-    if (countries.length === 0) {
-      fetchCountries()
-    }
-     
-  }, [])
-
-  // 當國家改變時載入城市
-  useEffect(() => {
-    if (data.country && countries.length > 0) {
-      const country = countries.find(c => c.name === data.country)
-      if (country) {
-        fetchCitiesByCountry(country.id)
-      }
-    }
-     
-  }, [data.country])
+  // SWR 自動載入國家和城市資料
 
   const updateField = <K extends keyof GeminiItineraryData>(field: K, value: GeminiItineraryData[K]) => {
     onChange({ ...data, [field]: value })

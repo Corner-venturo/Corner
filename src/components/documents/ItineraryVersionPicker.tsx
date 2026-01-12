@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useItineraryStore, useRegionsStore, useAuthStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { useItineraries, createItinerary, updateItinerary, useCountries, useCities } from '@/data'
 import type { Tour, Itinerary } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
@@ -47,23 +48,16 @@ export function ItineraryVersionPicker({
   nested = false,
 }: ItineraryVersionPickerProps) {
   const router = useRouter()
-  const { items: itineraries, fetchAll, create, update, loading } = useItineraryStore()
-  const { countries, cities, fetchAll: fetchRegions } = useRegionsStore()
+  const { items: itineraries, loading } = useItineraries()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
   const { user: currentUser } = useAuthStore()
   const [isCreating, setIsCreating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 載入行程表與區域資料
-  useEffect(() => {
-    if (isOpen) {
-      fetchAll()
-      if (countries.length === 0) {
-        fetchRegions()
-      }
-    }
-  }, [isOpen, fetchAll, fetchRegions, countries.length])
+  // SWR 自動載入 regions 資料，不需要手動 fetchAll
 
   // 編輯時自動聚焦
   useEffect(() => {
@@ -140,7 +134,7 @@ export function ItineraryVersionPicker({
       const authorName = currentUser?.display_name || currentUser?.chinese_name || ''
       const formattedDailyItinerary = initializeDailyItinerary()
 
-      const newItinerary = await create({
+      const newItinerary = await createItinerary({
         title: '未命名行程表',
         tour_id: tour.id,
         tour_code: tour.code,
@@ -208,7 +202,7 @@ export function ItineraryVersionPicker({
     }
 
     try {
-      await update(itinerary.id, { title: editingName.trim() })
+      await updateItinerary(itinerary.id, { title: editingName.trim() })
     } catch (error) {
       logger.error('更新名稱失敗:', error)
     }

@@ -62,7 +62,7 @@ export default function PaymentsPage() {
   const router = useRouter()
 
   // 資料與業務邏輯
-  const { receipts, availableOrders, fetchReceipts, handleCreateReceipt, handleConfirmReceipt } = usePaymentData()
+  const { receipts, availableOrders, invalidateReceipts, handleCreateReceipt, handleConfirmReceipt } = usePaymentData()
   const { user } = useAuthStore()
 
   // 檢查是否為可批量確認的角色（管理員、會計、超級管理員）
@@ -82,10 +82,7 @@ export default function PaymentsPage() {
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
-  // 初始化載入資料
-  useEffect(() => {
-    fetchReceipts()
-  }, [fetchReceipts])
+  // SWR 自動載入資料，不需要手動 fetch
 
   // 如果有 URL 參數，自動開啟新增對話框
   useEffect(() => {
@@ -267,7 +264,7 @@ export default function PaymentsPage() {
       <AddReceiptDialog
         open={isDialogOpen}
         onOpenChange={handleAddDialogClose}
-        onSuccess={fetchReceipts}
+        onSuccess={invalidateReceipts}
         defaultOrderId={urlOrderId || undefined}
       />
 
@@ -286,7 +283,7 @@ export default function PaymentsPage() {
       <BatchConfirmReceiptDialog
         open={isBatchConfirmDialogOpen}
         onOpenChange={setIsBatchConfirmDialogOpen}
-        onSuccess={fetchReceipts}
+        onSuccess={invalidateReceipts}
       />
 
       {/* 收款單確認對話框 */}
@@ -295,7 +292,7 @@ export default function PaymentsPage() {
         onOpenChange={setIsDetailDialogOpen}
         receipt={selectedReceipt}
         onConfirm={handleConfirmReceipt}
-        onSuccess={fetchReceipts}
+        onSuccess={invalidateReceipts}
       />
     </div>
   )

@@ -6,19 +6,21 @@
 import { logger } from '@/lib/utils/logger'
 import { useCallback } from 'react'
 import { generateDisbursementPDF } from '@/lib/pdf/disbursement-pdf'
-import { usePaymentRequestStore, usePaymentRequestItemStore } from '@/stores'
+import { usePaymentRequests, usePaymentRequestItems } from '@/data'
 import type { DisbursementOrder } from '../types'
 
 export function useDisbursementPDF() {
-  const { items: paymentRequests } = usePaymentRequestStore()
-  const { items: paymentRequestItems } = usePaymentRequestItemStore()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: paymentRequests } = usePaymentRequests()
+  const { items: paymentRequestItems } = usePaymentRequestItems()
 
   const handlePrintPDF = useCallback(
     async (order: DisbursementOrder) => {
       try {
         // 找出該出納單關聯的所有請款單
+        const requestIds = order.payment_request_ids || []
         const relatedRequests = paymentRequests.filter(req =>
-          order.payment_request_ids.includes(req.id)
+          requestIds.includes(req.id)
         )
 
         // 找出這些請款單的所有項目

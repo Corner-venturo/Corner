@@ -6,7 +6,7 @@ import React from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
-import { useVisaStore } from '@/stores'
+import { updateVisa } from '@/data'
 import type { Visa } from '@/stores/types'
 
 interface ReturnDocumentsDialogProps {
@@ -25,8 +25,6 @@ export function ReturnDocumentsDialog({
   const [returnDate, setReturnDate] = React.useState('')
   const [returnNote, setReturnNote] = React.useState('')
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-
-  const updateVisa = useVisaStore(state => state.update)
 
   // 重置表單，預設今天日期
   React.useEffect(() => {

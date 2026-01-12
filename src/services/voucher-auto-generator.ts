@@ -13,9 +13,9 @@
  * 4. 結團 → 一張傳票處理所有轉列
  */
 
-import { useVoucherStore } from '@/stores/voucher-store'
-import { useVoucherEntryStore } from '@/stores/voucher-entry-store'
-import { useAccountingSubjectStore } from '@/stores/accounting-subject-store'
+import { createVoucher, createVoucherEntry } from '@/data'
+import { supabase } from '@/lib/supabase/client'
+import type { AccountingSubject } from '@/types/accounting-pro.types'
 import type {
   AutoVoucherFromPayment,
   AutoVoucherFromCardPayment,
@@ -83,6 +83,45 @@ function roundTWD(n: number): number {
 }
 
 /**
+ * 從 Supabase 直接查詢會計科目（by code）
+ * 避免依賴可能未載入的 Zustand store
+ */
+async function findSubjectByCode(code: string): Promise<AccountingSubject> {
+  const { data, error } = await supabase
+    .from('accounting_subjects')
+    .select('*')
+    .eq('code', code)
+    .single()
+
+  if (error || !data) {
+    throw new Error(`找不到會計科目: ${code}`)
+  }
+
+  return data as AccountingSubject
+}
+
+/**
+ * 批量查詢多個會計科目（by codes）
+ */
+async function findSubjectsByCodes(codes: string[]): Promise<Map<string, AccountingSubject>> {
+  const { data, error } = await supabase
+    .from('accounting_subjects')
+    .select('*')
+    .in('code', codes)
+
+  if (error) {
+    throw new Error(`查詢會計科目失敗: ${error.message}`)
+  }
+
+  const map = new Map<string, AccountingSubject>()
+  for (const subject of (data || []) as AccountingSubject[]) {
+    map.set(subject.code, subject)
+  }
+
+  return map
+}
+
+/**
  * 產生傳票編號
  */
 function generateVoucherNo(workspace_id: string, date: string, suffix = ''): string {
@@ -135,17 +174,15 @@ export function calculateCardPaymentMeta(
 export async function generateVoucherFromPayment(
   data: AutoVoucherFromPayment
 ): Promise<{ voucher: Voucher; entries: VoucherEntry[] }> {
-  const voucherStore = useVoucherStore.getState()
-  const entryStore = useVoucherEntryStore.getState()
-  const subjectStore = useAccountingSubjectStore.getState()
-
   const debitSubjectCode =
     data.payment_method === 'cash'
       ? SUBJECT_CODES.CASH
       : data.bank_account_code || SUBJECT_CODES.BANK
 
-  const debitSubject = subjectStore.items.find((s) => s.code === debitSubjectCode)
-  const creditSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.PREPAID_TOUR_FEE)
+  // 直接從 Supabase 查詢會計科目
+  const subjectsMap = await findSubjectsByCodes([debitSubjectCode, SUBJECT_CODES.PREPAID_TOUR_FEE])
+  const debitSubject = subjectsMap.get(debitSubjectCode)
+  const creditSubject = subjectsMap.get(SUBJECT_CODES.PREPAID_TOUR_FEE)
 
   if (!debitSubject || !creditSubject) {
     throw new Error('找不到會計科目，請確認會計科目表已初始化')
@@ -164,11 +201,11 @@ export async function generateVoucherFromPayment(
     status: 'draft',
   }
 
-  const createdVoucher = await voucherStore.create(voucher as Omit<Voucher, 'id' | 'created_at'>)
+  const createdVoucher = await createVoucher(voucher as Omit<Voucher, 'id' | 'created_at'>)
   const entries: VoucherEntry[] = []
 
   // 借方：銀行/現金
-  const debitEntry = await entryStore.create({
+  const debitEntry = await createVoucherEntry({
     voucher_id: createdVoucher.id,
     entry_no: 1,
     subject_id: debitSubject.id,
@@ -179,7 +216,7 @@ export async function generateVoucherFromPayment(
   entries.push(debitEntry)
 
   // 貸方：預收團款
-  const creditEntry = await entryStore.create({
+  const creditEntry = await createVoucherEntry({
     voucher_id: createdVoucher.id,
     entry_no: 2,
     subject_id: creditSubject.id,
@@ -204,10 +241,6 @@ export async function generateVoucherFromPayment(
 export async function generateVoucherFromCardPayment(
   data: AutoVoucherFromCardPayment
 ): Promise<{ voucher: Voucher; entries: VoucherEntry[]; meta: CardPaymentMeta }> {
-  const voucherStore = useVoucherStore.getState()
-  const entryStore = useVoucherEntryStore.getState()
-  const subjectStore = useAccountingSubjectStore.getState()
-
   // 計算刷卡金額
   const meta = calculateCardPaymentMeta(
     data.gross_amount,
@@ -215,13 +248,19 @@ export async function generateVoucherFromCardPayment(
     data.fee_rate_total || DEFAULT_RATES.CARD_FEE_TOTAL
   )
 
-  // 查找會計科目
-  const bankSubject = subjectStore.items.find(
-    (s) => s.code === (data.bank_account_code || SUBJECT_CODES.BANK)
-  )
-  const cardFeeSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.PREPAID_CARD_FEE)
-  const prepaidSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.PREPAID_TOUR_FEE)
-  const rebateSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.CARD_REBATE_INCOME)
+  // 直接從 Supabase 查詢會計科目
+  const bankCode = data.bank_account_code || SUBJECT_CODES.BANK
+  const subjectsMap = await findSubjectsByCodes([
+    bankCode,
+    SUBJECT_CODES.PREPAID_CARD_FEE,
+    SUBJECT_CODES.PREPAID_TOUR_FEE,
+    SUBJECT_CODES.CARD_REBATE_INCOME,
+  ])
+
+  const bankSubject = subjectsMap.get(bankCode)
+  const cardFeeSubject = subjectsMap.get(SUBJECT_CODES.PREPAID_CARD_FEE)
+  const prepaidSubject = subjectsMap.get(SUBJECT_CODES.PREPAID_TOUR_FEE)
+  const rebateSubject = subjectsMap.get(SUBJECT_CODES.CARD_REBATE_INCOME)
 
   if (!bankSubject || !cardFeeSubject || !prepaidSubject || !rebateSubject) {
     throw new Error('找不到刷卡相關會計科目，請確認已執行 V2 migration')
@@ -243,12 +282,12 @@ export async function generateVoucherFromCardPayment(
     status: 'draft',
   }
 
-  const createdVoucher = await voucherStore.create(voucher as Omit<Voucher, 'id' | 'created_at'>)
+  const createdVoucher = await createVoucher(voucher as Omit<Voucher, 'id' | 'created_at'>)
   const entries: VoucherEntry[] = []
 
   // 借方 1：銀行存款（實收）
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 1,
       subject_id: bankSubject.id,
@@ -260,7 +299,7 @@ export async function generateVoucherFromCardPayment(
 
   // 借方 2：預付團務成本－刷卡成本（2%）
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 2,
       subject_id: cardFeeSubject.id,
@@ -272,7 +311,7 @@ export async function generateVoucherFromCardPayment(
 
   // 貸方 1：預收團款
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 3,
       subject_id: prepaidSubject.id,
@@ -284,7 +323,7 @@ export async function generateVoucherFromCardPayment(
 
   // 貸方 2：其他收入－刷卡回饋（0.32%）
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 4,
       subject_id: rebateSubject.id,
@@ -307,12 +346,14 @@ export async function generateVoucherFromCardPayment(
 export async function generateVoucherFromPaymentRequest(
   data: AutoVoucherFromPaymentRequest
 ): Promise<{ voucher: Voucher; entries: VoucherEntry[] }> {
-  const voucherStore = useVoucherStore.getState()
-  const entryStore = useVoucherEntryStore.getState()
-  const subjectStore = useAccountingSubjectStore.getState()
+  // 直接從 Supabase 查詢會計科目
+  const subjectsMap = await findSubjectsByCodes([
+    SUBJECT_CODES.ADVANCE_TOUR_FEE,
+    SUBJECT_CODES.BANK,
+  ])
 
-  const debitSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.ADVANCE_TOUR_FEE)
-  const creditSubject = subjectStore.items.find((s) => s.code === SUBJECT_CODES.BANK)
+  const debitSubject = subjectsMap.get(SUBJECT_CODES.ADVANCE_TOUR_FEE)
+  const creditSubject = subjectsMap.get(SUBJECT_CODES.BANK)
 
   if (!debitSubject || !creditSubject) {
     throw new Error('找不到會計科目')
@@ -331,12 +372,12 @@ export async function generateVoucherFromPaymentRequest(
     status: 'draft',
   }
 
-  const createdVoucher = await voucherStore.create(voucher as Omit<Voucher, 'id' | 'created_at'>)
+  const createdVoucher = await createVoucher(voucher as Omit<Voucher, 'id' | 'created_at'>)
   const entries: VoucherEntry[] = []
 
   // 借方：預付團務成本
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 1,
       subject_id: debitSubject.id,
@@ -348,7 +389,7 @@ export async function generateVoucherFromPaymentRequest(
 
   // 貸方：銀行存款
   entries.push(
-    await entryStore.create({
+    await createVoucherEntry({
       voucher_id: createdVoucher.id,
       entry_no: 2,
       subject_id: creditSubject.id,
@@ -374,13 +415,30 @@ export async function generateVoucherFromPaymentRequest(
 export async function generateVoucherFromTourClosing(
   data: AutoVoucherFromTourClosing
 ): Promise<{ voucher: Voucher; entries: VoucherEntry[] }> {
-  const voucherStore = useVoucherStore.getState()
-  const entryStore = useVoucherEntryStore.getState()
-  const subjectStore = useAccountingSubjectStore.getState()
+  // 預先查詢所有需要的會計科目
+  const allCodes = [
+    SUBJECT_CODES.PREPAID_TOUR_FEE,
+    SUBJECT_CODES.TOUR_REVENUE,
+    SUBJECT_CODES.ADVANCE_TOUR_FEE,
+    SUBJECT_CODES.PREPAID_CARD_FEE,
+    SUBJECT_CODES.COST_CARD_FEE,
+    SUBJECT_CODES.ADMIN_FEE_INCOME,
+    SUBJECT_CODES.TAX_PAYABLE,
+    SUBJECT_CODES.BANK,
+    SUBJECT_CODES.BONUS_PAYABLE,
+    SUBJECT_CODES.BONUS_EXPENSE,
+    SUBJECT_CODES.COST_TRANSPORTATION,
+    SUBJECT_CODES.COST_ACCOMMODATION,
+    SUBJECT_CODES.COST_MEAL,
+    SUBJECT_CODES.COST_TICKET,
+    SUBJECT_CODES.COST_INSURANCE,
+    SUBJECT_CODES.COST_OTHER,
+  ]
+  const subjectsMap = await findSubjectsByCodes(allCodes)
 
-  // 查找所有需要的科目
+  // 查找科目的輔助函數
   const findSubject = (code: string) => {
-    const subject = subjectStore.items.find((s) => s.code === code)
+    const subject = subjectsMap.get(code)
     if (!subject) throw new Error(`找不到會計科目: ${code}`)
     return subject
   }
@@ -580,7 +638,7 @@ export async function generateVoucherFromTourClosing(
     status: 'draft',
   }
 
-  const createdVoucher = await voucherStore.create(voucher as Omit<Voucher, 'id' | 'created_at'>)
+  const createdVoucher = await createVoucher(voucher as Omit<Voucher, 'id' | 'created_at'>)
 
   // 建立分錄
   const createdEntries: VoucherEntry[] = []
@@ -589,7 +647,7 @@ export async function generateVoucherFromTourClosing(
   for (const entry of entries) {
     const subject = findSubject(entry.code)
     createdEntries.push(
-      await entryStore.create({
+      await createVoucherEntry({
         voucher_id: createdVoucher.id,
         entry_no: entryNo++,
         subject_id: subject.id,

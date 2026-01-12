@@ -60,23 +60,54 @@ interface CloudHookReturn<T extends BaseEntity> {
 }
 
 // 需要 workspace 隔離的表格列表
-// ✅ 軍事級別修復：所有表格都已添加 workspace_id 支援
+// ✅ 2026-01-12: Workspace 資料隔離重構
+//
+// 規則：
+// 1. 只包含有 workspace_id 欄位的表格
+// 2. 透過父表做 RLS 的表格不放這裡（如 order_members, quote_items）
+// 3. 跨公司系統的表格用 responder_workspace_id（如 request_responses）
+//
 const WORKSPACE_SCOPED_TABLES = [
+  // === 核心業務 ===
   'tours',
   'orders',
   'customers',
+
+  // === 提案系統 ===
+  'proposals',
+  // 'proposal_packages' - 沒有 workspace_id 欄位，透過 proposal_id 關聯到 proposals
+
+  // === 行程與報價 ===
   'quotes',
-  'quote_items',
-  'itineraries', // ✅ 2025-12-10: workspace_id 已添加，RLS 已更新
+  'itineraries',
+
+  // === 財務管理 ===
   'payment_requests',
-  'payment_request_items',
   'disbursement_orders',
   'receipt_orders',
-  'todos',
+
+  // === 會計模組 === ✅ 2026-01-12: 補齊
+  'chart_of_accounts',
+  'erp_bank_accounts',
+  'erp_transactions',
+  'erp_vouchers',
+  'journal_vouchers',
+  'confirmations',
+
+  // === 供應商 === ✅ 2026-01-12: 補齊
+  'suppliers',
+
+  // === 其他業務 ===
   'visas',
+  'todos',
   'calendar_events',
   'tour_addons',
-  // ✅ 2025-12-29: PNR Enhancement 新增
+
+  // === 溝通頻道 === ✅ 2026-01-12: 補齊
+  'channels',
+  'messages',
+
+  // === PNR 系統 ===
   'pnr_records',
   'pnr_fare_history',
   'pnr_fare_alerts',
@@ -85,17 +116,20 @@ const WORKSPACE_SCOPED_TABLES = [
   'pnr_queue_items',
   'pnr_schedule_changes',
   'pnr_ai_queries',
-  // ✅ 2025-12-31: 機場圖片庫
+
+  // === 其他 ===
   'airport_images',
-  // ✅ 2026-01-04: 客戶群組
   'customer_groups',
-  // ✅ 2026-01-05: 提案系統
-  'proposals',
-  'proposal_packages',
-  // ✅ 2026-01-11: 跨公司需求系統
   'leader_availability',
+
+  // === 跨公司系統（用 responder_workspace_id）===
   'request_responses',
-  'request_response_items',
+  'request_response_items', // ✅ 2026-01-12: 已添加 workspace_id
+
+  // 注意：以下表格透過父表做 RLS，不需要在這裡
+  // - order_members (透過 orders)
+  // - quote_items (透過 quotes)
+  // - payment_request_items (透過 payment_requests)
 ]
 
 // 表格對應的 code prefix（用於自動生成編號）

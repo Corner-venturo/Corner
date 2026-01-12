@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
-import { useRegionsStore } from '@/stores/region-store'
+import { useCountries, useCities } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
@@ -36,9 +36,8 @@ export default function ItineraryPage() {
   const { items: tours } = useTours()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
-  const regionsStore = useRegionsStore()
-  const countries = regionsStore.countries
-  const cities = regionsStore.cities
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
 
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
@@ -103,10 +102,9 @@ export default function ItineraryPage() {
   // 打開新增行程對話框
   const handleOpenTypeSelect = useCallback(() => {
     formState.resetForm()
-    // 🔧 優化：只在對話框開啟時才載入 regions（延遲載入）
-    regionsStore.fetchAll()
+    // 🔧 優化：SWR 自動載入 regions，不需要手動 fetchAll()
     pageState.setIsTypeSelectOpen(true)
-  }, [formState, pageState, regionsStore])
+  }, [formState, pageState])
 
   // 建立行程
   const handleCreateItinerary = useCallback(async () => {

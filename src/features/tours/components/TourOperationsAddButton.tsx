@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Tour } from '@/stores/types'
-import { useTourStore, useOrderStore, useMemberStore } from '@/stores'
+import { useOrders, useMembers } from '@/data'
 import { Plus, FileText, Package, RefreshCw, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -21,15 +21,15 @@ export function TourOperationsAddButton({
   tourExtraFields,
   setTourExtraFields,
 }: TourOperationsAddButtonProps) {
-  const orderStore = useOrderStore()
-  const memberStore = useMemberStore()
+  const { items: orders } = useOrders()
+  const { items: members } = useMembers()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // Get all orders for this tour
-  const tourOrders = orderStore.items.filter(order => order.tour_id === tour.id)
+  const tourOrders = orders.filter(order => order.tour_id === tour.id)
 
   // Get member data
-  const allTourMembers = memberStore.items.filter(member =>
+  const allTourMembers = members.filter(member =>
     tourOrders.some(order => order.id === member.order_id)
   )
 

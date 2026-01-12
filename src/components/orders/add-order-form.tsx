@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { useToursListSlim } from '@/hooks/useListSlim'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployees } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 
@@ -35,7 +35,7 @@ interface AddOrderFormProps {
 
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
   const { items: tours } = useToursListSlim()
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
+  const { items: employees } = useEmployees()
 
   // 判斷是否為嵌入模式
   const isEmbedded = !!onChange
@@ -51,14 +51,6 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
   // 使用外部 state 或內部 state
   const formData = isEmbedded ? value || {} : internalFormData
   const updateFormData = isEmbedded ? onChange : setInternalFormData
-
-  // 載入員工資料
-  React.useEffect(() => {
-    if (employees.length === 0) {
-      fetchEmployees()
-    }
-  }, [employees.length, fetchEmployees])
-
 
   // 排序函數：按員工編號排序
   const sortByEmployeeNumber = (a: Employee, b: Employee) => {

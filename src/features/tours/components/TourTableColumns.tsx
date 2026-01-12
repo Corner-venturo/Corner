@@ -4,35 +4,17 @@
 
 'use client'
 
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { Tour } from '@/stores/types'
 import { cn } from '@/lib/utils'
 import { DateCell } from '@/components/table-cells'
-import { useEmployeeStore } from '@/stores'
 
 interface UseTourTableColumnsParams {
   getStatusColor: (status: string) => string
 }
 
 export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParams) {
-  const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
-
-  // 載入員工資料（用於顯示團控人員名稱）
-  useEffect(() => {
-    if (employees.length === 0) {
-      fetchEmployees()
-    }
-  }, [employees.length, fetchEmployees])
-
-  // 建立 ID -> 名稱的映射
-  const employeeMap = useMemo(() => {
-    const map = new Map<string, string>()
-    employees.forEach(emp => {
-      map.set(emp.id, emp.display_name || emp.english_name || emp.employee_number)
-    })
-    return map
-  }, [employees])
 
   return useMemo<TableColumn[]>(
     () => [
@@ -61,21 +43,6 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         },
       },
       {
-        key: 'controller_id',
-        label: '團控',
-        sortable: false,
-        width: '80px',
-        render: (value, row) => {
-          const tour = row as Tour
-          const controllerName = tour.controller_id ? employeeMap.get(tour.controller_id) : null
-          return (
-            <span className="text-sm text-morandi-secondary">
-              {controllerName || '-'}
-            </span>
-          )
-        },
-      },
-      {
         key: 'status',
         label: '狀態',
         sortable: true,
@@ -91,6 +58,6 @@ export function useTourTableColumns({ getStatusColor }: UseTourTableColumnsParam
         },
       },
     ],
-    [getStatusColor, employeeMap]
+    [getStatusColor]
   )
 }

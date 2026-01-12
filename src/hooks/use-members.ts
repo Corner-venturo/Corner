@@ -14,25 +14,10 @@ import { useMembers as useMembersCloud } from './cloud-hooks' // Renamed to avoi
 import { useMemberActions } from './useMemberActions' // 使用有同步邏輯的 actions
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Member } from '@/stores/types'
 
-/**
- * 取得當前使用者的 workspace_id
- * 從 localStorage 讀取 auth-store 的值
- */
-function getCurrentWorkspaceId(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const authData = localStorage.getItem('auth-storage')
-    if (authData) {
-      const parsed = JSON.parse(authData)
-      return parsed?.state?.user?.workspace_id || null
-    }
-  } catch {
-    // 忽略解析錯誤
-  }
-  return null
-}
+// 使用 @/lib/workspace-helpers 的 getCurrentWorkspaceId
 
 interface UseMembersOptions {
   /** 訂單 ID（選填，用於過濾成員） */

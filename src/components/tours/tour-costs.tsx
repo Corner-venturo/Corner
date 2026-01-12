@@ -7,7 +7,13 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tour, Payment } from '@/stores/types'
-import { useOrderStore, usePaymentRequestStore, useSupplierStore } from '@/stores'
+import {
+  useOrders,
+  usePaymentRequests,
+  useSuppliers,
+  createPaymentRequest as createPaymentRequestApi,
+  invalidatePaymentRequests,
+} from '@/data'
 import type { PaymentRequestItem } from '@/stores/types'
 import { supabase } from '@/lib/supabase/client'
 import { mutate } from 'swr'
@@ -42,13 +48,10 @@ interface CostPayment extends Payment {
 }
 
 export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, showSummary = true, onChildDialogChange }: TourCostsProps) {
-  const { items: orders } = useOrderStore()
-  const {
-    items: paymentRequests,
-    create: createPaymentRequest,
-    fetchAll: fetchPaymentRequests,
-  } = usePaymentRequestStore()
-  const { items: suppliers } = useSupplierStore()
+  const { items: orders } = useOrders()
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: paymentRequests } = usePaymentRequests()
+  const { items: suppliers } = useSuppliers()
   const { toast } = useToast()
 
   // 更新 tour 的成本財務欄位
@@ -182,8 +185,9 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
         updated_at: new Date().toISOString(),
       }
 
-      await createPaymentRequest(paymentRequestData as unknown as Parameters<typeof createPaymentRequest>[0])
-      await fetchPaymentRequests()
+      await createPaymentRequestApi(paymentRequestData as unknown as Parameters<typeof createPaymentRequestApi>[0])
+      // SWR 快取失效，自動重新載入
+      await invalidatePaymentRequests()
 
       // 同步更新 tour 的成本數據
       await updateTourCostFinancials()

@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Combobox } from '@/components/ui/combobox'
-import { useUserStore } from '@/stores/user-store'
+import { useEmployees } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 import type { NewTourData } from '../../types'
@@ -15,14 +15,7 @@ interface TourSettingsProps {
 }
 
 export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
-  const { items: employees, fetchAll: fetchEmployees } = useUserStore()
-
-  // 載入員工資料
-  useEffect(() => {
-    if (employees.length === 0) {
-      fetchEmployees()
-    }
-  }, [employees.length, fetchEmployees])
+  const { items: employees } = useEmployees()
 
   // 篩選團控人員（roles 包含 'controller'）
   const controllers = useMemo(() => {

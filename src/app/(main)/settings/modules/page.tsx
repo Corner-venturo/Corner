@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useWorkspaceModuleStore } from '@/stores/workspace-module-store'
+import { useWorkspaceModules, createWorkspaceModule, updateWorkspaceModule } from '@/data'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores/auth-store'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -77,7 +77,7 @@ type ModuleName = keyof typeof MODULE_INFO
 
 export default function ModulesManagementPage() {
   const user = useAuthStore(state => state.user)
-  const { items: modules, create, update, fetchAll } = useWorkspaceModuleStore()
+  const { items: modules } = useWorkspaceModules()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
 
   const [selectedModule, setSelectedModule] = useState<ModuleName | null>(null)
@@ -86,7 +86,6 @@ export default function ModulesManagementPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchAll()
     loadWorkspaces()
   }, [])
 
@@ -127,14 +126,14 @@ export default function ModulesManagementPage() {
 
       if (existingModule) {
         // 更新現有模組
-        await update(existingModule.id, {
+        await updateWorkspaceModule(existingModule.id, {
           is_enabled: true,
           enabled_at: new Date().toISOString(),
           expires_at: expiresDate || null,
         })
       } else {
         // 建立新模組
-        await create({
+        await createWorkspaceModule({
           workspace_id: user.workspace_id,
           module_name: selectedModule,
           is_enabled: true,
@@ -172,7 +171,7 @@ export default function ModulesManagementPage() {
 
     setLoading(true)
     try {
-      await update(module.id, {
+      await updateWorkspaceModule(module.id, {
         is_enabled: false,
       })
 

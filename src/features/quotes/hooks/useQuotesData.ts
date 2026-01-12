@@ -7,7 +7,8 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTourStore, useRegionsStore, useItineraryStore } from '@/stores'
+import { useTours, invalidateTours, useCountries, useCities } from '@/data'
+import { useItineraries, updateItinerary } from '@/data'
 import { logger } from '@/lib/utils/logger'
 import { DELETE_QUOTE_PASSWORD } from '@/lib/constants/workspace-settings'
 import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
@@ -15,23 +16,24 @@ import { confirm, alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 export const useQuotesData = () => {
   const router = useRouter()
   const { quotes, addQuote, updateQuote, deleteQuote, duplicateQuote, loadQuotes } = useQuotes()
-  const { items: tours, fetchAll: fetchTours } = useTourStore()
-  const { countries, cities, fetchAll: fetchRegions, getCitiesByCountry } = useRegionsStore()
-  const { items: itineraries, update: updateItinerary } = useItineraryStore()
+  const { items: tours } = useTours()
+  const { items: countries } = useCountries()
+  const { items: cities } = useCities()
+  const { items: itineraries } = useItineraries()
+
+  // Helper function to filter cities by country (replaces getCitiesByCountry)
+  const getCitiesByCountry = (countryId: string) => {
+    return cities.filter(c => c.country_id === countryId)
+  }
 
   // 載入報價單資料 - 只在首次載入時執行
+  // SWR 自動處理 tours/itineraries，只需載入 quotes
   useEffect(() => {
     const timer = setTimeout(() => {
       loadQuotes()
-      // ✅ 載入 tours（報價單需要關聯旅遊團）
-      if (tours.length === 0) {
-        fetchTours()
-      }
-      // ✅ 移除自動載入 regions（改為在打開對話框時才載入）
-      // fetchRegions()
     }, 100)
     return () => clearTimeout(timer)
-     
+
   }, []) // 只執行一次，避免無限循環
 
   const handleDuplicateQuote = async (quote_id: string, e?: React.MouseEvent) => {

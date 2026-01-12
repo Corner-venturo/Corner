@@ -3,17 +3,24 @@
  *
  * ⚠️ 架構說明：
  * - 此檔案使用 Zustand Store（舊架構，向後相容）
- * - 新功能請優先使用 @/hooks/cloud-hooks（SWR-based）
+ * - 新功能請優先使用 @/data（SWR-based 統一資料層）
  *
  * 兩套系統對照：
- * | Zustand (此處)      | SWR (cloud-hooks)  |
- * |---------------------|-------------------|
- * | useTourStore        | useTours          |
- * | useOrderStore       | useOrders         |
- * | useCustomerStore    | useCustomers      |
- * | ...                 | ...               |
+ * | Zustand (此處)           | @/data (新架構)              |
+ * |--------------------------|------------------------------|
+ * | useTourStore             | useTours                     |
+ * | useOrderStore            | useOrders                    |
+ * | useCustomerStore         | useCustomers                 |
+ * | useTourLeaderStore ⚠️    | useTourLeaders (已遷移)      |
+ * | useRegionsStore ⚠️       | useCountries, useCities      |
+ * | usePaymentRequestStore   | usePaymentRequests (進行中)  |
+ * | ...                      | ...                          |
  *
- * 遷移狀態：73 個檔案仍使用 Zustand，8 個使用 SWR
+ * 遷移狀態 (2026-01-12)：
+ * - ✅ TourLeaders: 已遷移到 @/data
+ * - ✅ Regions: 已遷移到 @/data (useCountries, useCities)
+ * - 🔄 PaymentRequest: 服務層已遷移，hooks 待遷移
+ * - ⏳ 其他: 待遷移
  */
 
 import { createStore } from './core/create-store'
@@ -233,6 +240,9 @@ export const useSupplierStore = createStore<Supplier>({
 /**
  * 領隊資料 Store
  * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
+ *
+ * @deprecated 請使用 @/data 的 useTourLeaders, createTourLeader 等
+ * 此 store 保留是為了向後兼容，新代碼請使用 @/data
  */
 export const useTourLeaderStore = createStore<import('@/types/tour-leader.types').TourLeader>({
   tableName: 'tour_leaders',
@@ -285,11 +295,8 @@ export const useLeaderScheduleStore = createStore<import('@/types/fleet.types').
   workspaceScoped: true,
 })
 
-// 供應商類別 Store
-export { useSupplierCategoryStore } from './supplier-category-store'
-
-// 成本模板 Store
-export { useCostTemplateStore } from './cost-template-store'
+// 供應商類別 Store - 已遷移到 @/data (useSupplierCategories)
+// 成本模板 Store - 已遷移到 @/data (useCostTemplates)
 
 /**
  * 企業客戶 Store
@@ -325,9 +332,7 @@ export { useRegionsStore } from './region-store'
 export type { Country, City, RegionStats } from './region-store'
 export type { Region as RegionNew } from './region-store'
 
-// 景點 Store
-export { useAttractionStore } from './attraction-store'
-export type { Attraction } from './attraction-store'
+// 景點 Store - 已遷移到 @/data (useAttractions)
 
 // 行事曆事件 Store
 // 🔒 啟用 Workspace 隔離
@@ -336,18 +341,13 @@ export const useCalendarEventStore = createStore<import('@/types/calendar.types'
   workspaceScoped: true,
 })
 
-// 確認單 Store（航班/住宿）
-export { useConfirmationStore } from './confirmation-store'
+// 確認單 Store - 已遷移到 @/data (useConfirmations)
 
 // ============================================
-// 財務收款系統 Stores
+// 財務收款系統 Stores - 已遷移到 @/data
 // ============================================
-
-// 收款單 Store（新版，支援 LinkPay）
-export { useReceiptStore } from './receipt-store'
-
-// LinkPay 付款記錄 Store
-export { useLinkPayLogStore } from './linkpay-log-store'
+// 收款單 Store - 已遷移到 @/data (useReceipts)
+// LinkPay 付款記錄 Store - 已遷移到 @/data (useLinkPayLogs)
 
 // WorkspaceItem, TimeboxSession 型別需要定義後再啟用
 // export const useTimeboxSessionStore = createStore<TimeboxSession>('timebox_sessions');

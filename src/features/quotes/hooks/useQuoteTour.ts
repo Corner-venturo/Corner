@@ -6,7 +6,7 @@ import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
-import { useTourStore } from '@/stores'
+import { useTours } from '@/data'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
 import type { Quote, Tour, QuoteVersion } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
@@ -38,6 +38,9 @@ export const useQuoteTour = ({
   participantCounts,
   sellingPrices,
 }: UseQuoteTourProps) => {
+  // 使用 @/data hooks（SWR 自動載入）
+  const { items: existingTours } = useTours()
+
   // 開旅遊團
   const handleCreateTour = useCallback(async () => {
     if (!quote) return
@@ -85,8 +88,7 @@ export const useQuoteTour = ({
       throw new Error('無法取得 workspace code，請重新登入')
     }
 
-    // 獲取現有的 tours 來避免編號衝突
-    const existingTours = useTourStore.getState().items
+    // 使用 SWR 快取的 tours 來避免編號衝突
     const tourCode = generateTourCode(
       workspaceCode,
       'XX', // 預設地區代碼，用戶可以後續修改
@@ -127,6 +129,7 @@ export const useQuoteTour = ({
     quoteName,
     addTour,
     router,
+    existingTours,
   ])
 
   return {
