@@ -208,10 +208,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
       }
     }
 
-    if (showEntryCardDialog || showPnrToolDialog) {
+    if (showEntryCardDialog || showPnrToolDialog || showMembersPnrMatchDialog) {
       loadMembers()
     }
-  }, [tour?.id, showEntryCardDialog, showPnrToolDialog])
+  }, [tour?.id, showEntryCardDialog, showPnrToolDialog, showMembersPnrMatchDialog])
 
   // 建立頻道對話框狀態
   const [showCreateChannelDialog, setShowCreateChannelDialog] = useState(false)
