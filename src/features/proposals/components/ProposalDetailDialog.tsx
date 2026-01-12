@@ -190,12 +190,14 @@ export function ProposalDetailDialog({
       )}
 
       {/* 時間軸行程表對話框：放在主對話框外面（單一遮罩模式） */}
-      <TimelineItineraryDialog
-        isOpen={timelineDialogOpen}
-        onClose={handleCloseTimelineDialog}
-        pkg={timelinePackage}
-        onSave={handleSaveTimeline}
-      />
+      {timelinePackage && (
+        <TimelineItineraryDialog
+          isOpen={timelineDialogOpen}
+          onClose={handleCloseTimelineDialog}
+          pkg={timelinePackage}
+          onSave={handleSaveTimeline}
+        />
+      )}
     </>
   )
 }

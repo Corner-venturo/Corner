@@ -734,7 +734,7 @@ export function PackageListPanel({
       />
 
       {/* 時間軸編輯器對話框（僅在未使用父組件回調時渲染） */}
-      {!onOpenTimelineDialog && (
+      {!onOpenTimelineDialog && selectedPackage && (
         <TimelineItineraryDialog
           isOpen={timelineDialogOpen}
           onClose={() => {
