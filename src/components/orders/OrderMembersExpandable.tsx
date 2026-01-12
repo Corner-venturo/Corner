@@ -281,11 +281,13 @@ export function OrderMembersExpandable({
           <span className="text-sm text-morandi-secondary">({sortedMembers.length} 人)</span>
         </div>
         <div className="flex items-center gap-1">
+          {/* PNR 配對按鈕：在 tour 和 order 模式都顯示 */}
+          <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrMatchDialog(true)}>
+            <Plane size={14} className="mr-1" />PNR 配對
+          </Button>
+          {/* 分房、分車按鈕：僅在 tour 模式顯示 */}
           {mode === 'tour' && (
             <>
-              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setShowPnrMatchDialog(true)}>
-                <Plane size={14} className="mr-1" />PNR 配對
-              </Button>
               <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => roomVehicle.setShowRoomManager(true)}>
                 <Hotel size={14} className="mr-1" />分房
               </Button>

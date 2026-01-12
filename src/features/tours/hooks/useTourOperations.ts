@@ -33,6 +33,7 @@ interface UseTourOperationsParams {
   setFormError: (error: string | null) => void
   dialogType: string
   dialogData: Tour | null
+  workspaceId?: string
 }
 
 export function useTourOperations(params: UseTourOperationsParams) {
@@ -51,6 +52,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
     setFormError,
     dialogType,
     dialogData,
+    workspaceId,
   } = params
 
   const handleAddTour = useCallback(
@@ -167,6 +169,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
           controller_id: newTour.controller_id || undefined,
           outbound_flight: parseFlightText(newTour.outbound_flight_text),
           return_flight: parseFlightText(newTour.return_flight_text),
+          workspace_id: workspaceId, // RLS 必須
         }
 
         const createdTour = await actions.create(tourData)
@@ -240,6 +243,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
       router,
       incrementCountryUsage,
       incrementCityUsage,
+      workspaceId,
     ]
   )
 

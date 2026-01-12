@@ -1,12 +1,11 @@
 /**
  * TourItineraryDialog - 旅遊團行程表選擇對話框
- * 讓用戶選擇建立「快速行程表」或「網頁行程表」
+ * 讓用戶選擇建立「快速行程表」或「時間軸行程表」
  */
 
 'use client'
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -23,11 +22,12 @@ import {
 } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import type { Tour } from '@/stores/types'
-import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
+import type { ProposalPackage, TimelineItineraryData, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 
 interface TourItineraryDialogProps {
@@ -41,14 +41,13 @@ export function TourItineraryDialog({
   onClose,
   tour,
 }: TourItineraryDialogProps) {
-  const router = useRouter()
-
   // Proposal Packages（用於取得 timeline_data）
   const { items: proposalPackages, fetchAll: fetchProposalPackages } = useProposalPackages()
 
   // 狀態
   const [isCreatingPackage, setIsCreatingPackage] = useState(false)
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
+  const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
   const [dynamicPackage, setDynamicPackage] = useState<ProposalPackage | null>(null)
 
   // 載入資料
@@ -77,6 +76,22 @@ export function TourItineraryDialog({
 
   // 檢查是否有快速行程表（itinerary record）
   const hasQuickItinerary = itineraryType === 'simple' || !!tourProposalPackage?.itinerary_id
+
+  // 為 PackageItineraryDialog 建立模擬 Proposal 物件（使用 Tour 資料）
+  const fakeProposal = useMemo((): Proposal => ({
+    id: tour.id,
+    code: tour.code || '',
+    title: tour.name,
+    status: 'converted' as const,
+    destination: tour.location || null,
+    country_id: tour.country_id || null,
+    main_city_id: tour.main_city_id || null,
+    expected_start_date: tour.departure_date || null,
+    expected_end_date: tour.return_date || null,
+    created_at: tour.created_at || new Date().toISOString(),
+    updated_at: tour.updated_at || new Date().toISOString(),
+    workspace_id: tour.workspace_id || '',
+  }), [tour])
 
   // 為旅遊團建立或取得 proposal_package
   const getOrCreatePackageForTour = async (): Promise<ProposalPackage | null> => {
@@ -141,13 +156,11 @@ export function TourItineraryDialog({
     }
   }
 
-  // 選擇快速行程表（網頁編輯器）
-  const handleSelectQuickItinerary = () => {
-    onClose()
-    if (tourProposalPackage?.itinerary_id) {
-      router.push(`/itinerary/new?itinerary_id=${tourProposalPackage.itinerary_id}`)
-    } else {
-      router.push(`/itinerary/new?tour_id=${tour.id}`)
+  // 選擇快速行程表（PackageItineraryDialog）
+  const handleSelectQuickItinerary = async () => {
+    const pkg = await getOrCreatePackageForTour()
+    if (pkg) {
+      setPackageItineraryDialogOpen(true)
     }
   }
 
@@ -188,10 +201,14 @@ export function TourItineraryDialog({
     }
   }, [tourProposalPackage, fetchProposalPackages])
 
+  // 任何子 Dialog 開啟時，主 Dialog 關閉
+  const hasChildDialogOpen = timelineDialogOpen || packageItineraryDialogOpen
+
   return (
     <>
-      {/* 主對話框 - 使用 open 控制而非條件渲染，避免動畫期間的 ref 問題 */}
-      <Dialog open={isOpen && !timelineDialogOpen} onOpenChange={open => !open && onClose()}>
+      {/* 主對話框：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+      {!hasChildDialogOpen && (
+      <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -275,6 +292,20 @@ export function TourItineraryDialog({
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* 快速行程表對話框 */}
+      {tourProposalPackage && (
+        <PackageItineraryDialog
+          isOpen={packageItineraryDialogOpen}
+          onClose={() => setPackageItineraryDialogOpen(false)}
+          pkg={tourProposalPackage}
+          proposal={fakeProposal}
+          onItineraryCreated={() => {
+            fetchProposalPackages()
+          }}
+        />
+      )}
 
       {/* 時間軸行程表對話框 */}
       {tourProposalPackage && (

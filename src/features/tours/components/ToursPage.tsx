@@ -157,6 +157,7 @@ export const ToursPage: React.FC = () => {
     setFormError,
     dialogType: dialog.type || 'create',
     dialogData: (dialog.data && Object.keys(dialog.data).length > 0 ? dialog.data : null) as Tour | null,
+    workspaceId: user?.workspace_id,
   })
 
   const handleAddTour = useCallback(async () => {
