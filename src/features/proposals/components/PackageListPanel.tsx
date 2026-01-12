@@ -109,14 +109,14 @@ export function PackageListPanel({
 
       try {
         // CreatePackageData requires proposal_id and version_name, which are set in the dialog
-        await createPackage(data as CreatePackageData, user.id)
+        await createPackage(data as CreatePackageData, user.id, user.workspace_id)
         onPackagesChange()
         setAddDialogOpen(false)
       } catch (error) {
         await alert('建立套件失敗', 'error')
       }
     },
-    [user?.id, onPackagesChange]
+    [user?.id, user?.workspace_id, onPackagesChange]
   )
 
   // 更新套件
@@ -143,13 +143,13 @@ export function PackageListPanel({
 
       const newVersionName = `${pkg.version_name} (複製)`
       try {
-        await duplicatePackage(pkg.id, newVersionName, user.id)
+        await duplicatePackage(pkg.id, newVersionName, user.id, user.workspace_id)
         onPackagesChange()
       } catch (error) {
         await alert('複製套件失敗', 'error')
       }
     },
-    [user?.id, onPackagesChange]
+    [user?.id, user?.workspace_id, onPackagesChange]
   )
 
   // 刪除套件

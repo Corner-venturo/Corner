@@ -248,6 +248,7 @@ export const CompanyAssetsPage: React.FC = () => {
           uploaded_by_name: userName,
           description: formData.restricted ? '受限資源' : null,
           restricted: formData.restricted,
+          workspace_id: user?.workspace_id,
         })
 
         if (dbError) throw dbError

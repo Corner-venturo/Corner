@@ -9,6 +9,7 @@ import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
 import { useMessageStore } from './message-store'
+import { useChannelStore } from './channel-store'
 import type { Message } from './types'
 import { ensureMessageAttachments, normalizeMessage } from './utils'
 import type { Json } from '@/lib/supabase/types'
@@ -177,6 +178,10 @@ export const useChatStore = () => {
       uiStore.setCurrentChannelMessages(newMessage.channel_id, optimisticMessages)
 
       try {
+        // 取得頻道的 workspace_id
+        const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === newMessage.channel_id)
+        const workspaceId = channel?.workspace_id
+
         // 直接寫入 Supabase（不透過 messageStore 避免重複更新）
         const { error } = await supabase
           .from('messages')
@@ -190,6 +195,7 @@ export const useChatStore = () => {
             reactions: newMessage.reactions as unknown as Json,
             parent_message_id: newMessage.parent_message_id,
             created_at: newMessage.created_at,
+            workspace_id: workspaceId,
           })
 
         if (error) {

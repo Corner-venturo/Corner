@@ -14,7 +14,6 @@ import {
   AlertCircle,
   CheckCircle,
   Calculator,
-  Route,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -167,9 +166,11 @@ export const TourOverview = React.memo(function TourOverview({
           <Button onClick={onManageQuote} size="sm" className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
             <Calculator size={14} className="mr-1" />報價單
           </Button>
-          <Button onClick={onManageItinerary} size="sm" variant="outline">
-            <Route size={14} className="mr-1" />行程表
-          </Button>
+          {onManageItinerary && (
+            <Button onClick={onManageItinerary} size="sm" variant="outline">
+              <FileText size={14} className="mr-1" />行程表
+            </Button>
+          )}
           <Button onClick={onEdit} size="sm" variant="outline">
             <FileText size={14} className="mr-1" />編輯
           </Button>

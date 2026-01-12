@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { useAuthStore } from '@/stores/auth-store'
 
 export interface TourDestination {
   id: string
@@ -23,6 +24,7 @@ interface Country {
 }
 
 export function useTourDestinations() {
+  const user = useAuthStore(state => state.user)
   const [countriesData, setCountriesData] = useState<Country[]>([])
   const [destinations, setDestinations] = useState<TourDestination[]>([])
   const [loading, setLoading] = useState(true)
@@ -95,6 +97,10 @@ export function useTourDestinations() {
   // 新增目的地（在 tour_destinations 表新增）
   const addDestination = useCallback(
     async (countryName: string, cityName: string, airportCode: string) => {
+      if (!user?.workspace_id) {
+        return { success: false, error: '無法取得工作區資訊' }
+      }
+
       try {
         const { data, error } = await supabase
           .from('tour_destinations')
@@ -102,6 +108,7 @@ export function useTourDestinations() {
             country: countryName.trim(),
             city: cityName.trim(),
             airport_code: airportCode.trim().toUpperCase(),
+            workspace_id: user.workspace_id,
           })
           .select()
           .single()
@@ -116,7 +123,7 @@ export function useTourDestinations() {
         return { success: false, error: errorMessage }
       }
     },
-    []
+    [user?.workspace_id]
   )
 
   // 更新目的地

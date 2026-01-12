@@ -157,7 +157,8 @@ export async function getProposalWithPackages(id: string): Promise<Proposal | nu
  */
 export async function createPackage(
   data: CreatePackageData,
-  userId: string
+  userId: string,
+  workspaceId?: string
 ): Promise<ProposalPackage> {
   // 1. 取得現有套件以決定版本號
   const { data: existingPackages } = await packagesDb()
@@ -191,6 +192,7 @@ export async function createPackage(
     is_active: true,
     created_by: userId,
     updated_by: userId,
+    workspace_id: workspaceId,
   }
 
   const { data: pkg, error } = await packagesDb()
@@ -238,7 +240,8 @@ export async function updatePackage(
 export async function duplicatePackage(
   sourceId: string,
   newVersionName: string,
-  userId: string
+  userId: string,
+  workspaceId?: string
 ): Promise<ProposalPackage> {
   // 1. 取得來源套件
   const { data: source, error: sourceError } = await packagesDb()
@@ -252,7 +255,18 @@ export async function duplicatePackage(
 
   const sourceData = source as unknown as ProposalPackage
 
-  // 2. 建立新版本
+  // 2. 如果沒有提供 workspaceId，從 proposal 取得
+  let finalWorkspaceId = workspaceId
+  if (!finalWorkspaceId && sourceData.proposal_id) {
+    const { data: proposal } = await supabase
+      .from('proposals')
+      .select('workspace_id')
+      .eq('id', sourceData.proposal_id)
+      .single()
+    finalWorkspaceId = proposal?.workspace_id
+  }
+
+  // 3. 建立新版本
   const newPackage = await createPackage(
     {
       proposal_id: sourceData.proposal_id,
@@ -268,7 +282,8 @@ export async function duplicatePackage(
       participant_counts: sourceData.participant_counts || undefined,
       notes: sourceData.notes || undefined,
     },
-    userId
+    userId,
+    finalWorkspaceId
   )
 
   return newPackage

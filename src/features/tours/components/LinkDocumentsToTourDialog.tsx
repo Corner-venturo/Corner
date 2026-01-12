@@ -245,6 +245,7 @@ export function LinkDocumentsToTourDialog({
         is_selected: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        workspace_id: tour.workspace_id,
       }
 
       // 使用 type assertion 因為這是獨立 package（不屬於任何提案）

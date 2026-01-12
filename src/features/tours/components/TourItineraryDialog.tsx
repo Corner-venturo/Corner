@@ -121,6 +121,7 @@ export function TourItineraryDialog({
         is_selected: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        workspace_id: tour.workspace_id,
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

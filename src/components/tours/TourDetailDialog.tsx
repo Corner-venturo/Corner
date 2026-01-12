@@ -21,7 +21,7 @@ import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/Crea
 import { MessageSquare, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check, ClipboardList } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
-import { DocumentVersionPicker, ItineraryVersionPicker } from '@/components/documents'
+import { DocumentVersionPicker } from '@/components/documents'
 import { Input } from '@/components/ui/input'
 import { Dialog as EntryCardDialog, DialogContent as EntryCardDialogContent, DialogHeader as EntryCardDialogHeader, DialogTitle as EntryCardDialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
@@ -89,7 +89,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showPnrToolDialog, setShowPnrToolDialog] = useState(false)
   const [showQuotePicker, setShowQuotePicker] = useState(false)
-  const [showItineraryPicker, setShowItineraryPicker] = useState(false)
 
   // PNR 開票期限
   const [pnrTicketingDeadline, setPnrTicketingDeadline] = useState<Date | null>(null)
@@ -367,7 +366,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
   // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
   const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
-    showEditDialog || showQuotePicker || showItineraryPicker || showPnrToolDialog || showEntryCardDialog ||
+    showEditDialog || showQuotePicker || showPnrToolDialog || showEntryCardDialog ||
     showMembersPnrMatchDialog || membersHasChildDialog || ordersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
 
   const renderTabContent = () => {
@@ -382,7 +381,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               tour={tour}
               onEdit={() => setShowEditDialog(true)}
               onManageQuote={() => setShowQuotePicker(true)}
-              onManageItinerary={() => setShowItineraryPicker(true)}
             />
 
             {/* 收款紀錄 */}
@@ -600,14 +598,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
           <DocumentVersionPicker
             isOpen={showQuotePicker}
             onClose={() => setShowQuotePicker(false)}
-            tour={tour}
-            nested
-          />
-
-          {/* 行程表版本選擇器 */}
-          <ItineraryVersionPicker
-            isOpen={showItineraryPicker}
-            onClose={() => setShowItineraryPicker(false)}
             tour={tour}
             nested
           />

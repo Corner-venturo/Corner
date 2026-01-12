@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase as supabaseClient } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores'
 import type { TourRoomStatus, TourRoomAssignment } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
@@ -44,6 +45,7 @@ interface UseRoomDataReturn {
 }
 
 export function useRoomData({ tourId, open }: UseRoomDataProps): UseRoomDataReturn {
+  const user = useAuthStore(state => state.user)
   const [rooms, setRooms] = useState<TourRoomStatus[]>([])
   const [assignments, setAssignments] = useState<TourRoomAssignment[]>([])
   const [loading, setLoading] = useState(true)
@@ -160,6 +162,7 @@ export function useRoomData({ tourId, open }: UseRoomDataProps): UseRoomDataRetu
       const result = await supabase.from('tour_room_assignments').insert({
         room_id: roomId,
         order_member_id: memberId,
+        workspace_id: user?.workspace_id,
       }).select()
 
       if (result.error) {

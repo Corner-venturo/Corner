@@ -1,6 +1,7 @@
 'use client'
 
 import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores'
 import type { TourRoomStatus } from '@/types/room-vehicle.types'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
@@ -19,6 +20,8 @@ interface UseRoomAssignmentProps {
 }
 
 export function useRoomAssignment({ rooms, assignments, members, reload }: UseRoomAssignmentProps) {
+  const user = useAuthStore(state => state.user)
+
   const getRoomMembers = (roomId: string) => {
     const roomAssignments = assignments.filter(a => a.room_id === roomId)
     return roomAssignments.map(a => {
@@ -59,6 +62,7 @@ export function useRoomAssignment({ rooms, assignments, members, reload }: UseRo
       const result = await supabase.from('tour_room_assignments').insert({
         room_id: roomId,
         order_member_id: memberId,
+        workspace_id: user?.workspace_id,
       }).select()
 
       if (result.error) {

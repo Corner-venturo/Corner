@@ -202,13 +202,24 @@ export function OrderMembersExpandable({
     }
   }, [forceShowPnr])
 
+  // 當父組件控制的 PNR Dialog 關閉時，重新載入成員資料
+  // （因為可能在 Dialog 中新增了成員）
+  const prevShowPnrMatchDialog = useRef(showPnrMatchDialog)
+  useEffect(() => {
+    if (isParentControlledPnrDialog && prevShowPnrMatchDialog.current && !showPnrMatchDialog) {
+      // Dialog 從開啟變成關閉，重新載入成員
+      membersData.loadMembers()
+    }
+    prevShowPnrMatchDialog.current = showPnrMatchDialog
+  }, [isParentControlledPnrDialog, showPnrMatchDialog, membersData])
+
   // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  // 注意：isAddDialogOpen、showOrderSelectDialog、showCustomerMatchDialog、previewMember 不包含在內
-  // 因為它們是在此組件內部渲染的小型 Dialog，不需要隱藏父 Dialog
+  // 注意：以下 Dialog 不包含在內，因為它們使用 nested 模式在父 Dialog 內顯示：
+  // - isAddDialogOpen、showOrderSelectDialog、showCustomerMatchDialog、previewMember（小型 Dialog）
+  // - memberEdit.isEditDialogOpen、memberExport.isExportDialogOpen（使用 nested prop）
   // 當 PNR Dialog 由父組件控制時，不包含在此計算中（父組件會處理）
   const hasChildDialogOpen = (!isParentControlledPnrDialog && showPnrMatchDialog) ||
-    roomVehicle.showRoomManager || roomVehicle.showVehicleManager ||
-    memberEdit.isEditDialogOpen || memberExport.isExportDialogOpen
+    roomVehicle.showRoomManager || roomVehicle.showVehicleManager
 
   useEffect(() => {
     onChildDialogChange?.(hasChildDialogOpen)

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -29,6 +30,7 @@ interface TourVehicleManagerProps {
 }
 
 export function TourVehicleManager({ tourId, members, open, onOpenChange }: TourVehicleManagerProps) {
+  const user = useAuthStore(state => state.user)
   const [vehicles, setVehicles] = useState<TourVehicleStatus[]>([])
   const [assignments, setAssignments] = useState<TourVehicleAssignment[]>([])
   const [loading, setLoading] = useState(true)
@@ -109,6 +111,7 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
         driver_phone: newVehicle.driver_phone || null,
         license_plate: newVehicle.license_plate || null,
         display_order: vehicles.length,
+        workspace_id: user?.workspace_id,
       })
 
       if (error) throw error

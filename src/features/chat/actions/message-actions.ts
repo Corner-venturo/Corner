@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { getServerUser, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
+import { getServerAuth, getAuthenticatedSupabase } from '@/lib/auth/server-auth'
 
 export async function sendMessageAction({
   channelId,
@@ -10,14 +10,14 @@ export async function sendMessageAction({
   channelId: string
   content: string
 }) {
-  // 使用統一的認證服務
-  const auth = await getServerUser()
+  // 使用統一的認證服務（包含 workspace_id）
+  const auth = await getServerAuth()
 
-  if ('error' in auth) {
-    return { error: auth.error }
+  if (!auth.success) {
+    return { error: auth.error.error }
   }
 
-  const { user } = auth
+  const { user, workspaceId } = auth.data
 
   if (!content.trim()) {
     return { error: 'Message cannot be empty.' }
@@ -31,6 +31,7 @@ export async function sendMessageAction({
       channel_id: channelId,
       user_id: user.id,
       content: content.trim(),
+      workspace_id: workspaceId,
     })
 
   if (error) {

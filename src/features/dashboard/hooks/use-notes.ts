@@ -87,6 +87,7 @@ export function useNotes() {
             tab_name: tab.name,
             content: tab.content,
             tab_order: index,
+            workspace_id: user.workspace_id,
           }))
 
           const { error } = await supabase.from('notes').insert(notesToInsert)

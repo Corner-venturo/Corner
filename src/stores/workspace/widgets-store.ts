@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { supabase } from '@/lib/supabase/client'
 import { useAdvanceListStore } from './advance-list-store'
 import { useSharedOrderListStore } from './shared-order-list-store'
+import { useChannelStore } from './channel-store'
 import type { AdvanceItem, AdvanceList, SharedOrderList } from './types'
 
 /**
@@ -77,11 +78,16 @@ export const useWidgetsStore = () => {
 
       try {
         if (isOnline && process.env.NEXT_PUBLIC_ENABLE_SUPABASE === 'true') {
+          // 取得頻道的 workspace_id
+          const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === channelId)
+          const workspaceId = channel?.workspace_id
+
           const { error: listError } = await supabase.from('advance_lists').insert({
             id: listId,
             channel_id: channelId,
             created_by: currentUserId,
             created_at: newList.created_at,
+            workspace_id: workspaceId,
           })
 
           if (listError) throw listError
@@ -96,6 +102,7 @@ export const useWidgetsStore = () => {
               advance_person: item.advance_person,
               status: item.status,
               created_at: newList.created_at,
+              workspace_id: workspaceId,
             }))
           )
 

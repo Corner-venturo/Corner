@@ -41,6 +41,7 @@ interface SuggestedCustomer {
   name: string
   passport_romanization: string | null
   passport_number: string | null
+  passport_expiry_date: string | null
   national_id: string | null
   date_of_birth: string | null
   gender: string | null
@@ -98,7 +99,7 @@ export function PnrMatchDialog({
       // 從客戶資料庫載入所有有護照拼音的客戶
       const { data: customers, error } = await supabase
         .from('customers')
-        .select('id, name, passport_romanization, passport_number, national_id, date_of_birth, gender')
+        .select('id, name, passport_romanization, passport_number, passport_expiry_date, national_id, date_of_birth, gender')
         .not('passport_romanization', 'is', null)
 
       if (error) throw error
@@ -319,6 +320,7 @@ export function PnrMatchDialog({
             chinese_name: customer.name,
             passport_name: customer.passport_romanization,
             passport_number: customer.passport_number,
+            passport_expiry: customer.passport_expiry_date,
             id_number: customer.national_id,
             birth_date: customer.date_of_birth,
             gender: customer.gender,
