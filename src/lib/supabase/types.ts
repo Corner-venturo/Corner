@@ -3279,6 +3279,7 @@ export type Database = {
           job_info: Json | null
           last_login_at: string | null
           monthly_salary: number | null
+          must_change_password: boolean | null
           password_hash: string | null
           permissions: string[] | null
           personal_info: Json | null
@@ -3288,6 +3289,7 @@ export type Database = {
           status: string | null
           supabase_user_id: string | null
           updated_at: string | null
+          updated_by: string | null
           user_id: string | null
           workspace_id: string | null
         }
@@ -3308,6 +3310,7 @@ export type Database = {
           job_info?: Json | null
           last_login_at?: string | null
           monthly_salary?: number | null
+          must_change_password?: boolean | null
           password_hash?: string | null
           permissions?: string[] | null
           personal_info?: Json | null
@@ -3317,6 +3320,7 @@ export type Database = {
           status?: string | null
           supabase_user_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
           user_id?: string | null
           workspace_id?: string | null
         }
@@ -3337,6 +3341,7 @@ export type Database = {
           job_info?: Json | null
           last_login_at?: string | null
           monthly_salary?: number | null
+          must_change_password?: boolean | null
           password_hash?: string | null
           permissions?: string[] | null
           personal_info?: Json | null
@@ -3346,10 +3351,18 @@ export type Database = {
           status?: string | null
           supabase_user_id?: string | null
           updated_at?: string | null
+          updated_by?: string | null
           user_id?: string | null
           workspace_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "employees_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "employees_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -6223,6 +6236,8 @@ export type Database = {
           balance_amount: number | null
           balance_receipt_no: string | null
           birth_date: string | null
+          checked_in: boolean | null
+          checked_in_at: string | null
           chinese_name: string | null
           contract_created_at: string | null
           cost_price: number | null
@@ -6267,6 +6282,8 @@ export type Database = {
           balance_amount?: number | null
           balance_receipt_no?: string | null
           birth_date?: string | null
+          checked_in?: boolean | null
+          checked_in_at?: string | null
           chinese_name?: string | null
           contract_created_at?: string | null
           cost_price?: number | null
@@ -6311,6 +6328,8 @@ export type Database = {
           balance_amount?: number | null
           balance_receipt_no?: string | null
           birth_date?: string | null
+          checked_in?: boolean | null
+          checked_in_at?: string | null
           chinese_name?: string | null
           contract_created_at?: string | null
           cost_price?: number | null

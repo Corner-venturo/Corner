@@ -72,6 +72,7 @@ export interface User {
     notes?: string
   }[]
   status: 'active' | 'probation' | 'leave' | 'terminated'
+  employee_type?: 'human' | 'bot' // 員工類型：人類或機器人
   avatar?: string
   workspace_id?: string // 所屬工作空間 ID
   workspace_code?: string // 所屬工作空間代碼（TP, TC 等）- 登入時一併取得

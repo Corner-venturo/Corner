@@ -12,7 +12,7 @@ import { Employee } from '@/stores/types'
 import { EmployeeExpandedView } from '@/components/hr/employee-expanded-view'
 import { AddEmployeeForm } from '@/components/hr/add-employee'
 import { SalaryPaymentDialog, SalaryPaymentData } from '@/components/hr/salary-payment-dialog'
-import { Users, Edit2, Trash2, UserX, DollarSign } from 'lucide-react'
+import { Users, Edit2, Trash2, UserX, DollarSign, Bot } from 'lucide-react'
 import { getRoleConfig, type UserRole } from '@/lib/rbac-config'
 import { TableColumn } from '@/components/ui/enhanced-table'
 import { DateCell, ActionCell } from '@/components/table-cells'
@@ -21,6 +21,9 @@ import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { generateCompanyPaymentRequestCode } from '@/stores/utils/code-generator'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
+
+// 員工分類 Tab 類型
+type EmployeeTab = 'active' | 'terminated' | 'bot'
 
 export default function HRPage() {
   const { items: users, fetchAll, update: updateUser, delete: deleteUser } = useUserStore()
@@ -31,7 +34,13 @@ export default function HRPage() {
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isSalaryPaymentDialogOpen, setIsSalaryPaymentDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<EmployeeTab>('active')
   const { confirm, confirmDialogProps } = useConfirmDialog()
+
+  // 檢查是否為超級管理員
+  const isSuperAdmin = useMemo(() => {
+    return currentUser?.roles?.includes('super_admin') || currentUser?.roles?.includes('admin')
+  }, [currentUser?.roles])
 
   // 初始化時載入員工、工作空間、請款單資料（只執行一次）
   useEffect(() => {
@@ -39,6 +48,44 @@ export default function HRPage() {
     fetchWorkspaces()
     fetchPaymentRequests()
   }, [])
+
+  // 根據 Tab 過濾員工
+  const filteredEmployees = useMemo(() => {
+    return users.filter(emp => {
+      const isBot = emp.employee_type === 'bot'
+      const isTerminated = emp.status === 'terminated'
+
+      switch (activeTab) {
+        case 'active':
+          // 在職：非機器人 且 非離職
+          return !isBot && !isTerminated
+        case 'terminated':
+          // 離職：非機器人 且 已離職
+          return !isBot && isTerminated
+        case 'bot':
+          // 機器人：只有超級管理員能看
+          return isBot && isSuperAdmin
+        default:
+          return !isBot && !isTerminated
+      }
+    })
+  }, [users, activeTab, isSuperAdmin])
+
+  // Tab 選項（機器人 Tab 只有超級管理員能看）
+  const tabOptions = useMemo(() => {
+    const baseTabs: { value: EmployeeTab; label: string; count: number }[] = [
+      { value: 'active', label: '在職', count: users.filter(e => e.employee_type !== 'bot' && e.status !== 'terminated').length },
+      { value: 'terminated', label: '離職', count: users.filter(e => e.employee_type !== 'bot' && e.status === 'terminated').length },
+    ]
+    if (isSuperAdmin) {
+      baseTabs.push({
+        value: 'bot',
+        label: '機器人',
+        count: users.filter(e => e.employee_type === 'bot').length,
+      })
+    }
+    return baseTabs
+  }, [users, isSuperAdmin])
 
   const getStatusLabel = (status: Employee['status']) => {
     const statusMap = {
@@ -334,13 +381,40 @@ export default function HRPage() {
           { label: '首頁', href: '/' },
           { label: '人資管理', href: '/hr' },
         ]}
-        data={users}
+        data={filteredEmployees}
         columns={columns}
         searchFields={['display_name', 'employee_number', 'personal_info'] as (keyof Employee)[]}
         searchPlaceholder="搜尋員工..."
         onRowClick={handleEmployeeClick}
         renderActions={renderActions}
         bordered={true}
+        beforeTable={
+          <div className="px-6 py-3 border-b border-border/50">
+            <div className="flex gap-1 bg-morandi-container/50 p-1 rounded-lg w-fit">
+              {tabOptions.map(tab => (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                    activeTab === tab.value
+                      ? 'bg-white text-morandi-primary shadow-sm'
+                      : 'text-morandi-secondary hover:text-morandi-primary hover:bg-white/50'
+                  }`}
+                >
+                  {tab.value === 'bot' && <Bot className="w-4 h-4" />}
+                  {tab.label}
+                  <span className={`px-1.5 py-0.5 rounded text-xs ${
+                    activeTab === tab.value
+                      ? 'bg-morandi-gold/20 text-morandi-gold'
+                      : 'bg-morandi-container text-morandi-secondary'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        }
         headerActions={
           <div className="flex gap-3">
             <Button

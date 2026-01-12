@@ -52,6 +52,11 @@ const TourControlSheet = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+const TourCheckin = dynamic(
+  () => import('@/components/tours/tour-checkin').then(m => m.TourCheckin),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
 // 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
 const tabs = [
   { value: 'members', label: '團員名單' },
@@ -59,6 +64,7 @@ const tabs = [
   { value: 'overview', label: '總覽' },
   { value: 'confirmation', label: '團確單' },
   { value: 'control', label: '團控' },
+  { value: 'checkin', label: '報到' },
 ]
 
 interface TourDetailDialogProps {
@@ -395,6 +401,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         return <TourConfirmationSheet tourId={tour.id} />
       case 'control':
         return <TourControlSheet tourId={tour.id} />
+      case 'checkin':
+        return <TourCheckin tour={tour} />
       default:
         return <TourOverview tour={tour} />
     }

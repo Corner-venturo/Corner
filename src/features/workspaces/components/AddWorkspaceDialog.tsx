@@ -115,7 +115,7 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
       }
 
       // 2. 建立管理員帳號
-      const passwordHash = await bcrypt.hash(formData.admin_password, 10)
+      const passwordHash = await bcrypt.hash(formData.admin_password, 12) // 與 auth.ts 一致
       const employeeNumber = formData.admin_employee_number.trim().toUpperCase()
       const workspaceCode = formData.code.toLowerCase().trim()
 
@@ -126,8 +126,10 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
           display_name: formData.admin_name.trim(),
           employee_number: employeeNumber,
           password_hash: passwordHash,
-          role: 'admin',
+          roles: ['admin'], // 使用 roles 陣列
           status: 'active',
+          employee_type: 'human',
+          must_change_password: true, // 首次登入需要改密碼
         })
         .select('id')
         .single()

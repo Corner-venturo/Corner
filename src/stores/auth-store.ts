@@ -147,10 +147,11 @@ export const useAuthStore = create<AuthState>()(
           // Supabase Auth 登入（必須成功才能繼續）
           // 新格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
           // 舊格式：{employee_number}@venturo.com（向後兼容現有用戶）
+          // 統一使用小寫格式（與 create-employee-auth API 一致）
           const newFormatEmail = code
-            ? `${code.toUpperCase()}_${username}@venturo.com`
-            : `${username}@venturo.com`
-          const oldFormatEmail = `${username}@venturo.com`
+            ? `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
+            : `${username.toLowerCase()}@venturo.com`
+          const oldFormatEmail = `${username.toLowerCase()}@venturo.com`
 
           // 先嘗試新格式
           let authData = null
