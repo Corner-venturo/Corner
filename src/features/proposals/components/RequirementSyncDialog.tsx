@@ -38,6 +38,7 @@ import {
 import { TourRequestFormDialog } from './TourRequestFormDialog'
 import { AddManualRequestDialog } from './AddManualRequestDialog'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuthStore } from '@/stores'
@@ -299,8 +300,7 @@ export function RequirementSyncDialog({
             setConfirmedSnapshot([])
           }
         } else {
-          const { data: pkgData } = await (supabase as any)
-            .from('proposal_packages')
+          const { data: pkgData } = await dynamicFrom('proposal_packages')
             .select('confirmed_requirements')
             .eq('id', source.id)
             .single()
@@ -779,8 +779,7 @@ export function RequirementSyncDialog({
         .getPublicUrl(filePath)
 
        
-      const { error: insertError } = await (supabase as any)
-        .from('tour_documents')
+      const { error: insertError } = await dynamicFrom('tour_documents')
         .insert({
           tour_id: tourId,
           workspace_id: user.workspace_id,
@@ -956,8 +955,7 @@ export function RequirementSyncDialog({
           .eq('id', source.id)
         if (error) throw error
       } else {
-        const { error } = await (supabase as any)
-          .from('proposal_packages')
+        const { error } = await dynamicFrom('proposal_packages')
           .update({ confirmed_requirements: snapshotData as unknown as Json })
           .eq('id', source.id)
         if (error) throw error

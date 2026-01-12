@@ -26,6 +26,7 @@ export interface QuoteRegion {
 
 export interface Quote {
   id: string
+  workspace_id?: string // 工作區 ID
   code?: string // 報價單編號 (Q20250001 或自訂編號如 JP-BASIC)
   quote_number?: string // 報價單號碼 (QUOTE-2025-0001) - 向下相容
   quote_type: 'standard' | 'quick' // 報價單類型（standard: 團體報價單, quick: 快速報價單）
@@ -45,6 +46,7 @@ export interface Quote {
   proposal_package_id?: string // 關聯的提案套件ID
   converted_to_tour?: boolean // 是否已轉成旅遊團
   is_pinned?: boolean // 是否置頂（範本報價單）
+  is_active?: boolean // 是否啟用
   regions?: QuoteRegion[] // 多地區支援（新）
 
   // 客戶資訊

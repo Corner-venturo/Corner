@@ -27,6 +27,21 @@ interface BatchCreateReceiptDialogProps {
   workspaceId: string
 }
 
+/** Excel 匯入的收款單資料列 */
+interface ExcelReceiptRow {
+  '訂單ID'?: string
+  '訂單編號'?: string
+  '團名'?: string
+  '收款日期'?: string
+  '收款方式'?: string
+  '應收金額'?: number
+  '實收金額'?: number
+  '付款人'?: string
+  '經手人'?: string
+  '帳戶資訊'?: string
+  '備註'?: string
+}
+
 export function BatchCreateReceiptDialog({
   isOpen,
   onClose,
@@ -52,22 +67,22 @@ export function BatchCreateReceiptDialog({
       const workbook = XLSX.read(data)
       const worksheet = workbook.Sheets[workbook.SheetNames[0]]
 
-      const jsonData: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet)
+      const jsonData = XLSX.utils.sheet_to_json<ExcelReceiptRow>(worksheet)
 
       const parsedReceipts: CreateReceiptData[] = jsonData.map(row => ({
         workspace_id: workspaceId,
         order_id: row['訂單ID'] || '',
         order_number: row['訂單編號'] || '',
-        tour_name: row['團名'],
-        receipt_date: row['收款日期'],
-        receipt_type: parseReceiptType(row['收款方式']),
-        receipt_amount: Number(row['應收金額']),
+        tour_name: row['團名'] || '',
+        receipt_date: row['收款日期'] || new Date().toISOString().split('T')[0],
+        receipt_type: parseReceiptType(row['收款方式'] || ''),
+        receipt_amount: Number(row['應收金額']) || 0,
         actual_amount: row['實收金額'] ? Number(row['實收金額']) : undefined,
         status: row['實收金額'] ? 1 : 0,
-        receipt_account: row['付款人'],
-        handler_name: row['經手人'],
-        account_info: row['帳戶資訊'],
-        note: row['備註'],
+        receipt_account: row['付款人'] || '',
+        handler_name: row['經手人'] || '',
+        account_info: row['帳戶資訊'] || '',
+        note: row['備註'] || '',
       }))
 
       setReceipts(parsedReceipts)

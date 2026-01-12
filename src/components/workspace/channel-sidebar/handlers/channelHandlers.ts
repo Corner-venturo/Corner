@@ -6,6 +6,24 @@ import { useChannelStore } from '@/stores/workspace/channel-store'
 import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { alert } from '@/lib/ui/alert-dialog'
 
+/** Channel creation data */
+interface CreateChannelData {
+  workspace_id: string
+  name: string
+  description?: string
+  type: 'public' | 'private'
+  scope?: 'workspace' | 'company'
+  created_by: string
+}
+
+/** Channel group creation data */
+interface CreateChannelGroupData {
+  workspace_id: string
+  name: string
+  is_collapsed: boolean
+  order: number
+}
+
 interface ChannelHandlersParams {
   channels: Channel[]
   channelGroups: ChannelGroup[]
@@ -13,11 +31,11 @@ interface ChannelHandlersParams {
   user: { id: string } | null
   updateChannel: (channelId: string, updates: Partial<Channel>) => Promise<void>
   updateChannelOrder: (channelId: string, order: number) => Promise<void>
-  createChannel: (channel: any) => Promise<Channel | null>
+  createChannel: (channel: CreateChannelData) => Promise<Channel | null>
   deleteChannel: (channelId: string) => Promise<void>
   deleteChannelGroup: (groupId: string) => Promise<void>
   loadChannels: (workspaceId: string) => Promise<void>
-  createChannelGroup: (group: any) => void
+  createChannelGroup: (group: CreateChannelGroupData) => void
   selectedMembers: string[]
 }
 

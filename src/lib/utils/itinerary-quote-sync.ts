@@ -3,7 +3,7 @@
  * 當行程表的餐食/住宿資料更新時，自動同步到關聯的報價單
  */
 
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { CostCategory, CostItem } from '@/features/quotes/types'
@@ -24,15 +24,10 @@ interface DailyItineraryDay {
   accommodation: string
 }
 
-// Helper：繞過 proposal_packages 的類型檢查（表格尚未在 generated types 中）
- 
-const proposalPackagesDb = () => (supabase as any).from('proposal_packages')
-
- 
-const itinerariesDb = () => (supabase as any).from('itineraries')
-
- 
-const quotesDb = () => (supabase as any).from('quotes')
+// Database helpers using dynamicFrom (for tables with JSONB columns requiring custom types)
+const proposalPackagesDb = () => dynamicFrom('proposal_packages')
+const itinerariesDb = () => dynamicFrom('itineraries')
+const quotesDb = () => dynamicFrom('quotes')
 
 /**
  * 將行程表的每日餐食轉換為報價單的 meals 分類格式

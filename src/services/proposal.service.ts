@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { generateProposalCode } from '@/stores/utils/code-generator'
 import { logger } from '@/lib/utils/logger'
 import type {
@@ -21,13 +22,12 @@ import type {
 // 提案 CRUD
 // ============================================
 
-// Helper functions to bypass type checking for tables not yet in generated types
-// These tables exist in the database but TypeScript types haven't been regenerated yet
- 
-const proposalsDb = () => (supabase as any).from('proposals')
-const packagesDb = () => (supabase as any).from('proposal_packages')
-const quotesDb = () => (supabase as any).from('quotes')
-const itinerariesDb = () => (supabase as any).from('itineraries')
+// Database helpers using dynamicFrom (for tables with JSONB columns requiring custom types)
+// The dynamicFrom function encapsulates type coercion in typed-client.ts
+const proposalsDb = () => dynamicFrom('proposals')
+const packagesDb = () => dynamicFrom('proposal_packages')
+const quotesDb = () => dynamicFrom('quotes')
+const itinerariesDb = () => dynamicFrom('itineraries')
 
 /**
  * 建立提案

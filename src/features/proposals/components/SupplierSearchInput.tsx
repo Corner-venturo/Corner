@@ -13,7 +13,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, Plus, Loader2, Building2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
 
 // 供應商資料（完整欄位）
@@ -67,8 +67,7 @@ export function SupplierSearchInput({
 
         // 查詢供應商（包含完整欄位）
          
-        let query = (supabase as any)
-          .from('suppliers')
+        let query = dynamicFrom('suppliers')
           .select('id, code, name, contact_person, phone, type')
           .ilike('name', `%${searchTerm}%`)
           .eq('is_active', true)

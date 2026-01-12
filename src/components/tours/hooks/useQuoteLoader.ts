@@ -14,6 +14,9 @@ import type {
   TourDepartureActivity,
   TourDepartureOther,
 } from '@/types/tour-departure.types'
+import type { Database } from '@/lib/supabase/types'
+
+type QuoteItemRow = Database['public']['Tables']['quote_items']['Row']
 
 const supabase = supabaseClient
 
@@ -143,7 +146,7 @@ export function useQuoteLoader(
       const activityItems: TourDepartureActivity[] = []
       const otherItems: TourDepartureOther[] = []
 
-      quoteItems?.forEach((item: any, index: number) => {
+      quoteItems?.forEach((item: QuoteItemRow, index: number) => {
         const baseDate = tour.departure_date || getTodayString()
         const itemName = item.description || ''
         const category = item.category?.toLowerCase() || ''

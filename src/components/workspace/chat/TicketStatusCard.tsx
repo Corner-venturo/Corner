@@ -25,7 +25,7 @@ interface OrderData {
   members: MemberStatus[]
 }
 
-interface TourStats {
+export interface TourStats {
   total: number
   ticketed: number
   needs_ticketing: number
@@ -33,7 +33,7 @@ interface TourStats {
   self_arranged: number
 }
 
-interface TourData {
+export interface TourData {
   tour_id: string
   tour_code: string
   tour_name: string

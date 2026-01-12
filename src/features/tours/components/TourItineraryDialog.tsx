@@ -25,6 +25,7 @@ import type { Tour } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
@@ -125,8 +126,7 @@ export function TourItineraryDialog({
       }
 
        
-      const { data: newPackage, error } = await (supabase as any)
-        .from('proposal_packages')
+      const { data: newPackage, error } = await dynamicFrom('proposal_packages')
         .insert(newPackageData)
         .select()
         .single()

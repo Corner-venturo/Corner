@@ -12,8 +12,8 @@ import { prompt } from '@/lib/ui/alert-dialog'
 
 interface TourOperationsAddButtonProps {
   tour: Tour
-  tourExtraFields: Record<string, any>
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
+  tourExtraFields: Record<string, TourExtraFields>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, TourExtraFields>>>
 }
 
 export function TourOperationsAddButton({
@@ -69,8 +69,8 @@ interface TourOperationsAddDialogProps {
   isOpen: boolean
   onClose: () => void
   tour: Tour
-  tourExtraFields: Record<string, any>
-  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, any>>>
+  tourExtraFields: Record<string, TourExtraFields>
+  setTourExtraFields: React.Dispatch<React.SetStateAction<Record<string, TourExtraFields>>>
 }
 
 function TourOperationsAddDialog({

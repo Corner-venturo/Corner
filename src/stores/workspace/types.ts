@@ -106,14 +106,21 @@ export interface Message {
     avatar?: string
   }
   // 訊息額外資料（機器人卡片等）
-  metadata?: {
-    message_type?: string
-     
-    [key: string]: any
-  } | null
+  metadata?: MessageMetadata | null
   _deleted?: boolean | null
   _needs_sync?: boolean | null
   _synced_at?: string | null
+}
+
+/** 訊息元資料型別 - 允許任意 JSON 值 */
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
+
+interface MessageMetadata {
+  message_type?: string
+  tours?: JsonValue
+  summary?: JsonValue
+  generated_at?: string
+  [key: string]: JsonValue | undefined
 }
 
 

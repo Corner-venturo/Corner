@@ -25,6 +25,7 @@ import {
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import {
@@ -340,8 +341,7 @@ export function PackageListPanel({
         if (newQuote) {
           // 更新套件關聯報價單
            
-          await (supabase as any)
-            .from('proposal_packages')
+          await dynamicFrom('proposal_packages')
             .update({ quote_id: newQuote.id })
             .eq('id', pkg.id)
 

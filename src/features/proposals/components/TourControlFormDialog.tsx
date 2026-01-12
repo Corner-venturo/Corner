@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, Printer, X, Plus, Trash2, Save } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import type { Json } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
 import { useToast } from '@/components/ui/use-toast'
 import { openTourControlForm } from './TourControlFormGenerator'
@@ -237,7 +238,7 @@ export function TourControlFormDialog({
     setSaving(true)
     try {
        
-      const jsonFormData = JSON.parse(JSON.stringify(formData)) as any
+      const jsonFormData = JSON.parse(JSON.stringify(formData)) as Json
 
       if (existingFormId) {
         // 更新現有記錄

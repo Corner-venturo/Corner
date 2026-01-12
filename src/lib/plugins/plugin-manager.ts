@@ -14,9 +14,9 @@ import type {
   HookResult,
 } from './types'
 
-// Generic hook handler type - needs any[] for flexibility with different hook signatures
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type HookHandler = (data: any, context: any) => Promise<unknown> | unknown
+// Generic hook handler type for plugin system
+// Plugin system is a planned feature; tables (plugin_storage, plugin_configs) not yet in database
+type HookHandler = (data: unknown, context: PluginContext) => Promise<unknown> | unknown
 
 export class PluginManager {
   private plugins: Map<string, LoadedPlugin> = new Map()

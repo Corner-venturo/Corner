@@ -6,9 +6,14 @@
 'use client'
 
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { Canvas } from 'fabric'
+import { Canvas, FabricObject } from 'fabric'
 import { renderPageOnCanvas } from '../components/core/renderer'
 import type { CanvasPage, CanvasElement, FabricObjectWithData, ShapeElement, TextElement, ImageElement } from '../components/types'
+
+/** Fabric.js IText 物件（用於文字編輯後取得內容） */
+interface FabricITextObject extends FabricObject {
+  text?: string
+}
 
 export interface UseCanvasEditorOptions {
   page: CanvasPage | null
@@ -61,7 +66,7 @@ export function useCanvasEditor({
 
     // 物件修改事件（位置、大小、旋轉）
 
-    const handleObjectModified = (e: any) => {
+    const handleObjectModified = (e: { target?: FabricObject }) => {
       const target = e.target as FabricObjectWithData | undefined
       if (!target || !target.data) return
 
@@ -76,14 +81,14 @@ export function useCanvasEditor({
     }
 
     // 文字編輯完成事件
-    const handleTextChanged = (e: any) => {
+    const handleTextChanged = (e: { target?: FabricObject }) => {
       const target = e.target as FabricObjectWithData | undefined
       if (!target || !target.data) return
 
       const { elementId, elementType } = target.data
       if (elementType === 'text') {
         // 取得編輯後的文字內容
-        const textObj = target as any
+        const textObj = target as FabricITextObject
         const newContent = textObj.text || ''
         onElementChange(elementId, {
           content: newContent,
@@ -92,8 +97,8 @@ export function useCanvasEditor({
     }
 
     // 選取事件
-     
-    const handleSelection = (e: any) => {
+
+    const handleSelection = (e: { selected?: FabricObject[] }) => {
       const selected = e.selected as FabricObjectWithData[] | undefined
       if (selected && selected.length === 1 && selected[0].data) {
         onSelect(selected[0].data.elementId)
@@ -107,8 +112,8 @@ export function useCanvasEditor({
     }
 
     // 雙擊事件（用於觸發占位元素的上傳功能）
-     
-    const handleDoubleClick = (e: any) => {
+
+    const handleDoubleClick = (e: { target?: FabricObject }) => {
       const target = e.target as FabricObjectWithData | undefined
       if (!target || !target.data) return
 

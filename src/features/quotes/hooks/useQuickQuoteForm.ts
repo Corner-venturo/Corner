@@ -45,8 +45,7 @@ const getInitialFormData = (): QuickQuoteFormData => ({
 const STORAGE_KEY = 'venturo_quick_quote_draft'
 
 interface UseQuickQuoteFormParams {
-   
-  addQuote: (data: any) => Promise<Quote | undefined>
+  addQuote: (data: Partial<Quote>) => Promise<Quote | undefined>
 }
 
 export const useQuickQuoteForm = ({ addQuote }: UseQuickQuoteFormParams) => {

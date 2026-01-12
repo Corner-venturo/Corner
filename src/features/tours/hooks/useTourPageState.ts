@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Tour } from '@/stores/types'
+import { City } from '@/stores/region-store'
 import { NewTourData, TourExtraFields, DeleteConfirmState } from '../types'
 import { OrderFormData } from '@/components/orders/add-order-form'
 
@@ -80,7 +81,7 @@ export function useTourPageState() {
   })
 
   // Available cities for selected country
-  const [availableCities, setAvailableCities] = useState<any[]>([])
+  const [availableCities, setAvailableCities] = useState<City[]>([])
 
   // Toggle row expand
   const toggleRowExpand = useCallback((tour_id: string) => {

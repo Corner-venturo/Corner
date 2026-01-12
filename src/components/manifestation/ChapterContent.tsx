@@ -17,9 +17,21 @@ interface ChapterContentProps {
   onNext?: () => void
 }
 
+/** 顯化日記表單資料 */
+interface ManifestationFormData {
+  desire?: string
+  body_sensations?: string[]
+  dialogue?: string
+  small_action?: string
+  gratitude?: string
+  magic_phrases?: string[]
+  shared_wish?: string
+  notes?: string
+}
+
 export function ChapterContent({ chapter, onPrevious, onNext }: ChapterContentProps) {
   const { currentEntry, createEntry, updateEntry, fetchEntryByChapter } = useManifestationStore()
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const [formData, setFormData] = useState<ManifestationFormData>({})
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 

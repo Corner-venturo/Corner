@@ -12,7 +12,17 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import type { Tour } from '@/types/tour.types'
-type EnvelopeRecord = any
+
+/** 信封寄件紀錄 */
+interface EnvelopeRecord {
+  id: string
+  printed_at: string
+  recipient_name: string
+  recipient_address: string
+  recipient_phone: string
+  sender_name: string
+  sender_phone: string
+}
 import { useAuthStore } from '@/stores/auth-store'
 import { useTours, updateTour, useQuotes } from '@/data'
 import { generateUUID } from '@/lib/utils/uuid'

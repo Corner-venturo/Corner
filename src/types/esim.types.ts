@@ -7,10 +7,63 @@ export const ESIM_STATUSES = {
 
 export type EsimStatus = (typeof ESIM_STATUSES)[keyof typeof ESIM_STATUSES]
 
-// eSIM 資料表型別（暫時使用 any）
-export type EsimRow = any
-export type EsimInsert = any
-export type EsimUpdate = any
+// eSIM 資料表型別（基於 Esim interface）
+export interface EsimRow {
+  id: string
+  workspace_id: string
+  esim_number: string
+  group_code: string
+  order_number: string | null
+  supplier_order_number: string | null
+  status: EsimStatus
+  product_id: string | null
+  quantity: number
+  price: number | null
+  email: string | null
+  note: string | null
+  created_at: string
+  created_by: string
+  updated_at: string
+  updated_by: string
+}
+
+export interface EsimInsert {
+  id?: string
+  workspace_id: string
+  esim_number: string
+  group_code: string
+  order_number?: string | null
+  supplier_order_number?: string | null
+  status?: EsimStatus
+  product_id?: string | null
+  quantity: number
+  price?: number | null
+  email?: string | null
+  note?: string | null
+  created_at?: string
+  created_by: string
+  updated_at?: string
+  updated_by?: string
+}
+
+export interface EsimUpdate {
+  id?: string
+  workspace_id?: string
+  esim_number?: string
+  group_code?: string
+  order_number?: string | null
+  supplier_order_number?: string | null
+  status?: EsimStatus
+  product_id?: string | null
+  quantity?: number
+  price?: number | null
+  email?: string | null
+  note?: string | null
+  created_at?: string
+  created_by?: string
+  updated_at?: string
+  updated_by?: string
+}
 
 // eSIM 實體
 export interface Esim {

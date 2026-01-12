@@ -28,6 +28,7 @@ import { searchFlightAction } from '@/features/dashboard/actions/flight-actions'
 import { useAuthStore } from '@/stores'
 import { useItineraries } from '@/hooks/cloud-hooks'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 import type { ProposalPackage, Proposal } from '@/types/proposal.types'
@@ -723,8 +724,7 @@ export function PackageItineraryDialog({
 
           // 更新套件關聯（只設置 itinerary_id 和 itinerary_type，保留 timeline_data）
 
-          await (supabase as any)
-            .from('proposal_packages')
+          await dynamicFrom('proposal_packages')
             .update({
               itinerary_id: newItinerary.id,
               itinerary_type: 'simple',

@@ -33,6 +33,7 @@ import { SupplierSearchInput, type Supplier as SupplierData } from './SupplierSe
 import { usePrintLogo } from '@/features/quotes/components/printable/shared/usePrintLogo'
 import { COMPANY } from '@/lib/constants/company'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { useAuthStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
@@ -375,8 +376,7 @@ export function TourRequestFormDialog({
 
       // 記錄到 tour_documents 表
        
-      const { error: insertError } = await (supabase as any)
-        .from('tour_documents')
+      const { error: insertError } = await dynamicFrom('tour_documents')
         .insert({
           tour_id: tourId,
           workspace_id: user.workspace_id,
@@ -415,8 +415,7 @@ export function TourRequestFormDialog({
       // 如果有 ID，表示是選擇的既有供應商，更新聯絡資訊
       if (supplierInfo.id) {
          
-        const { error } = await (supabase as any)
-          .from('suppliers')
+        const { error } = await dynamicFrom('suppliers')
           .update({
             contact_person: supplierInfo.contactPerson || null,
             phone: supplierInfo.phone || null,
@@ -432,8 +431,7 @@ export function TourRequestFormDialog({
 
       // 檢查是否已存在同名同類別的供應商
        
-      const { data: existing } = await (supabase as any)
-        .from('suppliers')
+      const { data: existing } = await dynamicFrom('suppliers')
         .select('id')
         .eq('name', supplierInfo.name)
         .eq('type', supplierTypeCode)
@@ -443,8 +441,7 @@ export function TourRequestFormDialog({
       if (existing) {
         // 已存在，更新聯絡資訊
          
-        const { error } = await (supabase as any)
-          .from('suppliers')
+        const { error } = await dynamicFrom('suppliers')
           .update({
             contact_person: supplierInfo.contactPerson || null,
             phone: supplierInfo.phone || null,
@@ -459,8 +456,7 @@ export function TourRequestFormDialog({
         // 不存在，建立新供應商
         // 生成供應商代碼
          
-        const { data: maxCodeData } = await (supabase as any)
-          .from('suppliers')
+        const { data: maxCodeData } = await dynamicFrom('suppliers')
           .select('code')
           .like('code', 'S%')
           .order('code', { ascending: false })
@@ -473,8 +469,7 @@ export function TourRequestFormDialog({
         }
 
          
-        const { error } = await (supabase as any)
-          .from('suppliers')
+        const { error } = await dynamicFrom('suppliers')
           .insert({
             code: newCode,
             name: supplierInfo.name,

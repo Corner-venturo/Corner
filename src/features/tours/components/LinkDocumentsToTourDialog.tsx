@@ -44,6 +44,7 @@ import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.ty
 import { logger } from '@/lib/utils/logger'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
+import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
@@ -276,8 +277,7 @@ export function LinkDocumentsToTourDialog({
 
       // 使用 type assertion 因為這是獨立 package（不屬於任何提案）
        
-      const { data: newPackage, error } = await (supabase as any)
-        .from('proposal_packages')
+      const { data: newPackage, error } = await dynamicFrom('proposal_packages')
         .insert(newPackageData)
         .select()
         .single()
