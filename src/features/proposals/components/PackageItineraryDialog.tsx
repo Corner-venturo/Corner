@@ -16,7 +16,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown } from 'lucide-react'
+import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown, Wand2, Sparkles } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,9 @@ import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
+import { useRegionsStore, type City } from '@/stores/region-store'
+import { isFeatureAvailable } from '@/lib/feature-restrictions'
+import { toast } from 'sonner'
 
 interface FlightInfo {
   flightNumber: string
@@ -100,6 +103,15 @@ export function PackageItineraryDialog({
   // 版本控制狀態
   const [selectedVersionIndex, setSelectedVersionIndex] = useState(-1) // -1 = 主版本
   const [directLoadedItinerary, setDirectLoadedItinerary] = useState<Itinerary | null>(null)
+
+  // AI 排行程狀態
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [aiCityId, setAiCityId] = useState<string>('')
+  const [aiArrivalTime, setAiArrivalTime] = useState('11:00')
+  const [aiDepartureTime, setAiDepartureTime] = useState('14:00')
+  const { cities, loading: citiesLoading, fetchAll: fetchRegions } = useRegionsStore()
+  const showAiGenerate = isFeatureAvailable('ai_suggest', currentUser?.workspace_code)
 
   // 追蹤是否已初始化每日行程（防止無限迴圈）
   const hasInitializedDailyScheduleRef = React.useRef(false)
@@ -417,6 +429,88 @@ export function PackageItineraryDialog({
     setReturnSegments([])
     setReturnFlightNumber('')
   }
+
+  // 打開 AI 排行程對話框
+  const openAiDialog = useCallback(() => {
+    if (cities.length === 0) {
+      fetchRegions()
+    }
+    // 嘗試根據目的地找到城市 ID
+    if (pkg.destination && cities.length > 0) {
+      const matchedCity = cities.find(
+        (c: City) => c.name === pkg.destination || c.name?.includes(pkg.destination || '')
+      )
+      if (matchedCity) {
+        setAiCityId(matchedCity.id)
+      }
+    }
+    setAiDialogOpen(true)
+  }, [cities, fetchRegions, pkg.destination])
+
+  // AI 排行程生成
+  const handleAiGenerate = useCallback(async () => {
+    if (!aiCityId) {
+      toast.error('請選擇城市')
+      return
+    }
+    if (!pkg.start_date) {
+      toast.error('請先設定出發日期')
+      return
+    }
+
+    setAiGenerating(true)
+    try {
+      const numDays = dailySchedule.length
+      const response = await fetch('/api/itineraries/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cityId: aiCityId,
+          numDays,
+          departureDate: pkg.start_date,
+          outboundFlight: { arrivalTime: aiArrivalTime },
+          returnFlight: { departureTime: aiDepartureTime },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '生成失敗')
+      }
+
+      if (result.success && result.data?.dailyItinerary) {
+        // 轉換 AI 結果為 dailySchedule 格式
+        interface GeneratedDay {
+          title: string
+          meals: { breakfast?: string; lunch?: string; dinner?: string }
+          accommodation: string
+        }
+        const newSchedule = result.data.dailyItinerary.map((day: GeneratedDay, index: number) => ({
+          day: index + 1,
+          route: day.title || '',
+          meals: {
+            breakfast: day.meals?.breakfast || '',
+            lunch: day.meals?.lunch || '',
+            dinner: day.meals?.dinner || '',
+          },
+          accommodation: day.accommodation || '',
+          sameAsPrevious: false,
+          hotelBreakfast: day.meals?.breakfast === '飯店早餐',
+        }))
+
+        setDailySchedule(newSchedule)
+        toast.success(`成功生成 ${newSchedule.length} 天行程！`)
+        setAiDialogOpen(false)
+      } else {
+        throw new Error('生成失敗')
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '生成失敗，請稍後再試')
+    } finally {
+      setAiGenerating(false)
+    }
+  }, [aiCityId, aiArrivalTime, aiDepartureTime, pkg.start_date, dailySchedule.length])
 
   // 取得前一天的住宿（用於續住顯示）
   const getPreviousAccommodation = (index: number): string => {
@@ -749,6 +843,7 @@ export function PackageItineraryDialog({
   }
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         {/* 載入中 */}
@@ -1033,8 +1128,20 @@ export function PackageItineraryDialog({
 
                 {/* 底部按鈕 */}
                 <div className="flex justify-between items-center pt-4 border-t border-border">
-                  {/* 版本選擇器 - 編輯模式永遠顯示 */}
+                  {/* 左側：AI 排行程 + 版本選擇器 */}
                   <div className="flex items-center gap-2">
+                    {/* AI 排行程按鈕 */}
+                    {showAiGenerate && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openAiDialog}
+                        className="h-7 px-2 text-[11px] gap-1 text-morandi-gold border-morandi-gold/50 hover:bg-morandi-gold/10"
+                      >
+                        <Wand2 size={12} />
+                        AI 排行程
+                      </Button>
+                    )}
                     {isEditMode && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -1218,5 +1325,88 @@ export function PackageItineraryDialog({
         )}
       </DialogContent>
     </Dialog>
+
+    {/* AI 排行程設定對話框 */}
+    <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Sparkles size={18} className="text-morandi-gold" />
+            AI 排行程
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label className="text-xs text-morandi-primary">選擇城市</Label>
+            <select
+              value={aiCityId}
+              onChange={(e) => setAiCityId(e.target.value)}
+              className="w-full h-9 px-3 rounded-md border border-border bg-background text-sm"
+              disabled={citiesLoading}
+            >
+              <option value="">
+                {citiesLoading ? '載入中...' : '請選擇城市'}
+              </option>
+              {cities.map((city: City) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs text-morandi-primary">抵達當地時間</Label>
+              <Input
+                type="time"
+                value={aiArrivalTime}
+                onChange={(e) => setAiArrivalTime(e.target.value)}
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-morandi-primary">離開當地時間</Label>
+              <Input
+                type="time"
+                value={aiDepartureTime}
+                onChange={(e) => setAiDepartureTime(e.target.value)}
+                className="h-9"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-morandi-secondary">
+            AI 將根據景點資料庫，為您生成 {dailySchedule.length} 天的行程建議
+          </p>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setAiDialogOpen(false)}
+            className="gap-1"
+          >
+            <X size={14} />
+            取消
+          </Button>
+          <Button
+            onClick={handleAiGenerate}
+            disabled={aiGenerating || !aiCityId}
+            className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+          >
+            {aiGenerating ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                生成中...
+              </>
+            ) : (
+              <>
+                <Sparkles size={14} />
+                生成行程
+              </>
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }

@@ -49,7 +49,7 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    const trimmedCode = code.trim().toUpperCase()
+    const trimmedCode = code.trim().toLowerCase()
     if (!trimmedCode) {
       setError('請輸入辦公室或廠商代號')
       return

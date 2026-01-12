@@ -126,6 +126,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     flight_cost?: number | null
     pnr?: string | null
   }>>([])
+  const [firstOrderId, setFirstOrderId] = useState<string | null>(null)
 
   // 載入 PNR 開票期限 + 檢查票號狀態
   useEffect(() => {
@@ -194,7 +195,13 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
         .select('id')
         .eq('tour_id', tour.id)
 
-      if (!orders || orders.length === 0) return
+      if (!orders || orders.length === 0) {
+        setFirstOrderId(null)
+        return
+      }
+
+      // 儲存第一個訂單的 ID（用於 PNR 配對建立新成員）
+      setFirstOrderId(orders[0].id)
 
       const orderIds = orders.map(o => o.id)
 
@@ -636,6 +643,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               passport_name: m.passport_name ?? null,
               pnr: m.pnr ?? null,
             }))}
+            orderId={firstOrderId || undefined}
             workspaceId={currentWorkspace?.id}
             onSuccess={() => {
               setForceShowPnr(true)

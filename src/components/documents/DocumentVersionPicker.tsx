@@ -13,6 +13,7 @@ import {
   Copy,
   FilePlus,
   Trash2,
+  Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -20,14 +21,17 @@ import { useQuoteStore } from '@/stores'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
+import type { TimelineItineraryData } from '@/types/timeline-itinerary.types'
 import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { TimelineItineraryPreview } from './TimelineItineraryPreview'
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {
@@ -82,12 +86,66 @@ export function DocumentVersionPicker({
   const [previewQuote, setPreviewQuote] = useState<Quote | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // 行程表資料
+  const [timelineData, setTimelineData] = useState<TimelineItineraryData | null>(null)
+  const [loadingTimeline, setLoadingTimeline] = useState(false)
+  const [showItinerary, setShowItinerary] = useState(false)
+
   // 載入報價單資料
   useEffect(() => {
     if (isOpen) {
       fetchAll()
     }
   }, [isOpen, fetchAll])
+
+  // 載入行程表資料（點擊按鈕後才載入）
+  const loadTimelineData = async () => {
+    // 檢查 tour 是否有 proposal_package_id（類型斷言處理）
+    const proposalPackageId = (tour as { proposal_package_id?: string | null }).proposal_package_id
+    if (!proposalPackageId) {
+      setTimelineData(null)
+      return
+    }
+
+    setLoadingTimeline(true)
+    try {
+      const { data, error } = await supabase
+        .from('proposal_packages')
+        .select('timeline_data, itinerary_type')
+        .eq('id', proposalPackageId)
+        .single()
+
+      if (error) {
+        logger.error('載入行程表資料失敗:', error)
+        setTimelineData(null)
+      } else if (data?.itinerary_type === 'timeline' && data?.timeline_data) {
+        setTimelineData(data.timeline_data as unknown as TimelineItineraryData)
+      } else {
+        setTimelineData(null)
+      }
+    } catch (err) {
+      logger.error('載入行程表資料錯誤:', err)
+      setTimelineData(null)
+    } finally {
+      setLoadingTimeline(false)
+    }
+  }
+
+  // 點擊顯示行程表按鈕
+  const handleShowItinerary = () => {
+    setShowItinerary(true)
+    if (!timelineData && !loadingTimeline) {
+      loadTimelineData()
+    }
+  }
+
+  // 關閉對話框時重置狀態
+  useEffect(() => {
+    if (!isOpen) {
+      setShowItinerary(false)
+      setTimelineData(null)
+    }
+  }, [isOpen])
 
   // 編輯時自動聚焦
   useEffect(() => {
@@ -489,10 +547,18 @@ export function DocumentVersionPicker({
     )
   }
 
+  // 檢查是否有行程表資料
+  const hasItinerary = timelineData && timelineData.days && timelineData.days.length > 0
+  // 檢查 tour 是否有 proposal_package_id
+  const hasProposalPackage = !!(tour as { proposal_package_id?: string | null }).proposal_package_id
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent nested={nested} className="max-w-[500px] h-[70vh] max-h-[800px] flex flex-col overflow-hidden">
+        <DialogContent nested={nested} className={cn(
+          'h-[70vh] max-h-[800px] flex flex-col overflow-hidden',
+          showItinerary ? 'max-w-[900px]' : 'max-w-[500px]'
+        )}>
           {/* 標題區 */}
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -502,9 +568,16 @@ export function DocumentVersionPicker({
             </DialogTitle>
           </DialogHeader>
 
-          {/* 報價單列表 */}
-          <div className="flex-1 overflow-hidden">
-            <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full">
+          {/* 主要內容區 - 雙欄布局（當顯示行程表時） */}
+          <div className={cn(
+            'flex-1 overflow-hidden',
+            showItinerary && 'flex gap-4'
+          )}>
+            {/* 左側：報價單列表 */}
+            <div className={cn(
+              'flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full',
+              showItinerary ? 'w-1/2' : 'w-full'
+            )}>
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
@@ -554,6 +627,16 @@ export function DocumentVersionPicker({
                   </button>
                 ) : (
                   <div className="flex gap-2">
+                    {/* 行程表按鈕（只在有 proposal_package 且未顯示行程時） */}
+                    {hasProposalPackage && !showItinerary && (
+                      <button
+                        onClick={handleShowItinerary}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-primary border border-border hover:bg-morandi-container/50 rounded-lg transition-colors"
+                      >
+                        <Clock size={16} />
+                        行程表
+                      </button>
+                    )}
                     <button
                       onClick={handleCreateStandard}
                       disabled={isCreatingStandard}
@@ -584,6 +667,31 @@ export function DocumentVersionPicker({
                 )}
               </div>
             </div>
+
+            {/* 右側：行程表預覽（點擊行程表按鈕後顯示） */}
+            {showItinerary && (
+              <div className="w-1/2 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full">
+                <div className="flex-shrink-0 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-morandi-gold" />
+                    <span className="text-sm font-medium text-morandi-primary">行程表</span>
+                  </div>
+                  <p className="text-xs text-morandi-secondary mt-1">開團時設定的行程內容</p>
+                </div>
+
+                {/* 分割線留白 */}
+                <div className="mx-4">
+                  <div className="border-t border-border" />
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4">
+                  <TimelineItineraryPreview
+                    data={timelineData}
+                    loading={loadingTimeline}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
