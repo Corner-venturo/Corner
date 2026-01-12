@@ -24,6 +24,7 @@ export function hasFullFeatures(workspaceCode: string | undefined | null): boole
  * - itinerary_editor: 行程編輯器（其他公司只有簡易列印）
  * - esim: eSIM 網卡管理
  * - travel_invoices: 電子代轉發票
+ * - ai_suggest: AI 景點資料補充
  */
 export type RestrictedFeature =
   | 'timebox'
@@ -32,6 +33,7 @@ export type RestrictedFeature =
   | 'itinerary_editor'
   | 'esim'
   | 'travel_invoices'
+  | 'ai_suggest'
 
 /**
  * 檢查特定功能是否可用
@@ -53,6 +55,7 @@ export function isFeatureAvailable(
     'itinerary_editor',
     'esim',
     'travel_invoices',
+    'ai_suggest',
   ]
 
   return !restrictedFeatures.includes(feature)

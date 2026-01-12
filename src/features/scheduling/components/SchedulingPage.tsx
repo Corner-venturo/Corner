@@ -71,6 +71,7 @@ type TabType = 'vehicles' | 'leaders'
 
 const emptyVehicleScheduleForm: FleetScheduleFormData = {
   vehicle_id: '',
+  driver_id: '',
   start_date: '',
   end_date: '',
   client_name: '',
@@ -78,8 +79,9 @@ const emptyVehicleScheduleForm: FleetScheduleFormData = {
   tour_code: '',
   contact_person: '',
   contact_phone: '',
-  driver_name: '',
-  driver_phone: '',
+  pickup_location: '',
+  destination: '',
+  rental_fee: null,
   notes: '',
 }
 
@@ -253,10 +255,9 @@ export const SchedulingPage: React.FC = () => {
     setVehicleFormData({
       ...emptyVehicleScheduleForm,
       vehicle_id: vehicleId,
+      driver_id: vehicle?.default_driver_id || '',
       start_date: date,
       end_date: date,
-      driver_name: vehicle?.driver_name || '',
-      driver_phone: vehicle?.driver_phone || '',
     })
     setVehicleDialogOpen(true)
   }, [vehicles])
@@ -266,6 +267,7 @@ export const SchedulingPage: React.FC = () => {
     setEditingVehicleSchedule(schedule)
     setVehicleFormData({
       vehicle_id: schedule.vehicle_id,
+      driver_id: schedule.driver_id || '',
       start_date: schedule.start_date,
       end_date: schedule.end_date,
       client_name: schedule.client_name || '',
@@ -273,8 +275,9 @@ export const SchedulingPage: React.FC = () => {
       tour_code: schedule.tour_code || '',
       contact_person: schedule.contact_person || '',
       contact_phone: schedule.contact_phone || '',
-      driver_name: schedule.driver_name || '',
-      driver_phone: schedule.driver_phone || '',
+      pickup_location: schedule.pickup_location || '',
+      destination: schedule.destination || '',
+      rental_fee: schedule.rental_fee,
       notes: schedule.notes || '',
     })
     setVehicleDialogOpen(true)

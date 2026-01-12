@@ -67,7 +67,20 @@ export default function WorkspacesPage() {
           is_announcement: true,
           created_by: user.id,
         })
-        toast.success('工作空間和公告頻道已建立')
+
+        // 自動建立專屬機器人
+        try {
+          const botResponse = await fetch('/api/debug/setup-workspace-bots', {
+            method: 'POST',
+          })
+          if (botResponse.ok) {
+            logger.log(`Bot created for workspace: ${createdWs.id}`)
+          }
+        } catch (botError) {
+          logger.warn('建立機器人失敗（不影響 workspace 建立）:', botError)
+        }
+
+        toast.success('工作空間、公告頻道和機器人已建立')
       }
 
       setNewWorkspace({ name: '', description: '' })

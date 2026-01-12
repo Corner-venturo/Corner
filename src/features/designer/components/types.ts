@@ -84,6 +84,7 @@ export interface ImageAdjustments {
   contrast: number      // 對比度
   highlights: number    // 高光
   shadows: number       // 陰影
+  clarity: number       // 銳利度/清晰度
   saturation: number    // 飽和度
   temperature: number   // 色溫
   tint: number          // 色調
@@ -107,6 +108,7 @@ export const DEFAULT_IMAGE_ADJUSTMENTS: ImageAdjustments = {
   contrast: 0,
   highlights: 0,
   shadows: 0,
+  clarity: 0,
   saturation: 0,
   temperature: 0,
   tint: 0,
@@ -125,6 +127,7 @@ export const DEFAULT_IMAGE_POSITION: ImagePositionSettings = {
 export interface ImageElement extends BaseElement {
   type: 'image'
   src: string
+  originalSrc?: string // 原始圖片 URL（套用調整前），用於重新處理
   objectFit: ObjectFit
   borderRadius?: ImageBorderRadius // 自訂圓角（支援圓拱形狀）
   // 新增：圖片編輯設定

@@ -73,6 +73,11 @@ export function useAttractionsData() {
           images: formData.images ? formData.images.split(',').map(url => url.trim()).filter(Boolean) : [],
           notes: formData.notes || undefined,
           is_active: formData.is_active,
+          // AI 補充欄位
+          latitude: formData.latitude || undefined,
+          longitude: formData.longitude || undefined,
+          ticket_price: formData.ticket_price || undefined,
+          opening_hours: formData.opening_hours || undefined,
         }
 
         logger.log('[Attractions] attractionData:', attractionData)

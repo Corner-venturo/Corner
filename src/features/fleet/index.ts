@@ -3,5 +3,7 @@
  */
 
 export { FleetPage } from './components/FleetPage'
-export { FleetList } from './components/FleetList'
-export { FleetDialog } from './components/FleetDialog'
+export { FleetVehicleList } from './components/FleetVehicleList'
+export { FleetVehicleDialog } from './components/FleetVehicleDialog'
+export { FleetDriverList } from './components/FleetDriverList'
+export { FleetDriverDialog } from './components/FleetDriverDialog'

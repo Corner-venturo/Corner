@@ -3649,21 +3649,105 @@ export type Database = {
           },
         ]
       }
+      fleet_drivers: {
+        Row: {
+          created_at: string | null
+          employee_id: string | null
+          health_check_date: string | null
+          health_check_document_url: string | null
+          health_check_expiry: string | null
+          id: string
+          id_number: string | null
+          license_expiry_date: string | null
+          license_image_url: string | null
+          license_number: string | null
+          license_type: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          professional_license_expiry: string | null
+          professional_license_image_url: string | null
+          professional_license_number: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id?: string | null
+          health_check_date?: string | null
+          health_check_document_url?: string | null
+          health_check_expiry?: string | null
+          id?: string
+          id_number?: string | null
+          license_expiry_date?: string | null
+          license_image_url?: string | null
+          license_number?: string | null
+          license_type?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          professional_license_expiry?: string | null
+          professional_license_image_url?: string | null
+          professional_license_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string | null
+          health_check_date?: string | null
+          health_check_document_url?: string | null
+          health_check_expiry?: string | null
+          id?: string
+          id_number?: string | null
+          license_expiry_date?: string | null
+          license_image_url?: string | null
+          license_number?: string | null
+          license_type?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          professional_license_expiry?: string | null
+          professional_license_image_url?: string | null
+          professional_license_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_drivers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_schedules: {
         Row: {
           client_name: string | null
+          client_workspace_id: string | null
           contact_person: string | null
           contact_phone: string | null
           created_at: string | null
           created_by: string | null
+          destination: string | null
+          driver_id: string | null
           driver_name: string | null
           driver_phone: string | null
           end_date: string
           id: string
           notes: string | null
+          pickup_location: string | null
+          rental_fee: number | null
+          route_notes: string | null
           start_date: string
           status: string
           tour_code: string | null
+          tour_id: string | null
           tour_name: string | null
           updated_at: string | null
           vehicle_id: string
@@ -3671,18 +3755,25 @@ export type Database = {
         }
         Insert: {
           client_name?: string | null
+          client_workspace_id?: string | null
           contact_person?: string | null
           contact_phone?: string | null
           created_at?: string | null
           created_by?: string | null
+          destination?: string | null
+          driver_id?: string | null
           driver_name?: string | null
           driver_phone?: string | null
           end_date: string
           id?: string
           notes?: string | null
+          pickup_location?: string | null
+          rental_fee?: number | null
+          route_notes?: string | null
           start_date: string
           status?: string
           tour_code?: string | null
+          tour_id?: string | null
           tour_name?: string | null
           updated_at?: string | null
           vehicle_id: string
@@ -3690,24 +3781,38 @@ export type Database = {
         }
         Update: {
           client_name?: string | null
+          client_workspace_id?: string | null
           contact_person?: string | null
           contact_phone?: string | null
           created_at?: string | null
           created_by?: string | null
+          destination?: string | null
+          driver_id?: string | null
           driver_name?: string | null
           driver_phone?: string | null
           end_date?: string
           id?: string
           notes?: string | null
+          pickup_location?: string | null
+          rental_fee?: number | null
+          route_notes?: string | null
           start_date?: string
           status?: string
           tour_code?: string | null
+          tour_id?: string | null
           tour_name?: string | null
           updated_at?: string | null
           vehicle_id?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fleet_schedules_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_drivers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fleet_schedules_vehicle_id_fkey"
             columns: ["vehicle_id"]
@@ -3724,53 +3829,177 @@ export type Database = {
           },
         ]
       }
-      fleet_vehicles: {
+      fleet_vehicle_logs: {
         Row: {
-          capacity: number
+          cost: number | null
           created_at: string | null
-          display_order: number | null
-          driver_name: string | null
-          driver_phone: string | null
+          created_by: string | null
+          description: string | null
+          documents: Json | null
           id: string
-          license_plate: string
+          log_date: string
+          log_type: string
+          mileage: number | null
+          next_due_date: string | null
+          next_due_mileage: number | null
           notes: string | null
-          status: string
           updated_at: string | null
-          vehicle_name: string | null
-          vehicle_type: string
+          vehicle_id: string
+          vendor_name: string | null
           workspace_id: string
         }
         Insert: {
-          capacity?: number
+          cost?: number | null
           created_at?: string | null
-          display_order?: number | null
-          driver_name?: string | null
-          driver_phone?: string | null
+          created_by?: string | null
+          description?: string | null
+          documents?: Json | null
           id?: string
-          license_plate: string
+          log_date: string
+          log_type: string
+          mileage?: number | null
+          next_due_date?: string | null
+          next_due_mileage?: number | null
           notes?: string | null
-          status?: string
           updated_at?: string | null
-          vehicle_name?: string | null
-          vehicle_type?: string
+          vehicle_id: string
+          vendor_name?: string | null
           workspace_id: string
         }
         Update: {
-          capacity?: number
+          cost?: number | null
           created_at?: string | null
-          display_order?: number | null
-          driver_name?: string | null
-          driver_phone?: string | null
+          created_by?: string | null
+          description?: string | null
+          documents?: Json | null
           id?: string
-          license_plate?: string
+          log_date?: string
+          log_type?: string
+          mileage?: number | null
+          next_due_date?: string | null
+          next_due_mileage?: number | null
           notes?: string | null
-          status?: string
           updated_at?: string | null
-          vehicle_name?: string | null
-          vehicle_type?: string
+          vehicle_id?: string
+          vendor_name?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fleet_vehicle_logs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_vehicle_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_vehicles: {
+        Row: {
+          brand: string | null
+          capacity: number
+          created_at: string | null
+          created_by: string | null
+          current_mileage: number | null
+          default_driver_id: string | null
+          display_order: number | null
+          documents: Json | null
+          driver_name: string | null
+          driver_phone: string | null
+          id: string
+          inspection_due_date: string | null
+          insurance_due_date: string | null
+          last_maintenance_date: string | null
+          license_plate: string
+          model: string | null
+          next_maintenance_date: string | null
+          next_maintenance_km: number | null
+          notes: string | null
+          registration_date: string | null
+          status: string
+          updated_at: string | null
+          updated_by: string | null
+          vehicle_name: string | null
+          vehicle_type: string
+          vin: string | null
+          workspace_id: string
+          year: number | null
+        }
+        Insert: {
+          brand?: string | null
+          capacity?: number
+          created_at?: string | null
+          created_by?: string | null
+          current_mileage?: number | null
+          default_driver_id?: string | null
+          display_order?: number | null
+          documents?: Json | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          inspection_due_date?: string | null
+          insurance_due_date?: string | null
+          last_maintenance_date?: string | null
+          license_plate: string
+          model?: string | null
+          next_maintenance_date?: string | null
+          next_maintenance_km?: number | null
+          notes?: string | null
+          registration_date?: string | null
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_name?: string | null
+          vehicle_type?: string
+          vin?: string | null
+          workspace_id: string
+          year?: number | null
+        }
+        Update: {
+          brand?: string | null
+          capacity?: number
+          created_at?: string | null
+          created_by?: string | null
+          current_mileage?: number | null
+          default_driver_id?: string | null
+          display_order?: number | null
+          documents?: Json | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          inspection_due_date?: string | null
+          insurance_due_date?: string | null
+          last_maintenance_date?: string | null
+          license_plate?: string
+          model?: string | null
+          next_maintenance_date?: string | null
+          next_maintenance_km?: number | null
+          notes?: string | null
+          registration_date?: string | null
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          vehicle_name?: string | null
+          vehicle_type?: string
+          vin?: string | null
+          workspace_id?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_vehicles_default_driver_id_fkey"
+            columns: ["default_driver_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_drivers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fleet_vehicles_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -15799,6 +16028,11 @@ export type Database = {
         Returns: string
       }
       generate_confirmation_token: { Args: never; Returns: string }
+      generate_voucher_no: { Args: { p_workspace_id: string }; Returns: string }
+      get_account_id_by_code: {
+        Args: { p_code: string; p_workspace_id: string }
+        Returns: string
+      }
       get_cron_job_status: {
         Args: never
         Returns: {

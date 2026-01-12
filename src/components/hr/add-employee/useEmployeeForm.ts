@@ -137,7 +137,24 @@ export function useEmployeeForm(onSubmit: () => void) {
           const error = await authResponse.json()
           logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', error)
         } else {
+          const authResult = await authResponse.json()
           logger.log('✅ Auth 帳號已建立:', employee_number)
+
+          // 🔧 重要：將 Auth User ID 寫入員工記錄的 supabase_user_id
+          // 這樣 RLS 才能正確運作
+          if (authResult.data?.user?.id && newEmployee?.id) {
+            const { supabase: supabaseClient } = await import('@/lib/supabase/client')
+            const { error: updateError } = await supabaseClient
+              .from('employees')
+              .update({ supabase_user_id: authResult.data.user.id })
+              .eq('id', newEmployee.id)
+
+            if (updateError) {
+              logger.warn('⚠️ 更新 supabase_user_id 失敗:', updateError)
+            } else {
+              logger.log('✅ supabase_user_id 已綁定:', authResult.data.user.id)
+            }
+          }
         }
       } catch (authError) {
         logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', authError)

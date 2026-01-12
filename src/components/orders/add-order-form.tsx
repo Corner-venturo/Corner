@@ -60,19 +60,29 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
   }, [employees.length, fetchEmployees])
 
 
+  // 排序函數：按員工編號排序
+  const sortByEmployeeNumber = (a: Employee, b: Employee) => {
+    const numA = a.employee_number || ''
+    const numB = b.employee_number || ''
+    return numA.localeCompare(numB, 'en', { numeric: true })
+  }
+
   // 篩選業務人員（roles 包含 'sales'）
   const salesPersons = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
       const empWithSync = emp as EmployeeWithSync
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
-      return notDeleted && isActive
+      // 排除機器人
+      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      return notDeleted && isActive && notBot
     })
 
     const salesOnly = activeEmployees.filter(emp => emp.roles?.includes('sales'))
 
     // 如果有標記業務的就只顯示業務，沒有就顯示所有人
-    return salesOnly.length > 0 ? salesOnly : activeEmployees
+    const result = salesOnly.length > 0 ? salesOnly : activeEmployees
+    return result.sort(sortByEmployeeNumber)
   }, [employees])
 
   // 篩選助理（roles 包含 'assistant'）
@@ -81,13 +91,16 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       const empWithSync = emp as EmployeeWithSync
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
-      return notDeleted && isActive
+      // 排除機器人
+      const notBot = emp.employee_number !== 'BOT001' && emp.id !== '00000000-0000-0000-0000-000000000001'
+      return notDeleted && isActive && notBot
     })
 
     const assistantsOnly = activeEmployees.filter(emp => emp.roles?.includes('assistant'))
 
     // 如果有標記助理的就只顯示助理，沒有就顯示所有人
-    return assistantsOnly.length > 0 ? assistantsOnly : activeEmployees
+    const result = assistantsOnly.length > 0 ? assistantsOnly : activeEmployees
+    return result.sort(sortByEmployeeNumber)
   }, [employees])
 
   const handleSubmit = (e: React.FormEvent) => {

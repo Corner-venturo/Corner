@@ -60,4 +60,9 @@ export interface AttractionFormData {
   images: string
   notes: string
   is_active: boolean
+  // AI 補充欄位
+  latitude?: number
+  longitude?: number
+  ticket_price?: string
+  opening_hours?: string
 }

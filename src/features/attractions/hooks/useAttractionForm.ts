@@ -62,6 +62,11 @@ export function useAttractionForm({ attraction, initialFormData, open }: UseAttr
         images: attraction.images?.join(', ') || '',
         notes: attraction.notes || '',
         is_active: attraction.is_active,
+        // AI 補充欄位
+        latitude: attraction.latitude,
+        longitude: attraction.longitude,
+        ticket_price: attraction.ticket_price || '',
+        opening_hours: typeof attraction.opening_hours === 'string' ? attraction.opening_hours : '',
       })
       setUploadedImages(attraction.images || [])
       setImagePositions(parseImagePositions(attraction.notes))

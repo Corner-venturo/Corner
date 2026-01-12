@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Attraction, AttractionFormData } from '../types'
 import type { Country, Region, City } from '@/stores/region-store'
@@ -9,6 +10,10 @@ import { logger } from '@/lib/utils/logger'
 import { useAttractionForm } from '../hooks/useAttractionForm'
 import { AttractionForm } from './attraction-dialog/AttractionForm'
 import { AttractionImageUpload } from './attraction-dialog/AttractionImageUpload'
+import { useAuthStore } from '@/stores/auth-store'
+import { isFeatureAvailable } from '@/lib/feature-restrictions'
+import { Button } from '@/components/ui/button'
+import { Sparkles, Loader2 } from 'lucide-react'
 
 interface AttractionsDialogProps {
   open: boolean
@@ -54,6 +59,76 @@ export function AttractionsDialog({
     fetchAndUploadImage,
   } = useAttractionForm({ attraction, initialFormData, open })
 
+  const { user } = useAuthStore()
+  const [isAiLoading, setIsAiLoading] = useState(false)
+
+  // 檢查是否顯示 AI 補充按鈕（僅 TP/TC）
+  const showAiSuggest = isFeatureAvailable('ai_suggest', user?.workspace_code)
+
+  // AI 補充景點資料
+  const handleAiSuggest = async () => {
+    if (!formData.name) {
+      void alert('請先填寫景點名稱', 'warning')
+      return
+    }
+
+    setIsAiLoading(true)
+    try {
+      // 取得國家和城市名稱
+      const country = countries.find(c => c.id === formData.country_id)
+      const city = cities.find(c => c.id === formData.city_id)
+
+      const response = await fetch('/api/ai/suggest-attraction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          city: city?.name,
+          country: country?.name,
+          category: formData.category,
+          existingData: {
+            latitude: formData.latitude,
+            longitude: formData.longitude,
+            duration_minutes: formData.duration_minutes,
+            ticket_price: formData.ticket_price,
+            opening_hours: formData.opening_hours,
+            description: formData.description,
+          },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'AI 補充失敗')
+      }
+
+      const suggestion = result.data.suggestion
+
+      // 填入 AI 建議的資料（只填入空白的欄位）
+      setFormData(prev => ({
+        ...prev,
+        latitude: prev.latitude || suggestion.latitude,
+        longitude: prev.longitude || suggestion.longitude,
+        duration_minutes: prev.duration_minutes || suggestion.duration_minutes || 60,
+        ticket_price: prev.ticket_price || suggestion.ticket_price,
+        opening_hours: prev.opening_hours || suggestion.opening_hours,
+        description: prev.description || suggestion.description,
+        address: prev.address || suggestion.address,
+        website: prev.website || suggestion.website,
+        phone: prev.phone || suggestion.phone,
+        tags: prev.tags || (suggestion.tags?.join(', ') || ''),
+      }))
+
+      void alert(`已補充 ${result.data.missingFields?.length || 0} 個欄位的資料`, 'success')
+    } catch (error) {
+      logger.error('AI 補充失敗:', error)
+      void alert(error instanceof Error ? error.message : 'AI 補充失敗', 'error')
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
+
   // 上傳圖片
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -96,6 +171,25 @@ export function AttractionsDialog({
       ...prev,
       [url]: position
     }))
+  }
+
+  // 替換圖片（用於 AI 編輯後）
+  const handleReplaceImage = (index: number, newUrl: string) => {
+    const oldUrl = uploadedImages[index]
+    const newImages = [...uploadedImages]
+    newImages[index] = newUrl
+    setUploadedImages(newImages)
+    setFormData(prev => ({ ...prev, images: newImages.join(', ') }))
+
+    // 如果舊圖片有位置設定，複製到新圖片
+    if (oldUrl && imagePositions[oldUrl]) {
+      setImagePositions(prev => {
+        const newPositions = { ...prev }
+        newPositions[newUrl] = prev[oldUrl]
+        delete newPositions[oldUrl]
+        return newPositions
+      })
+    }
   }
 
   // 新增網址圖片
@@ -190,11 +284,35 @@ export function AttractionsDialog({
       ? getCitiesByCountry(formData.country_id)
       : []
 
+  // 自訂標題（包含 AI 補充按鈕）
+  const dialogTitle = (
+    <div className="flex items-center gap-3">
+      <span>{attraction ? '編輯景點' : '新增景點'}</span>
+      {showAiSuggest && attraction && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleAiSuggest}
+          disabled={isAiLoading || !formData.name}
+          className="h-7 text-xs gap-1.5 text-morandi-gold border-morandi-gold/50 hover:bg-morandi-gold/10"
+        >
+          {isAiLoading ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Sparkles size={14} />
+          )}
+          AI 補充
+        </Button>
+      )}
+    </div>
+  )
+
   return (
     <FormDialog
       open={open}
       onOpenChange={open => !open && onClose()}
-      title={attraction ? '編輯景點' : '新增景點'}
+      title={dialogTitle}
       onSubmit={handleSubmit}
       submitLabel={attraction ? '更新' : '新增'}
       submitDisabled={!formData.name || !formData.country_id}
@@ -223,6 +341,7 @@ export function AttractionsDialog({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onReplaceImage={handleReplaceImage}
       />
     </FormDialog>
   )

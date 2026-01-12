@@ -52,6 +52,14 @@ export async function getServerAuth(): Promise<AuthResult> {
     }
   }
 
+  // 記錄 auth user 資訊以便除錯
+  const { logger } = await import('@/lib/utils/logger')
+  logger.log('🔍 getServerAuth - auth user:', {
+    auth_uid: user.id?.substring(0, 8),
+    auth_email: user.email,
+    metadata: user.user_metadata,
+  })
+
   // 2. 嘗試從 user_metadata 取得 workspace_id（快速路徑）
   let workspaceId = user.user_metadata?.workspace_id as string | undefined
   let employeeId = user.user_metadata?.employee_id as string | undefined
@@ -132,9 +140,22 @@ export async function getServerAuth(): Promise<AuthResult> {
     if (!employee) {
       // 記錄詳細資訊以便除錯
       const { logger } = await import('@/lib/utils/logger')
+
+      // 額外查詢：列出所有員工以便除錯
+      const { data: allEmployees } = await adminClient
+        .from('employees')
+        .select('id, employee_number, supabase_user_id, workspace_id')
+        .limit(10)
+
       logger.error('找不到員工資料', {
         auth_uid: user.id,
         auth_email: user.email,
+        user_metadata: user.user_metadata,
+        sample_employees: allEmployees?.map(e => ({
+          id: e.id.substring(0, 8),
+          num: e.employee_number,
+          uid: e.supabase_user_id?.substring(0, 8),
+        })),
       })
       return {
         success: false,

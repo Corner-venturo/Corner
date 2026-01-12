@@ -60,6 +60,8 @@ export const TABLES = {
   TOUR_LEADERS: 'tour_leaders',
   // 車隊調度系統
   FLEET_VEHICLES: 'fleet_vehicles',
+  FLEET_DRIVERS: 'fleet_drivers',
+  FLEET_VEHICLE_LOGS: 'fleet_vehicle_logs',
   FLEET_SCHEDULES: 'fleet_schedules',
   LEADER_SCHEDULES: 'leader_schedules',
   // 會計系統

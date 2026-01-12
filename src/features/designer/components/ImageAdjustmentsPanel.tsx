@@ -144,6 +144,13 @@ export function ImageAdjustmentsPanel({
           效果
         </h4>
         <AdjustmentSlider
+          label="銳利度"
+          value={adjustments.clarity}
+          min={-100}
+          max={100}
+          onChange={(v) => handleChange('clarity', v)}
+        />
+        <AdjustmentSlider
           label="暈影"
           value={adjustments.vignette}
           min={0}

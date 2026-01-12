@@ -250,6 +250,24 @@ export const useFleetVehicleStore = createStore<import('@/types/fleet.types').Fl
 })
 
 /**
+ * 車隊司機 Store
+ * 🔒 啟用 Workspace 隔離
+ */
+export const useFleetDriverStore = createStore<import('@/types/fleet.types').FleetDriver>({
+  tableName: 'fleet_drivers',
+  workspaceScoped: true,
+})
+
+/**
+ * 車輛維護記錄 Store
+ * 🔒 啟用 Workspace 隔離
+ */
+export const useFleetVehicleLogStore = createStore<import('@/types/fleet.types').FleetVehicleLog>({
+  tableName: 'fleet_vehicle_logs',
+  workspaceScoped: true,
+})
+
+/**
  * 車輛調度 Store
  * 🔒 啟用 Workspace 隔離
  */

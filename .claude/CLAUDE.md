@@ -1,13 +1,27 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2026-01-11 (新增日期處理規範)
+> **最後更新**: 2026-01-11 (新增 VENTURO_VISION.md)
 > **專案狀態**: 核心功能完成，代碼品質強化中
 
 ---
 
 ## 🚨🚨🚨 對話開始必做 (P0) 🚨🚨🚨
 
-### 第一步：閱讀 SITEMAP
+### 第一步：理解 Venturo 願景
+
+**首先閱讀 VENTURO_VISION.md：**
+```
+Read /Users/williamchien/Projects/venturo-erp/.claude/VENTURO_VISION.md
+```
+
+**核心概念**：
+- Venturo 是一個**雙平台生態系統**（ERP + Online）
+- **venturo-erp**：旅行社員工內部營運系統
+- **venturo-online**：旅客會員體驗系統
+- 兩個系統**共享同一個 Supabase 資料庫**
+- 資料流向：ERP 產生 → Online 呈現 → 會員回饋 → ERP 優化
+
+### 第二步：閱讀 SITEMAP
 
 **每次對話開始時，必須先執行：**
 ```
@@ -31,7 +45,16 @@ Read /Users/williamchien/Projects/SITEMAP.md
 
 ## 📍 必讀清單（開發前必看）
 
-### 1. 專案網站地圖（已在上方強調）
+### 0. Venturo 願景文件（最重要！）
+```
+/Users/williamchien/Projects/venturo-erp/.claude/VENTURO_VISION.md
+```
+- 雙平台架構（ERP + Online）
+- 價值飛輪：設計 → 銷售 → 出發 → 回憶 → 推薦
+- 資料流向與共享機制
+- 開發優先級與協作規範
+
+### 1. 專案網站地圖
 ```
 /Users/williamchien/Projects/SITEMAP.md
 ```

@@ -36,8 +36,8 @@ export interface FormDialogProps {
   open: boolean
   /** 對話框狀態變更回調 */
   onOpenChange: (open: boolean) => void
-  /** 對話框標題 */
-  title: string
+  /** 對話框標題（支援字串或 ReactNode） */
+  title: ReactNode
   /** 對話框副標題（可選） */
   subtitle?: string
   /** 表單內容 */

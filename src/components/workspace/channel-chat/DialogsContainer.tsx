@@ -36,7 +36,10 @@ function TicketStatusDialog({
   const [error, setError] = useState<string | null>(null)
 
   const handleSendQuery = useCallback(async (days: number) => {
+    logger.log('🎫 開始查詢機票狀態, channelId:', channelId, 'days:', days)
+
     if (!channelId) {
+      logger.error('❌ channelId 為空')
       setError('無法取得頻道資訊')
       return
     }
@@ -46,6 +49,7 @@ function TicketStatusDialog({
     setError(null)
 
     try {
+      logger.log('📡 發送 API 請求...')
       const response = await fetch('/api/bot/ticket-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,16 +59,27 @@ function TicketStatusDialog({
           notify_sales: false, // 不發送給業務，只發到當前頻道
         }),
       })
+      logger.log('📥 API 回應狀態:', response.status)
       const data = await response.json()
+      logger.log('📦 API 回應資料:', data)
 
       if (data.success) {
+        logger.log('✅ 查詢成功，關閉 Dialog')
+        // 如果沒有需要通知的內容，顯示提示訊息
+        if (data.message === '無需發送通知' || data.data?.sent === false) {
+          setError('✅ 未來 ' + days + ' 天內沒有需要關注的開票狀況')
+          setLoading(false)
+          setSelectedDays(null)
+          return
+        }
         // 成功發送，關閉 Dialog
         onClose()
       } else {
+        logger.error('❌ API 回傳失敗:', data.message)
         setError(data.message || '查詢失敗')
       }
     } catch (err) {
-      logger.error('查詢機票狀態失敗:', err)
+      logger.error('❌ 查詢機票狀態失敗:', err)
       setError('查詢失敗，請稍後再試')
     } finally {
       setLoading(false)
