@@ -18,7 +18,6 @@ import {
   ClipboardList,
   ClipboardEdit,
   Palette,
-  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -41,12 +40,10 @@ interface UseTourActionButtonsParams {
   setSelectedTour: (tour: Tour) => void
   setDeleteConfirm: (state: { isOpen: boolean; tour: Tour | null }) => void
   handleCreateChannel: (tour: Tour) => Promise<void>
-  // 新增：打開報價單/行程表/合約連結對話框
+  // 新增：打開報價單（含行程表）/合約連結對話框
   onOpenQuoteDialog?: (tour: Tour) => void
   onOpenItineraryDialog?: (tour: Tour) => void
   onOpenContractDialog?: (tour: Tour) => void
-  // 新增：打開行程表選擇對話框
-  onOpenTourItineraryDialog?: (tour: Tour) => void
   // 結案
   onCloseTour?: (tour: Tour) => void
   // 封存對話框
@@ -75,7 +72,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onOpenQuoteDialog,
     onOpenItineraryDialog,
     onOpenContractDialog,
-    onOpenTourItineraryDialog,
     onCloseTour,
     onOpenArchiveDialog,
     onOpenTourControlDialog,
@@ -206,23 +202,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>頻道</span>
           </button>
 
-          {/* 行程表 */}
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              setSelectedTour(tour)
-              if (onOpenTourItineraryDialog) {
-                onOpenTourItineraryDialog(tour)
-              }
-            }}
-            className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="建立或編輯行程表"
-          >
-            <FileText size={14} />
-            <span>行程</span>
-          </button>
-
-          {/* 報價單 */}
+          {/* 報價與行程（整合） */}
           <button
             onClick={e => {
               e.stopPropagation()
@@ -236,10 +216,10 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               }
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
-            title="報價單"
+            title="報價與行程管理"
           >
             <Calculator size={14} />
-            <span>報價</span>
+            <span>報價/行程</span>
           </button>
 
           {/* 設計 */}
@@ -346,7 +326,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       handleCreateChannel,
       onOpenQuoteDialog,
       onOpenItineraryDialog,
-      onOpenTourItineraryDialog,
       onCloseTour,
       onOpenArchiveDialog,
       onOpenTourControlDialog,

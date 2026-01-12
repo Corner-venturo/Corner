@@ -344,7 +344,6 @@ export const ToursPage: React.FC = () => {
     onOpenItineraryDialog: openItineraryDialog,
     onOpenQuoteDialog: openQuoteDialog,
     onOpenContractDialog: openContractDialog,
-    onOpenTourItineraryDialog: openTourItineraryDialog,
     onCloseTour: openClosingDialog,
     onOpenArchiveDialog: openArchiveDialog,
     onOpenTourControlDialog: (tour: Tour) => {
