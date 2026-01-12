@@ -42,7 +42,7 @@ export function ImportPNRDialog({ isOpen, onClose, onImport }: ImportPNRDialogPr
       toast.success('PNR 解析成功！')
     } catch (error) {
       toast.error('PNR 格式錯誤，請檢查內容')
-      logger.error(error)
+      logger.error('PNR 解析失敗', error)
     } finally {
       setIsParsing(false)
     }

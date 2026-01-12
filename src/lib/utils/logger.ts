@@ -1,51 +1,297 @@
 /**
- * Safe Logger for SSR
- * 防止 Next.js SSR 時的 console 錯誤
- * 使用動態引用避免 Turbopack 靜態分析錯誤
+ * Enhanced Logger for Venturo ERP
+ * 支援結構化日誌、遠端收集、多層級輸出
  */
 
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+
+interface LogContext {
+  userId?: string
+  workspaceId?: string
+  tourId?: string
+  requestId?: string
+  [key: string]: unknown
+}
+
+interface LogEntry {
+  timestamp: string
+  level: LogLevel
+  message: string
+  context?: LogContext
+  data?: unknown
+  stack?: string
+}
+
+// 環境變數
 const isDevelopment = process.env.NODE_ENV === 'development'
-const isBrowser = typeof window !== 'undefined'
+const isServer = typeof window === 'undefined'
+const LOG_LEVEL = (process.env.NEXT_PUBLIC_LOG_LEVEL || 'info') as LogLevel
+const REMOTE_LOGGING_ENABLED = process.env.NEXT_PUBLIC_REMOTE_LOGGING === 'true'
 
-// 動態獲取 console，避免 SSR 編譯時的靜態分析
-const getConsole = () => {
-  if (!isBrowser) return null
-  return typeof window !== 'undefined' ? window.console : null
+// 日誌層級權重
+const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
 }
 
+// 全域 context（可在 app 層級設定）
+let globalContext: LogContext = {}
+
+/**
+ * 設定全域 context（通常在登入後設定）
+ */
+export function setLogContext(context: LogContext): void {
+  globalContext = { ...globalContext, ...context }
+}
+
+/**
+ * 清除全域 context（登出時呼叫）
+ */
+export function clearLogContext(): void {
+  globalContext = {}
+}
+
+/**
+ * 檢查是否應該輸出該層級的日誌
+ */
+function shouldLog(level: LogLevel): boolean {
+  return LOG_LEVEL_PRIORITY[level] >= LOG_LEVEL_PRIORITY[LOG_LEVEL]
+}
+
+/**
+ * 建立結構化日誌條目
+ */
+function createLogEntry(
+  level: LogLevel,
+  message: string,
+  data?: unknown,
+  context?: LogContext
+): LogEntry {
+  const entry: LogEntry = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    context: { ...globalContext, ...context },
+  }
+
+  if (data !== undefined) {
+    entry.data = data
+  }
+
+  if (data instanceof Error) {
+    entry.stack = data.stack
+    entry.data = {
+      name: data.name,
+      message: data.message,
+    }
+  }
+
+  return entry
+}
+
+/**
+ * 輸出到 console
+ */
+function writeToConsole(entry: LogEntry): void {
+  // 在生產環境的瀏覽器中，只輸出 error
+  if (!isDevelopment && !isServer && entry.level !== 'error') {
+    return
+  }
+
+  const consoleMethod = console[entry.level] || console.log
+
+  if (isDevelopment) {
+    // 開發環境：格式化輸出
+    const prefix = `[${entry.level.toUpperCase()}]`
+    const contextStr = Object.keys(entry.context || {}).length > 0
+      ? ` ${JSON.stringify(entry.context)}`
+      : ''
+
+    if (entry.data) {
+      consoleMethod(prefix, entry.message, entry.data, contextStr)
+    } else {
+      consoleMethod(prefix, entry.message, contextStr)
+    }
+
+    if (entry.stack) {
+      console.error(entry.stack)
+    }
+  } else {
+    // 生產環境：JSON 格式（便於日誌收集）
+    consoleMethod(JSON.stringify(entry))
+  }
+}
+
+/**
+ * 發送到遠端日誌收集器（非阻塞）
+ */
+async function sendToRemote(entry: LogEntry): Promise<void> {
+  if (!REMOTE_LOGGING_ENABLED) return
+  if (isServer) return // 目前只支援瀏覽器端發送
+
+  try {
+    // 使用 sendBeacon 確保日誌不會因頁面關閉而丟失
+    const payload = JSON.stringify(entry)
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/log-error', payload)
+    } else {
+      // Fallback to fetch
+      fetch('/api/log-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {
+        // 忽略發送失敗
+      })
+    }
+  } catch {
+    // 忽略錯誤，日誌系統本身不應該拋出錯誤
+  }
+}
+
+/**
+ * 解析日誌參數（向下相容舊的呼叫方式）
+ * 舊: logger.log('message', arg1, arg2, arg3)
+ * 新: logger.log('message', data, context)
+ */
+function parseLogArgs(args: unknown[]): [unknown, LogContext | undefined] {
+  if (args.length === 0) {
+    return [undefined, undefined]
+  }
+
+  if (args.length === 1) {
+    // 單一參數，可能是 data 或 context
+    const arg = args[0]
+    if (isLogContext(arg)) {
+      return [undefined, arg]
+    }
+    return [arg, undefined]
+  }
+
+  // 多個參數
+  const lastArg = args[args.length - 1]
+  if (isLogContext(lastArg)) {
+    // 最後一個是 context
+    return [args.length === 2 ? args[0] : args.slice(0, -1), lastArg]
+  }
+
+  // 沒有 context，全部當作 data
+  return [args.length === 1 ? args[0] : args, undefined]
+}
+
+/**
+ * 檢查是否為 LogContext
+ */
+function isLogContext(arg: unknown): arg is LogContext {
+  if (typeof arg !== 'object' || arg === null) return false
+  const keys = Object.keys(arg)
+  // LogContext 通常包含這些 key
+  const contextKeys = ['userId', 'workspaceId', 'tourId', 'requestId']
+  return keys.some(k => contextKeys.includes(k))
+}
+
+/**
+ * 核心日誌函數
+ */
+function logMessage(
+  level: LogLevel,
+  message: string,
+  data?: unknown,
+  context?: LogContext
+): void {
+  if (!shouldLog(level)) return
+
+  const entry = createLogEntry(level, message, data, context)
+
+  writeToConsole(entry)
+
+  // error 層級自動發送到遠端
+  if (level === 'error') {
+    sendToRemote(entry)
+  }
+}
+
+/**
+ * Logger 實例
+ */
 export const logger = {
-  log: (...args: unknown[]) => {
-    if (isDevelopment && isBrowser) {
-      const c = getConsole()
-      c?.log(...args)
+  /**
+   * Debug 層級日誌（僅開發環境）
+   */
+  debug: (message: string, ...args: unknown[]) => {
+    const [data, context] = parseLogArgs(args)
+    logMessage('debug', message, data, context)
+  },
+
+  /**
+   * Info 層級日誌
+   */
+  info: (message: string, ...args: unknown[]) => {
+    const [data, context] = parseLogArgs(args)
+    logMessage('info', message, data, context)
+  },
+
+  /**
+   * 一般日誌（等同 info）
+   */
+  log: (message: string, ...args: unknown[]) => {
+    const [data, context] = parseLogArgs(args)
+    logMessage('info', message, data, context)
+  },
+
+  /**
+   * Warning 層級日誌
+   */
+  warn: (message: string, ...args: unknown[]) => {
+    const [data, context] = parseLogArgs(args)
+    logMessage('warn', message, data, context)
+  },
+
+  /**
+   * Error 層級日誌（會自動發送到遠端）
+   */
+  error: (message: string, ...args: unknown[]) => {
+    const [data, context] = parseLogArgs(args)
+    logMessage('error', message, data, context)
+  },
+
+  /**
+   * 建立帶有特定 context 的子 logger
+   */
+  child: (childContext: LogContext) => {
+    return {
+      debug: (message: string, data?: unknown) =>
+        logMessage('debug', message, data, childContext),
+      info: (message: string, data?: unknown) =>
+        logMessage('info', message, data, childContext),
+      log: (message: string, data?: unknown) =>
+        logMessage('info', message, data, childContext),
+      warn: (message: string, data?: unknown) =>
+        logMessage('warn', message, data, childContext),
+      error: (message: string, data?: unknown) =>
+        logMessage('error', message, data, childContext),
     }
   },
 
-  error: (...args: unknown[]) => {
-    if (isDevelopment && isBrowser) {
-      const c = getConsole()
-      c?.error(...args)
-    }
-  },
-
-  warn: (...args: unknown[]) => {
-    if (isDevelopment && isBrowser) {
-      const c = getConsole()
-      c?.warn(...args)
-    }
-  },
-
-  info: (...args: unknown[]) => {
-    if (isDevelopment && isBrowser) {
-      const c = getConsole()
-      c?.info(...args)
-    }
-  },
-
-  debug: (...args: unknown[]) => {
-    if (isDevelopment && isBrowser) {
-      const c = getConsole()
-      c?.debug(...args)
+  /**
+   * 計時工具
+   */
+  time: (label: string) => {
+    const start = performance.now()
+    return {
+      end: (context?: LogContext) => {
+        const duration = performance.now() - start
+        logMessage('info', `${label} completed`, { duration: `${duration.toFixed(2)}ms` }, context)
+        return duration
+      },
     }
   },
 }
+
+// 向下相容：確保舊的呼叫方式仍然有效
+// 舊: logger.log('message', data)
+// 新: logger.log('message', data, context)

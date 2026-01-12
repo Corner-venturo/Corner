@@ -61,7 +61,7 @@ export function usePnrQuickAction({ todo, onUpdate, onClose }: UsePnrQuickAction
       }
     } catch (error) {
       toast.error('電報格式錯誤，請檢查內容')
-      logger.error(error)
+      logger.error('電報解析失敗', error)
     } finally {
       setIsParsing(false)
     }
