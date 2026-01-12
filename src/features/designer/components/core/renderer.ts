@@ -238,7 +238,12 @@ async function renderImageElement(
   try {
     // 預載圖片
     const htmlImg = new window.Image()
-    htmlImg.crossOrigin = 'anonymous'
+
+    // 只有遠端 URL 需要設定 crossOrigin
+    // data: 和 blob: URL 不需要（且設定會導致某些瀏覽器出錯）
+    if (!el.src.startsWith('data:') && !el.src.startsWith('blob:')) {
+      htmlImg.crossOrigin = 'anonymous'
+    }
 
     await new Promise<void>((resolve, reject) => {
       htmlImg.onload = () => resolve()

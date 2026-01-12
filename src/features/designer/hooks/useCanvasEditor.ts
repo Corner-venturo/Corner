@@ -138,6 +138,21 @@ export function useCanvasEditor({
     }
   }, [page?.width, page?.height, page?.backgroundColor, onElementChange, onSelect, onPlaceholderClick])
 
+  // 計算 elements 的內容 hash，用於偵測深層變化
+  const elementsHash = page?.elements?.map(el => {
+    // 對於圖片元素，包含 src 和 adjustments 的變化
+    if (el.type === 'image') {
+      const imgEl = el as ImageElement
+      return `${el.id}:${imgEl.src?.slice(-20) || ''}:${JSON.stringify(imgEl.adjustments || {})}`
+    }
+    // 對於文字元素，包含 content 的變化
+    if (el.type === 'text') {
+      const textEl = el as TextElement
+      return `${el.id}:${textEl.content?.slice(0, 20) || ''}`
+    }
+    return `${el.id}:${el.x}:${el.y}:${el.width}:${el.height}`
+  }).join('|') || ''
+
   // 當 page 變更時重新渲染（包含 elements 變更）
   useEffect(() => {
     const fabricCanvas = fabricCanvasRef.current
@@ -153,7 +168,7 @@ export function useCanvasEditor({
       canvasWidth: page.width,
       canvasHeight: page.height,
     })
-  }, [page, page?.elements, page?.elements?.length])
+  }, [page, elementsHash])
 
   // 新增文字元素
   const addTextElement = useCallback(() => {

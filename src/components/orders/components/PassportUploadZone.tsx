@@ -85,6 +85,9 @@ export function PassportUploadZone({
       <p className="text-xs text-morandi-muted">
         上傳護照照片或 PDF，系統將自動辨識並建立成員資料
       </p>
+      <p className="text-xs text-morandi-gold">
+        💡 圖片模糊？上傳後點擊圖片左上角的 ✨ 按鈕進行銳利化增強
+      </p>
 
       {/* 拖放區域 */}
       <label
@@ -148,14 +151,14 @@ export function PassportUploadZone({
                 >
                   <X size={10} />
                 </button>
-                {/* 增強按鈕（非 PDF） */}
+                {/* 增強按鈕（非 PDF） - 始終顯示以提高可發現性 */}
                 {!pf.isPdf && onUpdateFilePreview && (
                   <button
                     onClick={(e) => { e.stopPropagation(); handleOpenEnhancer(index) }}
-                    className="absolute -top-1 -left-1 w-4 h-4 bg-morandi-gold text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="圖片增強"
+                    className="absolute -top-1 -left-1 w-5 h-5 bg-morandi-gold text-white rounded-full flex items-center justify-center shadow-sm hover:bg-morandi-gold-hover transition-colors"
+                    title="圖片增強（銳利化）"
                   >
-                    <Sparkles size={8} />
+                    <Sparkles size={10} />
                   </button>
                 )}
                 {pf.isPdf && (
