@@ -194,9 +194,10 @@ export function OrderMembersExpandable({
   }, [forceShowPnr])
 
   // 通知父組件有子 Dialog 開啟（避免多重遮罩）
+  // 注意：isAddDialogOpen、showOrderSelectDialog、showCustomerMatchDialog、previewMember 不包含在內
+  // 因為它們是在此組件內部渲染的小型 Dialog，不需要隱藏父 Dialog
   const hasChildDialogOpen = showPnrMatchDialog || roomVehicle.showRoomManager || roomVehicle.showVehicleManager ||
-    memberEdit.isEditDialogOpen || memberExport.isExportDialogOpen || membersData.isAddDialogOpen ||
-    membersData.showOrderSelectDialog || customerMatch.showCustomerMatchDialog || !!previewMember
+    memberEdit.isEditDialogOpen || memberExport.isExportDialogOpen
 
   useEffect(() => {
     onChildDialogChange?.(hasChildDialogOpen)
@@ -512,6 +513,7 @@ export function OrderMembersExpandable({
         onDrop={passportUpload.handleDrop}
         onRemoveFile={passportUpload.handleRemoveFile}
         onBatchUpload={passportUpload.handleBatchUpload}
+        onUpdateFilePreview={passportUpload.handleUpdateFilePreview}
       />
       <OrderSelectDialog
         isOpen={membersData.showOrderSelectDialog}

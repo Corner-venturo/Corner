@@ -5,15 +5,17 @@
  * 功能：
  * - 檔案拖放上傳
  * - 檔案預覽
+ * - 圖片增強（銳利化）
  * - 批次辨識按鈕
  */
 
 'use client'
 
-import React from 'react'
-import { Upload, X } from 'lucide-react'
+import React, { useState, useCallback } from 'react'
+import { Upload, X, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProcessedFile } from '../order-member.types'
+import { PassportImageEnhancer } from './PassportImageEnhancer'
 
 interface PassportUploadZoneProps {
   processedFiles: ProcessedFile[]
@@ -26,6 +28,8 @@ interface PassportUploadZoneProps {
   onDrop: (e: React.DragEvent<HTMLLabelElement>) => void
   onRemoveFile: (index: number) => void
   onBatchUpload: () => void
+  /** 可選：更新檔案預覽（用於圖片增強後） */
+  onUpdateFilePreview?: (index: number, newPreview: string) => void
 }
 
 export function PassportUploadZone({
@@ -39,8 +43,41 @@ export function PassportUploadZone({
   onDrop,
   onRemoveFile,
   onBatchUpload,
+  onUpdateFilePreview,
 }: PassportUploadZoneProps) {
+  // 圖片增強狀態
+  const [enhancingIndex, setEnhancingIndex] = useState<number | null>(null)
+  const [showEnhancer, setShowEnhancer] = useState(false)
+
+  // 開啟圖片增強
+  const handleOpenEnhancer = useCallback((index: number) => {
+    const file = processedFiles[index]
+    if (file && !file.isPdf) {
+      setEnhancingIndex(index)
+      setShowEnhancer(true)
+    }
+  }, [processedFiles])
+
+  // 儲存增強後的圖片
+  const handleSaveEnhanced = useCallback((enhancedSrc: string) => {
+    if (enhancingIndex !== null && onUpdateFilePreview) {
+      onUpdateFilePreview(enhancingIndex, enhancedSrc)
+    }
+    setShowEnhancer(false)
+    setEnhancingIndex(null)
+  }, [enhancingIndex, onUpdateFilePreview])
+
   return (
+    <>
+    {/* 圖片增強 Dialog */}
+    {enhancingIndex !== null && processedFiles[enhancingIndex] && (
+      <PassportImageEnhancer
+        open={showEnhancer}
+        onOpenChange={setShowEnhancer}
+        imageSrc={processedFiles[enhancingIndex].preview}
+        onSave={handleSaveEnhanced}
+      />
+    )}
     <div className="space-y-3">
       <h4 className="text-sm font-medium text-morandi-primary">
         護照批次辨識 (OCR)
@@ -100,14 +137,27 @@ export function PassportUploadZone({
                 <img
                   src={pf.preview}
                   alt={pf.originalName}
-                  className="w-full h-16 object-cover rounded border border-morandi-border"
+                  className="w-full h-16 object-cover rounded border border-morandi-border cursor-pointer hover:border-morandi-gold transition-colors"
+                  onClick={() => !pf.isPdf && handleOpenEnhancer(index)}
+                  title={pf.isPdf ? 'PDF 不支援增強' : '點擊進行圖片增強'}
                 />
+                {/* 刪除按鈕 */}
                 <button
-                  onClick={() => onRemoveFile(index)}
+                  onClick={(e) => { e.stopPropagation(); onRemoveFile(index) }}
                   className="absolute -top-1 -right-1 w-4 h-4 bg-status-danger text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <X size={10} />
                 </button>
+                {/* 增強按鈕（非 PDF） */}
+                {!pf.isPdf && onUpdateFilePreview && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleOpenEnhancer(index) }}
+                    className="absolute -top-1 -left-1 w-4 h-4 bg-morandi-gold text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="圖片增強"
+                  >
+                    <Sparkles size={8} />
+                  </button>
+                )}
                 {pf.isPdf && (
                   <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[8px] text-center py-0.5">
                     PDF
@@ -137,5 +187,6 @@ export function PassportUploadZone({
         </div>
       )}
     </div>
+    </>
   )
 }

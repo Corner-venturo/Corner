@@ -43,6 +43,7 @@ interface UsePassportUploadReturn {
   handleDragLeave: (e: React.DragEvent<HTMLLabelElement>) => void
   handleDrop: (e: React.DragEvent<HTMLLabelElement>) => Promise<void>
   handleRemoveFile: (index: number) => void
+  handleUpdateFilePreview: (index: number, newPreviewDataUrl: string) => void
   handleBatchUpload: () => Promise<void>
   clearFiles: () => void
 }
@@ -207,6 +208,7 @@ export function usePassportUpload({
     handleDragLeave: fileModule.handleDragLeave,
     handleDrop: fileModule.handleDrop,
     handleRemoveFile: fileModule.handleRemoveFile,
+    handleUpdateFilePreview: fileModule.updateFilePreview,
     handleBatchUpload,
     clearFiles: fileModule.clearFiles,
   }

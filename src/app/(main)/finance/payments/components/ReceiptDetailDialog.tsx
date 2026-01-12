@@ -189,7 +189,9 @@ export function ReceiptDetailDialog({
 
   return (
     <>
-    <Dialog open={open && !showLinkPayDialog} onOpenChange={(v) => !showLinkPayDialog && onOpenChange(v)}>
+    {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+    {!showLinkPayDialog && (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -453,6 +455,7 @@ export function ReceiptDetailDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    )}
 
     {/* LinkPay 建立對話框 - 放在外層避免多重遮罩 */}
     {isLinkPay && (

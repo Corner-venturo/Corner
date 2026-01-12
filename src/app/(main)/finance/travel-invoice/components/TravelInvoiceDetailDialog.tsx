@@ -80,8 +80,9 @@ export function TravelInvoiceDetailDialog({
 
   return (
     <>
-      {/* 單一遮罩模式：子 Dialog 開啟時隱藏父 Dialog */}
-      <Dialog open={open && !showVoidDialog} onOpenChange={(v) => !showVoidDialog && onOpenChange(v)}>
+      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+      {!showVoidDialog && (
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -278,6 +279,7 @@ export function TravelInvoiceDetailDialog({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      )}
 
       {/* 作廢確認對話框 */}
       <Dialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>

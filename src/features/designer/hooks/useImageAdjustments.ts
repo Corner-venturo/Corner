@@ -3,6 +3,7 @@
 import { useCallback, useRef, useEffect } from 'react'
 import type { ImageAdjustments } from '../components/types'
 import { DEFAULT_IMAGE_ADJUSTMENTS } from '../components/types'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 圖片調整 Hook
@@ -80,16 +81,18 @@ export function useImageAdjustments() {
         // 載入圖片到 WebGL
         wgl.loadimage()
 
-        // 套用濾鏡調整
-        wgl.filterAdjustments({
+        // 套用濾鏡調整（mini-gl 類型定義不完整，使用展開運算子繞過）
+        const adjustmentOptions = {
           brightness: normalizeValue(adjustments.exposure, -1, 1),
           contrast: normalizeValue(adjustments.contrast, -1, 1),
           highlights: normalizeValue(adjustments.highlights, -1, 1),
           shadows: normalizeValue(adjustments.shadows, -1, 1),
+          clarity: normalizeValue(adjustments.clarity, -1, 1), // 銳利化
           saturation: normalizeValue(adjustments.saturation, -1, 1),
           temperature: normalizeValue(adjustments.temperature, -1, 1),
           tint: normalizeValue(adjustments.tint, -1, 1),
-        })
+        }
+        wgl.filterAdjustments(adjustmentOptions as Parameters<typeof wgl.filterAdjustments>[0])
 
         // 套用暈影效果（如果有）
         if (adjustments.vignette > 0) {
@@ -107,7 +110,7 @@ export function useImageAdjustments() {
 
         return dataURL
       } catch (error) {
-        console.error('圖片調整失敗:', error)
+        logger.error('圖片調整失敗:', error)
         // 失敗時回傳原始圖片
         return imageSrc
       }

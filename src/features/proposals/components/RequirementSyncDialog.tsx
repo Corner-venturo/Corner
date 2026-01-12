@@ -1016,9 +1016,14 @@ export function RequirementSyncDialog({
 
   if (!source) return null
 
+  // 任何子 Dialog 開啟時，主 Dialog 完全不渲染（避免多重遮罩）
+  const hasChildDialogOpen = requestDialogOpen || addManualDialogOpen
+
   return (
     <>
-    <Dialog open={isOpen && !requestDialogOpen && !addManualDialogOpen} onOpenChange={(open) => !open && !requestDialogOpen && !addManualDialogOpen && onClose()} modal={true}>
+    {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+    {!hasChildDialogOpen && (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
       <DialogContent nested className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="flex items-center gap-2">
@@ -1275,6 +1280,7 @@ export function RequirementSyncDialog({
         </div>
       </DialogContent>
     </Dialog>
+    )}
 
     {/* 需求單 Dialog - 必須在外層 Dialog 外面，避免 z-index 衝突 */}
     {selectedRequestData && (

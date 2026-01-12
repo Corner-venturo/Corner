@@ -25,6 +25,7 @@ interface UsePassportFilesReturn {
   handleDragLeave: (e: React.DragEvent<HTMLLabelElement>) => void
   handleDrop: (e: React.DragEvent<HTMLLabelElement>) => Promise<void>
   handleRemoveFile: (index: number) => void
+  updateFilePreview: (index: number, newPreviewDataUrl: string) => void
   clearFiles: () => void
   compressImage: (file: File, quality?: number) => Promise<File>
 }
@@ -165,6 +166,36 @@ export function usePassportFiles(): UsePassportFilesReturn {
     setProcessedFiles([])
   }, [processedFiles])
 
+  // 更新檔案預覽（用於圖片增強後）
+  const updateFilePreview = useCallback((index: number, newPreviewDataUrl: string) => {
+    setProcessedFiles(prev => {
+      const newFiles = [...prev]
+      if (newFiles[index]) {
+        // 釋放舊的預覽 URL
+        URL.revokeObjectURL(newFiles[index].preview)
+
+        // 將 data URL 轉換為 File 物件
+        const byteString = atob(newPreviewDataUrl.split(',')[1])
+        const mimeString = newPreviewDataUrl.split(',')[0].split(':')[1].split(';')[0]
+        const ab = new ArrayBuffer(byteString.length)
+        const ia = new Uint8Array(ab)
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
+        }
+        const blob = new Blob([ab], { type: mimeString })
+        const newFile = new File([blob], newFiles[index].originalName, { type: mimeString })
+
+        // 更新檔案和預覽
+        newFiles[index] = {
+          ...newFiles[index],
+          file: newFile,
+          preview: newPreviewDataUrl,
+        }
+      }
+      return newFiles
+    })
+  }, [])
+
   // 壓縮圖片
   const compressImage = useCallback(async (file: File, quality = 0.6): Promise<File> => {
     return new Promise((resolve, reject) => {
@@ -231,6 +262,7 @@ export function usePassportFiles(): UsePassportFilesReturn {
     handleDragLeave,
     handleDrop,
     handleRemoveFile,
+    updateFilePreview,
     clearFiles,
     compressImage,
   }

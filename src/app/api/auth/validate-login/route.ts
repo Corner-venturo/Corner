@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import bcrypt from 'bcryptjs'
+import { logger } from '@/lib/utils/logger'
 
 interface ValidateLoginRequest {
   username: string
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (wsError) {
-      console.error('Workspace query error:', wsError)
+      logger.error('Workspace query error:', wsError)
       return NextResponse.json(
         { success: false, message: '系統錯誤' },
         { status: 500 }
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (empError) {
-      console.error('Employee query error:', empError)
+      logger.error('Employee query error:', empError)
       return NextResponse.json(
         { success: false, message: '系統錯誤' },
         { status: 500 }
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
       workspaceCode: workspace.code,
     })
   } catch (error) {
-    console.error('Validate login error:', error)
+    logger.error('Validate login error:', error)
     return NextResponse.json(
       { success: false, message: '系統錯誤' },
       { status: 500 }

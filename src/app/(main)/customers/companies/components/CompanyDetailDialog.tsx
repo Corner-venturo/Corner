@@ -62,7 +62,9 @@ export function CompanyDetailDialog({
 
   return (
     <>
-      <Dialog open={open && !isEditDialogOpen} onOpenChange={(v) => !isEditDialogOpen && onOpenChange(v)}>
+      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+      {!isEditDialogOpen && (
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -280,6 +282,7 @@ export function CompanyDetailDialog({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      )}
 
       {/* 編輯對話框 */}
       {onUpdate && (

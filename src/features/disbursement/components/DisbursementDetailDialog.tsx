@@ -191,7 +191,9 @@ export function DisbursementDetailDialog({
 
   return (
     <>
-    <Dialog open={open && !isPrintDialogOpen} onOpenChange={(v) => !isPrintDialogOpen && onOpenChange(v)}>
+    {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
+    {!isPrintDialogOpen && (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -415,6 +417,7 @@ export function DisbursementDetailDialog({
         </div>
       </DialogContent>
     </Dialog>
+    )}
 
     {/* 列印預覽對話框 - 放在外層避免多重遮罩 */}
     <DisbursementPrintDialog

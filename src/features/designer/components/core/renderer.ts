@@ -333,7 +333,7 @@ async function renderImageElement(
     return fabricImg
   } catch (error) {
     // 圖片載入失敗時顯示佔位符
-    console.error('[Renderer] Failed to load image:', error)
+    logger.error('[Renderer] Failed to load image:', error)
     return new Rect({
       ...getCommonProps(el, isEditable),
       left: el.x,
@@ -358,7 +358,7 @@ function renderIconElement(el: IconElement, options: RenderOptions): FabricObjec
   const pathData = MATERIAL_ICON_PATHS[el.icon]
   if (!pathData) {
     // 圖標不存在時顯示佔位符
-    console.warn(`[Renderer] Icon "${el.icon}" not found, using placeholder`)
+    logger.warn(`[Renderer] Icon "${el.icon}" not found, using placeholder`)
     return new Rect({
       ...getCommonProps(el, isEditable),
       left: el.x,

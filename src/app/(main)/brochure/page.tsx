@@ -33,8 +33,9 @@ import type { CanvasPage, CanvasElement } from '@/features/designer/components/t
 import { BookOpen, FileImage, ChevronDown, ChevronUp, Plus, Minus, ClipboardList, Check, Globe, Hotel, PanelLeft, X, Home, List, Calendar, FileText, Layers, Image, Type, Palette, Settings, Clock, Utensils, MapPin, Info, Plane, Cloud, Sun } from 'lucide-react'
 import { CollapsiblePanel } from '@/components/designer'
 import { ImageAdjustmentsPanel } from '@/features/designer/components/ImageAdjustmentsPanel'
-import type { ImageAdjustments } from '@/features/designer/components/types'
+import type { ImageAdjustments, ImageElement } from '@/features/designer/components/types'
 import { DEFAULT_IMAGE_ADJUSTMENTS } from '@/features/designer/components/types'
+import { useImageAdjustments } from '@/features/designer/hooks/useImageAdjustments'
 
 // 頁面類型：cover, toc, itinerary, daily-0, daily-1..., memo-0, memo-1..., hotel-0, hotel-1..., 或 attraction-0, attraction-1...
 type PageType = 'cover' | 'toc' | 'itinerary' | `daily-${number}` | `memo-${number}` | `hotel-${number}` | `attraction-${number}`
@@ -171,6 +172,9 @@ function DesignerPageContent() {
   } | null>(null) // 發現的草稿（等待用戶選擇是否載入）
   // 手動編輯的元素（格式: { "pageType:elementId": elementData }）
   const [editedElements, setEditedElements] = useState<Record<string, CanvasElement>>({})
+  // 圖片色彩調整 hook
+  const { applyAdjustments } = useImageAdjustments()
+  const [isApplyingAdjustments, setIsApplyingAdjustments] = useState(false)
 
   // 取得當前頁面
   const page = pages[currentPageType]
@@ -1085,15 +1089,6 @@ function DesignerPageContent() {
 
     setIsSavingDraft(true)
     try {
-      // 除錯：檢查 RLS 函數返回的 workspace
-      const { data: dbWorkspace } = await supabase.rpc('get_current_user_workspace')
-      console.log('儲存草稿除錯:', {
-        frontendWorkspaceId: workspaceId,
-        dbWorkspace: dbWorkspace,
-        userId: userId,
-        match: workspaceId === dbWorkspace,
-      })
-
       const draftPayload = {
         workspace_id: workspaceId,
         user_id: userId,
@@ -4146,12 +4141,36 @@ function DesignerPageContent() {
                   {/* 色彩調整 */}
                   <div className="space-y-1.5">
                     <label className="text-[10px] uppercase tracking-wider text-morandi-muted font-semibold">
-                      色彩調整
+                      色彩調整 {isApplyingAdjustments && <span className="text-morandi-gold">(處理中...)</span>}
                     </label>
                     <ImageAdjustmentsPanel
                       adjustments={imageEl.adjustments || DEFAULT_IMAGE_ADJUSTMENTS}
-                      onChange={(newAdjustments) => {
-                        updateElement(selectedElementId, { adjustments: newAdjustments })
+                      disabled={isApplyingAdjustments}
+                      onChange={async (newAdjustments) => {
+                        // 取得原始圖片（首次調整時儲存）
+                        const originalSrc = imageEl.originalSrc || imageEl.src
+
+                        // 先更新調整值（即時回饋）
+                        updateElement(selectedElementId, {
+                          adjustments: newAdjustments,
+                          originalSrc, // 保存原始圖片
+                        })
+
+                        // 套用 WebGL 處理
+                        setIsApplyingAdjustments(true)
+                        try {
+                          const processedSrc = await applyAdjustments(originalSrc, newAdjustments)
+                          // 更新圖片 src 為處理後的結果
+                          updateElement(selectedElementId, {
+                            src: processedSrc,
+                            adjustments: newAdjustments,
+                            originalSrc,
+                          })
+                        } catch (error) {
+                          logger.error('圖片調整失敗:', error)
+                        } finally {
+                          setIsApplyingAdjustments(false)
+                        }
                       }}
                     />
                   </div>
