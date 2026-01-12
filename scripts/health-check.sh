@@ -3,8 +3,8 @@
 echo "========================================="
 echo "🔍 步驟一：檢查殘留的舊命名..."
 echo "========================================="
-# -l 只列出有匹配的檔名
-files_with_old_names=$(rg -i -l "(createdat|author_id|creator_user_id|tourid|orderid|paymentdate|itemname|quoteid|changenote|receiptid|memberid|processedby)" src/)
+# 使用 grep -r 遞迴搜尋
+files_with_old_names=$(grep -r -i -l -E "(createdat|author_id|creator_user_id|tourid|orderid|paymentdate|itemname|quoteid|changenote|receiptid|memberid|processedby)" src/ --include="*.ts" --include="*.tsx" 2>/dev/null)
 if [ -z "$files_with_old_names" ]; then
   echo "✅ 命名一致性檢查通過！未發現殘留的舊命名。"
 else
@@ -16,8 +16,8 @@ echo ""
 echo "========================================="
 echo "🔍 步驟二：分析 'any' 型別使用情況..."
 echo "========================================="
-# --glob 只搜尋 ts/tsx 檔案, -w 全詞匹配
-files_with_any=$(rg -l --glob="**/*.{ts,tsx}" -w "any" src/)
+# 搜尋 ts/tsx 檔案中的 any 型別
+files_with_any=$(grep -r -l -w "any" src/ --include="*.ts" --include="*.tsx" 2>/dev/null)
 if [ -z "$files_with_any" ]; then
   echo "✅ 'any' 型別檢查通過！"
 else
