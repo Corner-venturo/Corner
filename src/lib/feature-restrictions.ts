@@ -6,7 +6,7 @@
  */
 
 // 擁有完整功能的公司代碼
-const FULL_FEATURE_WORKSPACES = ['TP', 'TC']
+const FULL_FEATURE_WORKSPACES = ['TP', 'TC', 'CORNER', 'CORNERTC']
 
 /**
  * 檢查 workspace 是否擁有完整功能

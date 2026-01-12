@@ -391,6 +391,8 @@ export async function convertToTour(
     current_participants: 0,
     contract_status: 'pending',
     workspace_id: workspaceId,
+    // 關聯提案套件（保留行程類型和資料）
+    proposal_package_id: package_id,
     // 財務欄位預設值
     profit: 0,
     total_cost: 0,
