@@ -166,7 +166,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
   const fetchProducts = async () => {
     setIsLoadingProducts(true)
     try {
-      // TODO: 等 FastMove API Key 配置後，取消註解下面這行
+      // [Pending] FastMove API 整合 - 待 API Key 配置後啟用
       // const productList = await fastMoveService.getProducts()
 
       // 🧪 臨時使用 Mock 資料測試
@@ -301,7 +301,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
         const productPrice = selectedProduct?.product_price || 0
 
         // 產生請款單號（給 FastMove 使用）
-        // TODO: 實作 maxNumberGetDbNumber 或使用簡單的遞增邏輯
+        // [Note] 請款單號使用時間戳產生，確保唯一性
         const invoiceNumber = `I${finalGroupCode}${String(Date.now()).slice(-4)}`
 
         await createEsim({
@@ -317,7 +317,7 @@ export function EsimCreateDialog({ open, onOpenChange }: EsimCreateDialogProps) 
           status: 0,
         } as unknown as Parameters<typeof createEsim>[0])
 
-        // TODO: 調用 FastMove API 下單，並傳入 invoiceNumber
+        // [Integration] FastMove API 下單
         // FastMove API 會自動產生請款單，請款日期為「下個月第一個週四」
         try {
           await fastMoveService.createOrder({

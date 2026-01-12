@@ -4,7 +4,7 @@ import { Calendar } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
 
 export default function FitnessHistoryPage() {
-  // TODO: 從資料庫讀取訓練歷史
+  // [Feature] 訓練歷史功能待整合 fitness_records 資料表
 
   return (
     <FitnessLayout activeTab="history">

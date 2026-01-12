@@ -4,7 +4,7 @@ import { BarChart3, TrendingUp, Trophy } from 'lucide-react'
 import { FitnessLayout } from '../components/FitnessLayout'
 
 export default function FitnessStatsPage() {
-  // TODO: 從資料庫讀取統計數據
+  // [Feature] 訓練統計功能待整合 fitness_records 資料表
 
   return (
     <FitnessLayout activeTab="stats">

@@ -60,7 +60,7 @@ export async function GET() {
     return errorResponse('請先登入', 401)
   }
 
-  // TODO: 未來可加入管理員權限檢查
+  // [Planned] 管理員權限檢查 - 待 RBAC 模組完成後啟用
   // if (!isAdmin(auth.data.employeeId)) {
   //   return errorResponse('需要管理員權限', 403)
   // }

@@ -1,9 +1,12 @@
 /**
  * Task Handlers
  * 預定義的任務處理器
+ *
+ * 注意：這些處理器目前為占位實作，回傳模擬結果。
+ * 當 background_tasks 資料表建立後，將整合實際服務。
  */
 
-import { registerTaskHandler, TaskTypes, Task } from './task-queue'
+import { registerTaskHandler, TaskTypes } from './task-queue'
 import { logger } from '@/lib/utils/logger'
 
 // ==================== 報表生成 ====================
@@ -19,8 +22,8 @@ registerTaskHandler<GenerateReportPayload>(
   async (payload, task) => {
     logger.info('Generating report', { reportType: payload.reportType, taskId: task.id })
 
-    // TODO: 實作報表生成邏輯
-    // 這裡應該呼叫實際的報表生成服務
+    // [Planned] 整合報表生成服務 (e.g., Puppeteer for PDF, ExcelJS for Excel)
+    // 目前回傳模擬結果
 
     return {
       reportUrl: `/reports/${task.id}.${payload.format}`,
@@ -43,8 +46,8 @@ registerTaskHandler<SendEmailPayload>(
   async (payload, task) => {
     logger.info('Sending email', { to: payload.to, subject: payload.subject, taskId: task.id })
 
-    // TODO: 實作郵件發送邏輯
-    // 可以整合 Resend, SendGrid 等服務
+    // [Planned] 整合郵件服務 (e.g., Resend, SendGrid)
+    // 目前回傳模擬結果
 
     return {
       sent: true,
@@ -67,8 +70,8 @@ registerTaskHandler<SendNotificationPayload>(
   async (payload, task) => {
     logger.info('Sending notification', { userId: payload.userId, taskId: task.id })
 
-    // TODO: 實作通知發送邏輯
-    // 可以使用 Supabase Realtime 或 WebSocket
+    // [Planned] 整合即時通知 (e.g., Supabase Realtime, WebSocket)
+    // 目前回傳模擬結果
 
     return {
       notified: true,
@@ -89,8 +92,8 @@ registerTaskHandler<GeneratePDFPayload>(
   async (payload, task) => {
     logger.info('Generating PDF', { templateId: payload.templateId, taskId: task.id })
 
-    // TODO: 實作 PDF 生成邏輯
-    // 可以使用 puppeteer, pdf-lib 等
+    // [Planned] 整合 PDF 生成服務 (e.g., Puppeteer, pdf-lib)
+    // 目前回傳模擬結果
 
     return {
       pdfUrl: `/pdfs/${task.id}.pdf`,
@@ -112,7 +115,8 @@ registerTaskHandler<SyncDataPayload>(
   async (payload, task) => {
     logger.info('Syncing data', { source: payload.source, target: payload.target, taskId: task.id })
 
-    // TODO: 實作資料同步邏輯
+    // [Planned] 整合外部系統資料同步 (e.g., Google Calendar, CRM)
+    // 目前回傳模擬結果
 
     return {
       synced: true,
@@ -134,8 +138,9 @@ registerTaskHandler<CleanupOldDataPayload>(
   async (payload, task) => {
     logger.info('Cleaning up old data', { tableName: payload.tableName, taskId: task.id })
 
-    // TODO: 實作資料清理邏輯
-    // 注意：這是危險操作，需要謹慎處理
+    // [Planned] 實作資料清理排程
+    // 注意：危險操作，需啟用 dry-run 模式測試
+    // 目前回傳模擬結果
 
     return {
       cleaned: true,

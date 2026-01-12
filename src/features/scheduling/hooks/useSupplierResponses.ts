@@ -82,8 +82,8 @@ export function useSupplierResponses(options?: UseSupplierResponsesOptions) {
     if (!workspaceId) return []
 
     try {
-      // TODO: 當 request_responses 表建立後啟用此查詢
-      // 目前返回空陣列，因為表格尚未建立
+      // [Pending] request_responses 資料表尚未建立
+      // 待建立後啟用此查詢
       logger.log('⚠️ request_responses 表尚未建立，返回空資料')
       return []
 

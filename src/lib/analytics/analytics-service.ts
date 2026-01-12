@@ -132,15 +132,15 @@ export class AnalyticsService {
         }).length
       }
 
-      // TODO: 實作更複雜的回購率計算
-      const repeatCustomers = 0 // 需要關聯訂單資料
+      // [Planned] 回購率計算需關聯訂單資料，待效能優化後實作
+      const repeatCustomers = 0
 
       return {
         totalCustomers: customersData.length,
         newCustomers,
         repeatCustomers,
-        averageLifetimeValue: 0, // TODO: 計算客戶終身價值
-        retentionRate: 0, // TODO: 計算留存率
+        averageLifetimeValue: 0, // [Planned] 客戶終身價值 (LTV) 計算
+        retentionRate: 0, // [Planned] 留存率計算
       }
     } catch (error) {
       logger.error('Failed to get customer metrics', { error })

@@ -1,9 +1,14 @@
 /**
  * Plugin Registry
  * 內建插件註冊表
+ *
+ * 注意：插件系統為計畫中的功能。
+ * 相關資料表 (plugin_storage, plugin_configs) 尚未建立。
+ * 以下為插件架構定義與占位實作。
  */
 
 import type { Plugin } from './types'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * 內建插件清單
@@ -25,14 +30,16 @@ export const PluginRegistry: Record<string, () => Plugin> = {
         type: 'tour:afterCreate',
         handler: async (data, context) => {
           context.logger.info('Tour created, sending notifications...')
-          // TODO: 實作通知邏輯
+          // [Planned] 整合通知服務 (Email, LINE, SMS)
+          logger.debug('[Plugin] venturo-notifications: tour:afterCreate triggered')
         },
       },
       {
         type: 'order:afterPayment',
         handler: async (data, context) => {
           context.logger.info('Payment received, sending confirmation...')
-          // TODO: 實作付款確認通知
+          // [Planned] 發送付款確認通知
+          logger.debug('[Plugin] venturo-notifications: order:afterPayment triggered')
         },
       },
     ],
@@ -55,7 +62,8 @@ export const PluginRegistry: Record<string, () => Plugin> = {
         priority: 50, // 高優先級
         handler: async (data, context) => {
           context.logger.info('Auto-creating tour channel...')
-          // TODO: 自動建立團聊天頻道
+          // [Planned] 自動建立團聊天頻道
+          logger.debug('[Plugin] venturo-automation: tour:afterCreate triggered')
         },
       },
     ],
@@ -74,12 +82,14 @@ export const PluginRegistry: Record<string, () => Plugin> = {
     },
     services: {
       generatePDF: async (data: unknown) => {
-        // TODO: PDF 生成服務
-        return { success: true }
+        // [Planned] PDF 生成服務 (整合 Puppeteer)
+        logger.debug('[Plugin] venturo-reports: generatePDF called', { data })
+        return { success: true, message: 'PDF generation pending implementation' }
       },
       generateExcel: async (data: unknown) => {
-        // TODO: Excel 生成服務
-        return { success: true }
+        // [Planned] Excel 生成服務 (整合 ExcelJS)
+        logger.debug('[Plugin] venturo-reports: generateExcel called', { data })
+        return { success: true, message: 'Excel generation pending implementation' }
       },
     },
   }),
@@ -97,16 +107,19 @@ export const PluginRegistry: Record<string, () => Plugin> = {
     },
     init: async (context) => {
       context.logger.info('Initializing integrations...')
-      // TODO: 初始化第三方服務連接
+      // [Planned] 初始化第三方服務連接 (OAuth tokens, API keys)
+      logger.debug('[Plugin] venturo-integrations: initialized')
     },
     services: {
       syncToGoogleCalendar: async (tourId: string) => {
-        // TODO: 同步到 Google Calendar
-        return { success: true }
+        // [Planned] Google Calendar API 整合
+        logger.debug('[Plugin] venturo-integrations: syncToGoogleCalendar', { tourId })
+        return { success: true, message: 'Google Calendar sync pending implementation' }
       },
       sendLineMessage: async (userId: string, message: string) => {
-        // TODO: 發送 LINE 訊息
-        return { success: true }
+        // [Planned] LINE Messaging API 整合
+        logger.debug('[Plugin] venturo-integrations: sendLineMessage', { userId, message })
+        return { success: true, message: 'LINE messaging pending implementation' }
       },
     },
   }),

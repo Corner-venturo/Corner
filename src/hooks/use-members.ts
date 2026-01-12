@@ -93,8 +93,8 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
       if (orderId) {
         filtered = filtered.filter(member => member.order_id === orderId);
       }
-      // TODO: 如果需要根據 tourId 過濾，且 Member 類型沒有 tour_id，則需要從 OrderStore 獲取相關訂單 ID
-      // 目前，如果只提供 tourId，這裡不會執行任何過濾。
+      // [Note] tourId 過濾需透過 OrderStore 取得相關訂單 ID
+      // 目前僅支援 orderId 過濾，tourId 過濾待後續實作
       return filtered;
     },
     [allMembers, orderId, tourId] // Added tourId to dependencies for future use

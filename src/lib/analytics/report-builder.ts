@@ -211,8 +211,8 @@ export class ReportBuilder {
       { key: 'balance', label: '餘額', type: 'currency' },
     ]
 
-    // TODO: 實作財務報表邏輯
-    // 需要整合傳票資料
+    // [Planned] 財務報表需整合傳票 (vouchers) 資料
+    // 待傳票模組完成後實作完整財務報表
 
     return this.createReport([], {})
   }

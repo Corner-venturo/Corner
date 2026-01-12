@@ -174,7 +174,7 @@ export function TourRequestFormDialog({
     }
   }
 
-  // 我方資訊（TODO: 之後從 workspace settings 讀取）
+  // [Planned] 我方資訊 - 待整合 workspace settings
   const companyInfo = {
     name: '角落旅行社',
     contactPerson: '',

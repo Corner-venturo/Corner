@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // TODO: 未來應檢查是否為管理員
+    // [Planned] 管理員權限檢查 - 待 RBAC 模組完成後啟用
     // const isAdmin = await checkIsAdmin(auth.data.employeeId)
     // if (!isAdmin) {
     //   return errorResponse('需要管理員權限', 403, ErrorCode.FORBIDDEN)

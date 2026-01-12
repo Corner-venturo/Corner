@@ -7,6 +7,7 @@ import { CheckinQRCode } from './CheckinQRCode'
 import { CheckinMemberList, CheckinMember } from './CheckinMemberList'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { logger } from '@/lib/utils/logger'
 
 interface TourCheckinProps {
   tour: Tour
@@ -50,7 +51,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
 
       setMembers((membersData || []) as CheckinMember[])
     } catch (error) {
-      console.error('載入團員失敗:', error)
+      logger.error('載入團員失敗:', error)
       toast.error('載入團員資料失敗')
     } finally {
       setLoading(false)
@@ -74,7 +75,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
       setEnableCheckin(enabled)
       toast.success(enabled ? '已啟用報到功能' : '已停用報到功能')
     } catch (error) {
-      console.error('切換報到功能失敗:', error)
+      logger.error('切換報到功能失敗:', error)
       toast.error('操作失敗')
     }
   }
@@ -102,7 +103,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
       )
       toast.success('報到成功')
     } catch (error) {
-      console.error('報到失敗:', error)
+      logger.error('報到失敗:', error)
       toast.error('報到失敗')
     }
   }
@@ -130,7 +131,7 @@ export function TourCheckin({ tour }: TourCheckinProps) {
       )
       toast.success('已取消報到')
     } catch (error) {
-      console.error('取消報到失敗:', error)
+      logger.error('取消報到失敗:', error)
       toast.error('操作失敗')
     }
   }

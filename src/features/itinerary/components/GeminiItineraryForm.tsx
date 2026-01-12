@@ -87,8 +87,8 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
     setGeneratingDescription(index)
 
-    // TODO: 這裡之後會接 Gemini API
-    // 目前先用模擬資料示範
+    // [Planned] Gemini API 整合 - 待 API Key 配置
+    // 目前使用模擬資料示範
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     const mockDescriptions: Record<string, string> = {
@@ -113,7 +113,7 @@ export function GeminiItineraryForm({ data, onChange }: GeminiItineraryFormProps
 
     setGeneratingSightDesc(index)
 
-    // TODO: 這裡之後會接 Gemini API
+    // [Planned] Gemini API 整合 - 待 API Key 配置
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     const description = `${sight.name}是${data.city}不可錯過的景點之一。這裡融合了傳統與現代的魅力，讓遊客能夠深入體驗當地的文化與風情。無論是建築特色、自然景觀，還是當地美食，都能讓人留下深刻的印象。建議預留充足的時間，細細品味這個地方的獨特之處。`

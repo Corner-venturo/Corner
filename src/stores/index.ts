@@ -398,7 +398,7 @@ export { useWorkspaceStore } from './workspace-store'
  * - DisbursementOrder (出納單) - 應改用 useDisbursementOrderStore
  * - 複雜的業務邏輯 - 應移到 payment.service.ts
  *
- * TODO:
+ * [Migration] 待完成的遷移工作：
  * - [ ] 遷移 PaymentRequest 相關頁面
  * - [ ] 遷移 DisbursementOrder 相關頁面
  * - [ ] 業務邏輯移到 service
