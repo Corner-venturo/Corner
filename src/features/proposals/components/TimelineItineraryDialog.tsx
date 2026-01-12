@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import {
+  Clock,
   Plus,
   Trash2,
   X,
@@ -38,7 +39,6 @@ import {
   Building2,
   Loader2,
   Wand2,
-  Zap,
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
 import { toast } from 'sonner'
@@ -681,8 +681,8 @@ export function TimelineItineraryDialog({
       <DialogContent className={DIALOG_SIZES['4xl']}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Zap size={18} className="text-morandi-gold" />
-            快速行程編輯器
+            <Clock size={18} className="text-morandi-gold" />
+            時間軸行程編輯器
           </DialogTitle>
         </DialogHeader>
 
