@@ -481,7 +481,7 @@ export function PackageListPanel({
                             }
                           }}
                           className="p-1.5 rounded transition-colors text-morandi-green hover:bg-morandi-green/10"
-                          title={pkg.itinerary_type === 'timeline' ? '編輯時間軸行程表' : '編輯快速行程表'}
+                          title={pkg.itinerary_type === 'timeline' ? '編輯快速行程表' : '編輯網頁行程'}
                         >
                           <FileText size={16} />
                         </button>
@@ -499,19 +499,6 @@ export function PackageListPanel({
                           <DropdownMenuContent align="start" className="w-44">
                             <DropdownMenuItem
                               onClick={() => {
-                                if (onOpenItineraryDialog) {
-                                  onOpenItineraryDialog(pkg)
-                                } else {
-                                  openItineraryDialog(pkg)
-                                }
-                              }}
-                              className="gap-2 cursor-pointer"
-                            >
-                              <Zap size={16} className="text-morandi-secondary" />
-                              <span>快速行程表</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
                                 if (onOpenTimelineDialog) {
                                   onOpenTimelineDialog(pkg)
                                 } else {
@@ -521,8 +508,21 @@ export function PackageListPanel({
                               }}
                               className="gap-2 cursor-pointer"
                             >
+                              <Zap size={16} className="text-morandi-secondary" />
+                              <span>快速行程表</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (onOpenItineraryDialog) {
+                                  onOpenItineraryDialog(pkg)
+                                } else {
+                                  openItineraryDialog(pkg)
+                                }
+                              }}
+                              className="gap-2 cursor-pointer"
+                            >
                               <Clock size={16} className="text-morandi-secondary" />
-                              <span>時間軸行程表</span>
+                              <span>網頁行程編輯器</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
