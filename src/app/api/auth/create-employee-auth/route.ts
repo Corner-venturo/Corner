@@ -18,9 +18,10 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdminClient()
     // Email 格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
+    // 統一使用小寫格式
     const email = workspace_code
-      ? `${workspace_code.toUpperCase()}_${employee_number}@venturo.com`
-      : `${employee_number}@venturo.com`
+      ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
+      : `${employee_number.toLowerCase()}@venturo.com`
 
     // 使用 Admin API 建立用戶
     const { data, error } = await supabaseAdmin.auth.admin.createUser({

@@ -116,17 +116,21 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
 
       // 2. 建立管理員帳號
       const passwordHash = await bcrypt.hash(formData.admin_password, 10)
+      const employeeNumber = formData.admin_employee_number.trim().toUpperCase()
+      const workspaceCode = formData.code.toLowerCase().trim()
 
-      const { error: empError } = await supabase
+      const { data: employee, error: empError } = await supabase
         .from('employees')
         .insert({
           workspace_id: workspace.id,
           display_name: formData.admin_name.trim(),
-          employee_number: formData.admin_employee_number.trim().toUpperCase(),
+          employee_number: employeeNumber,
           password_hash: passwordHash,
           role: 'admin',
           status: 'active',
         })
+        .select('id')
+        .single()
 
       if (empError) {
         // 如果建立員工失敗，刪除剛建立的公司
@@ -134,7 +138,39 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
         throw empError
       }
 
-      await alert(`公司「${formData.name}」已建立，管理員帳號為 ${formData.admin_employee_number.toUpperCase()}`, 'success')
+      // 3. 建立 Supabase Auth 帳號（重要！否則無法登入）
+      try {
+        const authResponse = await fetch('/api/auth/create-employee-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employee_number: employeeNumber,
+            password: formData.admin_password,
+            workspace_code: workspaceCode,
+          }),
+        })
+
+        if (authResponse.ok) {
+          const authResult = await authResponse.json()
+          logger.log('✅ Auth 帳號已建立:', authResult)
+
+          // 綁定 supabase_user_id
+          if (authResult.data?.user?.id && employee?.id) {
+            await supabase
+              .from('employees')
+              .update({ supabase_user_id: authResult.data.user.id })
+              .eq('id', employee.id)
+            logger.log('✅ supabase_user_id 已綁定')
+          }
+        } else {
+          const error = await authResponse.json()
+          logger.warn('⚠️ 建立 Auth 帳號失敗:', error)
+        }
+      } catch (authError) {
+        logger.warn('⚠️ 建立 Auth 帳號失敗（不影響公司建立）:', authError)
+      }
+
+      await alert(`公司「${formData.name}」已建立，管理員帳號為 ${employeeNumber}`, 'success')
       resetForm()
       onOpenChange(false)
       onSuccess()
