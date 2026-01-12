@@ -215,11 +215,10 @@ export function AddWorkspaceDialog({ open, onOpenChange, onSuccess }: AddWorkspa
                 <Label required>公司代號</Label>
                 <Input
                   value={formData.code}
-                  onChange={(e) => handleFieldChange('code', e.target.value)}
+                  onChange={(e) => handleFieldChange('code', e.target.value.toLowerCase())}
                   placeholder="例：corner（小寫）"
-                  className="lowercase"
                 />
-                <p className="text-xs text-morandi-secondary">登入時使用，建議用英文小寫</p>
+                <p className="text-xs text-morandi-secondary">登入時使用，自動轉為小寫</p>
               </div>
             </div>
 
