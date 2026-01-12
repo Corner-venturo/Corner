@@ -1,15 +1,18 @@
 #!/bin/bash
 
 echo "========================================="
-echo "🔍 步驟一：檢查殘留的舊命名..."
+echo "🔍 步驟一：檢查資料庫欄位命名..."
 echo "========================================="
-# 使用 grep -r 遞迴搜尋
-files_with_old_names=$(grep -r -i -l -E "(createdat|author_id|creator_user_id|tourid|orderid|paymentdate|itemname|quoteid|changenote|receiptid|memberid|processedby)" src/ --include="*.ts" --include="*.tsx" 2>/dev/null)
-if [ -z "$files_with_old_names" ]; then
-  echo "✅ 命名一致性檢查通過！未發現殘留的舊命名。"
+# 檢查 Supabase 查詢中欄位名稱使用 camelCase 的情況
+# 正確: .eq('created_at', value)
+# 錯誤: .eq('createdAt', value)
+# 注意：只檢查引號內的欄位名，不檢查變數
+files_with_db_naming_issues=$(grep -r -n -E "\.(eq|neq|gt|gte|lt|lte|like|ilike)\(['\"][a-z]+[A-Z][a-zA-Z]*['\"]" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -20)
+if [ -z "$files_with_db_naming_issues" ]; then
+  echo "✅ 資料庫欄位命名檢查通過！"
 else
-  echo "⚠️ 注意：在以下檔案中發現了殘留的舊命名："
-  echo "$files_with_old_names"
+  echo "⚠️ 注意：以下位置資料庫欄位使用了 camelCase（應改為 snake_case）："
+  echo "$files_with_db_naming_issues"
 fi
 echo ""
 
