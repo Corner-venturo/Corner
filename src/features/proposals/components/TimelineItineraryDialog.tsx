@@ -112,6 +112,9 @@ export function TimelineItineraryDialog({
   // 檢查是否顯示 AI 排行程按鈕
   const showAiGenerate = isFeatureAvailable('ai_suggest', user?.workspace_code)
 
+  // DEBUG: 暫時顯示 workspace_code 值
+  console.log('[DEBUG] TimelineItineraryDialog - workspace_code:', user?.workspace_code, 'showAiGenerate:', showAiGenerate)
+
   // 計算日期的輔助函數（提前定義）
   const calcDate = (dayNumber: number, startDate?: string): string => {
     if (!startDate) return ''
