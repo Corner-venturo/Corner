@@ -47,7 +47,7 @@ export function IncomeStatementReport() {
     if (startDate && endDate) {
       handleSearch()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 匯出 CSV

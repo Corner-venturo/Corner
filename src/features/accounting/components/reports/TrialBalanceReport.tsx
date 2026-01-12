@@ -44,7 +44,7 @@ export function TrialBalanceReport() {
     if (endDate) {
       handleSearch()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 計算合計

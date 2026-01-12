@@ -374,7 +374,7 @@ export function TourRequestFormDialog({
         .getPublicUrl(filePath)
 
       // 記錄到 tour_documents 表
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: insertError } = await (supabase as any)
         .from('tour_documents')
         .insert({
@@ -414,7 +414,7 @@ export function TourRequestFormDialog({
 
       // 如果有 ID，表示是選擇的既有供應商，更新聯絡資訊
       if (supplierInfo.id) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { error } = await (supabase as any)
           .from('suppliers')
           .update({
@@ -431,7 +431,7 @@ export function TourRequestFormDialog({
       }
 
       // 檢查是否已存在同名同類別的供應商
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: existing } = await (supabase as any)
         .from('suppliers')
         .select('id')
@@ -442,7 +442,7 @@ export function TourRequestFormDialog({
 
       if (existing) {
         // 已存在，更新聯絡資訊
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { error } = await (supabase as any)
           .from('suppliers')
           .update({
@@ -458,7 +458,7 @@ export function TourRequestFormDialog({
       } else {
         // 不存在，建立新供應商
         // 生成供應商代碼
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: maxCodeData } = await (supabase as any)
           .from('suppliers')
           .select('code')
@@ -472,7 +472,7 @@ export function TourRequestFormDialog({
           newCode = `S${String(maxNum + 1).padStart(6, '0')}`
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { error } = await (supabase as any)
           .from('suppliers')
           .insert({

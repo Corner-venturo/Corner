@@ -236,7 +236,7 @@ export function TourControlFormDialog({
 
     setSaving(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const jsonFormData = JSON.parse(JSON.stringify(formData)) as any
 
       if (existingFormId) {
@@ -859,6 +859,7 @@ export function TourControlFormDialog({
           <Button variant="outline" onClick={onClose} className="gap-1.5 h-8 text-sm">
             <X size={14} />關閉
           </Button>
+          {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button onClick={handleSave} disabled={loading || saving} variant="outline" className="gap-1.5 h-8 text-sm">
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}儲存
           </Button>

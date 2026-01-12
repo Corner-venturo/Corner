@@ -138,19 +138,19 @@ export function ConfirmationHeader({
         {/* 第一列：團號、團名、日期 */}
         <div className="grid grid-cols-4 gap-6 mb-6">
           <div>
-            <Label className="text-xs text-morandi-secondary">團號</Label>
+            <Label className="text-xs text-morandi-primary">團號</Label>
             <p className="text-base font-medium text-morandi-primary mt-1">
               {tour.code}
             </p>
           </div>
           <div className="col-span-2">
-            <Label className="text-xs text-morandi-secondary">團名</Label>
+            <Label className="text-xs text-morandi-primary">團名</Label>
             <p className="text-base font-medium text-morandi-primary mt-1">
               {tour.name}
             </p>
           </div>
           <div>
-            <Label className="text-xs text-morandi-secondary">出發/回程</Label>
+            <Label className="text-xs text-morandi-primary">出發/回程</Label>
             <div className="flex items-center gap-2 mt-1">
               <Calendar size={14} className="text-morandi-secondary" />
               <span className="text-sm text-morandi-primary">
@@ -165,7 +165,7 @@ export function ConfirmationHeader({
           {editing ? (
             <>
               <div>
-                <Label className="text-xs text-morandi-secondary">領隊</Label>
+                <Label className="text-xs text-morandi-primary">領隊</Label>
                 <Input
                   value={formData.tour_leader_name}
                   onChange={(e) =>
@@ -176,7 +176,7 @@ export function ConfirmationHeader({
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">業務</Label>
+                <Label className="text-xs text-morandi-primary">業務</Label>
                 <Input
                   value={formData.sales_person}
                   onChange={(e) =>
@@ -187,7 +187,7 @@ export function ConfirmationHeader({
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">助理</Label>
+                <Label className="text-xs text-morandi-primary">助理</Label>
                 <Input
                   value={formData.assistant}
                   onChange={(e) =>
@@ -198,7 +198,7 @@ export function ConfirmationHeader({
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">人數</Label>
+                <Label className="text-xs text-morandi-primary">人數</Label>
                 <Input
                   type="number"
                   value={formData.pax}
@@ -209,7 +209,7 @@ export function ConfirmationHeader({
                 />
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">航班</Label>
+                <Label className="text-xs text-morandi-primary">航班</Label>
                 <Input
                   value={formData.flight_info}
                   onChange={(e) =>
@@ -223,7 +223,7 @@ export function ConfirmationHeader({
           ) : (
             <>
               <div>
-                <Label className="text-xs text-morandi-secondary">領隊</Label>
+                <Label className="text-xs text-morandi-primary">領隊</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -232,7 +232,7 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">業務</Label>
+                <Label className="text-xs text-morandi-primary">業務</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Briefcase size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -241,7 +241,7 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">助理</Label>
+                <Label className="text-xs text-morandi-primary">助理</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -250,7 +250,7 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">人數</Label>
+                <Label className="text-xs text-morandi-primary">人數</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Users size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">
@@ -259,7 +259,7 @@ export function ConfirmationHeader({
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-morandi-secondary">航班</Label>
+                <Label className="text-xs text-morandi-primary">航班</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <Plane size={14} className="text-morandi-secondary" />
                   <span className="text-sm text-morandi-primary">

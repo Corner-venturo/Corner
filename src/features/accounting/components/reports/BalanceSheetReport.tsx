@@ -38,7 +38,7 @@ export function BalanceSheetReport() {
     if (asOfDate) {
       handleSearch()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // 匯出 CSV

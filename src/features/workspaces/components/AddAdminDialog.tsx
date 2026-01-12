@@ -157,6 +157,7 @@ export function AddAdminDialog({ open, onOpenChange, workspace, onSuccess }: Add
             <X size={16} />
             取消
           </Button>
+          {/* eslint-disable-next-line venturo/button-requires-icon -- 三元運算式中有圖標 */}
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}

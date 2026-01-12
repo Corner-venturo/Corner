@@ -55,7 +55,7 @@ export function TourItineraryDialog({
     if (isOpen) {
       fetchProposalPackages()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isOpen])
 
   // 取得 tour 關聯的 proposal_package
@@ -124,7 +124,7 @@ export function TourItineraryDialog({
         workspace_id: tour.workspace_id,
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: newPackage, error } = await (supabase as any)
         .from('proposal_packages')
         .insert(newPackageData)

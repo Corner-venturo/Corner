@@ -789,7 +789,7 @@ export function TourPnrToolDialog({
                           {/* 擴充欄位編輯 */}
                           <div className="flex flex-wrap items-center gap-3 px-3 py-2 bg-morandi-container/20 border-t border-border/50 text-xs">
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-secondary whitespace-nowrap">出發航站</label>
+                              <label className="text-morandi-primary whitespace-nowrap">出發航站</label>
                               <Input
                                 value={editData.departureTerminal}
                                 onChange={(e) => handleSegmentEdit(i, 'departureTerminal', e.target.value)}
@@ -798,7 +798,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-secondary whitespace-nowrap">抵達航站</label>
+                              <label className="text-morandi-primary whitespace-nowrap">抵達航站</label>
                               <Input
                                 value={editData.arrivalTerminal}
                                 onChange={(e) => handleSegmentEdit(i, 'arrivalTerminal', e.target.value)}
@@ -807,7 +807,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-secondary whitespace-nowrap">餐食</label>
+                              <label className="text-morandi-primary whitespace-nowrap">餐食</label>
                               <Input
                                 value={editData.meal}
                                 onChange={(e) => handleSegmentEdit(i, 'meal', e.target.value)}
@@ -816,7 +816,7 @@ export function TourPnrToolDialog({
                               />
                             </div>
                             <div className="flex items-center gap-1">
-                              <label className="text-morandi-secondary whitespace-nowrap">飛行時間</label>
+                              <label className="text-morandi-primary whitespace-nowrap">飛行時間</label>
                               <Input
                                 value={editData.duration}
                                 onChange={(e) => handleSegmentEdit(i, 'duration', e.target.value)}

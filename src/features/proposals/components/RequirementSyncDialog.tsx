@@ -778,7 +778,7 @@ export function RequirementSyncDialog({
         .from('tour-documents')
         .getPublicUrl(filePath)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { error: insertError } = await (supabase as any)
         .from('tour_documents')
         .insert({

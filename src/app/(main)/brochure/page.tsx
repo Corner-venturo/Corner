@@ -2422,6 +2422,7 @@ function DesignerPageContent() {
 
       {/* 上傳中遮罩 */}
       {isUploading && (
+        // eslint-disable-next-line venturo/no-custom-modal -- 上傳遮罩需要自訂樣式
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card rounded-lg p-6 flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-morandi-gold" />
@@ -2530,6 +2531,7 @@ function DesignerPageContent() {
 
       {/* 頁面導航抽屜 */}
       {showPageDrawer && (
+        // eslint-disable-next-line venturo/no-custom-modal -- 抽屜需要自訂動畫
         <div className="fixed inset-0 z-50 flex">
           {/* 背景遮罩 */}
           <div
@@ -2537,7 +2539,7 @@ function DesignerPageContent() {
             onClick={() => setShowPageDrawer(false)}
           />
           {/* 抽屜內容 */}
-          <div className="relative w-[320px] h-full bg-card shadow-2xl flex flex-col animate-in slide-in-from-left duration-200 ml-16">
+          <div className="relative w-[320px] h-full bg-card shadow-lg flex flex-col animate-in slide-in-from-left duration-200 ml-16">
             {/* 抽屜標題 */}
             <div className="p-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -3987,7 +3989,7 @@ function DesignerPageContent() {
             >
               {/* A5 預覽 - 固定尺寸 559x794 */}
               <div
-                className="relative bg-card shadow-xl rounded-sm"
+                className="relative bg-card shadow-lg rounded-md"
                 style={{
                   width: 559,
                   height: 794,
@@ -4410,6 +4412,7 @@ function DesignerPageContent() {
 
       {/* 列印預覽 Portal */}
       {showPrintPreview && typeof document !== 'undefined' && createPortal(
+        // eslint-disable-next-line venturo/no-custom-modal -- Portal 列印預覽需要全螢幕
         <div className="fixed inset-0 z-[99999] bg-card overflow-auto">
           {/* 螢幕上的控制列 */}
           <div className="sticky top-0 z-10 bg-card border-b border-border p-4 flex items-center justify-between">
@@ -4439,7 +4442,7 @@ function DesignerPageContent() {
             {printImages.map((imgSrc, idx) => (
               <div
                 key={idx}
-                className="bg-card shadow-xl rounded-sm overflow-hidden"
+                className="bg-card shadow-lg rounded-md overflow-hidden"
                 style={{
                   width: '148mm',  // A5 寬度
                   height: '210mm', // A5 高度

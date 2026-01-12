@@ -137,6 +137,7 @@ export function TourControlDialogWrapper({
   // 載入中
   if (loading) {
     return (
+      // eslint-disable-next-line venturo/no-custom-modal -- 載入狀態需要簡單遮罩
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-card rounded-lg p-6 flex items-center gap-3">
           <Loader2 className="animate-spin text-morandi-gold" size={24} />
@@ -149,6 +150,7 @@ export function TourControlDialogWrapper({
   // 錯誤訊息
   if (error) {
     return (
+      // eslint-disable-next-line venturo/no-custom-modal -- 錯誤狀態需要簡單遮罩
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-card rounded-lg p-6 max-w-md">
           <h3 className="text-lg font-medium text-morandi-red mb-2">無法開啟團控表</h3>

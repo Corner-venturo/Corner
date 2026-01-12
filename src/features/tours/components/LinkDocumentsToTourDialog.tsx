@@ -94,7 +94,7 @@ export function LinkDocumentsToTourDialog({
       // SWR 自動處理 quotes 載入
       fetchProposalPackages()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isOpen])
 
   // 取得 tour 關聯的 proposal_package（透過 proposal_package_id 或動態建立的）
@@ -275,7 +275,7 @@ export function LinkDocumentsToTourDialog({
       }
 
       // 使用 type assertion 因為這是獨立 package（不屬於任何提案）
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const { data: newPackage, error } = await (supabase as any)
         .from('proposal_packages')
         .insert(newPackageData)

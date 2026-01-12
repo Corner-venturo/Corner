@@ -66,7 +66,7 @@ export function SupplierSearchInput({
         const supplierType = category === 'activity' ? 'attraction' : category
 
         // 查詢供應商（包含完整欄位）
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         let query = (supabase as any)
           .from('suppliers')
           .select('id, code, name, contact_person, phone, type')

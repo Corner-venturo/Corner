@@ -571,7 +571,7 @@ export function TimelineItineraryDialog({
         {/* 標題區 */}
         <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
           <div>
-            <Label className="text-xs text-morandi-secondary">行程標題</Label>
+            <Label className="text-xs text-morandi-primary">行程標題</Label>
             <Input
               value={data.title}
               onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
@@ -580,7 +580,7 @@ export function TimelineItineraryDialog({
             />
           </div>
           <div>
-            <Label className="text-xs text-morandi-secondary">副標題</Label>
+            <Label className="text-xs text-morandi-primary">副標題</Label>
             <Input
               value={data.subtitle || ''}
               onChange={(e) => setData((prev) => ({ ...prev, subtitle: e.target.value }))}
@@ -621,7 +621,7 @@ export function TimelineItineraryDialog({
           {/* 每日標題 */}
           <div className="py-3 border-b border-border/50 shrink-0">
             <div className="flex items-center justify-between mb-1">
-              <Label className="text-xs text-morandi-secondary">今日主題</Label>
+              <Label className="text-xs text-morandi-primary">今日主題</Label>
               <div className="flex items-center gap-1">
                 {/* 符號插入按鈕 */}
                 <button
@@ -845,7 +845,7 @@ export function TimelineItineraryDialog({
               className="gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover"
               title="從景點庫選擇"
             >
-              <Database size={12} />
+              <Plus size={12} />
               從景點庫新增
             </Button>
             <Button
@@ -893,7 +893,7 @@ export function TimelineItineraryDialog({
           <div className="py-3 border-t border-border/50">
             <div className="flex items-center gap-2">
               <Building2 size={16} className="text-morandi-gold shrink-0" />
-              <Label className="text-xs text-morandi-secondary shrink-0">當晚住宿：</Label>
+              <Label className="text-xs text-morandi-primary shrink-0">當晚住宿：</Label>
               <Input
                 value={activeDay.accommodation || ''}
                 onChange={(e) => updateDayAccommodation(e.target.value)}
