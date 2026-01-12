@@ -481,7 +481,7 @@ export function PackageListPanel({
                             }
                           }}
                           className="p-1.5 rounded transition-colors text-morandi-green hover:bg-morandi-green/10"
-                          title={pkg.itinerary_type === 'timeline' ? '編輯快速行程表' : '編輯網頁行程'}
+                          title={pkg.itinerary_type === 'timeline' ? '編輯時間軸行程表' : '編輯快速行程表'}
                         >
                           <FileText size={16} />
                         </button>
@@ -499,11 +499,10 @@ export function PackageListPanel({
                           <DropdownMenuContent align="start" className="w-44">
                             <DropdownMenuItem
                               onClick={() => {
-                                if (onOpenTimelineDialog) {
-                                  onOpenTimelineDialog(pkg)
+                                if (onOpenItineraryDialog) {
+                                  onOpenItineraryDialog(pkg)
                                 } else {
-                                  setSelectedPackage(pkg)
-                                  setTimelineDialogOpen(true)
+                                  openItineraryDialog(pkg)
                                 }
                               }}
                               className="gap-2 cursor-pointer"
@@ -513,16 +512,17 @@ export function PackageListPanel({
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                if (onOpenItineraryDialog) {
-                                  onOpenItineraryDialog(pkg)
+                                if (onOpenTimelineDialog) {
+                                  onOpenTimelineDialog(pkg)
                                 } else {
-                                  openItineraryDialog(pkg)
+                                  setSelectedPackage(pkg)
+                                  setTimelineDialogOpen(true)
                                 }
                               }}
                               className="gap-2 cursor-pointer"
                             >
                               <Clock size={16} className="text-morandi-secondary" />
-                              <span>網頁行程編輯器</span>
+                              <span>時間軸行程表</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
