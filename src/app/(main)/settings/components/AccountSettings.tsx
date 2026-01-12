@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Lock, EyeOff, Eye, Camera, User, Loader2, ChevronDown, ChevronUp, X } from 'lucide-react'
-import { alert, alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-dialog'
+import { alertSuccess, alertError, alertWarning } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import { PasswordData } from '../types'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
@@ -20,6 +20,7 @@ interface AccountSettingsProps {
     name?: string
     email?: string
     avatar_url?: string | null
+    workspace_code?: string
   } | null
   showPasswordSection: boolean
   setShowPasswordSection: (show: boolean) => void
@@ -145,54 +146,27 @@ export function AccountSettings({
     setPasswordUpdateLoading(true)
 
     try {
-      // 動態導入（只在需要時載入）
-      const [authModule, supabaseModule] = await Promise.all([
-        import('@/lib/auth'),
-        import('@/lib/supabase/client'),
-      ])
+      // 使用新的 API 來更換密碼（同時更新 employees 和 Supabase Auth）
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_number: user.employee_number,
+          workspace_code: user.workspace_code,
+          current_password: passwordData.currentPassword,
+          new_password: passwordData.newPassword,
+        }),
+      })
 
-      const { hashPassword, verifyPassword } = authModule
-      const { supabase } = supabaseModule
+      const result = await response.json()
 
-      // 1. 驗證目前密碼
-      const { data: userData, error: fetchError } = await supabase
-        .from('employees')
-        .select('password_hash')
-        .eq('employee_number', user.employee_number)
-        .single()
-
-      if (fetchError || !userData) {
-        await alertError('驗證失敗，請稍後再試')
+      if (!result.success) {
+        await alertError(result.error || '密碼更新失敗')
         setPasswordUpdateLoading(false)
         return
       }
 
-      const isPasswordValid = await verifyPassword(
-        passwordData.currentPassword,
-        userData.password_hash || ''
-      )
-      if (!isPasswordValid) {
-        await alertError('目前密碼錯誤！')
-        setPasswordUpdateLoading(false)
-        return
-      }
-
-      // 2. 更新新密碼
-      const hashedPassword = await hashPassword(passwordData.newPassword)
-
-      const { error } = await supabase
-        .from('employees')
-        .update({ password_hash: hashedPassword })
-        .eq('employee_number', user.employee_number)
-
-      if (error) {
-        logger.error('密碼更新失敗:', error)
-        await alertError('密碼更新失敗：' + error.message)
-        setPasswordUpdateLoading(false)
-        return
-      }
-
-      await alertSuccess('密碼更新成功！下次登入需重新驗證。', '更新成功')
+      await alertSuccess('密碼更新成功！', '更新成功')
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setShowPasswordSection(false)
     } catch (error) {

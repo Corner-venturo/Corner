@@ -181,10 +181,10 @@ export const useAuthStore = create<AuthState>()(
 
           if (authError || !authData) {
             logger.error('❌ Supabase Auth session sign-in failed:', authError?.message)
-            // 密碼不同步，需要重設
+            // 顯示更明確的錯誤訊息
             return {
               success: false,
-              message: '密碼需要重設，請聯繫管理員或使用「忘記密碼」功能'
+              message: '登入驗證失敗，請稍後再試或聯繫管理員'
             }
           }
 
