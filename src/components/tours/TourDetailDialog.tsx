@@ -13,6 +13,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
+import { PnrMatchDialog } from '@/components/orders/components/PnrMatchDialog'
 import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
@@ -98,6 +99,9 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
   // 入境卡列印
   const [showEntryCardDialog, setShowEntryCardDialog] = useState(false)
+
+  // 團員名單內的 PNR 配對 Dialog（需要父組件控制以避免多重遮罩）
+  const [showMembersPnrMatchDialog, setShowMembersPnrMatchDialog] = useState(false)
 
   // 子組件內的 Dialog 狀態（用於避免多重遮罩）
   const [membersHasChildDialog, setMembersHasChildDialog] = useState(false)
@@ -357,7 +361,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
   const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
     showEditDialog || showQuotePicker || showItineraryPicker || showPnrToolDialog || showEntryCardDialog ||
-    membersHasChildDialog || ordersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
+    showMembersPnrMatchDialog || membersHasChildDialog || ordersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
 
   const renderTabContent = () => {
     if (!tour) return null
@@ -396,7 +400,22 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
       case 'orders':
         return <TourOrders tour={tour} onChildDialogChange={setOrdersHasChildDialog} />
       case 'members':
-        return <OrderMembersExpandable tourId={tour.id} workspaceId={currentWorkspace?.id || ''} mode="tour" forceShowPnr={forceShowPnr} tour={tour} onChildDialogChange={setMembersHasChildDialog} />
+        return (
+          <OrderMembersExpandable
+            tourId={tour.id}
+            workspaceId={currentWorkspace?.id || ''}
+            mode="tour"
+            forceShowPnr={forceShowPnr}
+            tour={tour}
+            onChildDialogChange={setMembersHasChildDialog}
+            showPnrMatchDialog={showMembersPnrMatchDialog}
+            onPnrMatchDialogChange={setShowMembersPnrMatchDialog}
+            onPnrMatchSuccess={() => {
+              setForceShowPnr(true)
+              handleSuccess()
+            }}
+          />
+        )
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
       case 'control':
@@ -604,6 +623,24 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               pnr: m.pnr,
             }))}
             onSuccess={handleSuccess}
+          />
+
+          {/* PNR 配對對話框（來自團員名單的 PNR 配對按鈕） */}
+          <PnrMatchDialog
+            isOpen={showMembersPnrMatchDialog}
+            onClose={() => setShowMembersPnrMatchDialog(false)}
+            nested
+            members={tourMembers.map(m => ({
+              id: m.id,
+              chinese_name: m.chinese_name ?? null,
+              passport_name: m.passport_name ?? null,
+              pnr: m.pnr ?? null,
+            }))}
+            workspaceId={currentWorkspace?.id}
+            onSuccess={() => {
+              setForceShowPnr(true)
+              handleSuccess()
+            }}
           />
 
           {/* 入境卡列印對話框 */}

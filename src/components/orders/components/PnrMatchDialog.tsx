@@ -63,6 +63,8 @@ interface PnrMatchDialogProps {
   orderId?: string
   workspaceId?: string
   onSuccess?: () => void
+  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
+  nested?: boolean
 }
 
 export function PnrMatchDialog({
@@ -72,6 +74,7 @@ export function PnrMatchDialog({
   orderId,
   workspaceId,
   onSuccess,
+  nested = false,
 }: PnrMatchDialogProps) {
   const [rawPnr, setRawPnr] = useState('')
   const [parsedPnr, setParsedPnr] = useState<ParsedPNR | null>(null)
@@ -385,7 +388,7 @@ export function PnrMatchDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+      <DialogContent nested={nested} className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />

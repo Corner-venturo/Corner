@@ -130,6 +130,12 @@ export interface OrderMembersExpandableProps {
   forceShowPnr?: boolean
   /** Tour 物件（用於列印功能） */
   tour?: import('@/stores/types').Tour
+  /** 控制 PNR 配對 Dialog 顯示狀態（由父組件控制） */
+  showPnrMatchDialog?: boolean
+  /** PNR 配對 Dialog 狀態變更回調 */
+  onPnrMatchDialogChange?: (show: boolean) => void
+  /** PNR 配對成功回調 */
+  onPnrMatchSuccess?: () => void
 }
 
 export interface MemberRowProps {

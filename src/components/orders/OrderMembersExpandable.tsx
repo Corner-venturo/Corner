@@ -115,6 +115,9 @@ export function OrderMembersExpandable({
   forceShowPnr = false,
   tour,
   onChildDialogChange,
+  showPnrMatchDialog: parentShowPnrMatchDialog,
+  onPnrMatchDialogChange,
+  onPnrMatchSuccess,
 }: OrderMembersExpandableProps & { onChildDialogChange?: (hasOpen: boolean) => void }) {
   const mode = propMode || (orderId ? 'order' : 'tour')
 
@@ -156,7 +159,13 @@ export function OrderMembersExpandable({
   const [customCostFields, setCustomCostFields] = useState<CustomCostField[]>([])
   const [pnrValues, setPnrValues] = useState<Record<string, string>>({})
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(getInitialColumnVisibility)
-  const [showPnrMatchDialog, setShowPnrMatchDialog] = useState(false)
+  // PNR 配對 Dialog：支援父組件控制（避免多重遮罩問題）
+  const [internalShowPnrMatchDialog, setInternalShowPnrMatchDialog] = useState(false)
+  const isParentControlledPnrDialog = parentShowPnrMatchDialog !== undefined
+  const showPnrMatchDialog = isParentControlledPnrDialog ? parentShowPnrMatchDialog : internalShowPnrMatchDialog
+  const setShowPnrMatchDialog = isParentControlledPnrDialog
+    ? (show: boolean) => onPnrMatchDialogChange?.(show)
+    : setInternalShowPnrMatchDialog
 
   // 切換欄位可見性
   const toggleColumnVisibility = useCallback((column: keyof ColumnVisibility) => {
@@ -196,7 +205,9 @@ export function OrderMembersExpandable({
   // 通知父組件有子 Dialog 開啟（避免多重遮罩）
   // 注意：isAddDialogOpen、showOrderSelectDialog、showCustomerMatchDialog、previewMember 不包含在內
   // 因為它們是在此組件內部渲染的小型 Dialog，不需要隱藏父 Dialog
-  const hasChildDialogOpen = showPnrMatchDialog || roomVehicle.showRoomManager || roomVehicle.showVehicleManager ||
+  // 當 PNR Dialog 由父組件控制時，不包含在此計算中（父組件會處理）
+  const hasChildDialogOpen = (!isParentControlledPnrDialog && showPnrMatchDialog) ||
+    roomVehicle.showRoomManager || roomVehicle.showVehicleManager ||
     memberEdit.isEditDialogOpen || memberExport.isExportDialogOpen
 
   useEffect(() => {
@@ -528,23 +539,27 @@ export function OrderMembersExpandable({
         onClose={customerMatch.closeCustomerMatchDialog}
         onSelect={customerMatch.handleSelectCustomer}
       />
-      <PnrMatchDialog
-        isOpen={showPnrMatchDialog}
-        onClose={() => setShowPnrMatchDialog(false)}
-        members={membersData.members.map(m => ({
-          id: m.id,
-          chinese_name: m.chinese_name ?? null,
-          passport_name: m.passport_name ?? null,
-          pnr: m.pnr,
-        }))}
-        orderId={orderId || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0].id : undefined)}
-        workspaceId={workspaceId}
-        onSuccess={() => {
-          membersData.loadMembers()
-          // PNR 配對成功後自動顯示 PNR 欄位
-          setColumnVisibility(prev => ({ ...prev, pnr: true }))
-        }}
-      />
+      {/* PNR 配對 Dialog：只有在非父組件控制模式下才渲染，否則由父組件渲染（避免多重遮罩） */}
+      {!isParentControlledPnrDialog && (
+        <PnrMatchDialog
+          isOpen={showPnrMatchDialog}
+          onClose={() => setShowPnrMatchDialog(false)}
+          members={membersData.members.map(m => ({
+            id: m.id,
+            chinese_name: m.chinese_name ?? null,
+            passport_name: m.passport_name ?? null,
+            pnr: m.pnr,
+          }))}
+          orderId={orderId || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0].id : undefined)}
+          workspaceId={workspaceId}
+          onSuccess={() => {
+            membersData.loadMembers()
+            // PNR 配對成功後自動顯示 PNR 欄位
+            setColumnVisibility(prev => ({ ...prev, pnr: true }))
+            onPnrMatchSuccess?.()
+          }}
+        />
+      )}
       <MemberEditDialog
         isOpen={memberEdit.isEditDialogOpen}
         editMode={memberEdit.editMode}
