@@ -58,6 +58,16 @@ export function VisasList({
       render: (value) => <TextCell text={String(value || '')} />,
     },
     {
+      key: 'is_urgent',
+      label: '急件',
+      width: '50',
+      render: (value) => (
+        <span className={cn('text-sm', value ? 'text-morandi-red font-medium' : 'text-morandi-secondary')}>
+          {value ? '是' : '-'}
+        </span>
+      ),
+    },
+    {
       key: 'status',
       label: '狀態',
       width: '80',

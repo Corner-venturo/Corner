@@ -15220,6 +15220,7 @@ export type Database = {
           fee: number | null
           id: string
           is_active: boolean | null
+          is_urgent: boolean | null
           note: string | null
           order_id: string
           order_number: string
@@ -15251,6 +15252,7 @@ export type Database = {
           fee?: number | null
           id?: string
           is_active?: boolean | null
+          is_urgent?: boolean | null
           note?: string | null
           order_id: string
           order_number: string
@@ -15282,6 +15284,7 @@ export type Database = {
           fee?: number | null
           id?: string
           is_active?: boolean | null
+          is_urgent?: boolean | null
           note?: string | null
           order_id?: string
           order_number?: string

@@ -179,13 +179,14 @@ export const FEATURE_PERMISSIONS: PermissionConfig[] = [
     routes: ['/manifestation'],
     description: '顯化魔法功能',
   },
-  {
-    id: 'confirmations',
-    label: '確認單管理',
-    category: '全部',
-    routes: ['/confirmations'],
-    description: '確認單建立和管理',
-  },
+  // 確認單管理已整合到團的操作中，不再需要獨立權限
+  // {
+  //   id: 'confirmations',
+  //   label: '確認單管理',
+  //   category: '全部',
+  //   routes: ['/confirmations'],
+  //   description: '確認單建立和管理',
+  // },
   {
     id: 'esims',
     label: 'eSIM 管理',

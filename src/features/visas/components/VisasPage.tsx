@@ -19,7 +19,6 @@ import { VisasList } from './VisasList'
 import { VisasInfoDialog } from './VisasInfoDialog'
 import { AddVisaDialog } from './AddVisaDialog'
 import { SubmitVisaDialog } from './SubmitVisaDialog'
-import { VisaDialog } from './VisaDialog'
 import { ReturnDocumentsDialog } from './ReturnDocumentsDialog'
 import { BatchPickupDialog } from './BatchPickupDialog'
 import { CustomerMatchDialog, AddCustomerFormDialog } from './CustomerMatchDialog'
@@ -66,6 +65,7 @@ export default function VisasPage() {
   const {
     isDialogOpen,
     setIsDialogOpen,
+    editingVisa,
     contact_info,
     setContactInfo,
     applicants,
@@ -76,6 +76,7 @@ export default function VisasPage() {
     removeApplicant,
     updateApplicant,
     resetForm,
+    loadVisaForEdit,
   } = useVisasDialog(tours)
 
   // 客戶比對
@@ -87,8 +88,6 @@ export default function VisasPage() {
   // 其他對話框狀態
   const [isInfoDialogOpen, setIsInfoDialogOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [editingVisa, setEditingVisa] = React.useState<Visa | null>(null)
   const [isReturnDialogOpen, setIsReturnDialogOpen] = React.useState(false)
   const [isBatchPickupDialogOpen, setIsBatchPickupDialogOpen] = React.useState(false)
 
@@ -216,6 +215,7 @@ export default function VisasPage() {
           contact_phone: contact_info.contact_phone || '',
           visa_type: applicant.country,
           country: applicant.country,
+          is_urgent: applicant.is_urgent,
           received_date: applicant.received_date || undefined,
           expected_issue_date: applicant.expected_issue_date || undefined,
           fee,
@@ -419,8 +419,7 @@ export default function VisasPage() {
           onDelete={deleteVisa}
           onUpdateStatus={(id, status) => updateVisa(id, { status })}
           onEdit={(visa) => {
-            setEditingVisa(visa)
-            setIsEditDialogOpen(true)
+            loadVisaForEdit(visa)
           }}
         />
       </div>
@@ -428,7 +427,7 @@ export default function VisasPage() {
       {/* 簽證資訊對話框 */}
       <VisasInfoDialog open={isInfoDialogOpen} onClose={() => setIsInfoDialogOpen(false)} />
 
-      {/* 新增簽證對話框 */}
+      {/* 新增/編輯簽證對話框（統一使用同一個） */}
       <AddVisaDialog
         open={isDialogOpen}
         onClose={() => {
@@ -436,6 +435,13 @@ export default function VisasPage() {
           resetForm()
         }}
         onSubmit={handleAddVisa}
+        onUpdate={async (visaId, data) => {
+          await updateVisa(visaId, data)
+          setIsDialogOpen(false)
+          resetForm()
+          toast.success('簽證已更新')
+        }}
+        editingVisa={editingVisa}
         contact_info={contact_info}
         setContactInfo={setContactInfo}
         applicants={applicants}
@@ -482,16 +488,6 @@ export default function VisasPage() {
           setSelectedRows([])
           toast.success(`已送出 ${selectedRows.length} 筆簽證`)
         }}
-      />
-
-      {/* 編輯對話框 */}
-      <VisaDialog
-        open={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false)
-          setEditingVisa(null)
-        }}
-        visa={editingVisa}
       />
 
       {/* 證件歸還對話框 */}

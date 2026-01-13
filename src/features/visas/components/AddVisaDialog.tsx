@@ -2,26 +2,14 @@
 
 import { logger } from '@/lib/utils/logger'
 import React from 'react'
-import { Button } from '@/components/ui/button'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Combobox } from '@/components/ui/combobox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-
-interface VisaApplicant {
-  id: string
-  name: string
-  country: string
-  is_urgent: boolean
-  received_date: string // 收件時間
-  expected_issue_date: string // 預計下件時間
-  fee?: number // 代辦費（可手動修改）
-  cost: number
-  isAdditional?: boolean // 是否為追加列（同一人的其他簽證）
-  parentId?: string // 追加列的父申請人 ID
-}
+import type { VisaApplicant } from '../hooks/useVisasDialog'
+import type { Visa } from '@/stores/types'
 
 interface ContactInfo {
   tour_id: string
@@ -47,6 +35,8 @@ interface AddVisaDialogProps {
   open: boolean
   onClose: () => void
   onSubmit: () => Promise<void>
+  onUpdate?: (visaId: string, data: Partial<Visa>) => Promise<void> // 編輯模式提交
+  editingVisa?: Visa | null // 編輯模式下的簽證
   contact_info: ContactInfo
   setContactInfo: React.Dispatch<React.SetStateAction<ContactInfo>>
   applicants: VisaApplicant[]
@@ -64,6 +54,8 @@ export function AddVisaDialog({
   open,
   onClose,
   onSubmit,
+  onUpdate,
+  editingVisa,
   contact_info,
   setContactInfo,
   applicants,
@@ -78,6 +70,8 @@ export function AddVisaDialog({
 }: AddVisaDialogProps) {
   const [tourOrders, setTourOrders] = React.useState<OrderData[]>([])
   const [hasInitialized, setHasInitialized] = React.useState(false)
+
+  const isEditMode = !!editingVisa
 
   // ✅ 當對話框打開時，載入團號資料並自動選擇簽證專用團
   React.useEffect(() => {
@@ -153,53 +147,82 @@ export function AddVisaDialog({
     return options
   }, [tourOrders, contact_info.tour_id])
 
+  // 處理編輯模式的提交
+  const handleSubmit = async () => {
+    if (isEditMode && onUpdate && editingVisa && applicants[0]) {
+      const applicant = applicants[0]
+      await onUpdate(editingVisa.id, {
+        applicant_name: applicant.name,
+        visa_type: applicant.country,
+        country: applicant.country,
+        is_urgent: applicant.is_urgent,
+        received_date: applicant.received_date || undefined,
+        expected_issue_date: applicant.expected_issue_date || undefined,
+        fee: applicant.fee ?? calculateFee(applicant.country),
+        cost: applicant.cost,
+        actual_submission_date: applicant.actual_submission_date || undefined,
+        documents_returned_date: applicant.documents_returned_date || undefined,
+        pickup_date: applicant.pickup_date || undefined,
+        vendor: applicant.vendor || undefined,
+        note: applicant.note || undefined,
+        status: (applicant.status as Visa['status']) || 'pending',
+        contact_person: contact_info.contact_person,
+        contact_phone: contact_info.contact_phone,
+      })
+    } else {
+      await onSubmit()
+    }
+  }
+
   return (
     <FormDialog
       open={open}
       onOpenChange={open => !open && onClose()}
-      title="新增簽證"
-      onSubmit={onSubmit}
+      title={isEditMode ? '編輯簽證' : '新增簽證'}
+      onSubmit={handleSubmit}
       onCancel={onClose}
-      submitLabel="批次新增簽證"
+      submitLabel={isEditMode ? '儲存' : '批次新增簽證'}
       submitDisabled={!canSubmit}
       loading={isSubmitting}
       maxWidth="6xl"
       contentClassName="max-h-[75vh] overflow-y-auto"
     >
-      {/* 上半部：聯絡人資訊 */}
+      {/* 上半部：聯絡人資訊（編輯模式下團號訂單不可改） */}
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
-            <Combobox
-              value={contact_info.tour_id}
-              onChange={value => {
-                setContactInfo((prev) => ({ ...prev, tour_id: value, order_id: '' }))
-              }}
-              options={tourOptions}
-              placeholder="請輸入或選擇團號（例如：0810）"
-              className="mt-1"
-              showSearchIcon
-              showClearButton
-            />
+        {!isEditMode && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">選擇團號</label>
+              <Combobox
+                value={contact_info.tour_id}
+                onChange={value => {
+                  setContactInfo((prev) => ({ ...prev, tour_id: value, order_id: '' }))
+                }}
+                options={tourOptions}
+                placeholder="請輸入或選擇團號（例如：0810）"
+                className="mt-1"
+                showSearchIcon
+                showClearButton
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">
+                選擇訂單{' '}
+                <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
+              </label>
+              <Combobox
+                value={contact_info.order_id}
+                onChange={value => setContactInfo((prev) => ({ ...prev, order_id: value }))}
+                options={orderOptions}
+                placeholder={contact_info.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
+                className="mt-1"
+                disabled={!contact_info.tour_id}
+                showSearchIcon
+                showClearButton
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-morandi-primary">
-              選擇訂單{' '}
-              <span className="text-xs text-morandi-secondary">(選填，未選擇將自動建立)</span>
-            </label>
-            <Combobox
-              value={contact_info.order_id}
-              onChange={value => setContactInfo((prev) => ({ ...prev, order_id: value }))}
-              options={orderOptions}
-              placeholder={contact_info.tour_id ? '請選擇訂單或留空自動建立' : '請先選擇團號'}
-              className="mt-1"
-              disabled={!contact_info.tour_id}
-              showSearchIcon
-              showClearButton
-            />
-          </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -242,8 +265,8 @@ export function AddVisaDialog({
             <th className="text-center py-2 px-3 border border-border">辦理費用</th>
             <th className="text-center py-2 px-3 border border-border">急件費用</th>
             <th className="text-center py-2 px-3 border border-border">應收費用</th>
-            <th className="text-center py-2 px-3 border border-border">追加辦理</th>
-            <th className="border border-border w-10"></th>
+            {!isEditMode && <th className="text-center py-2 px-3 border border-border">追加辦理</th>}
+            {!isEditMode && <th className="border border-border w-10"></th>}
           </tr>
         </thead>
         <tbody>
@@ -357,44 +380,137 @@ export function AddVisaDialog({
                   {totalFee !== null ? totalFee.toLocaleString() : '-'}
                 </td>
 
-                {/* 追加辦理 */}
-                <td className="py-2 px-3 border border-border text-center">
-                  {!applicant.isAdditional && (
-                    <span
-                      onClick={() => addApplicantForSame(applicant.id, applicant.name)}
-                      className="text-morandi-green cursor-pointer hover:text-morandi-green/70 text-lg"
-                      title="追加同一人的其他簽證"
-                    >
-                      +
-                    </span>
-                  )}
-                </td>
+                {/* 追加辦理（只在新增模式顯示） */}
+                {!isEditMode && (
+                  <td className="py-2 px-3 border border-border text-center">
+                    {!applicant.isAdditional && (
+                      <span
+                        onClick={() => addApplicantForSame(applicant.id, applicant.name)}
+                        className="text-morandi-green cursor-pointer hover:text-morandi-green/70 text-lg"
+                        title="追加同一人的其他簽證"
+                      >
+                        +
+                      </span>
+                    )}
+                  </td>
+                )}
 
-                {/* 刪除 */}
-                <td className="py-2 px-3 border border-border text-center">
-                  <span
-                    onClick={() => removeApplicant(applicant.id)}
-                    className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
-                    title="刪除"
-                  >
-                    x
-                  </span>
-                </td>
+                {/* 刪除（只在新增模式顯示） */}
+                {!isEditMode && (
+                  <td className="py-2 px-3 border border-border text-center">
+                    <span
+                      onClick={() => removeApplicant(applicant.id)}
+                      className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
+                      title="刪除"
+                    >
+                      x
+                    </span>
+                  </td>
+                )}
               </tr>
             )
           })}
         </tbody>
       </table>
 
-      {/* 新增辦理人 */}
-      <div className="flex justify-end mt-2 pr-2">
-        <span
-          onClick={addApplicant}
-          className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm"
-        >
-          + 新增辦理人
-        </span>
-      </div>
+      {/* 新增辦理人（只在新增模式顯示） */}
+      {!isEditMode && (
+        <div className="flex justify-end mt-2 pr-2">
+          <span
+            onClick={addApplicant}
+            className="text-morandi-gold cursor-pointer hover:text-morandi-gold-hover text-sm"
+          >
+            + 新增辦理人
+          </span>
+        </div>
+      )}
+
+      {/* 編輯模式額外欄位 */}
+      {isEditMode && applicants[0] && (
+        <div className="border-t border-border pt-4 mt-4 space-y-4">
+          {/* 狀態 */}
+          <div className="grid grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">狀態</label>
+              <Select
+                value={applicants[0].status || 'pending'}
+                onValueChange={value => updateApplicant(applicants[0].id, 'status', value)}
+              >
+                <SelectTrigger className="w-full mt-1 h-10">
+                  <SelectValue placeholder="選擇狀態" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">待送件</SelectItem>
+                  <SelectItem value="submitted">已送件</SelectItem>
+                  <SelectItem value="collected">已取件</SelectItem>
+                  <SelectItem value="returned">已歸還</SelectItem>
+                  <SelectItem value="rejected">退件</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">送件單位</label>
+              <Input
+                value={applicants[0].vendor || ''}
+                onChange={e => updateApplicant(applicants[0].id, 'vendor', e.target.value)}
+                className="mt-1"
+                placeholder="輸入送件單位"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">成本</label>
+              <Input
+                type="number"
+                value={applicants[0].cost || 0}
+                onChange={e => updateApplicant(applicants[0].id, 'cost', Number(e.target.value))}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* 日期資訊 */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">送件時間</label>
+              <DatePicker
+                value={applicants[0].actual_submission_date || ''}
+                onChange={date => updateApplicant(applicants[0].id, 'actual_submission_date', date || '')}
+                className="mt-1"
+                placeholder="選擇日期"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">證件歸還</label>
+              <DatePicker
+                value={applicants[0].documents_returned_date || ''}
+                onChange={date => updateApplicant(applicants[0].id, 'documents_returned_date', date || '')}
+                className="mt-1"
+                placeholder="選擇日期"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-morandi-primary">取件時間</label>
+              <DatePicker
+                value={applicants[0].pickup_date || ''}
+                onChange={date => updateApplicant(applicants[0].id, 'pickup_date', date || '')}
+                className="mt-1"
+                placeholder="選擇日期"
+              />
+            </div>
+          </div>
+
+          {/* 備註 */}
+          <div>
+            <label className="text-sm font-medium text-morandi-primary">備註</label>
+            <textarea
+              value={applicants[0].note || ''}
+              onChange={e => updateApplicant(applicants[0].id, 'note', e.target.value)}
+              className="w-full mt-1 p-2 border border-border rounded-md bg-card text-sm min-h-[80px]"
+              placeholder="輸入備註..."
+            />
+          </div>
+        </div>
+      )}
     </FormDialog>
   )
 }

@@ -4,8 +4,9 @@ import { formatDate } from '@/lib/utils/format-date'
 
 import { useState, useCallback, useMemo } from 'react'
 import type { ComboboxOption } from '@/components/ui/combobox'
+import type { Visa } from '@/stores/types'
 
-interface VisaApplicant {
+export interface VisaApplicant {
   id: string
   name: string
   country: string
@@ -16,6 +17,13 @@ interface VisaApplicant {
   cost: number
   isAdditional?: boolean // 是否為追加列（同一人的其他簽證）
   parentId?: string // 追加列的父申請人 ID
+  // 編輯模式額外欄位
+  actual_submission_date?: string // 送件時間
+  documents_returned_date?: string // 證件歸還
+  pickup_date?: string // 取件時間
+  vendor?: string // 送件單位
+  note?: string // 備註
+  status?: string // 狀態
 }
 
 /**
@@ -31,6 +39,7 @@ interface Tour {
 
 export function useVisasDialog(tours: Tour[]) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingVisa, setEditingVisa] = useState<Visa | null>(null) // 編輯模式下的簽證
 
   // 聯絡人資訊
   const [contact_info, setContactInfo] = useState({
@@ -268,6 +277,7 @@ export function useVisasDialog(tours: Tour[]) {
 
   // 重置表單
   const resetForm = useCallback((defaultTourId?: string) => {
+    setEditingVisa(null)
     setContactInfo({
       tour_id: defaultTourId || '',
       order_id: '',
@@ -287,9 +297,41 @@ export function useVisasDialog(tours: Tour[]) {
     ])
   }, [])
 
+  // 載入簽證進行編輯
+  const loadVisaForEdit = useCallback((visa: Visa) => {
+    setEditingVisa(visa)
+    setContactInfo({
+      tour_id: visa.tour_id || '',
+      order_id: visa.order_id || '',
+      contact_person: visa.contact_person || '',
+      contact_phone: visa.contact_phone || '',
+    })
+    setApplicants([
+      {
+        id: visa.id,
+        name: visa.applicant_name || '',
+        country: visa.visa_type || '護照 成人',
+        is_urgent: visa.is_urgent || false,
+        received_date: visa.received_date || '',
+        expected_issue_date: visa.expected_issue_date || '',
+        fee: visa.fee || 0,
+        cost: visa.cost || 0,
+        actual_submission_date: visa.actual_submission_date || '',
+        documents_returned_date: visa.documents_returned_date || '',
+        pickup_date: visa.pickup_date || '',
+        vendor: visa.vendor || '',
+        note: visa.note || '',
+        status: visa.status || 'pending',
+      },
+    ])
+    setIsDialogOpen(true)
+  }, [])
+
   return {
     isDialogOpen,
     setIsDialogOpen,
+    editingVisa,
+    setEditingVisa,
     contact_info,
     setContactInfo,
     applicants,
@@ -302,5 +344,6 @@ export function useVisasDialog(tours: Tour[]) {
     removeApplicant,
     updateApplicant,
     resetForm,
+    loadVisaForEdit,
   }
 }

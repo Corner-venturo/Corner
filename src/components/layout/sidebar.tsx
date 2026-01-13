@@ -69,8 +69,9 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/visas', label: '簽證管理', icon: FileCheck, requiredPermission: 'visas' },
-  { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },
-  { href: '/confirmations', label: '確認單管理', icon: CircleDot, requiredPermission: 'confirmations' },
+  // 合約管理和確認單管理已整合到團的操作中，不需要獨立入口
+  // { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },
+  // { href: '/confirmations', label: '確認單管理', icon: CircleDot, requiredPermission: 'confirmations' },
   {
     href: '/database',
     label: '資料管理',

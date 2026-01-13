@@ -210,6 +210,7 @@ export interface Visa {
   // 簽證資訊
   visa_type: string // 簽證類型（護照 成人、台胞證等）
   country: string // 國家
+  is_urgent?: boolean // 是否為急件
 
   // 狀態
   status: 'pending' | 'submitted' | 'collected' | 'rejected' | 'returned'
