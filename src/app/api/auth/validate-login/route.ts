@@ -42,21 +42,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (!workspace) {
-      // 檢查是否是 supplier code（大小寫都查）
-      const { data: supplier } = await supabase
-        .from('suppliers')
-        .select('id, code, name')
-        .or(`code.eq.${normalizedCode},code.eq.${code.toUpperCase()}`)
-        .eq('is_active', true)
-        .maybeSingle()
-
-      if (supplier) {
-        return NextResponse.json(
-          { success: false, message: `🏭 ${supplier.name}\n廠商登入功能開發中` },
-          { status: 400 }
-        )
-      }
-
       return NextResponse.json(
         { success: false, message: '找不到此代號' },
         { status: 400 }
