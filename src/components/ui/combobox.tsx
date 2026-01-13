@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, X, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
@@ -97,7 +98,9 @@ export function Combobox<T = unknown>({
   const [isOpen, setIsOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
+  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0 })
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
   const optionRefs = React.useRef<(HTMLButtonElement | null)[]>([])
 
@@ -233,8 +236,8 @@ export function Combobox<T = unknown>({
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false)
       }
@@ -244,13 +247,25 @@ export function Combobox<T = unknown>({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // 計算下拉選單位置（使用 Portal 時需要）
+  React.useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      })
+    }
+  }, [isOpen])
+
   // 預設選項渲染
   const defaultRenderOption = (option: ComboboxOption<T>) => (
     <span className="text-morandi-primary">{option.label}</span>
   )
 
   return (
-    <div className={cn('relative', className)}>
+    <div ref={containerRef} className={cn('relative', className)}>
       {/* 輸入框 */}
       <div className="relative">
         {showSearchIcon && (
@@ -299,12 +314,15 @@ export function Combobox<T = unknown>({
         </div>
       </div>
 
-      {/* 下拉選單 */}
-      {isOpen && !disabled && (
+      {/* 下拉選單（使用 Portal 避免被 overflow 裁切） */}
+      {isOpen && !disabled && typeof document !== 'undefined' && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute z-[10010] bg-card border border-border rounded-lg shadow-lg overflow-hidden mt-1 w-full"
+          className="fixed z-[10010] bg-card border border-border rounded-lg shadow-lg overflow-hidden"
           style={{
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            width: dropdownPosition.width,
             maxHeight,
           }}
         >
@@ -334,7 +352,8 @@ export function Combobox<T = unknown>({
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

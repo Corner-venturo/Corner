@@ -1,7 +1,15 @@
 'use client'
 
+/**
+ * AttractionsTab - 景點管理分頁
+ *
+ * [Refactored] 使用 @/data hooks 取代直接 Supabase 查詢
+ * - useCountryDictionary / useCityDictionary: O(1) 查詢，用於顯示
+ * - useCountries / useRegions / useCities: 完整列表，用於對話框下拉選單
+ */
+
 import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useAttractionsData } from '../../hooks/useAttractionsData'
 import { useAttractionsFilters } from '../../hooks/useAttractionsFilters'
@@ -9,10 +17,9 @@ import { useAttractionsDialog } from '../../hooks/useAttractionsDialog'
 import { useAttractionsReorder } from '../../hooks/useAttractionsReorder'
 import { AttractionsList } from '../AttractionsList'
 import { SortableAttractionsList } from '../SortableAttractionsList'
-import { supabase } from '@/lib/supabase/client'
+import { useCountries, useRegions, useCities } from '@/data'
 import { Button } from '@/components/ui/button'
 import { ArrowUpDown, List, SortAsc, Loader2 } from 'lucide-react'
-import type { Country, City } from '@/data'
 
 // Dynamic import for large dialog component (807 lines)
 const AttractionsDialog = dynamic(
@@ -48,9 +55,6 @@ export default function AttractionsTab({
   closeAdd,
   initialFormData,
 }: AttractionsTabProps) {
-  // 用於顯示的國家和城市資料（從景點載入後，按需從資料庫查詢）
-  const [displayCountries, setDisplayCountries] = useState<Country[]>([])
-  const [displayCities, setDisplayCities] = useState<City[]>([])
   // 排序模式控制
   const [isReorderMode, setIsReorderMode] = useState(false)
   const [isSorting, setIsSorting] = useState(false)
@@ -61,43 +65,21 @@ export default function AttractionsTab({
   const { isEditOpen, editingAttraction, openEdit, closeEdit } = useAttractionsDialog()
   const { reorderAttractions, moveUp, moveDown } = useAttractionsReorder()
 
-  // 當景點載入後，取得所有用到的國家和城市 ID，然後查詢這些資料
-  useEffect(() => {
-    if (attractions.length > 0) {
-      const countryIds = Array.from(new Set(attractions.map(a => a.country_id).filter((id): id is string => !!id)))
-      const cityIds = Array.from(new Set(attractions.map(a => a.city_id).filter((id): id is string => !!id)))
+  // 使用 @/data hooks 載入地區資料（SWR 自動快取、去重）
+  const { items: allCountries = [] } = useCountries()
+  const { items: regions = [] } = useRegions()
+  const { items: allCities = [] } = useCities()
 
-      // 載入這些國家
-      if (countryIds.length > 0) {
-        supabase
-          .from('countries')
-          .select('*')
-          .in('id', countryIds)
-          .then(({ data, error }) => {
-            if (error) {
-              logger.error('載入國家失敗:', error)
-              return
-            }
-            if (data) setDisplayCountries(data as Country[])
-          })
-      }
+  // 從完整列表中篩選出景點引用的國家和城市（用於列表顯示）
+  const displayCountries = useMemo(() => {
+    const countryIds = new Set(attractions.map(a => a.country_id).filter(Boolean))
+    return allCountries.filter(c => countryIds.has(c.id))
+  }, [attractions, allCountries])
 
-      // 載入這些城市
-      if (cityIds.length > 0) {
-        supabase
-          .from('cities')
-          .select('*')
-          .in('id', cityIds)
-          .then(({ data, error }) => {
-            if (error) {
-              logger.error('載入城市失敗:', error)
-              return
-            }
-            if (data) setDisplayCities(data as City[])
-          })
-      }
-    }
-  }, [attractions])
+  const displayCities = useMemo(() => {
+    const cityIds = new Set(attractions.map(a => a.city_id).filter(Boolean))
+    return allCities.filter(c => cityIds.has(c.id))
+  }, [attractions, allCities])
 
   const { sortedAttractions } = useAttractionsFilters({
     attractions,
@@ -109,44 +91,9 @@ export default function AttractionsTab({
     selectedCity: '', // 不再使用城市篩選
   })
 
-  // 使用 SWR 載入地區資料供對話框使用
-  // 動態 import 避免 SSR 問題
-  interface Region {
-    id: string
-    country_id: string
-    name: string
-    name_en?: string
-    description?: string
-    display_order: number
-    is_active: boolean
-    workspace_id?: string
-    created_at: string
-    updated_at: string
-  }
-
-  const [regionsData, setRegionsData] = useState<{
-    countries: Country[]
-    regions: Region[]
-    cities: City[]
-  }>({ countries: [], regions: [], cities: [] })
-
-  useEffect(() => {
-    const loadRegions = async () => {
-      const [countriesRes, regionsRes, citiesRes] = await Promise.all([
-        supabase.from('countries').select('*'),
-        supabase.from('regions').select('*'),
-        supabase.from('cities').select('*'),
-      ])
-      setRegionsData({
-        countries: (countriesRes.data || []) as Country[],
-        regions: (regionsRes.data || []) as Region[],
-        cities: (citiesRes.data || []) as City[],
-      })
-    }
-    loadRegions()
-  }, [])
-
-  const { countries, regions, cities } = regionsData
+  // 對話框使用完整的 countries/cities 列表（上面已載入）
+  const countries = allCountries
+  const cities = allCities
 
   const getRegionsByCountry = (countryId: string) => {
     return regions.filter(r => r.country_id === countryId)

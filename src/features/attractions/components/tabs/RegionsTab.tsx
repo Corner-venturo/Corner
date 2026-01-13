@@ -1,74 +1,37 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+/**
+ * RegionsTab - 地區管理標籤頁
+ *
+ * [Refactored] 使用 @/data hooks 取代直接 Supabase 查詢
+ * - useCountries: 國家列表
+ * - useRegions: 地區列表
+ * - useCities: 城市列表
+ */
+
+import { useState, useMemo } from 'react'
 import { Check } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { useCountries, useRegions, useCities } from '@/data'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { logger } from '@/lib/utils/logger'
 
-interface Country {
-  id: string
-  name: string
-  name_en: string
-  code: string | null
-  has_regions: boolean | null
-  display_order: number | null
-  is_active: boolean | null
-}
-
-interface Region {
-  id: string
-  country_id: string
-  name: string
-  name_en: string | null
-  description: string | null
-  display_order: number | null
-  is_active: boolean | null
-}
-
-interface City {
-  id: string
-  country_id: string
-  region_id: string | null
-  name: string
-  name_en: string | null
-  is_active: boolean | null
-}
+// 使用 @/data 中定義的型別
+type Country = NonNullable<ReturnType<typeof useCountries>['items']>[number]
+type Region = NonNullable<ReturnType<typeof useRegions>['items']>[number]
+type City = NonNullable<ReturnType<typeof useCities>['items']>[number]
 
 export default function RegionsTab() {
-  const [countries, setCountries] = useState<Country[]>([])
-  const [regions, setRegions] = useState<Region[]>([])
-  const [cities, setCities] = useState<City[]>([])
-  const [loading, setLoading] = useState(true)
+  // 使用 @/data hooks 載入資料（自動快取、去重、重試）
+  const { items: countries = [], loading: countriesLoading } = useCountries()
+  const { items: regions = [] } = useRegions()
+  const { items: cities = [] } = useCities()
+
+  const loading = countriesLoading
 
   // 城市管理視窗
   const [isCitiesDialogOpen, setIsCitiesDialogOpen] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
-
-  // 載入資料
-  const fetchData = async () => {
-    setLoading(true)
-    const [countriesRes, regionsRes, citiesRes] = await Promise.all([
-      supabase.from('countries').select('*').order('display_order'),
-      supabase.from('regions').select('*').order('country_id').order('display_order'),
-      supabase.from('cities').select('*').order('country_id').order('region_id').order('name'),
-    ])
-
-    if (countriesRes.error) logger.error('Error fetching countries:', countriesRes.error)
-    if (regionsRes.error) logger.error('Error fetching regions:', regionsRes.error)
-    if (citiesRes.error) logger.error('Error fetching cities:', citiesRes.error)
-
-    if (countriesRes.data) setCountries(countriesRes.data as Country[])
-    if (regionsRes.data) setRegions(regionsRes.data as Region[])
-    if (citiesRes.data) setCities(citiesRes.data as City[])
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   // 開啟城市管理視窗
   const handleOpenCitiesDialog = (country: Country) => {

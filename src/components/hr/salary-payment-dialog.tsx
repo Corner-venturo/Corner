@@ -57,13 +57,15 @@ export function SalaryPaymentDialog({ open, onOpenChange, employees, onSubmit }:
     return thursdays
   }, [])
 
-  // Filter active employees by workspace
+  // Filter active employees by workspace (exclude bots)
   const activeEmployees = useMemo(
     () =>
       employees
         .filter(emp => {
           // 過濾特殊帳號
           if (emp.employee_number === 'liao00') return false
+          // 過濾機器人
+          if (emp.employee_type === 'bot') return false
 
           // 只顯示同一個 workspace 的員工
           const isSameWorkspace = emp.workspace_id === currentUser?.workspace_id

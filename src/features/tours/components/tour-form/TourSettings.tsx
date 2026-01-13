@@ -17,13 +17,14 @@ interface TourSettingsProps {
 export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
   const { items: employees } = useEmployees()
 
-  // 篩選團控人員（roles 包含 'controller'）
+  // 篩選團控人員（roles 包含 'controller'，排除機器人）
   const controllers = useMemo(() => {
     const activeEmployees = employees.filter(emp => {
       const empWithSync = emp as EmployeeWithSync
       const notDeleted = !empWithSync._deleted
       const isActive = emp.status === 'active'
-      return notDeleted && isActive
+      const isNotBot = emp.employee_type !== 'bot'
+      return notDeleted && isActive && isNotBot
     })
 
     const controllerOnly = activeEmployees.filter(emp => emp.roles?.includes('controller'))

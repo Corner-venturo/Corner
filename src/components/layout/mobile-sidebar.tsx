@@ -54,10 +54,12 @@ const menuItems: MenuItem[] = [
   // 旅伴通訊已整合到工作頻道中，此路由暫時隱藏
   // { href: '/traveler-chat', label: '旅伴通訊', icon: MessageCircle, requiredPermission: 'workspace' },
   { href: '/todos', label: '待辦事項', icon: CheckSquare, requiredPermission: 'todos' },
-  { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
+  // 行程管理已整合到旅遊團中，從團的視角操作
+  // { href: '/itinerary', label: '行程管理', icon: Flag, requiredPermission: 'itinerary' },
   { href: '/tours', label: '旅遊團', icon: MapPin, requiredPermission: 'tours' },
   { href: '/orders', label: '訂單', icon: ShoppingCart, requiredPermission: 'orders' },
-  { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
+  // 報價單已整合到旅遊團中，從團的視角操作
+  // { href: '/quotes', label: '報價單', icon: Calculator, requiredPermission: 'quotes' },
   {
     href: '/finance',
     label: '財務系統',

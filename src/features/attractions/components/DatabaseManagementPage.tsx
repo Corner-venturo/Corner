@@ -1,14 +1,12 @@
 'use client'
 
-import { logger } from '@/lib/utils/logger'
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { MapPin, Star, Sparkles, Globe } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
 import { Combobox } from '@/components/ui/combobox'
-import { supabase } from '@/lib/supabase/client'
-import type { Country } from '@/stores/region-store'
+import { useCountries } from '@/data'
 
 // Lazy load tabs - 只有切換到該 tab 才載入組件
 const RegionsTab = lazy(() => import('./tabs/RegionsTab'))
@@ -30,30 +28,8 @@ export default function DatabaseManagementPage() {
   const [selectedCountry, setSelectedCountry] = useState('')
   const { openAdd, isAddOpen, closeAdd, initialFormData } = useAttractionsDialog()
 
-  // 地區資料 - 只載入國家列表
-  const [countries, setCountries] = useState<Country[]>([])
-
-  // 只載入國家列表（不載入地區和城市）
-  useEffect(() => {
-    const loadCountries = async () => {
-      try {
-        const { data, error } = await supabase.from('countries').select('*').order('usage_count', { ascending: false })
-
-        if (error) {
-          logger.error('Error loading countries:', error)
-          return
-        }
-
-        if (data) {
-          logger.log('Loaded countries:', data.length)
-          setCountries(data as Country[])
-        }
-      } catch (err) {
-        logger.error('Exception loading countries:', err)
-      }
-    }
-    loadCountries().catch(err => logger.error('載入國家失敗:', err))
-  }, [])
+  // 使用 @/data hook 載入國家列表（自動快取、去重）
+  const { items: countries = [] } = useCountries()
 
   // 當切換 tab 時，標記該 tab 已載入
   const handleTabChange = (tab: string) => {
