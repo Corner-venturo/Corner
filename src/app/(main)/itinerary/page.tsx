@@ -13,7 +13,8 @@ import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useItineraries, useEmployees, useQuotes, useTours } from '@/hooks/cloud-hooks'
-import { useCountries, useCities } from '@/data'
+// 🔧 優化：移除 useCountries/useCities，Itinerary 已有 denormalized 欄位
+import { useCountries } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores'
 import type { Itinerary } from '@/stores/types'
@@ -36,8 +37,8 @@ export default function ItineraryPage() {
   const { items: tours } = useTours()
   const { user } = useAuthStore()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
+  // 🔧 優化：countries 只用於新增對話框，cities 已不需要（Itinerary 有 denormalized 欄位）
   const { items: countries } = useCountries()
-  const { items: cities } = useCities()
 
   const isSuperAdmin = user?.roles?.includes('super_admin') || user?.permissions?.includes('super_admin')
 
@@ -74,9 +75,8 @@ export default function ItineraryPage() {
     pageState,
   })
 
+  // 🔧 優化：移除 countries/cities 參數，Itinerary 已有 denormalized 欄位
   const { tableColumns } = useItineraryTableColumns({
-    countries,
-    cities,
     employees,
     tours,
     handleDelete: actions.handleDelete,

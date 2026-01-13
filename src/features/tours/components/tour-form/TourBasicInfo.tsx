@@ -58,11 +58,11 @@ export function TourBasicInfo({
               value: country,
               label: country,
             }))}
-            placeholder={destinationsLoading ? '載入中...' : '選擇國家...'}
-            emptyMessage="找不到國家"
+            placeholder="選擇國家..."
+            emptyMessage={destinationsLoading ? '載入中...' : '找不到國家'}
             showSearchIcon={true}
             showClearButton={true}
-            className="mt-1"
+            className="mt-1 w-full"
           />
         </div>
 
@@ -89,11 +89,11 @@ export function TourBasicInfo({
                       label: `${c.city} (${c.airport_code})`,
                     }))}
                     placeholder={!newTour.countryCode ? '請先選擇國家' : '選擇城市...'}
-                    emptyMessage="找不到城市"
+                    emptyMessage={destinationsLoading ? '載入中...' : '找不到城市，點 + 新增'}
                     showSearchIcon={true}
                     showClearButton={true}
                     disabled={!newTour.countryCode}
-                    className="flex-1"
+                    className="flex-1 min-w-0"
                   />
                 )
               })()}

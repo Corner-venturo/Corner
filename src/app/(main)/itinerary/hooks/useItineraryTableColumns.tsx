@@ -9,9 +9,8 @@ import type { Itinerary, Employee, Tour } from '@/stores/types'
 import { alertSuccess, alertError } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 
+// 🔧 優化：移除 countries/cities 參數，Itinerary 已有 denormalized 欄位
 interface UseItineraryTableColumnsProps {
-  countries: Array<{ id: string; name: string }>
-  cities: Array<{ id: string; name: string }>
   employees: Employee[]
   tours: Tour[]
   handleDelete: (id: string) => Promise<void>
@@ -25,8 +24,6 @@ interface UseItineraryTableColumnsProps {
 }
 
 export function useItineraryTableColumns({
-  countries,
-  cities,
   employees,
   tours,
   handleDelete,
@@ -38,19 +35,7 @@ export function useItineraryTableColumns({
   handleReopen,
   isItineraryClosed,
 }: UseItineraryTableColumnsProps) {
-  // 根據 ID 取得國家名稱
-  const getCountryName = useCallback((countryId?: string) => {
-    if (!countryId) return '-'
-    const country = countries.find(c => c.id === countryId)
-    return country?.name || countryId
-  }, [countries])
-
-  // 根據 ID 取得城市名稱
-  const getCityName = useCallback((cityId?: string) => {
-    if (!cityId) return '-'
-    const city = cities.find(c => c.id === cityId)
-    return city?.name || cityId
-  }, [cities])
+  // 🔧 優化：移除 getCountryName/getCityName，Itinerary 的 country/city 欄位已是名稱字串
 
   // 根據 created_by ID 查找員工名稱
   const getEmployeeName = useCallback((employeeId?: string) => {
@@ -118,7 +103,8 @@ export function useItineraryTableColumns({
         render: (_value, itinerary) => (
           <div className="flex items-center text-sm text-morandi-secondary">
             <MapPin size={14} className="mr-1" />
-            {getCountryName(itinerary.country)} · {getCityName(itinerary.city)}
+            {/* 🔧 優化：直接使用 denormalized 欄位，不需查詢 */}
+            {itinerary.country || '-'} · {itinerary.city || '-'}
           </div>
         ),
       },
@@ -329,13 +315,11 @@ export function useItineraryTableColumns({
         },
       },
     ],
-    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getCountryName, getCityName, getLinkedTourCode]
+    [handleDelete, handleOpenDuplicateDialog, handleArchive, handleUnarchive, handleSetTemplate, handleClose, handleReopen, isItineraryClosed, getEmployeeName, getLinkedTourCode]
   )
 
   return {
     tableColumns,
-    getCountryName,
-    getCityName,
     getEmployeeName,
     getLinkedTourCode,
   }

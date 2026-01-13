@@ -387,6 +387,8 @@ export const useQuoteState = () => {
   // 檢查是否為 404 狀態（資料已載入但找不到對應的 quote）
   const [notFound, setNotFound] = useState(false)
   const [hasLoaded, setHasLoaded] = useState(false)
+  // 🔧 修復：追蹤是否曾經找到過報價單，避免 SWR 刷新時短暫顯示 404
+  const hasFoundQuoteRef = useRef(false)
 
   useEffect(() => {
     // 當 quotes 已載入時設定 hasLoaded
@@ -396,13 +398,25 @@ export const useQuoteState = () => {
   }, [quotes.length])
 
   useEffect(() => {
-    // 只有當資料已載入且找不到對應的 quote 時，才設定 notFound
-    if (hasLoaded && !quote) {
-      setNotFound(true)
-    } else if (quote) {
+    // 如果找到報價單，記錄下來
+    if (quote) {
+      hasFoundQuoteRef.current = true
       setNotFound(false)
+      return
+    }
+
+    // 只有當資料已載入、找不到報價單、且從未找到過時，才設定 notFound
+    // 這樣可以避免 SWR 刷新時短暫顯示 404
+    if (hasLoaded && !quote && !hasFoundQuoteRef.current) {
+      setNotFound(true)
     }
   }, [quote, hasLoaded])
+
+  // 當 quote_id 改變時，重置 hasFoundQuoteRef
+  useEffect(() => {
+    hasFoundQuoteRef.current = false
+    setNotFound(false)
+  }, [quote_id])
 
   return {
     quote_id,

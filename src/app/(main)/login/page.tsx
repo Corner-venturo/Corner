@@ -51,7 +51,7 @@ export default function LoginPage() {
 
     const trimmedCode = code.trim().toLowerCase()
     if (!trimmedCode) {
-      setError('請輸入辦公室或廠商代號')
+      setError('請輸入公司代號')
       return
     }
 
@@ -93,20 +93,6 @@ export default function LoginPage() {
     }
   }
 
-  // 判斷代號類型（用於顯示提示）
-  const getCodeHint = () => {
-    const trimmedCode = code.trim().toUpperCase()
-    if (!trimmedCode) return null
-    if (trimmedCode === 'TP' || trimmedCode === 'TC') {
-      return { type: 'workspace', label: trimmedCode === 'TP' ? '台北辦公室' : '台中辦公室' }
-    }
-    if (trimmedCode.length >= 3) {
-      return { type: 'supplier', label: '廠商登入' }
-    }
-    return null
-  }
-
-  const codeHint = getCodeHint()
 
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-br from-morandi-light via-white to-morandi-container/20">
@@ -133,7 +119,7 @@ export default function LoginPage() {
           {/* 代號輸入 */}
           <div>
             <label className="block text-sm font-medium text-morandi-primary mb-2">
-              辦公室/廠商代號
+              公司
             </label>
             <div className="relative">
               <Building2
@@ -145,17 +131,12 @@ export default function LoginPage() {
                 value={code}
                 onChange={e => setCode(e.target.value.toUpperCase())}
                 className="pl-10 uppercase"
-                placeholder="例：TP、TC、HTL01"
+                placeholder="輸入公司代號"
                 required
                 autoComplete="organization"
                 autoFocus
               />
             </div>
-            {codeHint && (
-              <p className="mt-1 text-xs text-morandi-secondary">
-                {codeHint.type === 'workspace' ? '🏢' : '🏭'} {codeHint.label}
-              </p>
-            )}
           </div>
 
           {/* 帳號 */}
@@ -230,13 +211,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        {/* 提示 */}
-        <div className="mt-6 pt-4 border-t border-border/50">
-          <p className="text-xs text-morandi-secondary text-center">
-            員工請輸入辦公室代號（TP/TC）+ 員工編號<br />
-            廠商請輸入廠商代號 + 帳號
-          </p>
-        </div>
       </div>
     </div>
   )

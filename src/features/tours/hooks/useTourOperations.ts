@@ -19,14 +19,9 @@ interface TourActions {
   delete: (id: string) => Promise<boolean | void>
 }
 
-
+// 🔧 優化：移除不必要的外部依賴，改成內部直接查詢
 interface UseTourOperationsParams {
   actions: TourActions
-  addOrder: (data: CreateInput<Order>) => Promise<Order>
-  updateQuote: (id: string, data: Partial<Quote>) => Promise<void>
-  updateItinerary: (id: string, data: { tour_id?: undefined; tour_code?: undefined; status?: '提案' | '進行中' }) => Promise<unknown>
-  quotes: Quote[]
-  itineraries: { id: string; tour_id?: string | null }[]
   resetForm: () => void
   closeDialog: () => void
   setSubmitting: (value: boolean) => void
@@ -34,6 +29,8 @@ interface UseTourOperationsParams {
   dialogType: string
   dialogData: Tour | null
   workspaceId?: string
+  // 🔧 保留 fromQuoteId 更新功能（可選）
+  onQuoteLinked?: (quoteId: string, tourId: string) => void
 }
 
 export function useTourOperations(params: UseTourOperationsParams) {
@@ -58,11 +55,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
   const {
     actions,
-    addOrder,
-    updateQuote,
-    updateItinerary,
-    quotes,
-    itineraries,
     resetForm,
     closeDialog,
     setSubmitting,
@@ -70,6 +62,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
     dialogType,
     dialogData,
     workspaceId,
+    onQuoteLinked,
   } = params
 
   const handleAddTour = useCallback(
@@ -204,11 +197,13 @@ export function useTourOperations(params: UseTourOperationsParams) {
 
         // If contact person is filled, also add order
         if (newOrder.contact_person?.trim()) {
-          // 新建旅遊團的第一張訂單，編號格式: {團號}-O01
+          // 🔧 優化：直接用 supabase insert，不依賴外部 hook
           const order_number = `${code}-O01`
           const memberCount = newOrder.member_count || 1
           const totalAmount = newOrder.total_amount || newTour.price * memberCount
+          const now = new Date().toISOString()
           const orderData = {
+            id: crypto.randomUUID(),
             order_number,
             tour_id: createdTour.id,
             code: code,
@@ -221,14 +216,28 @@ export function useTourOperations(params: UseTourOperationsParams) {
             total_amount: totalAmount,
             paid_amount: 0,
             remaining_amount: totalAmount,
+            workspace_id: workspaceId,
+            created_at: now,
+            updated_at: now,
           }
 
-          addOrder(orderData as Parameters<typeof addOrder>[0])
+          const { error: orderError } = await supabase.from('orders').insert(orderData)
+          if (orderError) {
+            logger.warn('建立訂單失敗:', orderError.message)
+          }
         }
 
         // If created from quote, update quote's tourId
         if (fromQuoteId) {
-          updateQuote(fromQuoteId, { tour_id: createdTour.id })
+          // 🔧 優化：直接用 supabase update
+          const { error: quoteError } = await supabase
+            .from('quotes')
+            .update({ tour_id: createdTour.id, updated_at: new Date().toISOString() })
+            .eq('id', fromQuoteId)
+          if (quoteError) {
+            logger.warn('更新報價單失敗:', quoteError.message)
+          }
+          onQuoteLinked?.(fromQuoteId, createdTour.id)
           router.replace('/tours')
         }
 
@@ -249,8 +258,6 @@ export function useTourOperations(params: UseTourOperationsParams) {
     },
     [
       actions,
-      addOrder,
-      updateQuote,
       resetForm,
       closeDialog,
       setSubmitting,
@@ -261,6 +268,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
       incrementCountryUsage,
       incrementCityUsage,
       workspaceId,
+      onQuoteLinked,
     ]
   )
 
@@ -314,27 +322,47 @@ export function useTourOperations(params: UseTourOperationsParams) {
           logger.warn('刪除訂單失敗:', JSON.stringify(ordError))
         }
 
-        // 7. 斷開關聯的報價單
-        const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
-        for (const quote of linkedQuotes) {
-          await updateQuote(quote.id, { tour_id: undefined, status: 'proposed' })
+        // 7. 🔧 優化：直接查詢並斷開關聯的報價單
+        const { data: linkedQuotes } = await supabase
+          .from('quotes')
+          .select('id')
+          .eq('tour_id', tour.id)
+
+        if (linkedQuotes && linkedQuotes.length > 0) {
+          const { error: quoteError } = await supabase
+            .from('quotes')
+            .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
+            .eq('tour_id', tour.id)
+          if (quoteError) {
+            logger.warn('斷開報價單失敗:', quoteError.message)
+          }
         }
 
-        // 8. 斷開關聯的行程表
-        const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
-        for (const itinerary of linkedItineraries) {
-          await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined, status: '提案' })
+        // 8. 🔧 優化：直接查詢並斷開關聯的行程表
+        const { data: linkedItineraries } = await supabase
+          .from('itineraries')
+          .select('id')
+          .eq('tour_id', tour.id)
+
+        if (linkedItineraries && linkedItineraries.length > 0) {
+          const { error: itinError } = await supabase
+            .from('itineraries')
+            .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
+            .eq('tour_id', tour.id)
+          if (itinError) {
+            logger.warn('斷開行程表失敗:', itinError.message)
+          }
         }
 
         // 9. 刪除旅遊團
         await actions.delete(tour.id)
 
-        logger.info(`已刪除旅遊團 ${tour.code}，包含相關訂單、請款單、收款單，並斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
+        logger.info(`已刪除旅遊團 ${tour.code}，包含相關訂單、請款單、收款單，並斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
       } catch (err) {
         logger.error('刪除旅遊團失敗:', JSON.stringify(err, null, 2))
       }
     },
-    [actions, quotes, itineraries, updateQuote, updateItinerary]
+    [actions]
   )
 
 
@@ -343,19 +371,39 @@ export function useTourOperations(params: UseTourOperationsParams) {
       try {
         // 封存時斷開連結，解除封存不需要
         if (!tour.archived) {
-          // 1. 斷開關聯的報價單
-          const linkedQuotes = quotes.filter(q => q.tour_id === tour.id)
-          for (const quote of linkedQuotes) {
-            await updateQuote(quote.id, { tour_id: undefined, status: 'proposed' })
+          // 1. 🔧 優化：直接查詢並斷開關聯的報價單
+          const { data: linkedQuotes } = await supabase
+            .from('quotes')
+            .select('id')
+            .eq('tour_id', tour.id)
+
+          if (linkedQuotes && linkedQuotes.length > 0) {
+            const { error: quoteError } = await supabase
+              .from('quotes')
+              .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
+              .eq('tour_id', tour.id)
+            if (quoteError) {
+              logger.warn('斷開報價單失敗:', quoteError.message)
+            }
           }
 
-          // 2. 斷開關聯的行程表
-          const linkedItineraries = itineraries.filter(i => i.tour_id === tour.id)
-          for (const itinerary of linkedItineraries) {
-            await updateItinerary(itinerary.id, { tour_id: undefined, tour_code: undefined, status: '提案' })
+          // 2. 🔧 優化：直接查詢並斷開關聯的行程表
+          const { data: linkedItineraries } = await supabase
+            .from('itineraries')
+            .select('id')
+            .eq('tour_id', tour.id)
+
+          if (linkedItineraries && linkedItineraries.length > 0) {
+            const { error: itinError } = await supabase
+              .from('itineraries')
+              .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
+              .eq('tour_id', tour.id)
+            if (itinError) {
+              logger.warn('斷開行程表失敗:', itinError.message)
+            }
           }
 
-          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes.length} 個報價單和 ${linkedItineraries.length} 個行程表的連結`)
+          logger.info(`封存旅遊團 ${tour.code}，斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
         }
 
         // 封存時記錄原因，解除封存時清除原因
@@ -368,7 +416,7 @@ export function useTourOperations(params: UseTourOperationsParams) {
         logger.error('封存/解封旅遊團失敗:', err)
       }
     },
-    [actions, quotes, itineraries, updateQuote, updateItinerary]
+    [actions]
   )
 
   return {

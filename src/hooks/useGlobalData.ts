@@ -69,6 +69,9 @@ const DATA_CONFIG: Record<DataKey, GlobalDataConfig> = {
   },
 }
 
+// 統一快取 key 前綴（與 @/data 和 @/hooks/createCloudHook 共用）
+const CACHE_KEY_PREFIX = 'entity'
+
 // SWR 配置：統一快取策略
 const SWR_CONFIG = {
   revalidateOnFocus: false,      // 切換 tab 不重新載入
@@ -113,7 +116,8 @@ export function useToursGlobal() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const hasHydrated = useAuthStore(state => state._hasHydrated)
 
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? 'global-tours' : null
+  // 統一快取 key（與其他 hooks 共用）
+  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:tours:list` : null
 
   const { data, error, isLoading, mutate } = useSWR<Tour[]>(
     swrKey,
@@ -137,7 +141,8 @@ export function useToursSlimGlobal() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const hasHydrated = useAuthStore(state => state._hasHydrated)
 
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? 'global-tours-slim' : null
+  // 統一快取 key（與其他 hooks 共用）
+  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:tours:slim` : null
 
   const { data, error, isLoading, mutate } = useSWR<Partial<Tour>[]>(
     swrKey,
@@ -161,7 +166,8 @@ export function useOrdersGlobal() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const hasHydrated = useAuthStore(state => state._hasHydrated)
 
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? 'global-orders' : null
+  // 統一快取 key（與其他 hooks 共用）
+  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:orders:list` : null
 
   const { data, error, isLoading, mutate } = useSWR<Order[]>(
     swrKey,
@@ -185,7 +191,8 @@ export function useOrdersSlimGlobal() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const hasHydrated = useAuthStore(state => state._hasHydrated)
 
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? 'global-orders-slim' : null
+  // 統一快取 key（與其他 hooks 共用）
+  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:orders:slim` : null
 
   const { data, error, isLoading, mutate } = useSWR<Partial<Order>[]>(
     swrKey,
@@ -307,14 +314,15 @@ export function usePreloadCommonData() {
   const isReady = hasHydrated && isAuthenticated && user?.id
 
   // 預載入精簡版資料（背景執行，不阻塞 UI）
+  // 使用統一快取 key，預載入後其他 hooks 可直接使用快取
   useSWR(
-    isReady ? 'preload-tours-slim' : null,
+    isReady ? `${CACHE_KEY_PREFIX}:tours:slim` : null,
     () => fetchData<Partial<Tour>>(DATA_CONFIG.toursSlim),
     { ...SWR_CONFIG, revalidateOnMount: true }
   )
 
   useSWR(
-    isReady ? 'preload-orders-slim' : null,
+    isReady ? `${CACHE_KEY_PREFIX}:orders:slim` : null,
     () => fetchData<Partial<Order>>(DATA_CONFIG.ordersSlim),
     { ...SWR_CONFIG, revalidateOnMount: true }
   )

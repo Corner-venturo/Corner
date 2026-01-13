@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,6 @@ import {
   Clock,
   Eye,
 } from 'lucide-react'
-import { useProposalPackages } from '@/hooks/cloud-hooks'
 import type { Tour } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
@@ -42,40 +41,25 @@ export function TourItineraryDialog({
   onClose,
   tour,
 }: TourItineraryDialogProps) {
-  // Proposal Packages（用於取得 timeline_data）
-  const { items: proposalPackages, fetchAll: fetchProposalPackages } = useProposalPackages()
-
   // 狀態
   const [isCreatingPackage, setIsCreatingPackage] = useState(false)
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
-  const [dynamicPackage, setDynamicPackage] = useState<ProposalPackage | null>(null)
+  const [tourProposalPackage, setTourProposalPackage] = useState<ProposalPackage | null>(null)
 
-  // 載入資料
-  useEffect(() => {
-    if (isOpen) {
-      fetchProposalPackages()
-    }
-     
-  }, [isOpen])
+  // 🔧 優化：不在打開時查詢，只有用戶點擊時才載入
+  // 對話框只是顯示兩個選項按鈕，不需要等資料
 
-  // 取得 tour 關聯的 proposal_package
-  const tourProposalPackage = useMemo(() => {
-    if (dynamicPackage) return dynamicPackage
-    if (!tour.proposal_package_id) return null
-    return proposalPackages.find(p => p.id === tour.proposal_package_id) || null
-  }, [tour, proposalPackages, dynamicPackage])
+  // 🔧 簡化：只用 tour.proposal_package_id 判斷是否已有行程資料
+  // 不需要載入整個 package 來判斷
+  const hasExistingPackage = !!tour.proposal_package_id
 
-  // 檢查行程表類型
+  // 這些只有在 tourProposalPackage 載入後才有意義（用於子 Dialog）
   const itineraryType = tourProposalPackage?.itinerary_type || null
-
-  // 檢查是否有時間軸行程表（timeline_data）
   const hasTimelineData = itineraryType === 'timeline' &&
     tourProposalPackage?.timeline_data &&
     typeof tourProposalPackage.timeline_data === 'object' &&
     Object.keys(tourProposalPackage.timeline_data).length > 0
-
-  // 檢查是否有快速行程表（itinerary record）
   const hasQuickItinerary = itineraryType === 'simple' || !!tourProposalPackage?.itinerary_id
 
   // 為 PackageItineraryDialog 建立模擬 Proposal 物件（使用 Tour 資料）
@@ -96,8 +80,24 @@ export function TourItineraryDialog({
 
   // 為旅遊團建立或取得 proposal_package
   const getOrCreatePackageForTour = async (): Promise<ProposalPackage | null> => {
-    if (tourProposalPackage) return tourProposalPackage
+    // 🔧 修正：每次都從資料庫查詢以確保資料是最新的
+    // 避免使用過時的快取資料（例如之前 package 還沒有 itinerary_id 時的快取）
 
+    // 如果 tour 有 proposal_package_id，直接查詢
+    if (tour.proposal_package_id) {
+      const { data: existingPkg, error: pkgError } = await supabase
+        .from('proposal_packages')
+        .select('*')
+        .eq('id', tour.proposal_package_id)
+        .single()
+
+      if (!pkgError && existingPkg) {
+        setTourProposalPackage(existingPkg as ProposalPackage)
+        return existingPkg as ProposalPackage
+      }
+    }
+
+    // 沒有現有 package，建立新的
     setIsCreatingPackage(true)
     try {
       let days = 5
@@ -146,7 +146,7 @@ export function TourItineraryDialog({
         logger.error('更新旅遊團關聯失敗:', updateError)
       }
 
-      setDynamicPackage(newPackage as ProposalPackage)
+      setTourProposalPackage(newPackage as ProposalPackage)
       return newPackage as ProposalPackage
     } catch (err) {
       logger.error('建立 package 錯誤:', err)
@@ -159,19 +159,46 @@ export function TourItineraryDialog({
 
   // 選擇快速行程表（PackageItineraryDialog）
   const handleSelectQuickItinerary = async () => {
-    const pkg = await getOrCreatePackageForTour()
-    if (pkg) {
-      setPackageItineraryDialogOpen(true)
+    setIsCreatingPackage(true)
+    try {
+      const pkg = await getOrCreatePackageForTour()
+      if (pkg) {
+        // 🔧 確保 state 更新後再打開 Dialog
+        setTourProposalPackage(pkg)
+        // 使用 setTimeout 確保 state 已更新
+        setTimeout(() => setPackageItineraryDialogOpen(true), 0)
+      }
+    } finally {
+      setIsCreatingPackage(false)
     }
   }
 
   // 選擇時間軸行程表
   const handleSelectTimelineItinerary = async () => {
-    const pkg = await getOrCreatePackageForTour()
-    if (pkg) {
-      setTimelineDialogOpen(true)
+    setIsCreatingPackage(true)
+    try {
+      const pkg = await getOrCreatePackageForTour()
+      if (pkg) {
+        setTourProposalPackage(pkg)
+        setTimeout(() => setTimelineDialogOpen(true), 0)
+      }
+    } finally {
+      setIsCreatingPackage(false)
     }
   }
+
+  // 刷新當前 package 資料
+  const refreshPackage = useCallback(async () => {
+    if (!tourProposalPackage?.id) return
+    const { data, error } = await supabase
+      .from('proposal_packages')
+      .select('*')
+      .eq('id', tourProposalPackage.id)
+      .single()
+    if (!error && data) {
+      setTourProposalPackage(data as ProposalPackage)
+    }
+  }, [tourProposalPackage?.id])
 
   // 儲存時間軸資料
   const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
@@ -195,12 +222,12 @@ export function TourItineraryDialog({
         await syncTimelineToQuote(tourProposalPackage.quote_id, timelineData)
       }
 
-      fetchProposalPackages()
+      refreshPackage()
     } catch (error) {
       logger.error('儲存時間軸資料失敗:', error)
       throw error
     }
-  }, [tourProposalPackage, fetchProposalPackages])
+  }, [tourProposalPackage, refreshPackage])
 
   // 任何子 Dialog 開啟時，主 Dialog 關閉
   const hasChildDialogOpen = timelineDialogOpen || packageItineraryDialogOpen
@@ -225,17 +252,16 @@ export function TourItineraryDialog({
               {isCreatingPackage ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-morandi-secondary" />
+                  <span className="ml-2 text-sm text-morandi-secondary">處理中...</span>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* 已有行程表時顯示 */}
-                  {(hasQuickItinerary || hasTimelineData) && (
+                  {/* 已有行程資料時顯示 */}
+                  {hasExistingPackage && (
                     <div className="p-3 rounded-lg border border-morandi-gold/30 bg-morandi-gold/5 mb-4">
                       <div className="flex items-center gap-2 text-sm text-morandi-primary">
                         <Eye className="w-4 h-4 text-morandi-gold" />
-                        <span>
-                          已有{hasQuickItinerary ? '快速行程表' : '時間軸行程表'}，點擊下方按鈕編輯
-                        </span>
+                        <span>已有行程資料，點擊下方按鈕查看或編輯</span>
                       </div>
                     </div>
                   )}
@@ -257,11 +283,6 @@ export function TourItineraryDialog({
                       <p className="text-xs text-morandi-secondary">
                         完整的行程編輯器，支援景點、餐食、住宿等詳細設定
                       </p>
-                      {hasQuickItinerary && (
-                        <div className="mt-2 text-xs text-morandi-gold">
-                          ✓ 已建立
-                        </div>
-                      )}
                     </button>
 
                     {/* 時間軸行程表 */}
@@ -281,11 +302,6 @@ export function TourItineraryDialog({
                       <p className="text-xs text-morandi-secondary">
                         以時間軸方式編輯每日行程，適合快速建立
                       </p>
-                      {hasTimelineData && (
-                        <div className="mt-2 text-xs text-morandi-gold">
-                          ✓ 已建立
-                        </div>
-                      )}
                     </button>
                   </div>
                 </div>
@@ -302,9 +318,7 @@ export function TourItineraryDialog({
           onClose={() => setPackageItineraryDialogOpen(false)}
           pkg={tourProposalPackage}
           proposal={fakeProposal}
-          onItineraryCreated={() => {
-            fetchProposalPackages()
-          }}
+          onItineraryCreated={refreshPackage}
         />
       )}
 

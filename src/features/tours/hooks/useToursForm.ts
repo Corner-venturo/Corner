@@ -89,7 +89,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
       departure_date: '',
       return_date: '',
       price: 0,
-      status: '提案',
+      status: '進行中',  // 開團預設為進行中
       isSpecial: false,
       max_participants: 20,
       description: '',
@@ -226,7 +226,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
           departure_date: pkg.start_date || proposal.expected_start_date || '',
           return_date: pkg.end_date || proposal.expected_end_date || '',
           price: 0,
-          status: '提案',
+          status: '進行中',  // 開團後直接進入進行中狀態
           isSpecial: false,
           max_participants: pkg.group_size || 20,
           description: '',

@@ -10,7 +10,8 @@ import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 // 🔧 優化：移除 useRegionsStore import（不再需要載入 countries/cities）
-import { useOrdersListSlim, useQuotesListSlim, useItinerariesListSlim } from '@/hooks/useListSlim'
+// 🔧 優化：移除 useOrdersListSlim 和 useItinerariesListSlim（useTourOperations 已內部處理）
+import { useQuotesListSlim } from '@/hooks/useListSlim'
 import { useDialog } from '@/hooks/useDialog'
 import { useTourOperations } from '../hooks/useTourOperations'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
@@ -38,7 +39,7 @@ import { useProposals } from '@/hooks/cloud-hooks'
 import { createProposal, updateProposal, archiveProposal, convertToTour } from '@/services/proposal.service'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { ArchiveProposalDialog } from '@/features/proposals/components/ArchiveProposalDialog'
-import { useProposalPackages } from '@/hooks/cloud-hooks'
+// 🔧 優化：移除 useProposalPackages import，改為刪除時才查詢
 import type { CreateProposalData, UpdateProposalData, Proposal } from '@/types/proposal.types'
 
 const TourDetailDialog = dynamic(
@@ -66,11 +67,10 @@ export const ToursPage: React.FC = () => {
   const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
 
-  const { items: orders, create: addOrder } = useOrdersListSlim()
-  const { items: quotes, update: updateQuote } = useQuotesListSlim()
-  const { items: itineraries, update: updateItinerary } = useItinerariesListSlim()
+  // 🔧 優化：只保留 quotes（TourActionButtons 需要），其他由 useTourOperations 內部處理
+  const { items: quotes } = useQuotesListSlim()
   const { items: proposals, fetchAll: refreshProposals } = useProposals()
-  const { items: proposalPackages, fetchAll: refreshProposalPackages } = useProposalPackages()
+  // 🔧 優化：移除 useProposalPackages，改為刪除提案時才查詢
   // 🔧 優化：移除 useRegionsStore，不需要載入 countries/cities
   // 提案和旅遊團都有 destination/location 欄位，不需要 ID→名稱轉換
   const { dialog, closeDialog, openDialog } = useDialog()
@@ -144,13 +144,9 @@ export const ToursPage: React.FC = () => {
     clearProposalConvertData,
   } = useToursForm({ state, openDialog, dialog })
 
+  // 🔧 優化：useTourOperations 不再需要外部傳入 quotes/itineraries/addOrder 等
   const operations = useTourOperations({
     actions,
-    addOrder: addOrder as never,
-    updateQuote,
-    updateItinerary,
-    quotes,
-    itineraries,
     resetForm,
     closeDialog,
     setSubmitting,
@@ -236,8 +232,15 @@ export const ToursPage: React.FC = () => {
   // 刪除提案
   const handleDeleteProposal = useCallback(
     async (proposal: Proposal) => {
-      const packages = proposalPackages.filter(p => p.proposal_id === proposal.id)
-      const packageInfo = packages.length > 0 ? `\n\n注意：此提案有 ${packages.length} 個版本，將一併刪除` : ''
+      // 🔧 優化：刪除時才查詢套件，不預先載入
+      const { supabase } = await import('@/lib/supabase/client')
+      const { data: packages } = await supabase
+        .from('proposal_packages')
+        .select('id')
+        .eq('proposal_id', proposal.id)
+
+      const packageCount = packages?.length || 0
+      const packageInfo = packageCount > 0 ? `\n\n注意：此提案有 ${packageCount} 個版本，將一併刪除` : ''
 
       const confirmed = await confirm(`確定要刪除提案「${proposal.title}」嗎？${packageInfo}`, {
         type: 'warning',
@@ -246,8 +249,6 @@ export const ToursPage: React.FC = () => {
 
       if (confirmed) {
         try {
-          const { supabase } = await import('@/lib/supabase/client')
-
           // 先解除旅遊團的提案關聯（避免外鍵衝突）
           logger.log('[ToursPage] 解除旅遊團關聯...')
           const { error: tourUnlinkError } = await supabase
@@ -271,7 +272,7 @@ export const ToursPage: React.FC = () => {
           }
 
           // 取得所有套件 ID
-          const packageIds = packages.map(p => p.id)
+          const packageIds = packages?.map(p => p.id) || []
 
           if (packageIds.length > 0) {
             // 解除報價單的套件關聯
@@ -297,7 +298,7 @@ export const ToursPage: React.FC = () => {
             }
 
             // 刪除相關套件
-            logger.log('[ToursPage] 正在刪除套件...', packages.length)
+            logger.log('[ToursPage] 正在刪除套件...', packageIds.length)
             const { error: pkgError } = await supabase
               .from('proposal_packages' as 'notes')
               .delete()
@@ -318,7 +319,6 @@ export const ToursPage: React.FC = () => {
 
           logger.log('[ToursPage] 刪除成功，重新整理列表...')
           refreshProposals()
-          refreshProposalPackages()
           setProposalDetailDialogOpen(false)
           setSelectedProposal(null)
           await alert('提案已刪除', 'success')
@@ -329,7 +329,7 @@ export const ToursPage: React.FC = () => {
         }
       }
     },
-    [proposalPackages, refreshProposals, refreshProposalPackages]
+    [refreshProposals]
   )
 
   const { renderActions } = useTourActionButtons({
@@ -485,13 +485,8 @@ export const ToursPage: React.FC = () => {
     handleEditDialogEffect()
   }, [handleEditDialogEffect])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-morandi-secondary">載入中...</div>
-      </div>
-    )
-  }
+  // 移除完整頁面載入阻擋，改為讓表格結構先顯示
+  // loading 狀態由 TourTable 內部處理
 
   return (
     <div className="h-full flex flex-col">
@@ -504,7 +499,7 @@ export const ToursPage: React.FC = () => {
           setCurrentPage(1)
         }}
         onAddProposal={() => setProposalDialogOpen(true)}
-        onAddTour={() => openDialog('create')}
+        onAddTour={() => handleOpenCreateDialog()}
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">

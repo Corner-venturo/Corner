@@ -56,6 +56,11 @@ ON public.background_tasks(type);
 ALTER TABLE public.background_tasks ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策：用戶只能看到自己 workspace 的任務
+DROP POLICY IF EXISTS "background_tasks_select" ON public.background_tasks;
+DROP POLICY IF EXISTS "background_tasks_insert" ON public.background_tasks;
+DROP POLICY IF EXISTS "background_tasks_update" ON public.background_tasks;
+DROP POLICY IF EXISTS "background_tasks_delete" ON public.background_tasks;
+
 CREATE POLICY "background_tasks_select" ON public.background_tasks FOR SELECT
 USING (
     workspace_id = get_current_user_workspace()

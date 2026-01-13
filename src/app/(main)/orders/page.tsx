@@ -6,7 +6,7 @@ import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { QuickReceipt } from '@/components/todos/quick-actions/quick-receipt'
 import { useOrdersListSlim, useToursListSlim } from '@/hooks/useListSlim'
-import { useMemberActions } from '@/hooks/useMemberActions'
+// 🔧 優化：移除 useMemberActions，此頁面沒有用到
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
@@ -19,7 +19,6 @@ export default function OrdersPage() {
   const router = useRouter()
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: tours } = useToursListSlim()
-  const { create: addMember } = useMemberActions()
   const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
   const [tourFilter, _setTourFilter] = useState('')

@@ -15,8 +15,13 @@ import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 // Supabase Insert 類型
 type TodoInsert = Database['public']['Tables']['todos']['Insert']
 
-// SWR key
-const TODOS_KEY = 'todos'
+/**
+ * 生成 SWR key（包含 workspaceId 確保不同 workspace 的資料分開快取）
+ */
+function getTodosKey(workspaceId: string | null): string | null {
+  if (!workspaceId) return null
+  return `entity:todos:list:${workspaceId}`
+}
 
 /**
  * 生成 UUID（相容不支援 crypto.randomUUID 的瀏覽器）
@@ -41,16 +46,26 @@ function generateUUID(): string {
 
 // ===== 主要 Hook =====
 export function useTodos() {
+  // 取得當前 workspace ID
+  const workspaceId = getCurrentWorkspaceId()
+  const swrKey = getTodosKey(workspaceId)
+
   // 使用 DAL 的 getAllTodos 作為 SWR fetcher
   // Todos 使用 REALTIME 策略（即時更新）
   const { data: todos = [], error, isLoading, isValidating } = useSWR<Todo[]>(
-    TODOS_KEY,
-    getAllTodos,
+    swrKey,
+    // SWR fetcher 接收 key，我們需要從 key 中提取 workspaceId
+    async () => {
+      if (!workspaceId) return []
+      return getAllTodos(workspaceId)
+    },
     CACHE_STRATEGY.REALTIME
   )
 
   // Realtime 訂閱：當其他人新增/修改/刪除待辦時，自動更新
   useEffect(() => {
+    if (!swrKey) return
+
     const channel = supabase
       .channel('todos_realtime')
       .on(
@@ -59,7 +74,7 @@ export function useTodos() {
         (payload) => {
           logger.log('[Todos] Realtime 收到更新:', payload.eventType)
           // 重新抓取資料
-          mutate(TODOS_KEY)
+          mutate(swrKey)
         }
       )
       .subscribe()
@@ -67,7 +82,7 @@ export function useTodos() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [swrKey])
 
   // 新增待辦
   const create = async (todoData: Omit<Todo, 'id' | 'created_at' | 'updated_at'>) => {
@@ -92,7 +107,7 @@ export function useTodos() {
     logger.log('[useTodos] 新增待辦:', { title: newTodo.title, creator: newTodo.creator, workspace_id })
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
-    mutate(TODOS_KEY, (currentTodos: Todo[] | undefined) => [...(currentTodos || []), newTodo], false)
+    mutate(swrKey, (currentTodos: Todo[] | undefined) => [...(currentTodos || []), newTodo], false)
 
     try {
       // 確保 workspace_id 存在（Supabase 必填欄位）
@@ -113,12 +128,12 @@ export function useTodos() {
       if (error) throw error
 
       // 成功後重新驗證
-      mutate(TODOS_KEY)
+      mutate(swrKey)
       return newTodo
     } catch (err) {
       // 失敗時回滾
       logger.error('[useTodos] 新增失敗:', err)
-      mutate(TODOS_KEY)
+      mutate(swrKey)
       throw err
     }
   }
@@ -132,7 +147,7 @@ export function useTodos() {
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
-      TODOS_KEY,
+      swrKey,
       (currentTodos: Todo[] | undefined) => (currentTodos || []).map(t => (t.id === id ? { ...t, ...updatedTodo } : t)),
       false
     )
@@ -144,9 +159,9 @@ export function useTodos() {
         .eq('id', id)
       if (error) throw error
 
-      mutate(TODOS_KEY)
+      mutate(swrKey)
     } catch (err) {
-      mutate(TODOS_KEY)
+      mutate(swrKey)
       throw err
     }
   }
@@ -155,7 +170,7 @@ export function useTodos() {
   const remove = async (id: string) => {
     // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(
-      TODOS_KEY,
+      swrKey,
       (currentTodos: Todo[] | undefined) => (currentTodos || []).filter(t => t.id !== id),
       false
     )
@@ -164,15 +179,15 @@ export function useTodos() {
       const { error } = await supabase.from('todos').delete().eq('id', id)
       if (error) throw error
 
-      mutate(TODOS_KEY)
+      mutate(swrKey)
     } catch (err) {
-      mutate(TODOS_KEY)
+      mutate(swrKey)
       throw err
     }
   }
 
   // 重新載入
-  const refresh = () => mutate(TODOS_KEY)
+  const refresh = () => mutate(swrKey)
 
   return {
     // 資料

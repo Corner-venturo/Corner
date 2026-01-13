@@ -1,9 +1,11 @@
 /**
  * useTourDestinations - 管理開團目的地
  * 國家從 countries 表讀取，機場代碼從 tour_destinations 表讀取
+ * 使用 SWR 快取，避免每次開啟 Dialog 都重新載入
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
+import useSWR, { mutate } from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useAuthStore } from '@/stores/auth-store'
@@ -23,47 +25,69 @@ interface Country {
   usage_count?: number | null
 }
 
+// SWR 快取 key
+const COUNTRIES_CACHE_KEY = 'entity:countries:list'
+const DESTINATIONS_CACHE_KEY = 'entity:tour_destinations:list'
+
+// SWR 配置：靜態資料，較長的快取時間
+const SWR_CONFIG = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: true,
+  dedupingInterval: 60000, // 1 分鐘內不重複請求
+}
+
+// Fetchers
+async function fetchCountries(): Promise<Country[]> {
+  const { data, error } = await supabase
+    .from('countries')
+    .select('id, name, name_en, usage_count')
+    .eq('is_active', true)
+    .order('usage_count', { ascending: false, nullsFirst: false })
+    .order('display_order', { ascending: true })
+    .order('name', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
+async function fetchDestinations(): Promise<TourDestination[]> {
+  const { data, error } = await supabase
+    .from('tour_destinations')
+    .select('*')
+    .order('country', { ascending: true })
+    .order('city', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
 export function useTourDestinations() {
   const user = useAuthStore(state => state.user)
-  const [countriesData, setCountriesData] = useState<Country[]>([])
-  const [destinations, setDestinations] = useState<TourDestination[]>([])
-  const [loading, setLoading] = useState(true)
 
-  // 載入國家和目的地資料
-  const fetchDestinations = useCallback(async () => {
-    setLoading(true)
-    try {
-      // 平行載入國家和開團目的地
-      const [countriesRes, destinationsRes] = await Promise.all([
-        supabase
-          .from('countries')
-          .select('id, name, name_en, usage_count')
-          .eq('is_active', true)
-          .order('usage_count', { ascending: false, nullsFirst: false })
-          .order('display_order', { ascending: true })
-          .order('name', { ascending: true }),
-        supabase
-          .from('tour_destinations')
-          .select('*')
-          .order('country', { ascending: true })
-          .order('city', { ascending: true }),
-      ])
+  // 使用 SWR 載入國家資料
+  const { data: countriesData = [], isLoading: countriesLoading } = useSWR<Country[]>(
+    COUNTRIES_CACHE_KEY,
+    fetchCountries,
+    SWR_CONFIG
+  )
 
-      if (countriesRes.error) throw countriesRes.error
-      if (destinationsRes.error) throw destinationsRes.error
+  // 使用 SWR 載入目的地資料
+  const { data: destinations = [], isLoading: destinationsLoading } = useSWR<TourDestination[]>(
+    DESTINATIONS_CACHE_KEY,
+    fetchDestinations,
+    SWR_CONFIG
+  )
 
-      setCountriesData(countriesRes.data || [])
-      setDestinations(destinationsRes.data || [])
-    } catch (error) {
-      logger.error('載入目的地失敗:', error)
-    } finally {
-      setLoading(false)
-    }
+  // 合併 loading 狀態
+  const loading = countriesLoading || destinationsLoading
+
+  // 重新載入資料
+  const refreshDestinations = useCallback(async () => {
+    await Promise.all([
+      mutate(COUNTRIES_CACHE_KEY),
+      mutate(DESTINATIONS_CACHE_KEY),
+    ])
   }, [])
-
-  useEffect(() => {
-    fetchDestinations()
-  }, [fetchDestinations])
 
   // 取得國家列表（從 countries 表，按使用次數排序）
   const countries = useMemo(() => {
@@ -115,7 +139,12 @@ export function useTourDestinations() {
 
         if (error) throw error
 
-        setDestinations(prev => [...prev, data])
+        // 使用 SWR mutate 更新快取
+        mutate(
+          DESTINATIONS_CACHE_KEY,
+          (current: TourDestination[] | undefined) => [...(current || []), data],
+          false
+        )
         return { success: true, data }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : '未知錯誤'
@@ -142,7 +171,8 @@ export function useTourDestinations() {
 
         if (error) throw error
 
-        await fetchDestinations()
+        // 使用 SWR mutate 重新載入
+        await mutate(DESTINATIONS_CACHE_KEY)
         return { success: true }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : '未知錯誤'
@@ -150,7 +180,7 @@ export function useTourDestinations() {
         return { success: false, error: errorMessage }
       }
     },
-    [fetchDestinations]
+    []
   )
 
   // 刪除目的地
@@ -164,7 +194,12 @@ export function useTourDestinations() {
 
         if (error) throw error
 
-        setDestinations(prev => prev.filter(d => d.id !== id))
+        // 使用 SWR mutate 更新快取
+        mutate(
+          DESTINATIONS_CACHE_KEY,
+          (current: TourDestination[] | undefined) => (current || []).filter(d => d.id !== id),
+          false
+        )
         return { success: true }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : '未知錯誤'
@@ -179,7 +214,7 @@ export function useTourDestinations() {
     destinations,
     countries,
     loading,
-    fetchDestinations,
+    fetchDestinations: refreshDestinations,
     getCitiesByCountry,
     getAirportCode,
     addDestination,

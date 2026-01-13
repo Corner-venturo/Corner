@@ -145,6 +145,9 @@ const TABLE_CODE_PREFIX: Record<string, string> = {
   visas: 'V',
 }
 
+// 統一快取 key 前綴（與 @/data/core/createEntityHook 共用）
+const CACHE_KEY_PREFIX = 'entity'
+
 // 快取策略類型
 type CacheStrategyType = 'STATIC' | 'DYNAMIC' | 'REALTIME'
 
@@ -184,7 +187,8 @@ export function createCloudHook<T extends BaseEntity>(
   const cacheStrategy = options?.cacheStrategy ?? TABLE_CACHE_STRATEGY[tableName] ?? 'DYNAMIC'
   const swrOptions = CACHE_STRATEGY[cacheStrategy]
 
-  const SWR_KEY = tableName
+  // 統一快取 key（與 @/data 層共用）
+  const SWR_KEY = `${CACHE_KEY_PREFIX}:${tableName}:list`
 
   // Supabase fetcher
   async function fetcher(): Promise<T[]> {

@@ -16,7 +16,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown, Wand2, Sparkles } from 'lucide-react'
+import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown, Wand2, Sparkles, Eye, Edit2, Printer } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,6 +105,9 @@ export function PackageItineraryDialog({
   const [selectedVersionIndex, setSelectedVersionIndex] = useState(-1) // -1 = 主版本
   const [directLoadedItinerary, setDirectLoadedItinerary] = useState<Itinerary | null>(null)
 
+  // 檢視模式：edit = 編輯模式, preview = 簡易行程表預覽
+  const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit')
+
   // AI 排行程狀態
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
   const [aiGenerating, setAiGenerating] = useState(false)
@@ -134,6 +137,7 @@ export function PackageItineraryDialog({
       setCreateError(null)
       setSelectedVersionIndex(-1)
       setDirectLoadedItinerary(null)
+      setViewMode('edit') // 重置為編輯模式
       hasInitializedDailyScheduleRef.current = false // 重置初始化標記
       setFormData({
         title: proposal.title || pkg.version_name,
@@ -511,6 +515,132 @@ export function PackageItineraryDialog({
     }
   }, [aiCityId, aiArrivalTime, aiDepartureTime, pkg.start_date, dailySchedule.length])
 
+  // 產生簡易行程表的每日資料（用於預覽和列印）
+  const getPreviewDailyData = useCallback(() => {
+    return dailySchedule.map((day, idx) => {
+      let dateLabel = ''
+      if (pkg.start_date) {
+        const date = new Date(pkg.start_date)
+        date.setDate(date.getDate() + idx)
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+        dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
+      }
+      const isFirst = idx === 0
+      const isLast = idx === dailySchedule.length - 1
+      const defaultTitle = isFirst ? '抵達目的地' : isLast ? '返回台灣' : `第 ${day.day} 天行程`
+      const title = day.route?.trim() || defaultTitle
+      const breakfast = day.hotelBreakfast ? '飯店早餐' : day.meals.breakfast
+      let accommodation = day.accommodation || ''
+      if (day.sameAsPrevious && idx > 0) {
+        // 往前找到實際填寫的住宿
+        for (let i = idx - 1; i >= 0; i--) {
+          if (!dailySchedule[i].sameAsPrevious && dailySchedule[i].accommodation) {
+            accommodation = dailySchedule[i].accommodation
+            break
+          }
+        }
+        if (!accommodation) accommodation = '續住'
+      }
+      return {
+        dayLabel: `Day ${day.day}`,
+        date: dateLabel,
+        title,
+        meals: { breakfast, lunch: day.meals.lunch, dinner: day.meals.dinner },
+        accommodation: isLast ? '' : accommodation,
+      }
+    })
+  }, [dailySchedule, pkg.start_date])
+
+  // 列印簡易行程表
+  const handlePrintPreview = useCallback(() => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const dailyData = getPreviewDailyData()
+    const companyName = currentUser?.workspace_code || '旅行社'
+    const destination = pkg.destination || pkg.country_id || ''
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${formData.title || '行程表'}</title>
+        <style>
+          @page { size: A4; margin: 10mm; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+          .header { border-bottom: 2px solid #c9aa7c; padding-bottom: 16px; margin-bottom: 24px; }
+          .title { font-size: 24px; font-weight: bold; color: #3a3633; margin-bottom: 4px; }
+          .subtitle { font-size: 14px; color: #8b8680; }
+          .company { text-align: right; color: #c9aa7c; font-weight: 600; }
+          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; font-size: 14px; }
+          .info-label { color: #8b8680; }
+          table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+          th { background: #c9aa7c; color: white; padding: 8px; text-align: left; border: 1px solid #c9aa7c; }
+          td { padding: 8px; border: 1px solid #e8e5e0; }
+          tr:nth-child(even) { background: #f6f4f1; }
+          .day-label { font-weight: 600; color: #c9aa7c; }
+          .day-date { font-size: 11px; color: #8b8680; }
+          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e8e5e0; text-align: center; font-size: 12px; color: #8b8680; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div style="display: flex; justify-content: space-between;">
+            <div>
+              <div class="title">${formData.title || '行程表'}</div>
+            </div>
+            <div class="company">${companyName}</div>
+          </div>
+          <div class="info-grid">
+            <div><span class="info-label">目的地：</span>${destination}</div>
+            <div><span class="info-label">出發日期：</span>${pkg.start_date || '-'}</div>
+            <div><span class="info-label">行程天數：</span>${dailyData.length} 天</div>
+          </div>
+          ${!isDomestic && (formData.outboundFlight || formData.returnFlight) ? `
+          <div class="info-grid" style="margin-top: 8px;">
+            ${formData.outboundFlight ? `<div><span class="info-label">去程航班：</span>${formData.outboundFlight.airline} ${formData.outboundFlight.flightNumber} (${formData.outboundFlight.departureAirport} ${formData.outboundFlight.departureTime} → ${formData.outboundFlight.arrivalAirport} ${formData.outboundFlight.arrivalTime})</div>` : ''}
+            ${formData.returnFlight ? `<div><span class="info-label">回程航班：</span>${formData.returnFlight.airline} ${formData.returnFlight.flightNumber} (${formData.returnFlight.departureAirport} ${formData.returnFlight.departureTime} → ${formData.returnFlight.arrivalAirport} ${formData.returnFlight.arrivalTime})</div>` : ''}
+          </div>` : ''}
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px;">日期</th>
+              <th>行程內容</th>
+              <th style="width: 70px; text-align: center;">早餐</th>
+              <th style="width: 70px; text-align: center;">午餐</th>
+              <th style="width: 70px; text-align: center;">晚餐</th>
+              <th style="width: 120px;">住宿</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dailyData.map((day) => `
+              <tr>
+                <td>
+                  <div class="day-label">${day.dayLabel}</div>
+                  <div class="day-date">${day.date}</div>
+                </td>
+                <td>${day.title}</td>
+                <td style="text-align: center; font-size: 12px;">${day.meals.breakfast || '-'}</td>
+                <td style="text-align: center; font-size: 12px;">${day.meals.lunch || '-'}</td>
+                <td style="text-align: center; font-size: 12px;">${day.meals.dinner || '-'}</td>
+                <td style="font-size: 12px;">${day.accommodation || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="footer">
+          本行程表由 ${companyName} 提供 | 列印日期：${new Date().toLocaleDateString('zh-TW')}
+        </div>
+      </body>
+      </html>
+    `
+
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+    printWindow.print()
+  }, [getPreviewDailyData, formData.title, formData.outboundFlight, formData.returnFlight, pkg.start_date, pkg.destination, pkg.country_id, currentUser?.workspace_code, isDomestic])
+
   // 取得前一天的住宿（用於續住顯示）
   const getPreviousAccommodation = (index: number): string => {
     if (index === 0) return ''
@@ -852,7 +982,144 @@ export function PackageItineraryDialog({
             </VisuallyHidden>
             <Loader2 className="w-6 h-6 animate-spin text-morandi-gold" />
           </div>
+        ) : viewMode === 'preview' ? (
+          /* 預覽模式：簡易行程表 */
+          <div className="flex flex-col h-full max-h-[80vh]">
+            <DialogHeader className="flex-shrink-0 flex flex-row items-center justify-between mb-4">
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-morandi-gold" />
+                簡易行程表
+                <span className="text-sm font-normal text-morandi-secondary">
+                  - {formData.title || proposal.title}
+                </span>
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewMode('edit')}
+                  className="h-7 text-[11px] gap-1"
+                >
+                  <Edit2 size={12} />
+                  編輯
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handlePrintPreview}
+                  className="h-7 text-[11px] gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                >
+                  <Printer size={12} />
+                  列印
+                </Button>
+              </div>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto border border-border rounded-lg bg-card p-6">
+              {/* 標題區 */}
+              <div className="border-b-2 border-morandi-gold pb-4 mb-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h1 className="text-xl font-bold text-morandi-primary mb-1">
+                      {formData.title || '行程表'}
+                    </h1>
+                  </div>
+                  <div className="text-right text-sm text-morandi-secondary">
+                    <p className="font-semibold text-morandi-gold">{currentUser?.workspace_code || '旅行社'}</p>
+                  </div>
+                </div>
+
+                {/* 基本資訊 */}
+                <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary">目的地：</span>
+                    <span className="font-medium">{pkg.destination || pkg.country_id || '-'}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary">出發日期：</span>
+                    <span className="font-medium">{pkg.start_date || '-'}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-morandi-secondary">行程天數：</span>
+                    <span className="font-medium">{dailySchedule.length} 天</span>
+                  </div>
+                </div>
+
+                {/* 航班資訊 */}
+                {!isDomestic && (formData.outboundFlight || formData.returnFlight) && (
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    {formData.outboundFlight && (
+                      <div className="flex gap-2">
+                        <span className="text-morandi-secondary">去程航班：</span>
+                        <span className="font-medium">
+                          {formData.outboundFlight.airline} {formData.outboundFlight.flightNumber}
+                          <span className="text-morandi-secondary ml-1">
+                            ({formData.outboundFlight.departureAirport} {formData.outboundFlight.departureTime} → {formData.outboundFlight.arrivalAirport} {formData.outboundFlight.arrivalTime})
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                    {formData.returnFlight && (
+                      <div className="flex gap-2">
+                        <span className="text-morandi-secondary">回程航班：</span>
+                        <span className="font-medium">
+                          {formData.returnFlight.airline} {formData.returnFlight.flightNumber}
+                          <span className="text-morandi-secondary ml-1">
+                            ({formData.returnFlight.departureAirport} {formData.returnFlight.departureTime} → {formData.returnFlight.arrivalAirport} {formData.returnFlight.arrivalTime})
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 每日行程表格 */}
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-morandi-gold text-white">
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-20">日期</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left">行程內容</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">早餐</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">午餐</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-center w-16">晚餐</th>
+                    <th className="border border-morandi-gold/50 px-3 py-2 text-left w-32">住宿</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getPreviewDailyData().map((day, index) => (
+                    <tr key={index} className={index % 2 === 0 ? 'bg-card' : 'bg-morandi-container/20'}>
+                      <td className="border border-morandi-container px-3 py-2">
+                        <div className="font-semibold text-morandi-gold">{day.dayLabel}</div>
+                        <div className="text-xs text-morandi-secondary">{day.date}</div>
+                      </td>
+                      <td className="border border-morandi-container px-3 py-2">
+                        <div className="font-medium">{day.title}</div>
+                      </td>
+                      <td className="border border-morandi-container px-3 py-2 text-center text-xs">
+                        {day.meals.breakfast || '-'}
+                      </td>
+                      <td className="border border-morandi-container px-3 py-2 text-center text-xs">
+                        {day.meals.lunch || '-'}
+                      </td>
+                      <td className="border border-morandi-container px-3 py-2 text-center text-xs">
+                        {day.meals.dinner || '-'}
+                      </td>
+                      <td className="border border-morandi-container px-3 py-2 text-xs">
+                        {day.accommodation || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* 頁尾 */}
+              <div className="mt-6 pt-4 border-t border-morandi-container text-xs text-morandi-secondary text-center">
+                <p>本行程表由 {currentUser?.workspace_code || '旅行社'} 提供</p>
+              </div>
+            </div>
+          </div>
         ) : (
+          /* 編輯模式 */
           <div className="flex h-full max-h-[80vh]">
             {/* 左側：基本資訊 */}
             <div className="w-1/2 pr-6 border-r border-border overflow-y-auto">
@@ -863,6 +1130,16 @@ export function PackageItineraryDialog({
                   <span className="text-sm font-normal text-morandi-secondary">
                     {pkg.version_name} - {proposal.title}
                   </span>
+                  {/* 預覽按鈕 */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setViewMode('preview')}
+                    className="ml-auto h-6 px-2 text-[10px] gap-1"
+                  >
+                    <Eye size={10} />
+                    預覽
+                  </Button>
                 </DialogTitle>
               </DialogHeader>
 

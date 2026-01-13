@@ -83,11 +83,11 @@ export function useNotes() {
           // 插入所有新筆記
           const notesToInsert = newTabs.map((tab, index) => ({
             user_id: user.id,
+            workspace_id: user.workspace_id,
             tab_id: tab.id,
             tab_name: tab.name,
             content: tab.content,
             tab_order: index,
-            workspace_id: user.workspace_id,
           }))
 
           const { error } = await supabase.from('notes').insert(notesToInsert)
