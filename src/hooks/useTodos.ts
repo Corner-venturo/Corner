@@ -47,7 +47,23 @@ function generateUUID(): string {
 // ===== 主要 Hook =====
 export function useTodos() {
   // 取得當前 workspace ID
-  const workspaceId = getCurrentWorkspaceId()
+  // 注意：super_admin 的 getCurrentWorkspaceId() 會返回 null（可跨 workspace）
+  // 但我們仍需要一個 workspace 來查詢，使用 user.workspace_id 作為備用
+  let workspaceId = getCurrentWorkspaceId()
+
+  // 如果是 super_admin（workspaceId 為 null），使用 user.workspace_id
+  if (!workspaceId) {
+    const authStorage = typeof window !== 'undefined' ? localStorage.getItem('auth-storage') : null
+    if (authStorage) {
+      try {
+        const authData = JSON.parse(authStorage)
+        workspaceId = authData?.state?.user?.workspace_id || null
+      } catch {
+        // ignore parse error
+      }
+    }
+  }
+
   const swrKey = getTodosKey(workspaceId)
 
   // 使用 DAL 的 getAllTodos 作為 SWR fetcher
