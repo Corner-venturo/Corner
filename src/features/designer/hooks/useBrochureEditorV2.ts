@@ -1,0 +1,1418 @@
+'use client'
+
+/**
+ * useBrochureEditorV2 - 簡化版手冊編輯器 Hook
+ *
+ * 核心理念：
+ * - 編輯時純 Fabric.js 操作，不觸發 React re-render
+ * - 只追蹤 isDirty 狀態
+ * - 載入時完整渲染，不做增量更新
+ * - 儲存時導出 canvas JSON
+ */
+
+import { useRef, useCallback, useEffect, useState } from 'react'
+import * as fabric from 'fabric'
+import { useDocumentStore } from '@/stores/document-store'
+import type { CanvasElement, TextElement, ShapeElement, ImageElement, CanvasPage } from '@/features/designer/components/types'
+import { renderPageOnCanvas } from '@/features/designer/components/core/renderer'
+
+// ============================================
+// Types
+// ============================================
+
+interface UseBrochureEditorV2Options {
+  width?: number
+  height?: number
+  onReady?: () => void
+}
+
+interface UseBrochureEditorV2Return {
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
+  canvas: fabric.Canvas | null
+  isCanvasReady: boolean
+
+  // Canvas 操作
+  initCanvas: () => void
+  disposeCanvas: () => void
+  loadCanvasData: (data: Record<string, unknown>) => Promise<void>
+  loadCanvasElements: (elements: CanvasElement[]) => Promise<void>
+  loadCanvasPage: (page: CanvasPage) => Promise<void>
+  exportCanvasData: () => Record<string, unknown>
+  exportThumbnail: (options?: { quality?: number; multiplier?: number }) => string
+
+  // 元素操作
+  addText: (options?: { content?: string; x?: number; y?: number }) => void
+  addRectangle: (options?: { x?: number; y?: number; width?: number; height?: number }) => void
+  addCircle: (options?: { x?: number; y?: number; radius?: number }) => void
+  addImage: (url: string, options?: { x?: number; y?: number }) => Promise<void>
+  addLine: (options?: { style?: 'solid' | 'dashed' | 'dotted'; arrow?: boolean }) => void
+  addSticker: (pathData: string, options?: {
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+    fill?: string
+    viewBox?: { width: number; height: number }
+  }) => void
+
+  // 選取操作
+  selectedObjectIds: string[]
+  deleteSelected: () => void
+  copySelected: () => void
+  pasteClipboard: () => void
+  cutSelected: () => void
+
+  // 圖層操作
+  bringForward: () => void
+  sendBackward: () => void
+  bringToFront: () => void
+  sendToBack: () => void
+
+  // 對齊操作
+  alignLeft: () => void
+  alignCenterH: () => void
+  alignRight: () => void
+  alignTop: () => void
+  alignCenterV: () => void
+  alignBottom: () => void
+
+  // 群組操作
+  groupSelected: () => void
+  ungroupSelected: () => void
+
+  // 鎖定
+  toggleLock: () => void
+
+  // Undo/Redo
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
+
+  // 頁面歷史管理（用於多頁切換）
+  saveCurrentPageHistory: () => void
+  loadPageHistory: (pageId: string) => void
+  initPageHistory: (pageId: string) => void
+
+  // 縮放
+  zoom: number
+  setZoom: (zoom: number) => void
+  zoomIn: () => void
+  zoomOut: () => void
+  resetZoom: () => void
+}
+
+// ============================================
+// Clipboard (module level for persistence)
+// ============================================
+let clipboard: fabric.FabricObject[] = []
+
+// ============================================
+// History Configuration
+// ============================================
+const MAX_HISTORY_SIZE = 30 // 減少記憶體使用
+const HISTORY_DEBOUNCE_MS = 300 // 防抖延遲
+
+// 每頁獨立的歷史記錄類型
+interface PageHistory {
+  stack: string[]
+  index: number
+}
+
+// ============================================
+// Hook
+// ============================================
+
+export function useBrochureEditorV2(
+  options: UseBrochureEditorV2Options = {}
+): UseBrochureEditorV2Return {
+  const { width = 559, height = 794, onReady } = options
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
+  const [isCanvasReady, setIsCanvasReady] = useState(false)
+  const [selectedObjectIds, setSelectedObjectIds] = useState<string[]>([])
+  const [zoom, setZoomState] = useState(1)
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
+
+  // 歷史記錄管理（使用 useRef 避免 re-render 問題）
+  const historyRef = useRef<PageHistory>({ stack: [], index: -1 })
+  const pageHistoriesRef = useRef<Map<string, PageHistory>>(new Map())
+  const isUndoRedoRef = useRef(false)
+  const currentPageIdRef = useRef<string | null>(null)
+  const saveHistoryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Document store for isDirty tracking
+  const setIsDirty = useDocumentStore((s) => s.setIsDirty)
+
+  // ============================================
+  // Mark Dirty Helper
+  // ============================================
+  const markDirty = useCallback(() => {
+    setIsDirty(true)
+  }, [setIsDirty])
+
+  // ============================================
+  // History Management Helpers
+  // ============================================
+  const updateHistoryState = useCallback(() => {
+    const history = historyRef.current
+    setCanUndo(history.index > 0)
+    setCanRedo(history.index < history.stack.length - 1)
+  }, [])
+
+  // 立即保存到歷史（內部使用）
+  const saveToHistoryImmediate = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas || isUndoRedoRef.current) return
+
+    const json = JSON.stringify(canvas.toJSON())
+    const history = historyRef.current
+
+    // 如果當前不在最新位置，刪除之後的歷史
+    if (history.index < history.stack.length - 1) {
+      history.stack = history.stack.slice(0, history.index + 1)
+    }
+
+    // 避免重複保存相同狀態
+    if (history.stack[history.stack.length - 1] === json) return
+
+    // 添加新狀態
+    history.stack.push(json)
+
+    // 限制歷史數量
+    if (history.stack.length > MAX_HISTORY_SIZE) {
+      history.stack.shift()
+    } else {
+      history.index++
+    }
+
+    updateHistoryState()
+  }, [updateHistoryState])
+
+  // 帶防抖的保存（用於頻繁操作如拖動）
+  const saveToHistory = useCallback(() => {
+    // 清除之前的定時器
+    if (saveHistoryTimeoutRef.current) {
+      clearTimeout(saveHistoryTimeoutRef.current)
+    }
+    // 設置新的延遲保存
+    saveHistoryTimeoutRef.current = setTimeout(() => {
+      saveToHistoryImmediate()
+      saveHistoryTimeoutRef.current = null
+    }, HISTORY_DEBOUNCE_MS)
+  }, [saveToHistoryImmediate])
+
+  // 切換頁面時保存當前頁面的歷史
+  const saveCurrentPageHistory = useCallback(() => {
+    const pageId = currentPageIdRef.current
+    if (pageId) {
+      pageHistoriesRef.current.set(pageId, {
+        stack: [...historyRef.current.stack],
+        index: historyRef.current.index,
+      })
+    }
+  }, [])
+
+  // 切換到新頁面時載入或初始化歷史
+  const loadPageHistory = useCallback((pageId: string) => {
+    currentPageIdRef.current = pageId
+    const savedHistory = pageHistoriesRef.current.get(pageId)
+    if (savedHistory) {
+      historyRef.current = {
+        stack: [...savedHistory.stack],
+        index: savedHistory.index,
+      }
+    } else {
+      // 新頁面，初始化空歷史
+      historyRef.current = { stack: [], index: -1 }
+    }
+    updateHistoryState()
+  }, [updateHistoryState])
+
+  // 初始化當前頁面的歷史（載入內容後呼叫）
+  const initPageHistory = useCallback((pageId: string) => {
+    currentPageIdRef.current = pageId
+    historyRef.current = { stack: [], index: -1 }
+    // 延遲保存初始狀態，確保 canvas 內容已載入
+    setTimeout(() => {
+      saveToHistoryImmediate()
+    }, 100)
+  }, [saveToHistoryImmediate])
+
+  // ============================================
+  // Initialize Canvas
+  // ============================================
+  const initCanvas = useCallback(() => {
+    if (!canvasRef.current || fabricCanvasRef.current) return
+
+    const canvas = new fabric.Canvas(canvasRef.current, {
+      width,
+      height,
+      backgroundColor: '#ffffff',
+      selection: true,
+      preserveObjectStacking: true,
+    })
+
+    // 綁定事件 - 保存歷史和標記 dirty
+    const handleChange = () => {
+      markDirty()
+      saveToHistory()
+    }
+    canvas.on('object:modified', handleChange)
+    canvas.on('object:added', handleChange)
+    canvas.on('object:removed', handleChange)
+
+    // 選取事件 - 支援兩種 ID 存取方式：obj.id 和 data.elementId
+    const getObjectId = (obj: fabric.FabricObject): string | undefined => {
+      // 優先從 obj.id 讀取（手動添加的元素）
+      const directId = (obj as fabric.FabricObject & { id?: string }).id
+      if (directId) return directId
+      // 其次從 data.elementId 讀取（renderer 渲染的元素）
+      const dataId = (obj as fabric.FabricObject & { data?: { elementId?: string } }).data?.elementId
+      return dataId
+    }
+
+    canvas.on('selection:created', (e) => {
+      const ids = e.selected?.map(getObjectId).filter(Boolean) as string[]
+      setSelectedObjectIds(ids)
+    })
+
+    canvas.on('selection:updated', (e) => {
+      const ids = e.selected?.map(getObjectId).filter(Boolean) as string[]
+      setSelectedObjectIds(ids)
+    })
+
+    canvas.on('selection:cleared', () => {
+      setSelectedObjectIds([])
+    })
+
+    // ============================================
+    // 對齊參考線功能
+    // ============================================
+    const SNAP_THRESHOLD = 8 // 吸附閾值（像素）
+    const guideLines: fabric.Line[] = []
+
+    // 創建參考線
+    const createGuideLine = (coords: [number, number, number, number]) => {
+      const line = new fabric.Line(coords, {
+        stroke: '#c9aa7c',
+        strokeWidth: 1,
+        strokeDashArray: [4, 4],
+        selectable: false,
+        evented: false,
+        excludeFromExport: true,
+      })
+      // 標記為參考線
+      ;(line as fabric.Line & { isGuideLine: boolean }).isGuideLine = true
+      return line
+    }
+
+    // 清除所有參考線
+    const clearGuideLines = () => {
+      guideLines.forEach(line => canvas.remove(line))
+      guideLines.length = 0
+    }
+
+    // 取得物件的邊界
+    const getObjEdges = (obj: fabric.FabricObject) => {
+      const bound = obj.getBoundingRect()
+      return {
+        left: bound.left,
+        right: bound.left + bound.width,
+        top: bound.top,
+        bottom: bound.top + bound.height,
+        centerX: bound.left + bound.width / 2,
+        centerY: bound.top + bound.height / 2,
+        width: bound.width,
+        height: bound.height,
+      }
+    }
+
+    canvas.on('object:moving', (e) => {
+      const movingObj = e.target
+      if (!movingObj) return
+
+      clearGuideLines()
+
+      const movingEdges = getObjEdges(movingObj)
+      const canvasWidth = width
+      const canvasHeight = height
+
+      // 要對齊的參考點
+      const snapPoints = {
+        vertical: [0, canvasWidth / 2, canvasWidth], // 左、中、右
+        horizontal: [0, canvasHeight / 2, canvasHeight], // 上、中、下
+      }
+
+      // 收集其他物件的邊緣
+      const otherObjects = canvas.getObjects().filter(obj => {
+        const isGuideLine = (obj as fabric.FabricObject & { isGuideLine?: boolean }).isGuideLine
+        return obj !== movingObj && !isGuideLine && obj.type !== 'activeSelection'
+      })
+
+      otherObjects.forEach(obj => {
+        const edges = getObjEdges(obj)
+        snapPoints.vertical.push(edges.left, edges.right, edges.centerX)
+        snapPoints.horizontal.push(edges.top, edges.bottom, edges.centerY)
+      })
+
+      let snappedLeft: number | null = null
+      let snappedTop: number | null = null
+      const newGuides: fabric.Line[] = []
+
+      // 檢查垂直對齊（左、中、右）
+      const movingX = [movingEdges.left, movingEdges.centerX, movingEdges.right]
+      for (const mx of movingX) {
+        for (const snap of snapPoints.vertical) {
+          if (Math.abs(mx - snap) < SNAP_THRESHOLD) {
+            // 計算需要調整的偏移量
+            const offset = snap - mx
+            snappedLeft = (movingObj.left || 0) + offset
+
+            // 創建垂直參考線
+            const line = createGuideLine([snap, 0, snap, canvasHeight])
+            canvas.add(line)
+            newGuides.push(line)
+            break
+          }
+        }
+        if (snappedLeft !== null) break
+      }
+
+      // 檢查水平對齊（上、中、下）
+      const movingY = [movingEdges.top, movingEdges.centerY, movingEdges.bottom]
+      for (const my of movingY) {
+        for (const snap of snapPoints.horizontal) {
+          if (Math.abs(my - snap) < SNAP_THRESHOLD) {
+            // 計算需要調整的偏移量
+            const offset = snap - my
+            snappedTop = (movingObj.top || 0) + offset
+
+            // 創建水平參考線
+            const line = createGuideLine([0, snap, canvasWidth, snap])
+            canvas.add(line)
+            newGuides.push(line)
+            break
+          }
+        }
+        if (snappedTop !== null) break
+      }
+
+      // 應用吸附
+      if (snappedLeft !== null) {
+        movingObj.set({ left: snappedLeft })
+      }
+      if (snappedTop !== null) {
+        movingObj.set({ top: snappedTop })
+      }
+
+      guideLines.push(...newGuides)
+    })
+
+    // 移動結束時清除參考線
+    canvas.on('object:modified', () => {
+      clearGuideLines()
+      canvas.renderAll()
+    })
+
+    canvas.on('mouse:up', () => {
+      clearGuideLines()
+      canvas.renderAll()
+    })
+
+    fabricCanvasRef.current = canvas
+    setIsCanvasReady(true)
+    onReady?.()
+  }, [width, height, markDirty, saveToHistory, onReady])
+
+  // ============================================
+  // Dispose Canvas
+  // ============================================
+  const disposeCanvas = useCallback(() => {
+    if (fabricCanvasRef.current) {
+      fabricCanvasRef.current.dispose()
+      fabricCanvasRef.current = null
+      setIsCanvasReady(false)
+    }
+  }, [])
+
+  // ============================================
+  // Load Canvas Data
+  // ============================================
+  const loadCanvasData = useCallback(async (data: Record<string, unknown>) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    // Clear existing objects
+    canvas.clear()
+
+    // Load from JSON
+    await canvas.loadFromJSON(data)
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Load Canvas Elements (from CanvasElement[] format)
+  // ============================================
+  const loadCanvasElements = useCallback(async (elements: CanvasElement[]) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    // Clear existing objects
+    canvas.clear()
+
+    // Sort elements by zIndex
+    const sortedElements = [...elements].sort((a, b) => a.zIndex - b.zIndex)
+
+    // Convert each element to Fabric.js object
+    for (const element of sortedElements) {
+      let fabricObj: fabric.FabricObject | null = null
+
+      switch (element.type) {
+        case 'text': {
+          const textEl = element as TextElement
+          // 使用 Textbox 而非 IText，可以支援自動換行和固定寬度
+          const textbox = new fabric.Textbox(textEl.content, {
+            left: textEl.x,
+            top: textEl.y,
+            width: textEl.width,
+            fontFamily: textEl.style.fontFamily,
+            fontSize: textEl.style.fontSize,
+            fontWeight: textEl.style.fontWeight as string,
+            fontStyle: textEl.style.fontStyle,
+            textAlign: textEl.style.textAlign,
+            lineHeight: textEl.style.lineHeight,
+            charSpacing: textEl.style.letterSpacing * 10,
+            fill: textEl.style.color,
+            angle: textEl.rotation,
+            opacity: textEl.opacity,
+            selectable: !textEl.locked,
+            evented: !textEl.locked,
+            visible: textEl.visible,
+            // 確保左上角對齊
+            originX: 'left',
+            originY: 'top',
+          })
+          fabricObj = textbox
+          break
+        }
+
+        case 'shape': {
+          const shapeEl = element as ShapeElement
+          if (shapeEl.variant === 'rectangle') {
+            fabricObj = new fabric.Rect({
+              left: shapeEl.x,
+              top: shapeEl.y,
+              width: shapeEl.width,
+              height: shapeEl.height,
+              fill: shapeEl.fill || '#c9aa7c',
+              stroke: shapeEl.stroke,
+              strokeWidth: shapeEl.strokeWidth || 0,
+              strokeDashArray: shapeEl.strokeDashArray,
+              rx: shapeEl.cornerRadius || 0,
+              ry: shapeEl.cornerRadius || 0,
+              angle: shapeEl.rotation,
+              opacity: shapeEl.opacity,
+              selectable: !shapeEl.locked,
+              evented: !shapeEl.locked,
+              visible: shapeEl.visible,
+              originX: 'left',
+              originY: 'top',
+            })
+          } else if (shapeEl.variant === 'circle') {
+            fabricObj = new fabric.Circle({
+              left: shapeEl.x,
+              top: shapeEl.y,
+              radius: Math.min(shapeEl.width, shapeEl.height) / 2,
+              fill: shapeEl.fill || '#c9aa7c',
+              stroke: shapeEl.stroke,
+              strokeWidth: shapeEl.strokeWidth || 0,
+              angle: shapeEl.rotation,
+              opacity: shapeEl.opacity,
+              selectable: !shapeEl.locked,
+              evented: !shapeEl.locked,
+              visible: shapeEl.visible,
+              originX: 'left',
+              originY: 'top',
+            })
+          } else if (shapeEl.variant === 'ellipse') {
+            fabricObj = new fabric.Ellipse({
+              left: shapeEl.x,
+              top: shapeEl.y,
+              rx: shapeEl.width / 2,
+              ry: shapeEl.height / 2,
+              fill: shapeEl.fill || '#c9aa7c',
+              stroke: shapeEl.stroke,
+              strokeWidth: shapeEl.strokeWidth || 0,
+              angle: shapeEl.rotation,
+              opacity: shapeEl.opacity,
+              selectable: !shapeEl.locked,
+              evented: !shapeEl.locked,
+              visible: shapeEl.visible,
+              originX: 'left',
+              originY: 'top',
+            })
+          }
+          break
+        }
+
+        case 'image': {
+          const imgEl = element as ImageElement
+          try {
+            const img = await fabric.FabricImage.fromURL(imgEl.src, { crossOrigin: 'anonymous' })
+            img.set({
+              left: imgEl.x,
+              top: imgEl.y,
+              angle: imgEl.rotation,
+              opacity: imgEl.opacity,
+              selectable: !imgEl.locked,
+              evented: !imgEl.locked,
+              visible: imgEl.visible,
+              originX: 'left',
+              originY: 'top',
+            })
+            // Scale to fit specified dimensions
+            if (img.width && img.height) {
+              img.scaleToWidth(imgEl.width)
+              if ((img.height * (imgEl.width / img.width)) > imgEl.height) {
+                img.scaleToHeight(imgEl.height)
+              }
+            }
+            fabricObj = img
+          } catch (err) {
+            console.error('Failed to load image:', imgEl.src, err)
+          }
+          break
+        }
+
+        case 'line': {
+          const lineEl = element
+          if ('x1' in lineEl && 'y1' in lineEl && 'x2' in lineEl && 'y2' in lineEl) {
+            const strokeDashArray = lineEl.lineStyle === 'dashed'
+              ? [10, 5]
+              : lineEl.lineStyle === 'dotted'
+                ? [2, 4]
+                : undefined
+            fabricObj = new fabric.Line(
+              [lineEl.x + lineEl.x1, lineEl.y + lineEl.y1, lineEl.x + lineEl.x2, lineEl.y + lineEl.y2],
+              {
+                stroke: lineEl.stroke,
+                strokeWidth: lineEl.strokeWidth,
+                strokeDashArray,
+                angle: lineEl.rotation,
+                opacity: lineEl.opacity,
+                selectable: !lineEl.locked,
+                evented: !lineEl.locked,
+                visible: lineEl.visible,
+              }
+            )
+          }
+          break
+        }
+      }
+
+      if (fabricObj) {
+        // Store original element ID
+        (fabricObj as fabric.FabricObject & { id: string }).id = element.id
+        canvas.add(fabricObj)
+      }
+    }
+
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Load Canvas Page (使用完整的 renderer)
+  // ============================================
+  const loadCanvasPage = useCallback(async (page: CanvasPage) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    // 使用 renderer.ts 的 renderPageOnCanvas 來正確處理所有元素類型
+    // 包括：圖片 borderRadius（圓拱形狀）、objectFit、漸層、圖標等
+    await renderPageOnCanvas(canvas, page, {
+      isEditable: true,
+      canvasWidth: width,
+      canvasHeight: height,
+    })
+  }, [width, height])
+
+  // ============================================
+  // Export Canvas Data
+  // ============================================
+  const exportCanvasData = useCallback((): Record<string, unknown> => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return {}
+
+    // Fabric.js 6 toJSON doesn't accept propertiesToInclude as argument
+    // Custom properties should be set via propertiesToInclude on canvas or serialized separately
+    return canvas.toJSON() as Record<string, unknown>
+  }, [])
+
+  // ============================================
+  // Export Thumbnail
+  // ============================================
+  const exportThumbnail = useCallback((options?: { quality?: number; multiplier?: number }): string => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return ''
+
+    return canvas.toDataURL({
+      format: 'jpeg',
+      quality: options?.quality ?? 0.6,
+      multiplier: options?.multiplier ?? 0.3,
+    })
+  }, [])
+
+  // ============================================
+  // Add Text
+  // ============================================
+  const addText = useCallback((options?: { content?: string; x?: number; y?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const text = new fabric.IText(options?.content ?? '雙擊編輯文字', {
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      fontFamily: 'Noto Sans TC',
+      fontSize: 24,
+      fill: '#3a3633',
+      originX: 'center',
+      originY: 'center',
+    })
+
+    // Add custom ID
+    ;(text as fabric.IText & { id: string }).id = `text-${Date.now()}`
+
+    canvas.add(text)
+    canvas.setActiveObject(text)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Rectangle
+  // ============================================
+  const addRectangle = useCallback((options?: { x?: number; y?: number; width?: number; height?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const rect = new fabric.Rect({
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      width: options?.width ?? 100,
+      height: options?.height ?? 80,
+      fill: '#c9aa7c',
+      stroke: '#b8996b',
+      strokeWidth: 1,
+      rx: 4,
+      ry: 4,
+      originX: 'center',
+      originY: 'center',
+    })
+
+    ;(rect as fabric.Rect & { id: string }).id = `rect-${Date.now()}`
+
+    canvas.add(rect)
+    canvas.setActiveObject(rect)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Circle
+  // ============================================
+  const addCircle = useCallback((options?: { x?: number; y?: number; radius?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const circle = new fabric.Circle({
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      radius: options?.radius ?? 50,
+      fill: '#c9aa7c',
+      stroke: '#b8996b',
+      strokeWidth: 1,
+      originX: 'center',
+      originY: 'center',
+    })
+
+    ;(circle as fabric.Circle & { id: string }).id = `circle-${Date.now()}`
+
+    canvas.add(circle)
+    canvas.setActiveObject(circle)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Image
+  // ============================================
+  const addImage = useCallback(async (url: string, options?: { x?: number; y?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const img = await fabric.FabricImage.fromURL(url)
+
+    img.set({
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      originX: 'center',
+      originY: 'center',
+    })
+
+    // Scale if too large
+    const maxSize = Math.min(width, height) * 0.8
+    if (img.width && img.width > maxSize) {
+      img.scale(maxSize / img.width)
+    }
+
+    ;(img as fabric.FabricImage & { id: string }).id = `image-${Date.now()}`
+
+    canvas.add(img)
+    canvas.setActiveObject(img)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Line
+  // ============================================
+  const addLine = useCallback((options?: { style?: 'solid' | 'dashed' | 'dotted'; arrow?: boolean }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const lineOptions: Partial<fabric.Line> = {
+      stroke: '#3a3633',
+      strokeWidth: 2,
+    }
+
+    if (options?.style === 'dashed') {
+      lineOptions.strokeDashArray = [10, 5]
+    } else if (options?.style === 'dotted') {
+      lineOptions.strokeDashArray = [2, 4]
+    }
+
+    const line = new fabric.Line(
+      [width / 2 - 50, height / 2, width / 2 + 50, height / 2],
+      lineOptions as Partial<fabric.Line>
+    )
+
+    ;(line as fabric.Line & { id: string }).id = `line-${Date.now()}`
+
+    canvas.add(line)
+
+    // Add arrow if needed
+    if (options?.arrow) {
+      const triangle = new fabric.Triangle({
+        left: width / 2 + 50,
+        top: height / 2,
+        width: 15,
+        height: 15,
+        fill: '#3a3633',
+        angle: 90,
+        originX: 'center',
+        originY: 'center',
+      })
+      ;(triangle as fabric.Triangle & { id: string }).id = `arrow-${Date.now()}`
+      canvas.add(triangle)
+    }
+
+    canvas.setActiveObject(line)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Sticker (SVG Path)
+  // ============================================
+  const addSticker = useCallback((pathData: string, options?: {
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+    fill?: string
+    viewBox?: { width: number; height: number }
+  }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const defaultSize = 100
+    const viewBoxWidth = options?.viewBox?.width || 100
+    const viewBoxHeight = options?.viewBox?.height || 100
+    const targetWidth = options?.width || defaultSize
+    const targetHeight = options?.height || defaultSize
+
+    const path = new fabric.Path(pathData, {
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      fill: options?.fill || '#c9aa7c',
+      stroke: options?.fill || '#c9aa7c',
+      strokeWidth: 1,
+      originX: 'center',
+      originY: 'center',
+      // 縮放到目標尺寸
+      scaleX: targetWidth / viewBoxWidth,
+      scaleY: targetHeight / viewBoxHeight,
+    })
+
+    ;(path as fabric.Path & { id: string }).id = `sticker-${Date.now()}`
+
+    canvas.add(path)
+    canvas.setActiveObject(path)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Delete Selected
+  // ============================================
+  const deleteSelected = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObjects = canvas.getActiveObjects()
+    if (activeObjects.length === 0) return
+
+    activeObjects.forEach((obj) => canvas.remove(obj))
+    canvas.discardActiveObject()
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Copy/Cut/Paste
+  // ============================================
+  const copySelected = useCallback(async () => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObjects = canvas.getActiveObjects()
+    if (activeObjects.length === 0) return
+
+    // Clone objects using Fabric.js clone method
+    const cloned: fabric.FabricObject[] = []
+    for (const obj of activeObjects) {
+      const clone = await obj.clone()
+      cloned.push(clone)
+    }
+    clipboard = cloned
+  }, [])
+
+  const pasteClipboard = useCallback(async () => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas || clipboard.length === 0) return
+
+    for (const obj of clipboard) {
+      const cloned = await obj.clone()
+      cloned.set({
+        left: (cloned.left || 0) + 20,
+        top: (cloned.top || 0) + 20,
+      })
+      ;(cloned as fabric.FabricObject & { id: string }).id = `paste-${Date.now()}-${Math.random()}`
+      canvas.add(cloned)
+    }
+
+    canvas.renderAll()
+  }, [])
+
+  const cutSelected = useCallback(() => {
+    copySelected()
+    deleteSelected()
+  }, [copySelected, deleteSelected])
+
+  // ============================================
+  // Layer Operations
+  // ============================================
+  const bringForward = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+    const activeObject = canvas.getActiveObject()
+    if (activeObject) {
+      canvas.bringObjectForward(activeObject)
+      canvas.renderAll()
+    }
+  }, [])
+
+  const sendBackward = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+    const activeObject = canvas.getActiveObject()
+    if (activeObject) {
+      canvas.sendObjectBackwards(activeObject)
+      canvas.renderAll()
+    }
+  }, [])
+
+  const bringToFront = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+    const activeObject = canvas.getActiveObject()
+    if (activeObject) {
+      canvas.bringObjectToFront(activeObject)
+      canvas.renderAll()
+    }
+  }, [])
+
+  const sendToBack = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+    const activeObject = canvas.getActiveObject()
+    if (activeObject) {
+      canvas.sendObjectToBack(activeObject)
+      canvas.renderAll()
+    }
+  }, [])
+
+  // ============================================
+  // Alignment Operations
+  // 支援單物件對齊畫布、多物件相對對齊
+  // ============================================
+
+  // 取得物件的實際邊界框（使用 Fabric.js 內建方法，確保考慮變換）
+  const getObjectBoundingBox = useCallback((obj: fabric.FabricObject) => {
+    const bound = obj.getBoundingRect()
+    return {
+      left: bound.left,
+      top: bound.top,
+      right: bound.left + bound.width,
+      bottom: bound.top + bound.height,
+      width: bound.width,
+      height: bound.height,
+      centerX: bound.left + bound.width / 2,
+      centerY: bound.top + bound.height / 2,
+    }
+  }, [])
+
+  // 移動物件到目標位置（以左上角為基準）
+  // 這個方法計算需要移動的差值，適用於任何 origin 設定
+  const moveObjectTo = useCallback((obj: fabric.FabricObject, targetLeft: number, targetTop: number) => {
+    const currentBound = obj.getBoundingRect()
+    const deltaX = targetLeft - currentBound.left
+    const deltaY = targetTop - currentBound.top
+    obj.set({
+      left: (obj.left || 0) + deltaX,
+      top: (obj.top || 0) + deltaY,
+    })
+    obj.setCoords()
+  }, [])
+
+  // 取得選中的物件陣列，並解除 ActiveSelection
+  // 這樣每個物件的位置都是絕對座標，方便對齊操作
+  const prepareObjectsForAlignment = useCallback((canvas: fabric.Canvas): {
+    objects: fabric.FabricObject[]
+    wasMultiSelect: boolean
+  } => {
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject) return { objects: [], wasMultiSelect: false }
+
+    // 如果是 ActiveSelection（多選），需要解除群組
+    if (activeObject.type === 'activeSelection') {
+      const activeSelection = activeObject as fabric.ActiveSelection
+      const objects = activeSelection.getObjects()
+
+      // 解除選取（這會讓物件的位置變成絕對座標）
+      canvas.discardActiveObject()
+
+      // 更新每個物件的座標
+      objects.forEach(obj => obj.setCoords())
+
+      return { objects, wasMultiSelect: true }
+    }
+
+    // 單選
+    return { objects: [activeObject], wasMultiSelect: false }
+  }, [])
+
+  // 重新建立多選
+  const restoreMultiSelection = useCallback((canvas: fabric.Canvas, objects: fabric.FabricObject[]) => {
+    if (objects.length > 1) {
+      const selection = new fabric.ActiveSelection(objects, { canvas })
+      canvas.setActiveObject(selection)
+    } else if (objects.length === 1) {
+      canvas.setActiveObject(objects[0])
+    }
+  }, [])
+
+  const alignLeft = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布左邊
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, 0, box.top)
+    } else {
+      // 多物件：全部對齊到最左邊物件的左邊
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const minLeft = Math.min(...boxes.map(b => b.box.left))
+      boxes.forEach(({ obj, box }) => {
+        moveObjectTo(obj, minLeft, box.top)
+      })
+    }
+
+    // 恢復多選狀態
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const alignCenterH = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布水平中心
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, (width - box.width) / 2, box.top)
+    } else {
+      // 多物件：以選區的中心為基準對齊
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const minLeft = Math.min(...boxes.map(b => b.box.left))
+      const maxRight = Math.max(...boxes.map(b => b.box.right))
+      const selectionCenterX = (minLeft + maxRight) / 2
+      boxes.forEach(({ obj, box }) => {
+        const newLeft = selectionCenterX - box.width / 2
+        moveObjectTo(obj, newLeft, box.top)
+      })
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [width, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const alignRight = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布右邊
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, width - box.width, box.top)
+    } else {
+      // 多物件：全部對齊到最右邊物件的右邊
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const maxRight = Math.max(...boxes.map(b => b.box.right))
+      boxes.forEach(({ obj, box }) => {
+        moveObjectTo(obj, maxRight - box.width, box.top)
+      })
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [width, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const alignTop = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布頂部
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, box.left, 0)
+    } else {
+      // 多物件：全部對齊到最上方物件的頂部
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const minTop = Math.min(...boxes.map(b => b.box.top))
+      boxes.forEach(({ obj, box }) => {
+        moveObjectTo(obj, box.left, minTop)
+      })
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const alignCenterV = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布垂直中心
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, box.left, (height - box.height) / 2)
+    } else {
+      // 多物件：以選區的中心為基準對齊
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const minTop = Math.min(...boxes.map(b => b.box.top))
+      const maxBottom = Math.max(...boxes.map(b => b.box.bottom))
+      const selectionCenterY = (minTop + maxBottom) / 2
+      boxes.forEach(({ obj, box }) => {
+        const newTop = selectionCenterY - box.height / 2
+        moveObjectTo(obj, box.left, newTop)
+      })
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [height, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const alignBottom = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length === 0) return
+
+    if (objects.length === 1) {
+      // 單物件：對齊到畫布底部
+      const obj = objects[0]
+      const box = getObjectBoundingBox(obj)
+      moveObjectTo(obj, box.left, height - box.height)
+    } else {
+      // 多物件：全部對齊到最下方物件的底部
+      const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+      const maxBottom = Math.max(...boxes.map(b => b.box.bottom))
+      boxes.forEach(({ obj, box }) => {
+        moveObjectTo(obj, box.left, maxBottom - box.height)
+      })
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [height, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  // ============================================
+  // Group Operations
+  // ============================================
+  const groupSelected = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeSelection = canvas.getActiveObject()
+    if (!activeSelection || activeSelection.type !== 'activeSelection') return
+
+    // Get all selected objects
+    const objects = (activeSelection as fabric.ActiveSelection).getObjects()
+    if (objects.length < 2) return
+
+    // Remove from canvas
+    objects.forEach((obj) => canvas.remove(obj))
+
+    // Create group
+    const group = new fabric.Group(objects)
+    ;(group as fabric.Group & { id: string }).id = `group-${Date.now()}`
+
+    canvas.add(group)
+    canvas.setActiveObject(group)
+    canvas.renderAll()
+  }, [])
+
+  const ungroupSelected = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject || activeObject.type !== 'group') return
+
+    const group = activeObject as fabric.Group
+    const items = group.getObjects()
+
+    // Calculate absolute positions
+    const groupLeft = group.left || 0
+    const groupTop = group.top || 0
+
+    // Remove group
+    canvas.remove(group)
+
+    // Add items back with correct positions
+    items.forEach((item) => {
+      item.set({
+        left: groupLeft + (item.left || 0),
+        top: groupTop + (item.top || 0),
+      })
+      canvas.add(item)
+    })
+
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Lock Toggle
+  // ============================================
+  const toggleLock = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject) return
+
+    const isLocked = !activeObject.selectable
+    activeObject.set({
+      selectable: isLocked,
+      evented: isLocked,
+      lockMovementX: !isLocked,
+      lockMovementY: !isLocked,
+      lockScalingX: !isLocked,
+      lockScalingY: !isLocked,
+      lockRotation: !isLocked,
+    })
+
+    canvas.discardActiveObject()
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Zoom Operations
+  // 注意：縮放只使用 CSS transform 顯示，不影響 canvas 內部座標
+  // 這樣可以避免雙重縮放問題，且匯出時保持原始尺寸
+  // ============================================
+  const setZoom = useCallback((newZoom: number) => {
+    const clampedZoom = Math.max(0.25, Math.min(3, newZoom))
+    setZoomState(clampedZoom)
+    // 不呼叫 canvas.setZoom()，只用 CSS transform 顯示
+  }, [])
+
+  const zoomIn = useCallback(() => setZoom(zoom + 0.1), [zoom, setZoom])
+  const zoomOut = useCallback(() => setZoom(zoom - 0.1), [zoom, setZoom])
+  const resetZoom = useCallback(() => setZoom(1), [setZoom])
+
+  // ============================================
+  // Undo/Redo Operations
+  // ============================================
+  const undo = useCallback(async () => {
+    const canvas = fabricCanvasRef.current
+    const history = historyRef.current
+    if (!canvas || history.index <= 0) return
+
+    // 確保沒有待處理的防抖保存
+    if (saveHistoryTimeoutRef.current) {
+      clearTimeout(saveHistoryTimeoutRef.current)
+      saveHistoryTimeoutRef.current = null
+    }
+
+    isUndoRedoRef.current = true
+    history.index--
+
+    try {
+      await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+      canvas.renderAll()
+      updateHistoryState()
+    } finally {
+      isUndoRedoRef.current = false
+    }
+  }, [updateHistoryState])
+
+  const redo = useCallback(async () => {
+    const canvas = fabricCanvasRef.current
+    const history = historyRef.current
+    if (!canvas || history.index >= history.stack.length - 1) return
+
+    isUndoRedoRef.current = true
+    history.index++
+
+    try {
+      await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+      canvas.renderAll()
+      updateHistoryState()
+    } finally {
+      isUndoRedoRef.current = false
+    }
+  }, [updateHistoryState])
+
+  // ============================================
+  // Cleanup on unmount
+  // ============================================
+  useEffect(() => {
+    return () => {
+      // 清理防抖計時器
+      if (saveHistoryTimeoutRef.current) {
+        clearTimeout(saveHistoryTimeoutRef.current)
+      }
+      // 清理畫布
+      disposeCanvas()
+    }
+  }, [disposeCanvas])
+
+  // ============================================
+  // Return
+  // ============================================
+  return {
+    canvasRef,
+    canvas: fabricCanvasRef.current,
+    isCanvasReady,
+
+    initCanvas,
+    disposeCanvas,
+    loadCanvasData,
+    loadCanvasElements,
+    loadCanvasPage,
+    exportCanvasData,
+    exportThumbnail,
+
+    addText,
+    addRectangle,
+    addCircle,
+    addImage,
+    addLine,
+    addSticker,
+
+    selectedObjectIds,
+    deleteSelected,
+    copySelected,
+    pasteClipboard,
+    cutSelected,
+
+    bringForward,
+    sendBackward,
+    bringToFront,
+    sendToBack,
+
+    alignLeft,
+    alignCenterH,
+    alignRight,
+    alignTop,
+    alignCenterV,
+    alignBottom,
+
+    groupSelected,
+    ungroupSelected,
+
+    toggleLock,
+
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    saveCurrentPageHistory,
+    loadPageHistory,
+    initPageHistory,
+
+    zoom,
+    setZoom,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+  }
+}

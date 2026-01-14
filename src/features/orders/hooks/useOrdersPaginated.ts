@@ -14,7 +14,6 @@ import useSWR from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-import { useAuthStore } from '@/stores/auth-store'
 
 // Fields needed for order list display
 const ORDERS_LIST_FIELDS = [
@@ -61,13 +60,8 @@ function buildSwrKey(params: UseOrdersPaginatedParams): string {
 export function useOrdersPaginated(params: UseOrdersPaginatedParams): UseOrdersPaginatedResult {
   const { page, pageSize, status, tourId, search, sortBy = 'created_at', sortOrder = 'desc' } = params
 
-  // Auth check
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // Only fetch when authenticated
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? buildSwrKey(params) : null
+  // ✅ 優化：讀取不等 auth hydration，讓 SWR 立即從快取顯示
+  const swrKey = buildSwrKey(params)
 
   const { data, error, isLoading, mutate: mutateSelf } = useSWR(
     swrKey,
@@ -142,8 +136,8 @@ export function useOrdersPaginated(params: UseOrdersPaginatedParams): UseOrdersP
     await mutateSelf()
   }
 
-  // Loading state
-  const effectiveLoading = !hasHydrated || (!swrKey && isAuthenticated) || isLoading
+  // Loading state - 簡化
+  const effectiveLoading = isLoading
 
   return {
     orders: data?.orders || [],

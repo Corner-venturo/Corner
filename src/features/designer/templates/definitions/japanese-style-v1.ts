@@ -99,10 +99,16 @@ export const japaneseStyleV1: PageTemplate = {
           bottomLeft: 4,
           bottomRight: 4,
         },
+        // 使用者調整的位置設定
+        position: data.coverImagePosition ? {
+          x: data.coverImagePosition.x,
+          y: data.coverImagePosition.y,
+          scale: data.coverImagePosition.scale,
+        } : undefined,
       }
       elements.push(coverImage)
     } else {
-      // 沒有封面圖片時顯示虛線占位框
+      // 沒有封面圖片時顯示圓拱形狀占位框（與圖片遮罩相同形狀）
       const placeholder: ShapeElement = {
         id: 'el-cover-placeholder',
         type: 'shape',
@@ -121,7 +127,13 @@ export const japaneseStyleV1: PageTemplate = {
         stroke: '#c9aa7c',
         strokeWidth: 2,
         strokeDashArray: [8, 4],
-        cornerRadius: 12,
+        // 使用與圖片相同的圓拱形狀
+        borderRadius: {
+          topLeft: 100,
+          topRight: 100,
+          bottomLeft: 4,
+          bottomRight: 4,
+        },
       }
       elements.push(placeholder)
 
@@ -237,9 +249,9 @@ export const japaneseStyleV1: PageTemplate = {
       type: 'text',
       name: '副標題',
       x: 40,
-      y: 700,
-      width: 200,
-      height: 12,
+      y: 680,
+      width: 300,
+      height: 40,
       zIndex: 7,
       rotation: 0,
       opacity: 1,
@@ -248,7 +260,7 @@ export const japaneseStyleV1: PageTemplate = {
       content: data.subtitle || 'Travel Handbook',
       style: {
         fontFamily: 'Noto Sans TC',
-        fontSize: 8,
+        fontSize: 32,
         fontWeight: '800',
         fontStyle: 'normal',
         textAlign: 'left',

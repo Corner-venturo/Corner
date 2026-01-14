@@ -23,7 +23,7 @@ export {
   getMemoItemsForPage,
   countryNames,
 } from '../definitions/country-presets'
-export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData } from '../definitions/types'
+export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData, TemplateData } from '../definitions/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH_PX = 559
@@ -116,6 +116,7 @@ export function generatePageFromTemplate(
   return {
     id: `page-${Date.now()}`,
     name: template.name,
+    templateKey: template.category, // 用於識別頁面類型（cover, toc, itinerary 等）
     width: A5_WIDTH_PX,
     height: A5_HEIGHT_PX,
     backgroundColor: '#ffffff',

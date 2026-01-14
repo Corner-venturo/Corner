@@ -12,7 +12,6 @@ import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
 import { generateUUID } from '@/lib/utils/uuid'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
-import { useAuthStore } from '@/stores/auth-store'
 
 const TOURS_KEY = 'tours'
 
@@ -34,14 +33,8 @@ async function fetchTours(): Promise<Tour[]> {
 }
 
 export function useTours(params?: PageRequest): UseEntityResult<Tour> {
-  // 等待 auth 準備好才開始查詢
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // 如果還沒登入，不發起查詢（SWR key 為 null 時不會 fetch）
-  // 但必須等 hydration 完成後才判斷
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? TOURS_KEY : null
+  // ✅ 優化：讀取不等 auth hydration，讓 SWR 立即從快取顯示
+  const swrKey = TOURS_KEY
 
   const { data: allTours = [], error, isLoading } = useSWR<Tour[]>(
     swrKey,
@@ -172,9 +165,8 @@ export function useTours(params?: PageRequest): UseEntityResult<Tour> {
     await mutate(TOURS_KEY)
   }
 
-  // 如果還沒 hydrate 或還沒認證，視為 loading 狀態
-  // 但如果已 hydrate 且未認證，就不應該是 loading（應該跳轉登入頁）
-  const effectiveLoading = !hasHydrated || (!swrKey && isAuthenticated) || isLoading
+  // Loading state - 簡化
+  const effectiveLoading = isLoading
 
   return {
     data: paginatedTours,

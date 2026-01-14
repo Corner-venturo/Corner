@@ -16,9 +16,9 @@ export interface BaseElement {
   zIndex: number
 }
 
-export type ElementType = 'shape' | 'text' | 'image' | 'icon' | 'group'
+export type ElementType = 'shape' | 'text' | 'image' | 'icon' | 'group' | 'line' | 'sticker'
 
-export type ShapeVariant = 'rectangle' | 'circle' | 'ellipse' | 'line'
+export type ShapeVariant = 'rectangle' | 'circle' | 'ellipse'
 export type HorizontalAlign = 'left' | 'center' | 'right'
 export type VerticalAlign = 'top' | 'center' | 'bottom'
 
@@ -42,7 +42,8 @@ export interface ShapeElement extends BaseElement {
   stroke?: string
   strokeWidth?: number
   strokeDashArray?: number[] // 虛線樣式，如 [8, 4] 表示 8px 實線 + 4px 空白
-  cornerRadius?: number
+  cornerRadius?: number // 統一圓角
+  borderRadius?: ImageBorderRadius // 四角不同圓角（用於圓拱形狀）
   align?: {
     horizontal?: HorizontalAlign
     vertical?: VerticalAlign
@@ -174,16 +175,46 @@ export interface IconElement extends BaseElement {
   color: string
 }
 
+// 線條元素
+export type LineStyle = 'solid' | 'dashed' | 'dotted'
+export type LineEndpoint = 'none' | 'arrow' | 'circle' | 'diamond'
+
+export interface LineElement extends BaseElement {
+  type: 'line'
+  // 起點和終點座標（相對於 x, y）
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  stroke: string
+  strokeWidth: number
+  lineStyle: LineStyle
+  startEndpoint?: LineEndpoint
+  endEndpoint?: LineEndpoint
+}
+
+// 印章/貼紙元素
+export type StickerCategory = 'frame' | 'decoration' | 'stamp' | 'badge' | 'divider'
+
+export interface StickerElement extends BaseElement {
+  type: 'sticker'
+  category: StickerCategory
+  stickerId: string  // 預設貼紙 ID
+  primaryColor?: string   // 主色（可自訂）
+  secondaryColor?: string // 副色（可自訂）
+}
+
 export interface GroupElement extends BaseElement {
   type: 'group'
   children: CanvasElement[]
 }
 
-export type CanvasElement = ShapeElement | TextElement | ImageElement | IconElement | GroupElement
+export type CanvasElement = ShapeElement | TextElement | ImageElement | IconElement | GroupElement | LineElement | StickerElement
 
 export interface CanvasPage {
   id: string
   name: string
+  templateKey?: string // 模板 key（cover, toc, itinerary 等）
   width: number
   height: number
   backgroundColor: string

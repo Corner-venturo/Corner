@@ -55,13 +55,12 @@ const TOURS_PAGINATED_PREFIX = 'tours-paginated-'
 export function useToursPaginated(params: UseToursPaginatedParams): UseToursPaginatedResult {
   const { page, pageSize, status, search, sortBy = 'departure_date', sortOrder = 'desc' } = params
 
-  // Auth check
+  // Auth check - 只用於寫入操作，讀取不需要等待 hydration
   const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
 
-  // Only fetch when authenticated
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? buildSwrKey(params) : null
+  // ✅ 優化：讀取操作不等待 auth hydration，讓 SWR 立即從快取顯示資料
+  // RLS 已在資料庫層保護資料，前端不需要重複驗證
+  const swrKey = buildSwrKey(params)
 
   const { data, error, isLoading, mutate: mutateSelf } = useSWR(
     swrKey,
@@ -230,8 +229,8 @@ export function useToursPaginated(params: UseToursPaginatedParams): UseToursPagi
     return code
   }
 
-  // Loading state
-  const effectiveLoading = !hasHydrated || (!swrKey && isAuthenticated) || isLoading
+  // Loading state - 簡化：只看 SWR 的 isLoading
+  const effectiveLoading = isLoading
 
   return {
     tours: data?.tours || [],

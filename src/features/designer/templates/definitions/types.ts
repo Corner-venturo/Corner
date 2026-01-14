@@ -147,10 +147,20 @@ export interface AttractionData {
 }
 
 /**
+ * 圖片位置設定
+ */
+export interface CoverImagePosition {
+  x: number // 0-100，水平位置百分比
+  y: number // 0-100，垂直位置百分比
+  scale: number // 1-3，縮放比例
+}
+
+/**
  * 從行程表中傳入的數據
  */
 export interface TemplateData {
   coverImage?: string
+  coverImagePosition?: CoverImagePosition // 封面圖片位置設定
   destination?: string
   mainTitle?: string
   subtitle?: string

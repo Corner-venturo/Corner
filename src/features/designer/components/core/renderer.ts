@@ -15,6 +15,8 @@ import {
   Object as FabricObject,
   Path,
   Gradient,
+  Line,
+  Triangle,
 } from 'fabric'
 import type {
   CanvasPage,
@@ -23,9 +25,12 @@ import type {
   TextElement,
   ImageElement,
   IconElement,
+  LineElement,
+  StickerElement,
   FabricObjectWithData,
   GradientFill,
 } from '../types'
+import { STICKER_PATHS, getStickerViewBox } from './sticker-paths'
 import { MATERIAL_ICON_PATHS, ICON_VIEWBOX_SIZE } from './icon-paths'
 import { logger } from '@/lib/utils/logger'
 
@@ -148,6 +153,20 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
 
   switch (el.variant) {
     case 'rectangle':
+      // 如果有四角不同圓角（borderRadius），使用 Path 來繪製
+      if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
+        const pathData = createRoundedRectPath(x, y, el.width, el.height, el.borderRadius)
+        return new Path(pathData, {
+          ...commonProps,
+          fill: fill,
+          stroke: el.stroke,
+          strokeWidth: el.strokeWidth,
+          strokeDashArray: el.strokeDashArray,
+          originX: 'left',
+          originY: 'top',
+        })
+      }
+      // 普通矩形
       return new Rect({
         ...commonProps,
         left: x,
@@ -211,7 +230,7 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
 function renderTextElement(el: TextElement, options: RenderOptions): FabricObject {
   const { isEditable } = options
 
-  return new Textbox(el.content, {
+  const textbox = new Textbox(el.content, {
     ...getCommonProps(el, isEditable),
     left: el.x,
     top: el.y,
@@ -226,7 +245,22 @@ function renderTextElement(el: TextElement, options: RenderOptions): FabricObjec
     textAlign: el.style.textAlign,
     originX: 'left',
     originY: 'top',
+    // 文字編輯設定：拉伸只改變寬度，不縮放文字
+    lockScalingY: true,  // 鎖定垂直縮放
+    splitByGrapheme: true, // 中文字元分割
   })
+
+  // 覆寫縮放行為：拉伸時只改變寬度，不縮放文字大小
+  textbox.on('scaling', () => {
+    const newWidth = textbox.width! * textbox.scaleX!
+    textbox.set({
+      width: newWidth,
+      scaleX: 1,
+      scaleY: 1,
+    })
+  })
+
+  return textbox
 }
 
 async function renderImageElement(
@@ -395,6 +429,187 @@ function renderIconElement(el: IconElement, options: RenderOptions): FabricObjec
 }
 
 /**
+ * 渲染線條元素
+ */
+function renderLineElement(el: LineElement, options: RenderOptions): FabricObject[] {
+  const { isEditable } = options
+  const commonProps = getCommonProps(el, isEditable)
+
+  // 計算線條虛線樣式
+  let strokeDashArray: number[] | undefined
+  switch (el.lineStyle) {
+    case 'dashed':
+      strokeDashArray = [10, 5]
+      break
+    case 'dotted':
+      strokeDashArray = [2, 4]
+      break
+    default:
+      strokeDashArray = undefined
+  }
+
+  const objects: FabricObject[] = []
+
+  // 主線條
+  const line = new Line([el.x1, el.y1, el.x2, el.y2], {
+    ...commonProps,
+    left: el.x,
+    top: el.y,
+    stroke: el.stroke,
+    strokeWidth: el.strokeWidth,
+    strokeDashArray,
+    originX: 'left',
+    originY: 'top',
+  })
+  objects.push(line)
+
+  // 計算線條角度（用於端點旋轉）
+  const angle = Math.atan2(el.y2 - el.y1, el.x2 - el.x1) * (180 / Math.PI)
+
+  // 起點端點
+  if (el.startEndpoint && el.startEndpoint !== 'none') {
+    const startObj = createEndpoint(
+      el.x + el.x1,
+      el.y + el.y1,
+      el.startEndpoint,
+      angle + 180,
+      el.stroke,
+      el.strokeWidth,
+      isEditable
+    )
+    if (startObj) objects.push(startObj)
+  }
+
+  // 終點端點
+  if (el.endEndpoint && el.endEndpoint !== 'none') {
+    const endObj = createEndpoint(
+      el.x + el.x2,
+      el.y + el.y2,
+      el.endEndpoint,
+      angle,
+      el.stroke,
+      el.strokeWidth,
+      isEditable
+    )
+    if (endObj) objects.push(endObj)
+  }
+
+  return objects
+}
+
+/**
+ * 建立線條端點形狀
+ */
+function createEndpoint(
+  x: number,
+  y: number,
+  type: 'arrow' | 'circle' | 'diamond',
+  angle: number,
+  color: string,
+  strokeWidth: number,
+  isEditable: boolean
+): FabricObject | null {
+  const size = strokeWidth * 3
+
+  switch (type) {
+    case 'arrow':
+      return new Triangle({
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        fill: color,
+        angle: angle + 90,
+        originX: 'center',
+        originY: 'center',
+        selectable: false,
+        evented: false,
+      })
+    case 'circle':
+      return new Circle({
+        left: x - size / 2,
+        top: y - size / 2,
+        radius: size / 2,
+        fill: color,
+        originX: 'left',
+        originY: 'top',
+        selectable: false,
+        evented: false,
+      })
+    case 'diamond':
+      return new Rect({
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        fill: color,
+        angle: 45,
+        originX: 'center',
+        originY: 'center',
+        selectable: false,
+        evented: false,
+      })
+    default:
+      return null
+  }
+}
+
+/**
+ * 渲染印章/貼紙元素
+ */
+function renderStickerElement(el: StickerElement, options: RenderOptions): FabricObject {
+  const { isEditable } = options
+  const commonProps = getCommonProps(el, isEditable)
+
+  const stickerData = STICKER_PATHS[el.stickerId]
+  if (!stickerData) {
+    // 貼紙不存在時顯示佔位符
+    logger.warn(`[Renderer] Sticker "${el.stickerId}" not found, using placeholder`)
+    return new Rect({
+      ...commonProps,
+      left: el.x,
+      top: el.y,
+      width: el.width,
+      height: el.height,
+      fill: '#f0f0f0',
+      stroke: '#ccc',
+      strokeWidth: 1,
+      strokeDashArray: [5, 5],
+      originX: 'left',
+      originY: 'top',
+    })
+  }
+
+  // 取得 viewBox 並計算縮放
+  const viewBox = getStickerViewBox(el.stickerId)
+  const scaleX = el.width / viewBox.width
+  const scaleY = el.height / viewBox.height
+  const scale = Math.min(scaleX, scaleY)
+
+  // 替換顏色
+  let pathData = stickerData.path
+  if (el.primaryColor) {
+    pathData = pathData.replace(/#c9aa7c/gi, el.primaryColor)
+  }
+  if (el.secondaryColor) {
+    pathData = pathData.replace(/#8b8680/gi, el.secondaryColor)
+  }
+
+  const path = new Path(pathData, {
+    ...commonProps,
+    left: el.x,
+    top: el.y,
+    fill: el.primaryColor || stickerData.defaultColor || '#c9aa7c',
+    scaleX: scale,
+    scaleY: scale,
+    originX: 'left',
+    originY: 'top',
+  })
+
+  return path
+}
+
+/**
  * 確保必要的字體已載入
  */
 async function ensureFontsLoaded(): Promise<void> {
@@ -468,15 +683,26 @@ export async function renderPageOnCanvas(
         return renderImageElement(el as ImageElement, options)
       case 'icon':
         return Promise.resolve(renderIconElement(el as IconElement, options))
+      case 'line':
+        // 線條元素返回多個物件（線條 + 端點）
+        return Promise.resolve(renderLineElement(el as LineElement, options))
+      case 'sticker':
+        return Promise.resolve(renderStickerElement(el as StickerElement, options))
       default:
         return Promise.resolve(null)
     }
   })
 
-  const fabricObjects = await Promise.all(fabricObjectPromises)
+  const fabricObjectsOrArrays = await Promise.all(fabricObjectPromises)
+
+  // 扁平化陣列（處理線條元素返回的多個物件）
+  const fabricObjects = fabricObjectsOrArrays.flatMap((obj) => {
+    if (Array.isArray(obj)) return obj
+    return obj ? [obj] : []
+  })
 
   // 加入到 Canvas
-  canvas.add(...fabricObjects.filter((obj): obj is FabricObject => obj !== null))
+  canvas.add(...fabricObjects)
 
   // 渲染
   canvas.renderAll()

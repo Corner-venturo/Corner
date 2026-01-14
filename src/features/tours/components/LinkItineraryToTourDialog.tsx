@@ -80,14 +80,30 @@ export function LinkItineraryToTourDialog({
     if (type === 'brochure') {
       // 手冊設計 - 導向 brochure 頁面
       if (linkedPackage) {
-        router.push(`/brochure?package_id=${linkedPackage.id}`)
+        // 判斷套件的行程表類型
+        if (linkedPackage.itinerary_type === 'timeline' && linkedPackage.timeline_data) {
+          // 時間軸行程表：使用 package_id
+          router.push(`/brochure?package_id=${linkedPackage.id}`)
+        } else if (linkedPackage.itinerary_id) {
+          // 快速行程表：使用 itinerary_id
+          router.push(`/brochure?itinerary_id=${linkedPackage.itinerary_id}`)
+        } else {
+          // 沒有行程表，使用 package_id（會顯示空白範本）
+          router.push(`/brochure?package_id=${linkedPackage.id}`)
+        }
       } else {
         router.push(`/brochure?tour_id=${tour.id}`)
       }
     } else {
       // 網頁行程表 - 導向網頁行程頁面（未來功能）
       if (linkedPackage) {
-        router.push(`/brochure?package_id=${linkedPackage.id}&mode=web`)
+        if (linkedPackage.itinerary_type === 'timeline' && linkedPackage.timeline_data) {
+          router.push(`/brochure?package_id=${linkedPackage.id}&mode=web`)
+        } else if (linkedPackage.itinerary_id) {
+          router.push(`/brochure?itinerary_id=${linkedPackage.itinerary_id}&mode=web`)
+        } else {
+          router.push(`/brochure?package_id=${linkedPackage.id}&mode=web`)
+        }
       } else {
         router.push(`/brochure?tour_id=${tour.id}&mode=web`)
       }

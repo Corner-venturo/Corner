@@ -1045,6 +1045,78 @@ export type Database = {
           },
         ]
       }
+      background_tasks: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          id: string
+          max_attempts: number
+          payload: Json
+          priority: Database["public"]["Enums"]["task_priority"]
+          result: Json | null
+          scheduled_at: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          max_attempts?: number
+          payload?: Json
+          priority?: Database["public"]["Enums"]["task_priority"]
+          result?: Json | null
+          scheduled_at?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          max_attempts?: number
+          payload?: Json
+          priority?: Database["public"]["Enums"]["task_priority"]
+          result?: Json | null
+          scheduled_at?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "background_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "background_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badge_definitions: {
         Row: {
           category: string | null
@@ -1193,6 +1265,122 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brochure_documents: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_version_id: string | null
+          id: string
+          name: string
+          tour_id: string | null
+          type: string
+          updated_at: string
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          name?: string
+          tour_id?: string | null
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          name?: string
+          tour_id?: string | null
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brochure_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brochure_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brochure_documents_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_brochure_current_version"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "brochure_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brochure_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data: Json
+          document_id: string
+          id: string
+          restored_from: string | null
+          thumbnail_url: string | null
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          document_id: string
+          id?: string
+          restored_from?: string | null
+          thumbnail_url?: string | null
+          version_number?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          document_id?: string
+          id?: string
+          restored_from?: string | null
+          thumbnail_url?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brochure_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "brochure_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brochure_versions_restored_from_fkey"
+            columns: ["restored_from"]
+            isOneToOne: false
+            referencedRelation: "brochure_versions"
             referencedColumns: ["id"]
           },
         ]
@@ -3063,6 +3251,68 @@ export type Database = {
         }
         Relationships: []
       }
+      design_templates: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          data: Json
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          is_public: boolean | null
+          name: string
+          tags: string[] | null
+          thumbnail_url: string | null
+          type: string
+          updated_at: string
+          use_count: number | null
+          workspace_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          name: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          type: string
+          updated_at?: string
+          use_count?: number | null
+          workspace_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          type?: string
+          updated_at?: string
+          use_count?: number | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "design_templates_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       designer_drafts: {
         Row: {
           attractions: Json | null
@@ -4802,6 +5052,71 @@ export type Database = {
           },
         ]
       }
+      itinerary_documents: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_version_id: string | null
+          id: string
+          name: string
+          tour_id: string | null
+          updated_at: string
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          name?: string
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          name?: string
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_itinerary_current_version"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_documents_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itinerary_items: {
         Row: {
           attraction_id: string | null
@@ -4905,6 +5220,54 @@ export type Database = {
             columns: ["itinerary_id"]
             isOneToOne: false
             referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itinerary_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data: Json
+          document_id: string
+          id: string
+          restored_from: string | null
+          thumbnail_url: string | null
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          document_id: string
+          id?: string
+          restored_from?: string | null
+          thumbnail_url?: string | null
+          version_number?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          document_id?: string
+          id?: string
+          restored_from?: string | null
+          thumbnail_url?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_versions_restored_from_fkey"
+            columns: ["restored_from"]
+            isOneToOne: false
+            referencedRelation: "itinerary_versions"
             referencedColumns: ["id"]
           },
         ]
@@ -6202,6 +6565,7 @@ export type Database = {
           tab_order: number
           updated_at: string | null
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
           content?: string
@@ -6212,6 +6576,7 @@ export type Database = {
           tab_order?: number
           updated_at?: string | null
           user_id: string
+          workspace_id?: string | null
         }
         Update: {
           content?: string
@@ -6222,6 +6587,7 @@ export type Database = {
           tab_order?: number
           updated_at?: string | null
           user_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -6229,6 +6595,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -16258,6 +16631,13 @@ export type Database = {
       channel_visibility: "private" | "public"
       confirmation_type: "accommodation" | "flight"
       subledger_type: "customer" | "supplier" | "bank" | "group" | "employee"
+      task_priority: "low" | "normal" | "high" | "critical"
+      task_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "cancelled"
       verification_status: "verified" | "unverified" | "rejected"
       voucher_status: "draft" | "posted" | "reversed" | "locked"
     }
@@ -16400,6 +16780,14 @@ export const Constants = {
       channel_visibility: ["private", "public"],
       confirmation_type: ["accommodation", "flight"],
       subledger_type: ["customer", "supplier", "bank", "group", "employee"],
+      task_priority: ["low", "normal", "high", "critical"],
+      task_status: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
       verification_status: ["verified", "unverified", "rejected"],
       voucher_status: ["draft", "posted", "reversed", "locked"],
     },

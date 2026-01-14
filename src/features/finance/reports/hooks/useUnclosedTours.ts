@@ -13,7 +13,6 @@ import useSWR from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { Tour } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
-import { useAuthStore } from '@/stores/auth-store'
 
 // Extended type for unclosed tour with calculated fields
 export interface UnclosedTourData extends Tour {
@@ -49,13 +48,8 @@ export interface UseUnclosedToursResult {
 }
 
 export function useUnclosedTours(): UseUnclosedToursResult {
-  // Auth check
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // Only fetch when authenticated
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? 'unclosed-tours-report' : null
+  // ✅ 優化：讀取不等 auth hydration，讓 SWR 立即從快取顯示
+  const swrKey = 'unclosed-tours-report'
 
   const { data, error, isLoading, mutate } = useSWR(
     swrKey,
@@ -113,8 +107,8 @@ export function useUnclosedTours(): UseUnclosedToursResult {
     }
   )
 
-  // Loading state
-  const effectiveLoading = !hasHydrated || (!swrKey && isAuthenticated) || isLoading
+  // Loading state - 簡化
+  const effectiveLoading = isLoading
 
   return {
     tours: data?.tours || [],

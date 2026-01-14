@@ -112,12 +112,8 @@ async function fetchData<T>(config: GlobalDataConfig): Promise<T[]> {
  * 任何地方呼叫都共享同一份快取
  */
 export function useToursGlobal() {
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // 統一快取 key（與其他 hooks 共用）
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:tours:list` : null
+  // ✅ 優化：讀取不等 auth hydration，讓 SWR 立即從快取顯示
+  const swrKey = `${CACHE_KEY_PREFIX}:tours:list`
 
   const { data, error, isLoading, mutate } = useSWR<Tour[]>(
     swrKey,
@@ -127,7 +123,7 @@ export function useToursGlobal() {
 
   return {
     tours: data || [],
-    loading: !hasHydrated || isLoading,
+    loading: isLoading,
     error: error?.message || null,
     refresh: () => mutate(),
   }
@@ -137,12 +133,8 @@ export function useToursGlobal() {
  * useToursSlim - 精簡版 Tours（列表顯示用）
  */
 export function useToursSlimGlobal() {
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // 統一快取 key（與其他 hooks 共用）
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:tours:slim` : null
+  // ✅ 優化：讀取不等 auth hydration
+  const swrKey = `${CACHE_KEY_PREFIX}:tours:slim`
 
   const { data, error, isLoading, mutate } = useSWR<Partial<Tour>[]>(
     swrKey,
@@ -152,7 +144,7 @@ export function useToursSlimGlobal() {
 
   return {
     tours: data || [],
-    loading: !hasHydrated || isLoading,
+    loading: isLoading,
     error: error?.message || null,
     refresh: () => mutate(),
   }
@@ -162,12 +154,8 @@ export function useToursSlimGlobal() {
  * useOrdersGlobal - 全域快取的 Orders
  */
 export function useOrdersGlobal() {
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // 統一快取 key（與其他 hooks 共用）
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:orders:list` : null
+  // ✅ 優化：讀取不等 auth hydration
+  const swrKey = `${CACHE_KEY_PREFIX}:orders:list`
 
   const { data, error, isLoading, mutate } = useSWR<Order[]>(
     swrKey,
@@ -177,7 +165,7 @@ export function useOrdersGlobal() {
 
   return {
     orders: data || [],
-    loading: !hasHydrated || isLoading,
+    loading: isLoading,
     error: error?.message || null,
     refresh: () => mutate(),
   }
@@ -187,12 +175,8 @@ export function useOrdersGlobal() {
  * useOrdersSlimGlobal - 精簡版 Orders
  */
 export function useOrdersSlimGlobal() {
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  // 統一快取 key（與其他 hooks 共用）
-  const swrKey = hasHydrated && isAuthenticated && user?.id ? `${CACHE_KEY_PREFIX}:orders:slim` : null
+  // ✅ 優化：讀取不等 auth hydration
+  const swrKey = `${CACHE_KEY_PREFIX}:orders:slim`
 
   const { data, error, isLoading, mutate } = useSWR<Partial<Order>[]>(
     swrKey,
@@ -202,7 +186,7 @@ export function useOrdersSlimGlobal() {
 
   return {
     orders: data || [],
-    loading: !hasHydrated || isLoading,
+    loading: isLoading,
     error: error?.message || null,
     refresh: () => mutate(),
   }
@@ -244,19 +228,14 @@ interface UseGlobalDataResult {
  * const { tours, loading } = useGlobalData({ toursSlim: true })
  */
 export function useGlobalData(options: UseGlobalDataOptions): UseGlobalDataResult {
-  const user = useAuthStore(state => state.user)
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const hasHydrated = useAuthStore(state => state._hasHydrated)
-
-  const isReady = hasHydrated && isAuthenticated && user?.id
-
+  // ✅ 優化：讀取不等 auth hydration
   // 根據 options 決定要載入哪些資料
   const keysToLoad = Object.entries(options)
     .filter(([_, enabled]) => enabled)
     .map(([key]) => key as DataKey)
 
   // 建立 SWR key（包含所有要載入的資料類型）
-  const swrKey = isReady ? `global-data-${keysToLoad.sort().join('-')}` : null
+  const swrKey = `global-data-${keysToLoad.sort().join('-')}`
 
   const { data, error, isLoading, mutate } = useSWR(
     swrKey,
@@ -292,7 +271,7 @@ export function useGlobalData(options: UseGlobalDataOptions): UseGlobalDataResul
     members: (data?.members as Member[]) || [],
     quotes: (data?.quotes as Quote[]) || [],
     itineraries: (data?.itineraries as Itinerary[]) || [],
-    loading: !hasHydrated || isLoading,
+    loading: isLoading,
     error: error?.message || null,
     refresh: async () => { await mutate() },
   }

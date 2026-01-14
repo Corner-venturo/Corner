@@ -145,7 +145,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           'top-14 bottom-0 left-0',
           // 桌面模式 (>= lg)：扣除 sidebar 寬度，有 top header
           'lg:top-[72px] lg:bottom-0',
-          !isClient ? 'lg:left-16' : sidebarCollapsed ? 'lg:left-16' : 'lg:left-[190px]'
+          !isClient ? 'lg:left-16' : sidebarCollapsed ? 'lg:left-16' : 'lg:left-[180px]'
         )}
         style={{
           transitionDuration: `${LAYOUT_TRANSITION_DURATION}ms`,
