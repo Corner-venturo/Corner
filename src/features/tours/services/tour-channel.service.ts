@@ -69,19 +69,24 @@ export async function createTourChannel(
       membersToAdd.push({ employeeId: tour.controller_id, role: 'admin' })
     }
 
-    // 5. 批量加入成員
-    for (const member of membersToAdd) {
-      try {
-        await supabase.from('channel_members').insert({
-          workspace_id: tour.workspace_id,
-          channel_id: newChannel.id,
-          employee_id: member.employeeId,
-          role: member.role,
-          status: 'active',
-        } as never)
-        logger.log(`[TourChannel] 成員加入成功: ${member.employeeId} (${member.role})`)
-      } catch (memberError) {
-        logger.warn(`[TourChannel] 加入成員失敗（可能已存在）:`, memberError)
+    // 5. 批量加入成員（一次 INSERT 多筆）
+    if (membersToAdd.length > 0) {
+      const memberInserts = membersToAdd.map(member => ({
+        workspace_id: tour.workspace_id,
+        channel_id: newChannel.id,
+        employee_id: member.employeeId,
+        role: member.role,
+        status: 'active',
+      }))
+
+      const { error: membersError } = await supabase
+        .from('channel_members')
+        .insert(memberInserts as never)
+
+      if (membersError) {
+        logger.warn(`[TourChannel] 批量加入成員失敗（可能已存在）:`, membersError)
+      } else {
+        logger.log(`[TourChannel] 成功加入 ${membersToAdd.length} 位成員`)
       }
     }
 
@@ -117,30 +122,39 @@ export async function addMembersToTourChannel(
       return { success: false, error: '找不到頻道' }
     }
 
-    // 2. 加入成員
-    for (const employeeId of employeeIds) {
-      try {
-        // 先檢查是否已經是成員
-        const { data: existingMember } = await supabase
-          .from('channel_members')
-          .select('id')
-          .eq('channel_id', channel.id)
-          .eq('employee_id', employeeId)
-          .maybeSingle()
+    // 2. 批量檢查已存在的成員（1 次查詢取代 N 次）
+    const { data: existingMembers } = await supabase
+      .from('channel_members')
+      .select('employee_id')
+      .eq('channel_id', channel.id)
+      .in('employee_id', employeeIds)
 
-        if (!existingMember) {
-          await supabase.from('channel_members').insert({
-            workspace_id: channel.workspace_id,
-            channel_id: channel.id,
-            employee_id: employeeId,
-            role,
-            status: 'active',
-          } as never)
-          logger.log(`[TourChannel] 成員加入頻道: ${employeeId}`)
-        }
-      } catch (memberError) {
-        logger.warn(`[TourChannel] 加入成員失敗:`, memberError)
+    const existingSet = new Set((existingMembers || []).map(m => m.employee_id))
+
+    // 3. 篩選出需要新增的成員
+    const newEmployeeIds = employeeIds.filter(id => !existingSet.has(id))
+
+    // 4. 批量新增成員（1 次 INSERT 取代 N 次）
+    if (newEmployeeIds.length > 0) {
+      const memberInserts = newEmployeeIds.map(employeeId => ({
+        workspace_id: channel.workspace_id,
+        channel_id: channel.id,
+        employee_id: employeeId,
+        role,
+        status: 'active',
+      }))
+
+      const { error: insertError } = await supabase
+        .from('channel_members')
+        .insert(memberInserts as never)
+
+      if (insertError) {
+        logger.warn(`[TourChannel] 批量加入成員失敗:`, insertError)
+      } else {
+        logger.log(`[TourChannel] 成功加入 ${newEmployeeIds.length} 位成員至頻道`)
       }
+    } else {
+      logger.log(`[TourChannel] 所有成員已在頻道中，無需新增`)
     }
 
     return { success: true }
