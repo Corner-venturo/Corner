@@ -5,7 +5,8 @@
 import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
 import { useAuthStore } from '@/stores'
-import { useOrders, useTours, useEmployees, useReceipts, createReceipt, updateReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
+import { alert } from '@/lib/ui/alert-dialog'
+import { useOrders, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
@@ -24,9 +25,9 @@ export function usePaymentData() {
   const { items: orders } = useOrders()
   const { items: receipts } = useReceipts()
   const { items: linkpayLogs } = useLinkPayLogs()
-  const { items: tours } = useTours()
+  const { get: getTour } = useTourDictionary()
   const { user } = useAuthStore()
-  const { items: employees } = useEmployees()
+  const { get: getEmployee } = useEmployeeDictionary()
   const { hasAccounting, isExpired } = useAccountingModule()
 
   // 過濾可用訂單（未收款或部分收款）
@@ -55,13 +56,13 @@ export function usePaymentData() {
       const data = await response.json()
 
       if (data.success) {
-        alert('✅ LinkPay 付款連結生成成功')
+        void alert('LinkPay 付款連結生成成功', 'success')
       } else {
-        alert(`❌ LinkPay 生成失敗: ${data.message}`)
+        void alert(`LinkPay 生成失敗: ${data.message}`, 'error')
       }
     } catch (error) {
       logger.error('LinkPay API 錯誤:', error)
-      alert('❌ LinkPay 連結生成失敗')
+      void alert('LinkPay 連結生成失敗', 'error')
     }
   }
 
@@ -77,8 +78,8 @@ export function usePaymentData() {
 
     const selectedOrder = orders.find(order => order.id === selectedOrderId)
 
-    // 取得團號（從訂單關聯的旅遊團）
-    const tour = tours.find(t => t.id === selectedOrder?.tour_id)
+    // 取得團號（從訂單關聯的旅遊團）- 使用 Dictionary O(1) 查詢
+    const tour = selectedOrder?.tour_id ? getTour(selectedOrder.tour_id) : undefined
     const tourCode = tour?.code || ''
     if (!tourCode) {
       throw new Error('無法取得團號，請確認訂單已關聯旅遊團')
@@ -206,7 +207,7 @@ export function usePaymentData() {
 
     // 如果金額異常，發送機器人通知給建立者
     if (isAbnormal && receipt?.created_by && receipt.created_by !== user.id) {
-      const confirmer = employees.find(e => e.id === user.id)
+      const confirmer = getEmployee(user.id)
       const confirmerName = confirmer?.chinese_name || confirmer?.display_name || '會計'
 
       try {

@@ -1,27 +1,22 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { QuickReceipt } from '@/components/todos/quick-actions/quick-receipt'
 import { useOrdersListSlim, useToursListSlim } from '@/hooks/useListSlim'
-// 🔧 優化：移除 useMemberActions，此頁面沒有用到
 import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
-import { cn } from '@/lib/utils'
-import type { Order, Member } from '@/stores/types'
+import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
 export default function OrdersPage() {
-  const router = useRouter()
   const { items: orders, create: addOrder } = useOrdersListSlim()
   const { items: tours } = useToursListSlim()
   const { currentWorkspace, loadWorkspaces } = useWorkspaceChannels()
   const [statusFilter, setStatusFilter] = useState('all')
-  const [tourFilter, _setTourFilter] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
@@ -35,7 +30,7 @@ export default function OrdersPage() {
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
     loadWorkspaces()
-  }, [])
+  }, [loadWorkspaces])
 
   // 🔧 優化：建立 tour 出發日期 Map，避免排序時 O(n²) 查詢
   const tourDepartureDates = useMemo(() => {
@@ -63,8 +58,6 @@ export default function OrdersPage() {
         break
     }
 
-    const matchesTour = !tourFilter || order.tour_id === tourFilter
-
     const searchLower = searchQuery.toLowerCase()
     const matchesSearch =
       !searchQuery ||
@@ -75,7 +68,7 @@ export default function OrdersPage() {
       order.sales_person?.toLowerCase().includes(searchLower) ||
       order.assistant?.toLowerCase().includes(searchLower)
 
-    return matchesFilter && matchesTour && matchesSearch
+    return matchesFilter && matchesSearch
   })
 
   // 按出發日期排序（近的在前）- 使用 Map 做 O(1) 查詢
@@ -84,68 +77,6 @@ export default function OrdersPage() {
     const dateB = b.tour_id ? (tourDepartureDates.get(b.tour_id) ?? 0) : 0
     return dateA - dateB
   })
-
-  // 計算待辦事項 (用戶要求移除)
-  const todos: never[] = React.useMemo(() => {
-    return [];
-    /*
-    const result: TodoItem[] = []
-    const today = new Date()
-    const _sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
-
-    orders.forEach(order => {
-      const tour = tours.find(t => t.id === order.tour_id)
-      if (!tour) return
-
-      const departure_date = new Date(tour.departure_date)
-      const daysUntilDeparture = Math.ceil(
-        (departure_date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      )
-
-      // 1. 即將出發但未收齊款項
-      if (daysUntilDeparture <= 7 && daysUntilDeparture >= 0 && order.payment_status !== 'paid') {
-        result.push({
-          type: 'payment',
-          priority: 'high',
-          message: `${order.order_number} - ${daysUntilDeparture}天後出發，尚未收齊款項`,
-          order_id: order.id,
-        })
-      }
-
-      // 2. 未收款超過30天
-      if (order.payment_status === 'unpaid') {
-        const orderDate = new Date(order.created_at || today)
-        const daysOverdue = Math.ceil(
-          (today.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24)
-        )
-        if (daysOverdue > 30) {
-          result.push({
-            type: 'overdue',
-            priority: 'high',
-            message: `${order.order_number} - 訂單已${daysOverdue}天未收款`,
-            order_id: order.id,
-          })
-        }
-      }
-
-      // 3. 部分收款提醒
-      if (
-        order.payment_status === 'partial' &&
-        daysUntilDeparture <= 14 &&
-        daysUntilDeparture >= 0
-      ) {
-        result.push({
-          type: 'partial',
-          priority: 'medium',
-          message: `${order.order_number} - 尚有 NT$ ${(order.remaining_amount ?? 0).toLocaleString()} 未收`,
-          order_id: order.id,
-        })
-      }
-    })
-
-    return result
-    */
-  }, [orders, tours]);
 
   const handleAddOrder = async (orderData: {
     tour_id: string
@@ -220,67 +151,11 @@ export default function OrdersPage() {
         onTabChange={setStatusFilter}
         onAdd={() => setIsAddDialogOpen(true)}
         addLabel="新增訂單"
-        actions={
-          todos.length > 0 && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-morandi-red/10 text-morandi-red rounded-lg">
-              <AlertCircle size={16} />
-              <span className="text-sm font-medium">{todos.length} 個待辦</span>
-            </div>
-          )
-        }
       />
 
       <div className="flex-1 overflow-auto flex flex-col">
-        {/* 待辦事項提醒 (用戶要求移除) */}
-        {/*
-        {todos.length > 0 && (
-          <div className="mb-6">
-            <div className="bg-morandi-red/5 border border-morandi-red/20 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertCircle size={20} className="text-morandi-red" />
-                <h3 className="font-semibold text-morandi-primary">待辦事項</h3>
-              </div>
-              <div className="space-y-2">
-                {todos.map((todo, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 p-3 bg-card rounded-lg hover:bg-morandi-container/20 transition-colors cursor-pointer"
-                    onClick={() => {
-                      const order = orders.find(o => o.id === todo.order_id)
-                      if (order) {
-                        // 🔥 開啟快速收款對話框，而不是跳轉
-                        setSelectedOrderForReceipt({
-                          orderId: order.id,
-                          tourId: order.tour_id,
-                        })
-                        setIsReceiptDialogOpen(true)
-                      }
-                    }}
-                  >
-                    <div
-                      className={cn(
-                        'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
-                        todo.priority === 'high' ? 'bg-morandi-red' : 'bg-morandi-gold'
-                      )}
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm text-morandi-primary">{todo.message}</p>
-                      <p className="text-xs text-morandi-secondary mt-1">
-                        {todo.type === 'payment' && '💰 收款提醒'}
-                        {todo.type === 'overdue' && '⚠️ 逾期提醒'}
-                        {todo.type === 'partial' && '💵 尾款提醒'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        */}
-
         {/* 訂單列表 */}
-        <SimpleOrderTable className="flex-1" orders={sortedOrders as Order[]} tours={tours} showTourInfo={true} />
+        <SimpleOrderTable className="flex-1" orders={sortedOrders} tours={tours} showTourInfo={true} />
       </div>
 
       {/* 新增訂單對話框 */}

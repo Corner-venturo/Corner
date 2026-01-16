@@ -166,7 +166,8 @@ export const useChannelsStore = () => {
     // ============================================
     // Channel 操作 (使用 createStore 的方法)
     // ============================================
-    loadChannels: async (workspaceId?: string) => {
+    loadChannels: async (_workspaceId?: string) => {
+      // workspaceId 參數保留以維持 API 兼容性，實際過濾由 RLS 處理
       await channelStore.fetchAll()
     },
 
@@ -189,7 +190,7 @@ export const useChannelsStore = () => {
             status: 'active',
           })
         } catch (error) {
-          // Silently fail
+          logger.warn('[ChannelsStore] 加入頻道擁有者失敗:', error)
         }
       }
 
@@ -262,8 +263,8 @@ export const useChannelsStore = () => {
     reorderChannels: (channels: Channel[]) => {
       // 批量更新順序 (createStore 會自動處理)
       channels.forEach((channel, index) => {
-        channelStore.update(channel.id, { order: index }).catch(() => {
-          // 靜默失敗
+        channelStore.update(channel.id, { order: index }).catch((error) => {
+          logger.warn('[ChannelsStore] 更新頻道順序失敗:', error)
         })
       })
     },

@@ -170,11 +170,11 @@ export function Sidebar() {
     return pathname.startsWith(href)
   }
 
-  // 權限過濾
-  const userPermissions = user?.permissions || []
-  const userRoles = user?.roles || []
-  const hiddenMenuItems = user?.hidden_menu_items || []
-  const preferredFeatures = user?.preferred_features || []
+  // 權限過濾（使用 useMemo 避免每次渲染時建立新陣列）
+  const userPermissions = useMemo(() => user?.permissions || [], [user?.permissions])
+  const userRoles = useMemo(() => user?.roles || [], [user?.roles])
+  const hiddenMenuItems = useMemo(() => user?.hidden_menu_items || [], [user?.hidden_menu_items])
+  const preferredFeatures = useMemo(() => user?.preferred_features || [], [user?.preferred_features])
 
   const isSuperAdmin =
     userPermissions.includes('super_admin') ||
@@ -225,25 +225,22 @@ export function Sidebar() {
         .filter((item): item is MenuItem => item !== null)
     }
     return filterMenuByPermissions(menuItems)
-  }, [user?.id, user?.workspace_code, user?.workspace_type, isSupplierWorkspace, isVehicleSupplier, isSuperAdmin, JSON.stringify(preferredFeatures), JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+  }, [user?.id, user?.workspace_code, user?.workspace_type, isSupplierWorkspace, isVehicleSupplier, isSuperAdmin, preferredFeatures, hiddenMenuItems, userPermissions])
 
   const visiblePersonalToolItems = useMemo(() => {
     // 供應商不顯示個人工具
     if (isSupplierWorkspace) return []
 
-    const filterMenuByPermissions = (items: MenuItem[]): MenuItem[] => {
-      if (!user) return items.filter(item => !item.requiredPermission)
-      return items
-        .map(item => {
-          if (isMenuItemHidden(item.href, hiddenMenuItems)) return null
-          if (!item.requiredPermission) return item
-          if (isSuperAdmin) return item
-          return userPermissions.includes(item.requiredPermission) ? item : null
-        })
-        .filter((item): item is MenuItem => item !== null)
-    }
-    return filterMenuByPermissions(personalToolItems)
-  }, [user?.id, isSupplierWorkspace, isSuperAdmin, JSON.stringify(hiddenMenuItems), JSON.stringify(userPermissions)])
+    // 簡化版篩選（個人工具不需要 restrictedFeature 或 preferredFeatures 檢查）
+    return personalToolItems
+      .filter(item => {
+        if (!user) return !item.requiredPermission
+        if (isMenuItemHidden(item.href, hiddenMenuItems)) return false
+        if (!item.requiredPermission) return true
+        if (isSuperAdmin) return true
+        return userPermissions.includes(item.requiredPermission)
+      })
+  }, [user?.id, isSupplierWorkspace, isSuperAdmin, hiddenMenuItems, userPermissions])
 
   // 渲染菜單項目
   const renderMenuItem = (item: MenuItem, isChild = false) => {

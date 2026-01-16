@@ -6,7 +6,7 @@ import { Sidebar } from './sidebar'
 import { MobileHeader } from './mobile-header'
 import { MobileSidebar } from './mobile-sidebar'
 import { cn } from '@/lib/utils'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation'
 import {
   NO_SIDEBAR_PAGES,
@@ -27,7 +27,6 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const { sidebarCollapsed } = useAuthStore()
   const pathname = usePathname()
-  const router = useRouter()
   const [isClient, setIsClient] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -46,24 +45,6 @@ export function MainLayout({ children }: MainLayoutProps) {
     // 儲存當前路徑到 localStorage
     localStorage.setItem(STORAGE_KEY_LAST_VISITED, pathname)
   }, [isClient, pathname])
-
-  // 簡化的認證檢查 - 暫時停用,使用 auth-store 的 user
-  useEffect(() => {
-    if (!isClient) return
-    if (pathname === '/login') return
-
-    // 給 Zustand persist 一點時間載入
-    const checkTimeout = setTimeout(() => {
-      // 暫時停用檢查,避免無限循環
-      // const authState = useAuthStore.getState()
-      // const authUser = authState.user
-      // if (!authUser) {
-      //   router.push('/login');
-      // }
-    }, 50)
-
-    return () => clearTimeout(checkTimeout)
-  }, [isClient, pathname, router])
 
       // 初始化離線資料庫和基礎資料（延遲執行，避免阻塞首次渲染）
       useEffect(() => {

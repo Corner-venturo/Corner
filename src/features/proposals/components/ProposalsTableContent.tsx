@@ -127,14 +127,14 @@ export function ProposalsTableContent({ searchQuery = '' }: ProposalsTableConten
           // 先刪除相關套件
           if (packages.length > 0) {
             const { error: pkgError } = await supabase
-              .from('proposal_packages' as 'notes')
+              .from('proposal_packages')
               .delete()
               .eq('proposal_id', proposal.id)
             if (pkgError) throw pkgError
           }
 
           // 再刪除提案
-          const { error } = await supabase.from('proposals' as 'notes').delete().eq('id', proposal.id)
+          const { error } = await supabase.from('proposals').delete().eq('id', proposal.id)
           if (error) throw error
 
           refreshProposals()

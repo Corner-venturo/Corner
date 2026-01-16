@@ -144,12 +144,12 @@ export const useCustomerGroupMembers = createCloudHook<CustomerGroupMember>('cus
 // ===== 提案系統 =====
 
 // 提案
-export const useProposals = createCloudHook<Proposal>('proposals' as 'notes', {
+export const useProposals = createCloudHook<Proposal>('proposals', {
   orderBy: { column: 'created_at', ascending: false },
 })
 
 // 團體套件
-export const useProposalPackages = createCloudHook<ProposalPackage>('proposal_packages' as 'notes', {
+export const useProposalPackages = createCloudHook<ProposalPackage>('proposal_packages', {
   orderBy: { column: 'version_number', ascending: true },
 })
 

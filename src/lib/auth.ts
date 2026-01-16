@@ -1,7 +1,5 @@
 import bcrypt from 'bcryptjs'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'venturo_app_jwt_secret_key_change_in_production_2024'
-
 export interface AuthPayload {
   id: string
   employee_number: string

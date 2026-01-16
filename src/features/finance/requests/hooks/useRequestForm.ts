@@ -18,7 +18,7 @@ export function useRequestForm() {
   useEffect(() => {
     loadTours()
     loadOrders()
-  }, [])  
+  }, [loadTours, loadOrders])  
 
   const [formData, setFormData] = useState<RequestFormData>({
     request_category: 'tour', // 預設團體請款

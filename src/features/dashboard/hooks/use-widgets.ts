@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import type { WidgetType } from '../types'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
+import { logger } from '@/lib/utils/logger'
 
 const STORAGE_KEY = 'homepage-widgets'
 const PREFERENCE_KEY = 'homepage-widgets-order'
@@ -89,10 +90,10 @@ export function useWidgets() {
         )
 
         if (error) {
-          // Failed to save to Supabase but localStorage is synced
+          logger.warn('[useWidgets] Failed to save to Supabase:', error.message)
         }
       } catch (error) {
-        // Error saving widget preferences
+        logger.warn('[useWidgets] Error saving widget preferences:', error)
       }
     }
   }

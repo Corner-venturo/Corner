@@ -9,6 +9,7 @@ import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
 import { CurrencyCell, DateCell } from '@/components/table-cells'
 import { useAccountingStore } from '@/stores/accounting-store'
 import type { Transaction } from '@/stores/accounting-store'
+import { useReceipts } from '@/data'
 import {
   CreditCard,
   TrendingUp,
@@ -31,6 +32,7 @@ export default function FinancePage() {
     transactionsPageSize,
     transactionsCount,
   } = useAccountingStore()
+  const { items: receipts } = useReceipts()
 
   useEffect(() => {
     initialize()
@@ -40,8 +42,12 @@ export default function FinancePage() {
   const totalReceivable = stats.total_income
   const totalPayable = stats.total_expense
   const netProfit = totalReceivable - totalPayable
-  // Placeholder for pending payments as this data is not in the accounting store
-  const pendingPayments = 0 
+  // 計算待確認款項：status === '0' 的收款單金額總和
+  const pendingPayments = useMemo(() => {
+    return receipts
+      .filter(r => r.status === '0')
+      .reduce((sum, r) => sum + (r.receipt_amount || 0), 0)
+  }, [receipts]) 
 
   const transactionColumns: TableColumn<Transaction>[] = useMemo(
     () => [

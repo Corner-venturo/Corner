@@ -49,9 +49,6 @@ function buildSwrKey(params: UseToursPaginatedParams): string {
   return `tours-paginated-${JSON.stringify(params)}`
 }
 
-// Global key for invalidating all paginated tour queries
-const TOURS_PAGINATED_PREFIX = 'tours-paginated-'
-
 export function useToursPaginated(params: UseToursPaginatedParams): UseToursPaginatedResult {
   const { page, pageSize, status, search, sortBy = 'departure_date', sortOrder = 'desc' } = params
 

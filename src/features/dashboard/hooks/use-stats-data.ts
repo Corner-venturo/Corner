@@ -3,89 +3,90 @@
 import { useMemo } from 'react'
 import { useTours, useOrders } from '@/data'
 import type { StatConfig, StatType } from '../types'
+import type { Tour, Order } from '@/stores/types'
 import { CheckSquare, TrendingUp, Briefcase, Calendar } from 'lucide-react'
+
+// 計算週範圍（weekOffset: 0 = 本週, 1 = 下週, -1 = 上週）
+function getWeekRange(weekOffset = 0): { start: Date; end: Date } {
+  const today = new Date()
+  const dayOfWeek = today.getDay()
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+  const weekStart = new Date(today)
+  weekStart.setDate(today.getDate() + mondayOffset + weekOffset * 7)
+  weekStart.setHours(0, 0, 0, 0)
+
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekStart.getDate() + 6)
+  weekEnd.setHours(23, 59, 59, 999)
+
+  return { start: weekStart, end: weekEnd }
+}
+
+// 計算月份範圍（monthOffset: 0 = 本月, 1 = 下月, -1 = 上月）
+function getMonthRange(monthOffset = 0): { start: Date; end: Date } {
+  const today = new Date()
+  const monthStart = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1)
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + monthOffset + 1, 0, 23, 59, 59, 999)
+  return { start: monthStart, end: monthEnd }
+}
+
+// 篩選指定日期範圍內的旅遊團
+function filterToursByDateRange(tours: Tour[], start: Date, end: Date): Tour[] {
+  return tours.filter(tour => {
+    const departureDate = new Date(tour.departure_date)
+    return departureDate >= start && departureDate <= end
+  })
+}
+
+// 計算指定日期範圍內訂單的金額總和
+function sumOrderAmountByTourDateRange(
+  orders: Order[],
+  tours: Tour[],
+  start: Date,
+  end: Date,
+  amountField: 'total_amount' | 'paid_amount'
+): number {
+  const tourIdsInRange = new Set(filterToursByDateRange(tours, start, end).map(t => t.id))
+  return orders
+    .filter(order => tourIdsInRange.has(order.tour_id || ''))
+    .reduce((sum, order) => sum + (order[amountField] || 0), 0)
+}
 
 export function useStatsData() {
   const { items: tours } = useTours()
   const { items: orders } = useOrders()
 
   return useMemo(() => {
+    const today = new Date()
+
     // 過濾掉特殊團
     const normalTours = tours.filter(t => t.status !== 'special')
 
-    // 計算本週時間範圍
-    const today = new Date()
-    const dayOfWeek = today.getDay()
-    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-    const weekStart = new Date(today)
-    weekStart.setDate(today.getDate() + mondayOffset)
-    weekStart.setHours(0, 0, 0, 0)
+    // 計算時間範圍
+    const thisWeek = getWeekRange(0)
+    const nextWeek = getWeekRange(1)
+    const thisMonth = getMonthRange(0)
 
-    const weekEnd = new Date(weekStart)
-    weekEnd.setDate(weekStart.getDate() + 6)
-    weekEnd.setHours(23, 59, 59, 999)
+    // 本週/本月出團數量
+    const toursThisWeek = filterToursByDateRange(normalTours, thisWeek.start, thisWeek.end).length
+    const toursThisMonth = filterToursByDateRange(normalTours, thisMonth.start, thisMonth.end).length
 
-    // 下週時間範圍
-    const nextWeekStart = new Date(weekStart)
-    nextWeekStart.setDate(weekStart.getDate() + 7)
-    const nextWeekEnd = new Date(nextWeekStart)
-    nextWeekEnd.setDate(nextWeekStart.getDate() + 6)
+    // 本週/下週請款金額
+    const paymentsThisWeek = sumOrderAmountByTourDateRange(orders, normalTours, thisWeek.start, thisWeek.end, 'total_amount')
+    const paymentsNextWeek = sumOrderAmountByTourDateRange(orders, normalTours, nextWeek.start, nextWeek.end, 'total_amount')
 
-    // 本月時間範圍
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
-    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
+    // 本週甲存金額
+    const depositsThisWeek = sumOrderAmountByTourDateRange(orders, normalTours, thisWeek.start, thisWeek.end, 'paid_amount')
 
-    // 本週出團數量（排除特殊團）
-    const toursThisWeek = normalTours.filter(tour => {
-      const departureDate = new Date(tour.departure_date)
-      return departureDate >= weekStart && departureDate <= weekEnd
-    }).length
-
-    // 本月出團數量（排除特殊團）
-    const toursThisMonth = normalTours.filter(tour => {
-      const departureDate = new Date(tour.departure_date)
-      return departureDate >= monthStart && departureDate <= monthEnd
-    }).length
-
-    // 本週請款金額（本週出發的團，排除特殊團）
-    const paymentsThisWeek = orders
-      .filter(order => {
-        const tour = normalTours.find(t => t.id === order.tour_id)
-        if (!tour) return false
-        const departureDate = new Date(tour.departure_date)
-        return departureDate >= weekStart && departureDate <= weekEnd
-      })
-      .reduce((sum, order) => sum + (order.total_amount || 0), 0)
-
-    // 下週請款金額（下週出發的團，排除特殊團）
-    const paymentsNextWeek = orders
-      .filter(order => {
-        const tour = normalTours.find(t => t.id === order.tour_id)
-        if (!tour) return false
-        const departureDate = new Date(tour.departure_date)
-        return departureDate >= nextWeekStart && departureDate <= nextWeekEnd
-      })
-      .reduce((sum, order) => sum + (order.total_amount || 0), 0)
-
-    // 本週甲存金額（本週出發的團已付款，排除特殊團）
-    const depositsThisWeek = orders
-      .filter(order => {
-        const tour = normalTours.find(t => t.id === order.tour_id)
-        if (!tour) return false
-        const departureDate = new Date(tour.departure_date)
-        return departureDate >= weekStart && departureDate <= weekEnd
-      })
-      .reduce((sum, order) => sum + (order.paid_amount || 0), 0)
-
-    // 待辦事項數量（簡化版：未收齊款且即將出發的訂單，排除特殊團）
+    // 待辦事項數量（未收齊款且 14 天內出發的訂單）
+    const tourIdSet = new Set(normalTours.map(t => t.id))
     const todosCount = orders.filter(order => {
       if (order.payment_status === 'paid') return false
+      if (!order.tour_id || !tourIdSet.has(order.tour_id)) return false
       const tour = normalTours.find(t => t.id === order.tour_id)
       if (!tour) return false
       const departureDate = new Date(tour.departure_date)
-      const daysUntilDeparture = Math.ceil(
-        (departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      )
+      const daysUntilDeparture = Math.ceil((departureDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
       return daysUntilDeparture <= 14 && daysUntilDeparture >= 0
     }).length
 

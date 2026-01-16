@@ -137,7 +137,6 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const employeeData = result.employee as EmployeeRow
-          const workspaceId = result.workspaceId
           logger.log('✅ Employee validated:', employeeData.display_name)
 
           const { supabase } = await import('@/lib/supabase/client')
