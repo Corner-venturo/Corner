@@ -332,12 +332,19 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
       bgColor: 'bg-morandi-green/10',
       borderColor: 'border-morandi-green',
     },
-    void: {
+    reversed: {
       color: 'text-morandi-red',
-      label: '已作廢',
+      label: '已沖銷',
       icon: XCircle,
       bgColor: 'bg-morandi-red/10',
       borderColor: 'border-morandi-red',
+    },
+    locked: {
+      color: 'text-morandi-primary',
+      label: '已鎖定',
+      icon: FileCheck,
+      bgColor: 'bg-morandi-primary/10',
+      borderColor: 'border-morandi-primary',
     },
     default: {
       color: 'text-morandi-secondary',

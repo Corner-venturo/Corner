@@ -128,20 +128,20 @@ export const usePayments = () => {
       return await disbursementOrderService.addPaymentRequests(orderId, requestIds)
     },
 
-    getCurrentWeekDisbursementOrder: () => {
-      return disbursementOrderService.getCurrentWeekOrder()
+    getCurrentWeekDisbursementOrder: async () => {
+      return await disbursementOrderService.getCurrentWeekOrderAsync()
     },
 
     getNextThursday: () => {
       return disbursementOrderService.getNextThursday()
     },
 
-    getPendingOrders: () => {
-      return disbursementOrderService.getPendingOrders()
+    getPendingOrders: async () => {
+      return await disbursementOrderService.getPendingOrdersAsync()
     },
 
-    getConfirmedOrders: () => {
-      return disbursementOrderService.getConfirmedOrders()
+    getConfirmedOrders: async () => {
+      return await disbursementOrderService.getConfirmedOrdersAsync()
     },
   }
 }

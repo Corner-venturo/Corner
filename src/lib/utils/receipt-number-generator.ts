@@ -45,38 +45,6 @@ export function generateReceiptNumber(
   return `${prefix}${nextNumber}`
 }
 
-/**
- * 生成收款單號（舊格式，向後相容）
- * @deprecated 請使用新格式 generateReceiptNumber(tourCode, receipts)
- */
-export function generateReceiptNumberLegacy(
-  workspaceCode: string,
-  receiptDate: string | Date,
-  existingReceipts: Receipt[]
-): string {
-  const date = typeof receiptDate === 'string' ? new Date(receiptDate) : receiptDate
-
-  const year = date.getFullYear().toString().slice(-2)
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
-
-  const datePrefix = `${workspaceCode}-R${year}${month}${day}`
-
-  let maxSequence = 0
-  existingReceipts.forEach(receipt => {
-    const code = receipt.receipt_number || receipt.code
-    if (code?.startsWith(datePrefix)) {
-      const sequencePart = code.slice(-4)
-      const sequence = parseInt(sequencePart, 10)
-      if (!isNaN(sequence) && sequence > maxSequence) {
-        maxSequence = sequence
-      }
-    }
-  })
-
-  const nextSequence = (maxSequence + 1).toString().padStart(4, '0')
-  return `${datePrefix}${nextSequence}`
-}
 
 /**
  * 驗證收款單號格式

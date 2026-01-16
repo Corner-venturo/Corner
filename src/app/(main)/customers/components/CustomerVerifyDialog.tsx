@@ -25,7 +25,8 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
-import { useImageEditor, useOcrRecognition } from '@/hooks'
+import { useImageEditor } from '@/hooks/image-editor'
+import { useOcrRecognition } from '@/hooks'
 
 interface CustomerVerifyDialogProps {
   open: boolean

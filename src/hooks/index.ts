@@ -11,7 +11,6 @@
 
 // 通用 Hooks
 export { usePermissions } from './usePermissions'
-export { useDialog } from './useDialog' // @deprecated - 使用 useManagedDialogState
 export { useEnterSubmit } from './useEnterSubmit'
 export { useCrudOperations } from './useCrudOperations'
 export { useDataFiltering } from './useDataFiltering'
@@ -25,9 +24,11 @@ export {
   type UseManagedDialogStateReturn,
 } from './useManagedDialogState'
 
-// 圖片編輯 & OCR 辨識 Hooks
-export { useImageEditor } from './useImageEditor'
+// OCR 辨識 Hook
 export { useOcrRecognition, type OcrParsedData } from './useOcrRecognition'
+
+// 圖片編輯 Hook - 請直接從 '@/hooks/image-editor' 匯入
+// import { useImageEditor } from '@/hooks/image-editor'
 
 // 導航 Hooks
 export {

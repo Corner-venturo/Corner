@@ -158,25 +158,6 @@ export type ContractStatusKey = keyof typeof CONTRACT_STATUS_MAP
 export type ContractStatusValue = (typeof CONTRACT_STATUS_MAP)[ContractStatusKey]
 
 // ============================================
-// 收款狀態對照表
-// ============================================
-
-export const RECEIPT_STATUS_MAP = {
-  received: '已收款',
-  confirmed: '已確認',
-  rejected: '退回',
-} as const
-
-export const RECEIPT_STATUS_REVERSE_MAP = {
-  已收款: 'received',
-  已確認: 'confirmed',
-  退回: 'rejected',
-} as const
-
-export type ReceiptStatusKey = keyof typeof RECEIPT_STATUS_MAP
-export type ReceiptStatusValue = (typeof RECEIPT_STATUS_MAP)[ReceiptStatusKey]
-
-// ============================================
 // 付款方式對照表
 // ============================================
 
@@ -264,13 +245,6 @@ export function getFinanceTypeLabel(type: FinanceTypeKey | string): string {
  */
 export function getContractStatusLabel(status: ContractStatusKey | string): string {
   return CONTRACT_STATUS_MAP[status as ContractStatusKey] || status
-}
-
-/**
- * 取得收款狀態的中文顯示
- */
-export function getReceiptStatusLabel(status: ReceiptStatusKey | string): string {
-  return RECEIPT_STATUS_MAP[status as ReceiptStatusKey] || status
 }
 
 /**

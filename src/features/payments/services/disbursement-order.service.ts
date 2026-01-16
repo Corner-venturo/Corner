@@ -119,18 +119,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     return data as unknown as DisbursementOrder | null
   }
 
-  /**
-   * 取得當週出納單（待處理）- 同步版本（使用快取）
-   * @deprecated 建議使用 getCurrentWeekOrderAsync
-   */
-  getCurrentWeekOrder(): DisbursementOrder | null {
-    const nextThursday = this.getNextThursday()
-    return (
-      this.cachedItems.find(
-        order => order.disbursement_date === nextThursday && order.status === 'pending'
-      ) || null
-    )
-  }
 
   /**
    * 使用請款單創建出納單
@@ -293,7 +281,7 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
    * 添加到當週出納單（找不到則創建新的）
    */
   async addToCurrentWeekOrder(requestIds: string[]): Promise<DisbursementOrder> {
-    const currentOrder = this.getCurrentWeekOrder()
+    const currentOrder = await this.getCurrentWeekOrderAsync()
 
     if (currentOrder) {
       // 已有當週出納單，直接添加
@@ -340,13 +328,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
     return (data || []) as unknown as DisbursementOrder[]
   }
 
-  /**
-   * 取得待處理出納單（同步版本，使用快取）
-   * @deprecated 建議使用 getPendingOrdersAsync
-   */
-  getPendingOrders(): DisbursementOrder[] {
-    return this.cachedItems.filter(o => o.status === 'pending')
-  }
 
   /**
    * 取得已確認出納單（非同步）
@@ -362,14 +343,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
   }
 
   /**
-   * 取得已確認出納單（同步版本，使用快取）
-   * @deprecated 建議使用 getConfirmedOrdersAsync
-   */
-  getConfirmedOrders(): DisbursementOrder[] {
-    return this.cachedItems.filter(o => o.status === 'confirmed')
-  }
-
-  /**
    * 按日期取得出納單（非同步）
    */
   async getOrdersByDateAsync(date: string): Promise<DisbursementOrder[]> {
@@ -380,14 +353,6 @@ class DisbursementOrderService extends BaseService<DisbursementOrder> {
       .order('created_at', { ascending: false })
     if (error) throw new Error(error.message)
     return (data || []) as unknown as DisbursementOrder[]
-  }
-
-  /**
-   * 按日期取得出納單（同步版本，使用快取）
-   * @deprecated 建議使用 getOrdersByDateAsync
-   */
-  getOrdersByDate(date: string): DisbursementOrder[] {
-    return this.cachedItems.filter(o => o.disbursement_date === date)
   }
 }
 

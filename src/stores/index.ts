@@ -238,19 +238,6 @@ export const useSupplierStore = createStore<Supplier>({
 })
 
 /**
- * 領隊資料 Store
- * ⚠️ 不啟用 Workspace 隔離（全局共享基礎資料）
- *
- * @deprecated 請使用 @/data 的 useTourLeaders, createTourLeader 等
- * 此 store 保留是為了向後兼容，新代碼請使用 @/data
- */
-export const useTourLeaderStore = createStore<import('@/types/tour-leader.types').TourLeader>({
-  tableName: 'tour_leaders',
-  codePrefix: 'TL',
-  workspaceScoped: false,
-})
-
-/**
  * 車隊車輛 Store
  * 🔒 啟用 Workspace 隔離
  */

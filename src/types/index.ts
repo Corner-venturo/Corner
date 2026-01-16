@@ -8,7 +8,6 @@ export type { Database, Json } from '@/lib/supabase/types'
 export type {
   BaseEntity,
   SyncableEntity,
-  SyncStatus as LegacySyncStatus,
   PageRequest,
   PageResponse,
   Filter,

@@ -6,7 +6,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useImageEditor } from '@/hooks/useImageEditor'
+import { useImageEditor } from '@/hooks/image-editor'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { OrderMember } from '../../../order-member.types'

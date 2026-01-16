@@ -318,6 +318,7 @@ export function Combobox<T = unknown>({
       {isOpen && !disabled && typeof document !== 'undefined' && createPortal(
         <div
           ref={dropdownRef}
+          role="listbox"
           className="fixed z-[10010] bg-card border border-border rounded-lg shadow-lg overflow-hidden"
           style={{
             top: dropdownPosition.top,
@@ -325,6 +326,8 @@ export function Combobox<T = unknown>({
             width: dropdownPosition.width,
             maxHeight,
           }}
+          onMouseDown={e => e.stopPropagation()}
+          onPointerDown={e => e.stopPropagation()}
         >
           <div className="overflow-y-auto" style={{ maxHeight }}>
             {filteredOptions.length > 0 ? (
@@ -359,74 +362,3 @@ export function Combobox<T = unknown>({
   )
 }
 
-// 保留舊版相容性的類型定義
-export interface LegacyComboboxOption {
-  id: string
-  name: string
-  price_per_person?: number
-  pricePerGroup?: number
-  isGroupCost?: boolean
-}
-
-export interface LegacyComboboxProps {
-  value: string
-  onChange: (value: string) => void
-  onSelect?: (option: LegacyComboboxOption) => void
-  options: LegacyComboboxOption[]
-  placeholder?: string
-  className?: string
-}
-
-/**
- * 舊版 Combobox（用於向後相容）
- * @deprecated 請使用新版 Combobox 組件
- */
-export function LegacyCombobox({
-  value,
-  onChange,
-  onSelect,
-  options,
-  placeholder = '輸入或選擇項目',
-  className,
-}: LegacyComboboxProps) {
-  const transformedOptions: ComboboxOption<LegacyComboboxOption>[] = options.map(opt => ({
-    value: opt.id,
-    label: opt.name,
-    data: opt,
-  }))
-
-  return (
-    <Combobox
-      value={value}
-      onChange={onChange}
-      onSelect={option => onSelect?.(option.data!)}
-      options={transformedOptions}
-      placeholder={placeholder}
-      className={className}
-      renderOption={option => (
-        <div className="flex justify-between items-center">
-          <span className="text-morandi-primary">{option.label}</span>
-          {option.data && (
-            <span className="text-xs text-morandi-secondary">
-              {option.data &&
-              typeof option.data === 'object' &&
-              'pricePerGroup' in option.data &&
-              option.data.pricePerGroup
-                ? 'isGroupCost' in option.data && option.data.isGroupCost
-                  ? `團體 NT$${option.data.pricePerGroup}`
-                  : 'price_per_person' in option.data
-                    ? `個人 NT$${option.data.price_per_person}`
-                    : ''
-                : option.data &&
-                    typeof option.data === 'object' &&
-                    'price_per_person' in option.data &&
-                    option.data.price_per_person
-                  ? `NT$${option.data.price_per_person}`
-                  : ''}
-            </span>
-          )}
-        </div>
-      )}
-    />
-  )
-}

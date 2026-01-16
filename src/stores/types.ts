@@ -4,7 +4,6 @@
 
 // 基礎型別
 export type {
-  ReceiptStatusString,
   PaymentMethod,
   VisaStatus,
   Todo,
@@ -53,9 +52,6 @@ export type {
   QuoteCategory,
   QuoteItem,
   Supplier,
-  SupplierContact,
-  SupplierBankInfo,
-  PriceListItem,
   TierPricing,
 } from './types/quote.types'
 

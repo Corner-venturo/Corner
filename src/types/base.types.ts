@@ -37,12 +37,6 @@ export interface SyncableEntity extends BaseEntity {
   _deleted?: boolean | null // 軟刪除標記
 }
 
-/**
- * @deprecated 舊版同步狀態型別，已改用 _needs_sync 布林值
- * 保留此型別以維持向後相容
- */
-export type SyncStatus = 'pending' | 'synced' | 'conflict'
-
 // ============================================
 // 分頁相關型別
 // ============================================

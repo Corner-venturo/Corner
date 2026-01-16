@@ -661,17 +661,3 @@ export async function generateVoucherFromTourClosing(
   return { voucher: createdVoucher, entries: createdEntries }
 }
 
-/**
- * @deprecated 使用 generateVoucherFromTourClosing 取代（V2 改為一張傳票）
- */
-export async function generateVouchersFromTourClosing(
-  data: AutoVoucherFromTourClosing
-): Promise<{ revenueVoucher: Voucher; costVoucher: Voucher; allEntries: VoucherEntry[] }> {
-  // 轉呼叫新版函數
-  const result = await generateVoucherFromTourClosing(data)
-  return {
-    revenueVoucher: result.voucher,
-    costVoucher: result.voucher, // V2 只有一張
-    allEntries: result.entries,
-  }
-}

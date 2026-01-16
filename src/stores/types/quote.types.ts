@@ -203,13 +203,7 @@ export interface QuoteItem {
 
 // === 供應商管理系統 ===
 // Supplier 類型已移至 @/types/supplier.types.ts
-// 使用完整的 Supplier 定義
-export type {
-  Supplier,
-  SupplierContact,
-  SupplierBankInfo,
-  PriceListItem,
-} from '@/types/supplier.types'
+export type { Supplier } from '@/types/supplier.types'
 
 // 砍次表價格（用於比較不同人數的報價）
 export interface TierPricing {

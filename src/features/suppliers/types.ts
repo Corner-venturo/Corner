@@ -2,9 +2,9 @@
  * Suppliers feature types
  */
 
-import type { Supplier, SupplierPaymentAccount } from '@/types/supplier.types'
+import type { Supplier } from '@/types/supplier.types'
 
-export type { Supplier, SupplierPaymentAccount }
+export type { Supplier }
 
 export interface SupplierFormData {
   supplier_code: string

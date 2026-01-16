@@ -5,7 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { useCustomers, updateCustomer, createCustomer } from '@/data'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useImageEditor } from '@/hooks'
+import { useImageEditor } from '@/hooks/image-editor'
 
 interface OrderMember {
   id: string

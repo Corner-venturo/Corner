@@ -15,6 +15,7 @@ import * as fabric from 'fabric'
 import { useDocumentStore } from '@/stores/document-store'
 import type { CanvasElement, TextElement, ShapeElement, ImageElement, CanvasPage } from '@/features/designer/components/types'
 import { renderPageOnCanvas } from '@/features/designer/components/core/renderer'
+import { logger } from '@/lib/utils/logger'
 
 // ============================================
 // Types
@@ -39,6 +40,7 @@ interface UseBrochureEditorV2Return {
   loadCanvasPage: (page: CanvasPage) => Promise<void>
   exportCanvasData: () => Record<string, unknown>
   exportThumbnail: (options?: { quality?: number; multiplier?: number }) => string
+  updateElementByName: (elementName: string, updates: { text?: string }) => boolean
 
   // 元素操作
   addText: (options?: { content?: string; x?: number; y?: number }) => void
@@ -61,6 +63,7 @@ interface UseBrochureEditorV2Return {
   copySelected: () => void
   pasteClipboard: () => void
   cutSelected: () => void
+  moveSelected: (dx: number, dy: number) => void
 
   // 圖層操作
   bringForward: () => void
@@ -330,27 +333,29 @@ export function useBrochureEditorV2(
       }
     }
 
+    // 追蹤上一次的吸附狀態，避免重複計算
+    let lastSnapX: number | null = null
+    let lastSnapY: number | null = null
+
     canvas.on('object:moving', (e) => {
       const movingObj = e.target
       if (!movingObj) return
-
-      clearGuideLines()
 
       const movingEdges = getObjEdges(movingObj)
       const canvasWidth = width
       const canvasHeight = height
 
-      // 要對齊的參考點
+      // 要對齊的參考點（只收集畫布邊界和中心）
       const snapPoints = {
-        vertical: [0, canvasWidth / 2, canvasWidth], // 左、中、右
-        horizontal: [0, canvasHeight / 2, canvasHeight], // 上、中、下
+        vertical: [0, canvasWidth / 2, canvasWidth],
+        horizontal: [0, canvasHeight / 2, canvasHeight],
       }
 
-      // 收集其他物件的邊緣
+      // 收集其他物件的邊緣（限制數量避免效能問題）
       const otherObjects = canvas.getObjects().filter(obj => {
         const isGuideLine = (obj as fabric.FabricObject & { isGuideLine?: boolean }).isGuideLine
         return obj !== movingObj && !isGuideLine && obj.type !== 'activeSelection'
-      })
+      }).slice(0, 20) // 最多檢查 20 個物件
 
       otherObjects.forEach(obj => {
         const edges = getObjEdges(obj)
@@ -360,21 +365,17 @@ export function useBrochureEditorV2(
 
       let snappedLeft: number | null = null
       let snappedTop: number | null = null
-      const newGuides: fabric.Line[] = []
+      let snapXPos: number | null = null
+      let snapYPos: number | null = null
 
       // 檢查垂直對齊（左、中、右）
       const movingX = [movingEdges.left, movingEdges.centerX, movingEdges.right]
       for (const mx of movingX) {
         for (const snap of snapPoints.vertical) {
           if (Math.abs(mx - snap) < SNAP_THRESHOLD) {
-            // 計算需要調整的偏移量
             const offset = snap - mx
             snappedLeft = (movingObj.left || 0) + offset
-
-            // 創建垂直參考線
-            const line = createGuideLine([snap, 0, snap, canvasHeight])
-            canvas.add(line)
-            newGuides.push(line)
+            snapXPos = snap
             break
           }
         }
@@ -386,39 +387,56 @@ export function useBrochureEditorV2(
       for (const my of movingY) {
         for (const snap of snapPoints.horizontal) {
           if (Math.abs(my - snap) < SNAP_THRESHOLD) {
-            // 計算需要調整的偏移量
             const offset = snap - my
             snappedTop = (movingObj.top || 0) + offset
-
-            // 創建水平參考線
-            const line = createGuideLine([0, snap, canvasWidth, snap])
-            canvas.add(line)
-            newGuides.push(line)
+            snapYPos = snap
             break
           }
         }
         if (snappedTop !== null) break
       }
 
-      // 應用吸附
+      // 只有當吸附狀態改變時才更新參考線
+      const snapChanged = snapXPos !== lastSnapX || snapYPos !== lastSnapY
+      if (snapChanged) {
+        clearGuideLines()
+        lastSnapX = snapXPos
+        lastSnapY = snapYPos
+
+        // 創建新的參考線
+        if (snapXPos !== null) {
+          const line = createGuideLine([snapXPos, 0, snapXPos, canvasHeight])
+          canvas.add(line)
+          guideLines.push(line)
+        }
+        if (snapYPos !== null) {
+          const line = createGuideLine([0, snapYPos, canvasWidth, snapYPos])
+          canvas.add(line)
+          guideLines.push(line)
+        }
+      }
+
+      // 應用吸附位置
       if (snappedLeft !== null) {
         movingObj.set({ left: snappedLeft })
       }
       if (snappedTop !== null) {
         movingObj.set({ top: snappedTop })
       }
-
-      guideLines.push(...newGuides)
     })
 
-    // 移動結束時清除參考線
+    // 移動結束時清除參考線並重置狀態
     canvas.on('object:modified', () => {
       clearGuideLines()
+      lastSnapX = null
+      lastSnapY = null
       canvas.renderAll()
     })
 
     canvas.on('mouse:up', () => {
       clearGuideLines()
+      lastSnapX = null
+      lastSnapY = null
       canvas.renderAll()
     })
 
@@ -582,7 +600,7 @@ export function useBrochureEditorV2(
             }
             fabricObj = img
           } catch (err) {
-            console.error('Failed to load image:', imgEl.src, err)
+            logger.error('Failed to load image:', imgEl.src, err)
           }
           break
         }
@@ -646,9 +664,25 @@ export function useBrochureEditorV2(
     const canvas = fabricCanvasRef.current
     if (!canvas) return {}
 
-    // Fabric.js 6 toJSON doesn't accept propertiesToInclude as argument
-    // Custom properties should be set via propertiesToInclude on canvas or serialized separately
-    return canvas.toJSON() as Record<string, unknown>
+    // Fabric.js 6: toJSON() 需要明確指定要序列化的自訂屬性
+    // name 和 data 都需要手動合併以確保狀態保留
+    const json = canvas.toJSON() as { objects?: Array<Record<string, unknown>> }
+    if (json.objects) {
+      const objects = canvas.getObjects()
+      json.objects = json.objects.map((obj, idx) => {
+        const fabricObj = objects[idx] as fabric.FabricObject & {
+          data?: Record<string, unknown>
+          name?: string
+        }
+        return {
+          ...obj,
+          // 確保 name 屬性被序列化（用於元素狀態匹配）
+          name: fabricObj?.name || obj.name,
+          data: fabricObj?.data,
+        }
+      })
+    }
+    return json as Record<string, unknown>
   }, [])
 
   // ============================================
@@ -914,6 +948,29 @@ export function useBrochureEditorV2(
     copySelected()
     deleteSelected()
   }, [copySelected, deleteSelected])
+
+  // ============================================
+  // Move Selected (Arrow Keys)
+  // ============================================
+  const moveSelected = useCallback((dx: number, dy: number) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject) return
+
+    // 移動物件
+    activeObject.set({
+      left: (activeObject.left || 0) + dx,
+      top: (activeObject.top || 0) + dy,
+    })
+    activeObject.setCoords()
+    canvas.renderAll()
+
+    // 標記已修改
+    markDirty()
+    saveToHistory()
+  }, [markDirty, saveToHistory])
 
   // ============================================
   // Layer Operations
@@ -1356,6 +1413,33 @@ export function useBrochureEditorV2(
   }, [disposeCanvas])
 
   // ============================================
+  // Update Element by Name (直接更新畫布上的元素，不重新渲染)
+  // ============================================
+  const updateElementByName = useCallback((elementName: string, updates: { text?: string }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return false
+
+    const objects = canvas.getObjects()
+    const targetObj = objects.find(obj => {
+      const fabricObj = obj as fabric.FabricObject & { name?: string }
+      return fabricObj.name === elementName
+    })
+
+    if (targetObj && updates.text !== undefined) {
+      // 如果是 Textbox，更新文字內容
+      const textObj = targetObj as fabric.Textbox
+      if (textObj.set && typeof textObj.text !== 'undefined') {
+        textObj.set('text', updates.text)
+        canvas.renderAll()
+        markDirty()
+        return true
+      }
+    }
+
+    return false
+  }, [markDirty])
+
+  // ============================================
   // Return
   // ============================================
   return {
@@ -1370,6 +1454,7 @@ export function useBrochureEditorV2(
     loadCanvasPage,
     exportCanvasData,
     exportThumbnail,
+    updateElementByName,
 
     addText,
     addRectangle,
@@ -1383,6 +1468,7 @@ export function useBrochureEditorV2(
     copySelected,
     pasteClipboard,
     cutSelected,
+    moveSelected,
 
     bringForward,
     sendBackward,

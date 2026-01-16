@@ -1,9 +1,13 @@
 /**
  * 會計模組型別定義
  * 建立日期：2025-01-17
+ *
+ * 注意：VoucherStatus 已統一從 accounting.types.ts 匯入
+ * 統一使用 'draft' | 'posted' | 'reversed' | 'locked'
  */
 
 import type { BaseEntity } from './base.types'
+import type { VoucherStatus } from './accounting.types'
 
 // ============================================
 // 模組管理
@@ -58,10 +62,9 @@ export interface AccountingSubject extends BaseEntity {
  */
 export type VoucherType = 'manual' | 'auto'
 
-/**
- * 傳票狀態
- */
-export type VoucherStatus = 'draft' | 'posted' | 'void'
+// VoucherStatus 從 accounting.types.ts 匯入（統一定義）
+// 'draft' | 'posted' | 'reversed' | 'locked'
+export type { VoucherStatus }
 
 /**
  * 傳票來源類型

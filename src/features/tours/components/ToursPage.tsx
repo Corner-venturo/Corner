@@ -12,7 +12,6 @@ import { useAuthStore } from '@/stores/auth-store'
 // 🔧 優化：移除 useRegionsStore import（不再需要載入 countries/cities）
 // 🔧 優化：移除 useOrdersListSlim 和 useItinerariesListSlim（useTourOperations 已內部處理）
 import { useQuotesListSlim } from '@/hooks/useListSlim'
-import { useDialog } from '@/hooks/useDialog'
 import { useTourOperations } from '../hooks/useTourOperations'
 import { useTourChannelOperations, TourStoreActions } from './TourChannelOperations'
 import { useTourActionButtons } from './TourActionButtons'
@@ -70,10 +69,21 @@ export const ToursPage: React.FC = () => {
   // 🔧 優化：只保留 quotes（TourActionButtons 需要），其他由 useTourOperations 內部處理
   const { items: quotes } = useQuotesListSlim()
   const { items: proposals, fetchAll: refreshProposals } = useProposals()
-  // 🔧 優化：移除 useProposalPackages，改為刪除提案時才查詢
-  // 🔧 優化：移除 useRegionsStore，不需要載入 countries/cities
-  // 提案和旅遊團都有 destination/location 欄位，不需要 ID→名稱轉換
-  const { dialog, closeDialog, openDialog } = useDialog()
+
+  // 🔧 對話框狀態（替代 deprecated useDialog）
+  const [dialogState, setDialogState] = useState<{
+    isOpen: boolean
+    type: string | null
+    data: Tour | null
+  }>({ isOpen: false, type: null, data: null })
+
+  const openDialog = useCallback((type: string, data?: unknown) => {
+    setDialogState({ isOpen: true, type, data: (data as Tour) || null })
+  }, [])
+
+  const closeDialog = useCallback(() => {
+    setDialogState({ isOpen: false, type: null, data: null })
+  }, [])
 
   // 🔧 優化：移除無條件載入 regions
   // 提案已有 destination 欄位，不需要 country_id/city_id 轉換
@@ -142,7 +152,7 @@ export const ToursPage: React.FC = () => {
     handleNavigationEffect,
     proposalConvertData,
     clearProposalConvertData,
-  } = useToursForm({ state, openDialog, dialog })
+  } = useToursForm({ state, openDialog, dialog: dialogState })
 
   // 🔧 優化：useTourOperations 不再需要外部傳入 quotes/itineraries/addOrder 等
   const operations = useTourOperations({
@@ -151,8 +161,8 @@ export const ToursPage: React.FC = () => {
     closeDialog,
     setSubmitting,
     setFormError,
-    dialogType: dialog.type || 'create',
-    dialogData: (dialog.data && Object.keys(dialog.data).length > 0 ? dialog.data : null) as Tour | null,
+    dialogType: dialogState.type || 'create',
+    dialogData: (dialogState.data && Object.keys(dialogState.data).length > 0 ? dialogState.data : null) as Tour | null,
     workspaceId: user?.workspace_id,
   })
 
@@ -522,7 +532,7 @@ export const ToursPage: React.FC = () => {
       </div>
 
       <TourForm
-        isOpen={dialog.isOpen}
+        isOpen={dialogState.isOpen}
         onClose={() => {
           resetForm()
           closeDialog()
@@ -531,7 +541,7 @@ export const ToursPage: React.FC = () => {
             clearProposalConvertData()
           }
         }}
-        mode={dialog.type === 'edit' ? 'edit' : 'create'}
+        mode={dialogState.type === 'edit' ? 'edit' : 'create'}
         newTour={newTour}
         setNewTour={setNewTour}
         newOrder={newOrder}
