@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { errorResponse, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 /**
  * 後端 API 代理下載圖片
@@ -10,6 +11,12 @@ import { errorResponse, ErrorCode } from '@/lib/api/response'
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 認證：防止未登入者使用此代理進行 SSRF 攻擊
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const { url } = await request.json()
 
     if (!url || typeof url !== 'string') {

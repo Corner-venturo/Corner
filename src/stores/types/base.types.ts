@@ -2,8 +2,9 @@
 // 基礎型別定義
 // ============================
 
-// 收款狀態
-export type ReceiptStatus = 'received' | 'confirmed' | 'rejected'
+// 收款狀態（資料庫存字串 '0', '1', '2'）
+// 完整定義請使用 @/types/receipt.types 的 ReceiptStatus enum
+export type ReceiptStatusString = '0' | '1' | '2' // '0':待確認 '1':已確認 '2':異常
 
 // 付款方式
 export type PaymentMethod = 'cash' | 'transfer' | 'card' | 'check'

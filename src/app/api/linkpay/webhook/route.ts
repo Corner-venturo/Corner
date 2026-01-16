@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     // 解析收款單號（order_no 格式：{receiptNumber}R{timestamp}，已移除 - 和 _）
     const receiptNumber = order_no.split('R')[0]
     const isSuccess = ret_code === '00'
-    const status = isSuccess ? 1 : 2 // 1: 已付款, 2: 失敗
+    const linkpayStatus = isSuccess ? 1 : 2 // linkpay_logs.status 是 number: 1=已付款 2=失敗
 
     const supabase = getSupabaseAdminClient()
     const currentTime = new Date().toISOString()
@@ -106,13 +106,18 @@ export async function POST(req: NextRequest) {
       const webhookAmount = parseInt(tx_amt, 10) / 100
       const expectedAmount = linkpayLog.price
 
-      // 允許 1 元的誤差（處理四捨五入問題）
-      if (Math.abs(webhookAmount - expectedAmount) > 1) {
+      // 使用百分比檢查：允許 0.5% 的誤差（處理四捨五入問題）
+      // 同時設定最低 1 元門檻，避免小額付款被誤判
+      const tolerancePercent = 0.005 // 0.5%
+      const tolerance = Math.max(expectedAmount * tolerancePercent, 1)
+
+      if (Math.abs(webhookAmount - expectedAmount) > tolerance) {
         logger.error('[LinkPay Webhook] 金額不一致，可能遭到竄改', {
           order_no,
           webhookAmount,
           expectedAmount,
           difference: Math.abs(webhookAmount - expectedAmount),
+          tolerance,
         })
         return NextResponse.json(
           { success: false, message: '金額驗證失敗' },
@@ -127,7 +132,7 @@ export async function POST(req: NextRequest) {
     const { error: logError } = await supabase
       .from('linkpay_logs')
       .update({
-        status: status,
+        status: linkpayStatus,
         updated_at: currentTime,
       })
       .eq('linkpay_order_number', order_no)

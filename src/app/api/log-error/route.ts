@@ -3,9 +3,16 @@ import { writeFileSync, appendFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 認證：防止未登入者濫用日誌 API
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const errorData = await request.json()
 
     // 創建 logs 目錄（如果不存在）

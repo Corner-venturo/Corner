@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
       linkpay_order_number: orderNo,
       price: amount,
       end_date: end_date,
-      status: 0,
+      status: 0, // linkpay_logs.status 是 number: 0=待付款
       payment_name: finalPaymentName,
       created_by: create_user || null,
       updated_by: create_user || null,
@@ -225,13 +225,13 @@ export async function POST(req: NextRequest) {
 
       // 更新 linkpay_logs
       const linkContent = ret_code === '00' ? hpp_url : ret_msg
-      const status = ret_code === '00' ? 0 : 2
+      const linkpayStatus = ret_code === '00' ? 0 : 2 // linkpay_logs.status 是 number: 0=待付款 2=失敗
 
       await supabase
         .from('linkpay_logs')
         .update({
           link: linkContent,
-          status: status,
+          status: linkpayStatus,
           updated_at: new Date().toISOString(),
         })
         .eq('linkpay_order_number', orderNo)
@@ -254,7 +254,7 @@ export async function POST(req: NextRequest) {
             payment_link: hpp_url,
             linkpay_order_number: orderNo,
             link: hpp_url,
-            status: 0,
+            status: 0, // linkpay_logs.status 是 number: 0=待付款
             end_date: end_date,
           },
         })
@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
       await supabase
         .from('linkpay_logs')
         .update({
-          status: 2,
+          status: 2, // linkpay_logs.status 是 number: 2=失敗
           link: apiError instanceof Error ? apiError.message : '呼叫失敗',
           updated_at: new Date().toISOString(),
         })

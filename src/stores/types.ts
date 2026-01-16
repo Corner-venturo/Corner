@@ -4,7 +4,7 @@
 
 // 基礎型別
 export type {
-  ReceiptStatus,
+  ReceiptStatusString,
   PaymentMethod,
   VisaStatus,
   Todo,

@@ -24,17 +24,32 @@ export const TOUR_STATUS_LIST = [
 export type TourStatusValue = (typeof TOUR_STATUS_LIST)[number]
 
 /**
+ * 旅遊團狀態常數 - 避免魔法字串
+ * 使用方式: TOUR_STATUS.PROPOSAL 代替 '提案'
+ */
+export const TOUR_STATUS = {
+  /** 提案階段 - 可編輯行程 */
+  PROPOSAL: '提案',
+  /** 進行中 - 已確認出團，行程鎖定 */
+  IN_PROGRESS: '進行中',
+  /** 結案 - 團結束，結算獎金 */
+  CLOSED: '結案',
+  /** 已取消 */
+  CANCELLED: '取消',
+} as const satisfies Record<string, TourStatusValue>
+
+/**
  * 判斷團是否已鎖定（不可自由編輯）
  */
 export function isTourLocked(status: string | null): boolean {
-  return status === '進行中' || status === '結案'
+  return status === TOUR_STATUS.IN_PROGRESS || status === TOUR_STATUS.CLOSED
 }
 
 /**
  * 判斷團是否可進入確認流程（確認出團）
  */
 export function canConfirmTour(status: string | null): boolean {
-  return status === '提案'
+  return status === TOUR_STATUS.PROPOSAL
 }
 
 // ============================================
