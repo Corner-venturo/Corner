@@ -82,6 +82,9 @@ export interface DayCardProps {
   dayIndex: number
   dayLabel: string
   data: TourFormData
+  // Collapse state
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
   // Actions
   updateDailyItinerary: (index: number, field: string, value: unknown) => void
   removeDailyItinerary: (index: number) => void

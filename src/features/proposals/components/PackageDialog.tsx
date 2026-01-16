@@ -1,14 +1,18 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { FormDialog } from '@/components/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Combobox } from '@/components/ui/combobox'
-import { useCountries } from '@/data'
-import { useTourDestinations } from '@/features/tours/hooks/useTourDestinations'
+import { CountryAirportSelector } from '@/components/selectors/CountryAirportSelector'
 import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
+
+interface CountryOption {
+  id: string
+  name: string
+  is_active: boolean
+}
 
 interface PackageDialogProps {
   open: boolean
@@ -20,6 +24,8 @@ interface PackageDialogProps {
   /** 新增時用於預填資料的基底套件 */
   basePackage?: ProposalPackage | null
   onSubmit: (data: CreatePackageData | Partial<CreatePackageData>) => Promise<void>
+  /** 國家列表（從父組件傳入，避免嵌套 Dialog 載入問題） */
+  countries?: CountryOption[]
 }
 
 interface FormData {
@@ -43,19 +49,8 @@ export function PackageDialog({
   package: pkg,
   basePackage,
   onSubmit,
+  countries = [],
 }: PackageDialogProps) {
-  // 國家用 useCountries (SWR 自動載入)
-  const { items: countries } = useCountries()
-  // 機場代碼用 useTourDestinations
-  const { destinations, addDestination, loading: destinationsLoading } = useTourDestinations()
-
-  // SWR 自動載入，不需要手動 fetchAll
-
-  // 新增機場代碼狀態
-  const [showAddNew, setShowAddNew] = useState(false)
-  const [newCity, setNewCity] = useState('')
-  const [newAirportCode, setNewAirportCode] = useState('')
-
   // 初始表單狀態（空白，會在 dialog 開啟時由 useEffect 設定）
   const [formData, setFormData] = useState<FormData>({
     version_name: '',
@@ -69,29 +64,6 @@ export function PackageDialog({
     notes: '',
   })
   const [submitting, setSubmitting] = useState(false)
-
-  // 取得啟用的國家列表（從 useRegionsStore）
-  const countryOptions = useMemo(() =>
-    countries
-      .filter(c => c.is_active)
-      .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))
-      .map(c => ({
-        value: c.name,  // 存國家名稱
-        label: c.name,
-      })),
-    [countries]
-  )
-
-  // 根據選中的國家取得機場代碼列表（從 tour_destinations）
-  const availableAirports = useMemo(() => {
-    if (!formData.country) return []
-    return destinations
-      .filter(d => d.country === formData.country)
-      .map(d => ({
-        value: d.airport_code,
-        label: `${d.city} (${d.airport_code})`,
-      }))
-  }, [formData.country, destinations])
 
   // 追蹤 dialog 是否剛開啟（用於避免重複初始化）
   const prevOpenRef = useRef(false)
@@ -132,36 +104,19 @@ export function PackageDialog({
     }
   }, [open, mode, pkg, basePackage, proposal])
 
-  // 當國家改變時，清空機場代碼
-  const handleCountryChange = (country: string) => {
+  // 處理國家變更 - 台灣團自動設 TW
+  const handleCountryChange = (country: string, airportCode: string) => {
     setFormData(prev => ({
       ...prev,
-      country: country,
-      airport_code: '', // 清空機場代碼
+      country,
+      airport_code: airportCode,
     }))
   }
 
-  // 當機場代碼改變時
+  // 處理機場代碼變更
   const handleAirportChange = (airportCode: string) => {
     setFormData(prev => ({ ...prev, airport_code: airportCode }))
   }
-
-  // 新增機場代碼
-  const handleAddAirport = useCallback(async () => {
-    if (!formData.country || !newCity.trim() || !newAirportCode.trim()) return
-
-    const result = await addDestination(formData.country, newCity, newAirportCode)
-    if (result.success) {
-      // 自動選擇新增的機場代碼
-      setFormData(prev => ({
-        ...prev,
-        airport_code: newAirportCode.trim().toUpperCase(),
-      }))
-      setShowAddNew(false)
-      setNewCity('')
-      setNewAirportCode('')
-    }
-  }, [formData.country, newCity, newAirportCode, addDestination])
 
   // 處理提交
   const handleSubmit = async () => {
@@ -214,94 +169,16 @@ export function PackageDialog({
           />
         </div>
 
-        {/* 國家/機場代碼選擇 */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              國家
-            </label>
-            <Combobox
-              value={formData.country}
-              onChange={handleCountryChange}
-              options={countryOptions}
-              placeholder="選擇國家..."
-              emptyMessage="找不到符合的國家"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-morandi-primary mb-2 block">
-              機場代碼
-            </label>
-            <Combobox
-              value={formData.airport_code}
-              onChange={handleAirportChange}
-              options={availableAirports}
-              placeholder={destinationsLoading ? "載入中..." : "選擇機場代碼..."}
-              emptyMessage={formData.country ? "尚無機場代碼，請點擊下方新增" : "請先選擇國家"}
-              disabled={!formData.country}
-            />
-          </div>
-        </div>
-
-        {/* 新增機場代碼區塊 - 只有選了國家才能新增 */}
-        {formData.country && (
-          !showAddNew ? (
-            <button
-              type="button"
-              onClick={() => setShowAddNew(true)}
-              className="text-sm text-morandi-gold hover:text-morandi-gold-hover"
-            >
-              + 新增機場代碼
-            </button>
-          ) : (
-            <div className="border border-border rounded-lg p-3 space-y-3 bg-morandi-container/20">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-morandi-primary">
-                  新增 {formData.country} 的機場代碼
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddNew(false)
-                    setNewCity('')
-                    setNewAirportCode('')
-                  }}
-                  className="text-morandi-secondary hover:text-morandi-primary text-sm"
-                >
-                  取消
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  value={newCity}
-                  onChange={e => setNewCity(e.target.value)}
-                  placeholder="城市（如：東京）"
-                />
-                <Input
-                  value={newAirportCode}
-                  onChange={e => {
-                    // 轉換全形為半形，只保留英文字母
-                    const halfWidth = e.target.value
-                      .replace(/[Ａ-Ｚａ-ｚ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-                      .replace(/[^A-Za-z]/g, '')
-                      .toUpperCase()
-                    setNewAirportCode(halfWidth)
-                  }}
-                  placeholder="代碼（如：NRT）"
-                  maxLength={4}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleAddAirport}
-                disabled={!newCity.trim() || !newAirportCode.trim()}
-                className="w-full px-3 py-1.5 text-sm bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                新增並選擇
-              </button>
-            </div>
-          )
-        )}
+        {/* 國家/機場代碼選擇 - 使用共用組件 */}
+        <CountryAirportSelector
+          country={formData.country}
+          airportCode={formData.airport_code}
+          onCountryChange={handleCountryChange}
+          onAirportChange={handleAirportChange}
+          disablePortal
+          showLabels
+          countries={countries}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>

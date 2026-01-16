@@ -96,7 +96,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
         zIndex: 1,
         rotation: 0,
         opacity: 0.85,
-        locked: false,
+        locked: true, // 鎖定位置，使用「調整位置」按鈕來調整圖片
         visible: true,
         src: dayDetail.coverImage,
         objectFit: 'cover',

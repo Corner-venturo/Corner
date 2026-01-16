@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils'
 
 interface TemplateSelectorProps {
   itineraryId?: string | null
+  tourId?: string | null
   onBack: () => void
   onComplete: (pages: CanvasPage[], templateData: TemplateData | null, selectedStyle: StyleSeries) => void
   sidebarWidth: string
@@ -36,6 +37,7 @@ interface TemplateSelectorProps {
 
 export function TemplateSelector({
   itineraryId,
+  tourId,
   onBack,
   onComplete,
   sidebarWidth,
@@ -51,52 +53,138 @@ export function TemplateSelector({
   const [isGenerating, setIsGenerating] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  // 載入行程資料
+  // 載入行程資料（從行程表或旅遊團）
   useEffect(() => {
-    if (!itineraryId) return
+    // 載入行程表資料
+    const loadItinerary = async (id: string) => {
+      const { data, error } = await supabase
+        .from('itineraries')
+        .select('*')
+        .eq('id', id)
+        .single()
 
-    const loadItinerary = async () => {
+      if (error) throw error
+
+      if (data) {
+        return itineraryToTemplateData({
+          title: data.title ?? undefined,
+          subtitle: data.subtitle ?? undefined,
+          tour_code: data.tour_code ?? undefined,
+          cover_image: data.cover_image ?? undefined,
+          country: data.country ?? undefined,
+          city: data.city ?? undefined,
+          departure_date: data.departure_date ?? undefined,
+          return_date: (data as { return_date?: string | null }).return_date ?? undefined,
+          duration_days: data.duration_days ?? undefined,
+          meeting_info: (data.meeting_info as Record<string, unknown>) ?? undefined,
+          leader: (data.leader as Record<string, unknown>) ?? undefined,
+          outbound_flight: (data.outbound_flight as Record<string, unknown>) ?? undefined,
+          return_flight: (data.return_flight as Record<string, unknown>) ?? undefined,
+          daily_itinerary: (data.daily_itinerary as Array<Record<string, unknown>>) ?? undefined,
+        })
+      }
+      return null
+    }
+
+    // 載入旅遊團資料
+    const loadTour = async (id: string) => {
+      const { data, error } = await supabase
+        .from('tours')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (error) throw error
+
+      if (data) {
+        // 計算天數（從出發日到回程日）
+        let durationDays = 1
+        if (data.departure_date && data.return_date) {
+          try {
+            const start = new Date(data.departure_date)
+            const end = new Date(data.return_date)
+            durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+          } catch {
+            durationDays = 1
+          }
+        }
+
+        // 如果旅遊團有關聯的行程表，嘗試載入
+        if (data.locked_itinerary_id) {
+          try {
+            const itineraryData = await loadItinerary(data.locked_itinerary_id)
+            if (itineraryData) {
+              // 確保 dailyItineraries 的天數與 tour 計算的天數一致
+              let dailyItineraries = itineraryData.dailyItineraries || []
+              if (dailyItineraries.length < durationDays) {
+                // 補齊缺少的天數
+                dailyItineraries = Array.from({ length: durationDays }, (_, index) => {
+                  const existing = dailyItineraries[index]
+                  if (existing) return existing
+                  return {
+                    dayNumber: index + 1,
+                    title: `第 ${index + 1} 天`,
+                    meals: { breakfast: '', lunch: '', dinner: '' },
+                    accommodation: '',
+                  }
+                })
+              }
+
+              // 補充旅遊團的資料
+              return {
+                ...itineraryData,
+                tourCode: data.code,
+                mainTitle: itineraryData.mainTitle || data.name,
+                dailyItineraries,
+              }
+            }
+          } catch {
+            // 載入行程表失敗，用旅遊團資料
+          }
+        }
+
+        // 用旅遊團資料建立 TemplateData
+        return itineraryToTemplateData({
+          title: data.name ?? undefined,
+          tour_code: data.code ?? undefined,
+          departure_date: data.departure_date ?? undefined,
+          return_date: data.return_date ?? undefined,
+          duration_days: durationDays,
+          outbound_flight: (data.outbound_flight as Record<string, unknown>) ?? undefined,
+          return_flight: (data.return_flight as Record<string, unknown>) ?? undefined,
+        })
+      }
+      return null
+    }
+
+    const loadData = async () => {
+      if (!itineraryId && !tourId) return
+
       setIsLoading(true)
       setLoadError(null)
 
       try {
-        const { data, error } = await supabase
-          .from('itineraries')
-          .select('*')
-          .eq('id', itineraryId)
-          .single()
+        let templateData: TemplateData | null = null
 
-        if (error) throw error
+        if (itineraryId) {
+          templateData = await loadItinerary(itineraryId)
+        } else if (tourId) {
+          templateData = await loadTour(tourId)
+        }
 
-        if (data) {
-          // 轉換為 TemplateData（處理 null -> undefined）
-          const templateData = itineraryToTemplateData({
-            title: data.title ?? undefined,
-            subtitle: data.subtitle ?? undefined,
-            tour_code: data.tour_code ?? undefined,
-            cover_image: data.cover_image ?? undefined,
-            country: data.country ?? undefined,
-            city: data.city ?? undefined,
-            departure_date: data.departure_date ?? undefined,
-            return_date: (data as { return_date?: string | null }).return_date ?? undefined,
-            meeting_info: (data.meeting_info as Record<string, unknown>) ?? undefined,
-            leader: (data.leader as Record<string, unknown>) ?? undefined,
-            outbound_flight: (data.outbound_flight as Record<string, unknown>) ?? undefined,
-            return_flight: (data.return_flight as Record<string, unknown>) ?? undefined,
-            daily_itinerary: (data.daily_itinerary as Array<Record<string, unknown>>) ?? undefined,
-          })
+        if (templateData) {
           setItineraryData(templateData)
         }
       } catch (err) {
-        logger.error('Failed to load itinerary:', err)
-        setLoadError('載入行程資料失敗')
+        logger.error('Failed to load data:', err)
+        setLoadError('載入資料失敗')
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadItinerary()
-  }, [itineraryId])
+    loadData()
+  }, [itineraryId, tourId])
 
   // 開始編輯（只生成封面頁）
   const handleStart = useCallback(async () => {
@@ -105,6 +193,7 @@ export function TemplateSelector({
     setIsGenerating(true)
 
     try {
+      // 使用載入的行程資料，如果沒有則用基本預設（不應該發生）
       const data = itineraryData || {
         mainTitle: '旅遊手冊',
         companyName: 'Corner Travel',
@@ -114,7 +203,8 @@ export function TemplateSelector({
       const coverTemplateId = selectedStyle.templates.cover
       const coverPage = generatePageFromTemplate(coverTemplateId, data)
 
-      onComplete([coverPage], itineraryData, selectedStyle)
+      // 傳遞 data 而不是 itineraryData，確保即使沒有載入行程資料也有預設值
+      onComplete([coverPage], data as TemplateData, selectedStyle)
     } catch (err) {
       logger.error('Failed to generate cover:', err)
     } finally {

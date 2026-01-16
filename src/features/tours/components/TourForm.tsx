@@ -12,7 +12,6 @@ import {
   TourFlightInfo,
   TourSettings,
   TourOrderSection,
-  AddDestinationDialog,
 } from './tour-form'
 
 interface TourFormProps {
@@ -43,28 +42,13 @@ export function TourForm({
   onSubmit,
   isFromProposal,
 }: TourFormProps) {
-  // 使用自定義 hook 處理所有表單邏輯
+  // 使用自定義 hook 處理航班查詢邏輯
   const {
-    countries,
-    destinationsLoading,
-    getCitiesByCountry,
     loadingOutbound,
     loadingReturn,
-    showAirportCodeDialog,
-    setShowAirportCodeDialog,
-    newAirportCode,
-    setNewAirportCode,
-    pendingCity,
-    setPendingCity,
-    pendingCountry,
-    savingDestination,
     handleSearchOutbound,
     handleSearchReturn,
-    handleAddDestination,
-    openAddDestinationDialog,
   } = useTourForm({
-    isOpen,
-    mode,
     newTour,
     setNewTour,
   })
@@ -83,6 +67,13 @@ export function TourForm({
         aria-describedby={undefined}
         onInteractOutside={e => {
           const target = e.target as HTMLElement
+          if (target.closest('[role="listbox"]') || target.closest('select')) {
+            e.preventDefault()
+          }
+        }}
+        onPointerDownOutside={e => {
+          const target = e.target as HTMLElement
+          // 允許點擊下拉選單（Combobox、Select 等）
           if (target.closest('[role="listbox"]') || target.closest('select')) {
             e.preventDefault()
           }
@@ -117,10 +108,6 @@ export function TourForm({
                 <TourBasicInfo
                   newTour={newTour}
                   setNewTour={setNewTour}
-                  countries={countries}
-                  destinationsLoading={destinationsLoading}
-                  getCitiesByCountry={getCitiesByCountry}
-                  openAddDestinationDialog={openAddDestinationDialog}
                 />
 
                 <TourFlightInfo
@@ -176,18 +163,6 @@ export function TourForm({
           </Button>
         </div>
 
-        {/* 新增城市機場代碼對話框 */}
-        <AddDestinationDialog
-          open={showAirportCodeDialog}
-          onOpenChange={setShowAirportCodeDialog}
-          pendingCountry={pendingCountry}
-          pendingCity={pendingCity}
-          setPendingCity={setPendingCity}
-          newAirportCode={newAirportCode}
-          setNewAirportCode={setNewAirportCode}
-          savingDestination={savingDestination}
-          handleAddDestination={handleAddDestination}
-        />
       </DialogContent>
     </Dialog>
   )

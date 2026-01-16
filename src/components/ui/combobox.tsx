@@ -51,6 +51,8 @@ export interface ComboboxProps<T = unknown> {
   renderOption?: (option: ComboboxOption<T>) => React.ReactNode
   /** 下拉選單最大高度 */
   maxHeight?: string
+  /** 禁用 Portal，讓下拉選單在原位置渲染（用於 Dialog 內） */
+  disablePortal?: boolean
 }
 
 /**
@@ -94,6 +96,7 @@ export function Combobox<T = unknown>({
   disabled = false,
   renderOption,
   maxHeight = '16rem',
+  disablePortal = false,
 }: ComboboxProps<T>) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
@@ -314,50 +317,60 @@ export function Combobox<T = unknown>({
         </div>
       </div>
 
-      {/* 下拉選單（使用 Portal 避免被 overflow 裁切） */}
-      {isOpen && !disabled && typeof document !== 'undefined' && createPortal(
-        <div
-          ref={dropdownRef}
-          role="listbox"
-          className="fixed z-[10010] bg-card border border-border rounded-lg shadow-lg overflow-hidden"
-          style={{
-            top: dropdownPosition.top,
-            left: dropdownPosition.left,
-            width: dropdownPosition.width,
-            maxHeight,
-          }}
-          onMouseDown={e => e.stopPropagation()}
-          onPointerDown={e => e.stopPropagation()}
-        >
-          <div className="overflow-y-auto" style={{ maxHeight }}>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => (
-                <button
-                  key={`${option.value}-${index}`}
-                  ref={el => { optionRefs.current[index] = el }}
-                  type="button"
-                  onClick={() => handleOptionSelect(option)}
-                  disabled={option.disabled}
-                  className={cn(
-                    'w-full px-3 py-2 text-left text-sm transition-colors',
-                    'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
-                    highlightedIndex === index && 'bg-morandi-container/50',
-                    option.value === value && 'bg-morandi-gold/10 font-medium',
-                    option.disabled && 'opacity-50 cursor-not-allowed'
-                  )}
-                >
-                  {renderOption ? renderOption(option) : defaultRenderOption(option)}
-                </button>
-              ))
-            ) : (
-              <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
-                {emptyMessage}
-              </div>
+      {/* 下拉選單 */}
+      {isOpen && !disabled && (() => {
+        const dropdownContent = (
+          <div
+            ref={dropdownRef}
+            role="listbox"
+            className={cn(
+              'bg-card border border-border rounded-lg shadow-lg overflow-hidden',
+              disablePortal ? 'absolute left-0 right-0 top-full mt-1 z-50' : 'fixed z-[10010]'
             )}
+            style={disablePortal ? { maxHeight } : {
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+              width: dropdownPosition.width,
+              maxHeight,
+            }}
+            onMouseDown={e => e.stopPropagation()}
+            onPointerDown={e => e.stopPropagation()}
+          >
+            <div className="overflow-y-auto" style={{ maxHeight }}>
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option, index) => (
+                  <button
+                    key={`${option.value}-${index}`}
+                    ref={el => { optionRefs.current[index] = el }}
+                    type="button"
+                    onClick={() => handleOptionSelect(option)}
+                    disabled={option.disabled}
+                    className={cn(
+                      'w-full px-3 py-2 text-left text-sm transition-colors',
+                      'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
+                      highlightedIndex === index && 'bg-morandi-container/50',
+                      option.value === value && 'bg-morandi-gold/10 font-medium',
+                      option.disabled && 'opacity-50 cursor-not-allowed'
+                    )}
+                  >
+                    {renderOption ? renderOption(option) : defaultRenderOption(option)}
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-6 text-center text-sm text-morandi-secondary">
+                  {emptyMessage}
+                </div>
+              )}
+            </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )
+
+        // 使用 Portal 或直接渲染
+        if (disablePortal) {
+          return dropdownContent
+        }
+        return typeof document !== 'undefined' ? createPortal(dropdownContent, document.body) : null
+      })()}
     </div>
   )
 }

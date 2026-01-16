@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Copy,
@@ -67,6 +67,26 @@ export function PackageListPanel({
 }: PackageListPanelProps) {
   const router = useRouter()
   const { user } = useAuthStore()
+
+  // 直接查詢國家列表（避免 useCountries 的認證狀態問題）
+  // 排序與 useTourDestinations 一致：usage_count DESC → display_order ASC → name ASC
+  const [countries, setCountries] = useState<Array<{ id: string; name: string; is_active: boolean }>>([])
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const { data } = await supabase
+        .from('countries')
+        .select('id, name, is_active, usage_count')
+        .eq('is_active', true)
+        .order('usage_count', { ascending: false, nullsFirst: false })
+        .order('display_order', { ascending: true })
+        .order('name', { ascending: true })
+      if (data) {
+        // 過濾掉 is_active 為 null 的資料
+        setCountries(data.filter(c => c.is_active === true) as Array<{ id: string; name: string; is_active: boolean }>)
+      }
+    }
+    fetchCountries()
+  }, [])
 
   // 取得目的地顯示名稱（國家 + 機場代碼）
   // 現在 country_id 存放國家名稱, main_city_id 存放機場代碼
@@ -458,75 +478,78 @@ export function PackageListPanel({
                   {/* 操作按鈕 */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      {/* 行程表按鈕 - 已建立則直接打開，否則顯示下拉選單 */}
-                      {pkg.itinerary_id || pkg.itinerary_type === 'timeline' ? (
-                        // 已建立行程表：直接點擊打開編輯
-                        <button
-                          onClick={() => {
-                            if (pkg.itinerary_type === 'timeline') {
-                              // 時間軸行程表
+                      {/* 行程表按鈕 - 下拉選單可選擇/切換類型 */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={`p-1.5 rounded transition-colors ${
+                              pkg.itinerary_id || pkg.timeline_data
+                                ? 'text-morandi-green hover:bg-morandi-green/10'
+                                : 'text-morandi-secondary hover:bg-morandi-container/80'
+                            }`}
+                            title="行程表"
+                          >
+                            <FileText size={16} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-52">
+                          {/* 快速行程表選項 */}
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              // 如果目前是時間軸，先切換類型
+                              if (pkg.itinerary_type === 'timeline' && pkg.itinerary_id) {
+                                await supabase
+                                  .from('proposal_packages')
+                                  .update({ itinerary_type: 'simple' })
+                                  .eq('id', pkg.id)
+                                onPackagesChange()
+                              }
+                              if (onOpenItineraryDialog) {
+                                onOpenItineraryDialog(pkg)
+                              } else {
+                                openItineraryDialog(pkg)
+                              }
+                            }}
+                            className="gap-2 cursor-pointer"
+                          >
+                            <Zap size={16} className="text-morandi-secondary" />
+                            <span>快速行程表</span>
+                            {pkg.itinerary_id && (
+                              <span className={`ml-auto text-xs ${pkg.itinerary_type !== 'timeline' ? 'text-morandi-green' : 'text-morandi-muted'}`}>
+                                {pkg.itinerary_type !== 'timeline' ? '使用中' : '已建立'}
+                              </span>
+                            )}
+                          </DropdownMenuItem>
+                          {/* 時間軸行程表選項 */}
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              // 如果目前是快速，先切換類型
+                              if (pkg.itinerary_type !== 'timeline' && pkg.timeline_data) {
+                                await supabase
+                                  .from('proposal_packages')
+                                  .update({ itinerary_type: 'timeline' })
+                                  .eq('id', pkg.id)
+                                onPackagesChange()
+                              }
                               if (onOpenTimelineDialog) {
                                 onOpenTimelineDialog(pkg)
                               } else {
                                 setSelectedPackage(pkg)
                                 setTimelineDialogOpen(true)
                               }
-                            } else {
-                              // 快速行程表
-                              if (onOpenItineraryDialog) {
-                                onOpenItineraryDialog(pkg)
-                              } else {
-                                openItineraryDialog(pkg)
-                              }
-                            }
-                          }}
-                          className="p-1.5 rounded transition-colors text-morandi-green hover:bg-morandi-green/10"
-                          title={pkg.itinerary_type === 'timeline' ? '編輯時間軸行程表' : '編輯快速行程表'}
-                        >
-                          <FileText size={16} />
-                        </button>
-                      ) : (
-                        // 未建立行程表：顯示下拉選單讓用戶選擇類型
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className="p-1.5 rounded transition-colors text-morandi-secondary hover:bg-morandi-container/80"
-                              title="建立行程表"
-                            >
-                              <FileText size={16} />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-44">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                if (onOpenItineraryDialog) {
-                                  onOpenItineraryDialog(pkg)
-                                } else {
-                                  openItineraryDialog(pkg)
-                                }
-                              }}
-                              className="gap-2 cursor-pointer"
-                            >
-                              <Zap size={16} className="text-morandi-secondary" />
-                              <span>快速行程表</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                if (onOpenTimelineDialog) {
-                                  onOpenTimelineDialog(pkg)
-                                } else {
-                                  setSelectedPackage(pkg)
-                                  setTimelineDialogOpen(true)
-                                }
-                              }}
-                              className="gap-2 cursor-pointer"
-                            >
-                              <Clock size={16} className="text-morandi-secondary" />
-                              <span>時間軸行程表</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
+                            }}
+                            className="gap-2 cursor-pointer"
+                          >
+                            <Clock size={16} className="text-morandi-secondary" />
+                            <span>時間軸行程表</span>
+                            {pkg.timeline_data && (
+                              <span className={`ml-auto text-xs ${pkg.itinerary_type === 'timeline' ? 'text-morandi-green' : 'text-morandi-muted'}`}>
+                                {pkg.itinerary_type === 'timeline' ? '使用中' : '已建立'}
+                              </span>
+                            )}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       {/* 簡易行程預覽 - 只有快速行程表才能用 */}
                       <button
                         onClick={() => {
@@ -684,6 +707,7 @@ export function PackageListPanel({
         proposal={proposal}
         basePackage={packages.length > 0 ? packages[packages.length - 1] : null}
         onSubmit={handleCreatePackage}
+        countries={countries}
       />
 
       {/* 編輯套件對話框 */}
@@ -695,6 +719,7 @@ export function PackageListPanel({
         proposal={proposal}
         package={selectedPackage}
         onSubmit={handleUpdatePackage}
+        countries={countries}
       />
 
       {/* 行程表對話框（僅在未使用父組件回調時渲染） */}

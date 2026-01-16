@@ -565,6 +565,7 @@ export function OrderMembersExpandable({
           }))}
           orderId={orderId || (membersData.tourOrders.length === 1 ? membersData.tourOrders[0].id : undefined)}
           workspaceId={workspaceId}
+          tourId={tourId}
           onSuccess={() => {
             membersData.loadMembers()
             // PNR 配對成功後自動顯示 PNR 欄位

@@ -6,6 +6,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase/admin'
  * 詳細的系統健康檢查，包含各表資料統計
  *
  * GET /api/health/detailed
+ *
+ * 注意：此 API 使用自定義狀態碼 (200/207/503)，不使用統一回應格式
  */
 export async function GET() {
   const startTime = Date.now()
@@ -109,10 +111,14 @@ export async function GET() {
 
   const totalTime = Date.now() - startTime
 
+  // 健康檢查使用特殊狀態碼：200=健康, 207=部分降級, 503=不健康
   return NextResponse.json(
     {
-      ...checks,
-      responseTime: totalTime,
+      success: checks.status === 'healthy',
+      data: {
+        ...checks,
+        responseTime: totalTime,
+      },
     },
     {
       status: checks.status === 'healthy' ? 200 : checks.status === 'degraded' ? 207 : 503,

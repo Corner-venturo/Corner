@@ -46,7 +46,11 @@ async function fetchCountries(): Promise<Country[]> {
     .order('display_order', { ascending: true })
     .order('name', { ascending: true })
 
-  if (error) throw error
+  if (error) {
+    logger.error('載入國家列表失敗:', error)
+    throw error
+  }
+  logger.log(`載入國家列表成功: ${data?.length || 0} 筆`)
   return data || []
 }
 
@@ -65,14 +69,14 @@ export function useTourDestinations() {
   const user = useAuthStore(state => state.user)
 
   // 使用 SWR 載入國家資料
-  const { data: countriesData = [], isLoading: countriesLoading } = useSWR<Country[]>(
+  const { data: countriesData = [], isLoading: countriesLoading, error: countriesError } = useSWR<Country[]>(
     COUNTRIES_CACHE_KEY,
     fetchCountries,
     SWR_CONFIG
   )
 
   // 使用 SWR 載入目的地資料
-  const { data: destinations = [], isLoading: destinationsLoading } = useSWR<TourDestination[]>(
+  const { data: destinations = [], isLoading: destinationsLoading, error: destinationsError } = useSWR<TourDestination[]>(
     DESTINATIONS_CACHE_KEY,
     fetchDestinations,
     SWR_CONFIG
@@ -80,6 +84,7 @@ export function useTourDestinations() {
 
   // 合併 loading 狀態
   const loading = countriesLoading || destinationsLoading
+  const error = countriesError || destinationsError
 
   // 重新載入資料
   const refreshDestinations = useCallback(async () => {
@@ -214,6 +219,7 @@ export function useTourDestinations() {
     destinations,
     countries,
     loading,
+    error,
     fetchDestinations: refreshDestinations,
     getCitiesByCountry,
     getAirportCode,

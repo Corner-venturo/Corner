@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ChevronUp, ChevronDown } from 'lucide-react'
+import { ChevronUp, ChevronDown, ChevronRight, GripVertical } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { DayStylePicker } from '../../components/DayStylePicker'
 import { DreamscapeLayoutPicker } from '../../components/DreamscapeLayoutPicker'
 import { DailyImagesUploader } from '../DailyImagesUploader'
@@ -17,6 +18,8 @@ export function DayCard({
   dayIndex,
   dayLabel,
   data,
+  isCollapsed = false,
+  onToggleCollapse,
   updateDailyItinerary,
   removeDailyItinerary,
   swapDailyItinerary,
@@ -51,11 +54,31 @@ export function DayCard({
   return (
     <div
       id={`day-${dayIndex}`}
-      className="p-6 border border-morandi-container rounded-xl space-y-5 bg-gradient-to-br from-morandi-container/20 via-card to-morandi-container/10 shadow-sm"
+      className={cn(
+        'border border-morandi-container rounded-xl bg-gradient-to-br from-morandi-container/20 via-card to-morandi-container/10 shadow-sm transition-all',
+        isCollapsed ? 'p-4' : 'p-6 space-y-5'
+      )}
     >
       {/* Day 標籤與控制按鈕 */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
+          {/* 摺疊/展開按鈕 */}
+          {onToggleCollapse && (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className="p-1 rounded transition-colors text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50"
+              title={isCollapsed ? '展開' : '摺疊'}
+            >
+              <ChevronRight
+                size={18}
+                className={cn(
+                  'transition-transform duration-200',
+                  !isCollapsed && 'rotate-90'
+                )}
+              />
+            </button>
+          )}
           {/* 上下箭頭排序按鈕 */}
           {swapDailyItinerary && data.dailyItinerary.length > 1 && (
             <div className="flex flex-col gap-0.5">
@@ -97,9 +120,15 @@ export function DayCard({
               建議方案
             </span>
           )}
-          <span className="text-sm text-morandi-primary">
+          <span className="text-sm text-morandi-primary truncate max-w-[300px]">
             {day.title || '尚未設定行程標題'}
           </span>
+          {/* 摺疊時顯示的統計 */}
+          {isCollapsed && (
+            <span className="text-xs text-morandi-secondary">
+              ({day.activities?.length || 0} 個景點)
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-4">
           {/* 每日風格選擇器 + 預覽編輯 - 只在藝術風格時顯示 */}
@@ -148,62 +177,65 @@ export function DayCard({
         </div>
       </div>
 
-      {/* 行程標題 */}
-      <DayTitleSection
-        day={day}
-        dayIndex={dayIndex}
-        updateDailyItinerary={updateDailyItinerary}
-      />
-
-      {/* 特別安排 (highlight) */}
-      <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">
-          特別安排 (highlight)
-        </label>
-        <input
-          type="text"
-          value={day.highlight || ''}
-          onChange={e => updateDailyItinerary(dayIndex, 'highlight', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
-          placeholder="✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地"
-        />
-      </div>
-
-      {/* Luxury 模板專用：地點標籤 */}
-      {data.coverStyle === 'luxury' && (
-        <div>
-          <label className="block text-sm font-medium text-morandi-primary mb-1">
-            <span className="inline-flex items-center gap-2">
-              地點標籤
-              <span className="px-1.5 py-0.5 text-[10px] bg-morandi-secondary/20 text-morandi-secondary rounded">
-                Luxury 專用
-              </span>
-            </span>
-          </label>
-          <input
-            type="text"
-            value={day.locationLabel || ''}
-            onChange={e => updateDailyItinerary(dayIndex, 'locationLabel', e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
-            placeholder="如：京都、大阪、由布院（顯示在 Luxury 模板的每日卡片上）"
+      {/* 可摺疊的內容區域 */}
+      {!isCollapsed && (
+        <>
+          {/* 行程標題 */}
+          <DayTitleSection
+            day={day}
+            dayIndex={dayIndex}
+            updateDailyItinerary={updateDailyItinerary}
           />
-        </div>
-      )}
 
-      {/* 描述 */}
-      <div>
-        <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
-        <textarea
-          value={day.description || ''}
-          onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
-          rows={3}
-          placeholder="集合於台灣桃園國際機場..."
-        />
-      </div>
+          {/* 特別安排 (highlight) */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">
+              特別安排 (highlight)
+            </label>
+            <input
+              type="text"
+              value={day.highlight || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'highlight', e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="✨ 特別安排：由布院 · 金麟湖 ～ 日本 OL 人氣 NO.1 散策地"
+            />
+          </div>
 
-      {/* 活動 */}
-      <ActivitiesSection
+          {/* Luxury 模板專用：地點標籤 */}
+          {data.coverStyle === 'luxury' && (
+            <div>
+              <label className="block text-sm font-medium text-morandi-primary mb-1">
+                <span className="inline-flex items-center gap-2">
+                  地點標籤
+                  <span className="px-1.5 py-0.5 text-[10px] bg-morandi-secondary/20 text-morandi-secondary rounded">
+                    Luxury 專用
+                  </span>
+                </span>
+              </label>
+              <input
+                type="text"
+                value={day.locationLabel || ''}
+                onChange={e => updateDailyItinerary(dayIndex, 'locationLabel', e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="如：京都、大阪、由布院（顯示在 Luxury 模板的每日卡片上）"
+              />
+            </div>
+          )}
+
+          {/* 描述 */}
+          <div>
+            <label className="block text-sm font-medium text-morandi-primary mb-1">描述</label>
+            <textarea
+              value={day.description || ''}
+              onChange={e => updateDailyItinerary(dayIndex, 'description', e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
+              rows={3}
+              placeholder="集合於台灣桃園國際機場..."
+            />
+          </div>
+
+          {/* 活動 */}
+          <ActivitiesSection
         day={day}
         dayIndex={dayIndex}
         addActivity={addActivity}
@@ -266,22 +298,24 @@ export function DayCard({
           )}
         </div>
         {day.showDailyImages === true && (
-          <DailyImagesUploader
-            dayIndex={dayIndex}
-            images={day.images || []}
-            onImagesChange={(newImages) => {
-              updateDailyItinerary(dayIndex, 'images', newImages)
-            }}
-            allTourImages={
-              data.dailyItinerary?.flatMap(d =>
-                (d.images || []).map(img =>
-                  typeof img === 'string' ? img : img.url
-                )
-              ) || []
-            }
-          />
-        )}
-      </div>
+            <DailyImagesUploader
+              dayIndex={dayIndex}
+              images={day.images || []}
+              onImagesChange={(newImages) => {
+                updateDailyItinerary(dayIndex, 'images', newImages)
+              }}
+              allTourImages={
+                data.dailyItinerary?.flatMap(d =>
+                  (d.images || []).map(img =>
+                    typeof img === 'string' ? img : img.url
+                  )
+                ) || []
+              }
+            />
+          )}
+        </div>
+        </>
+      )}
     </div>
   )
 }

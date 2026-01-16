@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useMemo } from 'react'
+import { ChevronsUpDown, ChevronsDownUp } from 'lucide-react'
 import { DailyItinerary, TourFormData, Activity } from '../../types'
 import { DayCard } from './DayCard'
 
@@ -45,8 +46,73 @@ export function DayList({
   handleActivityImageUpload,
   onOpenPositionEditor,
 }: DayListProps) {
+  // 管理每天的摺疊狀態
+  const [collapsedDays, setCollapsedDays] = useState<Set<number>>(new Set())
+
+  // 計算是否全部摺疊或全部展開
+  const totalDays = data.dailyItinerary?.length || 0
+  const allCollapsed = collapsedDays.size === totalDays && totalDays > 0
+  const allExpanded = collapsedDays.size === 0
+
+  // 切換單天的摺疊狀態
+  const toggleDayCollapse = (dayIndex: number) => {
+    setCollapsedDays(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(dayIndex)) {
+        newSet.delete(dayIndex)
+      } else {
+        newSet.add(dayIndex)
+      }
+      return newSet
+    })
+  }
+
+  // 全部摺疊
+  const collapseAll = () => {
+    const allIndices = new Set(Array.from({ length: totalDays }, (_, i) => i))
+    setCollapsedDays(allIndices)
+  }
+
+  // 全部展開
+  const expandAll = () => {
+    setCollapsedDays(new Set())
+  }
+
   return (
-    <>
+    <div className="space-y-4">
+      {/* 全部摺疊/展開按鈕 */}
+      {totalDays > 1 && (
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={collapseAll}
+            disabled={allCollapsed}
+            className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ${
+              allCollapsed
+                ? 'text-morandi-muted cursor-not-allowed'
+                : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+            }`}
+          >
+            <ChevronsDownUp size={14} />
+            全部摺疊
+          </button>
+          <button
+            type="button"
+            onClick={expandAll}
+            disabled={allExpanded}
+            className={`flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors ${
+              allExpanded
+                ? 'text-morandi-muted cursor-not-allowed'
+                : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+            }`}
+          >
+            <ChevronsUpDown size={14} />
+            全部展開
+          </button>
+        </div>
+      )}
+
+      {/* 每日行程卡片 */}
       {data.dailyItinerary?.map((day: DailyItinerary, dayIndex: number) => (
         <DayCard
           key={dayIndex}
@@ -54,6 +120,8 @@ export function DayList({
           dayIndex={dayIndex}
           dayLabel={dayLabels[dayIndex]}
           data={data}
+          isCollapsed={collapsedDays.has(dayIndex)}
+          onToggleCollapse={() => toggleDayCollapse(dayIndex)}
           updateDailyItinerary={updateDailyItinerary}
           removeDailyItinerary={removeDailyItinerary}
           swapDailyItinerary={swapDailyItinerary}
@@ -72,6 +140,6 @@ export function DayList({
           onOpenPositionEditor={onOpenPositionEditor}
         />
       ))}
-    </>
+    </div>
   )
 }

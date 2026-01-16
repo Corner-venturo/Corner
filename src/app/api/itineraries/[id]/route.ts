@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, ApiError } from '@/lib/api/response'
 
 export async function GET(
   request: NextRequest,
@@ -11,10 +12,7 @@ export async function GET(
     const supabaseAdmin = getSupabaseAdminClient()
 
     if (!id) {
-      return NextResponse.json(
-        { error: '缺少行程 ID' },
-        { status: 400 }
-      )
+      return ApiError.missingField('id')
     }
 
     // 判斷查詢類型：
@@ -62,22 +60,13 @@ export async function GET(
     if (error) {
       logger.error('查詢行程失敗:', error)
       if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: '找不到此行程' },
-          { status: 404 }
-        )
+        return ApiError.notFound('行程')
       }
-      return NextResponse.json(
-        { error: '查詢行程失敗' },
-        { status: 500 }
-      )
+      return ApiError.database('查詢行程失敗')
     }
 
     if (!itinerary) {
-      return NextResponse.json(
-        { error: '找不到此行程' },
-        { status: 404 }
-      )
+      return ApiError.notFound('行程')
     }
 
     // 轉換資料格式（snake_case → camelCase）
@@ -131,12 +120,9 @@ export async function GET(
       updatedAt: itinerary.updated_at,
     }
 
-    return NextResponse.json(formattedItinerary)
+    return successResponse(formattedItinerary)
   } catch (error) {
     logger.error('API 錯誤:', error)
-    return NextResponse.json(
-      { error: '伺服器錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('伺服器錯誤')
   }
 }

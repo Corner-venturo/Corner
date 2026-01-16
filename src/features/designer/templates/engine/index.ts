@@ -174,6 +174,7 @@ export function itineraryToTemplateData(itinerary: {
   city?: string
   departure_date?: string
   return_date?: string
+  duration_days?: number | null // 行程天數
   // JSON 欄位（Supabase 返回的是 unknown/Json 類型）
   meeting_info?: ItineraryMeetingInfo | null
   leader?: ItineraryLeader | null
@@ -247,15 +248,73 @@ export function itineraryToTemplateData(itinerary: {
     }
   }
 
+  // 計算旅遊天數（優先使用 duration_days，必須有行程資料）
+  const calculateTotalDays = (): number => {
+    // 優先使用 duration_days 欄位
+    if (itinerary.duration_days && itinerary.duration_days > 0) {
+      return itinerary.duration_days
+    }
+    // 其次從出發日到回程日計算
+    if (itinerary.departure_date && itinerary.return_date) {
+      try {
+        const startDate = new Date(itinerary.departure_date)
+        const endDate = new Date(itinerary.return_date)
+        if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+          const diffTime = endDate.getTime() - startDate.getTime()
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1 // +1 包含最後一天
+          return Math.max(1, diffDays)
+        }
+      } catch {
+        // 日期解析失敗，繼續往下
+      }
+    }
+    // 沒有天數資料，返回 0（不應該發生，行程應該都有天數）
+    return 0
+  }
+
+  const totalDays = calculateTotalDays()
+
   // 轉換每日行程（給行程總覽頁用）
-  const dailyItineraries: DailyItinerary[] = (dailyItineraryData || [])
-    .filter((day): day is ItineraryDay => day != null)
-    .map((day, index) => ({
-      dayNumber: index + 1,
-      title: day.title || '',
-      meals: day.meals,
-      accommodation: day.accommodation,
-    }))
+  // 以 duration_days 為準，用現有資料填充，不足的天數補空白
+  let dailyItineraries: DailyItinerary[] = []
+
+  if (totalDays > 0) {
+    // 先將現有資料轉換成 map，方便查找
+    const existingDays = (dailyItineraryData || [])
+      .filter((day): day is ItineraryDay => day != null)
+
+    // 根據總天數建立每日行程
+    dailyItineraries = Array.from({ length: totalDays }, (_, index) => {
+      const existingDay = existingDays[index]
+      if (existingDay) {
+        // 有現有資料就用現有的
+        return {
+          dayNumber: index + 1,
+          title: existingDay.title || `第 ${index + 1} 天`,
+          meals: existingDay.meals || { breakfast: '', lunch: '', dinner: '' },
+          accommodation: existingDay.accommodation || '',
+        }
+      } else {
+        // 沒有就建立空白
+        return {
+          dayNumber: index + 1,
+          title: `第 ${index + 1} 天`,
+          meals: { breakfast: '', lunch: '', dinner: '' },
+          accommodation: '',
+        }
+      }
+    })
+  } else if (dailyItineraryData && dailyItineraryData.length > 0) {
+    // 如果沒有天數但有現有資料，就用現有的
+    dailyItineraries = dailyItineraryData
+      .filter((day): day is ItineraryDay => day != null)
+      .map((day, index) => ({
+        dayNumber: index + 1,
+        title: day.title || '',
+        meals: day.meals,
+        accommodation: day.accommodation,
+      }))
+  }
 
   // 轉換每日詳細資料（給每日行程頁用）
   // 計算每天的日期

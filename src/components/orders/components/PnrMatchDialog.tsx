@@ -23,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Check, X, AlertCircle, Plane, Save, RefreshCw, UserPlus, Users } from 'lucide-react'
-import { parseAmadeusPNR, type ParsedPNR } from '@/lib/pnr-parser'
+import { parseFlightConfirmation, type ParsedPNR } from '@/lib/pnr-parser'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -63,6 +63,8 @@ interface PnrMatchDialogProps {
   members: TourMember[]
   orderId?: string
   workspaceId?: string
+  /** 旅遊團 ID，用於更新航班資訊 */
+  tourId?: string
   onSuccess?: () => void
   /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
   nested?: boolean
@@ -74,6 +76,7 @@ export function PnrMatchDialog({
   members,
   orderId,
   workspaceId,
+  tourId,
   onSuccess,
   nested = false,
 }: PnrMatchDialogProps) {
@@ -155,7 +158,8 @@ export function PnrMatchDialog({
       return
     }
 
-    const parsed = parseAmadeusPNR(rawPnr)
+    // 使用智慧格式偵測（支援 Amadeus PNR、E-Ticket、HTML 確認頁面）
+    const parsed = parseFlightConfirmation(rawPnr) as ParsedPNR
     setParsedPnr(parsed)
 
     // 進行成員配對
@@ -341,10 +345,79 @@ export function PnrMatchDialog({
         }
       }
 
+      // 3. 更新旅遊團的航班資訊
+      let flightUpdated = false
+      if (tourId && parsedPnr.segments.length > 0) {
+        // 將航班資訊分類為去程和回程
+        // 通常第一段（或前半段）是去程，最後一段是回程
+        const segments = parsedPnr.segments
+        const midIndex = Math.ceil(segments.length / 2)
+
+        // 轉換 segment 為 JSON 格式
+        const toJsonSegment = (seg: typeof segments[0]) => ({
+          airline: seg.airline,
+          flightNumber: seg.flightNumber,
+          origin: seg.origin,
+          destination: seg.destination,
+          departureDate: seg.departureDate,
+          departureTime: seg.departureTime || null,
+          arrivalTime: seg.arrivalTime || null,
+          status: seg.status,
+          class: seg.class,
+        })
+
+        // 去程航班（取第一段或前幾段）
+        const outboundSegments = segments.slice(0, midIndex)
+        const outboundFlight = outboundSegments.length > 0 ? {
+          airline: outboundSegments[0].airline,
+          flightNumber: outboundSegments[0].flightNumber,
+          origin: outboundSegments[0].origin,
+          destination: outboundSegments[outboundSegments.length - 1].destination,
+          departureDate: outboundSegments[0].departureDate,
+          departureTime: outboundSegments[0].departureTime || null,
+          arrivalTime: outboundSegments[outboundSegments.length - 1].arrivalTime || null,
+          status: outboundSegments[0].status,
+          class: outboundSegments[0].class,
+          pnr: recordLocator,
+          segments: outboundSegments.map(toJsonSegment),
+        } : null
+
+        // 回程航班（取最後一段或後幾段）
+        const returnSegments = segments.length > 1 ? segments.slice(midIndex) : []
+        const returnFlight = returnSegments.length > 0 ? {
+          airline: returnSegments[0].airline,
+          flightNumber: returnSegments[0].flightNumber,
+          origin: returnSegments[0].origin,
+          destination: returnSegments[returnSegments.length - 1].destination,
+          departureDate: returnSegments[0].departureDate,
+          departureTime: returnSegments[0].departureTime || null,
+          arrivalTime: returnSegments[returnSegments.length - 1].arrivalTime || null,
+          status: returnSegments[0].status,
+          class: returnSegments[0].class,
+          pnr: recordLocator,
+          segments: returnSegments.map(toJsonSegment),
+        } : null
+
+        const { error: tourError } = await supabase
+          .from('tours')
+          .update({
+            outbound_flight: outboundFlight,
+            return_flight: returnFlight,
+          })
+          .eq('id', tourId)
+
+        if (tourError) {
+          logger.error('更新航班資訊失敗:', tourError)
+        } else {
+          flightUpdated = true
+        }
+      }
+
       // 顯示結果
       const messages: string[] = []
       if (updatedCount > 0) messages.push(`${updatedCount} 位團員已更新 PNR`)
       if (createdCount > 0) messages.push(`${createdCount} 位新成員已建立`)
+      if (flightUpdated) messages.push('航班資訊已更新')
       toast.success(`${messages.join('，')}。訂位代號: ${recordLocator}`)
 
       onSuccess?.()

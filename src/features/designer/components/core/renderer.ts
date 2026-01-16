@@ -73,8 +73,9 @@ function createRoundedRectPath(
 function getCommonProps(
   el: CanvasElement,
   isEditable: boolean
-): Partial<FabricObject> & { data: FabricObjectWithData['data'] } {
+): Partial<FabricObject> & { data: FabricObjectWithData['data']; name: string } {
   return {
+    name: el.name, // 保留元素名稱，用於位置匹配
     angle: el.rotation || 0,
     opacity: el.opacity ?? 1,
     visible: el.visible ?? true,
@@ -334,10 +335,13 @@ async function renderImageElement(
     }
 
     // 建立裁切用的形狀（支援自訂圓角）
+    // 使用 absolutePositioned: true，clipPath 使用畫布絕對座標
+    // 圖片被鎖定時不能移動，所以這種方式可以正確裁切
     let clipShape: Rect | Path
 
     if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
       // 使用自訂圓角 Path（圓拱形狀）
+      // absolutePositioned 模式：使用元素的絕對位置
       const pathData = createRoundedRectPath(el.x, el.y, targetWidth, targetHeight, el.borderRadius)
       clipShape = new Path(pathData, {
         originX: 'left',

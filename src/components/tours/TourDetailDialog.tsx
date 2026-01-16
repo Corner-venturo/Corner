@@ -635,6 +635,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             }))}
             orderId={firstOrderId || undefined}
             workspaceId={currentWorkspace?.id}
+            tourId={tour?.id}
             onSuccess={() => {
               setForceShowPnr(true)
               handleSuccess()

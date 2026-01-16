@@ -307,6 +307,7 @@ export const ExpandableOrderTable = React.memo(function ExpandableOrderTable({
                                 tourId={order.tour_id || ''}
                                 workspaceId={workspaceId}
                                 onClose={() => setActiveTab(order.id, 'overview')}
+                                tour={tours.find(t => t.id === order.tour_id)}
                               />
                             ) : (
                               <div className="px-6 py-4">

@@ -4,9 +4,10 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import type { StaffConfirmParams, ConfirmationResult } from '@/types/quote.types'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +15,7 @@ export async function POST(request: NextRequest) {
     const { quote_id, staff_id, staff_name, notes } = body
 
     if (!quote_id || !staff_id || !staff_name) {
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: '缺少必要參數' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必要參數')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -32,25 +30,19 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('業務確認失敗:', error)
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return errorResponse(error.message, 400, ErrorCode.OPERATION_FAILED)
     }
 
     const result = data as unknown as ConfirmationResult
 
     if (!result.success) {
-      return NextResponse.json<ConfirmationResult>(result, { status: 400 })
+      return errorResponse(result.error || '確認失敗', 400, ErrorCode.OPERATION_FAILED)
     }
 
     logger.log('業務已確認報價單:', result.quote_code)
-    return NextResponse.json<ConfirmationResult>(result)
+    return successResponse(result)
   } catch (error) {
     logger.error('業務確認錯誤:', error)
-    return NextResponse.json<ConfirmationResult>(
-      { success: false, error: '系統錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('系統錯誤')
   }
 }

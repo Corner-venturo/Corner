@@ -1020,12 +1020,272 @@ export function parseHTMLConfirmation(html: string): ParsedHTMLConfirmation {
 }
 
 /**
+ * 解析電子機票確認單（E-Ticket Confirmation）
+ *
+ * 格式範例（英文版）：
+ * NAME: YU/CHIENHSUN
+ * TICKET NUMBER : ETKT 781 6392510194
+ * BOOKING REF : AMADEUS: D5WX26, AIRLINE: CA/NB77E7
+ * FROM /TO        FLIGHT  CL DATE   DEP      FARE BASIS ...
+ * TAIPEI TAIWAN   MU 5008 I  18JAN  1500     ISE0WCJ2   ...
+ */
+export function parseETicketConfirmation(input: string): ParsedPNR {
+  const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
+
+  logger.log('📋 開始解析電子機票，共', lines.length, '行');
+
+  const result: ParsedPNR = {
+    recordLocator: '',
+    passengerNames: [],
+    passengers: [],
+    segments: [],
+    ticketingDeadline: null,
+    cancellationDeadline: null,
+    specialRequests: [],
+    otherInfo: [],
+    contactInfo: [],
+    validation: { isValid: true, errors: [], warnings: [], suggestions: [] },
+    fareData: null,
+    ticketNumbers: [],
+  };
+
+  // 票價資訊
+  let baseFare: number | null = null;
+  let taxes: number | null = null;
+  let totalFare: number | null = null;
+  const taxBreakdown: TaxItem[] = [];
+
+  // 航班解析狀態
+  let currentSegment: Partial<FlightSegment> | null = null;
+  let expectingArrival = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const upperLine = line.toUpperCase();
+
+    // 1. 解析旅客姓名: NAME: YU/CHIENHSUN
+    const nameMatch = line.match(/NAME\s*[:：]\s*([A-Z]+\/[A-Z]+)/i);
+    if (nameMatch) {
+      const name = nameMatch[1].toUpperCase();
+      result.passengerNames.push(name);
+      result.passengers.push({
+        index: result.passengers.length + 1,
+        name,
+        type: 'ADT',
+      });
+      logger.log('  ✅ 找到旅客:', name);
+      continue;
+    }
+
+    // 2. 解析機票號碼: TICKET NUMBER : ETKT 781 6392510194
+    const ticketMatch = line.match(/TICKET\s+NUMBER\s*[:：]\s*(?:ETKT\s+)?(\d{3})\s+(\d+)/i);
+    if (ticketMatch) {
+      const ticketNumber = `${ticketMatch[1]}-${ticketMatch[2]}`;
+      result.ticketNumbers.push({
+        number: ticketNumber,
+        passenger: result.passengerNames[result.ticketNumbers.length] || '',
+      });
+      logger.log('  ✅ 找到機票號碼:', ticketNumber);
+      continue;
+    }
+
+    // 3. 解析訂位代號: BOOKING REF : AMADEUS: D5WX26, AIRLINE: CA/NB77E7
+    const bookingMatch = line.match(/BOOKING\s+REF\s*[:：]\s*AMADEUS\s*[:：]?\s*([A-Z0-9]{5,6})/i);
+    if (bookingMatch) {
+      result.recordLocator = bookingMatch[1];
+      logger.log('  ✅ 找到訂位代號:', bookingMatch[1]);
+      continue;
+    }
+
+    // 4. 解析航班表格行（檢測表頭之後的航班資料）
+    // 航班行格式: TAIPEI TAIWAN   MU 5008 I  18JAN  1500 ...
+    // 匹配模式: 地點名稱 + 航空公司代碼 + 航班號 + 艙等 + 日期 + 時間
+    const flightMatch = line.match(/^([A-Z\s]+?)\s+([A-Z]{2})\s+(\d{1,4})\s+([A-Z])\s+(\d{2}[A-Z]{3})\s+(\d{4})\s+/i);
+    if (flightMatch && !line.includes('FROM') && !line.includes('FLIGHT')) {
+      // 儲存上一段航班（如果有）
+      if (currentSegment && currentSegment.airline) {
+        result.segments.push(currentSegment as FlightSegment);
+      }
+
+      const origin = extractAirportCode(flightMatch[1].trim());
+      currentSegment = {
+        airline: flightMatch[2].toUpperCase(),
+        flightNumber: flightMatch[3],
+        class: flightMatch[4].toUpperCase(),
+        departureDate: flightMatch[5].toUpperCase(),
+        origin: origin,
+        destination: '', // 待從下方抵達行取得
+        status: 'HK',
+        passengers: result.passengerNames.length || 1,
+        departureTime: flightMatch[6],
+      };
+
+      // 檢查同一行是否有 OK/HK/TK 等狀態
+      const statusMatch = line.match(/\s+(OK|HK|TK|RR|UC|UN|NO|XX)\s*$/i);
+      if (statusMatch) {
+        currentSegment.status = statusMatch[1].toUpperCase();
+      }
+
+      expectingArrival = true;
+      logger.log('  ✅ 找到航班:', (currentSegment.airline || '') + (currentSegment.flightNumber || ''), '從', origin);
+      continue;
+    }
+
+    // 5. 解析航站資訊: TERMINAL:2
+    const terminalMatch = line.match(/TERMINAL\s*[:：]\s*(\d+)/i);
+    if (terminalMatch && currentSegment) {
+      if (expectingArrival && !currentSegment.arrivalTerminal) {
+        // 如果還在等抵達資訊，這是出發航站
+        currentSegment.departureTerminal = terminalMatch[1];
+      } else {
+        currentSegment.arrivalTerminal = terminalMatch[1];
+      }
+      continue;
+    }
+
+    // 6. 解析抵達資訊: SHANGHAI PUDONG   ARRIVAL TIME: 1705   ARRIVAL DATE: 18JAN
+    const arrivalMatch = line.match(/^([A-Z\s]+?)\s+ARRIVAL\s+TIME\s*[:：]\s*(\d{4})\s+ARRIVAL\s+DATE\s*[:：]\s*(\d{2}[A-Z]{3})/i);
+    if (arrivalMatch && currentSegment && expectingArrival) {
+      const destination = extractAirportCode(arrivalMatch[1].trim());
+      currentSegment.destination = destination;
+      currentSegment.arrivalTime = arrivalMatch[2];
+      expectingArrival = false;
+      logger.log('    抵達:', destination, '時間:', arrivalMatch[2]);
+      continue;
+    }
+
+    // 7. 解析票價資訊
+    // AIR FARE : TWD 10350
+    const airFareMatch = line.match(/AIR\s+FARE\s*[:：]\s*([A-Z]{3})\s+([\d,]+)/i);
+    if (airFareMatch) {
+      baseFare = parseFloat(airFareMatch[2].replace(/,/g, ''));
+      continue;
+    }
+
+    // TAX : TWD 500TW TWD 227CN (多個稅項)
+    const taxMatch = line.match(/^TAX\s*[:：]\s*(.+)/i);
+    if (taxMatch) {
+      const taxParts = taxMatch[1].match(/([A-Z]{3})\s+([\d,]+)([A-Z]{2})/gi);
+      if (taxParts) {
+        taxes = 0;
+        for (const part of taxParts) {
+          const m = part.match(/([A-Z]{3})\s+([\d,]+)([A-Z]{2})/i);
+          if (m) {
+            const amount = parseFloat(m[2].replace(/,/g, ''));
+            taxes += amount;
+            taxBreakdown.push({ code: m[3], amount, currency: m[1] });
+          }
+        }
+      }
+      continue;
+    }
+
+    // AIRLINE SURCHARGES : TWD 1591YQ
+    const surchargeMatch = line.match(/AIRLINE\s+SURCHARGES?\s*[:：]\s*([A-Z]{3})\s+([\d,]+)([A-Z]{2})/i);
+    if (surchargeMatch) {
+      const amount = parseFloat(surchargeMatch[2].replace(/,/g, ''));
+      if (taxes === null) taxes = 0;
+      taxes += amount;
+      taxBreakdown.push({ code: surchargeMatch[3], amount, currency: surchargeMatch[1] });
+      continue;
+    }
+
+    // TOTAL : TWD 12668
+    const totalMatch = line.match(/^TOTAL\s*[:：]\s*([A-Z]{3})\s+([\d,]+)/i);
+    if (totalMatch) {
+      totalFare = parseFloat(totalMatch[2].replace(/,/g, ''));
+      continue;
+    }
+  }
+
+  // 儲存最後一段航班
+  if (currentSegment && currentSegment.airline && currentSegment.destination) {
+    result.segments.push(currentSegment as FlightSegment);
+  }
+
+  // 組合票價資料
+  if (totalFare !== null || baseFare !== null) {
+    result.fareData = {
+      currency: 'TWD',
+      baseFare,
+      taxes,
+      totalFare: totalFare || (baseFare || 0) + (taxes || 0),
+      fareBasis: null,
+      validatingCarrier: null,
+      taxBreakdown,
+      perPassenger: true,
+      raw: '',
+    };
+  }
+
+  logger.log('📋 電子機票解析完成:', {
+    旅客數: result.passengerNames.length,
+    航班數: result.segments.length,
+    訂位代號: result.recordLocator,
+  });
+
+  return result;
+}
+
+/**
+ * 從地點名稱提取機場代碼（簡化版）
+ */
+function extractAirportCode(locationName: string): string {
+  const upperName = locationName.toUpperCase();
+
+  // 常見機場對照表
+  const airportMap: Record<string, string> = {
+    'TAIPEI': 'TPE',
+    'TAOYUAN': 'TPE',
+    'TAIPEI TAIWAN': 'TPE',
+    'SONGSHAN': 'TSA',
+    'KAOHSIUNG': 'KHH',
+    'SHANGHAI': 'PVG',
+    'SHANGHAI PUDONG': 'PVG',
+    'HONG KONG': 'HKG',
+    'TOKYO': 'NRT',
+    'NARITA': 'NRT',
+    'HANEDA': 'HND',
+    'OSAKA': 'KIX',
+    'KANSAI': 'KIX',
+    'SEOUL': 'ICN',
+    'INCHEON': 'ICN',
+    'SINGAPORE': 'SIN',
+    'BANGKOK': 'BKK',
+    'HARBIN': 'HRB',
+    'HARBIN TAIPING': 'HRB',
+    'MACAU': 'MFM',
+  };
+
+  // 嘗試匹配
+  for (const [key, code] of Object.entries(airportMap)) {
+    if (upperName.includes(key)) {
+      return code;
+    }
+  }
+
+  // 如果找不到，嘗試提取三字母代碼
+  const codeMatch = upperName.match(/\(([A-Z]{3})\)/);
+  if (codeMatch) {
+    return codeMatch[1];
+  }
+
+  // 返回名稱的前三個字母
+  return upperName.replace(/[^A-Z]/g, '').slice(0, 3) || 'XXX';
+}
+
+/**
  * 智能檢測並解析 PNR（自動判斷格式）
  */
 export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation | ParsedPNR {
   // 檢測是否為 HTML 格式
   if (input.includes('<html') || input.includes('<!DOCTYPE') || input.includes('電腦代號')) {
     return parseHTMLConfirmation(input);
+  }
+
+  // 檢測是否為電子機票格式（包含 TICKET NUMBER 和 BOOKING REF）
+  if (input.includes('TICKET NUMBER') && (input.includes('BOOKING REF') || input.includes('NAME:'))) {
+    return parseETicketConfirmation(input);
   }
 
   // 否則當作 Amadeus 電報處理

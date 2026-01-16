@@ -16,7 +16,7 @@
  * - itinerary_id: 行程表的手冊
  */
 
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import * as fabric from 'fabric'
 import {
@@ -228,7 +228,7 @@ export default function DesignerPage() {
     return { entityId: null, entityType: 'tour' }
   }, [tourId, packageId, itineraryId])
 
-  const { user, sidebarCollapsed } = useAuthStore()
+  const { user, sidebarCollapsed, _hasHydrated } = useAuthStore()
   const workspaceId = user?.workspace_id
 
   // UI 狀態
@@ -244,7 +244,9 @@ export default function DesignerPage() {
   const [showRightPanel, setShowRightPanel] = useState(true)
   const [selectedObject, setSelectedObject] = useState<fabric.FabricObject | null>(null)
   const [showCoverUpload, setShowCoverUpload] = useState(false)
+  const [showDailyCoverUpload, setShowDailyCoverUpload] = useState(false)
   const [showImageEditor, setShowImageEditor] = useState(false)
+  const [showDailyImageEditor, setShowDailyImageEditor] = useState(false)
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null)
 
   // Document store
@@ -285,6 +287,7 @@ export default function DesignerPage() {
     copySelected,
     pasteClipboard,
     cutSelected,
+    moveSelected,
     bringForward,
     sendBackward,
     bringToFront,
@@ -307,6 +310,7 @@ export default function DesignerPage() {
     zoomIn,
     zoomOut,
     resetZoom,
+    updateElementByName,
   } = useBrochureEditorV2({
     width: canvasWidth,
     height: canvasHeight,
@@ -314,6 +318,21 @@ export default function DesignerPage() {
 
   // 側邊欄寬度
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED_PX : SIDEBAR_WIDTH_EXPANDED_PX
+
+  // 計算當前每日行程頁對應的天數索引
+  const currentDayIndex = useMemo(() => {
+    const currentPage = generatedPages[currentPageIndex]
+    if (!currentPage || currentPage.templateKey !== 'daily') return undefined
+
+    // 計算當前頁面之前有多少個 daily 頁面
+    let dailyCount = 0
+    for (let i = 0; i < currentPageIndex; i++) {
+      if (generatedPages[i]?.templateKey === 'daily') {
+        dailyCount++
+      }
+    }
+    return dailyCount
+  }, [generatedPages, currentPageIndex])
 
   // ============================================
   // 監聽選取變化，更新 selectedObject
@@ -338,7 +357,7 @@ export default function DesignerPage() {
   }, [canvas])
 
   // ============================================
-  // 雙擊封面占位框時開啟上傳對話框/位置編輯器
+  // 雙擊封面占位框時開啟上傳對話框
   // ============================================
   useEffect(() => {
     if (!canvas) return
@@ -347,18 +366,11 @@ export default function DesignerPage() {
       const target = e.target
       if (!target) return
 
-      // 檢查是否為封面占位框或封面圖片
+      // 檢查是否為封面占位框（沒有圖片時）
       const elementData = (target as fabric.FabricObject & { data?: { elementId?: string } }).data
-      if (elementData?.elementId === 'el-cover-placeholder' || elementData?.elementId === 'el-cover-image') {
-        // 如果已有封面圖片，直接開啟位置編輯器
-        const existingCoverImage = templateData?.coverImage as string | undefined
-        if (existingCoverImage) {
-          setPendingImageUrl(existingCoverImage)
-          setShowImageEditor(true)
-        } else {
-          // 沒有圖片，開啟上傳對話框
-          setShowCoverUpload(true)
-        }
+      if (elementData?.elementId === 'el-cover-placeholder') {
+        // 沒有圖片，開啟上傳對話框
+        setShowCoverUpload(true)
       }
     }
 
@@ -367,7 +379,7 @@ export default function DesignerPage() {
     return () => {
       canvas.off('mouse:dblclick', handleDoubleClick)
     }
-  }, [canvas, templateData?.coverImage])
+  }, [canvas])
 
   // ============================================
   // 封面圖片上傳 - 步驟1：上傳後開啟位置編輯器
@@ -422,6 +434,78 @@ export default function DesignerPage() {
   }, [selectedStyle, templateData, loadCanvasPage, generatedPages, currentPageIndex, pendingImageUrl])
 
   // ============================================
+  // 每日行程封面圖片上傳 - 步驟1：上傳後開啟位置編輯器
+  // ============================================
+  const handleDailyImageUploaded = useCallback((imageUrl: string) => {
+    setPendingImageUrl(imageUrl)
+    setShowDailyCoverUpload(false)
+    setShowDailyImageEditor(true)
+  }, [])
+
+  // ============================================
+  // 每日行程封面圖片位置編輯完成 - 步驟2：套用圖片和位置
+  // ============================================
+  const handleDailyImagePositionSaved = useCallback(async (result: {
+    position?: ImagePositionSettings
+  }) => {
+    if (!selectedStyle || !pendingImageUrl || currentDayIndex === undefined) return
+
+    // 取得現有的 dailyDetails
+    const dailyDetails = (templateData?.dailyDetails as Array<{
+      dayNumber: number
+      date: string
+      title: string
+      coverImage?: string
+      coverImagePosition?: ImagePositionSettings
+      timeline: Array<{ time: string; activity: string; isHighlight?: boolean }>
+      meals: { breakfast?: string; lunch?: string; dinner?: string }
+    }>) || []
+
+    // 更新當日的封面圖片
+    const newDailyDetails = [...dailyDetails]
+    while (newDailyDetails.length <= currentDayIndex) {
+      newDailyDetails.push({
+        dayNumber: newDailyDetails.length + 1,
+        date: '',
+        title: '',
+        timeline: [],
+        meals: {},
+      })
+    }
+    newDailyDetails[currentDayIndex] = {
+      ...newDailyDetails[currentDayIndex],
+      coverImage: pendingImageUrl,
+      coverImagePosition: result.position || { x: 50, y: 50, scale: 1 },
+    }
+
+    // 更新 templateData
+    const newTemplateData = {
+      ...templateData,
+      dailyDetails: newDailyDetails,
+      currentDayIndex: currentDayIndex,
+    }
+    setTemplateData(newTemplateData)
+
+    // 重新生成當前每日行程頁面
+    const templateId = selectedStyle.templates.daily
+    if (templateId) {
+      const newPage = generatePageFromTemplate(templateId, newTemplateData as Parameters<typeof generatePageFromTemplate>[1])
+      newPage.name = `第 ${currentDayIndex + 1} 天行程`
+
+      const newPages = [...generatedPages]
+      newPages[currentPageIndex] = newPage
+      setGeneratedPages(newPages)
+
+      // 重新渲染當前頁面
+      await loadCanvasPage(newPage)
+    }
+
+    // 清理狀態
+    setPendingImageUrl(null)
+    setShowDailyImageEditor(false)
+  }, [selectedStyle, templateData, loadCanvasPage, generatedPages, currentPageIndex, pendingImageUrl, currentDayIndex])
+
+  // ============================================
   // 頁面管理功能
   // ============================================
   const handleSelectPage = useCallback(async (index: number) => {
@@ -448,8 +532,13 @@ export default function DesignerPage() {
     setCurrentPageIndex(index)
     const targetPage = updatedPages[index] as CanvasPage & { fabricData?: Record<string, unknown> }
 
-    // 如果目標頁面有儲存的 fabricData，優先使用它
-    if (targetPage?.fabricData) {
+    // 檢查 fabricData 是否有效（必須有 objects 陣列且不為空）
+    const hasValidFabricData = targetPage?.fabricData &&
+      Array.isArray((targetPage.fabricData as { objects?: unknown[] }).objects) &&
+      ((targetPage.fabricData as { objects?: unknown[] }).objects?.length ?? 0) > 0
+
+    // 如果目標頁面有有效的 fabricData，優先使用它
+    if (hasValidFabricData && targetPage.fabricData) {
       await loadCanvasData(targetPage.fabricData)
       // 載入該頁面的歷史記錄
       loadPageHistory(targetPage.id)
@@ -471,8 +560,8 @@ export default function DesignerPage() {
     // 保存當前頁面的歷史
     saveCurrentPageHistory()
 
-    // 生成新頁面
-    const newPage = generatePageFromTemplate(templateId, templateData as Parameters<typeof generatePageFromTemplate>[1])
+    // 生成新頁面（使用現有的 templateData）
+    const newPage = generatePageFromTemplate(templateId, templateData as TemplateData)
 
     // 加到頁面列表
     setGeneratedPages(prev => [...prev, newPage])
@@ -484,6 +573,47 @@ export default function DesignerPage() {
 
     // 初始化新頁面的歷史
     initPageHistory(newPage.id)
+  }, [selectedStyle, templateData, generatedPages.length, loadCanvasPage, saveCurrentPageHistory, initPageHistory])
+
+  // 一次新增所有天的每日行程頁面
+  const handleAddDailyPages = useCallback(async () => {
+    if (!selectedStyle || !templateData) return
+
+    const templateId = selectedStyle.templates.daily
+    if (!templateId) return
+
+    // 取得總天數
+    const data = templateData as TemplateData
+    const totalDays = data.dailyItineraries?.length || 0
+    if (totalDays === 0) return
+
+    // 保存當前頁面的歷史
+    saveCurrentPageHistory()
+
+    // 生成所有天的頁面
+    const newPages: CanvasPage[] = []
+    for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+      // 設定 currentDayIndex 來指定第幾天
+      const dataWithDay = {
+        ...data,
+        currentDayIndex: dayIndex,
+      }
+      const newPage = generatePageFromTemplate(templateId, dataWithDay)
+      // 修改頁面名稱以顯示是第幾天
+      newPage.name = `第 ${dayIndex + 1} 天行程`
+      newPages.push(newPage)
+    }
+
+    // 加到頁面列表
+    setGeneratedPages(prev => [...prev, ...newPages])
+
+    // 切換到第一個新增的頁面
+    const newIndex = generatedPages.length
+    setCurrentPageIndex(newIndex)
+    if (newPages[0]) {
+      await loadCanvasPage(newPages[0])
+      initPageHistory(newPages[0].id)
+    }
   }, [selectedStyle, templateData, generatedPages.length, loadCanvasPage, saveCurrentPageHistory, initPageHistory])
 
   const handleDeletePage = useCallback((index: number) => {
@@ -523,6 +653,49 @@ export default function DesignerPage() {
       setCurrentPageIndex(currentPageIndex + 1)
     }
   }, [currentPageIndex])
+
+  // ============================================
+  // 自動載入已存在的文件（頁面重新整理時）
+  // ============================================
+  useEffect(() => {
+    // 等待 auth store hydration 完成
+    if (!_hasHydrated) return
+    // 如果已選擇設計類型，不需要自動載入
+    if (selectedDesignType) return
+    // 需要有 entityId 才能載入
+    if (!entityId || !workspaceId) return
+
+    const autoLoadDocument = async () => {
+      try {
+        // 嘗試載入現有文件
+        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType)
+
+        const { document: loadedDoc, currentVersion: loadedVersion } = useDocumentStore.getState()
+
+        if (loadedVersion) {
+          // 有存檔，自動設定設計類型並跳過選擇器
+          // 從存檔資料中取得手冊尺寸
+          const versionData = loadedVersion.data as Record<string, unknown>
+          const pages = versionData.pages as Array<{ width?: number; height?: number }> | undefined
+          const firstPage = pages?.[0]
+
+          // 根據尺寸找到對應的設計類型
+          const matchedType = DESIGN_TYPES.find(dt =>
+            dt.width === (firstPage?.width || 559) &&
+            dt.height === (firstPage?.height || 794)
+          ) || DESIGN_TYPES[0]
+
+          setSelectedDesignType(matchedType)
+          // currentVersion 會在另一個 useEffect 中被處理並載入畫布
+        }
+        // 如果沒有存檔版本，不做任何事，讓使用者看到設計類型選擇器
+      } catch (err) {
+        logger.error('Failed to auto-load document:', err)
+      }
+    }
+
+    autoLoadDocument()
+  }, [_hasHydrated, entityId, workspaceId, entityType, selectedDesignType, loadOrCreateDocument])
 
   // ============================================
   // 選擇設計類型
@@ -640,15 +813,24 @@ export default function DesignerPage() {
       const savedStyleId = versionData.styleId as string | null
 
       // 還原頁面資料
-      const restoredPages: CanvasPage[] = savedPages.map(page => ({
-        id: page.id,
-        name: page.name,
-        templateKey: page.templateKey,
-        width: page.width,
-        height: page.height,
-        backgroundColor: page.backgroundColor,
-        elements: page.elements,
-      }))
+      const restoredPages: CanvasPage[] = savedPages.map(page => {
+        // 修正舊資料的 templateKey（行程總覽原本錯誤設為 'daily'）
+        let fixedTemplateKey = page.templateKey
+        if (page.name?.includes('行程總覽') && page.templateKey === 'daily') {
+          fixedTemplateKey = 'itinerary'
+        }
+
+        return {
+          id: page.id,
+          name: page.name,
+          templateKey: fixedTemplateKey,
+          width: page.width,
+          height: page.height,
+          backgroundColor: page.backgroundColor,
+          elements: page.elements,
+          fabricData: page.fabricData, // 還原畫布資料
+        }
+      })
 
       setGeneratedPages(restoredPages)
       setCurrentPageIndex(savedPageIndex)
@@ -666,14 +848,19 @@ export default function DesignerPage() {
 
       // 載入當前頁面的畫布資料
       const currentPageData = savedPages[savedPageIndex]
-      if (currentPageData?.fabricData) {
+      // 檢查 fabricData 是否有效（必須有 objects 陣列且不為空）
+      const hasValidFabricData = currentPageData?.fabricData &&
+        Array.isArray((currentPageData.fabricData as { objects?: unknown[] }).objects) &&
+        ((currentPageData.fabricData as { objects?: unknown[] }).objects?.length ?? 0) > 0
+
+      if (hasValidFabricData && currentPageData.fabricData) {
         loadCanvasData(currentPageData.fabricData).then(() => {
           setLoadingStage('idle', 100)
           // 初始化當前頁面的歷史記錄
           initPageHistory(currentPageData.id)
         })
       } else if (restoredPages[savedPageIndex]) {
-        // 如果沒有 fabricData，使用 elements 重新渲染
+        // 如果沒有有效的 fabricData，使用 elements 重新渲染
         loadCanvasPage(restoredPages[savedPageIndex]).then(() => {
           setLoadingStage('idle', 100)
           // 初始化當前頁面的歷史記錄
@@ -693,12 +880,16 @@ export default function DesignerPage() {
   }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory])
 
   // ============================================
-  // Load Generated Pages
+  // Load Generated Pages (初次載入)
   // ============================================
+  const initialLoadDoneRef = useRef(false)
   useEffect(() => {
     if (!isCanvasReady || generatedPages.length === 0) return
     // 如果有已存的版本，不覆蓋
     if (currentVersion) return
+    // 只在初次載入時執行，避免切換頁面後又重新載入第一頁
+    if (initialLoadDoneRef.current) return
+    initialLoadDoneRef.current = true
 
     // 載入第一頁到畫布（使用完整的 renderer，支援圓拱形狀遮罩等）
     const firstPage = generatedPages[0]
@@ -757,41 +948,36 @@ export default function DesignerPage() {
 
   // ============================================
   // Template Data Change Handler
-  // 當用戶修改模板數據時，重新渲染當前頁面
+  // 直接更新畫布上的元素，不重新生成頁面（Canva 模式）
   // ============================================
-  const handleTemplateDataChange = useCallback(async (newData: Record<string, unknown>) => {
+  const handleTemplateDataChange = useCallback((newData: Record<string, unknown>) => {
+    const oldData = templateData || {}
     setTemplateData(newData)
 
-    // 如果有選擇的模板風格，重新生成當前頁面
-    if (selectedStyle && generatedPages.length > 0 && isCanvasReady) {
-      const currentPage = generatedPages[currentPageIndex]
-      if (!currentPage?.templateKey) return
+    // 如果畫布未準備好，只更新 state
+    if (!isCanvasReady) return
 
-      // 根據 templateKey 找到對應的模板 ID
-      const templateKey = currentPage.templateKey as keyof typeof selectedStyle.templates
-      const templateId = selectedStyle.templates[templateKey]
-      if (!templateId) return
-
-      // 重新生成頁面
-      try {
-        const newPage = generatePageFromTemplate(templateId, newData as TemplateData)
-        if (newPage) {
-          // 更新頁面列表
-          const newPages = [...generatedPages]
-          newPages[currentPageIndex] = {
-            ...newPage,
-            id: currentPage.id, // 保持原有 ID
-          }
-          setGeneratedPages(newPages)
-
-          // 重新渲染畫布
-          await loadCanvasPage(newPage)
-        }
-      } catch (err) {
-        logger.error('Failed to regenerate page:', err)
-      }
+    // 欄位名稱到畫布元素名稱的對應表
+    const fieldToElementMap: Record<string, string> = {
+      destination: '地點',
+      mainTitle: '主標題',
+      subtitle: '副標題',
+      companyName: '公司名稱',
+      tourCode: '團號',
+      travelDates: '日期',
     }
-  }, [selectedStyle, generatedPages, currentPageIndex, isCanvasReady, loadCanvasPage])
+
+    // 檢查每個欄位，如果有變更就直接更新對應的畫布元素
+    Object.entries(fieldToElementMap).forEach(([field, elementName]) => {
+      const oldValue = oldData[field]
+      const newValue = newData[field]
+
+      // 只在值有變化時更新
+      if (oldValue !== newValue && newValue !== undefined) {
+        updateElementByName(elementName, { text: String(newValue || '') })
+      }
+    })
+  }, [templateData, isCanvasReady, updateElementByName])
 
   // ============================================
   // Image Upload Handler
@@ -867,6 +1053,29 @@ export default function DesignerPage() {
         return
       }
 
+      // 方向鍵移動選取的元素
+      const moveStep = e.shiftKey ? 10 : 1 // Shift 按住時移動 10px
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        moveSelected(0, -moveStep)
+        return
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        moveSelected(0, moveStep)
+        return
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        moveSelected(-moveStep, 0)
+        return
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        moveSelected(moveStep, 0)
+        return
+      }
+
       if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
         e.preventDefault()
         zoomIn()
@@ -888,7 +1097,7 @@ export default function DesignerPage() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedDesignType, handleSave, undo, redo, copySelected, pasteClipboard, cutSelected, deleteSelected, zoomIn, zoomOut, resetZoom])
+  }, [selectedDesignType, handleSave, undo, redo, copySelected, pasteClipboard, cutSelected, deleteSelected, moveSelected, zoomIn, zoomOut, resetZoom])
 
   // ============================================
   // Unsaved Changes Warning
@@ -924,6 +1133,7 @@ export default function DesignerPage() {
     return (
       <TemplateSelector
         itineraryId={itineraryId}
+        tourId={tourId}
         onBack={() => {
           setShowTemplateSelector(false)
           setSelectedDesignType(null)
@@ -1110,8 +1320,10 @@ export default function DesignerPage() {
             pages={generatedPages}
             currentPageIndex={currentPageIndex}
             selectedStyle={selectedStyle}
+            totalDays={(templateData as TemplateData | null)?.dailyItineraries?.length || 0}
             onSelectPage={handleSelectPage}
             onAddPage={handleAddPage}
+            onAddDailyPages={handleAddDailyPages}
             onDeletePage={handleDeletePage}
             onReorderPages={handleReorderPages}
           />
@@ -1200,6 +1412,26 @@ export default function DesignerPage() {
                 <TemplateDataPanel
                   templateData={templateData}
                   onTemplateDataChange={handleTemplateDataChange}
+                  onUploadCoverImage={() => setShowCoverUpload(true)}
+                  onAdjustCoverPosition={() => {
+                    const existingCoverImage = templateData?.coverImage as string | undefined
+                    if (existingCoverImage) {
+                      setPendingImageUrl(existingCoverImage)
+                      setShowImageEditor(true)
+                    }
+                  }}
+                  onUploadDailyCoverImage={() => setShowDailyCoverUpload(true)}
+                  onAdjustDailyCoverPosition={() => {
+                    if (currentDayIndex === undefined) return
+                    const dailyDetails = (templateData?.dailyDetails as Array<{ coverImage?: string }>) || []
+                    const existingCoverImage = dailyDetails[currentDayIndex]?.coverImage
+                    if (existingCoverImage) {
+                      setPendingImageUrl(existingCoverImage)
+                      setShowDailyImageEditor(true)
+                    }
+                  }}
+                  currentPageType={generatedPages[currentPageIndex]?.templateKey}
+                  currentDayIndex={currentDayIndex}
                 />
               </TabsContent>
             </Tabs>
@@ -1247,6 +1479,53 @@ export default function DesignerPage() {
           aspectRatio={495 / 350}
           initialPosition={templateData?.coverImagePosition as ImagePositionSettings | undefined}
           onSave={handleImagePositionSaved}
+          defaultMode="position"
+          hideModes={['crop', 'adjust']}
+        />
+      )}
+
+      {/* 每日行程封面圖片上傳對話框 */}
+      <Dialog open={showDailyCoverUpload} onOpenChange={setShowDailyCoverUpload}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>上傳當日封面圖片</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-morandi-secondary">
+              上傳圖片後可以調整顯示位置，作為當日行程的封面圖片。
+            </p>
+            <ImageUploader
+              value={currentDayIndex !== undefined
+                ? ((templateData?.dailyDetails as Array<{ coverImage?: string }>) || [])[currentDayIndex]?.coverImage
+                : undefined
+              }
+              onChange={handleDailyImageUploaded}
+              bucket="city-backgrounds"
+              filePrefix="brochure-daily-cover"
+              aspectRatio={16 / 9}
+              previewHeight="180px"
+              placeholder="拖曳或點擊上傳當日封面圖片"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 每日行程封面圖片位置編輯器 */}
+      {pendingImageUrl && (
+        <UnifiedImageEditor
+          open={showDailyImageEditor}
+          onClose={() => {
+            setShowDailyImageEditor(false)
+            setPendingImageUrl(null)
+          }}
+          imageSrc={pendingImageUrl}
+          aspectRatio={16 / 9}
+          initialPosition={
+            currentDayIndex !== undefined
+              ? ((templateData?.dailyDetails as Array<{ coverImagePosition?: ImagePositionSettings }>) || [])[currentDayIndex]?.coverImagePosition
+              : undefined
+          }
+          onSave={handleDailyImagePositionSaved}
           defaultMode="position"
           hideModes={['crop', 'adjust']}
         />

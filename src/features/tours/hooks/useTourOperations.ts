@@ -8,8 +8,6 @@ import { logger } from '@/lib/utils/logger'
 import { NewTourData } from '../types'
 import { OrderFormData } from '@/components/orders/add-order-form'
 import type { CreateInput, UpdateInput } from '@/stores/core/types'
-import type { Order } from '@/types'
-import type { Quote } from '@/stores/types'
 import { useCountries, useCities, updateCountry, updateCity } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 

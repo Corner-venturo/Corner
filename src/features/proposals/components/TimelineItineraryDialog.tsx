@@ -84,6 +84,7 @@ export function TimelineItineraryDialog({
 }: TimelineItineraryDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [uploadTarget, setUploadTarget] = useState<{ dayId: string; attractionId: string } | null>(null)
   const [activeDayIndex, setActiveDayIndex] = useState(0)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
@@ -467,9 +468,15 @@ export function TimelineItineraryDialog({
 
   // 自動 focus 輸入框
   useEffect(() => {
-    if (editingCell && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
+    if (editingCell) {
+      const isTextareaField = editingCell.field === 'name' || editingCell.field === 'menu'
+      if (isTextareaField && textareaRef.current) {
+        textareaRef.current.focus()
+        textareaRef.current.select()
+      } else if (inputRef.current) {
+        inputRef.current.focus()
+        inputRef.current.select()
+      }
     }
   }, [editingCell])
 
@@ -498,14 +505,43 @@ export function TimelineItineraryDialog({
         break
     }
 
+    // 時間欄位固定高度，名稱/菜色欄位允許多行
+    const isTimeField = field === 'startTime' || field === 'endTime'
+    const isTextareaField = field === 'name' || field === 'menu'
+
     if (isEditing) {
+      if (isTextareaField) {
+        // 名稱和菜色使用 textarea 支援多行
+        return (
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => updateAttractionField(rowIndex, field, e.target.value)}
+            onBlur={() => setEditingCell(null)}
+            onKeyDown={(e) => {
+              // Shift+Enter 換行，Enter 確認
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                setEditingCell(null)
+              } else if (e.key === 'Escape') {
+                setEditingCell(null)
+              }
+            }}
+            className={cn(
+              'w-full min-h-[32px] px-2 py-1 border-none outline-none bg-morandi-gold/10 focus:ring-0 resize-none text-sm leading-tight',
+              width
+            )}
+            rows={Math.max(1, Math.ceil(value.length / 15))}
+          />
+        )
+      }
       return (
         <input
           ref={inputRef}
           value={value}
           onChange={(e) => {
             let newValue = e.target.value
-            if (field === 'startTime' || field === 'endTime') {
+            if (isTimeField) {
               newValue = newValue.replace(/\D/g, '').slice(0, 4)
             }
             updateAttractionField(rowIndex, field, newValue)
@@ -514,10 +550,10 @@ export function TimelineItineraryDialog({
           onKeyDown={(e) => handleKeyDown(e, rowIndex, field)}
           className={cn(
             'w-full h-8 px-2 border-none outline-none bg-morandi-gold/10 focus:ring-0',
-            (field === 'startTime' || field === 'endTime') && 'text-center font-mono text-xs',
+            isTimeField && 'text-center font-mono text-xs',
             width
           )}
-          maxLength={field === 'startTime' || field === 'endTime' ? 4 : undefined}
+          maxLength={isTimeField ? 4 : undefined}
         />
       )
     }
@@ -530,8 +566,8 @@ export function TimelineItineraryDialog({
     return (
       <div
         className={cn(
-          'h-8 px-2 flex items-center cursor-pointer hover:bg-morandi-gold/5 transition-colors',
-          (field === 'startTime' || field === 'endTime') && 'justify-center font-mono text-xs',
+          'px-2 cursor-pointer hover:bg-morandi-gold/5 transition-colors',
+          isTimeField ? 'h-8 flex items-center justify-center font-mono text-xs' : 'min-h-[32px] py-1 text-sm leading-tight whitespace-pre-wrap break-words',
           !value && 'text-morandi-muted/40',
           width
         )}

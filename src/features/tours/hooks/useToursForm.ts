@@ -11,6 +11,13 @@ import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
 
+// 判斷是否為台灣（支援多種寫法）
+const isTaiwanCountry = (country: string | undefined | null): boolean => {
+  if (!country) return false
+  const normalized = country.trim().toLowerCase()
+  return normalized === '台灣' || normalized === 'taiwan' || normalized === '臺灣'
+}
+
 interface UseToursFormReturn {
   handleOpenCreateDialog: (fromQuoteId?: string) => Promise<void>
   handleOpenEditDialog: (tour: Tour) => Promise<void>
@@ -217,7 +224,7 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
         const returnFlight = itineraryRes.data?.return_flight as FlightData
 
         // 預填表單資料（包含航班）
-        const isTaiwan = pkg.country_id === '台灣'
+        const isTaiwan = isTaiwanCountry(pkg.country_id)
         setNewTour({
           name: pkg.version_name || proposal.title || '',
           countryCode: pkg.country_id || '',

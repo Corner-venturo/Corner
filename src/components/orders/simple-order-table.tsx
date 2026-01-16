@@ -239,6 +239,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                   workspaceId={workspaceId}
                   onClose={() => setExpandedOrderId(null)}
                   embedded
+                  tour={tours.find(t => t.id === order.tour_id) as import('@/stores/types').Tour | undefined}
                 />
               )}
             </React.Fragment>

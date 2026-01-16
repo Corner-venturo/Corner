@@ -167,6 +167,7 @@ export type MaterialIconName =
   | 'airlines'
   | 'luggage'
   | 'flight_takeoff'
+  | 'person'
 
 export interface IconElement extends BaseElement {
   type: 'icon'
@@ -219,6 +220,7 @@ export interface CanvasPage {
   height: number
   backgroundColor: string
   elements: CanvasElement[]
+  fabricData?: Record<string, unknown> // Fabric.js 畫布資料（用於保存編輯狀態）
 }
 
 export interface FabricElementData {

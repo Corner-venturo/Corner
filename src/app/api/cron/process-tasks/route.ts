@@ -6,9 +6,10 @@
  * 或使用 Supabase Edge Functions
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { processQueue } from '@/lib/tasks'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, ApiError } from '@/lib/api/response'
 
 // 驗證 cron secret（防止未授權呼叫）
 const CRON_SECRET = process.env.CRON_SECRET
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   // 驗證 cron secret
   const authHeader = request.headers.get('authorization')
   if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return ApiError.unauthorized('Unauthorized')
   }
 
   try {
@@ -30,8 +31,7 @@ export async function GET(request: NextRequest) {
       duration: `${duration}ms`,
     })
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       processed,
       duration: `${duration}ms`,
       timestamp: new Date().toISOString(),
@@ -40,10 +40,7 @@ export async function GET(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Cron: Failed to process task queue', { error: errorMessage })
 
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    )
+    return ApiError.internal(errorMessage)
   }
 }
 

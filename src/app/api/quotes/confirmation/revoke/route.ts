@@ -4,9 +4,10 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import type { ConfirmationResult } from '@/types/quote.types'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 interface RevokeParams {
   quote_id: string
@@ -21,10 +22,7 @@ export async function POST(request: NextRequest) {
     const { quote_id, staff_id, staff_name, reason } = body
 
     if (!quote_id || !staff_id || !staff_name || !reason) {
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: '缺少必要參數（包含撤銷原因）' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必要參數（包含撤銷原因）')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -39,25 +37,19 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('撤銷確認失敗:', error)
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return errorResponse(error.message, 400, ErrorCode.OPERATION_FAILED)
     }
 
     const result = data as unknown as ConfirmationResult
 
     if (!result.success) {
-      return NextResponse.json<ConfirmationResult>(result, { status: 400 })
+      return errorResponse(result.error || '撤銷失敗', 400, ErrorCode.OPERATION_FAILED)
     }
 
     logger.log('報價確認已撤銷')
-    return NextResponse.json<ConfirmationResult>(result)
+    return successResponse(result)
   } catch (error) {
     logger.error('撤銷確認錯誤:', error)
-    return NextResponse.json<ConfirmationResult>(
-      { success: false, error: '系統錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('系統錯誤')
   }
 }

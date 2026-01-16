@@ -49,7 +49,7 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
   name: '日系風格 - 行程總覽',
   description: '簡約、留白、優雅的日式設計風格，顯示多日行程總覽',
   thumbnailUrl: '/thumbnails/japanese-style-v1-itinerary.jpg',
-  category: 'daily',
+  category: 'itinerary',
 
   generateElements: (data: TemplateData): CanvasElement[] => {
     const elements: CanvasElement[] = []
@@ -241,9 +241,9 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
 
       // 領隊資訊
       if (data.leaderName) {
-        // badge 圖標（使用 SVG Path）
-        const badgeIcon: IconElement = {
-          id: 'el-badge-icon',
+        // person 圖標（使用 SVG Path）
+        const personIcon: IconElement = {
+          id: 'el-person-icon',
           type: 'icon',
           name: '領隊圖標',
           x: infoX,
@@ -255,11 +255,11 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
           opacity: 0.6,
           locked: false,
           visible: true,
-          icon: 'badge',
+          icon: 'person',
           size: 13,
           color: COLORS.primary,
         }
-        elements.push(badgeIcon)
+        elements.push(personIcon)
 
         // 領隊文字
         const leaderText: TextElement = {
@@ -297,15 +297,19 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
     if (data.outboundFlight || data.returnFlight) {
       const flightY = infoY
 
+      // 計算航班顯示的起始 X 位置（居中對齊）
+      const flightContentWidth = 340
+      const flightStartX = (A5_WIDTH - flightContentWidth) / 2
+
       // 航班區塊頂部分隔線
       const flightDivider: ShapeElement = {
         id: 'el-flight-divider',
         type: 'shape',
         name: '航班分隔線',
         variant: 'rectangle',
-        x: (A5_WIDTH - 320) / 2,
+        x: flightStartX,
         y: flightY,
-        width: 320,
+        width: flightContentWidth,
         height: 1,
         zIndex: 3,
         rotation: 0,
@@ -315,11 +319,6 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
         fill: COLORS.primary,
       }
       elements.push(flightDivider)
-
-      // 計算航班顯示的起始 X 位置（居中對齊）
-      // 假設航班資訊寬度約 400px，置中計算
-      const flightContentWidth = 400
-      const flightStartX = (A5_WIDTH - flightContentWidth) / 2
 
       if (data.outboundFlight) {
         // 去程標籤框
@@ -379,7 +378,7 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
           name: '去程航班',
           x: flightStartX + 34,
           y: flightY + 8,
-          width: A5_WIDTH - flightStartX - 80,
+          width: flightContentWidth - 34,
           height: 16,
           zIndex: 3,
           rotation: 0,
@@ -461,7 +460,7 @@ export const japaneseStyleV1Itinerary: PageTemplate = {
           name: '回程航班',
           x: flightStartX + 34,
           y: returnFlightY,
-          width: A5_WIDTH - flightStartX - 80,
+          width: flightContentWidth - 34,
           height: 16,
           zIndex: 3,
           rotation: 0,

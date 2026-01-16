@@ -61,7 +61,7 @@ interface PackageItineraryDialogProps {
   onClose: () => void
   pkg: ProposalPackage
   proposal: Proposal
-  onItineraryCreated?: () => void
+  onItineraryCreated?: (itineraryId?: string) => void
 }
 
 export function PackageItineraryDialog({
@@ -787,7 +787,7 @@ export function PackageItineraryDialog({
 
         // 使用 toast 通知，不關閉對話框讓用戶可以繼續編輯
         toast.success('行程表更新成功')
-        onItineraryCreated?.()
+        onItineraryCreated?.(existingItinerary.id)
       } else {
         // 建立新行程表（同時存到兩種航班格式以確保相容性）
         const workspaceId = currentUser?.workspace_id
@@ -873,7 +873,7 @@ export function PackageItineraryDialog({
             .eq('id', pkg.id)
 
           await alert('行程表建立成功', 'success')
-          onItineraryCreated?.()
+          onItineraryCreated?.(newItinerary.id)
           onClose()
         } else {
           setCreateError('建立失敗：未取得行程表 ID')
@@ -972,7 +972,7 @@ export function PackageItineraryDialog({
 
       // 使用 toast 通知，不關閉對話框
       toast.success('已另存為新版本')
-      onItineraryCreated?.()
+      onItineraryCreated?.(existingItinerary.id)
     } catch (error) {
       logger.error('另存新版本失敗:', error)
       toast.error('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))

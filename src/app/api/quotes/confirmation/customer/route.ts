@@ -6,9 +6,10 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import type { CustomerConfirmParams, ConfirmationResult } from '@/types/quote.types'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,10 +17,7 @@ export async function POST(request: NextRequest) {
     const { token, name, email, phone, notes } = body
 
     if (!token || !name) {
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: '請填寫您的姓名' },
-        { status: 400 }
-      )
+      return ApiError.validation('請填寫您的姓名')
     }
 
     // 取得客戶端資訊（稽核用）
@@ -43,10 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('客戶確認失敗:', error)
-      return NextResponse.json<ConfirmationResult>(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return errorResponse(error.message, 400, ErrorCode.OPERATION_FAILED)
     }
 
     const result = data as unknown as ConfirmationResult
@@ -54,22 +49,16 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       // 特殊處理已確認的情況
       if (result.already_confirmed) {
-        return NextResponse.json<ConfirmationResult>(
-          { ...result, error: '此報價單已確認，無需重複確認' },
-          { status: 200 } // 返回 200 因為這不是錯誤
-        )
+        return successResponse({ ...result, message: '此報價單已確認，無需重複確認' })
       }
-      return NextResponse.json<ConfirmationResult>(result, { status: 400 })
+      return errorResponse(result.error || '確認失敗', 400, ErrorCode.OPERATION_FAILED)
     }
 
     logger.log('客戶已確認報價單:', result.quote_code)
-    return NextResponse.json<ConfirmationResult>(result)
+    return successResponse(result)
   } catch (error) {
     logger.error('客戶確認錯誤:', error)
-    return NextResponse.json<ConfirmationResult>(
-      { success: false, error: '系統錯誤，請稍後再試' },
-      { status: 500 }
-    )
+    return ApiError.internal('系統錯誤，請稍後再試')
   }
 }
 
@@ -83,10 +72,7 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get('token')
 
     if (!token) {
-      return NextResponse.json(
-        { success: false, error: '缺少確認 token' },
-        { status: 400 }
-      )
+      return ApiError.missingField('token')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -120,42 +106,30 @@ export async function GET(request: NextRequest) {
         .limit(1)
 
       if (confirmedQuote && confirmedQuote.length > 0) {
-        return NextResponse.json({
-          success: false,
-          error: '此報價單已確認',
-          already_confirmed: true,
-        })
+        return successResponse({ error: '此報價單已確認', already_confirmed: true })
       }
 
-      return NextResponse.json(
-        { success: false, error: '確認連結無效或已過期' },
-        { status: 404 }
-      )
+      return ApiError.notFound('報價單')
     }
 
     // 檢查 token 是否過期
     if (data.confirmation_token_expires_at) {
       const expiresAt = new Date(data.confirmation_token_expires_at)
       if (expiresAt < new Date()) {
-        return NextResponse.json(
-          { success: false, error: '確認連結已過期，請聯繫業務重新發送' },
-          { status: 400 }
-        )
+        return ApiError.validation('確認連結已過期，請聯繫業務重新發送')
       }
     }
 
     // 檢查狀態
     if (data.confirmation_status !== 'pending') {
-      return NextResponse.json({
-        success: false,
+      return successResponse({
         error: '此報價單狀態不允許確認',
         already_confirmed: data.confirmation_status === 'customer_confirmed' ||
                           data.confirmation_status === 'staff_confirmed',
       })
     }
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       quote: {
         code: data.code,
         name: data.name,
@@ -170,9 +144,6 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     logger.error('取得報價單資訊錯誤:', error)
-    return NextResponse.json(
-      { success: false, error: '系統錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('系統錯誤')
   }
 }

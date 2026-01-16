@@ -675,7 +675,7 @@ export type Database = {
           channel_id: string
           created_at: string | null
           created_by: string | null
-          created_by_legacy_author: string
+          created_by_legacy_author: string | null
           id: string
           updated_at: string | null
         }
@@ -686,7 +686,7 @@ export type Database = {
           channel_id: string
           created_at?: string | null
           created_by?: string | null
-          created_by_legacy_author?: string
+          created_by_legacy_author?: string | null
           id?: string
           updated_at?: string | null
         }
@@ -697,7 +697,7 @@ export type Database = {
           channel_id?: string
           created_at?: string | null
           created_by?: string | null
-          created_by_legacy_author?: string
+          created_by_legacy_author?: string | null
           id?: string
           updated_at?: string | null
         }
@@ -1275,7 +1275,9 @@ export type Database = {
           created_by: string | null
           current_version_id: string | null
           id: string
+          itinerary_id: string | null
           name: string
+          package_id: string | null
           tour_id: string | null
           type: string
           updated_at: string
@@ -1287,7 +1289,9 @@ export type Database = {
           created_by?: string | null
           current_version_id?: string | null
           id?: string
+          itinerary_id?: string | null
           name?: string
+          package_id?: string | null
           tour_id?: string | null
           type?: string
           updated_at?: string
@@ -1299,7 +1303,9 @@ export type Database = {
           created_by?: string | null
           current_version_id?: string | null
           id?: string
+          itinerary_id?: string | null
           name?: string
+          package_id?: string | null
           tour_id?: string | null
           type?: string
           updated_at?: string

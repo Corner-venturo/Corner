@@ -12,8 +12,9 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 // ============================================
 // 型別定義
@@ -119,10 +120,7 @@ export async function POST(req: NextRequest) {
 
     // 驗證必填欄位
     if (!receipt_number || !user_name || !email || !amount) {
-      return NextResponse.json(
-        { success: false, message: '缺少必填欄位：receipt_number, user_name, email, amount' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必填欄位：receipt_number, user_name, email, amount')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -136,10 +134,7 @@ export async function POST(req: NextRequest) {
 
     if (receiptError || !receipt) {
       logger.error('找不到收款單:', receipt_number)
-      return NextResponse.json(
-        { success: false, message: '找不到收款單' },
-        { status: 404 }
-      )
+      return ApiError.notFound('收款單')
     }
 
     // 組裝付款名稱
@@ -200,10 +195,7 @@ export async function POST(req: NextRequest) {
 
     if (logError) {
       logger.error('建立 LinkPay 記錄失敗:', logError)
-      return NextResponse.json(
-        { success: false, message: '建立 LinkPay 記錄失敗' },
-        { status: 500 }
-      )
+      return ApiError.database('建立 LinkPay 記錄失敗')
     }
 
     // 呼叫台新銀行 API
@@ -247,22 +239,15 @@ export async function POST(req: NextRequest) {
           })
           .eq('receipt_number', receipt_number)
 
-        return NextResponse.json({
-          success: true,
-          message: '付款連結生成成功',
-          data: {
-            payment_link: hpp_url,
-            linkpay_order_number: orderNo,
-            link: hpp_url,
-            status: 0, // linkpay_logs.status 是 number: 0=待付款
-            end_date: end_date,
-          },
+        return successResponse({
+          payment_link: hpp_url,
+          linkpay_order_number: orderNo,
+          link: hpp_url,
+          status: 0, // linkpay_logs.status 是 number: 0=待付款
+          end_date: end_date,
         })
       } else {
-        return NextResponse.json(
-          { success: false, message: ret_msg || '產生付款連結失敗，請稍候再嘗試。' },
-          { status: 400 }
-        )
+        return errorResponse(ret_msg || '產生付款連結失敗，請稍候再嘗試。', 400, ErrorCode.EXTERNAL_API_ERROR)
       }
     } catch (apiError) {
       logger.error('台新 API 呼叫失敗:', apiError)
@@ -276,16 +261,10 @@ export async function POST(req: NextRequest) {
         })
         .eq('linkpay_order_number', orderNo)
 
-      return NextResponse.json(
-        { success: false, message: '呼叫台新 API 失敗，請稍候再嘗試。' },
-        { status: 500 }
-      )
+      return ApiError.externalApi('呼叫台新 API 失敗，請稍候再嘗試。')
     }
   } catch (error) {
     logger.error('❌ LinkPay API 錯誤:', error)
-    return NextResponse.json(
-      { success: false, message: '處理 LinkPay 請求時發生錯誤' },
-      { status: 500 }
-    )
+    return ApiError.internal('處理 LinkPay 請求時發生錯誤')
   }
 }

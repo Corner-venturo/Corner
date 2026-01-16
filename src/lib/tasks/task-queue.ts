@@ -5,6 +5,7 @@
 
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import type { Json } from '@/lib/supabase/types'
 
 export type TaskStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
 export type TaskPriority = 'low' | 'normal' | 'high' | 'critical'
@@ -76,7 +77,7 @@ export async function createTask<T = TaskPayload>(options: {
 
   const taskData = {
     type,
-    payload,
+    payload: payload as Json, // TaskPayload is compatible with Json
     status: 'pending' as TaskStatus,
     priority,
     workspace_id: workspaceId,
@@ -88,8 +89,7 @@ export async function createTask<T = TaskPayload>(options: {
     updated_at: now,
   }
 
-  // Note: background_tasks table needs to be created via migration
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('background_tasks')
     .insert(taskData)
     .select()
@@ -110,8 +110,7 @@ export async function createTask<T = TaskPayload>(options: {
 export async function getPendingTasks(limit = 10): Promise<Task[]> {
   const now = new Date().toISOString()
 
-  // Note: background_tasks table needs to be created via migration
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('background_tasks')
     .select('*')
     .eq('status', 'pending')
@@ -141,8 +140,7 @@ export async function processTask(task: Task): Promise<boolean> {
   }
 
   // 標記為處理中
-  // Note: background_tasks table needs to be created via migration
-  await (supabase as any)
+  await supabase
     .from('background_tasks')
     .update({
       status: 'processing',
@@ -205,8 +203,7 @@ async function updateTaskStatus(
     updateData.result = data.result
   }
 
-  // Note: background_tasks table needs to be created via migration
-  await (supabase as any)
+  await supabase
     .from('background_tasks')
     .update(updateData)
     .eq('id', taskId)
@@ -237,8 +234,7 @@ export async function processQueue(batchSize = 5): Promise<number> {
  * 取消任務
  */
 export async function cancelTask(taskId: string): Promise<boolean> {
-  // Note: background_tasks table needs to be created via migration
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('background_tasks')
     .update({
       status: 'cancelled',
@@ -264,8 +260,7 @@ export async function getTaskStats(workspaceId?: string): Promise<{
   completed: number
   failed: number
 }> {
-  // Note: background_tasks table needs to be created via migration
-  let query = (supabase as any)
+  let query = supabase
     .from('background_tasks')
     .select('status', { count: 'exact' })
 

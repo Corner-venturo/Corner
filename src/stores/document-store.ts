@@ -204,6 +204,13 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
           loadingStage: 'preloading_images',
           loadingProgress: 60,
         })
+      } else {
+        // 沒有版本時，清除舊的 currentVersion（避免殘留的舊版本資料阻止新頁面渲染）
+        set({
+          currentVersion: null,
+          loadingStage: 'preloading_images',
+          loadingProgress: 60,
+        })
       }
 
       // Note: Image preloading and canvas rendering will be done by the component

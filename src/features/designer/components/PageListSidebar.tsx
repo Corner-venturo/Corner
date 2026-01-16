@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { useDragSort } from '@/hooks/useDragSort'
 import type { CanvasPage } from './types'
 import type { StyleSeries } from '../templates/engine'
 
@@ -44,8 +45,10 @@ interface PageListSidebarProps {
   pages: CanvasPage[]
   currentPageIndex: number
   selectedStyle: StyleSeries | null
+  totalDays?: number // 行程總天數（用於每日行程）
   onSelectPage: (index: number) => void
   onAddPage: (templateKey: string) => void
+  onAddDailyPages?: () => void // 一次新增所有天的每日行程
   onDeletePage: (index: number) => void
   onReorderPages: (fromIndex: number, toIndex: number) => void
 }
@@ -54,56 +57,21 @@ export function PageListSidebar({
   pages,
   currentPageIndex,
   selectedStyle,
+  totalDays = 1,
   onSelectPage,
   onAddPage,
+  onAddDailyPages,
   onDeletePage,
   onReorderPages,
 }: PageListSidebarProps) {
   const [showAddDialog, setShowAddDialog] = useState(false)
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
-  // 拖曳開始
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    // 封面不可拖曳
-    if (index === 0) {
-      e.preventDefault()
-      return
-    }
-    setDraggedIndex(index)
-    e.dataTransfer.effectAllowed = 'move'
-  }
-
-  // 拖曳經過
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault()
-    // 不能拖到封面位置
-    if (index === 0) return
-    if (draggedIndex !== null && draggedIndex !== index) {
-      setDragOverIndex(index)
-    }
-  }
-
-  // 拖曳離開
-  const handleDragLeave = () => {
-    setDragOverIndex(null)
-  }
-
-  // 拖曳結束
-  const handleDrop = (e: React.DragEvent, toIndex: number) => {
-    e.preventDefault()
-    if (draggedIndex !== null && draggedIndex !== toIndex && toIndex > 0) {
-      onReorderPages(draggedIndex, toIndex)
-    }
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-  }
-
-  // 拖曳取消
-  const handleDragEnd = () => {
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-  }
+  // 拖曳排序（封面不可拖曳/放置）
+  const { dragState, dragHandlers } = useDragSort({
+    onReorder: onReorderPages,
+    canDrag: (index) => index > 0, // 封面不可拖曳
+    canDrop: (index) => index > 0, // 不能拖到封面位置
+  })
 
   // 可用的頁面類型（根據選擇的風格）
   const availablePageTypes = PAGE_TYPES.filter((pt) => {
@@ -132,12 +100,12 @@ export function PageListSidebar({
         {pages.map((page, index) => (
           <div
             key={page.id}
-            draggable={index > 0} // 封面不可拖曳
-            onDragStart={(e) => handleDragStart(e, index)}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, index)}
-            onDragEnd={handleDragEnd}
+            draggable={dragState.canDrag(index)}
+            onDragStart={(e) => dragHandlers.onDragStart(e, index)}
+            onDragOver={(e) => dragHandlers.onDragOver(e, index)}
+            onDragLeave={dragHandlers.onDragLeave}
+            onDrop={(e) => dragHandlers.onDrop(e, index)}
+            onDragEnd={dragHandlers.onDragEnd}
             className={cn(
               'group relative rounded-lg border-2 transition-all cursor-pointer',
               'hover:border-morandi-gold/50',
@@ -145,8 +113,8 @@ export function PageListSidebar({
                 ? 'border-morandi-gold bg-morandi-gold/5'
                 : 'border-border',
               // 拖曳中的樣式
-              draggedIndex === index && 'opacity-50',
-              dragOverIndex === index && 'border-morandi-gold border-dashed'
+              dragState.isDragging(index) && 'opacity-50',
+              dragState.isDragOver(index) && 'border-morandi-gold border-dashed'
             )}
             onClick={() => onSelectPage(index)}
           >
@@ -202,7 +170,12 @@ export function PageListSidebar({
                 key={pageType.id}
                 type="button"
                 onClick={() => {
-                  onAddPage(pageType.templateKey)
+                  if (pageType.templateKey === 'daily' && onAddDailyPages) {
+                    // 每日行程：一次新增所有天
+                    onAddDailyPages()
+                  } else {
+                    onAddPage(pageType.templateKey)
+                  }
                   setShowAddDialog(false)
                 }}
                 className={cn(
@@ -213,6 +186,11 @@ export function PageListSidebar({
                 <div>
                   <div className="font-medium text-morandi-primary">
                     {pageType.name}
+                    {pageType.templateKey === 'daily' && totalDays > 0 && (
+                      <span className="text-morandi-secondary font-normal ml-1">
+                        ({totalDays}天)
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-morandi-secondary">
                     {pageType.description}

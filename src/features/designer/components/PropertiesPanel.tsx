@@ -6,7 +6,7 @@
  * 顯示選中元素的屬性，並提供編輯功能
  */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import * as fabric from 'fabric'
 import {
   Type,
@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { FontPicker, FontWeightPicker, TextAlignPicker } from './FontPicker'
+import { cn } from '@/lib/utils'
 
 interface PropertiesPanelProps {
   canvas: fabric.Canvas | null
@@ -37,6 +38,29 @@ export function PropertiesPanel({
 }: PropertiesPanelProps) {
   const [properties, setProperties] = useState<Record<string, unknown>>({})
 
+  // 檢查是否為文字類型
+  const isTextType = (type: string) =>
+    type === 'i-text' || type === 'text' || type === 'textbox'
+
+  // 檢查多選時是否全部都是文字（使用 useMemo 避免重複計算）
+  const { selectedObjects, allAreText, isMultiSelect } = useMemo(() => {
+    if (!selectedObject) return { selectedObjects: [], allAreText: false, isMultiSelect: false }
+
+    let objects: fabric.FabricObject[] = []
+    if (selectedObject.type === 'activeselection' || selectedObject.type === 'activeSelection') {
+      objects = (selectedObject as fabric.ActiveSelection).getObjects()
+    } else {
+      objects = [selectedObject]
+    }
+
+    const allText = objects.length > 0 && objects.every(obj => isTextType(obj.type || ''))
+    return {
+      selectedObjects: objects,
+      allAreText: allText,
+      isMultiSelect: objects.length > 1,
+    }
+  }, [selectedObject])
+
   // 監聽選中物件的屬性變化
   useEffect(() => {
     if (!selectedObject) {
@@ -45,6 +69,9 @@ export function PropertiesPanel({
     }
 
     const updateProperties = () => {
+      // 多選且全是文字時，取第一個文字的屬性作為參考
+      const firstTextObj = allAreText ? selectedObjects[0] as fabric.IText : null
+
       setProperties({
         type: selectedObject.type,
         left: Math.round(selectedObject.left || 0),
@@ -56,16 +83,19 @@ export function PropertiesPanel({
         stroke: selectedObject.stroke,
         strokeWidth: selectedObject.strokeWidth,
         opacity: Math.round((selectedObject.opacity || 1) * 100),
-        // Text properties
-        ...(selectedObject.type === 'i-text' || selectedObject.type === 'text'
+        // Text properties (單選文字或多選全是文字)
+        ...((isTextType(selectedObject.type || '') || allAreText)
           ? {
-              fontFamily: (selectedObject as fabric.IText).fontFamily,
-              fontSize: (selectedObject as fabric.IText).fontSize,
-              fontWeight: (selectedObject as fabric.IText).fontWeight,
-              textAlign: (selectedObject as fabric.IText).textAlign,
-              text: (selectedObject as fabric.IText).text,
+              fontFamily: firstTextObj?.fontFamily || (selectedObject as fabric.IText).fontFamily,
+              fontSize: firstTextObj?.fontSize || (selectedObject as fabric.IText).fontSize,
+              fontWeight: firstTextObj?.fontWeight || (selectedObject as fabric.IText).fontWeight,
+              textAlign: firstTextObj?.textAlign || (selectedObject as fabric.IText).textAlign,
+              text: isMultiSelect ? `${selectedObjects.length} 個文字` : (selectedObject as fabric.IText).text,
             }
           : {}),
+        // 標記多選狀態
+        isMultiSelect,
+        selectedCount: selectedObjects.length,
       })
     }
 
@@ -83,16 +113,28 @@ export function PropertiesPanel({
       selectedObject.off('moving', updateProperties)
       selectedObject.off('rotating', updateProperties)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedObject])
 
-  // 更新物件屬性
+  // 更新物件屬性（支援多選）
   const updateProperty = (key: string, value: unknown) => {
     if (!selectedObject || !canvas) return
 
-    if (key === 'opacity') {
-      selectedObject.set('opacity', (value as number) / 100)
+    // 如果是多選且是文字屬性，更新所有選中的文字元素
+    const textProperties = ['fontFamily', 'fontSize', 'fontWeight', 'textAlign', 'fill']
+    if (isMultiSelect && textProperties.includes(key)) {
+      selectedObjects.forEach(obj => {
+        if (isTextType(obj.type || '')) {
+          obj.set(key as keyof fabric.FabricObject, value)
+        }
+      })
     } else {
-      selectedObject.set(key as keyof fabric.FabricObject, value)
+      // 單選或非文字屬性
+      if (key === 'opacity') {
+        selectedObject.set('opacity', (value as number) / 100)
+      } else {
+        selectedObject.set(key as keyof fabric.FabricObject, value)
+      }
     }
 
     canvas.renderAll()
@@ -116,7 +158,7 @@ export function PropertiesPanel({
     )
   }
 
-  const isText = properties.type === 'i-text' || properties.type === 'text'
+  const isText = isTextType(properties.type as string || '') || allAreText
 
   return (
     <div className="w-64 h-full bg-white border-l border-border flex flex-col overflow-hidden">
@@ -131,15 +173,59 @@ export function PropertiesPanel({
         {/* 文字屬性 */}
         {isText && (
           <div className="space-y-3">
+            {/* 多選時顯示選中數量，單選時可編輯文字 */}
+            {isMultiSelect ? (
+              <div className="p-2 bg-morandi-container/30 rounded text-sm text-morandi-secondary">
+                已選擇 {selectedObjects.length} 個文字元素
+              </div>
+            ) : (
+              <div>
+                <Label className="text-xs text-morandi-secondary">文字內容</Label>
+                <Input
+                  value={(properties.text as string) || ''}
+                  onChange={(e) => {
+                    updateProperty('text', e.target.value)
+                  }}
+                  className="mt-1 text-sm"
+                />
+              </div>
+            )}
+
+            {/* 字級 - 獨立顯示 */}
             <div>
-              <Label className="text-xs text-morandi-secondary">文字內容</Label>
-              <Input
-                value={(properties.text as string) || ''}
-                onChange={(e) => {
-                  updateProperty('text', e.target.value)
-                }}
-                className="mt-1 text-sm"
-              />
+              <div className="flex items-center gap-1 mb-2">
+                <Type size={12} className="text-morandi-secondary" />
+                <Label className="text-xs text-morandi-secondary">字級</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={String((properties.fontSize as number) || 24)}
+                  onChange={(e) => updateProperty('fontSize', parseInt(e.target.value) || 24)}
+                  className="w-20 text-sm h-8"
+                  min={8}
+                  max={200}
+                />
+                <span className="text-xs text-morandi-secondary">px</span>
+                {/* 快速選擇 */}
+                <div className="flex gap-1">
+                  {[16, 24, 32, 48].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => updateProperty('fontSize', size)}
+                      className={cn(
+                        'px-2 py-1 text-xs rounded border transition-colors',
+                        (properties.fontSize as number) === size
+                          ? 'bg-morandi-gold text-white border-morandi-gold'
+                          : 'border-border hover:border-morandi-gold'
+                      )}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div>
@@ -200,41 +286,43 @@ export function PropertiesPanel({
           </div>
         </div>
 
-        {/* 大小 */}
-        <div>
-          <div className="flex items-center gap-1 mb-2">
-            <Maximize2 size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-secondary">大小</Label>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label className="text-[10px] text-morandi-muted">寬</Label>
-              <Input
-                type="number"
-                value={String(properties.width || 0)}
-                onChange={(e) => {
-                  const newWidth = parseInt(e.target.value)
-                  const scale = newWidth / (selectedObject?.width || 1)
-                  updateProperty('scaleX', scale)
-                }}
-                className="mt-0.5 text-sm h-8"
-              />
+        {/* 大小 - 文字元素不顯示（改用字級調整） */}
+        {!isText && (
+          <div>
+            <div className="flex items-center gap-1 mb-2">
+              <Maximize2 size={12} className="text-morandi-secondary" />
+              <Label className="text-xs text-morandi-secondary">大小</Label>
             </div>
-            <div>
-              <Label className="text-[10px] text-morandi-muted">高</Label>
-              <Input
-                type="number"
-                value={String(properties.height || 0)}
-                onChange={(e) => {
-                  const newHeight = parseInt(e.target.value)
-                  const scale = newHeight / (selectedObject?.height || 1)
-                  updateProperty('scaleY', scale)
-                }}
-                className="mt-0.5 text-sm h-8"
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-[10px] text-morandi-muted">寬</Label>
+                <Input
+                  type="number"
+                  value={String(properties.width || 0)}
+                  onChange={(e) => {
+                    const newWidth = parseInt(e.target.value)
+                    const scale = newWidth / (selectedObject?.width || 1)
+                    updateProperty('scaleX', scale)
+                  }}
+                  className="mt-0.5 text-sm h-8"
+                />
+              </div>
+              <div>
+                <Label className="text-[10px] text-morandi-muted">高</Label>
+                <Input
+                  type="number"
+                  value={String(properties.height || 0)}
+                  onChange={(e) => {
+                    const newHeight = parseInt(e.target.value)
+                    const scale = newHeight / (selectedObject?.height || 1)
+                    updateProperty('scaleY', scale)
+                  }}
+                  className="mt-0.5 text-sm h-8"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 旋轉 */}
         <div>
@@ -316,6 +404,7 @@ function getTypeIcon(type: string) {
   switch (type) {
     case 'i-text':
     case 'text':
+    case 'textbox':
       return <Type size={14} className="text-morandi-gold" />
     case 'rect':
       return <Square size={14} className="text-morandi-gold" />
@@ -334,6 +423,7 @@ function getTypeName(type: string) {
   switch (type) {
     case 'i-text':
     case 'text':
+    case 'textbox':
       return '文字'
     case 'rect':
       return '矩形'

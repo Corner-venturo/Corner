@@ -11,12 +11,13 @@
  */
 
 import { logger } from '@/lib/utils/logger'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import {
   verifyWebhookSignature,
   type TaishinWebhookParams,
 } from '@/lib/linkpay/signature'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 // ============================================
 // 型別定義
@@ -50,14 +51,7 @@ export async function POST(req: NextRequest) {
       })
 
       // 返回 401 Unauthorized
-      return NextResponse.json(
-        {
-          success: false,
-          message: '簽名驗證失敗',
-          reason: signatureResult.reason,
-        },
-        { status: 401 }
-      )
+      return errorResponse(`簽名驗證失敗: ${signatureResult.reason}`, 401, ErrorCode.UNAUTHORIZED)
     }
 
     // ============================================
@@ -67,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     if (!order_no) {
       logger.error('[LinkPay Webhook] 缺少 order_no')
-      return NextResponse.json({ success: false }, { status: 400 })
+      return ApiError.missingField('order_no')
     }
 
     // 解析收款單號（order_no 格式：{receiptNumber}R{timestamp}，已移除 - 和 _）
@@ -92,10 +86,7 @@ export async function POST(req: NextRequest) {
         order_no,
         error: findError,
       })
-      return NextResponse.json(
-        { success: false, message: '找不到對應的訂單記錄' },
-        { status: 404 }
-      )
+      return ApiError.notFound('LinkPay 記錄')
     }
 
     // ============================================
@@ -119,10 +110,7 @@ export async function POST(req: NextRequest) {
           difference: Math.abs(webhookAmount - expectedAmount),
           tolerance,
         })
-        return NextResponse.json(
-          { success: false, message: '金額驗證失敗' },
-          { status: 400 }
-        )
+        return ApiError.validation('金額驗證失敗')
       }
     }
 
@@ -194,14 +182,14 @@ export async function POST(req: NextRequest) {
     }
 
     // 回應台新銀行（必須回應成功，否則會重複通知）
-    return NextResponse.json({ success: true })
+    return successResponse(null)
   } catch (error) {
     logger.error('[LinkPay Webhook] 處理過程發生錯誤', {
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
     })
     // 即使有錯誤也回應成功，避免重複通知
-    return NextResponse.json({ success: true })
+    return successResponse(null)
   }
 }
 
@@ -210,8 +198,5 @@ export async function POST(req: NextRequest) {
 // ============================================
 
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    message: 'LinkPay Webhook endpoint is ready',
-  })
+  return successResponse({ status: 'ok', message: 'LinkPay Webhook endpoint is ready' })
 }

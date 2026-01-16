@@ -122,6 +122,90 @@ export async function archiveProposal(
 }
 
 /**
+ * 刪除提案（含關聯的套件、報價單、行程表等）
+ */
+export async function deleteProposal(proposal: Proposal): Promise<void> {
+  logger.log('[deleteProposal] 開始刪除提案:', proposal.id)
+
+  // 1. 先查詢該提案的所有套件
+  const { data: packages } = await supabase
+    .from('proposal_packages')
+    .select('id')
+    .eq('proposal_id', proposal.id)
+
+  const packageIds = packages?.map(p => p.id) || []
+  const packageCount = packageIds.length
+
+  logger.log(`[deleteProposal] 找到 ${packageCount} 個套件`)
+
+  // 2. 解除旅遊團的提案關聯（避免外鍵衝突）
+  logger.log('[deleteProposal] 解除旅遊團關聯...')
+  const { error: tourUnlinkError } = await supabase
+    .from('tours')
+    .update({ proposal_id: null, proposal_package_id: null } as Record<string, unknown>)
+    .eq('proposal_id' as string, proposal.id)
+  if (tourUnlinkError) {
+    logger.error('[deleteProposal] 解除旅遊團關聯失敗:', tourUnlinkError)
+    throw new Error(`解除旅遊團關聯失敗: ${tourUnlinkError.message || tourUnlinkError.code || JSON.stringify(tourUnlinkError)}`)
+  }
+
+  // 3. 清除提案的 selected_package_id（避免外鍵衝突）
+  logger.log('[deleteProposal] 清除提案的 selected_package_id...')
+  const { error: clearSelectedError } = await proposalsDb()
+    .update({ selected_package_id: null } as Record<string, unknown>)
+    .eq('id', proposal.id)
+  if (clearSelectedError) {
+    logger.error('[deleteProposal] 清除 selected_package_id 失敗:', clearSelectedError)
+    // 不拋錯，繼續嘗試刪除
+  }
+
+  // 4. 處理套件關聯
+  if (packageIds.length > 0) {
+    // 4a. 解除報價單的套件關聯
+    logger.log('[deleteProposal] 解除報價單關聯...')
+    const { error: quoteUnlinkError } = await supabase
+      .from('quotes')
+      .update({ proposal_package_id: null } as Record<string, unknown>)
+      .in('proposal_package_id' as string, packageIds)
+    if (quoteUnlinkError) {
+      logger.error('[deleteProposal] 解除報價單關聯失敗:', quoteUnlinkError)
+      // 不拋錯，繼續嘗試
+    }
+
+    // 4b. 解除行程表的套件關聯
+    logger.log('[deleteProposal] 解除行程表關聯...')
+    const { error: itinUnlinkError } = await supabase
+      .from('itineraries')
+      .update({ proposal_package_id: null } as Record<string, unknown>)
+      .in('proposal_package_id' as string, packageIds)
+    if (itinUnlinkError) {
+      logger.error('[deleteProposal] 解除行程表關聯失敗:', itinUnlinkError)
+      // 不拋錯，繼續嘗試
+    }
+
+    // 4c. 刪除相關套件
+    logger.log('[deleteProposal] 正在刪除套件...', packageIds.length)
+    const { error: pkgError } = await packagesDb()
+      .delete()
+      .eq('proposal_id', proposal.id)
+    if (pkgError) {
+      logger.error('[deleteProposal] 刪除套件失敗:', pkgError)
+      throw new Error(`刪除套件失敗: ${pkgError.message || pkgError.code || JSON.stringify(pkgError)}`)
+    }
+  }
+
+  // 5. 刪除提案
+  logger.log('[deleteProposal] 正在刪除提案...', proposal.id)
+  const { error } = await proposalsDb().delete().eq('id', proposal.id)
+  if (error) {
+    logger.error('[deleteProposal] 刪除提案失敗:', error)
+    throw new Error(`刪除提案失敗: ${error.message || error.code || JSON.stringify(error)}`)
+  }
+
+  logger.log('[deleteProposal] 刪除成功，已刪除提案及', packageCount, '個套件')
+}
+
+/**
  * 取得提案詳情（含套件）
  */
 export async function getProposalWithPackages(id: string): Promise<Proposal | null> {

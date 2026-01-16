@@ -70,7 +70,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     setDeleteConfirm,
     handleCreateChannel,
     onOpenQuoteDialog,
-    onOpenItineraryDialog,
+    // onOpenItineraryDialog 已棄用 - 設計按鈕現在直接跳轉到 /brochure
     onOpenContractDialog,
     onCloseTour,
     onOpenArchiveDialog,
@@ -226,12 +226,8 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
           <button
             onClick={e => {
               e.stopPropagation()
-              setSelectedTour(tour)
-              if (onOpenItineraryDialog) {
-                onOpenItineraryDialog(tour)
-              } else {
-                router.push(`/brochure?tour_id=${tour.id}`)
-              }
+              // 直接跳轉到設計頁面，不需要中間的 Dialog
+              router.push(`/brochure?tour_id=${tour.id}`)
             }}
             className="px-1.5 py-0.5 text-morandi-gold hover:text-morandi-gold/80 hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
             title="設計手冊或網頁行程"
@@ -325,7 +321,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       setDeleteConfirm,
       handleCreateChannel,
       onOpenQuoteDialog,
-      onOpenItineraryDialog,
       onCloseTour,
       onOpenArchiveDialog,
       onOpenTourControlDialog,
