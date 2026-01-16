@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { MapPin, Star, Sparkles, Globe } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAttractionsDialog } from '../hooks/useAttractionsDialog'
-import { Combobox } from '@/components/ui/combobox'
 import { useCountries } from '@/data'
 
 // Lazy load tabs - 只有切換到該 tab 才載入組件
@@ -14,13 +14,24 @@ const AttractionsTab = lazy(() => import('./tabs/AttractionsTab'))
 const MichelinRestaurantsTab = lazy(() => import('./tabs/MichelinRestaurantsTab'))
 const PremiumExperiencesTab = lazy(() => import('./tabs/PremiumExperiencesTab'))
 
+// 有效的 tab 值
+const VALID_TABS = ['regions', 'attractions', 'michelin', 'experiences'] as const
+type TabValue = typeof VALID_TABS[number]
+
 // ============================================
 // 資料庫管理主頁面（含景點、米其林、體驗）
 // ============================================
 
 export default function DatabaseManagementPage() {
-  const [activeTab, setActiveTab] = useState('regions')
-  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['regions']))
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // 從 URL 讀取 tab，預設為 'regions'
+  const tabFromUrl = searchParams.get('tab') as TabValue | null
+  const initialTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'regions'
+
+  const [activeTab, setActiveTab] = useState<TabValue>(initialTab)
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set([initialTab]))
 
   // 景點分頁的狀態
   const [searchTerm, setSearchTerm] = useState('')
@@ -28,14 +39,32 @@ export default function DatabaseManagementPage() {
   const [selectedCountry, setSelectedCountry] = useState('')
   const { openAdd, isAddOpen, closeAdd, initialFormData } = useAttractionsDialog()
 
-  // 使用 @/data hook 載入國家列表（自動快取、去重）
+  // 國家列表（SWR 快取，只載入一次）
   const { items: countries = [] } = useCountries()
 
-  // 當切換 tab 時，標記該 tab 已載入
+  // 當切換 tab 時，更新 URL 並標記該 tab 已載入
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab)
+    const newTab = tab as TabValue
+    setActiveTab(newTab)
     setLoadedTabs(prev => new Set(prev).add(tab))
+
+    // 更新 URL（不重新載入頁面）
+    const params = new URLSearchParams(searchParams.toString())
+    if (tab === 'regions') {
+      params.delete('tab')
+    } else {
+      params.set('tab', tab)
+    }
+    router.replace(`/database/attractions${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false })
   }
+
+  // 同步 URL 變化到 state（處理瀏覽器前進/後退）
+  useEffect(() => {
+    if (tabFromUrl && VALID_TABS.includes(tabFromUrl) && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl)
+      setLoadedTabs(prev => new Set(prev).add(tabFromUrl))
+    }
+  }, [tabFromUrl])
 
   // 清除篩選
   const clearFilters = () => {
@@ -80,21 +109,18 @@ export default function DatabaseManagementPage() {
           activeTab !== 'regions' ? (
             <>
               {/* 國家篩選 - 景點相關 tab 共用 */}
-              <Combobox
+              <select
                 value={selectedCountry}
-                onChange={setSelectedCountry}
-                options={[
-                  { value: '', label: '所有國家' },
-                  ...countries.map(country => ({
-                    value: country.id,
-                    label: country.name,
-                  })),
-                ]}
-                placeholder="選擇國家..."
-                emptyMessage="找不到符合的國家"
-                showSearchIcon={true}
-                showClearButton={true}
-              />
+                onChange={e => setSelectedCountry(e.target.value)}
+                className="px-3 py-1 text-sm border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-morandi-primary bg-card text-morandi-primary min-w-[120px]"
+              >
+                <option value="">所有國家</option>
+                {countries.map(country => (
+                  <option key={country.id} value={country.id}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
               {/* 分類篩選 - 只在景點活動顯示 */}
               {activeTab === 'attractions' && (
                 <select

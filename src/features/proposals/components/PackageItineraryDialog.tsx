@@ -775,9 +775,19 @@ export function PackageItineraryDialog({
         // 同步餐食/住宿資料到關聯的報價單
         await syncItineraryToQuote(existingItinerary.id, formattedDailyItinerary, pkg.id)
 
-        await alert('行程表更新成功', 'success')
+        // 重新載入資料以確保 UI 顯示最新狀態
+        const { data: refreshedData } = await supabase
+          .from('itineraries')
+          .select('*')
+          .eq('id', existingItinerary.id)
+          .single()
+        if (refreshedData) {
+          setDirectLoadedItinerary(refreshedData as unknown as Itinerary)
+        }
+
+        // 使用 toast 通知，不關閉對話框讓用戶可以繼續編輯
+        toast.success('行程表更新成功')
         onItineraryCreated?.()
-        onClose()
       } else {
         // 建立新行程表（同時存到兩種航班格式以確保相容性）
         const workspaceId = currentUser?.workspace_id
@@ -960,11 +970,12 @@ export function PackageItineraryDialog({
       setDirectLoadedItinerary(prev => prev ? { ...prev, version_records: updatedRecords } : null)
       setSelectedVersionIndex(updatedRecords.length - 1)
 
-      await alert('已另存為新版本', 'success')
+      // 使用 toast 通知，不關閉對話框
+      toast.success('已另存為新版本')
       onItineraryCreated?.()
     } catch (error) {
       logger.error('另存新版本失敗:', error)
-      await alert('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'), 'error')
+      toast.error('另存新版本失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setIsCreating(false)
     }

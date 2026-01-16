@@ -128,19 +128,41 @@ async function createWorkspaceBot(
   workspace: { id: string; name: string; code: string; type: string | null }
 ) {
   try {
-    // 1. 建立員工記錄
-    const botId = crypto.randomUUID()
     const botName = `${workspace.name} 機器人`
 
+    // 🔧 統一 ID 架構：先建立 Auth，用 Auth ID 作為員工 ID
+    // 1. 建立 Auth 帳號
+    const email = `${workspace.code.toLowerCase()}_bot@venturo.internal`
+    const password = crypto.randomUUID() // 隨機密碼，機器人不需要登入
+
+    // 檢查 Auth 用戶是否已存在
+    const { data: { users } } = await adminClient.auth.admin.listUsers()
+    let authUser = users?.find(u => u.email === email)
+
+    if (!authUser) {
+      const { data, error } = await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      })
+
+      if (error) {
+        return { success: false, error: '建立 Auth 失敗: ' + error.message }
+      }
+      authUser = data.user
+    }
+
+    // 2. 用 Auth User ID 作為員工 ID 建立員工記錄
     const { error: insertError } = await adminClient
       .from('employees')
       .insert({
-        id: botId,
+        id: authUser.id, // 統一 ID：employee.id = auth.uid()
         employee_number: 'BOT001',
         english_name: 'Bot',
         display_name: botName,
         chinese_name: botName,
         workspace_id: workspace.id,
+        supabase_user_id: authUser.id, // 向後相容
         status: 'active',
         roles: ['bot'],
         permissions: ['bot'],
@@ -155,10 +177,7 @@ async function createWorkspaceBot(
       return { success: false, error: insertError.message }
     }
 
-    // 2. 建立 Auth 帳號並綁定
-    const authResult = await createBotAuth(adminClient, workspace.code, botId)
-
-    return authResult
+    return { success: true, authUserId: authUser.id }
   } catch (error) {
     return { success: false, error: String(error) }
   }

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Upload, X, Loader2, ChevronUp, ChevronDown, Minus, Wand2 } from 'lucide-react'
-import { prompt, alert } from '@/lib/ui/alert-dialog'
+import { Upload, X, Loader2, Wand2 } from 'lucide-react'
+import { alert } from '@/lib/ui/alert-dialog'
 import { ImagePosition } from '../../hooks/useAttractionForm'
 import { useAuthStore } from '@/stores/auth-store'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { SimpleImagePositionDragger } from '@/components/ui/image-position-dragger'
 
 // 圖片編輯動作類型
 type EditAction =
@@ -84,12 +85,6 @@ function ImagePositionAdjuster({
 }: ImagePositionAdjusterProps) {
   const [isEditing, setIsEditing] = useState(false)
 
-  const positionStyles: Record<ImagePosition, string> = {
-    top: 'object-top',
-    center: 'object-center',
-    bottom: 'object-bottom',
-  }
-
   // 執行 AI 圖片編輯
   const handleAiEdit = async (action: EditAction) => {
     if (!onReplace) return
@@ -136,41 +131,15 @@ function ImagePositionAdjuster({
         </div>
       )}
 
-      <img
+      {/* 使用拖拉調整位置的圖片組件 */}
+      <SimpleImagePositionDragger
         src={url}
-        alt="景點圖片"
-        className={`w-full h-24 object-cover rounded-md border border-border ${positionStyles[position]}`}
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Error'
-        }}
+        position={position}
+        onChange={onPositionChange}
+        className="w-full h-24 rounded-md border border-border"
+        aspectRatio={4 / 3}
+        disabled={isEditing}
       />
-      {/* 位置調整按鈕 */}
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          type="button"
-          onClick={() => onPositionChange('top')}
-          className={`p-1 rounded ${position === 'top' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示頂部"
-        >
-          <ChevronUp size={12} />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPositionChange('center')}
-          className={`p-1 rounded ${position === 'center' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示中間"
-        >
-          <Minus size={12} />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPositionChange('bottom')}
-          className={`p-1 rounded ${position === 'bottom' ? 'bg-morandi-gold text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
-          title="顯示底部"
-        >
-          <ChevronDown size={12} />
-        </button>
-      </div>
 
       {/* AI 美化按鈕 */}
       {showAiEdit && onReplace && (
@@ -189,7 +158,7 @@ function ImagePositionAdjuster({
             <div className="px-2 py-1.5 text-xs font-medium text-morandi-secondary">
               AI 美化
             </div>
-            {EDIT_ACTION_GROUPS.map((group, groupIndex) => (
+            {EDIT_ACTION_GROUPS.map((group) => (
               <div key={group.group}>
                 <DropdownMenuSeparator />
                 <div className="px-2 py-1 text-[10px] font-medium text-morandi-muted">

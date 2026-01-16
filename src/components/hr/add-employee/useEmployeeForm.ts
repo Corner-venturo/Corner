@@ -67,13 +67,53 @@ export function useEmployeeForm(onSubmit: () => void) {
         return
       }
 
+      // 取得 workspace code（用於 Auth email 格式）
+      const { supabase } = await import('@/lib/supabase/client')
+      const { data: workspace } = await supabase
+        .from('workspaces')
+        .select('code')
+        .eq('id', targetWorkspaceId)
+        .single()
+
+      // 🔧 統一 ID 架構：先建立 Auth 帳號，取得 ID 後作為員工 ID
+      // 這樣 employee.id = auth.uid()，不需要額外的 supabase_user_id 映射
+      let authUserId: string | null = null
+
+      try {
+        const authResponse = await fetch('/api/auth/create-employee-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employee_number,
+            password: formData.defaultPassword,
+            workspace_code: workspace?.code || null,
+          }),
+        })
+
+        if (authResponse.ok) {
+          const authResult = await authResponse.json()
+          authUserId = authResult.data?.user?.id || null
+          logger.log('✅ Auth 帳號已建立:', employee_number, 'ID:', authUserId)
+        } else {
+          const error = await authResponse.json()
+          logger.warn('⚠️ 建立 Auth 帳號失敗:', error)
+        }
+      } catch (authError) {
+        logger.warn('⚠️ 建立 Auth 帳號失敗:', authError)
+      }
+
+      // 建立員工資料
+      // 如果有 Auth User ID，使用它作為員工 ID（統一 ID 架構）
+      // 同時設定 supabase_user_id 確保向後相容
       const dbEmployeeData = {
+        ...(authUserId ? { id: authUserId } : {}), // 使用 Auth User ID 作為員工 ID
         employee_number: employee_number,
         english_name: formData.english_name,
         display_name: formData.display_name,
         chinese_name: formData.chinese_name,
         password_hash: hashedPassword,
         workspace_id: targetWorkspaceId,
+        supabase_user_id: authUserId, // 設定 supabase_user_id（向後相容）
         roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],
         personal_info: {
           national_id: formData.personal_info.national_id,
@@ -113,58 +153,9 @@ export function useEmployeeForm(onSubmit: () => void) {
 
       const newEmployee = await addUser(dbEmployeeData)
 
-      // 建立 Supabase Auth 帳號（用於 RLS）
-      try {
-        // 取得 workspace code（用於 Auth email 格式）
-        const { supabase } = await import('@/lib/supabase/client')
-        const { data: workspace } = await supabase
-          .from('workspaces')
-          .select('code')
-          .eq('id', targetWorkspaceId)
-          .single()
-
-        const authResponse = await fetch('/api/auth/create-employee-auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            employee_number,
-            password: formData.defaultPassword,
-            workspace_code: workspace?.code || null,
-          }),
-        })
-
-        if (!authResponse.ok) {
-          const error = await authResponse.json()
-          logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', error)
-        } else {
-          const authResult = await authResponse.json()
-          logger.log('✅ Auth 帳號已建立:', employee_number)
-
-          // 🔧 重要：將 Auth User ID 寫入員工記錄的 supabase_user_id
-          // 這樣 RLS 才能正確運作
-          if (authResult.data?.user?.id && newEmployee?.id) {
-            const { supabase: supabaseClient } = await import('@/lib/supabase/client')
-            const { error: updateError } = await supabaseClient
-              .from('employees')
-              .update({ supabase_user_id: authResult.data.user.id })
-              .eq('id', newEmployee.id)
-
-            if (updateError) {
-              logger.warn('⚠️ 更新 supabase_user_id 失敗:', updateError)
-            } else {
-              logger.log('✅ supabase_user_id 已綁定:', authResult.data.user.id)
-            }
-          }
-        }
-      } catch (authError) {
-        logger.warn('⚠️ 建立 Auth 帳號失敗（不影響員工建立）:', authError)
-      }
-
       // 自動加入該 workspace 的所有頻道
       if (newEmployee?.id) {
         try {
-          const { supabase } = await import('@/lib/supabase/client')
-
           // 取得該 workspace 的所有頻道
           const { data: channels } = await supabase
             .from('channels')

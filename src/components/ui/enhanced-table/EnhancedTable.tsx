@@ -139,23 +139,7 @@ export function EnhancedTable<T extends RowData = RowData>({
     onFilter?.(newFilters)
   }
 
-  // Loading and error states
-  if (actualLoading) {
-    return (
-      <div
-        className={cn(
-          'border border-border rounded-xl overflow-hidden bg-card shadow-sm',
-          className
-        )}
-      >
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-morandi-primary" />
-          <span className="ml-2 text-morandi-secondary">載入中...</span>
-        </div>
-      </div>
-    )
-  }
-
+  // Error state (loading state now handled in TableBody to keep table structure visible)
   if (error) {
     return (
       <div
@@ -207,6 +191,7 @@ export function EnhancedTable<T extends RowData = RowData>({
             rowClassName={typedRowClassName}
             striped={striped}
             hoverable={hoverable}
+            loading={actualLoading}
             onRowClick={typedOnRowClick}
             onRowDoubleClick={typedOnRowDoubleClick}
             getRowId={getRowId}

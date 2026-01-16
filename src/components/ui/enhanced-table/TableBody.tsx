@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TableColumn, SelectionConfig, ExpandableConfig, RowData } from './types'
 
@@ -16,6 +17,7 @@ interface TableBodyProps<T extends RowData = RowData> {
   rowClassName?: (row: T) => string
   striped?: boolean
   hoverable?: boolean
+  loading?: boolean
   onRowClick?: (row: T, rowIndex: number) => void
   onRowDoubleClick?: (row: T, rowIndex: number) => void
   getRowId: (row: T, index: number) => string
@@ -35,6 +37,7 @@ export function TableBody({
   rowClassName,
   striped,
   hoverable,
+  loading,
   onRowClick,
   onRowDoubleClick,
   getRowId,
@@ -42,6 +45,55 @@ export function TableBody({
   isRowExpanded,
   toggleSelection,
 }: TableBodyProps) {
+  // 載入狀態：顯示骨架屏
+  if (loading) {
+    const skeletonRows = 5 // 預設顯示 5 行骨架
+    const totalColumns = columns.length + (selection ? 1 : 0) + (expandable ? 1 : 0) + (actions ? 1 : 0)
+
+    return (
+      <tbody>
+        {Array.from({ length: skeletonRows }).map((_, rowIndex) => (
+          <tr key={`skeleton-${rowIndex}`} className="border-b border-border/40">
+            {selection && (
+              <td className="py-3 px-4">
+                <div className="w-4 h-4 bg-morandi-container/50 rounded animate-pulse" />
+              </td>
+            )}
+            {columns.map((column, colIndex) => (
+              <td
+                key={`skeleton-${rowIndex}-${colIndex}`}
+                className="py-3 px-4"
+                style={{ width: column.width }}
+              >
+                <div
+                  className="h-4 bg-morandi-container/50 rounded animate-pulse"
+                  style={{ width: colIndex === 0 ? '60%' : colIndex === columns.length - 1 ? '40%' : '80%' }}
+                />
+              </td>
+            ))}
+            {actions && (
+              <td className="py-3 px-4" style={{ width: '50%' }}>
+                <div className="flex gap-2">
+                  <div className="w-16 h-6 bg-morandi-container/50 rounded animate-pulse" />
+                  <div className="w-16 h-6 bg-morandi-container/50 rounded animate-pulse" />
+                </div>
+              </td>
+            )}
+          </tr>
+        ))}
+        {/* 載入中提示 */}
+        <tr>
+          <td colSpan={totalColumns} className="py-4">
+            <div className="flex items-center justify-center text-morandi-secondary">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <span className="text-sm">載入中...</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    )
+  }
+
   if (paginatedData.length === 0) {
     return (
       <tbody>
