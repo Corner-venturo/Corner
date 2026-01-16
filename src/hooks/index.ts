@@ -24,6 +24,14 @@ export {
   type UseManagedDialogStateReturn,
 } from './useManagedDialogState'
 
+// 統一的 Dialog 狀態管理 Hooks (P2 優化)
+export {
+  useDialogState,
+  useMultiDialogState,
+  type UseDialogStateOptions,
+  type UseDialogStateReturn,
+} from './useDialogState'
+
 // OCR 辨識 Hook
 export { useOcrRecognition, type OcrParsedData } from './useOcrRecognition'
 

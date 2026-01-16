@@ -3,7 +3,7 @@
 import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useCallback } from 'react'
-import { useTours, useOrders, useMembers, useCustomers, useEmployees } from '@/data'
+import { useTours, useMembers, useCustomers, useEmployees } from '@/data'
 import { useAuthStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
@@ -43,7 +43,9 @@ const getDateInTaipei = (isoString: string): string => {
  */
 export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
   const { items: tours } = useTours()
-  const { items: orders } = useOrders()
+  // P2 效能優化：移除 orders 完整載入
+  // 改用 tour.current_participants denormalized 欄位計算團員數
+  // members 保留用於生日事件（無 N+1 問題）
   const { items: members } = useMembers()
   const { items: customers } = useCustomers()
   const { items: employees } = useEmployees()
@@ -72,15 +74,16 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
   }, [])
 
   // 轉換旅遊團為日曆事件（過濾掉特殊團）
+  // P2 效能優化：使用 tour.current_participants 替代 N+1 查詢
+  // 原本：O(tours × orders × members) = O(n³)
+  // 現在：O(tours) = O(n)
   const tourEvents: FullCalendarEvent[] = useMemo(() => {
     return (tours || [])
       .filter(tour => tour.status !== '特殊團') // 過濾掉簽證專用團等特殊團
       .map(tour => {
         const color = getEventColor('tour', tour.status || '提案')
-        const tourOrders = (orders || []).filter(order => order.tour_id === tour.id)
-        const actualMembers = (members || []).filter(member =>
-          tourOrders.some(order => order.id === member.order_id)
-        ).length
+        // 使用 denormalized 欄位，避免 N+1 查詢
+        const actualMembers = tour.current_participants || 0
 
         // 修正 FullCalendar 的多日事件顯示問題
         // 如果有 return_date，則需要加一天才能正確顯示跨日事件
@@ -109,7 +112,7 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
           },
         } as FullCalendarEvent
       })
-  }, [tours, orders, members, getEventColor])
+  }, [tours, getEventColor])
 
   // 轉換個人事項為日曆事件
   const transformPersonalEvents = useCallback(
