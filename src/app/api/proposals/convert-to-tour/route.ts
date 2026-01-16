@@ -151,6 +151,10 @@ export async function POST(request: NextRequest) {
       proposal_id: proposal_id,
       proposal_package_id: package_id,
       converted_from_proposal: true,
+      // 自動鎖定報價單和行程表
+      locked_quote_id: pkgData.quote_id || null,
+      locked_itinerary_id: pkgData.itinerary_id || null,
+      locked_at: pkgData.quote_id || pkgData.itinerary_id ? new Date().toISOString() : null,
       profit: 0,
       total_cost: 0,
       total_revenue: 0,
@@ -176,19 +180,32 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. 更新套件的報價單和行程表
+    const updateWarnings: string[] = []
+
     if (pkgData.quote_id) {
-      await supabase.from('quotes').update({ tour_id: newTour.id }).eq('id', pkgData.quote_id)
+      const { error: quoteUpdateError } = await supabase
+        .from('quotes')
+        .update({ tour_id: newTour.id })
+        .eq('id', pkgData.quote_id)
+      if (quoteUpdateError) {
+        logger.warn('更新報價單失敗:', quoteUpdateError)
+        updateWarnings.push('報價單關聯更新失敗')
+      }
     }
 
     if (pkgData.itinerary_id) {
-      await supabase
+      const { error: itineraryUpdateError } = await supabase
         .from('itineraries')
         .update({ tour_id: newTour.id, tour_code: tourCode })
         .eq('id', pkgData.itinerary_id)
+      if (itineraryUpdateError) {
+        logger.warn('更新行程表失敗:', itineraryUpdateError)
+        updateWarnings.push('行程表關聯更新失敗')
+      }
     }
 
     // 5.1 更新需求單
-    await supabase
+    const { error: requestUpdateError } = await supabase
       .from('tour_requests')
       .update({
         tour_id: newTour.id,
@@ -196,9 +213,13 @@ export async function POST(request: NextRequest) {
         tour_name: tour_name || proposalData.title,
       })
       .eq('proposal_package_id', package_id)
+    if (requestUpdateError) {
+      logger.warn('更新需求單失敗:', requestUpdateError)
+      updateWarnings.push('需求單關聯更新失敗')
+    }
 
     // 6. 更新提案狀態
-    await supabase
+    const { error: proposalUpdateError } = await supabase
       .from('proposals')
       .update({
         status: 'converted',
@@ -210,9 +231,20 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', proposal_id)
+    if (proposalUpdateError) {
+      logger.warn('更新提案狀態失敗:', proposalUpdateError)
+      updateWarnings.push('提案狀態更新失敗')
+    }
 
     // 7. 標記套件為選定
-    await supabase.from('proposal_packages').update({ is_selected: true }).eq('id', package_id)
+    const { error: packageUpdateError } = await supabase
+      .from('proposal_packages')
+      .update({ is_selected: true })
+      .eq('id', package_id)
+    if (packageUpdateError) {
+      logger.warn('標記套件選定失敗:', packageUpdateError)
+      updateWarnings.push('套件標記更新失敗')
+    }
 
     // 8. 建立訂單（查詢所有訂單以避免衝突）
     const { data: existingOrdersRaw } = await supabase
@@ -260,7 +292,7 @@ export async function POST(request: NextRequest) {
       logger.log('自動建立訂單成功:', { orderCode: newOrder.order_number })
     }
 
-    logger.log('提案轉團成功:', { proposalId: proposal_id, tourCode })
+    logger.log('提案轉團成功:', { proposalId: proposal_id, tourCode, warnings: updateWarnings })
 
     return successResponse({
       tour_id: newTour.id,
@@ -268,6 +300,7 @@ export async function POST(request: NextRequest) {
       quote_id: pkgData.quote_id || undefined,
       itinerary_id: pkgData.itinerary_id || undefined,
       order_id: newOrder?.id,
+      warnings: updateWarnings.length > 0 ? updateWarnings : undefined,
     })
   } catch (error) {
     logger.error('轉開團 API 錯誤:', error)

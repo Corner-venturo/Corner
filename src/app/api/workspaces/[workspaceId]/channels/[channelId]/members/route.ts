@@ -1,6 +1,7 @@
 import { logger } from '@/lib/utils/logger'
 import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 type RouteParams = {
   params: Promise<{
@@ -10,10 +11,21 @@ type RouteParams = {
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+  }
+
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
     return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+  }
+
+  // workspace 驗證：只能存取自己的 workspace
+  if (auth.data.workspaceId !== workspaceId) {
+    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
   }
 
   try {
@@ -79,10 +91,21 @@ export async function GET(_request: Request, { params }: RouteParams) {
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+  }
+
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
     return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+  }
+
+  // workspace 驗證
+  if (auth.data.workspaceId !== workspaceId) {
+    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
   }
 
   const body = await request.json().catch(() => ({}))
@@ -135,10 +158,21 @@ export async function POST(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(request: Request, { params }: RouteParams) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return NextResponse.json({ error: '請先登入' }, { status: 401 })
+  }
+
   const { workspaceId, channelId } = await params
 
   if (!workspaceId || !channelId) {
     return NextResponse.json({ error: 'workspaceId and channelId are required' }, { status: 400 })
+  }
+
+  // workspace 驗證
+  if (auth.data.workspaceId !== workspaceId) {
+    return NextResponse.json({ error: '無權存取此 workspace' }, { status: 403 })
   }
 
   const { memberId } = await request.json().catch(() => ({ memberId: undefined }))
