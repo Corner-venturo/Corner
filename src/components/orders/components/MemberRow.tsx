@@ -86,7 +86,7 @@ export function MemberRow({
     balance: false,
     remarks: true,
     pnr: false,
-    ticket_number: false,
+    ticket_number: true,  // 預設顯示機票號碼
     ticketing_deadline: false,
   }
 

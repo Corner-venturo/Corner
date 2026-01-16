@@ -399,8 +399,8 @@ export function TourPrintDialog({
             <tr class="flight-detail">
               <td class="flight-date">${formatPnrDate(seg.departureDate)}</td>
               <td class="flight-times">
-                <div>${formatTime(seg.departureTime)} 出發: ${getAirportName(seg.origin)}(${seg.origin})${depTerminal ? ` ${depTerminal}` : ''}</div>
-                <div>${formatTime(seg.arrivalTime)} 抵達: ${getAirportName(seg.destination)}(${seg.destination})${arrTerminal ? ` ${arrTerminal}` : ''}</div>
+                <div>${formatTime(seg.departureTime)} 出發: ${seg.origin ? `${getAirportName(seg.origin)}(${seg.origin})` : '待確認'}${depTerminal ? ` ${depTerminal}` : ''}</div>
+                <div>${formatTime(seg.arrivalTime)} 抵達: ${seg.destination ? `${getAirportName(seg.destination)}(${seg.destination})` : '待確認'}${arrTerminal ? ` ${arrTerminal}` : ''}</div>
               </td>
               <td class="flight-extra">
                 ${seg.aircraft ? `<span>/${seg.aircraft}</span>` : ''}
@@ -430,8 +430,8 @@ export function TourPrintDialog({
             <tr class="flight-detail">
               <td class="flight-date">${tour.departure_date}</td>
               <td class="flight-times">
-                <div>${outbound.departureTime} 出發: ${getAirportName(outbound.departureAirport)}(${outbound.departureAirport})</div>
-                <div>${outbound.arrivalTime} 抵達: ${getAirportName(outbound.arrivalAirport)}(${outbound.arrivalAirport})</div>
+                <div>${outbound.departureTime} 出發: ${outbound.departureAirport ? `${getAirportName(outbound.departureAirport)}(${outbound.departureAirport})` : '待確認'}</div>
+                <div>${outbound.arrivalTime} 抵達: ${outbound.arrivalAirport ? `${getAirportName(outbound.arrivalAirport)}(${outbound.arrivalAirport})` : '待確認'}</div>
               </td>
               <td class="flight-extra"></td>
             </tr>
@@ -454,8 +454,8 @@ export function TourPrintDialog({
             <tr class="flight-detail">
               <td class="flight-date">${tour.return_date}</td>
               <td class="flight-times">
-                <div>${returnFlight.departureTime} 出發: ${getAirportName(returnFlight.departureAirport)}(${returnFlight.departureAirport})</div>
-                <div>${returnFlight.arrivalTime} 抵達: ${getAirportName(returnFlight.arrivalAirport)}(${returnFlight.arrivalAirport})</div>
+                <div>${returnFlight.departureTime} 出發: ${returnFlight.departureAirport ? `${getAirportName(returnFlight.departureAirport)}(${returnFlight.departureAirport})` : '待確認'}</div>
+                <div>${returnFlight.arrivalTime} 抵達: ${returnFlight.arrivalAirport ? `${getAirportName(returnFlight.arrivalAirport)}(${returnFlight.arrivalAirport})` : '待確認'}</div>
               </td>
               <td class="flight-extra"></td>
             </tr>
