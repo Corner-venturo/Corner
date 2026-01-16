@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
@@ -31,6 +32,12 @@ function getGoogleVisionKeys(): string[] {
  */
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：驗證用戶身份（護照資料敏感）
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const contentType = request.headers.get('content-type') || ''
 
     let base64Images: { name: string; data: string }[] = []

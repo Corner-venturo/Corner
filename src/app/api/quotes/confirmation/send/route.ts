@@ -6,11 +6,18 @@
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import type { SendConfirmationLinkParams, ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：驗證用戶身份
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const body: SendConfirmationLinkParams = await request.json()
     const { quote_id, expires_in_days = 7, staff_id } = body
 

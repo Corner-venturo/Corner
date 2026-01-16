@@ -126,6 +126,13 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     pnr?: string | null
   }>>([])
   const [firstOrderId, setFirstOrderId] = useState<string | null>(null)
+  // 訂單列表（用於 PNR 配對的訂單選擇）
+  const [tourOrders, setTourOrders] = useState<Array<{
+    id: string
+    order_number: string
+    contact_person: string | null
+  }>>([])
+
 
   // 載入 PNR 開票期限 + 檢查票號狀態
   useEffect(() => {
@@ -183,24 +190,32 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     }
   }, [isOpen, tour?.id])
 
-  // 載入團員資料（用於入境卡列印）
+  // 載入團員資料（用於入境卡列印）+ 訂單列表（用於 PNR 配對的訂單選擇）
   useEffect(() => {
-    const loadMembers = async () => {
+    const loadMembersAndOrders = async () => {
       if (!tour?.id) return
       const { supabase } = await import('@/lib/supabase/client')
 
       const { data: orders } = await supabase
         .from('orders')
-        .select('id')
+        .select('id, order_number, contact_person')
         .eq('tour_id', tour.id)
 
       if (!orders || orders.length === 0) {
         setFirstOrderId(null)
+        setTourOrders([])
         return
       }
 
       // 儲存第一個訂單的 ID（用於 PNR 配對建立新成員）
       setFirstOrderId(orders[0].id)
+
+      // 儲存訂單列表（用於 PNR 配對的訂單選擇）
+      setTourOrders(orders.map(o => ({
+        id: o.id,
+        order_number: o.order_number || '',
+        contact_person: o.contact_person,
+      })))
 
       const orderIds = orders.map(o => o.id)
 
@@ -215,7 +230,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     }
 
     if (showEntryCardDialog || showPnrToolDialog || showMembersPnrMatchDialog) {
-      loadMembers()
+      loadMembersAndOrders()
     }
   }, [tour?.id, showEntryCardDialog, showPnrToolDialog, showMembersPnrMatchDialog])
 
@@ -636,6 +651,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             orderId={firstOrderId || undefined}
             workspaceId={currentWorkspace?.id}
             tourId={tour?.id}
+            orders={tourOrders}
             onSuccess={() => {
               setForceShowPnr(true)
               handleSuccess()

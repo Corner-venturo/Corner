@@ -1275,12 +1275,198 @@ function extractAirportCode(locationName: string): string {
 }
 
 /**
+ * 解析「機票訂單明細」格式（開票系統匯出）
+ *
+ * 格式特徵：
+ * - 包含「機票訂單明細」或「銷售摘要」字樣
+ * - 票號格式：781-6392510194
+ * - 金額明細：金額、附加費、稅金、小計
+ * - 訂位記錄：內嵌完整 Amadeus PNR
+ */
+export function parseTicketOrderDetail(input: string): ParsedPNR {
+  const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
+
+  logger.log('📋 開始解析機票訂單明細，共', lines.length, '行');
+
+  // 先初始化結果
+  const result: ParsedPNR = {
+    recordLocator: '',
+    passengerNames: [],
+    passengers: [],
+    segments: [],
+    ticketingDeadline: null,
+    cancellationDeadline: null,
+    specialRequests: [],
+    otherInfo: [],
+    contactInfo: [],
+    validation: { isValid: true, errors: [], warnings: [], suggestions: [] },
+    fareData: null,
+    ticketNumbers: [],
+  };
+
+  // 解析票價資訊
+  let baseFare: number | null = null;
+  let surcharge: number | null = null;
+  let taxes: number | null = null;
+  let totalFare: number | null = null;
+  let currentPassenger = '';
+
+  // 找出訂位記錄區塊的起始位置
+  let pnrStartIndex = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes('訂位記錄') || lines[i].startsWith('/$---') || lines[i].startsWith('RP/')) {
+      pnrStartIndex = i;
+      break;
+    }
+  }
+
+  // 解析上方的票務資訊
+  for (let i = 0; i < (pnrStartIndex > 0 ? pnrStartIndex : lines.length); i++) {
+    const line = lines[i];
+
+    // 解析旅客姓名（英文格式 SURNAME/GIVENNAME）
+    const nameMatch = line.match(/^([A-Z]+\/[A-Z]+)$/);
+    if (nameMatch) {
+      currentPassenger = nameMatch[1];
+      if (!result.passengerNames.includes(currentPassenger)) {
+        result.passengerNames.push(currentPassenger);
+        result.passengers.push({
+          index: result.passengers.length + 1,
+          name: currentPassenger,
+          type: 'ADT',
+        });
+      }
+      logger.log('  ✅ 找到旅客:', currentPassenger);
+      continue;
+    }
+
+    // 解析機票號碼（格式：781-6392510194）
+    const ticketMatch = line.match(/^(\d{3})-(\d{10,})$/);
+    if (ticketMatch) {
+      const ticketNumber = `${ticketMatch[1]}-${ticketMatch[2]}`;
+      result.ticketNumbers.push({
+        number: ticketNumber,
+        passenger: currentPassenger,
+      });
+      logger.log('  ✅ 找到機票號碼:', ticketNumber);
+      continue;
+    }
+
+    // 解析金額（票面價）
+    if (line === '金　額' && i + 1 < lines.length) {
+      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+      if (!isNaN(amount)) {
+        baseFare = amount;
+      }
+      continue;
+    }
+
+    // 解析附加費
+    if (line === '附加費' && i + 1 < lines.length) {
+      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+      if (!isNaN(amount)) {
+        surcharge = amount;
+      }
+      continue;
+    }
+
+    // 解析稅金
+    if (line === '稅　金' && i + 1 < lines.length) {
+      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+      if (!isNaN(amount)) {
+        taxes = amount;
+      }
+      continue;
+    }
+
+    // 解析小計
+    if (line === '小　計' && i + 1 < lines.length) {
+      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+      if (!isNaN(amount)) {
+        totalFare = amount;
+      }
+      continue;
+    }
+
+    // 解析訂單編號（用作備用 record locator）
+    const orderMatch = line.match(/訂單編號[:：]\s*(\d+)/);
+    if (orderMatch && !result.recordLocator) {
+      // 先暫存，如果 PNR 裡沒有再用這個
+      result.contactInfo.push(`訂單編號: ${orderMatch[1]}`);
+    }
+  }
+
+  // 解析內嵌的 PNR
+  if (pnrStartIndex > 0) {
+    // 提取 PNR 區塊
+    const pnrLines = lines.slice(pnrStartIndex).filter(l =>
+      !l.includes('訂位記錄') && l.trim()
+    );
+    const pnrText = pnrLines.join('\n');
+
+    // 使用 Amadeus PNR 解析器
+    const pnrResult = parseAmadeusPNR(pnrText);
+
+    // 合併結果
+    if (pnrResult.recordLocator) {
+      result.recordLocator = pnrResult.recordLocator;
+    }
+    if (pnrResult.segments.length > 0) {
+      result.segments = pnrResult.segments;
+    }
+    if (pnrResult.passengerNames.length > 0 && result.passengerNames.length === 0) {
+      result.passengerNames = pnrResult.passengerNames;
+      result.passengers = pnrResult.passengers;
+    }
+    if (pnrResult.ticketingDeadline) {
+      result.ticketingDeadline = pnrResult.ticketingDeadline;
+    }
+    result.specialRequests = pnrResult.specialRequests;
+    result.otherInfo = pnrResult.otherInfo;
+    if (pnrResult.contactInfo.length > 0) {
+      result.contactInfo.push(...pnrResult.contactInfo);
+    }
+  }
+
+  // 組合票價資料
+  if (totalFare !== null || baseFare !== null) {
+    const totalTaxes = (taxes || 0) + (surcharge || 0);
+    result.fareData = {
+      currency: 'TWD',
+      baseFare,
+      taxes: totalTaxes,
+      totalFare: totalFare || (baseFare || 0) + totalTaxes,
+      fareBasis: null,
+      validatingCarrier: null,
+      taxBreakdown: [],
+      perPassenger: true,
+      raw: `金額: ${baseFare}, 附加費: ${surcharge}, 稅金: ${taxes}, 小計: ${totalFare}`,
+    };
+  }
+
+  logger.log('📋 機票訂單明細解析完成:', {
+    旅客數: result.passengerNames.length,
+    航班數: result.segments.length,
+    訂位代號: result.recordLocator,
+    票號數: result.ticketNumbers.length,
+  });
+
+  return result;
+}
+
+/**
  * 智能檢測並解析 PNR（自動判斷格式）
  */
 export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation | ParsedPNR {
   // 檢測是否為 HTML 格式
   if (input.includes('<html') || input.includes('<!DOCTYPE') || input.includes('電腦代號')) {
     return parseHTMLConfirmation(input);
+  }
+
+  // 檢測是否為「機票訂單明細」格式（開票系統匯出）
+  if (input.includes('機票訂單明細') || input.includes('銷售摘要') ||
+      (input.includes('金　額') && input.includes('小　計') && input.includes('訂位記錄'))) {
+    return parseTicketOrderDetail(input);
   }
 
   // 檢測是否為電子機票格式（包含 TICKET NUMBER 和 BOOKING REF）

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
@@ -21,25 +22,28 @@ export async function POST(
       return errorResponse('請輸入密碼', 400, ErrorCode.MISSING_FIELD)
     }
 
-    // 從 cookie 取得當前用戶 session
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return errorResponse('未登入', 401, ErrorCode.UNAUTHORIZED)
+    // 🔒 安全檢查：驗證用戶身份
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    const token = authHeader.split(' ')[1]
     const supabaseAdmin = getSupabaseAdminClient()
 
-    // 驗證 token 並取得用戶資訊
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
+    // 取得用戶資訊以驗證密碼
+    const { data: employee } = await supabaseAdmin
+      .from('employees')
+      .select('id, email')
+      .eq('id', auth.data.employeeId)
+      .single()
 
-    if (userError || !user) {
-      return errorResponse('無效的認證', 401, ErrorCode.UNAUTHORIZED)
+    if (!employee?.email) {
+      return errorResponse('無法取得用戶資訊', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // 使用用戶的 email 和輸入的密碼進行驗證
+    // 使用用戶的 email 和輸入的密碼進行二次驗證
     const { error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-      email: user.email!,
+      email: employee.email,
       password: password,
     })
 
@@ -70,7 +74,7 @@ export async function POST(
       .update({
         status: '提案',
         last_unlocked_at: new Date().toISOString(),
-        last_unlocked_by: user.id,
+        last_unlocked_by: auth.data.employeeId,
         modification_reason: reason || null,
         updated_at: new Date().toISOString(),
       })

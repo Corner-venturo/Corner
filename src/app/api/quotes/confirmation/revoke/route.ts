@@ -6,6 +6,7 @@
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import type { ConfirmationResult } from '@/types/quote.types'
 import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
 
@@ -18,6 +19,12 @@ interface RevokeParams {
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：驗證用戶身份
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const body: RevokeParams = await request.json()
     const { quote_id, staff_id, staff_name, reason } = body
 

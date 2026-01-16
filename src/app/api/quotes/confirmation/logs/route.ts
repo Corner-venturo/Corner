@@ -6,10 +6,17 @@
 import { logger } from '@/lib/utils/logger'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
 export async function GET(request: NextRequest) {
   try {
+    // 🔒 安全檢查：驗證用戶身份
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const { searchParams } = new URL(request.url)
     const quoteId = searchParams.get('quote_id')
 

@@ -8,6 +8,7 @@
 
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getServerAuth } from '@/lib/auth/server-auth'
 import { logger } from '@/lib/utils/logger'
 import { generateItinerary, type GenerateItineraryRequest } from '@/lib/itinerary-generator'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
@@ -27,6 +28,12 @@ interface RequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 安全檢查：驗證用戶身份
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
+    }
+
     // 1. 解析請求
     const body: RequestBody = await request.json()
 

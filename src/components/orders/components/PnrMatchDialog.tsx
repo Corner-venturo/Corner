@@ -57,6 +57,12 @@ interface MatchResult {
   score: number
 }
 
+interface OrderInfo {
+  id: string
+  order_number: string
+  contact_person: string | null
+}
+
 interface PnrMatchDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -65,6 +71,8 @@ interface PnrMatchDialogProps {
   workspaceId?: string
   /** 旅遊團 ID，用於更新航班資訊 */
   tourId?: string
+  /** 團體模式下的訂單列表（用於讓使用者選擇每位旅客屬於哪個訂單） */
+  orders?: OrderInfo[]
   onSuccess?: () => void
   /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
   nested?: boolean
@@ -77,6 +85,7 @@ export function PnrMatchDialog({
   orderId,
   workspaceId,
   tourId,
+  orders = [],
   onSuccess,
   nested = false,
 }: PnrMatchDialogProps) {
@@ -86,6 +95,11 @@ export function PnrMatchDialog({
   const [isSaving, setIsSaving] = useState(false)
   const [manualMatches, setManualMatches] = useState<Record<string, string>>({})
   const [isSearchingCustomers, setIsSearchingCustomers] = useState(false)
+  // 團體模式：每位旅客選擇的訂單 ID
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Record<string, string>>({})
+
+  // 是否為團體模式（有多個訂單可選）
+  const isTourMode = orders.length > 0
 
   /**
    * 從客戶資料庫搜尋符合護照拼音的客戶
@@ -244,6 +258,32 @@ export function PnrMatchDialog({
     }
   }
 
+  // 團體模式：選擇旅客所屬的訂單
+  const handleSelectOrder = (pnrPassenger: string, selectedOrderId: string) => {
+    setSelectedOrderIds(prev => {
+      if (selectedOrderId) {
+        return { ...prev, [pnrPassenger]: selectedOrderId }
+      } else {
+        const newIds = { ...prev }
+        delete newIds[pnrPassenger]
+        return newIds
+      }
+    })
+  }
+
+  // 團體模式：全部設為同一個訂單
+  const handleSetAllOrders = (selectedOrderId: string) => {
+    if (!selectedOrderId) {
+      setSelectedOrderIds({})
+      return
+    }
+    const newIds: Record<string, string> = {}
+    matchResults.forEach(r => {
+      newIds[r.pnrPassenger] = selectedOrderId
+    })
+    setSelectedOrderIds(newIds)
+  }
+
   // 計算最終配對結果（包含手動調整）
   const finalResults = useMemo(() => {
     return matchResults.map(result => {
@@ -284,10 +324,19 @@ export function PnrMatchDialog({
       return
     }
 
-    // 檢查是否需要建立新成員但缺少 orderId
-    if (selectedCustomers.length > 0 && !orderId) {
-      toast.error('無法建立新成員：缺少訂單資訊')
-      return
+    // 檢查是否需要建立新成員但缺少訂單資訊
+    if (selectedCustomers.length > 0) {
+      // 團體模式：檢查每位選擇的客戶是否有指定訂單
+      if (isTourMode) {
+        const missingOrders = selectedCustomers.filter(r => !selectedOrderIds[r.pnrPassenger])
+        if (missingOrders.length > 0) {
+          toast.error(`請為 ${missingOrders.length} 位旅客選擇所屬訂單`)
+          return
+        }
+      } else if (!orderId) {
+        toast.error('無法建立新成員：缺少訂單資訊')
+        return
+      }
     }
 
     setIsSaving(true)
@@ -295,30 +344,72 @@ export function PnrMatchDialog({
       let updatedCount = 0
       let createdCount = 0
 
-      // 1. 更新現有成員的 PNR
+      // 計算每人票價（如果有票價資訊）
+      let perPersonFare: number | null = null
+      if (parsedPnr.fareData) {
+        if (parsedPnr.fareData.perPassenger) {
+          // 票價已經是每人價格
+          perPersonFare = parsedPnr.fareData.totalFare
+        } else {
+          // 票價是總價，需要除以旅客人數
+          const passengerCount = parsedPnr.passengerNames.length || 1
+          perPersonFare = Math.round(parsedPnr.fareData.totalFare / passengerCount)
+        }
+      }
+
+      // 1. 更新現有成員的 PNR 和機票號碼
       if (matchedMembers.length > 0) {
-        const updates = matchedMembers.map(r => ({
-          id: r.matchedMember!.id,
-          pnr: recordLocator,
-        }))
+        const updates = matchedMembers.map(r => {
+          // 嘗試從解析結果找到該旅客的機票號碼
+          const ticketInfo = parsedPnr.ticketNumbers.find(t =>
+            t.passenger === r.pnrPassenger ||
+            t.passenger.includes(r.pnrPassenger.split('/')[0])
+          )
+          return {
+            id: r.matchedMember!.id,
+            pnr: recordLocator,
+            ticket_number: ticketInfo?.number || null,
+          }
+        })
 
         for (const update of updates) {
+          const updateData: { pnr: string; ticket_number?: string | null; flight_cost?: number | null } = { pnr: update.pnr }
+          if (update.ticket_number) {
+            updateData.ticket_number = update.ticket_number
+          }
+          // 如果有票價資訊，同時更新機票票價
+          if (perPersonFare !== null) {
+            updateData.flight_cost = perPersonFare
+          }
           await supabase
             .from('order_members')
-            .update({ pnr: update.pnr })
+            .update(updateData)
             .eq('id', update.id)
         }
         updatedCount = matchedMembers.length
       }
 
       // 2. 從選擇的客戶建立新成員
-      if (selectedCustomers.length > 0 && orderId && workspaceId) {
+      if (selectedCustomers.length > 0 && workspaceId) {
         for (const result of selectedCustomers) {
           const customer = result.suggestedCustomers.find(c => c.id === result.selectedCustomerId)
           if (!customer) continue
 
+          // 決定使用的 orderId：團體模式用選擇的訂單，否則用傳入的 orderId
+          const targetOrderId = isTourMode
+            ? selectedOrderIds[result.pnrPassenger]
+            : orderId
+
+          if (!targetOrderId) continue
+
+          // 嘗試從解析結果找到該旅客的機票號碼
+          const ticketInfo = parsedPnr.ticketNumbers.find(t =>
+            t.passenger === result.pnrPassenger ||
+            t.passenger.includes(result.pnrPassenger.split('/')[0])
+          )
+
           const newMember = {
-            order_id: orderId,
+            order_id: targetOrderId,
             workspace_id: workspaceId,
             customer_id: customer.id,
             chinese_name: customer.name,
@@ -329,6 +420,8 @@ export function PnrMatchDialog({
             birth_date: customer.date_of_birth,
             gender: customer.gender,
             pnr: recordLocator,
+            ticket_number: ticketInfo?.number || null,
+            flight_cost: perPersonFare,
             member_type: 'adult',
             identity: '大人',
           }
@@ -353,12 +446,12 @@ export function PnrMatchDialog({
         const segments = parsedPnr.segments
         const midIndex = Math.ceil(segments.length / 2)
 
-        // 轉換 segment 為 JSON 格式
+        // 轉換 segment 為 JSON 格式（使用標準 FlightInfo 欄位名稱）
         const toJsonSegment = (seg: typeof segments[0]) => ({
           airline: seg.airline,
           flightNumber: seg.flightNumber,
-          origin: seg.origin,
-          destination: seg.destination,
+          departureAirport: seg.origin,
+          arrivalAirport: seg.destination,
           departureDate: seg.departureDate,
           departureTime: seg.departureTime || null,
           arrivalTime: seg.arrivalTime || null,
@@ -371,8 +464,8 @@ export function PnrMatchDialog({
         const outboundFlight = outboundSegments.length > 0 ? {
           airline: outboundSegments[0].airline,
           flightNumber: outboundSegments[0].flightNumber,
-          origin: outboundSegments[0].origin,
-          destination: outboundSegments[outboundSegments.length - 1].destination,
+          departureAirport: outboundSegments[0].origin,
+          arrivalAirport: outboundSegments[outboundSegments.length - 1].destination,
           departureDate: outboundSegments[0].departureDate,
           departureTime: outboundSegments[0].departureTime || null,
           arrivalTime: outboundSegments[outboundSegments.length - 1].arrivalTime || null,
@@ -387,8 +480,8 @@ export function PnrMatchDialog({
         const returnFlight = returnSegments.length > 0 ? {
           airline: returnSegments[0].airline,
           flightNumber: returnSegments[0].flightNumber,
-          origin: returnSegments[0].origin,
-          destination: returnSegments[returnSegments.length - 1].destination,
+          departureAirport: returnSegments[0].origin,
+          arrivalAirport: returnSegments[returnSegments.length - 1].destination,
           departureDate: returnSegments[0].departureDate,
           departureTime: returnSegments[0].departureTime || null,
           arrivalTime: returnSegments[returnSegments.length - 1].arrivalTime || null,
@@ -435,6 +528,7 @@ export function PnrMatchDialog({
     setParsedPnr(null)
     setMatchResults([])
     setManualMatches({})
+    setSelectedOrderIds({})
     onClose()
   }
 
@@ -530,16 +624,35 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               </div>
 
               {/* 說明文字 */}
-              {stats.withSuggestions > 0 && orderId && (
+              {stats.withSuggestions > 0 && (orderId || isTourMode) && (
                 <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-700">
                   <Users size={12} className="inline mr-1" />
                   系統已從客戶資料庫找到相似護照拼音的客戶，您可以在「建議客戶」欄選擇後自動建立成員。
+                  {isTourMode && ' 請同時選擇每位旅客所屬的訂單。'}
                 </div>
               )}
-              {stats.withSuggestions > 0 && !orderId && (
+              {stats.withSuggestions > 0 && !orderId && !isTourMode && (
                 <div className="p-2 bg-amber-50 rounded-lg text-xs text-amber-700">
                   <AlertCircle size={12} className="inline mr-1" />
                   找到建議客戶，但因未指定訂單，無法建立新成員。請先選擇要新增成員的訂單。
+                </div>
+              )}
+
+              {/* 團體模式：快速設定所有人的訂單 */}
+              {isTourMode && stats.withSuggestions > 0 && (
+                <div className="flex items-center gap-2 p-2 bg-morandi-container/20 rounded-lg">
+                  <span className="text-xs text-morandi-secondary">快速設定所有人訂單：</span>
+                  <select
+                    onChange={(e) => handleSetAllOrders(e.target.value)}
+                    className="text-xs border rounded px-2 py-1"
+                  >
+                    <option value="">-- 請選擇 --</option>
+                    {orders.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.order_number} - {o.contact_person || '無聯絡人'}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
 
@@ -554,6 +667,9 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                       <th className="px-3 py-2 text-left font-medium whitespace-nowrap">中文姓名</th>
                       <th className="px-3 py-2 text-left font-medium whitespace-nowrap">手動選擇</th>
                       <th className="px-3 py-2 text-left font-medium whitespace-nowrap">建議客戶</th>
+                      {isTourMode && (
+                        <th className="px-3 py-2 text-left font-medium whitespace-nowrap">選擇訂單</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -635,6 +751,25 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                             <span className="text-xs text-morandi-muted">無建議</span>
                           )}
                         </td>
+                        {isTourMode && (
+                          <td className="px-3 py-2">
+                            <select
+                              value={selectedOrderIds[result.pnrPassenger] || ''}
+                              onChange={(e) => handleSelectOrder(result.pnrPassenger, e.target.value)}
+                              className={cn(
+                                "text-xs border rounded px-2 py-1 w-full max-w-[150px]",
+                                selectedOrderIds[result.pnrPassenger] && "border-blue-400 bg-blue-50"
+                              )}
+                            >
+                              <option value="">-- 選擇訂單 --</option>
+                              {orders.map((o) => (
+                                <option key={o.id} value={o.id}>
+                                  {o.order_number} - {o.contact_person || '無聯絡人'}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
