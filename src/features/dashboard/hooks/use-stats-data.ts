@@ -52,6 +52,16 @@ function sumOrderAmountByTourDateRange(
     .reduce((sum, order) => sum + (order[amountField] || 0), 0)
 }
 
+/**
+ * Dashboard 統計資料 Hook
+ *
+ * ⚠️ 效能注意 (DASH-03):
+ * 目前載入所有 tours 和 orders 後在前端計算統計。
+ * 當資料量大時，建議改用以下方式優化：
+ * 1. 建立 `/api/dashboard/stats` API 在後端計算
+ * 2. 或使用 Supabase RPC 函數進行聚合查詢
+ * 由於 stats widget 預設未啟用，暫時保留現有實作。
+ */
 export function useStatsData() {
   const { items: tours } = useTours()
   const { items: orders } = useOrders()

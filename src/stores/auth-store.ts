@@ -38,6 +38,79 @@ function mergePermissionsWithRoles(
   return Array.from(allPermissions)
 }
 
+/**
+ * 查詢 workspace 資訊
+ * @param workspaceId - Workspace ID
+ * @returns Workspace 資訊 (code, name, type)
+ */
+async function fetchWorkspaceInfo(
+  workspaceId: string | null | undefined
+): Promise<{ code?: string; name?: string; type?: User['workspace_type'] }> {
+  if (!workspaceId) return {}
+
+  try {
+    const { supabase } = await import('@/lib/supabase/client')
+    const { data: workspace } = await supabase
+      .from('workspaces')
+      .select('code, name, type')
+      .eq('id', workspaceId)
+      .single()
+
+    if (workspace) {
+      return {
+        code: workspace.code || workspace.name?.substring(0, 2).toUpperCase(),
+        name: workspace.name || undefined,
+        type: (workspace.type as User['workspace_type']) || undefined,
+      }
+    }
+  } catch (wsError) {
+    logger.warn('⚠️ Failed to fetch workspace info:', wsError)
+  }
+  return {}
+}
+
+/**
+ * 從 EmployeeRow 構建 User 物件
+ * @param employeeData - 員工資料
+ * @param workspaceInfo - Workspace 資訊
+ * @param options - 額外選項
+ */
+function buildUserFromEmployee(
+  employeeData: EmployeeRow,
+  workspaceInfo: { code?: string; name?: string; type?: User['workspace_type'] },
+  options?: { mustChangePassword?: boolean }
+): User {
+  const userRoles = (employeeData.roles || []) as UserRole[]
+  const mergedPermissions = mergePermissionsWithRoles(
+    employeeData.permissions || [],
+    userRoles
+  )
+
+  return {
+    id: employeeData.id,
+    employee_number: employeeData.employee_number,
+    english_name: employeeData.english_name ?? '',
+    display_name: employeeData.display_name ?? '',
+    chinese_name: employeeData.chinese_name ?? employeeData.display_name ?? '',
+    personal_info: (employeeData.personal_info ?? {}) as User['personal_info'],
+    job_info: (employeeData.job_info ?? {}) as User['job_info'],
+    salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
+    permissions: mergedPermissions,
+    roles: userRoles as User['roles'],
+    attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
+    contracts: (employeeData.contracts ?? []) as User['contracts'],
+    status: employeeData.status as User['status'],
+    workspace_id: employeeData.workspace_id ?? undefined,
+    workspace_code: workspaceInfo.code,
+    workspace_name: workspaceInfo.name,
+    workspace_type: workspaceInfo.type,
+    avatar: employeeData.avatar_url ?? employeeData.avatar ?? undefined,
+    must_change_password: options?.mustChangePassword,
+    created_at: employeeData.created_at ?? new Date().toISOString(),
+    updated_at: employeeData.updated_at ?? new Date().toISOString(),
+  }
+}
+
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
@@ -196,69 +269,27 @@ export const useAuthStore = create<AuthState>()(
             workspaceId: employeeData.workspace_id ?? undefined,
           })
 
-          // 查詢 workspace 資訊（如果有 workspace_id）
-          let workspaceCode: string | undefined = undefined
-          let workspaceName: string | undefined = undefined
-          let workspaceType: User['workspace_type'] = undefined
-          if (employeeData.workspace_id) {
-            try {
-              const { data: workspace } = await supabase
-                .from('workspaces')
-                .select('code, name, type')
-                .eq('id', employeeData.workspace_id)
-                .single()
-
-              if (workspace) {
-                workspaceCode = workspace.code || workspace.name?.substring(0, 2).toUpperCase()
-                workspaceName = workspace.name || undefined
-                workspaceType = (workspace.type as User['workspace_type']) || undefined
-                logger.log('✅ Workspace info fetched:', { workspaceCode, workspaceName, workspaceType })
-              }
-            } catch (wsError) {
-              logger.warn('⚠️ Failed to fetch workspace info:', wsError)
-            }
+          // 查詢 workspace 資訊並構建 User 物件
+          const workspaceInfo = await fetchWorkspaceInfo(employeeData.workspace_id)
+          if (workspaceInfo.code) {
+            logger.log('✅ Workspace info fetched:', workspaceInfo)
           }
 
-          // 合併角色預設權限和資料庫權限
-          const userRoles = (employeeData.roles || []) as UserRole[]
-          const mergedPermissions = mergePermissionsWithRoles(
-            employeeData.permissions || [],
-            userRoles
-          )
-
-          // 檢查是否需要首次設定（預設密碼 00000000 或 must_change_password 標記）
+          // 檢查是否需要首次設定
           const mustChangePassword = (employeeData as Record<string, unknown>).must_change_password === true
           const hasAvatar = !!(employeeData.avatar_url || employeeData.avatar)
           const needsSetup = mustChangePassword || !hasAvatar
 
-          const user: User = {
-            id: employeeData.id,
-            employee_number: employeeData.employee_number,
-            english_name: employeeData.english_name ?? '',
-            display_name: employeeData.display_name ?? '',
-            chinese_name: employeeData.chinese_name ?? employeeData.display_name ?? '',
-            personal_info: (employeeData.personal_info ?? {}) as User['personal_info'],
-            job_info: (employeeData.job_info ?? {}) as User['job_info'],
-            salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
-            permissions: mergedPermissions, // 使用合併後的權限
-            roles: userRoles as User['roles'],
-            attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
-            contracts: (employeeData.contracts ?? []) as User['contracts'],
-            status: employeeData.status as User['status'],
-            workspace_id: employeeData.workspace_id ?? undefined,
-            workspace_code: workspaceCode, // 登入時取得的 workspace code
-            workspace_name: workspaceName, // 登入時取得的 workspace 名稱
-            workspace_type: workspaceType, // 登入時取得的 workspace 類型
-            avatar: employeeData.avatar_url ?? employeeData.avatar ?? undefined,
-            must_change_password: mustChangePassword,
-            created_at: employeeData.created_at ?? new Date().toISOString(),
-            updated_at: employeeData.updated_at ?? new Date().toISOString(),
-          }
+          const user = buildUserFromEmployee(employeeData, workspaceInfo, { mustChangePassword })
+
+          // 合併後的權限（用於 authPayload）
+          const userRoles = (employeeData.roles || []) as UserRole[]
+          const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
 
           const authPayload: AuthPayload = {
             id: employeeData.id,
             employee_number: employeeData.employee_number,
-            permissions: mergedPermissions, // 使用合併後的權限
+            permissions: mergedPermissions,
             role: mergedPermissions.includes('admin') || mergedPermissions.includes('*') ? 'admin' : 'employee',
           }
 
@@ -326,58 +357,16 @@ export const useAuthStore = create<AuthState>()(
             return
           }
 
-          // 查詢 workspace 資訊（如果有 workspace_id）
-          let workspaceCode = currentUser.workspace_code // 保留原有的值
-          let workspaceName = currentUser.workspace_name
-          let workspaceType = currentUser.workspace_type
-          if (employeeData.workspace_id) {
-            try {
-              const { data: workspace } = await supabase
-                .from('workspaces')
-                .select('code, name, type')
-                .eq('id', employeeData.workspace_id)
-                .single()
-
-              if (workspace) {
-                workspaceCode = workspace.code || workspace.name?.substring(0, 2).toUpperCase()
-                workspaceName = workspace.name || undefined
-                workspaceType = (workspace.type as User['workspace_type']) || undefined
-              }
-            } catch (wsError) {
-              logger.warn('⚠️ Failed to fetch workspace info:', wsError)
-            }
+          // 查詢 workspace 資訊，失敗則保留原有值
+          const fetchedWorkspaceInfo = await fetchWorkspaceInfo(employeeData.workspace_id)
+          const workspaceInfo = {
+            code: fetchedWorkspaceInfo.code || currentUser.workspace_code,
+            name: fetchedWorkspaceInfo.name || currentUser.workspace_name,
+            type: fetchedWorkspaceInfo.type || currentUser.workspace_type,
           }
 
-          // 合併角色預設權限和資料庫權限
-          const userRoles = (employeeData.roles || []) as UserRole[]
-          const mergedPermissions = mergePermissionsWithRoles(
-            employeeData.permissions || [],
-            userRoles
-          )
-
-          const updatedUser: User = {
-            id: employeeData.id,
-            employee_number: employeeData.employee_number,
-            english_name: employeeData.english_name ?? '',
-            display_name: employeeData.display_name ?? '',
-            chinese_name: employeeData.chinese_name ?? employeeData.display_name ?? '',
-            personal_info: (employeeData.personal_info ?? {}) as User['personal_info'],
-            job_info: (employeeData.job_info ?? {}) as User['job_info'],
-            salary_info: (employeeData.salary_info ?? {}) as User['salary_info'],
-            permissions: mergedPermissions, // 使用合併後的權限
-            roles: userRoles as User['roles'],
-            attendance: (employeeData.attendance ?? { leave_records: [], overtime_records: [] }) as User['attendance'],
-            contracts: (employeeData.contracts ?? []) as User['contracts'],
-            status: employeeData.status as User['status'],
-            workspace_id: employeeData.workspace_id ?? undefined,
-            workspace_code: workspaceCode, // 保留或更新 workspace code
-            workspace_name: workspaceName, // 保留或更新 workspace 名稱
-            workspace_type: workspaceType, // 保留或更新 workspace 類型
-            created_at: employeeData.created_at ?? new Date().toISOString(),
-            updated_at: employeeData.updated_at ?? new Date().toISOString(),
-          }
-
-          get().setUser(updatedUser);
+          const updatedUser = buildUserFromEmployee(employeeData, workspaceInfo)
+          get().setUser(updatedUser)
           logger.log('✅ User data refreshed:', updatedUser.display_name)
         } catch (error) {
           logger.error('💥 Error refreshing user data:', error)
