@@ -3,11 +3,19 @@
  * GET /api/travel-invoice/query
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, ApiError } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function GET(request: NextRequest) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -50,10 +58,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('查詢發票失敗:', error)
-      return NextResponse.json(
-        { success: false, error: '查詢失敗' },
-        { status: 500 }
-      )
+      return ApiError.database('查詢失敗')
     }
 
     // 轉換資料格式以符合前端期望
@@ -89,8 +94,7 @@ export async function GET(request: NextRequest) {
       updated_at: invoice.updated_at,
     }))
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       data: formattedData,
       pagination: {
         page,
@@ -101,9 +105,6 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     logger.error('查詢發票錯誤:', error)
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : '查詢失敗' },
-      { status: 500 }
-    )
+    return ApiError.internal(error instanceof Error ? error.message : '查詢失敗')
   }
 }

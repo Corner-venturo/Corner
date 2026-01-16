@@ -3,22 +3,27 @@
  * POST /api/travel-invoice/issue
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { issueInvoice } from '@/lib/newebpay'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function POST(request: NextRequest) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
+
   try {
     const body = await request.json()
     const { invoice_date, total_amount, tax_type, buyerInfo, items, order_id, tour_id, created_by } = body
 
     // 驗證必要欄位
     if (!invoice_date || !total_amount || !buyerInfo?.buyerName || !items?.length) {
-      return NextResponse.json(
-        { success: false, error: '缺少必要欄位' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必要欄位')
     }
 
     // 呼叫藍新 API
@@ -31,10 +36,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.message },
-        { status: 400 }
-      )
+      return errorResponse(result.message || '開立失敗', 400, ErrorCode.EXTERNAL_API_ERROR)
     }
 
     // 儲存到資料庫（使用單例）
@@ -71,31 +73,20 @@ export async function POST(request: NextRequest) {
     if (error) {
       logger.error('儲存發票失敗:', error)
       // 發票已開立但儲存失敗，仍返回成功但記錄警告
-      return NextResponse.json({
-        success: true,
-        message: '發票已開立，但儲存時發生錯誤',
-        data: {
-          ...result.data,
-          warning: '請手動記錄此發票資訊',
-        },
+      return successResponse({
+        ...result.data,
+        warning: '發票已開立，但儲存時發生錯誤，請手動記錄此發票資訊',
       })
     }
 
-    return NextResponse.json({
-      success: true,
-      message: '開立成功',
-      data: {
-        id: data.id,
-        transactionNo: result.data!.transactionNo,
-        invoiceNumber: result.data!.invoiceNumber,
-        randomNum: result.data!.randomNum,
-      },
+    return successResponse({
+      id: data.id,
+      transactionNo: result.data!.transactionNo,
+      invoiceNumber: result.data!.invoiceNumber,
+      randomNum: result.data!.randomNum,
     })
   } catch (error) {
     logger.error('開立發票錯誤:', error)
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : '開立失敗' },
-      { status: 500 }
-    )
+    return ApiError.internal(error instanceof Error ? error.message : '開立失敗')
   }
 }

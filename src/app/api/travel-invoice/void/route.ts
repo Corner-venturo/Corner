@@ -3,22 +3,27 @@
  * POST /api/travel-invoice/void
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { voidInvoice } from '@/lib/newebpay'
 import { logger } from '@/lib/utils/logger'
+import { successResponse, errorResponse, ApiError, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function POST(request: NextRequest) {
+  // 認證檢查
+  const auth = await getServerAuth()
+  if (!auth.success) {
+    return ApiError.unauthorized('請先登入')
+  }
+
   try {
     const body = await request.json()
     const { invoiceId, voidReason, operatedBy } = body
 
     // 驗證必要欄位
     if (!invoiceId || !voidReason) {
-      return NextResponse.json(
-        { success: false, error: '缺少必要欄位' },
-        { status: 400 }
-      )
+      return ApiError.validation('缺少必要欄位')
     }
 
     const supabase = getSupabaseAdminClient()
@@ -31,25 +36,16 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (fetchError || !invoice) {
-      return NextResponse.json(
-        { success: false, error: '找不到發票' },
-        { status: 404 }
-      )
+      return ApiError.notFound('發票')
     }
 
     if (invoice.status !== 'issued') {
-      return NextResponse.json(
-        { success: false, error: '只能作廢已開立的發票' },
-        { status: 400 }
-      )
+      return ApiError.validation('只能作廢已開立的發票')
     }
 
     // 確保必要欄位存在
     if (!invoice.invoice_number || !invoice.invoice_date) {
-      return NextResponse.json(
-        { success: false, error: '發票資料不完整' },
-        { status: 400 }
-      )
+      return ApiError.validation('發票資料不完整')
     }
 
     // 呼叫藍新 API
@@ -60,10 +56,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.message },
-        { status: 400 }
-      )
+      return errorResponse(result.message || '作廢失敗', 400, ErrorCode.EXTERNAL_API_ERROR)
     }
 
     // 更新資料庫
@@ -82,23 +75,14 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       logger.error('更新發票狀態失敗:', updateError)
-      return NextResponse.json({
-        success: true,
-        message: '發票已作廢，但更新狀態時發生錯誤',
-        warning: '請手動更新發票狀態',
+      return successResponse({
+        warning: '發票已作廢，但更新狀態時發生錯誤，請手動更新發票狀態',
       })
     }
 
-    return NextResponse.json({
-      success: true,
-      message: '作廢成功',
-      data,
-    })
+    return successResponse(data)
   } catch (error) {
     logger.error('作廢發票錯誤:', error)
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : '作廢失敗' },
-      { status: 500 }
-    )
+    return ApiError.internal(error instanceof Error ? error.message : '作廢失敗')
   }
 }
