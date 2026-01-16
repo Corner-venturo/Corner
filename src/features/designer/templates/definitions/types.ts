@@ -202,7 +202,7 @@ export interface PageTemplate {
   name: string // e.g., '日系風格'
   description?: string // 範本描述
   thumbnailUrl: string // 用於選擇器中的預覽圖
-  category?: 'cover' | 'daily' | 'info' | 'general' // 範本類別
+  category?: 'cover' | 'daily' | 'info' | 'general' | 'itinerary' // 範本類別
   // 核心：一個接收數據並回傳元素陣列的函式
   generateElements: (data: TemplateData) => CanvasElement[]
 }

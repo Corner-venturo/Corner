@@ -10,6 +10,7 @@ import { NextRequest } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 import { checkApiUsage, updateApiUsage, API_LIMITS } from '@/lib/api-usage'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 // Gemini API 設定
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
@@ -47,6 +48,12 @@ interface SuggestAttractionResponse {
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 認證：確保用戶已登入
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
+    }
+
     if (!GEMINI_API_KEY) {
       return errorResponse('Gemini API Key 未設定', 500, ErrorCode.INTERNAL_ERROR)
     }

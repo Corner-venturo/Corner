@@ -2,22 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { postGroupSettlement } from '@/features/erp-accounting/services/posting-service'
 import type { PostGroupSettlementRequest } from '@/types/accounting.types'
 import { logger } from '@/lib/utils/logger'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as PostGroupSettlementRequest & {
-      workspace_id: string
-      user_id: string
-    }
-
-    const { workspace_id, user_id, ...requestData } = body
-
-    if (!workspace_id || !user_id) {
+    // 🔒 認證：從 session 取得 workspaceId 和 employeeId
+    const auth = await getServerAuth()
+    if (!auth.success) {
       return NextResponse.json(
-        { success: false, error: '缺少 workspace_id 或 user_id' },
-        { status: 400 }
+        { success: false, error: auth.error.error },
+        { status: 401 }
       )
     }
+    const { workspaceId, employeeId } = auth.data
+
+    const requestData = await request.json() as PostGroupSettlementRequest
 
     if (!requestData.tour_id || !requestData.bank_account_id) {
       return NextResponse.json(
@@ -26,7 +25,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await postGroupSettlement(workspace_id, user_id, requestData)
+    const result = await postGroupSettlement(workspaceId, employeeId, requestData)
 
     if (!result.success) {
       return NextResponse.json(result, { status: 400 })

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
+import { getServerAuth } from '@/lib/auth/server-auth'
 
 // 多 API Key 輪替機制
 const GEMINI_API_KEYS = [
@@ -47,6 +48,12 @@ const IMAGEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 認證：確保用戶已登入
+    const auth = await getServerAuth()
+    if (!auth.success) {
+      return errorResponse(auth.error.error, 401, ErrorCode.UNAUTHORIZED)
+    }
+
     const { prompt, style, aspectRatio = '16:9' } = await request.json()
 
     if (!prompt) {

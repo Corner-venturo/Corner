@@ -11,6 +11,7 @@ import type { Todo } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 import { logger } from '@/lib/utils/logger'
 import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
+import { useAuthStore } from '@/stores/auth-store'
 
 // Supabase Insert 類型
 type TodoInsert = Database['public']['Tables']['todos']['Insert']
@@ -46,22 +47,17 @@ function generateUUID(): string {
 
 // ===== 主要 Hook =====
 export function useTodos() {
+  // 直接從 auth store 取得 user，確保資料是最新的
+  const { user } = useAuthStore()
+
   // 取得當前 workspace ID
   // 注意：super_admin 的 getCurrentWorkspaceId() 會返回 null（可跨 workspace）
   // 但我們仍需要一個 workspace 來查詢，使用 user.workspace_id 作為備用
   let workspaceId = getCurrentWorkspaceId()
 
-  // 如果是 super_admin（workspaceId 為 null），使用 user.workspace_id
-  if (!workspaceId) {
-    const authStorage = typeof window !== 'undefined' ? localStorage.getItem('auth-storage') : null
-    if (authStorage) {
-      try {
-        const authData = JSON.parse(authStorage)
-        workspaceId = authData?.state?.user?.workspace_id || null
-      } catch {
-        // ignore parse error
-      }
-    }
+  // 如果是 super_admin（workspaceId 為 null），使用 auth store 的 user.workspace_id
+  if (!workspaceId && user?.workspace_id) {
+    workspaceId = user.workspace_id
   }
 
   const swrKey = getTodosKey(workspaceId)
@@ -110,7 +106,8 @@ export function useTodos() {
     const now = new Date().toISOString()
 
     // 自動注入 workspace_id（如果未提供）
-    const workspace_id = (todoData as { workspace_id?: string }).workspace_id || getCurrentWorkspaceId()
+    // 使用 hook 已計算好的 workspaceId，確保 Super Admin 也能正確取得
+    const workspace_id = (todoData as { workspace_id?: string }).workspace_id || workspaceId
 
     const newTodo = {
       ...todoData,
@@ -120,7 +117,13 @@ export function useTodos() {
       updated_at: now,
     }
 
-    logger.log('[useTodos] 新增待辦:', { title: newTodo.title, creator: newTodo.creator, workspace_id })
+    logger.log('[useTodos] 新增待辦:', {
+      title: newTodo.title,
+      creator: newTodo.creator,
+      workspace_id,
+      hook_workspaceId: workspaceId,
+      user_workspace_id: user?.workspace_id,
+    })
 
     // 樂觀更新：使用 functional update 避免 stale closure 問題
     mutate(swrKey, (currentTodos: Todo[] | undefined) => [...(currentTodos || []), newTodo], false)
@@ -132,10 +135,12 @@ export function useTodos() {
       }
 
       // 轉換為 Supabase Insert 類型（Json 欄位需要轉型）
+      // 排除 creator 欄位（todos 表沒有此欄位，改用 created_by_legacy）
+      const { creator, ...todoWithoutCreator } = newTodo
       const insertData: TodoInsert = {
-        ...newTodo,
+        ...todoWithoutCreator,
         workspace_id,
-        created_by_legacy: newTodo.creator, // 必填欄位：員工 ID
+        created_by_legacy: creator, // 必填欄位：員工 ID（對應前端的 creator）
         related_items: newTodo.related_items as unknown as TodoInsert['related_items'],
         sub_tasks: newTodo.sub_tasks as unknown as TodoInsert['sub_tasks'],
         notes: newTodo.notes as unknown as TodoInsert['notes'],
@@ -148,7 +153,16 @@ export function useTodos() {
       return newTodo
     } catch (err) {
       // 失敗時回滾
-      logger.error('[useTodos] 新增失敗:', err)
+      // 顯示完整的 Supabase 錯誤訊息
+      const errorDetails = err && typeof err === 'object'
+        ? {
+            message: (err as { message?: string }).message,
+            code: (err as { code?: string }).code,
+            details: (err as { details?: string }).details,
+            hint: (err as { hint?: string }).hint,
+          }
+        : err
+      logger.error('[useTodos] 新增失敗:', errorDetails)
       mutate(swrKey)
       throw err
     }
