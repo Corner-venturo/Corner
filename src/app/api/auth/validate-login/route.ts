@@ -23,14 +23,11 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdminClient()
 
-    // 統一轉小寫查詢
-    const normalizedCode = code.toLowerCase().trim()
-
-    // 1. 查詢 workspace（用小寫比對）
+    // 1. 查詢 workspace（大小寫不敏感）
     const { data: workspace, error: wsError } = await supabase
       .from('workspaces')
       .select('id, code')
-      .eq('code', normalizedCode)
+      .ilike('code', code.trim())
       .maybeSingle()
 
     if (wsError) {
