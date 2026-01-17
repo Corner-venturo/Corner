@@ -23,11 +23,11 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdminClient()
 
-    // 1. 查詢 workspace（大小寫不敏感）
+    // 1. 查詢 workspace（統一大寫）
     const { data: workspace, error: wsError } = await supabase
       .from('workspaces')
       .select('id, code')
-      .ilike('code', code.trim())
+      .eq('code', code.trim().toUpperCase())
       .maybeSingle()
 
     if (wsError) {
