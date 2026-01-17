@@ -217,43 +217,16 @@ export const useAuthStore = create<AuthState>()(
           logger.log('✅ Employee authentication successful')
 
           // Supabase Auth 登入（必須成功才能繼續）
-          // 新格式：{workspace_code}_{employee_number}@venturo.com（區分不同公司的同編號員工）
-          // 舊格式：{employee_number}@venturo.com（向後兼容現有用戶）
-          // 統一使用小寫格式（與 create-employee-auth API 一致）
-          const newFormatEmail = code
-            ? `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
-            : `${username.toLowerCase()}@venturo.com`
-          const oldFormatEmail = `${username.toLowerCase()}@venturo.com`
+          // 格式：{workspace_code}_{employee_number}@venturo.com（統一小寫）
+          const authEmail = `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
 
-          // 先嘗試新格式
-          let authData = null
-          let authError = null
-
-          const newResult = await supabase.auth.signInWithPassword({
-            email: newFormatEmail,
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email: authEmail,
             password,
           })
 
-          if (newResult.error) {
-            // 新格式失敗，嘗試舊格式（向後兼容）
-            if (code && newFormatEmail !== oldFormatEmail) {
-              logger.log('⚠️ 新格式登入失敗，嘗試舊格式:', oldFormatEmail)
-              const oldResult = await supabase.auth.signInWithPassword({
-                email: oldFormatEmail,
-                password,
-              })
-              authData = oldResult.data
-              authError = oldResult.error
-            } else {
-              authError = newResult.error
-            }
-          } else {
-            authData = newResult.data
-          }
-
           if (authError || !authData) {
-            logger.error('❌ Supabase Auth session sign-in failed:', authError?.message)
-            // 顯示更明確的錯誤訊息
+            logger.error('❌ Supabase Auth sign-in failed:', authError?.message)
             return {
               success: false,
               message: '登入驗證失敗，請稍後再試或聯繫管理員'
