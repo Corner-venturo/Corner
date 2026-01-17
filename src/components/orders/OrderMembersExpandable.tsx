@@ -67,6 +67,7 @@ export interface ColumnVisibility {
   pnr: boolean
   ticket_number: boolean
   ticketing_deadline: boolean
+  flight_cost: boolean  // 機票金額（成本）
 }
 
 // 預設欄位顯示設定（訂金/尾款/應付金額 預設關閉）
@@ -85,6 +86,7 @@ const defaultColumnVisibility: ColumnVisibility = {
   pnr: false,
   ticket_number: true,  // 預設顯示機票號碼
   ticketing_deadline: false,
+  flight_cost: false,   // 機票金額預設關閉
 }
 
 // 欄位標籤對照
@@ -103,6 +105,7 @@ const columnLabels: Record<keyof ColumnVisibility, string> = {
   pnr: 'PNR',
   ticket_number: '機票號碼',
   ticketing_deadline: '開票期限',
+  flight_cost: '機票金額',
 }
 
 export function OrderMembersExpandable({
@@ -435,6 +438,12 @@ export function OrderMembersExpandable({
                     onCheckedChange={() => toggleColumnVisibility('ticketing_deadline')}
                   >
                     {columnLabels.ticketing_deadline}
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.flight_cost}
+                    onCheckedChange={() => toggleColumnVisibility('flight_cost')}
+                  >
+                    {columnLabels.flight_cost}
                   </DropdownMenuCheckboxItem>
                 </>
               )}

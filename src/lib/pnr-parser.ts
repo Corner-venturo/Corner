@@ -16,6 +16,9 @@ import { logger } from '@/lib/utils/logger'
  * 電報解析錯誤
  */
 
+/** PNR 解析來源格式 */
+export type PnrSourceFormat = 'ticket_order_detail' | 'e_ticket' | 'amadeus_pnr' | 'html_confirmation';
+
 export interface ParsedPNR {
   recordLocator: string;
   passengerNames: string[];
@@ -31,6 +34,8 @@ export interface ParsedPNR {
   fareData: ParsedFareData | null;
   // 2026-01-04: 機票號碼
   ticketNumbers: Array<{ number: string; passenger: string }>;
+  // 2026-01-17: 識別來源格式（僅 ticket_order_detail 的 fareData 為成本價）
+  sourceFormat?: PnrSourceFormat;
 }
 
 /**
@@ -340,6 +345,7 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     validation,
     fareData: null,
     ticketNumbers: [],
+    sourceFormat: 'amadeus_pnr',
   };
 
   for (const line of lines) {
@@ -422,9 +428,10 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
     }
 
     // 2. 解析航班資訊
-    // 格式: "3  BR 116 Q 15JAN 4 TPECTS HK2  0930 1405  15JAN  E  BR/FUM2GY"
+    // 格式1: "3  BR 116 Q 15JAN 4 TPECTS HK2  0930 1405  15JAN  E  BR/FUM2GY"
+    // 格式2: "2 MU5008 I 18JAN 7*TPEPVG HK1 1500 1705 18JAN E CA/NB77E7" (無空格+星號)
     const segmentMatch = line.match(
-      /^(\d+)\s+([A-Z0-9]{2})\s+(\d{1,4})\s+([A-Z])\s+(\d{2}[A-Z]{3})\s+\d?\s*([A-Z]{6})\s+([A-Z]{2})(\d+)\s+(\d{4})\s+(\d{4})/i
+      /^(\d+)\s+([A-Z0-9]{2})\s*(\d{1,4})\s+([A-Z])\s+(\d{2}[A-Z]{3})\s+\d?\*?\s*([A-Z]{6})\s+([A-Z]{2})(\d+)\s+(\d{4})\s+(\d{4})/i
     );
 
     if (segmentMatch) {
@@ -1047,9 +1054,10 @@ export function parseETicketConfirmation(input: string): ParsedPNR {
     validation: { isValid: true, errors: [], warnings: [], suggestions: [] },
     fareData: null,
     ticketNumbers: [],
+    sourceFormat: 'e_ticket',
   };
 
-  // 票價資訊
+  // 票價資訊（注意：電子機票的金額是售價，非成本）
   let baseFare: number | null = null;
   let taxes: number | null = null;
   let totalFare: number | null = null;
@@ -1302,9 +1310,10 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
     validation: { isValid: true, errors: [], warnings: [], suggestions: [] },
     fareData: null,
     ticketNumbers: [],
+    sourceFormat: 'ticket_order_detail',  // ⭐️ 僅此格式的金額為成本價
   };
 
-  // 解析票價資訊
+  // 解析票價資訊（成本價格）
   let baseFare: number | null = null;
   let surcharge: number | null = null;
   let taxes: number | null = null;
@@ -1352,39 +1361,77 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
       continue;
     }
 
-    // 解析金額（票面價）
-    if (line === '金　額' && i + 1 < lines.length) {
-      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
-      if (!isNaN(amount)) {
-        baseFare = amount;
+    // 解析金額（票面價）- 支援兩種格式
+    // 格式1: 「金　額」在一行，數字在下一行
+    // 格式2: 「金　額	9,833」或「金　額 9,833」在同一行
+    if (line === '金　額' || line === '金額') {
+      if (i + 1 < lines.length) {
+        const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+        if (!isNaN(amount)) {
+          baseFare = amount;
+          logger.log('  ✅ 找到金額（下一行）:', amount);
+        }
       }
+      continue;
+    }
+    const baseFareMatch = line.match(/^金[\s　]*額[\s\t:：]*([0-9,]+)/);
+    if (baseFareMatch) {
+      baseFare = parseFloat(baseFareMatch[1].replace(/,/g, ''));
+      logger.log('  ✅ 找到金額（同一行）:', baseFare);
       continue;
     }
 
     // 解析附加費
-    if (line === '附加費' && i + 1 < lines.length) {
-      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
-      if (!isNaN(amount)) {
-        surcharge = amount;
+    if (line === '附加費') {
+      if (i + 1 < lines.length) {
+        const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+        if (!isNaN(amount)) {
+          surcharge = amount;
+          logger.log('  ✅ 找到附加費（下一行）:', amount);
+        }
       }
+      continue;
+    }
+    const surchargeMatch = line.match(/^附加費[\s\t:：]*([0-9,]+)/);
+    if (surchargeMatch) {
+      surcharge = parseFloat(surchargeMatch[1].replace(/,/g, ''));
+      logger.log('  ✅ 找到附加費（同一行）:', surcharge);
       continue;
     }
 
     // 解析稅金
-    if (line === '稅　金' && i + 1 < lines.length) {
-      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
-      if (!isNaN(amount)) {
-        taxes = amount;
+    if (line === '稅　金' || line === '稅金') {
+      if (i + 1 < lines.length) {
+        const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+        if (!isNaN(amount)) {
+          taxes = amount;
+          logger.log('  ✅ 找到稅金（下一行）:', amount);
+        }
       }
+      continue;
+    }
+    const taxMatch = line.match(/^稅[\s　]*金[\s\t:：]*([0-9,]+)/);
+    if (taxMatch) {
+      taxes = parseFloat(taxMatch[1].replace(/,/g, ''));
+      logger.log('  ✅ 找到稅金（同一行）:', taxes);
       continue;
     }
 
     // 解析小計
-    if (line === '小　計' && i + 1 < lines.length) {
-      const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
-      if (!isNaN(amount)) {
-        totalFare = amount;
+    if (line === '小　計' || line === '小計') {
+      if (i + 1 < lines.length) {
+        const amount = parseFloat(lines[i + 1].replace(/,/g, ''));
+        if (!isNaN(amount)) {
+          totalFare = amount;
+          logger.log('  ✅ 找到小計（下一行）:', amount);
+        }
       }
+      continue;
+    }
+    const totalMatch = line.match(/^小[\s　]*計[\s\t:：]*([0-9,]+)/);
+    if (totalMatch) {
+      totalFare = parseFloat(totalMatch[1].replace(/,/g, ''));
+      logger.log('  ✅ 找到小計（同一行）:', totalFare);
       continue;
     }
 
@@ -1449,6 +1496,12 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
     航班數: result.segments.length,
     訂位代號: result.recordLocator,
     票號數: result.ticketNumbers.length,
+    票價資料: result.fareData ? {
+      金額: result.fareData.baseFare,
+      稅金: result.fareData.taxes,
+      小計: result.fareData.totalFare,
+    } : '無',
+    來源格式: result.sourceFormat,
   });
 
   return result;
@@ -1456,6 +1509,22 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
 
 /**
  * 智能檢測並解析 PNR（自動判斷格式）
+ *
+ * 支援三種格式：
+ * 1. 機票訂單明細（開票系統匯出）⭐️ 機票成本以此為準
+ *    - 金額（票面價）、附加費、稅金、小計
+ *    - 這是「成本價格」，用於計算 flight_cost
+ *    - 內嵌 Amadeus PNR
+ *
+ * 2. 電子機票（E-Ticket）- 金額為「售後價格」，不用於成本計算
+ *    - 旅客姓名、機票號碼、訂位代號
+ *    - 航班資訊
+ *    - AIR FARE / TAX / TOTAL 是售價，非成本
+ *
+ * 3. Amadeus PNR 電報 - 無金額資訊
+ *    - 旅客姓名、航班資訊
+ *    - 出票期限
+ *    - FA 行機票號碼
  */
 export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation | ParsedPNR {
   // 檢測是否為 HTML 格式
@@ -1464,12 +1533,14 @@ export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation |
   }
 
   // 檢測是否為「機票訂單明細」格式（開票系統匯出）
+  // ⭐️ 機票金額以此格式為準（有 金額/附加費/稅金/小計）
   if (input.includes('機票訂單明細') || input.includes('銷售摘要') ||
       (input.includes('金　額') && input.includes('小　計') && input.includes('訂位記錄'))) {
     return parseTicketOrderDetail(input);
   }
 
   // 檢測是否為電子機票格式（包含 TICKET NUMBER 和 BOOKING REF）
+  // 金額為選填，不一定提供
   if (input.includes('TICKET NUMBER') && (input.includes('BOOKING REF') || input.includes('NAME:'))) {
     return parseETicketConfirmation(input);
   }

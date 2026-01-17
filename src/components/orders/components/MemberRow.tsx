@@ -88,6 +88,7 @@ export function MemberRow({
     pnr: false,
     ticket_number: true,  // 預設顯示機票號碼
     ticketing_deadline: false,
+    flight_cost: false,   // 機票金額預設關閉
   }
 
   // 處理數字輸入
@@ -265,6 +266,13 @@ export function MemberRow({
               className="w-full bg-transparent text-xs border-none outline-none shadow-none focus:ring-0 text-morandi-primary"
             />
           )}
+        </td>
+      )}
+
+      {/* 團體模式：機票金額（成本，從機票訂單明細匯入） */}
+      {mode === 'tour' && cv.flight_cost && (
+        <td className="border border-morandi-gold/20 px-2 py-1 bg-blue-50/50 text-xs text-right">
+          {member.flight_cost ? member.flight_cost.toLocaleString() : '-'}
         </td>
       )}
 

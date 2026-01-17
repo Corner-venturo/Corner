@@ -215,6 +215,13 @@ export function PnrMatchDialog({
     } else {
       toast.info(`配對完成：${exactCount} 完全符合, ${partialCount} 部分符合, ${noneCount} 未配對`)
     }
+
+    // 顯示票價解析結果（僅機票訂單明細格式）
+    if (parsed.fareData && parsed.sourceFormat === 'ticket_order_detail') {
+      toast.success(`已解析機票金額：${parsed.fareData.totalFare.toLocaleString()} 元/人`)
+    } else if (parsed.sourceFormat === 'ticket_order_detail' && !parsed.fareData) {
+      toast.warning('機票訂單明細格式但未能解析金額，請檢查格式')
+    }
   }, [rawPnr, members, searchCustomersForPassengers])
 
   // 手動選擇配對（現有成員）或取消配對
@@ -344,9 +351,9 @@ export function PnrMatchDialog({
       let updatedCount = 0
       let createdCount = 0
 
-      // 計算每人票價（如果有票價資訊）
+      // 計算每人票價（僅「機票訂單明細」格式的金額為成本價）
       let perPersonFare: number | null = null
-      if (parsedPnr.fareData) {
+      if (parsedPnr.fareData && parsedPnr.sourceFormat === 'ticket_order_detail') {
         if (parsedPnr.fareData.perPassenger) {
           // 票價已經是每人價格
           perPersonFare = parsedPnr.fareData.totalFare

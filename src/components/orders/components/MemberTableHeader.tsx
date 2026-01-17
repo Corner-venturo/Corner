@@ -49,6 +49,7 @@ export function MemberTableHeader({
     pnr: false,
     ticket_number: true,  // 預設顯示機票號碼
     ticketing_deadline: false,
+    flight_cost: false,   // 機票金額預設關閉
   }
 
   return (
@@ -112,6 +113,11 @@ export function MemberTableHeader({
         {/* 團體模式：開票期限 */}
         {mode === 'tour' && cv.ticketing_deadline && (
           <th className={`${thClass} min-w-[100px]`}>開票期限</th>
+        )}
+
+        {/* 團體模式：機票金額 */}
+        {mode === 'tour' && cv.flight_cost && (
+          <th className={`${thClass} min-w-[100px]`}>機票金額</th>
         )}
 
         {/* 團體模式：自訂費用欄位 */}
