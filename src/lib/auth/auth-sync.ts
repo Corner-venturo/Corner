@@ -82,7 +82,7 @@ interface SyncOptions {
  * 帶 timeout 的 getSession wrapper
  * 避免 getSession 掛住導致整個應用卡住
  */
-async function getSessionWithTimeout(timeoutMs: number = 5000): Promise<{ session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] | null; error: Error | null }> {
+async function getSessionWithTimeout(timeoutMs: number = 10000): Promise<{ session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] | null; error: Error | null }> {
   try {
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('getSession timeout')), timeoutMs)
@@ -96,7 +96,8 @@ async function getSessionWithTimeout(timeoutMs: number = 5000): Promise<{ sessio
     }
     return { session: data.session, error: null }
   } catch (err) {
-    logger.warn('⚠️ getSession timeout or error:', err)
+    // timeout 是正常情況（網路慢），不需要警告用戶
+    logger.debug('getSession timeout or slow response')
     return { session: null, error: err instanceof Error ? err : new Error(String(err)) }
   }
 }
@@ -110,6 +111,11 @@ async function getSessionWithTimeout(timeoutMs: number = 5000): Promise<{ sessio
  * 4. 手動觸發時
  */
 export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
+  // 如果已經同步過且沒有傳入新的 options，直接返回（避免閒置時重複檢查）
+  if (syncState.isSynced && !options) {
+    return true
+  }
+
   // 避免重複同步
   if (syncPromise) {
     return syncPromise
@@ -118,10 +124,10 @@ export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
   syncPromise = (async () => {
     try {
       // 1. 檢查 Supabase session (帶 timeout 保護)
-      const { session, error: sessionError } = await getSessionWithTimeout(5000)
+      const { session, error: sessionError } = await getSessionWithTimeout()
 
       if (sessionError || !session) {
-        logger.log('📭 無 Supabase session，跳過同步')
+        logger.debug('無 Supabase session，跳過同步')
         syncState.isSynced = false
         return false
       }
@@ -222,31 +228,14 @@ export function resetAuthSyncState(): void {
 
 /**
  * 設定 Auth 狀態監聽器
- * 在 Supabase Auth 狀態變化時自動同步
+ * 只處理登出，其他情況不需要自動同步（登入時已處理）
  */
 export function setupAuthSyncListener(): () => void {
   const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    async (event, session) => {
-      logger.log('🔔 Auth 狀態變化:', event)
-
-      switch (event) {
-        case 'SIGNED_IN':
-        case 'TOKEN_REFRESHED':
-          // 登入或 token 刷新時，確保同步
-          await ensureAuthSync()
-          break
-
-        case 'SIGNED_OUT':
-          // 登出時重置狀態
-          resetAuthSyncState()
-          break
-
-        case 'INITIAL_SESSION':
-          // 初始 session 載入時，檢查同步
-          if (session) {
-            await ensureAuthSync()
-          }
-          break
+    (event) => {
+      // 只在登出時重置狀態，其他事件不處理
+      if (event === 'SIGNED_OUT') {
+        resetAuthSyncState()
       }
     }
   )
@@ -258,7 +247,7 @@ export function setupAuthSyncListener(): () => void {
 
 /**
  * 初始化 Auth 同步系統
- * 應該在應用啟動時調用一次
+ * 只設定登出監聽器，不主動檢查（登入時已處理）
  */
 let isInitialized = false
 
@@ -268,11 +257,7 @@ export function initAuthSync(): void {
   }
 
   isInitialized = true
-  logger.log('🚀 初始化 Auth 同步系統')
 
-  // 設定監聽器
+  // 只設定登出監聽器
   setupAuthSyncListener()
-
-  // 立即檢查一次
-  ensureAuthSync()
 }
