@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client'
 import { generateUUID } from '@/lib/utils/uuid'
 import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import { shouldCrossWorkspace } from '@/lib/workspace-context'
 import { CACHE_STRATEGY } from '@/lib/swr'
 import type { Database } from '@/lib/supabase/types'
 
@@ -86,16 +87,16 @@ const WORKSPACE_SCOPED_TABLES = [
   'disbursement_orders',
   'receipt_orders',
 
-  // === 會計模組 === ✅ 2026-01-12: 補齊
+  // === 會計模組 ===
   'chart_of_accounts',
   'erp_bank_accounts',
-  'erp_transactions',
-  'erp_vouchers',
+  // 'erp_transactions', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id 欄位
+  // 'erp_vouchers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id 欄位
   'journal_vouchers',
   'confirmations',
 
-  // === 供應商 === ✅ 2026-01-12: 補齊
-  'suppliers',
+  // === 供應商 ===
+  // 'suppliers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id 欄位
 
   // === 其他業務 ===
   'visas',
@@ -200,9 +201,10 @@ export function createCloudHook<T extends BaseEntity>(
     // 🔒 Workspace 隔離：根據當前使用者過濾資料
     if (isWorkspaceScoped) {
       const { workspaceId, userRole } = getCurrentUserContext()
+      const isSuperAdmin = canCrossWorkspace(userRole)
 
-      // Super Admin 可以跨 workspace 查詢，不加過濾
-      if (!canCrossWorkspace(userRole) && workspaceId) {
+      // 只有 Super Admin 且明確開啟跨 workspace 模式才不過濾
+      if (!shouldCrossWorkspace(isSuperAdmin) && workspaceId) {
         // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
         query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
       }

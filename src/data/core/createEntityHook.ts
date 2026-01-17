@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores/auth-store'
 import { logger } from '@/lib/utils/logger'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import { shouldCrossWorkspace } from '@/lib/workspace-context'
 import {
   BaseEntity,
   EntityConfig,
@@ -44,10 +45,11 @@ const WORKSPACE_SCOPED_TABLES = [
   // === 財務管理 ===
   'payment_requests', 'disbursement_orders', 'receipt_orders',
   // === 會計模組 ===
-  'chart_of_accounts', 'erp_bank_accounts', 'erp_transactions',
-  'erp_vouchers', 'journal_vouchers', 'confirmations',
+  'chart_of_accounts', 'erp_bank_accounts',
+  // 'erp_transactions', 'erp_vouchers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id
+  'journal_vouchers', 'confirmations',
   // === 供應商 ===
-  'suppliers',
+  // 'suppliers', // ⚠️ 2026-01-17: 移除，表沒有 workspace_id
   // === 其他業務 ===
   'visas', 'todos', 'calendar_events', 'tour_addons',
   // === 溝通頻道 ===
@@ -150,8 +152,9 @@ export function createEntityHook<T extends BaseEntity>(
 
     const { workspaceId, userRole } = getCurrentUserContext()
 
-    // Super Admin 可以跨 workspace 查詢
-    if (canCrossWorkspace(userRole)) return null
+    // 只有 Super Admin 且明確開啟跨 workspace 模式才不過濾
+    const isSuperAdmin = canCrossWorkspace(userRole)
+    if (shouldCrossWorkspace(isSuperAdmin)) return null
 
     if (workspaceId) {
       // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料

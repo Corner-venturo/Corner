@@ -25,7 +25,7 @@ type AdvanceListEntity = AdvanceList & Pick<BaseEntity, 'updated_at'>
  */
 export const useAdvanceListStore = createStore<AdvanceListEntity>({
   tableName: 'advance_lists',
-  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
+  // ⚠️ 2026-01-17: 移除 workspaceScoped，因為 advance_lists 表沒有 workspace_id 欄位
 })
 
 /**

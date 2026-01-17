@@ -25,7 +25,7 @@ type SharedOrderListEntity = SharedOrderList & Pick<BaseEntity, 'updated_at'>
  */
 export const useSharedOrderListStore = createStore<SharedOrderListEntity>({
   tableName: 'shared_order_lists',
-  workspaceScoped: true, // 🔒 2026-01-12: 啟用 Workspace 隔離
+  // ⚠️ 2026-01-17: 移除 workspaceScoped，因為 shared_order_lists 表沒有 workspace_id 欄位
 })
 
 /**

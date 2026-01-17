@@ -356,6 +356,15 @@ export async function POST(request: NextRequest) {
 
     // 發送到指定頻道
     if (channel_id) {
+      // 先查詢頻道的 workspace_id
+      const { data: channelData } = await supabase
+        .from('channels')
+        .select('workspace_id')
+        .eq('id', channel_id)
+        .single()
+
+      const channelWorkspaceId = channelData?.workspace_id
+
       // 轉換資料格式為 TicketStatusCard 所需
       const cardTours = (tours as TourStats[]).map(tour => ({
         tour_id: tour.tour_id,
@@ -391,7 +400,9 @@ export async function POST(request: NextRequest) {
         .insert({
           channel_id,
           content: message, // 純文字 fallback
-          author_id: SYSTEM_BOT_ID,
+          created_by: SYSTEM_BOT_ID, // 使用 created_by 而非 author_id
+          author: { id: SYSTEM_BOT_ID, display_name: '系統機器人', type: 'bot' }, // JSON 格式，需用 display_name
+          workspace_id: channelWorkspaceId, // 繼承頻道的 workspace_id
           metadata: {
             message_type: 'ticket_status_card',
             tours: cardTours,
@@ -408,8 +419,14 @@ export async function POST(request: NextRequest) {
 
       if (msgError) {
         logger.error('發送開票狀態通知失敗:', msgError)
-        return NextResponse.json({ success: false, message: '發送通知失敗' }, { status: 500 })
+        return NextResponse.json({
+          success: false,
+          message: '發送通知失敗',
+          error: msgError.message || JSON.stringify(msgError)
+        }, { status: 500 })
       }
+
+      logger.info('開票狀態訊息已發送到頻道', { channel_id, workspace_id: channelWorkspaceId })
     }
 
     // 發送給各訂單的業務人員和助理 (OP)

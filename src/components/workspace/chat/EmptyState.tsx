@@ -10,21 +10,20 @@ const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
 interface EmptyStateProps {
   channelName: string
   channelType?: string
+  currentUserId?: string
 }
 
-export function EmptyState({ channelName, channelType }: EmptyStateProps) {
+export function EmptyState({ channelName, channelType, currentUserId }: EmptyStateProps) {
   const { items: employees } = useEmployees()
 
   // 解析 DM 頻道名稱，取得對方名字
   const displayInfo = useMemo(() => {
     // 檢查是否為 DM 頻道 (格式: dm:userId1:userId2)
     if (channelName.startsWith('dm:') || channelType === 'DIRECT' || channelType === 'direct') {
-      const parts = channelName.replace('dm:', '').split(':')
-      // 找到對方的 ID（排除自己）
-      const otherUserId = parts.find(id => id !== '') || ''
+      const parts = channelName.replace('dm:', '').split(':').filter(id => id !== '')
 
       // 檢查是否是機器人
-      if (otherUserId === SYSTEM_BOT_ID || parts.includes(SYSTEM_BOT_ID)) {
+      if (parts.includes(SYSTEM_BOT_ID)) {
         return {
           isDm: true,
           isBot: true,
@@ -33,8 +32,11 @@ export function EmptyState({ channelName, channelType }: EmptyStateProps) {
         }
       }
 
-      // 查找員工名字
-      const employee = employees.find(e => parts.includes(e.id))
+      // 找到對方的 ID（排除自己）
+      const otherUserId = parts.find(id => id !== currentUserId) || ''
+
+      // 查找對方員工名字
+      const employee = employees.find(e => e.id === otherUserId)
       if (employee) {
         return {
           isDm: true,
@@ -58,7 +60,7 @@ export function EmptyState({ channelName, channelType }: EmptyStateProps) {
       name: channelName,
       icon: Hash,
     }
-  }, [channelName, channelType, employees])
+  }, [channelName, channelType, employees, currentUserId])
 
   const Icon = displayInfo.icon
 

@@ -1,4 +1,6 @@
 export const DEFAULT_CHANNEL_NAME = '一般討論'
+export const BOT_CHANNEL_NAME = '機器人助手'
+export const LAST_CHANNEL_STORAGE_KEY = 'workspace_last_channel_id'
 
 export const CHANNEL_SWITCH_DELAY = 150
 

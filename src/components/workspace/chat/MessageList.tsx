@@ -111,7 +111,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   if (hasNoContent) {
     return (
       <div className="flex-1 flex items-center justify-center bg-card">
-        <EmptyState channelName={channelName} channelType={channelType} />
+        <EmptyState channelName={channelName} channelType={channelType} currentUserId={currentUserId} />
       </div>
     )
   }

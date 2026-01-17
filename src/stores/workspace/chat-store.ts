@@ -13,6 +13,10 @@ import { useChannelStore } from './channel-store'
 import type { Message } from './types'
 import { ensureMessageAttachments, normalizeMessage } from './utils'
 import type { Json } from '@/lib/supabase/types'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+
+// Realtime 訂閱 channel（模組層級變數）
+let realtimeChannel: RealtimeChannel | null = null
 
 /**
  * Chat UI 狀態 (不需要同步到 Supabase 的狀態)
@@ -134,13 +138,10 @@ export const useChatStore = () => {
 
       try {
         // 🔥 效能優化：使用 Supabase 查詢只載入當前頻道的訊息
-        // 📌 同時 join author 資料以顯示發送者名稱
+        // 📌 author 資訊已存在 JSON 欄位中，不需要 join
         const { data, error } = await supabase
           .from('messages')
-          .select(`
-            *,
-            author:employees!messages_author_id_fkey ( id, display_name, avatar )
-          `)
+          .select('*')
           .eq('channel_id', channelId)
           .order('created_at', { ascending: true })
 
@@ -183,12 +184,13 @@ export const useChatStore = () => {
         const workspaceId = channel?.workspace_id
 
         // 直接寫入 Supabase（不透過 messageStore 避免重複更新）
+        // 注意：messages 表沒有 author_id 欄位，使用 created_by 和 author (JSON)
         const { error } = await supabase
           .from('messages')
           .insert({
             id: newMessage.id,
             channel_id: newMessage.channel_id,
-            author_id: newMessage.author_id,
+            created_by: newMessage.author_id, // 使用 created_by 而非 author_id
             content: newMessage.content,
             author: newMessage.author as unknown as Json,
             attachments: newMessage.attachments as unknown as Json,
@@ -228,7 +230,30 @@ export const useChatStore = () => {
         parent_message_id: message.parent_message_id || null,
       }
 
-      await messageStore.create(newMessage)
+      // 取得頻道的 workspace_id
+      const channel = useChannelStore.getState().items.find((c: { id: string }) => c.id === newMessage.channel_id)
+      const workspaceId = channel?.workspace_id
+
+      // 直接寫入 Supabase（注意：messages 表沒有 author_id 欄位，使用 created_by）
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          id: newMessage.id,
+          channel_id: newMessage.channel_id,
+          created_by: newMessage.author_id, // 使用 created_by 而非 author_id
+          content: newMessage.content,
+          author: newMessage.author as unknown as Json,
+          attachments: newMessage.attachments as unknown as Json,
+          reactions: newMessage.reactions as unknown as Json,
+          parent_message_id: newMessage.parent_message_id,
+          created_at: newMessage.created_at,
+          workspace_id: workspaceId,
+        })
+
+      if (error) {
+        logger.error('addMessage 失敗:', error)
+        throw error
+      }
 
       // 🔥 使用緩存函數（避免重複計算）
       const channelMessages = getChannelMessages(messageStore.items, newMessage.channel_id)
@@ -377,12 +402,88 @@ export const useChatStore = () => {
     // Realtime Subscription
     // ============================================
     subscribeToMessages: () => {
-      // Placeholder: Realtime subscription could be added here if needed
-      // For now, the store uses SWR for data fetching
+      const channelId = uiStore.currentChannelId
+      if (!channelId) {
+        logger.warn('[ChatStore] 無法訂閱：沒有當前頻道')
+        return
+      }
+
+      // 避免重複訂閱
+      if (realtimeChannel) {
+        logger.log('[ChatStore] 已有訂閱，先取消舊訂閱')
+        supabase.removeChannel(realtimeChannel)
+      }
+
+      logger.log('[ChatStore] 訂閱頻道訊息 Realtime:', channelId)
+
+      realtimeChannel = supabase
+        .channel(`messages:${channelId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `channel_id=eq.${channelId}`,
+          },
+          (payload) => {
+            logger.log('[ChatStore] Realtime 收到新訊息:', payload.new)
+            const newMessage = payload.new as Message
+
+            // 檢查是否已存在（避免重複）
+            const currentMessages = uiStore.channelMessages[channelId] || []
+            const exists = currentMessages.some(m => m.id === newMessage.id)
+            if (!exists) {
+              const updatedMessages = [...currentMessages, newMessage]
+              uiStore.setCurrentChannelMessages(channelId, updatedMessages)
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages',
+            filter: `channel_id=eq.${channelId}`,
+          },
+          (payload) => {
+            logger.log('[ChatStore] Realtime 訊息更新:', payload.new)
+            const updatedMessage = payload.new as Message
+            const currentMessages = uiStore.channelMessages[channelId] || []
+            const updatedMessages = currentMessages.map(m =>
+              m.id === updatedMessage.id ? updatedMessage : m
+            )
+            uiStore.setCurrentChannelMessages(channelId, updatedMessages)
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'messages',
+            filter: `channel_id=eq.${channelId}`,
+          },
+          (payload) => {
+            logger.log('[ChatStore] Realtime 訊息刪除:', payload.old)
+            const deletedMessage = payload.old as { id: string }
+            const currentMessages = uiStore.channelMessages[channelId] || []
+            const updatedMessages = currentMessages.filter(m => m.id !== deletedMessage.id)
+            uiStore.setCurrentChannelMessages(channelId, updatedMessages)
+          }
+        )
+        .subscribe((status) => {
+          logger.log('[ChatStore] Realtime 訂閱狀態:', status)
+        })
     },
 
     unsubscribeFromMessages: () => {
-      // Placeholder: Realtime unsubscription could be added here if needed
+      if (realtimeChannel) {
+        logger.log('[ChatStore] 取消 Realtime 訂閱')
+        supabase.removeChannel(realtimeChannel)
+        realtimeChannel = null
+      }
     },
   }
 }

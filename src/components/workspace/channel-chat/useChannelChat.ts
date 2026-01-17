@@ -144,15 +144,8 @@ export function useChannelChat() {
     loadSharedOrderLists
   )
 
-  // Realtime subscription effect
-  useEffect(() => {
-    subscribeToMessages()
-
-    // Cleanup on unmount
-    return () => {
-      unsubscribeFromMessages()
-    }
-  }, [subscribeToMessages, unsubscribeFromMessages])
+  // Realtime subscription 已移至 useChannelEffects.ts
+  // 避免重複訂閱，這裡不再呼叫 subscribeToMessages()
 
   return {
     // State

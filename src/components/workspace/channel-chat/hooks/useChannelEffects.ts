@@ -4,7 +4,7 @@ import { useChannelMemberStore } from '@/stores/workspace/channel-member-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { DEFAULT_CHANNEL_NAME } from '../constants'
+import { BOT_CHANNEL_NAME, LAST_CHANNEL_STORAGE_KEY } from '../constants'
 
 /**
  * 管理頻道相關的副作用
@@ -46,12 +46,47 @@ export function useChannelEffects(
   // 選擇預設頻道（只從已加入的頻道中選擇）
   useEffect(() => {
     if (joinedChannels.length > 0 && !selectedChannel) {
-      // 優先選擇「一般討論」，否則選第一個已加入的頻道
-      const defaultChannel = joinedChannels.find(c => c.name === DEFAULT_CHANNEL_NAME) || joinedChannels[0]
-      selectChannel(defaultChannel)
+      // 優先順序：1. 上次使用的頻道 2. 機器人助手 3. 第一個已加入的頻道
+      let defaultChannel: Channel | undefined
+
+      // 1. 嘗試從 localStorage 讀取上次使用的頻道（僅在客戶端）
+      if (typeof window !== 'undefined') {
+        try {
+          const lastChannelId = localStorage.getItem(LAST_CHANNEL_STORAGE_KEY)
+          if (lastChannelId) {
+            defaultChannel = joinedChannels.find(c => c.id === lastChannelId)
+          }
+        } catch {
+          // localStorage 不可用時忽略
+        }
+      }
+
+      // 2. 如果沒有上次頻道，選擇機器人助手
+      if (!defaultChannel) {
+        defaultChannel = joinedChannels.find(c => c.name === BOT_CHANNEL_NAME)
+      }
+
+      // 3. 最後選第一個已加入的頻道
+      if (!defaultChannel) {
+        defaultChannel = joinedChannels[0]
+      }
+
+      if (defaultChannel) {
+        selectChannel(defaultChannel)
+      }
     }
-     
   }, [joinedChannels.length, selectedChannel?.id])
+
+  // 記住最後使用的頻道（僅在客戶端）
+  useEffect(() => {
+    if (selectedChannel?.id && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(LAST_CHANNEL_STORAGE_KEY, selectedChannel.id)
+      } catch {
+        // localStorage 不可用時忽略
+      }
+    }
+  }, [selectedChannel?.id])
 
   // 載入頻道資料（訊息、代墊清單、訂單清單）
   useEffect(() => {
