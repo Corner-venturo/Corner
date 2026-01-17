@@ -69,20 +69,10 @@ export default function LoginPage() {
 
       const result = await validateLogin(username.trim(), password, trimmedCode, rememberMe)
 
-      logger.log('🔐 Login result:', result)
-
       if (result.success) {
-        // 如果需要首次設定（修改密碼或上傳頭像），導向設定頁
-        if (result.needsSetup) {
-          logger.log('➡️ Redirecting to /settings?setup=true')
-          router.push('/settings?setup=true')
-        } else {
-          const redirectPath = getRedirectPath()
-          logger.log('➡️ Redirecting to:', redirectPath)
-          router.push(redirectPath)
-        }
+        const redirectPath = getRedirectPath()
+        router.push(redirectPath)
       } else {
-        logger.log('❌ Login failed:', result.message)
         setError(result.message || '帳號或密碼錯誤')
       }
     } catch (error) {

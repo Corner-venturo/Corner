@@ -133,7 +133,6 @@ export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
       }
 
       const supabaseUserId = session.user.id
-      logger.log('🔍 檢查 Auth 同步狀態:', supabaseUserId)
 
       // 2. 取得員工資訊（優先使用傳入的 options，否則從 localStorage）
       let employeeId = options?.employeeId
@@ -150,7 +149,6 @@ export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
       }
 
       if (!employeeId || !workspaceId) {
-        logger.log('📭 無法取得員工資訊，跳過同步')
         return false
       }
 
@@ -163,7 +161,6 @@ export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
 
       // 如果查詢失敗（可能因為 RLS），直接嘗試同步
       if (checkError) {
-        logger.log('⚠️ 無法檢查員工狀態（可能 RLS 問題），嘗試同步...')
         return await syncEmployeeToSupabase(
           employeeId,
           supabaseUserId,
@@ -174,7 +171,6 @@ export async function ensureAuthSync(options?: SyncOptions): Promise<boolean> {
 
       // 4. 如果 supabase_user_id 已經正確，不需要同步
       if (employee?.supabase_user_id === supabaseUserId) {
-        logger.log('✅ Auth 已同步，無需更新')
         syncState = {
           isSynced: true,
           lastSyncAt: new Date().toISOString(),

@@ -189,11 +189,11 @@ export const useAuthStore = create<AuthState>()(
 
       validateLogin: async (username: string, password: string, code?: string, rememberMe: boolean = true) => {
         try {
-          logger.log('🌐 Authenticating via API...', username, 'code:', code)
-
           if (!code) {
             return { success: false, message: '請輸入辦公室或廠商代號' }
           }
+
+          logger.log(`🔐 登入中: ${username}@${code}`)
 
           // 使用 API route 驗證登入（繞過 RLS）
           const response = await fetch('/api/auth/validate-login', {
@@ -205,38 +205,29 @@ export const useAuthStore = create<AuthState>()(
           const result = await response.json()
 
           if (!result.success) {
-            logger.warn('⚠️ Login validation failed:', result.message)
+            logger.warn(`⚠️ 登入失敗: ${result.message}`)
             return { success: false, message: result.message }
           }
 
           const employeeData = result.employee as EmployeeRow
-          logger.log('✅ Employee validated:', employeeData.display_name)
-
           const { supabase } = await import('@/lib/supabase/client')
 
-          logger.log('✅ Employee authentication successful')
-
-          // Supabase Auth 登入（必須成功才能繼續）
-          // 格式：{workspace_code}_{employee_number}@venturo.com（統一小寫）
+          // Supabase Auth 登入
           const authEmail = `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
-
           const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: authEmail,
             password,
           })
 
           if (authError || !authData) {
-            logger.error('❌ Supabase Auth sign-in failed:', authError?.message)
+            logger.error('❌ Supabase Auth 登入失敗:', authError?.message)
             return {
               success: false,
               message: '登入驗證失敗，請稍後再試或聯繫管理員'
             }
           }
 
-          logger.log('✅ Supabase Auth session created:', authData.user?.id)
-
-          // 使用抽象層確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
-          // 登入時直接傳入員工資訊，因為 localStorage 還沒寫入
+          // 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
           await ensureAuthSync({
             employeeId: employeeData.id,
             workspaceId: employeeData.workspace_id ?? undefined,
@@ -244,16 +235,8 @@ export const useAuthStore = create<AuthState>()(
 
           // 查詢 workspace 資訊並構建 User 物件
           const workspaceInfo = await fetchWorkspaceInfo(employeeData.workspace_id)
-          if (workspaceInfo.code) {
-            logger.log('✅ Workspace info fetched:', workspaceInfo)
-          }
 
-          // 檢查是否需要首次設定
-          const mustChangePassword = (employeeData as Record<string, unknown>).must_change_password === true
-          const hasAvatar = !!(employeeData.avatar_url || employeeData.avatar)
-          const needsSetup = mustChangePassword || !hasAvatar
-
-          const user = buildUserFromEmployee(employeeData, workspaceInfo, { mustChangePassword })
+          const user = buildUserFromEmployee(employeeData, workspaceInfo)
 
           // 合併後的權限（用於 authPayload）
           const userRoles = (employeeData.roles || []) as UserRole[]
@@ -271,13 +254,7 @@ export const useAuthStore = create<AuthState>()(
 
           get().setUser(user);
 
-          logger.log('✅ Login successful:', employeeData.display_name)
-
-          // 如果需要首次設定，返回 needsSetup 標記讓前端處理導向
-          if (needsSetup) {
-            logger.log('⚠️ User needs initial setup (password change or avatar)')
-            return { success: true, needsSetup: true }
-          }
+          logger.log(`✅ 登入成功: ${employeeData.display_name}`)
 
           return { success: true }
         } catch (error) {
@@ -308,16 +285,8 @@ export const useAuthStore = create<AuthState>()(
             .eq('id', currentUser.id)
             .maybeSingle()
 
-          if (error) {
-            // RLS 查詢失敗，可能是 supabase_user_id 未同步
-            // 靜默失敗，使用 localStorage 中的快取資料
-            logger.warn('⚠️ Failed to refresh user data (RLS issue?):', error?.message)
-            return
-          }
-
-          if (!data) {
-            // 沒有返回資料，可能是 RLS 阻擋
-            logger.warn('⚠️ No user data returned (RLS may be blocking), using cached data')
+          if (error || !data) {
+            // RLS 查詢失敗或無資料，靜默使用 localStorage 快取
             return
           }
 
@@ -325,7 +294,6 @@ export const useAuthStore = create<AuthState>()(
 
           // 如果帳號已停用，自動登出
           if (employeeData.status === 'terminated') {
-            logger.warn('⚠️ Account terminated, logging out')
             get().logout()
             return
           }
@@ -340,7 +308,6 @@ export const useAuthStore = create<AuthState>()(
 
           const updatedUser = buildUserFromEmployee(employeeData, workspaceInfo)
           get().setUser(updatedUser)
-          logger.log('✅ User data refreshed:', updatedUser.display_name)
         } catch (error) {
           logger.error('💥 Error refreshing user data:', error)
         }
