@@ -43,6 +43,7 @@ interface TourAllocation {
 
 // 請款類別選項（與 PaymentItemCategory 對應）
 const requestCategories: { value: PaymentItemCategory; label: string }[] = [
+  { value: '匯款', label: '匯款' },
   { value: '住宿', label: '住宿' },
   { value: '交通', label: '交通' },
   { value: '餐食', label: '餐食' },
@@ -63,7 +64,7 @@ export function BatchAllocateRequestDialog({ open, onOpenChange }: BatchAllocate
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
 
   const [requestDate, setRequestDate] = useState(getTodayString())
-  const [category, setCategory] = useState<PaymentItemCategory>('住宿')
+  const [category, setCategory] = useState<PaymentItemCategory>('匯款')
   const [supplierId, setSupplierId] = useState('')
   const [description, setDescription] = useState('')
   const [totalAmount, setTotalAmount] = useState(0)

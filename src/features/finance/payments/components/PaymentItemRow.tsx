@@ -190,10 +190,16 @@ export function PaymentItemRow({
                 ? '收款對象(五字內)'
                 : item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER
                   ? '帳號後五碼'
-                  : '輸入付款人'
+                  : item.receipt_type === RECEIPT_TYPES.CREDIT_CARD
+                    ? '調閱編號'
+                    : item.receipt_type === RECEIPT_TYPES.CHECK
+                      ? '到期日'
+                      : item.receipt_type === RECEIPT_TYPES.CASH
+                        ? '收款人'
+                        : ''
             }
             maxLength={item.receipt_type === RECEIPT_TYPES.LINK_PAY || item.receipt_type === RECEIPT_TYPES.BANK_TRANSFER ? 5 : undefined}
-            className="w-full bg-transparent outline-none text-sm"
+            className="input-no-focus w-full bg-transparent text-sm"
           />
         </td>
 
@@ -204,7 +210,7 @@ export function PaymentItemRow({
             value={item.note || ''}
             onChange={e => onUpdate(item.id, { note: e.target.value })}
             placeholder="備註（選填）"
-            className="w-full bg-transparent outline-none text-sm"
+            className="input-no-focus w-full bg-transparent text-sm"
           />
         </td>
 
@@ -215,7 +221,7 @@ export function PaymentItemRow({
             value={item.amount || ''}
             onChange={e => onUpdate(item.id, { amount: Number(e.target.value) })}
             placeholder="0"
-            className="w-full bg-transparent outline-none text-sm text-right"
+            className="input-no-focus w-full bg-transparent text-sm text-right"
           />
         </td>
 
@@ -252,7 +258,7 @@ export function PaymentItemRow({
               value={item.email || ''}
               onChange={e => onUpdate(item.id, { email: e.target.value })}
               placeholder="user@example.com"
-              className="w-full bg-transparent outline-none text-sm"
+              className="input-no-focus w-full bg-transparent text-sm"
             />
           </td>
           <td className="py-2 px-3 border-b border-r border-border">
@@ -269,7 +275,7 @@ export function PaymentItemRow({
               value={item.payment_name || ''}
               onChange={e => onUpdate(item.id, { payment_name: e.target.value })}
               placeholder="例如：峇里島五日遊 - 尾款"
-              className="w-full bg-transparent outline-none text-sm"
+              className="input-no-focus w-full bg-transparent text-sm"
             />
           </td>
           <td className="py-2 px-3 border-b border-border text-center" colSpan={2}>
@@ -305,7 +311,7 @@ export function PaymentItemRow({
               type="text"
               value={generatedLink}
               readOnly
-              className="w-full bg-transparent outline-none text-xs"
+              className="input-no-focus w-full bg-transparent text-xs"
             />
           </td>
           <td className="py-2 px-3 border-b border-border text-center" colSpan={2}>

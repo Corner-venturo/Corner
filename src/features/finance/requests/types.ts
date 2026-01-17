@@ -53,6 +53,7 @@ export const statusColors: Record<'pending' | 'approved' | 'paid', string> = {
 }
 
 export const categoryOptions = [
+  { value: '匯款', label: '匯款' },
   { value: '住宿', label: '住宿' },
   { value: '交通', label: '交通' },
   { value: '餐食', label: '餐食' },

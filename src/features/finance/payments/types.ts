@@ -14,8 +14,8 @@ export const RECEIPT_TYPES = {
 export type ReceiptType = (typeof RECEIPT_TYPES)[keyof typeof RECEIPT_TYPES]
 
 export const RECEIPT_TYPE_OPTIONS = [
-  { value: RECEIPT_TYPES.CASH, label: '現金' },
   { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
+  { value: RECEIPT_TYPES.CASH, label: '現金' },
   { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
   { value: RECEIPT_TYPES.CHECK, label: '支票' },
   { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },

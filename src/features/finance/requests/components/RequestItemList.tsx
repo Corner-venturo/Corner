@@ -123,8 +123,7 @@ export function EditableRequestItemList({
                 type="text"
                 value={item.description}
                 onChange={e => updateItem(item.id, { description: e.target.value })}
-                placeholder="輸入項目描述"
-                className={`${inputClass} placeholder:text-morandi-muted`}
+                className={inputClass}
               />
             </div>
 

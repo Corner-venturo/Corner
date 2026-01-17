@@ -14,7 +14,6 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         key: 'code',
         label: '請款單號',
         sortable: true,
-        filterable: true,
         render: (value: unknown, row: PaymentRequest) => {
           // 優先顯示 code，fallback 到 request_number
           const displayCode = (value as string) || row.request_number || ''
@@ -29,7 +28,6 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         key: 'tour_name',
         label: '團名',
         sortable: true,
-        filterable: true,
         render: (value: unknown, row: PaymentRequest) => {
           // 顯示團名，fallback 到團號
           const displayName = (value as string) || row.tour_code || ''
@@ -44,7 +42,6 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         key: 'order_number',
         label: '訂單編號',
         sortable: true,
-        filterable: true,
         render: (value: unknown, row: PaymentRequest) => {
           const displayValue = value as string
           return (
@@ -58,8 +55,6 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         key: 'request_date',
         label: '請款日期',
         sortable: true,
-        filterable: true,
-        filterType: 'date',
         render: (value: unknown, row: PaymentRequest) => (
           <div className="text-sm">
             <div
@@ -74,11 +69,9 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         ),
       },
       {
-        key: 'amount', // Renamed from total_amount
+        key: 'amount',
         label: '金額',
         sortable: true,
-        filterable: true,
-        filterType: 'number',
         render: (value: unknown) => (
           <CurrencyCell amount={value as number} className="font-semibold text-morandi-gold" />
         ),
@@ -87,14 +80,7 @@ export function useRequestTable(payment_requests: PaymentRequest[]) {
         key: 'status',
         label: '狀態',
         sortable: true,
-        filterable: true,
-        filterType: 'select',
-        filterOptions: [
-          { value: 'pending', label: '請款中' },
-          { value: 'approved', label: '已確認' }, // Statuses from PaymentRequest
-          { value: 'paid', label: '已付款' },
-        ],
-        render: (value: unknown, row: PaymentRequest) => { // Value is string | null
+        render: (value: unknown) => {
           const statusBadge = getStatusBadge(value as PaymentRequest['status'])
           return (
             <Badge className={cn('text-xs text-white', statusBadge.color)}>

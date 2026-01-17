@@ -1,24 +1,17 @@
-import { useState, useCallback, useMemo, useEffect } from 'react'
-import { useTours } from '@/features/tours/hooks/useTours'
-import { useOrders } from '@/features/orders/hooks/useOrders'
-import { useSuppliers, useEmployees } from '@/data'
+import { useState, useCallback, useMemo } from 'react'
+import { useTours, useOrders, useSuppliers, useEmployees } from '@/data'
 import { useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
-  const { tours, loadTours } = useTours()
-  const { orders, loadOrders } = useOrders()
+  // 使用 @/data 的 SWR hooks（和 usePaymentForm 一致）
+  const { items: tours } = useTours()
+  const { items: orders } = useOrders()
   const { items: suppliers } = useSuppliers()
   const { items: employees } = useEmployees()
 
   // 獲取當前登入用戶
-  const currentUser = useAuthStore(state => state.user)
-
-  // 載入所需資料（SWR hooks 會自動載入 suppliers 和 employees）
-  useEffect(() => {
-    loadTours()
-    loadOrders()
-  }, [loadTours, loadOrders])  
+  const currentUser = useAuthStore(state => state.user)  
 
   const [formData, setFormData] = useState<RequestFormData>({
     request_category: 'tour', // 預設團體請款
@@ -34,7 +27,7 @@ export function useRequestForm() {
   const [requestItems, setRequestItems] = useState<RequestItem[]>(() => [
     {
       id: Math.random().toString(36).substr(2, 9),
-      category: '住宿', // Default category
+      category: '匯款', // Default category
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -117,7 +110,7 @@ export function useRequestForm() {
   const addNewEmptyItem = useCallback(() => {
     const newItem: RequestItem = {
       id: Math.random().toString(36).substr(2, 9),
-      category: '住宿',
+      category: '匯款',
       supplier_id: '',
       supplierName: '',
       description: '',
@@ -154,7 +147,7 @@ export function useRequestForm() {
     setRequestItems([
       {
         id: Math.random().toString(36).substr(2, 9),
-        category: '住宿', // Default category
+        category: '匯款', // Default category
         supplier_id: '',
         supplierName: '',
         description: '',

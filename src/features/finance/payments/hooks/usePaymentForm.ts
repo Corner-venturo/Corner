@@ -24,7 +24,7 @@ export function usePaymentForm() {
   const [paymentItems, setPaymentItems] = useState<PaymentItem[]>([
     {
       id: '1',
-      receipt_type: RECEIPT_TYPES.CASH,
+      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     },
@@ -50,7 +50,7 @@ export function usePaymentForm() {
   const addPaymentItem = useCallback(() => {
     const newItem: PaymentItem = {
       id: Date.now().toString(),
-      receipt_type: RECEIPT_TYPES.CASH,
+      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     }
@@ -80,7 +80,7 @@ export function usePaymentForm() {
     setPaymentItems([
       {
         id: '1',
-        receipt_type: RECEIPT_TYPES.CASH,
+        receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
         amount: 0,
         transaction_date: getTodayString(),
       },

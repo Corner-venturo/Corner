@@ -74,6 +74,7 @@ export interface PaymentRequest {
 
 // 請款項目類型（參考 cornerERP 的 INVOICE_ITEM_TYPES）
 export type PaymentItemCategory =
+  | '匯款'      // 匯款（預設選項）
   | '住宿'      // 飯店住宿
   | '交通'      // 機票、巴士、高鐵等
   | '餐食'      // 餐廳、用餐
