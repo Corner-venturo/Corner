@@ -123,6 +123,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             placeholder="搜尋或選擇旅遊團..."
             emptyMessage="找不到旅遊團"
             className="mt-1"
+            disablePortal={true}
           />
         </div>
       )}
@@ -155,6 +156,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             showSearchIcon={true}
             showClearButton={true}
             className="mt-1"
+            disablePortal={true}
           />
         </div>
         <div>
@@ -171,6 +173,7 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
             showSearchIcon={true}
             showClearButton={true}
             className="mt-1"
+            disablePortal={true}
           />
         </div>
       </div>

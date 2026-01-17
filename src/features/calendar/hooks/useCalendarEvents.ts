@@ -60,21 +60,7 @@ export function useCalendarEvents() {
 
     if (!initializedRef.current) {
       initializedRef.current = true
-      logger.log('[Calendar] 載入行事曆所需資料...')
-      logger.log('[Calendar] 當前用戶:', {
-        id: user?.id,
-        workspace_id: user?.workspace_id,
-        roles: user?.roles,
-        isSuperAdmin,
-      })
-      // 所有行事曆需要的資料
-      // 🔧 優化：移除 fetchOrders/fetchMembers，改用 tour.current_participants
-      // 🔧 tours, customers, employees, calendarEvents 由 SWR 自動載入
-
-      // 顯示載入的資料數量（除錯用）
-      setTimeout(() => {
-        logger.log('[Calendar] 資料載入完成，tours 數量:', tours?.length || 0)
-      }, 2000)
+      // 資料由 SWR 自動載入，不需要手動 fetch
     }
   }, [user, isSuperAdmin, tours?.length])
 
@@ -85,8 +71,7 @@ export function useCalendarEvents() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'calendar_events' },
-        (payload) => {
-          logger.log('[Calendar] Realtime 收到更新:', payload.eventType)
+        () => {
           // 重新抓取資料（使用 SWR invalidate）
           invalidateCalendarEvents()
         }
@@ -122,7 +107,6 @@ export function useCalendarEvents() {
 
   // 轉換旅遊團為日曆事件（過濾掉特殊團和已封存的）
   const tourEvents: FullCalendarEvent[] = useMemo(() => {
-    logger.log('[Calendar] 轉換 tours，原始數量:', tours?.length || 0)
     return (tours || [])
       .filter(tour => tour.status !== '特殊團' && !tour.archived) // 過濾掉簽證專用團等特殊團，以及已封存的
       .map(tour => {
@@ -193,10 +177,6 @@ export function useCalendarEvents() {
 
   // 轉換公司事項為日曆事件
   const companyCalendarEvents: FullCalendarEvent[] = useMemo(() => {
-    // 🔍 診斷日誌：查看載入的行事曆事件
-    logger.log('[Calendar] calendarEvents 總數:', calendarEvents?.length || 0)
-    logger.log('[Calendar] 公司事件數量:', calendarEvents?.filter(e => e.visibility === 'company').length || 0)
-
     return (calendarEvents || [])
       .filter(event => {
         if (event.visibility !== 'company') return false

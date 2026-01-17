@@ -35,10 +35,10 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
 
   return (
     <div className="space-y-4">
-      {/* 團控人員選擇 */}
+      {/* 團控人員選擇（選填） */}
       <div>
         <label className="block text-sm font-medium text-morandi-primary mb-1">
-          團控人員
+          團控人員 <span className="text-morandi-secondary font-normal">(選填)</span>
         </label>
         <Combobox
           options={controllers.map(emp => ({
@@ -51,6 +51,7 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
           emptyMessage="找不到團控人員"
           showSearchIcon={true}
           showClearButton={true}
+          disablePortal={true}
         />
       </div>
 

@@ -42,6 +42,7 @@ export function TourDocumentLinks({
             emptyMessage="找不到行程表"
             className="mt-1"
             disabled={!!selectedQuoteId}
+            disablePortal={true}
           />
           <p className="text-xs text-morandi-secondary mt-1">
             選擇後自動帶入行程資料
@@ -63,6 +64,7 @@ export function TourDocumentLinks({
             emptyMessage="找不到報價單"
             className="mt-1"
             disabled={!!selectedItineraryId}
+            disablePortal={true}
           />
           <p className="text-xs text-morandi-secondary mt-1">
             選擇後自動帶入報價資料

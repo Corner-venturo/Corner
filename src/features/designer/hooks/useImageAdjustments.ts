@@ -6,12 +6,24 @@ import { DEFAULT_IMAGE_ADJUSTMENTS } from '../components/types'
 import { logger } from '@/lib/utils/logger'
 
 /**
+ * MiniGL 實例類型（套件沒有提供類型定義）
+ */
+interface MiniGLInstance {
+  loadimage: () => void
+  filterAdjustments: (options: Record<string, number>) => void
+  filterVignette: (options: { size: number; amount: number }) => void
+  paintCanvas: () => void
+  captureImage: (format: string, quality: number) => string
+  destroy: () => void
+}
+
+/**
  * 圖片調整 Hook
  * 使用 @xdadda/mini-gl 進行 WebGL 圖片處理
  */
 export function useImageAdjustments() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const wglRef = useRef<ReturnType<typeof import('@xdadda/mini-gl').default> | null>(null)
+  const wglRef = useRef<MiniGLInstance | null>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
   const isInitializedRef = useRef(false)
 
@@ -56,11 +68,21 @@ export function useImageAdjustments() {
       }
 
       try {
+        logger.log('🖼️ 開始圖片調整:', {
+          hasAdjustments,
+          adjustments,
+          imageSrcType: imageSrc.startsWith('data:') ? 'data-url' : imageSrc.startsWith('blob:') ? 'blob-url' : 'remote-url',
+        })
+
         // 動態載入 mini-gl（避免 SSR 問題）
-        const minigl = (await import('@xdadda/mini-gl')).default
+        // 套件使用 named export 'minigl'，但沒有 TypeScript 類型定義
+        const miniglModule = await import('@xdadda/mini-gl') as unknown as { minigl: (canvas: HTMLCanvasElement, img: HTMLImageElement, colorSpace?: string) => MiniGLInstance }
+        const minigl = miniglModule.minigl
+        logger.log('✅ mini-gl 載入成功')
 
         // 載入圖片
         const img = await loadImage(imageSrc)
+        logger.log('✅ 圖片載入成功:', img.naturalWidth, 'x', img.naturalHeight)
         imageRef.current = img
 
         // 建立或重用 canvas
@@ -104,13 +126,15 @@ export function useImageAdjustments() {
 
         // 渲染到 canvas
         wgl.paintCanvas()
+        logger.log('✅ 渲染到 canvas 完成')
 
         // 擷取處理後的圖片
         const dataURL = wgl.captureImage('image/jpeg', 0.92)
+        logger.log('✅ 圖片處理完成，dataURL 長度:', dataURL.length)
 
         return dataURL
       } catch (error) {
-        logger.error('圖片調整失敗:', error)
+        logger.error('❌ 圖片調整失敗:', error)
         // 失敗時回傳原始圖片
         return imageSrc
       }

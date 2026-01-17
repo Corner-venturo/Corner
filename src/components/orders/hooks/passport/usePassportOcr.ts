@@ -69,10 +69,20 @@ export function usePassportOcr(): UsePassportOcrReturn {
     const response = await fetch('/api/ocr/passport', {
       method: 'POST',
       body: formData,
+      credentials: 'include', // 確保帶上認證 cookie
     })
 
     if (!response.ok) {
-      throw new Error('OCR 辨識失敗')
+      let errorText = ''
+      try {
+        errorText = await response.text()
+      } catch (e) {
+        errorText = '無法讀取回應內容'
+      }
+      const statusCode = response.status
+      const statusMessage = response.statusText
+      logger.error(`OCR API 回應錯誤: status=${statusCode}, statusText=${statusMessage}, body=${errorText.slice(0, 500)}`)
+      throw new Error(`OCR 辨識失敗 (${statusCode}): ${errorText.slice(0, 100) || statusMessage || '未知錯誤'}`)
     }
 
     const json = await response.json()
