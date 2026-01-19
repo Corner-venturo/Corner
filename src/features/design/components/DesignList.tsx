@@ -23,26 +23,16 @@ interface DesignListProps {
  * 設計列表組件
  */
 export function DesignList({ onEdit, onDelete }: DesignListProps) {
-  const { designs, isLoading } = useDesigns()
+  const { designs, isLoading, error } = useDesigns()
 
   const columns: TableColumn<Design>[] = [
     {
       key: 'tour',
       label: '團名',
-      width: '200',
+      width: '250',
       render: (_, row) => (
         <span className="text-sm text-morandi-primary">
           {row.tour_name || '(無團名)'}
-        </span>
-      ),
-    },
-    {
-      key: 'itinerary',
-      label: '行程',
-      width: '150',
-      render: (_, row) => (
-        <span className="text-sm text-morandi-secondary">
-          {row.itinerary_name || '-'}
         </span>
       ),
     },
@@ -120,6 +110,15 @@ export function DesignList({ onEdit, onDelete }: DesignListProps) {
     return (
       <div className="flex items-center justify-center h-64 text-morandi-secondary">
         載入中...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-morandi-red">
+        <p>載入失敗</p>
+        <p className="text-sm mt-2">{error instanceof Error ? error.message : String(error)}</p>
       </div>
     )
   }

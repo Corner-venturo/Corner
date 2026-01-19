@@ -14,7 +14,7 @@ import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hote
 import { japaneseStyleV1Vehicle } from '../definitions/japanese-style-v1-vehicle'
 import { japaneseStyleV1Table } from '../definitions/japanese-style-v1-table'
 import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
-import type { CanvasPage } from '@/features/designer/components/types'
+import type { CanvasPage, CanvasElement } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
 
 // 備忘錄預設內容（依國家）
@@ -27,9 +27,17 @@ export {
 } from '../definitions/country-presets'
 export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData, VehicleData, TemplateData } from '../definitions/types'
 
-// A5 尺寸（像素，96 DPI）
-const A5_WIDTH_PX = 559
-const A5_HEIGHT_PX = 794
+// A5 尺寸
+// 設計尺寸（模板定義使用，96 DPI）
+const A5_DESIGN_WIDTH = 559
+const A5_DESIGN_HEIGHT = 794
+
+// 輸出尺寸（300 DPI + 3mm 出血）
+const A5_OUTPUT_WIDTH = 1819
+const A5_OUTPUT_HEIGHT = 2551
+
+// 縮放比例（輸出尺寸 / 設計尺寸）
+const SCALE_FACTOR = A5_OUTPUT_WIDTH / A5_DESIGN_WIDTH // ≈ 3.254
 
 // 範本註冊表
 const templateRegistry: Record<string, PageTemplate> = {
@@ -106,6 +114,44 @@ export function getTemplateById(templateId: string): PageTemplate | null {
 }
 
 /**
+ * 縮放單一元素（從設計尺寸到輸出尺寸）
+ */
+function scaleElement<T extends CanvasElement>(element: T): T {
+  const scaled = { ...element } as Record<string, unknown>
+
+  // 縮放位置和尺寸
+  scaled.x = (element.x || 0) * SCALE_FACTOR
+  scaled.y = (element.y || 0) * SCALE_FACTOR
+  if (element.width !== undefined) scaled.width = element.width * SCALE_FACTOR
+  if (element.height !== undefined) scaled.height = element.height * SCALE_FACTOR
+
+  // 如果是文字元素，縮放字體大小和相關屬性
+  if (element.type === 'text' && 'style' in element) {
+    const textElement = element as { style?: { fontSize?: number; letterSpacing?: number } }
+    if (textElement.style) {
+      scaled.style = {
+        ...textElement.style,
+        fontSize: (textElement.style.fontSize || 12) * SCALE_FACTOR,
+        letterSpacing: (textElement.style.letterSpacing || 0) * SCALE_FACTOR,
+      }
+    }
+  }
+
+  // 如果是形狀元素，縮放邊框寬度和圓角
+  if (element.type === 'shape') {
+    const shapeElement = element as { strokeWidth?: number; cornerRadius?: number }
+    if (shapeElement.strokeWidth) {
+      scaled.strokeWidth = shapeElement.strokeWidth * SCALE_FACTOR
+    }
+    if (shapeElement.cornerRadius) {
+      scaled.cornerRadius = shapeElement.cornerRadius * SCALE_FACTOR
+    }
+  }
+
+  return scaled as T
+}
+
+/**
  * 根據範本和行程數據生成一個完整的 CanvasPage 物件
  */
 export function generatePageFromTemplate(
@@ -118,15 +164,18 @@ export function generatePageFromTemplate(
     throw new Error(`Template with id "${templateId}" not found.`)
   }
 
-  // 使用範本的生成器函式來創建元素列表
-  const elements = template.generateElements(itineraryData)
+  // 使用範本的生成器函式來創建元素列表（設計尺寸）
+  const designElements = template.generateElements(itineraryData)
+
+  // 縮放所有元素到輸出尺寸
+  const elements = designElements.map(el => scaleElement(el))
 
   return {
     id: `page-${crypto.randomUUID()}`,
     name: template.name,
     templateKey: template.category, // 用於識別頁面類型（cover, toc, itinerary 等）
-    width: A5_WIDTH_PX,
-    height: A5_HEIGHT_PX,
+    width: A5_OUTPUT_WIDTH,
+    height: A5_OUTPUT_HEIGHT,
     backgroundColor: '#ffffff',
     elements,
   }

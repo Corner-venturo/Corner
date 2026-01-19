@@ -85,127 +85,133 @@ export function ElementLibrary({
           <TabsTrigger value="qrcode" className="text-xs px-1">QR</TabsTrigger>
         </TabsList>
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 relative overflow-hidden">
           {/* 基本元素 */}
-          <TabsContent value="elements" className="p-3 space-y-4">
-            {/* 文字 */}
-            <div>
-              <h4 className="text-xs font-medium text-morandi-secondary mb-2">文字</h4>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start gap-2"
-                onClick={onAddText}
-              >
-                <Type size={16} />
-                新增文字
-              </Button>
-            </div>
+          <TabsContent value="elements" className="absolute inset-0 m-0 p-0 overflow-auto">
+            <div className="p-3 space-y-4">
+              {/* 文字 */}
+              <div>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">文字</h4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start gap-2"
+                  onClick={onAddText}
+                >
+                  <Type size={16} />
+                  新增文字
+                </Button>
+              </div>
 
-            {/* 形狀 */}
-            <div>
-              <h4 className="text-xs font-medium text-morandi-secondary mb-2">形狀</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {BASIC_SHAPES.map((shape) => (
-                  <Button
-                    key={shape.id}
-                    variant="outline"
-                    size="sm"
-                    className="flex flex-col items-center gap-1 h-16"
-                    onClick={() => onAddShape(shape.id as 'rectangle' | 'circle')}
-                  >
-                    <shape.icon size={20} className="text-morandi-gold" />
-                    <span className="text-[10px]">{shape.name}</span>
-                  </Button>
-                ))}
+              {/* 形狀 */}
+              <div>
+                <h4 className="text-xs font-medium text-morandi-secondary mb-2">形狀</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {BASIC_SHAPES.map((shape) => (
+                    <Button
+                      key={shape.id}
+                      variant="outline"
+                      size="sm"
+                      className="flex flex-col items-center gap-1 h-16"
+                      onClick={() => onAddShape(shape.id as 'rectangle' | 'circle')}
+                    >
+                      <shape.icon size={20} className="text-morandi-gold" />
+                      <span className="text-[10px]">{shape.name}</span>
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           </TabsContent>
 
           {/* 線條 */}
-          <TabsContent value="lines" className="p-3">
-            <h4 className="text-xs font-medium text-morandi-secondary mb-2">線條樣式</h4>
-            <div className="grid grid-cols-2 gap-2">
-              {LINE_OPTIONS.map((line) => (
-                <Button
-                  key={line.id}
-                  variant="outline"
-                  size="sm"
-                  className="flex flex-col items-center gap-1 h-16"
-                  onClick={() => onAddLine({ style: line.style, arrow: line.arrow })}
-                >
-                  <line.icon size={20} className="text-morandi-gold" />
-                  <span className="text-[10px]">{line.name}</span>
-                </Button>
-              ))}
-            </div>
+          <TabsContent value="lines" className="absolute inset-0 m-0 p-0 overflow-auto">
+            <div className="p-3">
+              <h4 className="text-xs font-medium text-morandi-secondary mb-2">線條樣式</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {LINE_OPTIONS.map((line) => (
+                  <Button
+                    key={line.id}
+                    variant="outline"
+                    size="sm"
+                    className="flex flex-col items-center gap-1 h-16"
+                    onClick={() => onAddLine({ style: line.style, arrow: line.arrow })}
+                  >
+                    <line.icon size={20} className="text-morandi-gold" />
+                    <span className="text-[10px]">{line.name}</span>
+                  </Button>
+                ))}
+              </div>
 
-            {/* 線條預覽 */}
-            <div className="mt-4 p-3 bg-morandi-container/30 rounded-lg space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="flex-1 border-t-2 border-morandi-gold" />
-                <span className="text-[10px] text-morandi-secondary">實線</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 border-t-2 border-dashed border-morandi-gold" />
-                <span className="text-[10px] text-morandi-secondary">虛線</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 border-t-2 border-dotted border-morandi-gold" />
-                <span className="text-[10px] text-morandi-secondary">點線</span>
+              {/* 線條預覽 */}
+              <div className="mt-4 p-3 bg-morandi-container/30 rounded-lg space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 border-t-2 border-morandi-gold" />
+                  <span className="text-[10px] text-morandi-secondary">實線</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 border-t-2 border-dashed border-morandi-gold" />
+                  <span className="text-[10px] text-morandi-secondary">虛線</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 border-t-2 border-dotted border-morandi-gold" />
+                  <span className="text-[10px] text-morandi-secondary">點線</span>
+                </div>
               </div>
             </div>
           </TabsContent>
 
           {/* 貼紙/圖案 */}
-          <TabsContent value="stickers" className="p-3 space-y-4">
-            {categories.map(([category, label]) => {
-              const stickers = getStickersByCategory(category)
-              if (stickers.length === 0) return null
+          <TabsContent value="stickers" className="absolute inset-0 m-0 p-0 overflow-auto">
+            <div className="p-3 space-y-4">
+              {categories.map(([category, label]) => {
+                const stickers = getStickersByCategory(category)
+                if (stickers.length === 0) return null
 
-              return (
-                <div key={category}>
-                  <h4 className="text-xs font-medium text-morandi-secondary mb-2 flex items-center gap-1">
-                    {getCategoryIcon(category)}
-                    {label}
-                  </h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {stickers.map((sticker) => (
-                      <StickerButton
-                        key={sticker.id}
-                        sticker={sticker}
-                        onClick={() => onAddSticker(sticker.id, category)}
-                      />
-                    ))}
+                return (
+                  <div key={category}>
+                    <h4 className="text-xs font-medium text-morandi-secondary mb-2 flex items-center gap-1">
+                      {getCategoryIcon(category)}
+                      {label}
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {stickers.map((sticker) => (
+                        <StickerButton
+                          key={sticker.id}
+                          sticker={sticker}
+                          onClick={() => onAddSticker(sticker.id, category)}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </TabsContent>
 
           {/* 彩色圖標（使用 Iconify API） */}
-          <TabsContent value="colorful" className="flex-1 h-full m-0 p-0">
+          <TabsContent value="colorful" className="absolute inset-0 m-0 p-0 overflow-auto">
             {onAddColorfulIcon && (
               <ColorfulIconPicker onSelectIcon={onAddColorfulIcon} />
             )}
           </TabsContent>
 
           {/* 圖示庫 */}
-          <TabsContent value="icons" className="flex-1 h-full m-0 p-0">
+          <TabsContent value="icons" className="absolute inset-0 m-0 p-0 overflow-auto">
             {onAddIcon && (
               <IconPicker onSelectIcon={onAddIcon} />
             )}
           </TabsContent>
 
           {/* 圖片庫 (Unsplash + Pexels) */}
-          <TabsContent value="images" className="flex-1 h-full m-0 p-0">
+          <TabsContent value="images" className="absolute inset-0 m-0 p-0 overflow-auto">
             {onAddImage && (
               <ImageLibraryPicker onSelectImage={onAddImage} />
             )}
           </TabsContent>
 
           {/* QR Code 生成器 */}
-          <TabsContent value="qrcode" className="flex-1 h-full m-0 p-0">
+          <TabsContent value="qrcode" className="absolute inset-0 m-0 p-0 overflow-auto">
             {onAddQRCode && (
               <QRCodeGenerator onGenerate={onAddQRCode} />
             )}

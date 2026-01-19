@@ -39,15 +39,15 @@ export function UniverDocument({ className }: UniverDocumentProps) {
               container: containerRef.current,
             }),
           ],
-          plugins: [
-            UniverBackToListDocPlugin,
-          ],
         })
 
         univerRef.current = { univer, univerAPI }
 
         // 建立空白文件
         univerAPI.createUniverDoc({})
+
+        // 在文件建立後註冊返回列表 plugin
+        univer.registerPlugin(UniverBackToListDocPlugin)
       } catch (error) {
         console.error('Univer Document 初始化失敗:', error)
       }

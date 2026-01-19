@@ -47,14 +47,15 @@ const mockDocuments: OfficeDocument[] = [
     created_at: '2026-01-15T09:00:00Z',
     updated_at: '2026-01-17T16:00:00Z',
   },
-  {
-    id: '4',
-    name: '公司介紹簡報',
-    type: 'slides',
-    created_by: 'Admin',
-    created_at: '2026-01-10T11:00:00Z',
-    updated_at: '2026-01-12T15:00:00Z',
-  },
+  // TODO: Univer Slides 功能尚未完整，暫時隱藏
+  // {
+  //   id: '4',
+  //   name: '公司介紹簡報',
+  //   type: 'slides',
+  //   created_by: 'Admin',
+  //   created_at: '2026-01-10T11:00:00Z',
+  //   updated_at: '2026-01-12T15:00:00Z',
+  // },
 ]
 
 // 取得文件類型圖標

@@ -39,9 +39,6 @@ export function UniverSpreadsheet({ className }: UniverSpreadsheetProps) {
               container: containerRef.current,
             }),
           ],
-          plugins: [
-            UniverBackToListPlugin,
-          ],
         })
 
         univerRef.current = { univer, univerAPI }
@@ -50,6 +47,10 @@ export function UniverSpreadsheet({ className }: UniverSpreadsheetProps) {
         univerAPI.createWorkbook({
           name: '未命名試算表',
         })
+
+        // 在 workbook 建立後註冊返回列表 plugin
+        univer.registerPlugin(UniverBackToListPlugin)
+
       } catch (error) {
         console.error('Univer Spreadsheet 初始化失敗:', error)
       }

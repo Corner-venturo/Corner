@@ -1,4 +1,4 @@
-import type { Dependency, ICommand } from '@univerjs/core'
+import type { Dependency, IAccessor, ICommand } from '@univerjs/core'
 import {
   CommandType,
   Disposable,
@@ -19,11 +19,20 @@ import type { IMenuButtonItem } from '@univerjs/ui'
 // Command ID
 const BACK_TO_LIST_COMMAND_ID = 'office.command.back-to-list'
 
+// Custom Icon Component - 返回箭頭
+function BackToListIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  )
+}
+
 // Command handler
 const BackToListCommand: ICommand = {
   id: BACK_TO_LIST_COMMAND_ID,
   type: CommandType.OPERATION,
-  handler: () => {
+  handler: (_accessor: IAccessor) => {
     if (typeof window !== 'undefined') {
       window.location.href = '/office'
     }
@@ -37,7 +46,8 @@ function BackToListMenuItemFactory(): IMenuButtonItem<string> {
     id: BACK_TO_LIST_COMMAND_ID,
     type: MenuItemType.BUTTON,
     title: '返回列表',
-    icon: 'LeftSingle',
+    tooltip: '返回文件列表',
+    icon: 'BackToListIcon',
   }
 }
 
@@ -50,6 +60,7 @@ class BackToListController extends Disposable {
   ) {
     super()
     this._initCommands()
+    this._registerComponents()
     this._initMenus()
   }
 
@@ -57,11 +68,15 @@ class BackToListController extends Disposable {
     this.disposeWithMe(this._commandService.registerCommand(BackToListCommand))
   }
 
+  private _registerComponents(): void {
+    this._componentManager.register('BackToListIcon', BackToListIcon)
+  }
+
   private _initMenus(): void {
     this._menuManagerService.mergeMenu({
-      [RibbonStartGroup.OTHERS]: {
+      [RibbonStartGroup.HISTORY]: {
         [BACK_TO_LIST_COMMAND_ID]: {
-          order: -100, // 放在最前面
+          order: -1, // 放在 undo/redo 前面
           menuItemFactory: BackToListMenuItemFactory,
         },
       },
@@ -84,9 +99,7 @@ export class UniverBackToListPlugin extends Plugin {
   override onStarting(): void {
     const deps: Dependency[] = [[BackToListController]]
     deps.forEach((dep) => this._injector.add(dep))
-  }
-
-  override onRendered(): void {
+    // 立即取得 controller 觸發初始化
     this._injector.get(BackToListController)
   }
 }

@@ -16,14 +16,43 @@ export function useDesigns() {
   const { data, error, isLoading, mutate } = useSWR(
     workspaceId ? [DESIGNS_KEY, workspaceId] : null,
     async () => {
-      const { data, error } = await supabase
+      // 先取得所有設計文件
+      const { data: docs, error: docsError } = await supabase
         .from('brochure_documents')
         .select('*')
         .eq('workspace_id', workspaceId!)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      return data as Design[]
+      if (docsError) throw docsError
+
+      // 取得有 tour_id 的文件的團資料
+      const tourIds = (docs || [])
+        .map(d => d.tour_id)
+        .filter((id): id is string => !!id)
+
+      let tourMap: Record<string, { name: string | null; code: string | null }> = {}
+
+      if (tourIds.length > 0) {
+        const { data: tours } = await supabase
+          .from('tours')
+          .select('id, name, code')
+          .in('id', tourIds)
+
+        if (tours) {
+          tourMap = Object.fromEntries(
+            tours.map(t => [t.id, { name: t.name, code: t.code }])
+          )
+        }
+      }
+
+      // 合併資料
+      return (docs || []).map(doc => ({
+        ...doc,
+        tour_name: (doc.tour_id && tourMap[doc.tour_id]?.name) || doc.tour_name,
+        tour_code: (doc.tour_id && tourMap[doc.tour_id]?.code) || doc.tour_code,
+        // 如果 design_type 為空，默認 brochure_a5
+        design_type: doc.design_type || 'brochure_a5',
+      })) as Design[]
     }
   )
 

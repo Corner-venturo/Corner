@@ -117,7 +117,7 @@ interface DocumentState {
   // Actions
   loadDocument: (type: DocumentType, documentId: string) => Promise<void>
   loadOrCreateDocument: (type: DocumentType, entityId: string, workspaceId: string, entityType?: BrochureEntityType) => Promise<string>
-  saveVersion: (canvasData: Json, thumbnailUrl?: string) => Promise<DocumentVersion | null>
+  saveVersion: (canvasData: Json, thumbnailUrl?: string, designType?: string) => Promise<DocumentVersion | null>
   loadVersion: (versionId: string) => Promise<void>
   restoreVersion: (versionId: string) => Promise<void>
   fetchVersions: () => Promise<void>
@@ -315,7 +315,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // ============================================
   // Save Version
   // ============================================
-  saveVersion: async (canvasData: Json, thumbnailUrl?: string) => {
+  saveVersion: async (canvasData: Json, thumbnailUrl?: string, designType?: string) => {
     const { document, documentType } = get()
     if (!document || !documentType) return null
 
@@ -340,10 +340,15 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
 
       if (versionError) throw new Error(`儲存版本失敗: ${versionError.message}`)
 
-      // 2. Update document's current_version_id
+      // 2. Update document's current_version_id and design_type (if provided)
+      const updateData: Record<string, unknown> = { current_version_id: newVersion.id }
+      if (designType && documentType === 'brochure') {
+        updateData.design_type = designType
+      }
+
       const { error: updateError } = await supabase
         .from(docTable)
-        .update({ current_version_id: newVersion.id })
+        .update(updateData)
         .eq('id', document.id)
 
       if (updateError) throw new Error(`更新文件失敗: ${updateError.message}`)

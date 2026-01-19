@@ -1304,14 +1304,30 @@ export default function DesignerPage() {
           // 有存檔，自動設定設計類型並跳過選擇器
           // 從存檔資料中取得手冊尺寸
           const versionData = loadedVersion.data as Record<string, unknown>
-          const pages = versionData.pages as Array<{ width?: number; height?: number }> | undefined
+          const pages = versionData.pages as Array<{ width?: number; height?: number; templateKey?: string }> | undefined
           const firstPage = pages?.[0]
 
           // 根據尺寸找到對應的設計類型
-          const matchedType = DESIGN_TYPES.find(dt =>
-            dt.width === (firstPage?.width || 559) &&
-            dt.height === (firstPage?.height || 794)
-          ) || DESIGN_TYPES[0]
+          let matchedType: DesignType | undefined
+
+          // 1. 如果有有效的尺寸，嘗試精確匹配
+          if (firstPage?.width && firstPage?.height) {
+            matchedType = DESIGN_TYPES.find(dt =>
+              dt.width === firstPage.width &&
+              dt.height === firstPage.height
+            )
+          }
+
+          // 2. 如果沒有精確匹配，根據 templateKey 判斷是否為手冊類型
+          if (!matchedType) {
+            const isBrochureDocument = pages?.some(p =>
+              p.templateKey && ['cover', 'toc', 'daily', 'itinerary', 'memo', 'hotel', 'vehicle', 'table'].includes(p.templateKey)
+            )
+            // 手冊類型默認 A5，其他類型默認第一個
+            matchedType = isBrochureDocument
+              ? DESIGN_TYPES.find(dt => dt.id === 'brochure-a5') || DESIGN_TYPES[0]
+              : DESIGN_TYPES[0]
+          }
 
           setSelectedDesignType(matchedType)
           // currentVersion 會在另一個 useEffect 中被處理並載入畫布
@@ -1517,15 +1533,16 @@ export default function DesignerPage() {
     if (!isCanvasReady || !canvasContainerRef.current) return
 
     // 取得容器尺寸並計算適合的縮放
+    // padding 44 = 32px 原本邊距 + 12px 額外空間（因為尺規佔 24px，而 padding 會乘 2）
     const container = canvasContainerRef.current
     const { clientWidth, clientHeight } = container
-    fitToContainer(clientWidth, clientHeight, 32) // 32px padding
+    fitToContainer(clientWidth, clientHeight, 44)
 
     // 監聽視窗大小變化
     const handleResize = () => {
       if (canvasContainerRef.current) {
         const { clientWidth, clientHeight } = canvasContainerRef.current
-        fitToContainer(clientWidth, clientHeight, 32)
+        fitToContainer(clientWidth, clientHeight, 44)
       }
     }
 
@@ -1583,6 +1600,24 @@ export default function DesignerPage() {
       setCurrentPageIndex(savedPageIndex)
       if (savedTemplateData) {
         setTemplateData(savedTemplateData)
+
+        // 從資料庫取得最新的團名來更新（避免顯示舊的團名）
+        if (entityId && entityType === 'tour') {
+          supabase
+            .from('tours')
+            .select('name, code')
+            .eq('id', entityId)
+            .single()
+            .then(({ data: tourData }) => {
+              if (tourData?.name) {
+                setTemplateData(prev => prev ? {
+                  ...prev,
+                  mainTitle: tourData.name,
+                  tourCode: tourData.code || prev.tourCode,
+                } : prev)
+              }
+            })
+        }
       }
 
       // 還原選擇的風格
@@ -1624,7 +1659,7 @@ export default function DesignerPage() {
         initPageHistory('legacy-page')
       })
     }
-  }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory])
+  }, [isCanvasReady, currentVersion, loadCanvasData, loadCanvasPage, setLoadingStage, initPageHistory, entityId, entityType])
 
   // ============================================
   // Load Generated Pages (初次載入)
@@ -1688,11 +1723,18 @@ export default function DesignerPage() {
       styleId: selectedStyle?.id || null,
     }
 
-    await saveVersion(documentData as unknown as Parameters<typeof saveVersion>[0])
+    // 將設計類型 ID 轉換為資料庫格式 (brochure-a5 -> brochure_a5)
+    const dbDesignType = selectedDesignType?.id?.replace(/-/g, '_')
+
+    await saveVersion(
+      documentData as unknown as Parameters<typeof saveVersion>[0],
+      undefined,
+      dbDesignType
+    )
 
     // 更新本地的 generatedPages（包含 fabricData）
     setGeneratedPages(updatedPages as CanvasPage[])
-  }, [isCanvasReady, isSaving, exportCanvasData, saveVersion, generatedPages, currentPageIndex, templateData, selectedStyle])
+  }, [isCanvasReady, isSaving, exportCanvasData, saveVersion, generatedPages, currentPageIndex, templateData, selectedStyle, selectedDesignType])
 
   // ============================================
   // Print/PDF Export Handler - 開啟列印預覽
@@ -2732,20 +2774,15 @@ export default function DesignerPage() {
                 dpi={300}
               >
                 <div
+                  className="bg-white shadow-xl rounded"
                   style={{
+                    width: canvasWidth,
+                    height: canvasHeight,
                     transform: `scale(${displayZoom})`,
                     transformOrigin: 'top left',
                   }}
                 >
-                  <div
-                    className="bg-white shadow-xl rounded"
-                    style={{
-                      width: canvasWidth,
-                      height: canvasHeight,
-                    }}
-                  >
-                    <canvas ref={canvasRef} />
-                  </div>
+                  <canvas ref={canvasRef} />
                 </div>
               </CanvasWithRulers>
             )}

@@ -1,4 +1,4 @@
-import type { Dependency, ICommand } from '@univerjs/core'
+import type { Dependency, IAccessor, ICommand } from '@univerjs/core'
 import {
   CommandType,
   Disposable,
@@ -9,7 +9,6 @@ import {
   UniverInstanceType,
 } from '@univerjs/core'
 import {
-  ComponentManager,
   IMenuManagerService,
   MenuItemType,
   RibbonStartGroup,
@@ -23,7 +22,7 @@ const BACK_TO_LIST_DOC_COMMAND_ID = 'office.command.back-to-list-doc'
 const BackToListDocCommand: ICommand = {
   id: BACK_TO_LIST_DOC_COMMAND_ID,
   type: CommandType.OPERATION,
-  handler: () => {
+  handler: (_accessor: IAccessor) => {
     if (typeof window !== 'undefined') {
       window.location.href = '/office'
     }
@@ -31,22 +30,21 @@ const BackToListDocCommand: ICommand = {
   },
 }
 
-// Menu item factory
+// Menu item factory - 不使用自訂圖標，使用箭頭符號
 function BackToListDocMenuItemFactory(): IMenuButtonItem<string> {
   return {
     id: BACK_TO_LIST_DOC_COMMAND_ID,
     type: MenuItemType.BUTTON,
-    title: '返回列表',
-    icon: 'LeftSingle',
+    title: '← 返回',
+    tooltip: '返回文件列表',
   }
 }
 
-// Controller
+// Controller - 簡化版，不依賴 ComponentManager
 class BackToListDocController extends Disposable {
   constructor(
     @ICommandService private readonly _commandService: ICommandService,
-    @IMenuManagerService private readonly _menuManagerService: IMenuManagerService,
-    @Inject(ComponentManager) private readonly _componentManager: ComponentManager
+    @IMenuManagerService private readonly _menuManagerService: IMenuManagerService
   ) {
     super()
     this._initCommands()
@@ -59,9 +57,9 @@ class BackToListDocController extends Disposable {
 
   private _initMenus(): void {
     this._menuManagerService.mergeMenu({
-      [RibbonStartGroup.OTHERS]: {
+      [RibbonStartGroup.HISTORY]: {
         [BACK_TO_LIST_DOC_COMMAND_ID]: {
-          order: -100,
+          order: -1, // 放在 undo/redo 前面
           menuItemFactory: BackToListDocMenuItemFactory,
         },
       },
@@ -72,7 +70,8 @@ class BackToListDocController extends Disposable {
 // Plugin for Documents
 export class UniverBackToListDocPlugin extends Plugin {
   static override pluginName = 'UNIVER_BACK_TO_LIST_DOC_PLUGIN'
-  static override type = UniverInstanceType.UNIVER_DOC
+  // 使用 UNIVER_UNKNOWN 讓 plugin 可以在任何類型的 instance 上運行
+  static override type = UniverInstanceType.UNIVER_UNKNOWN
 
   constructor(
     _config: undefined,
@@ -82,11 +81,16 @@ export class UniverBackToListDocPlugin extends Plugin {
   }
 
   override onStarting(): void {
-    const deps: Dependency[] = [[BackToListDocController]]
-    deps.forEach((dep) => this._injector.add(dep))
-  }
-
-  override onRendered(): void {
-    this._injector.get(BackToListDocController)
+    // 延遲初始化，確保所有服務已註冊
+    setTimeout(() => {
+      try {
+        const deps: Dependency[] = [[BackToListDocController]]
+        deps.forEach((dep) => this._injector.add(dep))
+        // 取得 controller 觸發初始化
+        this._injector.get(BackToListDocController)
+      } catch (error) {
+        // Docs UI 可能尚未完全載入，這是預期的行為
+      }
+    }, 0)
   }
 }

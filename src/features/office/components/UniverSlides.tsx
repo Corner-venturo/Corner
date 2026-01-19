@@ -7,6 +7,7 @@ import { UniverRenderEnginePlugin } from '@univerjs/engine-render'
 import { UniverUIPlugin } from '@univerjs/ui'
 import { UniverSlidesPlugin } from '@univerjs/slides'
 import { UniverSlidesUIPlugin } from '@univerjs/slides-ui'
+import { UniverBackToListSlidesPlugin } from '../plugins/back-to-list-slides-plugin'
 
 // Locale imports
 import DesignZhTW from '@univerjs/design/lib/locale/zh-TW.js'
@@ -88,6 +89,9 @@ export function UniverSlides({ className }: UniverSlidesProps) {
 
         // 建立空白簡報（需要提供完整的簡報結構）
         univer.createUnit(UniverInstanceType.UNIVER_SLIDE, createEmptySlidesData())
+
+        // 在簡報建立後註冊返回列表 plugin
+        univer.registerPlugin(UniverBackToListSlidesPlugin)
       } catch (error) {
         console.error('Univer Slides 初始化失敗:', error)
       }

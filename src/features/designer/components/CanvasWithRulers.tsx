@@ -599,12 +599,14 @@ export function CanvasWithRulers({
         />
       )}
 
-      {/* 畫布內容區域 */}
+      {/* 畫布內容區域 - 設定正確的視覺尺寸讓佈局正確 */}
       <div
         className="relative"
         style={{
           marginLeft: RULER_OFFSET,
           marginTop: RULER_OFFSET,
+          width: canvasWidth * zoom,
+          height: canvasHeight * zoom,
         }}
       >
         {children}
