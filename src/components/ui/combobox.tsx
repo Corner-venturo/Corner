@@ -101,7 +101,7 @@ export function Combobox<T = unknown>({
   const [isOpen, setIsOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
-  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0 })
+  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0, maxHeight: 256 })
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
@@ -254,12 +254,26 @@ export function Combobox<T = unknown>({
   React.useEffect(() => {
     if (isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const dropdownMaxHeight = parseInt(maxHeight) * 16 || 256 // 16rem = 256px
+      const spaceBelow = viewportHeight - rect.bottom
+      const spaceAbove = rect.top
+
+      // 如果下方空間不足，且上方空間更大，則顯示在上方
+      const showAbove = spaceBelow < dropdownMaxHeight && spaceAbove > spaceBelow
+
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
+        top: showAbove
+          ? rect.top + window.scrollY - Math.min(dropdownMaxHeight, spaceAbove - 8) - 4
+          : rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
         width: rect.width,
+        maxHeight: showAbove
+          ? Math.min(dropdownMaxHeight, spaceAbove - 8)
+          : Math.min(dropdownMaxHeight, spaceBelow - 8),
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // 預設選項渲染
@@ -331,12 +345,21 @@ export function Combobox<T = unknown>({
               top: dropdownPosition.top,
               left: dropdownPosition.left,
               width: dropdownPosition.width,
-              maxHeight,
+              maxHeight: dropdownPosition.maxHeight,
+              pointerEvents: 'auto',
             }}
             onMouseDown={e => e.stopPropagation()}
             onPointerDown={e => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <div className="overflow-y-auto" style={{ maxHeight }}>
+            <div
+              className="overflow-y-auto overscroll-contain"
+              style={{
+                maxHeight: disablePortal ? maxHeight : dropdownPosition.maxHeight,
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'pan-y',
+              }}
+            >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option, index) => (
                   <button
@@ -346,7 +369,7 @@ export function Combobox<T = unknown>({
                     onClick={() => handleOptionSelect(option)}
                     disabled={option.disabled}
                     className={cn(
-                      'w-full px-3 py-2 text-left text-sm transition-colors',
+                      'w-full px-3 py-2 text-left text-sm transition-colors touch-manipulation',
                       'hover:bg-morandi-container/30 focus:bg-morandi-container/30 focus:outline-none',
                       highlightedIndex === index && 'bg-morandi-container/50',
                       option.value === value && 'bg-morandi-gold/10 font-medium',

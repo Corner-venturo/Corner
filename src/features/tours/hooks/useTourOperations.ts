@@ -193,8 +193,8 @@ export function useTourOperations(params: UseTourOperationsParams) {
           incrementCityUsage(cityName)
         }
 
-        // If contact person is filled, also add order
-        if (newOrder.contact_person?.trim()) {
+        // If contact person is filled, also add order (業務必填)
+        if (newOrder.contact_person?.trim() && newOrder.sales_person?.trim()) {
           // 🔧 優化：直接用 supabase insert，不依賴外部 hook
           const order_number = `${code}-O01`
           const memberCount = newOrder.member_count || 1
@@ -271,93 +271,71 @@ export function useTourOperations(params: UseTourOperationsParams) {
   )
 
   const handleDeleteTour = useCallback(
-    async (tour: Tour | null) => {
-      if (!tour) return
+    async (tour: Tour | null): Promise<{ success: boolean; error?: string }> => {
+      if (!tour) return { success: false, error: '無效的旅遊團' }
 
       try {
-        // 1. 刪除關聯的 PNRs
-        const { error: pnrError } = await supabase
-          .from('pnrs')
-          .delete()
-          .eq('tour_id', tour.id)
-        if (pnrError) {
-          logger.warn('刪除 PNRs 失敗:', JSON.stringify(pnrError))
+        // 檢查是否有關聯資料（團員、收款單、請款單、PNR 不能刪）
+        // 訂單可以連帶刪除，但如果有團員就不行
+        const checks = await Promise.all([
+          supabase.from('order_members').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+          supabase.from('receipt_orders').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+          supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+          supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+        ])
+
+        const [members, receipts, payments, pnrs] = checks
+        const blockers: string[] = []
+
+        if (members.count && members.count > 0) blockers.push(`${members.count} 位團員`)
+        if (receipts.count && receipts.count > 0) blockers.push(`${receipts.count} 筆收款單`)
+        if (payments.count && payments.count > 0) blockers.push(`${payments.count} 筆請款單`)
+        if (pnrs.count && pnrs.count > 0) blockers.push(`${pnrs.count} 筆 PNR`)
+
+        if (blockers.length > 0) {
+          const errorMsg = `無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`
+          logger.warn(`刪除旅遊團 ${tour.code} 失敗：${errorMsg}`)
+          return { success: false, error: errorMsg }
         }
 
-        // 2. 刪除關聯的請款單 (payment_requests)
-        const { error: prError } = await supabase
-          .from('payment_requests')
-          .delete()
-          .eq('tour_id', tour.id)
-        if (prError) {
-          logger.warn('刪除請款單失敗:', JSON.stringify(prError))
-        }
+        // 刪除關聯的訂單（沒有團員的空訂單可以刪）
+        await supabase.from('orders').delete().eq('tour_id', tour.id)
 
-        // 4. 刪除關聯的收款單 (receipt_orders)
-        const { error: roError } = await supabase
-          .from('receipt_orders')
-          .delete()
-          .eq('tour_id', tour.id)
-        if (roError) {
-          logger.warn('刪除收款單失敗:', JSON.stringify(roError))
-        }
-
-        // 5. 刪除關聯的團員 (order_members)
-        const { error: omError } = await supabase
-          .from('order_members')
-          .delete()
-          .eq('tour_id', tour.id)
-        if (omError) {
-          logger.warn('刪除團員失敗:', JSON.stringify(omError))
-        }
-
-        // 6. 刪除關聯的訂單 (orders)
-        const { error: ordError } = await supabase
-          .from('orders')
-          .delete()
-          .eq('tour_id', tour.id)
-        if (ordError) {
-          logger.warn('刪除訂單失敗:', JSON.stringify(ordError))
-        }
-
-        // 7. 🔧 優化：直接查詢並斷開關聯的報價單
+        // 斷開關聯的報價單（不刪除，只是解除連結）
         const { data: linkedQuotes } = await supabase
           .from('quotes')
           .select('id')
           .eq('tour_id', tour.id)
 
         if (linkedQuotes && linkedQuotes.length > 0) {
-          const { error: quoteError } = await supabase
+          await supabase
             .from('quotes')
             .update({ tour_id: null, status: 'proposed', updated_at: new Date().toISOString() })
             .eq('tour_id', tour.id)
-          if (quoteError) {
-            logger.warn('斷開報價單失敗:', quoteError.message)
-          }
         }
 
-        // 8. 🔧 優化：直接查詢並斷開關聯的行程表
+        // 斷開關聯的行程表（不刪除，只是解除連結）
         const { data: linkedItineraries } = await supabase
           .from('itineraries')
           .select('id')
           .eq('tour_id', tour.id)
 
         if (linkedItineraries && linkedItineraries.length > 0) {
-          const { error: itinError } = await supabase
+          await supabase
             .from('itineraries')
             .update({ tour_id: null, tour_code: null, status: '提案', updated_at: new Date().toISOString() })
             .eq('tour_id', tour.id)
-          if (itinError) {
-            logger.warn('斷開行程表失敗:', itinError.message)
-          }
         }
 
-        // 9. 刪除旅遊團
+        // 刪除旅遊團
         await actions.delete(tour.id)
 
-        logger.info(`已刪除旅遊團 ${tour.code}，包含相關訂單、請款單、收款單，並斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
+        logger.info(`已刪除旅遊團 ${tour.code}，斷開 ${linkedQuotes?.length || 0} 個報價單和 ${linkedItineraries?.length || 0} 個行程表的連結`)
+        return { success: true }
       } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : '刪除旅遊團失敗'
         logger.error('刪除旅遊團失敗:', JSON.stringify(err, null, 2))
+        return { success: false, error: errorMsg }
       }
     },
     [actions]

@@ -145,6 +145,7 @@ export function usePaymentForm() {
 
     // 操作
     setFormData,
+    setPaymentItems,
     addPaymentItem,
     removePaymentItem,
     updatePaymentItem,

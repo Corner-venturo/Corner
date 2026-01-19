@@ -24,6 +24,7 @@ import { logger } from '@/lib/utils/logger'
 interface UseBrochureEditorV2Options {
   width?: number
   height?: number
+  initialZoom?: number
   onReady?: () => void
 }
 
@@ -46,6 +47,8 @@ interface UseBrochureEditorV2Return {
   addText: (options?: { content?: string; x?: number; y?: number }) => void
   addRectangle: (options?: { x?: number; y?: number; width?: number; height?: number }) => void
   addCircle: (options?: { x?: number; y?: number; radius?: number }) => void
+  addEllipse: (options?: { x?: number; y?: number; rx?: number; ry?: number }) => void
+  addTriangle: (options?: { x?: number; y?: number; width?: number; height?: number }) => void
   addImage: (url: string, options?: { x?: number; y?: number }) => Promise<void>
   addLine: (options?: { style?: 'solid' | 'dashed' | 'dotted'; arrow?: boolean }) => void
   addSticker: (pathData: string, options?: {
@@ -56,6 +59,18 @@ interface UseBrochureEditorV2Return {
     fill?: string
     viewBox?: { width: number; height: number }
   }) => void
+  addIcon: (iconName: string, options?: {
+    x?: number
+    y?: number
+    size?: number
+    color?: string
+    keepOriginalColor?: boolean
+  }) => Promise<void>
+  addIllustration: (svgString: string, options?: {
+    x?: number
+    y?: number
+    size?: number
+  }) => Promise<void>
 
   // 選取操作
   selectedObjectIds: string[]
@@ -70,6 +85,8 @@ interface UseBrochureEditorV2Return {
   sendBackward: () => void
   bringToFront: () => void
   sendToBack: () => void
+  getObjects: () => fabric.FabricObject[]
+  selectObjectById: (id: string) => void
 
   // 對齊操作
   alignLeft: () => void
@@ -79,9 +96,17 @@ interface UseBrochureEditorV2Return {
   alignCenterV: () => void
   alignBottom: () => void
 
+  // 分佈操作
+  distributeH: () => void
+  distributeV: () => void
+
   // 群組操作
   groupSelected: () => void
   ungroupSelected: () => void
+
+  // 翻轉操作
+  flipHorizontal: () => void
+  flipVertical: () => void
 
   // 鎖定
   toggleLock: () => void
@@ -103,6 +128,7 @@ interface UseBrochureEditorV2Return {
   zoomIn: () => void
   zoomOut: () => void
   resetZoom: () => void
+  fitToContainer: (containerWidth: number, containerHeight: number, padding?: number) => void
 }
 
 // ============================================
@@ -129,13 +155,13 @@ interface PageHistory {
 export function useBrochureEditorV2(
   options: UseBrochureEditorV2Options = {}
 ): UseBrochureEditorV2Return {
-  const { width = 559, height = 794, onReady } = options
+  const { width = 559, height = 794, initialZoom = 1, onReady } = options
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
   const [isCanvasReady, setIsCanvasReady] = useState(false)
   const [selectedObjectIds, setSelectedObjectIds] = useState<string[]>([])
-  const [zoom, setZoomState] = useState(1)
+  const [zoom, setZoomState] = useState(initialZoom)
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
 
@@ -249,6 +275,17 @@ export function useBrochureEditorV2(
   // ============================================
   const initCanvas = useCallback(() => {
     if (!canvasRef.current || fabricCanvasRef.current) return
+
+    // 設定全域控制點樣式 - 小實心圓點（避免控制點比元素還大）
+    // fabric.js v7 需要直接修改 prototype 屬性
+    fabric.FabricObject.prototype.cornerSize = 6           // 控制點大小（原本預設 13）
+    fabric.FabricObject.prototype.cornerStyle = 'circle'   // 圓形控制點
+    fabric.FabricObject.prototype.cornerColor = '#c9aa7c'  // 莫蘭迪金色
+    fabric.FabricObject.prototype.cornerStrokeColor = '#ffffff' // 白色邊框
+    fabric.FabricObject.prototype.transparentCorners = false // 實心（不透明）
+    fabric.FabricObject.prototype.borderColor = '#c9aa7c'  // 選取框顏色
+    fabric.FabricObject.prototype.borderScaleFactor = 1    // 邊框粗細
+    fabric.FabricObject.prototype.padding = 2              // 控制點與元素的間距
 
     const canvas = new fabric.Canvas(canvasRef.current, {
       width,
@@ -459,6 +496,22 @@ export function useBrochureEditorV2(
   // ============================================
   // Load Canvas Data
   // ============================================
+  // 更新所有物件的控制點樣式（載入後調用）
+  const applyControlStyles = useCallback((canvas: fabric.Canvas) => {
+    canvas.getObjects().forEach((obj) => {
+      obj.set({
+        cornerSize: 6,
+        cornerStyle: 'circle',
+        cornerColor: '#c9aa7c',
+        cornerStrokeColor: '#ffffff',
+        transparentCorners: false,
+        borderColor: '#c9aa7c',
+        borderScaleFactor: 1,
+        padding: 2,
+      })
+    })
+  }, [])
+
   const loadCanvasData = useCallback(async (data: Record<string, unknown>) => {
     const canvas = fabricCanvasRef.current
     if (!canvas) return
@@ -468,8 +521,9 @@ export function useBrochureEditorV2(
 
     // Load from JSON
     await canvas.loadFromJSON(data)
+    applyControlStyles(canvas)
     canvas.renderAll()
-  }, [])
+  }, [applyControlStyles])
 
   // ============================================
   // Load Canvas Elements (from CanvasElement[] format)
@@ -655,7 +709,9 @@ export function useBrochureEditorV2(
       canvasWidth: width,
       canvasHeight: height,
     })
-  }, [width, height])
+    // 套用控制點樣式
+    applyControlStyles(canvas)
+  }, [width, height, applyControlStyles])
 
   // ============================================
   // Export Canvas Data
@@ -706,7 +762,8 @@ export function useBrochureEditorV2(
     const canvas = fabricCanvasRef.current
     if (!canvas) return
 
-    const text = new fabric.IText(options?.content ?? '雙擊編輯文字', {
+    // 使用 Textbox 支援多行編輯（按 Enter 換行）
+    const text = new fabric.Textbox(options?.content ?? '雙擊編輯文字', {
       left: options?.x ?? width / 2,
       top: options?.y ?? height / 2,
       fontFamily: 'Noto Sans TC',
@@ -714,10 +771,13 @@ export function useBrochureEditorV2(
       fill: '#3a3633',
       originX: 'center',
       originY: 'center',
+      width: 200, // 預設寬度，可拖曳調整
+      textAlign: 'left',
+      splitByGrapheme: true, // 支援中文換行
     })
 
     // Add custom ID
-    ;(text as fabric.IText & { id: string }).id = `text-${Date.now()}`
+    ;(text as fabric.Textbox & { id: string }).id = `text-${Date.now()}`
 
     canvas.add(text)
     canvas.setActiveObject(text)
@@ -778,6 +838,58 @@ export function useBrochureEditorV2(
   }, [width, height])
 
   // ============================================
+  // Add Ellipse
+  // ============================================
+  const addEllipse = useCallback((options?: { x?: number; y?: number; rx?: number; ry?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const ellipse = new fabric.Ellipse({
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      rx: options?.rx ?? 60,
+      ry: options?.ry ?? 40,
+      fill: '#c9aa7c',
+      stroke: '#b8996b',
+      strokeWidth: 1,
+      originX: 'center',
+      originY: 'center',
+    })
+
+    ;(ellipse as fabric.Ellipse & { id: string }).id = `ellipse-${Date.now()}`
+
+    canvas.add(ellipse)
+    canvas.setActiveObject(ellipse)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Triangle
+  // ============================================
+  const addTriangle = useCallback((options?: { x?: number; y?: number; width?: number; height?: number }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const triangle = new fabric.Triangle({
+      left: options?.x ?? width / 2,
+      top: options?.y ?? height / 2,
+      width: options?.width ?? 80,
+      height: options?.height ?? 70,
+      fill: '#c9aa7c',
+      stroke: '#b8996b',
+      strokeWidth: 1,
+      originX: 'center',
+      originY: 'center',
+    })
+
+    ;(triangle as fabric.Triangle & { id: string }).id = `triangle-${Date.now()}`
+
+    canvas.add(triangle)
+    canvas.setActiveObject(triangle)
+    canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
   // Add Image
   // ============================================
   const addImage = useCallback(async (url: string, options?: { x?: number; y?: number }) => {
@@ -786,18 +898,25 @@ export function useBrochureEditorV2(
 
     const img = await fabric.FabricImage.fromURL(url)
 
+    // 計算最大允許尺寸（畫布的 60%）
+    const maxWidth = width * 0.6
+    const maxHeight = height * 0.6
+
+    // 計算縮放比例（取較小值以確保完整顯示）
+    const imgWidth = img.width || 100
+    const imgHeight = img.height || 100
+    const scaleX = maxWidth / imgWidth
+    const scaleY = maxHeight / imgHeight
+    const scale = Math.min(scaleX, scaleY, 1) // 不放大，只縮小
+
     img.set({
       left: options?.x ?? width / 2,
       top: options?.y ?? height / 2,
       originX: 'center',
       originY: 'center',
+      scaleX: scale,
+      scaleY: scale,
     })
-
-    // Scale if too large
-    const maxSize = Math.min(width, height) * 0.8
-    if (img.width && img.width > maxSize) {
-      img.scale(maxSize / img.width)
-    }
 
     ;(img as fabric.FabricImage & { id: string }).id = `image-${Date.now()}`
 
@@ -891,6 +1010,102 @@ export function useBrochureEditorV2(
     canvas.add(path)
     canvas.setActiveObject(path)
     canvas.renderAll()
+  }, [width, height])
+
+  // ============================================
+  // Add Icon (from @iconify)
+  // ============================================
+  const addIcon = useCallback(async (iconName: string, options?: {
+    x?: number
+    y?: number
+    size?: number
+    color?: string
+    keepOriginalColor?: boolean  // 保持原始顏色（用於彩色圖標）
+  }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    try {
+      // 從 Iconify API 取得 SVG
+      const response = await fetch(`https://api.iconify.design/${iconName}.svg?height=64`)
+      if (!response.ok) throw new Error('Failed to fetch icon')
+
+      const svgText = await response.text()
+
+      // 使用 fabric 載入 SVG
+      fabric.loadSVGFromString(svgText).then((result) => {
+        const group = new fabric.Group(result.objects.filter(Boolean) as fabric.FabricObject[], {
+          left: options?.x ?? width / 2,
+          top: options?.y ?? height / 2,
+          originX: 'center',
+          originY: 'center',
+        })
+
+        // 設定顏色（除非指定保持原色）
+        if (!options?.keepOriginalColor) {
+          const color = options?.color || '#3a3633'
+          group.getObjects().forEach(obj => {
+            if ('fill' in obj) obj.set('fill', color)
+            if ('stroke' in obj && obj.stroke) obj.set('stroke', color)
+          })
+        }
+
+        // 縮放到目標尺寸
+        const size = options?.size || 64
+        const bounds = group.getBoundingRect()
+        const scale = size / Math.max(bounds.width, bounds.height)
+        group.scale(scale)
+
+        ;(group as fabric.Group & { id: string }).id = `icon-${Date.now()}`
+
+        canvas.add(group)
+        canvas.setActiveObject(group)
+        canvas.renderAll()
+      })
+    } catch (error) {
+      console.error('Failed to add icon:', error)
+    }
+  }, [width, height])
+
+  // ============================================
+  // Add Illustration (colorful SVG)
+  // ============================================
+  const addIllustration = useCallback(async (svgString: string, options?: {
+    x?: number
+    y?: number
+    size?: number
+  }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    try {
+      // 使用 fabric 載入 SVG
+      fabric.loadSVGFromString(svgString).then((result) => {
+        const objects = result.objects.filter(Boolean) as fabric.FabricObject[]
+        if (objects.length === 0) return
+
+        const group = new fabric.Group(objects, {
+          left: options?.x ?? width / 2,
+          top: options?.y ?? height / 2,
+          originX: 'center',
+          originY: 'center',
+        })
+
+        // 縮放到目標尺寸（保持原始顏色，不改變）
+        const size = options?.size || 100
+        const bounds = group.getBoundingRect()
+        const scale = size / Math.max(bounds.width, bounds.height)
+        group.scale(scale)
+
+        ;(group as fabric.Group & { id: string }).id = `illustration-${Date.now()}`
+
+        canvas.add(group)
+        canvas.setActiveObject(group)
+        canvas.renderAll()
+      })
+    } catch (error) {
+      console.error('Failed to add illustration:', error)
+    }
   }, [width, height])
 
   // ============================================
@@ -1011,6 +1226,26 @@ export function useBrochureEditorV2(
     const activeObject = canvas.getActiveObject()
     if (activeObject) {
       canvas.sendObjectToBack(activeObject)
+      canvas.renderAll()
+    }
+  }, [])
+
+  // 獲取畫布上所有物件（由下到上排序）
+  const getObjects = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return []
+    return canvas.getObjects()
+  }, [])
+
+  // 根據 ID 選取物件
+  const selectObjectById = useCallback((id: string) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const objects = canvas.getObjects()
+    const target = objects.find(obj => (obj as fabric.FabricObject & { id?: string }).id === id)
+    if (target) {
+      canvas.setActiveObject(target)
       canvas.renderAll()
     }
   }, [])
@@ -1261,6 +1496,89 @@ export function useBrochureEditorV2(
   }, [height, prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
 
   // ============================================
+  // Distribute Operations (需要 3 個以上物件)
+  // ============================================
+  const distributeH = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length < 3) return // 至少需要 3 個物件
+
+    // 取得所有物件的邊界框
+    const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+
+    // 按照 x 座標排序
+    boxes.sort((a, b) => a.box.left - b.box.left)
+
+    // 計算最左和最右物件的位置
+    const leftMost = boxes[0].box.left
+    const rightMost = boxes[boxes.length - 1].box.right
+
+    // 計算所有物件的總寬度（不包括第一個和最後一個的邊緣）
+    const totalObjWidth = boxes.reduce((sum, b) => sum + b.box.width, 0)
+
+    // 計算可用空間和間距
+    const totalSpace = rightMost - leftMost
+    const gapSpace = totalSpace - totalObjWidth
+    const gap = gapSpace / (boxes.length - 1)
+
+    // 分佈物件（第一個和最後一個保持不動）
+    let currentX = leftMost + boxes[0].box.width + gap
+    for (let i = 1; i < boxes.length - 1; i++) {
+      const { obj, box } = boxes[i]
+      moveObjectTo(obj, currentX, box.top)
+      currentX += box.width + gap
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  const distributeV = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const { objects, wasMultiSelect } = prepareObjectsForAlignment(canvas)
+    if (objects.length < 3) return // 至少需要 3 個物件
+
+    // 取得所有物件的邊界框
+    const boxes = objects.map(obj => ({ obj, box: getObjectBoundingBox(obj) }))
+
+    // 按照 y 座標排序
+    boxes.sort((a, b) => a.box.top - b.box.top)
+
+    // 計算最上和最下物件的位置
+    const topMost = boxes[0].box.top
+    const bottomMost = boxes[boxes.length - 1].box.bottom
+
+    // 計算所有物件的總高度
+    const totalObjHeight = boxes.reduce((sum, b) => sum + b.box.height, 0)
+
+    // 計算可用空間和間距
+    const totalSpace = bottomMost - topMost
+    const gapSpace = totalSpace - totalObjHeight
+    const gap = gapSpace / (boxes.length - 1)
+
+    // 分佈物件（第一個和最後一個保持不動）
+    let currentY = topMost + boxes[0].box.height + gap
+    for (let i = 1; i < boxes.length - 1; i++) {
+      const { obj, box } = boxes[i]
+      moveObjectTo(obj, box.left, currentY)
+      currentY += box.height + gap
+    }
+
+    if (wasMultiSelect) {
+      restoreMultiSelection(canvas, objects)
+    }
+    canvas.renderAll()
+    markDirty()
+  }, [prepareObjectsForAlignment, getObjectBoundingBox, moveObjectTo, restoreMultiSelection, markDirty])
+
+  // ============================================
   // Group Operations
   // ============================================
   const groupSelected = useCallback(() => {
@@ -1316,6 +1634,35 @@ export function useBrochureEditorV2(
   }, [])
 
   // ============================================
+  // Flip Operations
+  // ============================================
+  const flipHorizontal = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject) return
+
+    // 切換 flipX 狀態
+    activeObject.set('flipX', !activeObject.flipX)
+    canvas.renderAll()
+    markDirty()
+  }, [markDirty])
+
+  const flipVertical = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (!activeObject) return
+
+    // 切換 flipY 狀態
+    activeObject.set('flipY', !activeObject.flipY)
+    canvas.renderAll()
+    markDirty()
+  }, [markDirty])
+
+  // ============================================
   // Lock Toggle
   // ============================================
   const toggleLock = useCallback(() => {
@@ -1355,6 +1702,21 @@ export function useBrochureEditorV2(
   const zoomOut = useCallback(() => setZoom(zoom - 0.1), [zoom, setZoom])
   const resetZoom = useCallback(() => setZoom(1), [setZoom])
 
+  // 自動適應容器大小
+  const fitToContainer = useCallback((containerWidth: number, containerHeight: number, padding = 64) => {
+    // 計算可用空間（扣除 padding）
+    const availableWidth = containerWidth - padding * 2
+    const availableHeight = containerHeight - padding * 2
+
+    // 計算需要的縮放比例（取較小值以確保完整顯示）
+    const scaleX = availableWidth / width
+    const scaleY = availableHeight / height
+    const fitZoom = Math.min(scaleX, scaleY)
+
+    // 設定縮放（會被 clamp 到 0.25-3 範圍）
+    setZoom(fitZoom)
+  }, [width, height, setZoom])
+
   // ============================================
   // Undo/Redo Operations
   // ============================================
@@ -1374,12 +1736,13 @@ export function useBrochureEditorV2(
 
     try {
       await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+      applyControlStyles(canvas)
       canvas.renderAll()
       updateHistoryState()
     } finally {
       isUndoRedoRef.current = false
     }
-  }, [updateHistoryState])
+  }, [updateHistoryState, applyControlStyles])
 
   const redo = useCallback(async () => {
     const canvas = fabricCanvasRef.current
@@ -1391,12 +1754,13 @@ export function useBrochureEditorV2(
 
     try {
       await canvas.loadFromJSON(JSON.parse(history.stack[history.index]))
+      applyControlStyles(canvas)
       canvas.renderAll()
       updateHistoryState()
     } finally {
       isUndoRedoRef.current = false
     }
-  }, [updateHistoryState])
+  }, [updateHistoryState, applyControlStyles])
 
   // ============================================
   // Cleanup on unmount
@@ -1459,9 +1823,13 @@ export function useBrochureEditorV2(
     addText,
     addRectangle,
     addCircle,
+    addEllipse,
+    addTriangle,
     addImage,
     addLine,
     addSticker,
+    addIcon,
+    addIllustration,
 
     selectedObjectIds,
     deleteSelected,
@@ -1474,6 +1842,8 @@ export function useBrochureEditorV2(
     sendBackward,
     bringToFront,
     sendToBack,
+    getObjects,
+    selectObjectById,
 
     alignLeft,
     alignCenterH,
@@ -1482,8 +1852,14 @@ export function useBrochureEditorV2(
     alignCenterV,
     alignBottom,
 
+    distributeH,
+    distributeV,
+
     groupSelected,
     ungroupSelected,
+
+    flipHorizontal,
+    flipVertical,
 
     toggleLock,
 
@@ -1500,5 +1876,6 @@ export function useBrochureEditorV2(
     zoomIn,
     zoomOut,
     resetZoom,
+    fitToContainer,
   }
 }

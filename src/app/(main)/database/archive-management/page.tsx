@@ -146,8 +146,29 @@ export default function ArchiveManagementPage() {
 
   // 永久刪除旅遊團
   const handleDeleteTour = async (tour: ArchivedTour) => {
+    // 先檢查是否有關聯資料（團員、收款單、請款單、PNR 不能刪，訂單可以連帶刪）
+    const checks = await Promise.all([
+      supabase.from('order_members').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+      supabase.from('receipt_orders').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+      supabase.from('payment_requests').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+      supabase.from('pnrs').select('id', { count: 'exact', head: true }).eq('tour_id', tour.id),
+    ])
+
+    const [members, receipts, payments, pnrs] = checks
+    const blockers: string[] = []
+
+    if (members.count && members.count > 0) blockers.push(`${members.count} 位團員`)
+    if (receipts.count && receipts.count > 0) blockers.push(`${receipts.count} 筆收款單`)
+    if (payments.count && payments.count > 0) blockers.push(`${payments.count} 筆請款單`)
+    if (pnrs.count && pnrs.count > 0) blockers.push(`${pnrs.count} 筆 PNR`)
+
+    if (blockers.length > 0) {
+      toast.error(`無法刪除：此旅遊團有 ${blockers.join('、')}，請先刪除相關資料`)
+      return
+    }
+
     const confirmed = await confirm(
-      `確定要永久刪除旅遊團「${tour.code}」嗎？\n\n⚠️ 此操作無法復原，相關的訂單、請款單等資料也會一併刪除！`,
+      `確定要永久刪除旅遊團「${tour.code}」嗎？\n\n⚠️ 此操作無法復原！`,
       {
         title: '永久刪除',
         type: 'warning',
@@ -155,17 +176,10 @@ export default function ArchiveManagementPage() {
     )
     if (!confirmed) return
 
-    // 二次確認
-    const doubleConfirmed = await confirm(
-      `請再次確認：永久刪除「${tour.code}」及所有相關資料？`,
-      {
-        title: '最終確認',
-        type: 'warning',
-      }
-    )
-    if (!doubleConfirmed) return
-
     try {
+      // 先刪除空訂單（沒有團員的）
+      await supabase.from('orders').delete().eq('tour_id', tour.id)
+
       const { error } = await supabase
         .from('tours')
         .delete()
@@ -176,7 +190,7 @@ export default function ArchiveManagementPage() {
       loadArchivedData()
     } catch (error) {
       logger.error('刪除失敗:', error)
-      toast.error('刪除失敗，可能有關聯資料無法刪除')
+      toast.error('刪除失敗')
     }
   }
 

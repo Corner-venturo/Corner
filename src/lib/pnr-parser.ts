@@ -300,20 +300,36 @@ function parseEnhancedOSI(line: string): EnhancedOSI | null {
  *
  * 原本解析器逐行處理，第一行有 "ON OR BEFORE" 但日期 "05JAN" 在延續行
  * 修復: 先將延續行（以 4+ 空格開頭）合併到上一行，再進行解析
+ *
+ * 修復日期: 2026-01-17
+ * 問題: 某些 PNR 來源的航班行可能有較多前導空格，被誤判為延續行
+ * 範例:
+ *     2  BR 190 J 27MAR 5 TSAHND HK1  1630 2020  (4 空格開頭)
+ * 修復: 檢查 trim 後的內容，如果以「數字 + 空格」開頭，視為獨立行（航班/旅客行）
  */
 function mergeMultilineEntries(rawPNR: string): string[] {
   const rawLines = rawPNR.split('\n');
   const mergedLines: string[] = [];
 
   for (const line of rawLines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
     // 判斷是否為延續行（以多個空格開頭）
-    const isContinuation = /^\s{4,}/.test(line) && mergedLines.length > 0;
+    const hasLeadingSpaces = /^\s{4,}/.test(line);
+
+    // 檢查是否為獨立行（以數字開頭，通常是航班行或旅客行）
+    // 格式如: "2  BR 190..." 或 "1.CHEN/YIHSUAN"
+    const isIndependentLine = /^\d+[\s.]/.test(trimmed);
+
+    // 只有當有前導空格、不是獨立行、且有前一行時，才視為延續行
+    const isContinuation = hasLeadingSpaces && !isIndependentLine && mergedLines.length > 0;
 
     if (isContinuation) {
       // 將延續行內容附加到上一行
-      mergedLines[mergedLines.length - 1] += ' ' + line.trim();
-    } else if (line.trim()) {
-      mergedLines.push(line.trim());
+      mergedLines[mergedLines.length - 1] += ' ' + trimmed;
+    } else {
+      mergedLines.push(trimmed);
     }
   }
 

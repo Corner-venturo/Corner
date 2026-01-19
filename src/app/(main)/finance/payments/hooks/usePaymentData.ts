@@ -6,7 +6,7 @@ import { logger } from '@/lib/utils/logger'
 import { useMemo } from 'react'
 import { useAuthStore } from '@/stores'
 import { alert } from '@/lib/ui/alert-dialog'
-import { useOrders, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
+import { useOrders, useTourDictionary, useEmployeeDictionary, useReceipts, createReceipt, updateReceipt, deleteReceipt, invalidateReceipts, useLinkPayLogs } from '@/data'
 import { sendPaymentAbnormalNotification } from '@/lib/utils/bot-notification'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { generateVoucherFromPayment, generateVoucherFromCardPayment } from '@/services/voucher-auto-generator'
@@ -238,6 +238,39 @@ export function usePaymentData() {
     await invalidateReceipts()
   }
 
+  // 更新收款單（編輯模式使用）
+  const handleUpdateReceipt = async (receiptId: string, data: Partial<typeof receipts[0]>) => {
+    if (!user?.id) {
+      throw new Error('請先登入')
+    }
+
+    await updateReceipt(receiptId, {
+      ...data,
+      updated_by: user.id,
+    })
+
+    // 重新載入資料
+    await invalidateReceipts()
+  }
+
+  // 刪除收款單
+  const handleDeleteReceipt = async (receiptId: string) => {
+    if (!user?.id) {
+      throw new Error('請先登入')
+    }
+
+    // 檢查收款單是否已確認
+    const receipt = receipts.find(r => r.id === receiptId)
+    if (receipt?.status === '1') {
+      throw new Error('已確認的收款單無法刪除')
+    }
+
+    await deleteReceipt(receiptId)
+
+    // 重新載入資料
+    await invalidateReceipts()
+  }
+
   return {
     receipts,
     orders,
@@ -247,5 +280,7 @@ export function usePaymentData() {
     invalidateReceipts,
     handleCreateReceipt,
     handleConfirmReceipt,
+    handleUpdateReceipt,
+    handleDeleteReceipt,
   }
 }

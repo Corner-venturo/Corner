@@ -24,6 +24,11 @@ import {
   type ReferenceData,
 } from './reference-data'
 
+interface UseReferenceDataOptions {
+  /** 是否啟用資料載入（預設 true）*/
+  enabled?: boolean
+}
+
 interface UseReferenceDataResult {
   // 狀態
   isLoading: boolean
@@ -64,9 +69,15 @@ interface UseReferenceDataResult {
 /**
  * 使用 PNR 參考資料的 React Hook
  *
+ * @param options.enabled - 是否啟用資料載入（預設 true）
+ *
  * @example
  * ```tsx
+ * // 基本用法（立即載入）
  * const { isReady, getAirlineName, getAirportName } = useReferenceData()
+ *
+ * // 條件載入（Dialog 開啟時才載入）
+ * const { isReady, getAirlineName } = useReferenceData({ enabled: isOpen })
  *
  * if (!isReady) return <Loading />
  *
@@ -78,15 +89,21 @@ interface UseReferenceDataResult {
  * )
  * ```
  */
-export function useReferenceData(): UseReferenceDataResult {
-  const [isLoading, setIsLoading] = useState(true)
+export function useReferenceData(options: UseReferenceDataOptions = {}): UseReferenceDataResult {
+  const { enabled = true } = options
+
+  const [isLoading, setIsLoading] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<ReferenceData | null>(null)
   const [cacheStatus, setCacheStatus] = useState(getCacheStatus())
 
-  // 初始載入
+  // 條件載入：只在 enabled 為 true 時載入
   useEffect(() => {
+    if (!enabled) {
+      return
+    }
+
     let isMounted = true
 
     async function loadData() {
@@ -115,7 +132,7 @@ export function useReferenceData(): UseReferenceDataResult {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [enabled])
 
   // 重新載入
   const refresh = useCallback(async () => {

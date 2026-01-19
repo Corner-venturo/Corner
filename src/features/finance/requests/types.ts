@@ -59,6 +59,12 @@ export const categoryOptions = [
   { value: '餐食', label: '餐食' },
   { value: '門票', label: '門票' },
   { value: '導遊', label: '導遊' },
+  { value: '保險', label: '保險' },
+  { value: '出團款', label: '出團款' },
+  { value: '回團款', label: '回團款' },
+  { value: '員工代墊', label: '員工代墊' },
+  { value: 'ESIM', label: 'ESIM' },
+  { value: '同業', label: '同業' },
   { value: '其他', label: '其他' },
 ] as const
 

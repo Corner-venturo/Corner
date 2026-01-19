@@ -48,7 +48,7 @@ export function CreateReceiptDialog({
   const [paymentItems, setPaymentItems] = useState<ReceiptItem[]>([
     {
       id: '1',
-      receipt_type: RECEIPT_TYPES.CASH,
+      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     },
@@ -68,7 +68,7 @@ export function CreateReceiptDialog({
   const addPaymentItem = () => {
     const newItem: ReceiptItem = {
       id: Date.now().toString(),
-      receipt_type: RECEIPT_TYPES.CASH,
+      receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
       amount: 0,
       transaction_date: getTodayString(),
     }
@@ -91,7 +91,7 @@ export function CreateReceiptDialog({
     setPaymentItems([
       {
         id: '1',
-        receipt_type: RECEIPT_TYPES.CASH,
+        receipt_type: RECEIPT_TYPES.BANK_TRANSFER,
         amount: 0,
         transaction_date: getTodayString(),
       },

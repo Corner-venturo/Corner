@@ -28,7 +28,8 @@ import { PaymentItemCategory, CompanyExpenseType } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
-import { getTodayString } from '@/lib/utils/format-date'
+import { formatDate } from '@/lib/utils/format-date'
+import { useWorkspaceId } from '@/lib/workspace-context'
 import type { UserRole } from '@/lib/rbac-config'
 
 /**
@@ -76,6 +77,23 @@ interface TourAllocation {
 
 type RequestMode = 'tour' | 'batch' | 'company'
 
+// 計算下一個週四（如果今天是週四，跳到下週四）
+function getNextThursdayDate(): string {
+  const today = new Date()
+  const dayOfWeek = today.getDay() // 0=週日, 1=週一, ..., 4=週四
+
+  let daysUntilThursday = 4 - dayOfWeek
+  if (daysUntilThursday <= 0) {
+    // 今天是週四或之後，跳到下週四
+    daysUntilThursday += 7
+  }
+
+  const nextThursday = new Date(today)
+  nextThursday.setDate(today.getDate() + daysUntilThursday)
+
+  return formatDate(nextThursday)
+}
+
 export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false }: AddRequestDialogProps) {
   // === 共用 Hooks ===
   const {
@@ -96,6 +114,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   const { generateRequestCode, generateCompanyRequestCode, createRequest } = useRequestOperations()
   const { payment_requests, createPaymentRequest, addPaymentItem } = usePayments()
+  const workspaceId = useWorkspaceId()
 
   // === 共用狀態 ===
   const [activeTab, setActiveTab] = useState<RequestMode>('tour')
@@ -115,7 +134,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   )
 
   // === 批量請款狀態 ===
-  const [batchDate, setBatchDate] = useState(getTodayString())
+  const [batchDate, setBatchDate] = useState(getNextThursdayDate())
   const [batchCategory, setBatchCategory] = useState<PaymentItemCategory>('匯款')
   const [batchSupplierId, setBatchSupplierId] = useState('')
   const [batchDescription, setBatchDescription] = useState('')
@@ -244,7 +263,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setSelectedRequestItems({})
 
     // 重置批量請款（預設兩個空白行）
-    setBatchDate(getTodayString())
+    setBatchDate(getNextThursdayDate())
     setBatchCategory('匯款')
     setBatchSupplierId('')
     setBatchDescription('')
@@ -313,7 +332,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
     resetForm()
     setImportFromRequests(false)
     setSelectedRequestItems({})
-    setBatchDate(getTodayString())
+    setBatchDate(getNextThursdayDate())
     setBatchCategory('匯款')
     setBatchSupplierId('')
     setBatchDescription('')
@@ -328,6 +347,12 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   const handleSubmit = async () => {
     try {
+      // 檢查 workspace_id
+      if (!workspaceId) {
+        void alert('無法取得工作空間，請重新登入', 'warning')
+        return
+      }
+
       if (activeTab === 'batch') {
         // 批量請款 - 過濾掉未選擇旅遊團的行
         const toSubmit = tourAllocations.filter(a => a.tour_id && a.allocated_amount > 0)
@@ -345,32 +370,53 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
           return
         }
 
+        // 生成批次 ID，讓所有同批建立的請款單可以關聯在一起
+        const batchId = crypto.randomUUID()
+
+        let successCount = 0
+        let errorCount = 0
+
         for (const allocation of toSubmit) {
-          const requestCode = generateBatchRequestCode(allocation.tour_code)
-          const request = await createPaymentRequest({
-            tour_id: allocation.tour_id,
-            code: requestCode,
-            tour_code: allocation.tour_code,
-            tour_name: allocation.tour_name,
-            request_date: batchDate,
-            amount: 0,
-            status: 'pending',
-            note: batchNote,
-            request_type: '供應商支出',
-          })
-          await addPaymentItem(request.id, {
-            category: batchCategory,
-            supplier_id: batchSupplierId || '',
-            supplier_name: batchSupplierName || null,
-            description: batchDescription || batchCategory,
-            unit_price: allocation.allocated_amount,
-            quantity: 1,
-            note: '',
-            sort_order: 1,
-          })
+          try {
+            const requestCode = generateBatchRequestCode(allocation.tour_code)
+            const request = await createPaymentRequest({
+              workspace_id: workspaceId,
+              tour_id: allocation.tour_id,
+              code: requestCode,
+              tour_code: allocation.tour_code,
+              tour_name: allocation.tour_name,
+              request_date: batchDate,
+              amount: 0,
+              status: 'pending',
+              note: batchNote,
+              request_type: '供應商支出',
+              request_category: 'tour',
+              batch_id: batchId, // 批次 ID：同批請款單共用此 ID
+            })
+
+            // 建立品項（帶獨立編號如 HND260328A-I01-1）
+            await addPaymentItem(request.id, {
+              category: batchCategory,
+              supplier_id: batchSupplierId || '',
+              supplier_name: batchSupplierName || null,
+              description: batchDescription || batchCategory,
+              unit_price: allocation.allocated_amount,
+              quantity: 1,
+              note: '',
+              sort_order: 1,
+            })
+            successCount++
+          } catch (itemError) {
+            logger.error(`建立請款單品項失敗 (${allocation.tour_code}):`, itemError)
+            errorCount++
+          }
         }
 
-        await alert(`成功建立 ${toSubmit.length} 筆請款單`, 'success')
+        if (errorCount > 0) {
+          await alert(`建立完成：成功 ${successCount} 筆，失敗 ${errorCount} 筆。請檢查失敗的請款單品項。`, 'warning')
+        } else {
+          await alert(`成功建立 ${successCount} 筆請款單（批次 ID: ${batchId.slice(0, 8)}...）`, 'success')
+        }
         handleCancel()
         onSuccess?.()
       } else if (activeTab === 'company') {
@@ -612,8 +658,8 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
                   <Label>供應商</Label>
                   <Select value={batchSupplierId} onValueChange={setBatchSupplierId}>
                     <SelectTrigger><SelectValue placeholder="選擇供應商（選填）" /></SelectTrigger>
-                    <SelectContent>
-                      {suppliers.map(supplier => (
+                    <SelectContent className="max-h-[300px] overflow-y-auto">
+                      {suppliers.filter(s => s.type === 'supplier').map(supplier => (
                         <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -756,29 +802,45 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
         </Tabs>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-2 pt-4 border-t border-border">
-          <Button variant="outline" onClick={handleCancel} className="gap-2">
-            <X size={16} />
-            取消
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={
-              activeTab === 'batch'
-                ? unallocatedAmount !== 0 || tourAllocations.filter(a => a.tour_id).length === 0
-                : activeTab === 'company'
-                  ? !formData.expense_type || !formData.request_date || requestItems.length === 0
-                  : !formData.tour_id || (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
-            }
-            className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
-          >
-            <Plus size={16} />
-            {activeTab === 'batch' ? (
-              `建立批次請款（${tourAllocations.filter(a => a.tour_id).length} 筆）`
-            ) : (
-              <>新增請款單 (共 {activeTab === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length} 項，<CurrencyCell amount={activeTab === 'tour' && importFromRequests ? selectedRequestTotal : total_amount} className="inline" />)</>
-            )}
-          </Button>
+        <div className="flex items-center gap-4 pt-4 border-t border-border">
+          {/* 左側：總金額顯示 */}
+          <div className="flex items-center text-sm">
+            <span className="text-morandi-secondary">
+              {activeTab === 'batch'
+                ? `共 ${tourAllocations.filter(a => a.tour_id).length} 筆，總金額`
+                : `共 ${activeTab === 'tour' && importFromRequests ? selectedRequestCount : requestItems.length} 項，總金額`
+              }
+            </span>
+            <span className="inline-block min-w-[120px] text-right font-semibold text-morandi-gold">
+              NT$ {(activeTab === 'batch'
+                ? batchTotalAmount
+                : (activeTab === 'tour' && importFromRequests ? selectedRequestTotal : total_amount)
+              ).toLocaleString()}
+            </span>
+          </div>
+          {/* 中間空白 */}
+          <div className="flex-1" />
+          {/* 右側：按鈕 */}
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleCancel} className="gap-2">
+              <X size={16} />
+              取消
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={
+                activeTab === 'batch'
+                  ? unallocatedAmount !== 0 || tourAllocations.filter(a => a.tour_id).length === 0
+                  : activeTab === 'company'
+                    ? !formData.expense_type || !formData.request_date || requestItems.length === 0
+                    : !formData.tour_id || (importFromRequests ? selectedRequestCount === 0 : requestItems.length === 0)
+              }
+              className="bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded-md gap-2"
+            >
+              <Plus size={16} />
+              {activeTab === 'batch' ? '建立批次請款' : '新增請款單'}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

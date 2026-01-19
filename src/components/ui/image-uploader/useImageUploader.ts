@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import imageCompression from 'browser-image-compression'
 import { supabase } from '@/lib/supabase/client'
 import { alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
@@ -94,15 +95,41 @@ export function useImageUploader({
     })
   }, [])
 
+  // 壓縮圖片（使用 browser-image-compression）
+  const compressImage = useCallback(async (file: File, targetMaxSize: number): Promise<File> => {
+    // 如果檔案已經小於目標大小，直接返回
+    if (file.size <= targetMaxSize) {
+      logger.log(`[ImageUploader] 圖片已小於 ${Math.round(targetMaxSize / 1024)}KB，無需壓縮`)
+      return file
+    }
+
+    logger.log(`[ImageUploader] 開始壓縮圖片: ${Math.round(file.size / 1024)}KB → 目標 ${Math.round(targetMaxSize / 1024)}KB`)
+
+    try {
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: targetMaxSize / (1024 * 1024),
+        maxWidthOrHeight: 2048, // 限制最大尺寸
+        useWebWorker: true,
+        fileType: 'image/jpeg', // 輸出為 JPEG
+        initialQuality: 0.85,
+      })
+
+      logger.log(`[ImageUploader] 壓縮完成: ${Math.round(compressedFile.size / 1024)}KB`)
+
+      // 確保返回的是 File 物件
+      return new File([compressedFile], file.name.replace(/\.[^.]+$/, '.jpg'), {
+        type: 'image/jpeg',
+      })
+    } catch (error) {
+      logger.error('[ImageUploader] 壓縮失敗:', error)
+      // 壓縮失敗時返回原檔案
+      return file
+    }
+  }, [])
+
   // 上傳檔案
   const uploadFile = useCallback(async (file: File) => {
-    logger.log(`[ImageUploader] 開始處理檔案: ${file.name}, 類型: ${file.type}, 大小: ${file.size}`)
-
-    // 檢查檔案大小
-    if (file.size > maxSize) {
-      void alert(`檔案太大！請選擇小於 ${Math.round(maxSize / 1024 / 1024)}MB 的圖片`, 'warning')
-      return
-    }
+    logger.log(`[ImageUploader] 開始處理檔案: ${file.name}, 類型: ${file.type}, 大小: ${Math.round(file.size / 1024)}KB`)
 
     // 檢查檔案類型
     if (!file.type.startsWith('image/')) {
@@ -114,10 +141,21 @@ export function useImageUploader({
     const oldImageUrl = value
 
     try {
-      // 如果是不支援的格式，先轉換為 JPEG
-      logger.log(`[ImageUploader] 準備轉換圖片格式...`)
-      const fileToUpload = await convertToJpeg(file)
-      logger.log(`[ImageUploader] 轉換完成: ${fileToUpload.name}, 類型: ${fileToUpload.type}`)
+      // Step 1: 如果是不支援的格式，先轉換為 JPEG
+      logger.log(`[ImageUploader] Step 1: 轉換圖片格式...`)
+      let fileToUpload = await convertToJpeg(file)
+      logger.log(`[ImageUploader] 轉換完成: ${fileToUpload.name}, 類型: ${fileToUpload.type}, 大小: ${Math.round(fileToUpload.size / 1024)}KB`)
+
+      // Step 2: 壓縮圖片（如果超過 maxSize）
+      logger.log(`[ImageUploader] Step 2: 檢查是否需要壓縮...`)
+      fileToUpload = await compressImage(fileToUpload, maxSize)
+
+      // Step 3: 最終大小檢查（壓縮後仍太大的情況）
+      if (fileToUpload.size > maxSize * 1.5) {
+        // 給 50% 的緩衝，壓縮後應該接近目標大小
+        void alert(`圖片壓縮後仍過大（${Math.round(fileToUpload.size / 1024 / 1024)}MB），請選擇較小的圖片`, 'warning')
+        return
+      }
 
       // 生成唯一檔名
       const timestamp = Date.now()
@@ -170,7 +208,7 @@ export function useImageUploader({
     } finally {
       setUploading(false)
     }
-  }, [maxSize, bucket, filePrefix, value, onChange, onPositionChange, deleteStorageImage, convertToJpeg])
+  }, [maxSize, bucket, filePrefix, value, onChange, onPositionChange, deleteStorageImage, convertToJpeg, compressImage])
 
   // 從 URL 下載並上傳圖片
   const fetchAndUploadImage = useCallback(async (imageUrl: string) => {

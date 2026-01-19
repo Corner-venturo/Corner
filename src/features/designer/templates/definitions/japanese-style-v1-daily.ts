@@ -71,6 +71,9 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 取得當日資料（從 currentDayIndex 指定）
     const dayIndex = data.currentDayIndex || 0
+
+    // 輔助函數：生成帶 dayIndex 的唯一元素 ID
+    const elId = (name: string) => `el-daily-${name}-d${dayIndex}`
     const dayDetail = data.dailyDetails?.[dayIndex] || {
       dayNumber: dayIndex + 1,
       date: '',
@@ -86,7 +89,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
     // === 封面圖片區域 ===
     if (dayDetail.coverImage) {
       const coverImage: ImageElement = {
-        id: 'el-daily-cover',
+        id: elId('cover'),
         type: 'image',
         name: '當日封面',
         x: 0,
@@ -105,7 +108,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 日期區域的半透明背景（讓白色文字更清晰）
       const dateBackdrop: ShapeElement = {
-        id: 'el-daily-date-backdrop',
+        id: elId('date-backdrop'),
         type: 'shape',
         name: '日期背景',
         variant: 'rectangle',
@@ -127,7 +130,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
     } else {
       // 佔位區域
       const placeholder: ShapeElement = {
-        id: 'el-daily-cover-placeholder',
+        id: elId('cover-placeholder'),
         type: 'shape',
         name: '封面佔位',
         variant: 'rectangle',
@@ -148,7 +151,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 上傳提示
       const uploadHint: TextElement = {
-        id: 'el-daily-upload-hint',
+        id: elId('upload-hint'),
         type: 'text',
         name: '上傳提示',
         x: 0,
@@ -181,7 +184,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 月份
     const monthText: TextElement = {
-      id: 'el-daily-month',
+      id: elId('month'),
       type: 'text',
       name: '月份',
       x: dateX,
@@ -209,7 +212,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 日期數字
     const dayText: TextElement = {
-      id: 'el-daily-day',
+      id: elId('day'),
       type: 'text',
       name: '日期',
       x: dateX,
@@ -237,7 +240,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 星期
     const weekdayText: TextElement = {
-      id: 'el-daily-weekday',
+      id: elId('weekday'),
       type: 'text',
       name: '星期',
       x: dateX,
@@ -269,7 +272,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // Day 標籤
     const dayBadge: ShapeElement = {
-      id: 'el-daily-badge-bg',
+      id: elId('badge-bg'),
       type: 'shape',
       name: 'Day標籤背景',
       variant: 'rectangle',
@@ -290,7 +293,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
     elements.push(dayBadge)
 
     const dayBadgeText: TextElement = {
-      id: 'el-daily-badge-text',
+      id: elId('badge-text'),
       type: 'text',
       name: 'Day標籤',
       x: contentPadding,
@@ -318,7 +321,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // Day 標籤後的橫線
     const badgeLine: ShapeElement = {
-      id: 'el-daily-badge-line',
+      id: elId('badge-line'),
       type: 'shape',
       name: '標籤橫線',
       variant: 'rectangle',
@@ -344,7 +347,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
     const titleHeight = Math.max(28, estimatedTitleLines * 26)
 
     const titleText: TextElement = {
-      id: 'el-daily-title',
+      id: elId('title'),
       type: 'text',
       name: '當日標題',
       x: contentPadding,
@@ -377,7 +380,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 時間軸垂直線
     const timelineLine: ShapeElement = {
-      id: 'el-daily-timeline-line',
+      id: elId('timeline-line'),
       type: 'shape',
       name: '時間軸線',
       variant: 'rectangle',
@@ -402,7 +405,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 時間
       const timeText: TextElement = {
-        id: `el-daily-time-${idx}`,
+        id: elId(`time-${idx}`),
         type: 'text',
         name: `時間${idx + 1}`,
         x: timelineX,
@@ -430,7 +433,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 圓點
       const dot: ShapeElement = {
-        id: `el-daily-dot-${idx}`,
+        id: elId(`dot-${idx}`),
         type: 'shape',
         name: `圓點${idx + 1}`,
         variant: 'circle',
@@ -451,7 +454,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 活動內容
       const activityText: TextElement = {
-        id: `el-daily-activity-${idx}`,
+        id: elId(`activity-${idx}`),
         type: 'text',
         name: `活動${idx + 1}`,
         x: timelineX + 64,
@@ -483,7 +486,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 分隔線
     const footerLine: ShapeElement = {
-      id: 'el-daily-footer-line',
+      id: elId('footer-line'),
       type: 'shape',
       name: '底部分隔線',
       variant: 'rectangle',
@@ -519,7 +522,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 圖標
       const mealIcon: IconElement = {
-        id: `el-daily-meal-${meal.type}-icon`,
+        id: elId(`meal-${meal.type}-icon`),
         type: 'icon',
         name: `${meal.label}餐圖標`,
         x: mealX,
@@ -539,7 +542,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
       // 文字
       const mealText: TextElement = {
-        id: `el-daily-meal-${meal.type}-text`,
+        id: elId(`meal-${meal.type}-text`),
         type: 'text',
         name: `${meal.label}餐`,
         x: mealX + 18,
@@ -569,7 +572,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
     // 頁碼
     const pageNumber = (data.currentDayIndex || 0) + 3 // 封面=1, 總覽=2, Day1=3...
     const pageText: TextElement = {
-      id: 'el-daily-page',
+      id: elId('page'),
       type: 'text',
       name: '頁碼',
       x: A5_WIDTH - contentPadding - 30,
@@ -597,7 +600,7 @@ export const japaneseStyleV1Daily: PageTemplate = {
 
     // 行程名稱（左下角）
     const tripName: TextElement = {
-      id: 'el-daily-trip-name',
+      id: elId('trip-name'),
       type: 'text',
       name: '行程名稱',
       x: contentPadding,

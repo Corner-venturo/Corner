@@ -5,7 +5,7 @@
 
 'use client'
 
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
@@ -39,6 +39,8 @@ interface ProposalDetailDialogProps {
   onOpenChange: (open: boolean) => void
   proposal: Proposal | null
   onPackagesChange?: () => void
+  /** 開啟時自動顯示新增版本對話框（新建提案後直接開版本） */
+  autoOpenAddVersion?: boolean
 }
 
 export function ProposalDetailDialog({
@@ -46,9 +48,17 @@ export function ProposalDetailDialog({
   onOpenChange,
   proposal,
   onPackagesChange,
+  autoOpenAddVersion = false,
 }: ProposalDetailDialogProps) {
   const { items: allPackages, fetchAll: refreshPackages } = useProposalPackages()
   const [showAddDialog, setShowAddDialog] = useState(false)
+
+  // 當 autoOpenAddVersion 變為 true 時，開啟新增版本對話框
+  useEffect(() => {
+    if (autoOpenAddVersion && open) {
+      setShowAddDialog(true)
+    }
+  }, [autoOpenAddVersion, open])
 
   // 快速行程表對話框狀態（用於單一遮罩模式）
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)

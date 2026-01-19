@@ -7,8 +7,12 @@
  * import { useTours, useTour, useToursPaginated, useTourDictionary } from '@/data'
  */
 
+import useSWR from 'swr'
 import { createEntityHook } from '../core/createEntityHook'
-import { CACHE_PRESETS } from '../core/types'
+import { CACHE_PRESETS, type ListResult } from '../core/types'
+import { supabase } from '@/lib/supabase/client'
+import { useAuthStore } from '@/stores/auth-store'
+import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
 import type { Tour } from '@/stores/types'
 
 // ============================================
@@ -33,6 +37,78 @@ export const tourEntity = createEntityHook<Tour>('tours', {
 })
 
 // ============================================
+// 行事曆專用 Hook（日期範圍查詢）
+// ============================================
+
+interface DateRange {
+  start: string // YYYY-MM-DD
+  end: string   // YYYY-MM-DD
+}
+
+/**
+ * 行事曆專用 Tours Hook
+ * 只載入指定日期範圍內的團（出發日或回程日在範圍內）
+ */
+export function useToursForCalendar(dateRange: DateRange | null): ListResult<Tour> {
+  const user = useAuthStore(state => state.user)
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+  const hasHydrated = useAuthStore(state => state._hasHydrated)
+
+  const isReady = hasHydrated && isAuthenticated && !!user?.id
+  const userRole = (user?.roles?.includes('super_admin') ? 'super_admin' : user?.roles?.[0]) as UserRole | null
+  const workspaceId = user?.workspace_id
+
+  // SWR key 包含日期範圍
+  const swrKey = isReady && dateRange
+    ? `entity:tours:calendar:${dateRange.start}:${dateRange.end}`
+    : null
+
+  const { data, error, isLoading, mutate } = useSWR<Tour[]>(
+    swrKey,
+    async () => {
+      if (!dateRange) return []
+
+      // 選擇精簡欄位（行事曆只需要這些）
+      const selectFields = 'id,code,name,departure_date,return_date,status,location,current_participants,max_participants,archived'
+
+      let query = supabase
+        .from('tours')
+        .select(selectFields)
+        // 日期範圍過濾：團出發日在範圍結束前，且回程日在範圍開始後（或尚未設定回程日）
+        // 這樣可以正確選取所有與日期範圍重疊的團
+        .lte('departure_date', dateRange.end)
+        .or(`return_date.gte.${dateRange.start},return_date.is.null,departure_date.gte.${dateRange.start}`)
+        .order('departure_date', { ascending: false })
+
+      // 套用 workspace 過濾（非 super_admin）
+      if (!canCrossWorkspace(userRole) && workspaceId) {
+        query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        throw error
+      }
+
+      return (data || []) as unknown as Tour[]
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000, // 1 分鐘內重複請求使用快取
+    }
+  )
+
+  return {
+    items: data || [],
+    loading: !hasHydrated || isLoading,
+    error: error?.message || null,
+    refresh: async () => { await mutate() },
+  }
+}
+
+// ============================================
 // 便捷 Hooks Export
 // ============================================
 
@@ -50,6 +126,8 @@ export const useToursPaginated = tourEntity.usePaginated
 
 /** Tour Dictionary（O(1) 查詢）*/
 export const useTourDictionary = tourEntity.useDictionary
+
+// useToursForCalendar 已在上方定義並匯出
 
 // ============================================
 // CRUD Export

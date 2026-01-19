@@ -57,34 +57,34 @@ function createTextStyle(overrides: Partial<TextStyle> = {}): TextStyle {
   }
 }
 
-// 預設飯店資料
+// 預設飯店資料（佔位提示）
 function getDefaultHotel(index: number): HotelData {
   const hotels = [
     {
       id: 'default-hotel-1',
-      nameZh: '星野集團 界 由布院',
-      nameEn: 'Hoshino Resorts KAI Yufuin',
-      location: '大分縣由布市湯布院町川上',
-      description: '位於由布院溫泉的深處，被梯田與群山環繞的溫泉旅館。設計由名建築師隈研吾操刀，將建築與自然景觀完美融合。',
-      tags: ['露天溫泉', '梯田景觀', '懷石料理'],
+      nameZh: '主要飯店名稱',
+      nameEn: 'Main Hotel Name',
+      location: '請從右側面板帶入飯店',
+      description: '此處將顯示主要飯店的介紹文字。請在右側面板中「從行程帶入飯店」或「手動新增飯店」。',
+      tags: ['設施標籤'],
       enabled: true,
     },
     {
       id: 'default-hotel-2',
-      nameZh: '由布院玉之湯',
-      nameEn: 'Yufuin Tamanoyu',
-      location: '大分縣由布市湯布院町',
-      description: '傳統日式溫泉旅館，享有優美庭園景觀。',
-      tags: ['溫泉', '和室'],
+      nameZh: '次要飯店 1',
+      nameEn: 'Secondary Hotel 1',
+      location: '',
+      description: '',
+      tags: [],
       enabled: true,
     },
     {
       id: 'default-hotel-3',
-      nameZh: '別府灣皇家酒店',
-      nameEn: 'Beppu Bay Royal Hotel',
-      location: '大分縣別府市',
-      description: '面朝別府灣的現代化溫泉酒店。',
-      tags: ['海景', '溫泉'],
+      nameZh: '次要飯店 2',
+      nameEn: 'Secondary Hotel 2',
+      location: '',
+      description: '',
+      tags: [],
       enabled: true,
     },
   ]
@@ -96,7 +96,7 @@ export const japaneseStyleV1HotelMulti: PageTemplate = {
   name: '日系風格 - 飯店介紹（多飯店）',
   description: '精選住宿頁面，展示1個主要飯店和2個次要飯店',
   thumbnailUrl: '/templates/japanese-style-v1-hotel-multi.png',
-  category: 'info',
+  category: 'hotelMulti',
 
   generateElements: (data: TemplateData): CanvasElement[] => {
     zIndexCounter = 0
@@ -225,21 +225,9 @@ export const japaneseStyleV1HotelMulti: PageTemplate = {
         },
       }
       elements.push(primaryImgElement)
-    } else {
-      // 無圖片時顯示佔位圖標
-      const placeholderIcon: IconElement = {
-        ...createBaseElement('hotel-multi-primary-placeholder', '主飯店圖片佔位'),
-        type: 'icon',
-        x: A5_WIDTH / 2 - 24,
-        y: primaryImgY + primaryImgHeight / 2 - 24,
-        width: 48,
-        height: 48,
-        icon: 'image',
-        size: 48,
-        color: 'rgba(62, 58, 54, 0.2)',
-      }
-      elements.push(placeholderIcon)
     }
+    // 無圖片時只顯示灰色背景區域（圖片區背景已建立），不再顯示佔位 icon
+    // 使用者可從右側面板上傳飯店圖片
 
     // 主飯店名稱
     const primaryInfoY = primaryImgY + primaryImgHeight + 16

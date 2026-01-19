@@ -9,11 +9,10 @@ import { logger } from '@/lib/utils/logger'
  * MiniGL 實例類型（套件沒有提供類型定義）
  */
 interface MiniGLInstance {
-  loadimage: () => void
+  loadImage: () => void
   filterAdjustments: (options: Record<string, number>) => void
   filterVignette: (options: { size: number; amount: number }) => void
   paintCanvas: () => void
-  captureImage: (format: string, quality: number) => string
   destroy: () => void
 }
 
@@ -101,7 +100,7 @@ export function useImageAdjustments() {
         wglRef.current = wgl
 
         // 載入圖片到 WebGL
-        wgl.loadimage()
+        wgl.loadImage()
 
         // 套用濾鏡調整（mini-gl 類型定義不完整，使用展開運算子繞過）
         const adjustmentOptions = {
@@ -128,8 +127,8 @@ export function useImageAdjustments() {
         wgl.paintCanvas()
         logger.log('✅ 渲染到 canvas 完成')
 
-        // 擷取處理後的圖片
-        const dataURL = wgl.captureImage('image/jpeg', 0.92)
+        // 直接從 canvas 取得 data URL（captureImage 回傳的是 HTMLImageElement，不是字串）
+        const dataURL = canvas.toDataURL('image/jpeg', 0.92)
         logger.log('✅ 圖片處理完成，dataURL 長度:', dataURL.length)
 
         return dataURL

@@ -96,12 +96,15 @@ export function useRequestForm() {
       group: '供應商',
     }))
 
-    const employeeList = employees.map(e => ({
-      id: e.id,
-      name: e.display_name,
-      type: 'employee' as const,
-      group: '員工',
-    }))
+    // 過濾掉機器人（BOT001）
+    const employeeList = employees
+      .filter(e => e.employee_number !== 'BOT001' && e.id !== '00000000-0000-0000-0000-000000000001')
+      .map(e => ({
+        id: e.id,
+        name: e.display_name,
+        type: 'employee' as const,
+        group: '員工',
+      }))
 
     return [...supplierList, ...employeeList]
   }, [suppliers, employees])

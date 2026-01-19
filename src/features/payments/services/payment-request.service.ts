@@ -23,14 +23,22 @@ class PaymentRequestService extends BaseService<PaymentRequest> {
       getById: (id: string) => this._items.find(r => r.id === id),
       add: async (request: PaymentRequest) => {
         const { id, created_at, updated_at, ...createData } = request
+        const insertData = { id: request.id, ...createData, created_at: request.created_at, updated_at: request.updated_at }
+        logger.log('Creating payment_request with data:', insertData)
         const { data, error } = await supabase
           .from('payment_requests')
-          .insert({ id: request.id, ...createData, created_at: request.created_at, updated_at: request.updated_at })
+          .insert(insertData)
           .select()
           .single()
-        if (error) throw error
+        if (error) {
+          logger.error('Supabase error creating payment_request:', error)
+          throw new Error(`新增請款單失敗: ${error.message || JSON.stringify(error)}`)
+        }
+        // 更新內部快取，確保 getById 可以找到新建立的請款單
+        const newRequest = data as unknown as PaymentRequest
+        this._items = [newRequest, ...this._items]
         await invalidatePaymentRequests()
-        return data as unknown as PaymentRequest
+        return newRequest
       },
       update: async (id: string, data: Partial<PaymentRequest>) => {
         const { error } = await supabase

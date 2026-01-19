@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
-import { Trash2, Plus, Pencil, X, Save } from 'lucide-react'
+import { Trash2, Plus, Pencil, X, Save, Layers } from 'lucide-react'
 import { useTours, useSuppliers, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
@@ -20,6 +20,8 @@ import { statusLabels, statusColors, categoryOptions } from '../types'
 import { paymentRequestService } from '@/features/payments/services/payment-request.service'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { supabase } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 
 interface RequestDetailDialogProps {
   request: PaymentRequest | null
@@ -31,6 +33,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const { items: requestItems, refresh: refreshRequestItems } = usePaymentRequestItems()
   const { items: tours } = useTours()
   const { items: suppliers } = useSuppliers()
+
+  // 批次請款單狀態
+  const [batchRequests, setBatchRequests] = useState<PaymentRequest[]>([])
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null)
 
   // 編輯模式狀態
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
@@ -44,6 +50,40 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     quantity: 1,
   })
   const [editItem, setEditItem] = useState<Partial<PaymentRequestItem>>({})
+
+  // 載入批次請款單（如果有 batch_id）
+  useEffect(() => {
+    const loadBatchRequests = async () => {
+      if (!open || !request) {
+        setBatchRequests([])
+        setSelectedRequestId(null)
+        return
+      }
+
+      // 如果有 batch_id，查詢同批次的所有請款單
+      if (request.batch_id) {
+        const { data, error } = await supabase
+          .from('payment_requests')
+          .select('*')
+          .eq('batch_id', request.batch_id)
+          .order('code', { ascending: true })
+
+        if (error) {
+          logger.error('載入批次請款單失敗:', error)
+          setBatchRequests([request])
+        } else {
+          setBatchRequests(data as PaymentRequest[])
+        }
+      } else {
+        // 沒有 batch_id，只有單一請款單
+        setBatchRequests([request])
+      }
+
+      setSelectedRequestId(request.id)
+    }
+
+    loadBatchRequests()
+  }, [open, request])
 
   // 載入請款項目
   useEffect(() => {
@@ -68,13 +108,26 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     }
   }, [open])
 
-  if (!request) return null
+  // 當前選中的請款單
+  const currentRequest = useMemo(() => {
+    return batchRequests.find(r => r.id === selectedRequestId) || request
+  }, [batchRequests, selectedRequestId, request])
 
-  // 取得此請款單的項目
-  const items = requestItems.filter(item => item.request_id === request.id)
+  // 是否為批次請款單
+  const isBatch = batchRequests.length > 1
+
+  // 批次總金額
+  const batchTotalAmount = useMemo(() => {
+    return batchRequests.reduce((sum, r) => sum + (r.amount || 0), 0)
+  }, [batchRequests])
+
+  if (!request || !currentRequest) return null
+
+  // 取得當前選中請款單的項目
+  const items = requestItems.filter(item => item.request_id === currentRequest.id)
 
   // 取得關聯的團
-  const tour = request.tour_id ? tours.find(t => t.id === request.tour_id) : null
+  const tour = currentRequest.tour_id ? tours.find(t => t.id === currentRequest.tour_id) : null
 
   // 供應商選項（給 Combobox 使用）
   const supplierOptions = suppliers.map(s => ({
@@ -84,7 +137,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   // 刪除請款單
   const handleDelete = async () => {
-    const confirmed = await confirm('確定要刪除此請款單嗎？此操作無法復原。', {
+    const deleteMessage = isBatch
+      ? `確定要刪除此請款單（${currentRequest.code}）嗎？此操作無法復原。\n\n注意：只會刪除當前選中的請款單，同批次的其他請款單不受影響。`
+      : '確定要刪除此請款單嗎？此操作無法復原。'
+
+    const confirmed = await confirm(deleteMessage, {
       title: '刪除請款單',
       type: 'warning',
     })
@@ -93,9 +150,17 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     }
 
     try {
-      await deletePaymentRequestApi(request.id)
+      await deletePaymentRequestApi(currentRequest.id)
       await alert('請款單已刪除', 'success')
-      onOpenChange(false)
+
+      // 如果是批次且還有其他請款單，切換到下一個
+      if (isBatch && batchRequests.length > 1) {
+        const remainingRequests = batchRequests.filter(r => r.id !== currentRequest.id)
+        setBatchRequests(remainingRequests)
+        setSelectedRequestId(remainingRequests[0].id)
+      } else {
+        onOpenChange(false)
+      }
     } catch (error) {
       logger.error('刪除請款單失敗:', error)
       await alert('刪除請款單失敗', 'error')
@@ -111,7 +176,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
     try {
       const selectedSupplier = suppliers.find(s => s.id === newItem.supplier_id)
-      await paymentRequestService.addItem(request.id, {
+      await paymentRequestService.addItem(currentRequest.id, {
         category: newItem.category,
         supplier_id: newItem.supplier_id || '',
         supplier_name: selectedSupplier?.name || newItem.supplier_name || '',
@@ -141,12 +206,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   // 開始編輯項目
   const startEditItem = (item: PaymentRequestItem) => {
     setEditingItemId(item.id)
+    // 處理資料庫欄位名稱 unitprice vs TypeScript 介面 unit_price
+    const unitPrice = (item as unknown as { unitprice?: number }).unitprice ?? item.unit_price ?? 0
     setEditItem({
       category: item.category,
       supplier_id: item.supplier_id,
       supplier_name: item.supplier_name,
       description: item.description,
-      unit_price: item.unit_price,
+      unit_price: unitPrice,
       quantity: item.quantity,
     })
   }
@@ -155,7 +222,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   const handleSaveEdit = async (itemId: string) => {
     try {
       const selectedSupplier = suppliers.find(s => s.id === editItem.supplier_id)
-      await paymentRequestService.updateItem(request.id, itemId, {
+      await paymentRequestService.updateItem(currentRequest.id, itemId, {
         ...editItem,
         supplier_name: selectedSupplier?.name || editItem.supplier_name,
       })
@@ -176,7 +243,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
     if (!confirmed) return
 
     try {
-      await paymentRequestService.deleteItem(request.id, itemId)
+      await paymentRequestService.deleteItem(currentRequest.id, itemId)
       await refreshRequestItems()
     } catch (error) {
       logger.error('刪除項目失敗:', error)
@@ -185,7 +252,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
   }
 
   // 判斷是否可以編輯（只有待處理狀態可以編輯）
-  const canEdit = request.status === 'pending'
+  const canEdit = currentRequest.status === 'pending'
 
   // 是否正在編輯中（新增或編輯項目）
   const isEditing = isAddingItem || editingItemId !== null
@@ -206,33 +273,72 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-xl">請款單 {request.code}</DialogTitle>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                請款單 {currentRequest.code}
+                {isBatch && (
+                  <Badge variant="outline" className="text-xs font-normal">
+                    <Layers size={12} className="mr-1" />
+                    批次 {batchRequests.findIndex(r => r.id === currentRequest.id) + 1}/{batchRequests.length}
+                  </Badge>
+                )}
+              </DialogTitle>
               <p className="text-sm text-morandi-muted mt-1">
-                {request.tour_code ? `團號：${request.tour_code}` : '無關聯團號'}
-                {request.order_number && ` | 訂單：${request.order_number}`}
+                {currentRequest.tour_code ? `團號：${currentRequest.tour_code}` : '無關聯團號'}
+                {currentRequest.order_number && ` | 訂單：${currentRequest.order_number}`}
               </p>
             </div>
-            <Badge className={statusColors[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}>
-              {statusLabels[(request.status || 'pending') as 'pending' | 'approved' | 'paid']}
+            <Badge className={statusColors[(currentRequest.status || 'pending') as 'pending' | 'approved' | 'paid']}>
+              {statusLabels[(currentRequest.status || 'pending') as 'pending' | 'approved' | 'paid']}
             </Badge>
           </div>
         </DialogHeader>
 
+        {/* 批次請款單切換列 */}
+        {isBatch && (
+          <div className="mt-2 mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Layers size={14} className="text-morandi-muted" />
+              <span className="text-xs text-morandi-muted">同批次請款單 ({batchRequests.length} 張，共 <CurrencyCell amount={batchTotalAmount} className="inline text-xs" />)</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {batchRequests.map((br) => (
+                <Button
+                  key={br.id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedRequestId(br.id)}
+                  className={cn(
+                    'h-7 text-xs',
+                    selectedRequestId === br.id
+                      ? 'bg-morandi-gold/10 border-morandi-gold text-morandi-gold'
+                      : 'hover:bg-morandi-container/50'
+                  )}
+                >
+                  <span className="font-medium">{br.tour_code || br.code}</span>
+                  <span className="ml-1 text-morandi-muted">
+                    <CurrencyCell amount={br.amount || 0} className="inline text-xs" />
+                  </span>
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-6 mt-4">
           {/* 基本資訊 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-morandi-background/50 rounded-lg">
-            <InfoItem label="請款單號" value={request.code} />
-            <InfoItem label="團號" value={request.tour_code || '-'} />
-            <InfoItem label="團名" value={request.tour_name || tour?.name || '-'} />
-            <InfoItem label="訂單編號" value={request.order_number || '-'} />
-            <InfoItem label="請款人" value={request.created_by_name || '-'} />
+            <InfoItem label="請款單號" value={currentRequest.code} />
+            <InfoItem label="團號" value={currentRequest.tour_code || '-'} />
+            <InfoItem label="團名" value={currentRequest.tour_name || tour?.name || '-'} />
+            <InfoItem label="訂單編號" value={currentRequest.order_number || '-'} />
+            <InfoItem label="請款人" value={currentRequest.created_by_name || '-'} />
             <div>
               <p className="text-xs text-morandi-muted mb-1">請款日期</p>
-              <DateCell date={request.created_at} showIcon={false} />
+              <DateCell date={currentRequest.created_at} showIcon={false} />
             </div>
             <div>
               <p className="text-xs text-morandi-muted mb-1">總金額</p>
-              <CurrencyCell amount={request.amount || 0} className="font-semibold text-morandi-gold" />
+              <CurrencyCell amount={currentRequest.amount || 0} className="font-semibold text-morandi-gold" />
             </div>
           </div>
 
@@ -256,9 +362,9 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
             </div>
 
             <div className="border border-morandi-container/20 rounded-lg overflow-hidden">
-              {/* 表頭 - 與 EditableRequestItemList 一致的 grid 結構 */}
+              {/* 表頭 */}
               <div className="bg-morandi-background/50 border-b border-morandi-container/20">
-                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-3 py-2.5`}>
+                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-2.5`}>
                   <span className="text-xs font-medium text-morandi-muted">類別</span>
                   <span className="text-xs font-medium text-morandi-muted">供應商</span>
                   <span className="text-xs font-medium text-morandi-muted">說明</span>
@@ -273,7 +379,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
               <div className="max-h-[280px] overflow-y-auto">
                 {/* 新增項目表單 */}
                 {isAddingItem && (
-                  <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-2 py-1.5 border-b border-morandi-container/10 bg-morandi-gold/5 items-center`}>
+                  <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 bg-morandi-gold/5 items-center`}>
                     <div>
                       <Select
                         value={newItem.category}
@@ -331,16 +437,18 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                       />
                     </div>
                     <div className="text-right pr-2">
-                      <CurrencyCell amount={newItem.unit_price * newItem.quantity} className="text-morandi-gold" />
+                      <CurrencyCell amount={newItem.unit_price * newItem.quantity} className="text-morandi-gold text-sm" />
                     </div>
-                    <div className="flex items-center justify-center gap-1">
-                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
-                        <Save size={14} className="text-status-success" />
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
-                        <X size={14} className="text-status-danger" />
-                      </Button>
-                    </div>
+                    {canEdit && (
+                      <div className="flex items-center justify-center gap-1">
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleAddItem}>
+                          <Save size={14} className="text-status-success" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsAddingItem(false)}>
+                          <X size={14} className="text-status-danger" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -350,7 +458,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                   </div>
                 ) : (
                   items.map((item) => (
-                    <div key={item.id} className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-2 py-1.5 border-b border-morandi-container/10 items-center hover:bg-morandi-container/5`}>
+                    <div key={item.id} className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-2 py-1.5 border-b border-morandi-container/10 items-center hover:bg-morandi-container/5`}>
                       {editingItemId === item.id ? (
                         /* 編輯模式 */
                         <>
@@ -410,7 +518,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                             />
                           </div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={(editItem.unit_price || 0) * (editItem.quantity || 0)} className="text-morandi-gold" />
+                            <CurrencyCell amount={(editItem.unit_price || 0) * (editItem.quantity || 0)} className="text-morandi-gold text-sm" />
                           </div>
                           <div className="flex items-center justify-center gap-1">
                             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSaveEdit(item.id)}>
@@ -430,11 +538,11 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
                           <div className="text-sm px-1">{item.supplier_name || '-'}</div>
                           <div className="text-sm px-1">{item.description || '-'}</div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={item.unit_price || 0} className="text-sm" />
+                            <CurrencyCell amount={(item as unknown as { unitprice?: number }).unitprice ?? item.unit_price ?? 0} className="text-sm" />
                           </div>
                           <div className="text-sm text-center">{item.quantity}</div>
                           <div className="text-right pr-2">
-                            <CurrencyCell amount={item.subtotal || 0} className="text-morandi-gold" />
+                            <CurrencyCell amount={item.subtotal || 0} className="text-morandi-gold text-sm" />
                           </div>
                           {canEdit && (
                             <div className="flex items-center justify-center gap-1">
@@ -455,14 +563,14 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
               {/* 合計 */}
               <div className="bg-morandi-background/50 border-t border-morandi-container/20">
-                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_112px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_112px]'} px-3 py-3`}>
+                <div className={`grid ${canEdit ? 'grid-cols-[80px_1fr_1fr_96px_64px_96px_80px]' : 'grid-cols-[80px_1fr_1fr_96px_64px_96px]'} px-3 py-3`}>
                   <div></div>
                   <div></div>
                   <div></div>
                   <div></div>
                   <div className="text-right font-semibold text-sm">合計</div>
                   <div className="text-right pr-2">
-                    <CurrencyCell amount={request.amount || 0} className="font-bold text-morandi-gold" />
+                    <CurrencyCell amount={currentRequest.amount || 0} className="font-bold text-morandi-gold" />
                   </div>
                   {canEdit && <div></div>}
                 </div>
@@ -471,10 +579,10 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
           </div>
 
           {/* 備註 */}
-          {request.note && (
+          {currentRequest.note && (
             <div className="p-4 bg-morandi-background/50 rounded-lg">
               <h3 className="text-sm font-semibold text-morandi-primary mb-2">備註</h3>
-              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{request.note}</p>
+              <p className="text-sm text-morandi-secondary whitespace-pre-wrap">{currentRequest.note}</p>
             </div>
           )}
 

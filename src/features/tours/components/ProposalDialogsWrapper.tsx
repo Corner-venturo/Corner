@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react'
-import { ProposalDialog } from '@/features/proposals/components/ProposalDialog'
+import { ProposalDialog, type CreateProposalWithPackageData } from '@/features/proposals/components/ProposalDialog'
 import { ProposalDetailDialog } from '@/features/proposals/components/ProposalDetailDialog'
 import { ArchiveProposalDialog } from '@/features/proposals/components/ArchiveProposalDialog'
-import type { Proposal, CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
+import type { Proposal, UpdateProposalData } from '@/types/proposal.types'
 
 interface ProposalDialogsWrapperProps {
   // Dialog states
@@ -22,10 +22,14 @@ interface ProposalDialogsWrapperProps {
   setSelectedProposal: (proposal: Proposal | null) => void
 
   // Handlers
-  onCreateProposal: (data: CreateProposalData | UpdateProposalData) => Promise<void>
-  onUpdateProposal: (data: CreateProposalData | UpdateProposalData) => Promise<void>
+  onCreateProposal: (data: CreateProposalWithPackageData | UpdateProposalData) => Promise<void>
+  onUpdateProposal: (data: CreateProposalWithPackageData | UpdateProposalData) => Promise<void>
   onArchiveProposal: (reason: string) => Promise<void>
   onRefreshProposals: () => Promise<Proposal[] | undefined> | void
+
+  /** 新建提案後自動開啟新增版本對話框 */
+  autoOpenAddVersion?: boolean
+  setAutoOpenAddVersion?: (value: boolean) => void
 }
 
 export function ProposalDialogsWrapper({
@@ -43,6 +47,8 @@ export function ProposalDialogsWrapper({
   onUpdateProposal,
   onArchiveProposal,
   onRefreshProposals,
+  autoOpenAddVersion = false,
+  setAutoOpenAddVersion,
 }: ProposalDialogsWrapperProps) {
   return (
     <>
@@ -59,13 +65,15 @@ export function ProposalDialogsWrapper({
         open={proposalDetailDialogOpen}
         onOpenChange={(open) => {
           setProposalDetailDialogOpen(open)
-          // 關閉時清除選擇，但不改變 tab 狀態
+          // 關閉時清除選擇和自動開版本標記
           if (!open) {
             setSelectedProposal(null)
+            setAutoOpenAddVersion?.(false)
           }
         }}
         proposal={selectedProposal}
         onPackagesChange={onRefreshProposals}
+        autoOpenAddVersion={autoOpenAddVersion}
       />
 
       {/* 編輯提案對話框 */}

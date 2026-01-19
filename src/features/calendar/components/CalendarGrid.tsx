@@ -5,7 +5,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin, { EventDragStopArg } from '@fullcalendar/interaction'
-import { EventClickArg, MoreLinkAction, EventDropArg } from '@fullcalendar/core'
+import { EventClickArg, MoreLinkAction, EventDropArg, DatesSetArg } from '@fullcalendar/core'
 import { DateClickArg } from '@fullcalendar/interaction'
 import { FullCalendarEvent } from '../types'
 
@@ -18,6 +18,7 @@ interface CalendarGridProps {
   onMoreLinkClick: MoreLinkAction
   onEventDrop?: (info: EventDropArg) => void
   onEventDragStop?: (info: EventDragStopArg) => void
+  onDatesSet?: (info: DatesSetArg) => void
 }
 
 export function CalendarGrid({
@@ -29,6 +30,7 @@ export function CalendarGrid({
   onMoreLinkClick,
   onEventDrop,
   onEventDragStop,
+  onDatesSet,
 }: CalendarGridProps) {
   return (
     <div className="calendar-container h-full">
@@ -40,6 +42,7 @@ export function CalendarGrid({
         events={events}
         dateClick={onDateClick}
         eventClick={onEventClick}
+        datesSet={onDatesSet}
         locale="zh-tw"
         // 🔧 修正：明確指定台灣時區，避免時間跳動問題
         timeZone="Asia/Taipei"

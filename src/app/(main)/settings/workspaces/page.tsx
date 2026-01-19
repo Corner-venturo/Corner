@@ -31,7 +31,8 @@ export default function WorkspacesPage() {
   // 載入 workspaces 資料（employees 由 SWR 自動載入）
   useEffect(() => {
     loadWorkspaces()
-  }, [loadWorkspaces])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 計算每個 workspace 的員工數
   const getEmployeeCount = (workspaceId: string) => {

@@ -11,7 +11,9 @@ import { japaneseStyleV1Hotel } from '../definitions/japanese-style-v1-hotel'
 import { japaneseStyleV1Toc } from '../definitions/japanese-style-v1-toc'
 import { japaneseStyleV1Attraction } from '../definitions/japanese-style-v1-attraction'
 import { japaneseStyleV1HotelMulti } from '../definitions/japanese-style-v1-hotel-multi'
-import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData } from '../definitions/types'
+import { japaneseStyleV1Vehicle } from '../definitions/japanese-style-v1-vehicle'
+import { japaneseStyleV1Table } from '../definitions/japanese-style-v1-table'
+import type { PageTemplate, TemplateData, TemplateOption, DailyItinerary, DailyDetailData, MemoSettings, CountryCode, HotelData, VehicleData } from '../definitions/types'
 import type { CanvasPage } from '@/features/designer/components/types'
 import type { TimelineItineraryData, TimelineDay } from '@/types/timeline-itinerary.types'
 
@@ -23,7 +25,7 @@ export {
   getMemoItemsForPage,
   countryNames,
 } from '../definitions/country-presets'
-export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData, TemplateData } from '../definitions/types'
+export type { MemoSettings, CountryCode, MemoItem, SeasonInfo, MemoInfoItem, HotelData, VehicleData, TemplateData } from '../definitions/types'
 
 // A5 尺寸（像素，96 DPI）
 const A5_WIDTH_PX = 559
@@ -39,6 +41,8 @@ const templateRegistry: Record<string, PageTemplate> = {
   [japaneseStyleV1Hotel.id]: japaneseStyleV1Hotel,
   [japaneseStyleV1HotelMulti.id]: japaneseStyleV1HotelMulti,
   [japaneseStyleV1Attraction.id]: japaneseStyleV1Attraction,
+  [japaneseStyleV1Vehicle.id]: japaneseStyleV1Vehicle,
+  [japaneseStyleV1Table.id]: japaneseStyleV1Table,
   // 未來可以在此處註冊更多範本
   // [modernStyleV1.id]: modernStyleV1,
   // [elegantStyleV1.id]: elegantStyleV1,
@@ -57,6 +61,8 @@ export interface StyleSeries {
     hotel: string // 飯店介紹範本 ID（單一飯店）
     hotelMulti: string // 飯店介紹範本 ID（多飯店）
     attraction: string // 景點介紹範本 ID
+    vehicle: string // 分車名單範本 ID
+    table: string // 分桌名單範本 ID
   }
 }
 
@@ -73,6 +79,8 @@ export const styleSeries: StyleSeries[] = [
       hotel: 'japanese-style-v1-hotel',
       hotelMulti: 'japanese-style-v1-hotel-multi',
       attraction: 'japanese-style-v1-attraction',
+      vehicle: 'japanese-style-v1-vehicle',
+      table: 'japanese-style-v1-table',
     },
   },
 ]
@@ -114,7 +122,7 @@ export function generatePageFromTemplate(
   const elements = template.generateElements(itineraryData)
 
   return {
-    id: `page-${Date.now()}`,
+    id: `page-${crypto.randomUUID()}`,
     name: template.name,
     templateKey: template.category, // 用於識別頁面類型（cover, toc, itinerary 等）
     width: A5_WIDTH_PX,

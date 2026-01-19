@@ -118,7 +118,7 @@ export interface MemoSettings {
  * 國家代碼（ISO 3166-1 alpha-2）
  * 對應資料庫 countries.code 欄位
  */
-export type CountryCode = 'JP' | 'TH' | 'KR' | 'VN' | 'CN' | 'TW' | 'GU' | 'OTHER'
+export type CountryCode = 'JP' | 'TH' | 'KR' | 'VN' | 'CN' | 'HK' | 'TW' | 'GU' | 'OTHER'
 
 /**
  * 飯店資料（用於飯店介紹頁面）
@@ -147,12 +147,76 @@ export interface AttractionData {
 }
 
 /**
+ * 分組類型
+ */
+export type GroupType = 'vehicle' | 'table'
+
+/**
+ * 分車/分桌頁面的欄位顯示設定
+ */
+export interface VehicleColumnSettings {
+  showSeatNumber?: boolean // 顯示座位號（已棄用，改用序號）
+  showOrderCode?: boolean // 顯示訂單編號
+  showDestination?: boolean // 顯示目的地/備註
+  showDriverInfo?: boolean // 顯示司機資訊
+  columnsPerRow?: 1 | 2 | 3 // 每行人數（1=單欄, 2=雙欄, 3=三欄）- 列表模式用
+  layoutMode?: 'list' | 'grid' // 排版模式：list=分開列表, grid=表格式（車輛為欄）
+}
+
+/**
+ * 車輛/分桌資料（用於分車、分桌頁面）
+ */
+export interface VehicleData {
+  id: string // 唯一識別碼
+  groupType?: GroupType // 分組類型：vehicle=分車, table=分桌
+  vehicleName: string // 名稱（如：1號車、A桌）
+  vehicleType?: string // 車型（如：43人座大巴）- 僅分車用
+  capacity?: number // 座位數
+  licensePlate?: string // 車牌號碼 - 僅分車用
+  driverName?: string // 司機姓名 / 桌長姓名
+  driverPhone?: string // 司機電話 - 僅分車用
+  notes?: string // 備註/目的地
+  members: VehicleMemberData[] // 成員
+}
+
+/**
+ * 車輛成員資料（用於分車頁面）
+ */
+export interface VehicleMemberData {
+  id: string
+  chineseName: string | null
+  passportName?: string | null
+  orderCode?: string | null
+  seatNumber?: number | null
+}
+
+/**
  * 圖片位置設定
  */
 export interface CoverImagePosition {
   x: number // 0-100，水平位置百分比
   y: number // 0-100，垂直位置百分比
   scale: number // 1-3，縮放比例
+}
+
+/**
+ * 目錄項目（用於目錄編輯）
+ */
+export interface TocItemData {
+  pageId: string       // 對應的頁面 ID
+  displayName: string  // 顯示名稱
+  icon: string         // 圖標 ID
+  enabled: boolean     // 是否顯示在目錄
+  pageNumber: number   // 頁碼（自動計算）
+}
+
+/**
+ * 目錄內容（用於模板渲染）
+ */
+export interface TocContentItem {
+  name: string   // 顯示名稱
+  page: number   // 頁碼
+  icon?: string  // 圖標 ID
 }
 
 /**
@@ -190,6 +254,20 @@ export interface TemplateData {
   // 景點介紹頁專用
   attractions?: AttractionData[] // 景點列表
   currentAttractionPageIndex?: number // 當前景點頁索引（0-based）
+  // 分車頁專用
+  vehicles?: VehicleData[] // 車輛列表（含成員）
+  currentVehiclePageIndex?: number // 當前分車頁索引（0-based）
+  vehicleColumnSettings?: VehicleColumnSettings // 分車頁欄位顯示設定
+  // 目錄頁專用
+  tocItems?: TocItemData[] // 目錄編輯項目（用於編輯 UI）
+  tocContent?: TocContentItem[] // 目錄內容（用於模板渲染）
+  // 備忘錄頁專用（新增頁面時選擇的內容）
+  memoPageContent?: {
+    items?: MemoItem[]
+    seasons?: SeasonInfo[]
+    infoItems?: MemoInfoItem[]
+    isWeatherPage?: boolean
+  }
   // 通用
   currentPageNumber?: number // 當前頁碼
 }
@@ -202,7 +280,7 @@ export interface PageTemplate {
   name: string // e.g., '日系風格'
   description?: string // 範本描述
   thumbnailUrl: string // 用於選擇器中的預覽圖
-  category?: 'cover' | 'daily' | 'info' | 'general' | 'itinerary' // 範本類別
+  category?: 'cover' | 'toc' | 'itinerary' | 'daily' | 'memo' | 'hotel' | 'hotelMulti' | 'attraction' | 'vehicle' | 'table' | 'info' | 'general' // 範本類別
   // 核心：一個接收數據並回傳元素陣列的函式
   generateElements: (data: TemplateData) => CanvasElement[]
 }

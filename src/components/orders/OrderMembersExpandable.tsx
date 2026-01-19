@@ -25,7 +25,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useOcrRecognition } from '@/hooks'
-import { useCustomers } from '@/data'
+import { useCustomers, useTour } from '@/data'
 import { TourRoomManager } from '@/components/tours/tour-room-manager'
 import { TourVehicleManager } from '@/components/tours/tour-vehicle-manager'
 import {
@@ -40,7 +40,6 @@ import {
   MemberRow,
   AddMemberDialog,
   MemberEditDialog,
-  ExportDialog,
   OrderSelectDialog,
   CustomerMatchDialog,
   CustomCostFieldsSection,
@@ -126,6 +125,9 @@ export function OrderMembersExpandable({
 
   // Hooks
   const { items: customers } = useCustomers()
+  // 當沒有傳入 tour prop 時，根據 tourId 自動獲取 tour 資料（用於訂單管理頁的列印功能）
+  const { item: fetchedTour } = useTour(tour ? null : tourId)
+  const effectiveTour = tour || fetchedTour
   const membersData = useOrderMembersData({ orderId, tourId, workspaceId, mode })
   const roomVehicle = useRoomVehicleAssignments({ tourId })
   const customerMatch = useCustomerMatch(customers, membersData.members, membersData.setMembers)
@@ -217,9 +219,8 @@ export function OrderMembersExpandable({
   }, [isParentControlledPnrDialog, showPnrMatchDialog, membersData])
 
   // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  // 注意：以下 Dialog 不包含在內，因為它們使用 nested 模式在父 Dialog 內顯示：
-  // - isAddDialogOpen、showOrderSelectDialog、showCustomerMatchDialog、previewMember（小型 Dialog）
-  // - memberEdit.isEditDialogOpen、memberExport.isExportDialogOpen（使用 nested prop）
+  // 只包含需要獨占全屏的大型 Dialog（分房、分車）
+  // 其他小型 Dialog（新增成員、編輯成員等）使用 nested 模式在父 Dialog 內顯示
   // 當 PNR Dialog 由父組件控制時，不包含在此計算中（父組件會處理）
   const hasChildDialogOpen = (!isParentControlledPnrDialog && showPnrMatchDialog) ||
     roomVehicle.showRoomManager || roomVehicle.showVehicleManager
@@ -512,7 +513,7 @@ export function OrderMembersExpandable({
       {/* Dialogs */}
       {/* 護照照片預覽 */}
       <Dialog open={!!previewMember} onOpenChange={(open) => !open && setPreviewMember(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent nested className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {previewMember?.chinese_name || previewMember?.passport_name || '護照照片'}
@@ -596,21 +597,12 @@ export function OrderMembersExpandable({
         onSave={memberEdit.handleSaveEdit}
         onRecognize={(url) => recognizePassport(url, () => {})}
       />
-      {tour ? (
+      {effectiveTour && (
         <TourPrintDialog
           isOpen={memberExport.isExportDialogOpen}
-          tour={tour}
+          tour={effectiveTour}
           members={membersData.members}
           onClose={() => memberExport.setIsExportDialogOpen(false)}
-        />
-      ) : (
-        <ExportDialog
-          isOpen={memberExport.isExportDialogOpen}
-          columns={memberExport.exportColumns as unknown as import('./order-member.types').ExportColumnsConfig}
-          members={membersData.members}
-          departureDate={membersData.departureDate}
-          onClose={() => memberExport.setIsExportDialogOpen(false)}
-          onColumnsChange={(cols) => memberExport.setExportColumns(cols as unknown as typeof memberExport.exportColumns)}
         />
       )}
       <TourRoomManager

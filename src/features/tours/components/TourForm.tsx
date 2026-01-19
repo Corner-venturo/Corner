@@ -143,7 +143,12 @@ export function TourForm({
           <Button
             onClick={onSubmit}
             disabled={
-              submitting || !newTour.name.trim() || !newTour.departure_date || !newTour.return_date
+              submitting ||
+              !newTour.name.trim() ||
+              !newTour.departure_date ||
+              !newTour.return_date ||
+              // 如果有填聯絡人（要建訂單），業務必填
+              (!!newOrder.contact_person?.trim() && !newOrder.sales_person?.trim())
             }
             className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >

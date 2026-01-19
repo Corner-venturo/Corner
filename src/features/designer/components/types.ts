@@ -1,19 +1,24 @@
 // venturo-erp/src/features/designer/components/types.ts
 import type { Object as FabricObject } from 'fabric'
 
-export interface BaseElement {
+// 基礎元素屬性（不含尺寸）
+export interface BaseElementCore {
   id: string
   type: ElementType
   name: string
   x: number
   y: number
-  width: number
-  height: number
   rotation: number
   opacity: number
   locked: boolean
   visible: boolean
   zIndex: number
+}
+
+// 有固定尺寸的元素（形狀、圖片等）
+export interface BaseElement extends BaseElementCore {
+  width: number
+  height: number
 }
 
 export type ElementType = 'shape' | 'text' | 'image' | 'icon' | 'group' | 'line' | 'sticker'
@@ -61,10 +66,13 @@ export interface TextStyle {
   color: string
 }
 
-export interface TextElement extends BaseElement {
+// 文字元素：大小由字級決定，width/height 可選（渲染時忽略）
+export interface TextElement extends BaseElementCore {
   type: 'text'
   content: string
   style: TextStyle
+  width?: number   // 舊模板相容，渲染時忽略
+  height?: number  // 舊模板相容，渲染時忽略
 }
 
 export type ObjectFit = 'cover' | 'contain' | 'fill'
@@ -169,18 +177,22 @@ export type MaterialIconName =
   | 'flight_takeoff'
   | 'person'
 
-export interface IconElement extends BaseElement {
+// 圖標元素：大小由 size 決定，width/height 可選（渲染時忽略）
+export interface IconElement extends BaseElementCore {
   type: 'icon'
   icon: MaterialIconName
   size: number // 圖標尺寸
   color: string
+  width?: number   // 舊模板相容，渲染時忽略
+  height?: number  // 舊模板相容，渲染時忽略
 }
 
 // 線條元素
 export type LineStyle = 'solid' | 'dashed' | 'dotted'
 export type LineEndpoint = 'none' | 'arrow' | 'circle' | 'diamond'
 
-export interface LineElement extends BaseElement {
+// 線條元素：大小由端點座標決定，width/height 可選（渲染時忽略）
+export interface LineElement extends BaseElementCore {
   type: 'line'
   // 起點和終點座標（相對於 x, y）
   x1: number
@@ -192,6 +204,8 @@ export interface LineElement extends BaseElement {
   lineStyle: LineStyle
   startEndpoint?: LineEndpoint
   endEndpoint?: LineEndpoint
+  width?: number   // 舊模板相容，渲染時忽略
+  height?: number  // 舊模板相容，渲染時忽略
 }
 
 // 印章/貼紙元素

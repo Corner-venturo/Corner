@@ -93,3 +93,6 @@ fix-types-to-snake.js
 Corner/
 backup/
 temp/
+
+# Playwright auth state
+tests/e2e/.auth/

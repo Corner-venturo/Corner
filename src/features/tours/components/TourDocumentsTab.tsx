@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormDialog } from '@/components/dialog'
 import { DateCell } from '@/components/table-cells'
-import { Plus, FileText, Image, File, Eye, Edit2, Trash2, Upload } from 'lucide-react'
+import { Plus, FileText, Image, File, Eye, Edit2, Trash2, Upload, MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface TourDocument {
   id: string
@@ -28,6 +29,9 @@ interface TourDocument {
   uploaded_by: string | null
   created_at: string | null
   updated_at: string | null
+  // 來源標記
+  source?: 'upload' | 'channel'
+  message_id?: string // 如果來自頻道訊息
 }
 
 interface TourDocumentsTabProps {
@@ -64,20 +68,88 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
 
-  // 載入文件列表
+  // 載入文件列表（包含直接上傳 + 頻道附件）
   const loadDocuments = useCallback(async () => {
     if (!tour.id) return
 
     setLoading(true)
     try {
-      const { data, error } = await supabase
+      // 1. 載入直接上傳的文件
+      const { data: uploadedDocs, error: uploadError } = await supabase
         .from('tour_documents')
         .select('*')
         .eq('tour_id', tour.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setDocuments(data || [])
+      if (uploadError) throw uploadError
+
+      // 標記來源為上傳
+      const docsWithSource: TourDocument[] = (uploadedDocs || []).map(doc => ({
+        ...doc,
+        source: 'upload' as const,
+      }))
+
+      // 2. 載入頻道附件（透過 channel.tour_id 關聯）
+      const { data: channelData } = await supabase
+        .from('channels')
+        .select('id')
+        .eq('tour_id', tour.id)
+        .single()
+
+      let channelDocs: TourDocument[] = []
+      if (channelData?.id) {
+        const { data: messages } = await supabase
+          .from('messages')
+          .select('id, attachments, created_at, workspace_id')
+          .eq('channel_id', channelData.id)
+          .not('attachments', 'is', null)
+          .order('created_at', { ascending: false })
+
+        // 將訊息附件轉換為 TourDocument 格式
+        channelDocs = (messages || []).flatMap(msg => {
+          const attachments = msg.attachments as Array<{
+            id?: string
+            fileName?: string
+            name?: string
+            fileSize?: number
+            size?: number
+            mimeType?: string
+            type?: string
+            path?: string
+            publicUrl?: string
+            url?: string
+          }> | null
+
+          if (!attachments || !Array.isArray(attachments)) return []
+
+          return attachments.map((att, idx) => ({
+            id: att.id || `${msg.id}-${idx}`,
+            tour_id: tour.id,
+            workspace_id: msg.workspace_id || '',
+            name: att.fileName || att.name || '未命名檔案',
+            description: '來自工作空間頻道',
+            file_path: att.path || '',
+            public_url: att.publicUrl || att.url || '',
+            file_name: att.fileName || att.name || '',
+            file_size: att.fileSize || att.size || null,
+            mime_type: att.mimeType || att.type || null,
+            uploaded_by: null,
+            created_at: msg.created_at,
+            updated_at: msg.created_at,
+            source: 'channel' as const,
+            message_id: msg.id,
+          }))
+        })
+      }
+
+      // 合併兩個來源，按時間排序
+      const allDocs = [...docsWithSource, ...channelDocs].sort((a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime()
+        const dateB = new Date(b.created_at || 0).getTime()
+        return dateB - dateA
+      })
+
+      setDocuments(allDocs)
     } catch (error) {
       logger.error('載入文件失敗:', error)
       toast.error('載入文件失敗')
@@ -86,9 +158,44 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
     }
   }, [tour.id])
 
+  // 初始載入 + Realtime 訂閱
   useEffect(() => {
     loadDocuments()
-  }, [loadDocuments])
+
+    // 訂閱 tour_documents 表的變更
+    const channel = supabase
+      .channel(`tour-docs-${tour.id}`)
+      .on<TourDocument>(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tour_documents',
+          filter: `tour_id=eq.${tour.id}`,
+        },
+        (payload: RealtimePostgresChangesPayload<TourDocument>) => {
+          if (payload.eventType === 'INSERT') {
+            const newDoc = { ...payload.new, source: 'upload' as const }
+            setDocuments(prev => [newDoc, ...prev])
+            toast.success('新文件已上傳', { duration: 2000 })
+          } else if (payload.eventType === 'UPDATE') {
+            setDocuments(prev =>
+              prev.map(doc =>
+                doc.id === payload.new.id ? { ...payload.new, source: 'upload' as const } : doc
+              )
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setDocuments(prev => prev.filter(doc => doc.id !== payload.old.id))
+          }
+        }
+      )
+      .subscribe()
+
+    // 清理訂閱
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [tour.id, loadDocuments])
 
   // 上傳文件
   const handleUpload = async (files: FileList | null) => {
@@ -132,8 +239,11 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
         if (dbError) throw dbError
       }
 
-      toast.success(`已上傳 ${files.length} 個文件`)
-      loadDocuments()
+      // Realtime 會自動更新列表，不需要手動 reload
+      // 但多檔上傳時只會收到最後一個的通知，所以還是顯示總數
+      if (files.length > 1) {
+        toast.success(`已上傳 ${files.length} 個文件`)
+      }
     } catch (error) {
       logger.error('上傳失敗:', error)
       toast.error('上傳失敗')
@@ -178,7 +288,7 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
 
       toast.success('已更新')
       setEditDialogOpen(false)
-      loadDocuments()
+      // Realtime 會自動更新列表
     } catch (error) {
       logger.error('更新失敗:', error)
       toast.error('更新失敗')
@@ -209,7 +319,7 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
       if (error) throw error
 
       toast.success('已刪除')
-      loadDocuments()
+      // Realtime 會自動更新列表
     } catch (error) {
       logger.error('刪除失敗:', error)
       toast.error('刪除失敗')
@@ -241,7 +351,15 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
       label: '文件名稱',
       render: (_, row) => (
         <div>
-          <div className="font-medium text-morandi-primary">{row.name}</div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-morandi-primary">{row.name}</span>
+            {row.source === 'channel' && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs bg-blue-50 text-blue-600 rounded">
+                <MessageSquare size={10} />
+                頻道
+              </span>
+            )}
+          </div>
           <div className="text-xs text-morandi-muted">
             {row.file_name} · {formatFileSize(row.file_size)}
           </div>
@@ -278,24 +396,28 @@ export function TourDocumentsTab({ tour }: TourDocumentsTabProps) {
           >
             <Eye size={16} />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEdit(row)}
-            className="h-8 w-8 p-0"
-            title="編輯"
-          >
-            <Edit2 size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDelete(row)}
-            className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red"
-            title="刪除"
-          >
-            <Trash2 size={16} />
-          </Button>
+          {row.source !== 'channel' && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEdit(row)}
+                className="h-8 w-8 p-0"
+                title="編輯"
+              >
+                <Edit2 size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDelete(row)}
+                className="h-8 w-8 p-0 text-morandi-red hover:text-morandi-red"
+                title="刪除"
+              >
+                <Trash2 size={16} />
+              </Button>
+            </>
+          )}
         </div>
       ),
     },

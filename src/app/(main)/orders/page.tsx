@@ -30,7 +30,8 @@ export default function OrdersPage() {
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
     loadWorkspaces()
-  }, [loadWorkspaces])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 🔧 優化：建立 tour 出發日期 Map，避免排序時 O(n²) 查詢
   const tourDepartureDates = useMemo(() => {
@@ -93,6 +94,10 @@ export default function OrdersPage() {
       alert('無法取得工作空間，請重新登入')
       return
     }
+    if (!orderData.sales_person?.trim()) {
+      alert('請選擇業務人員')
+      return
+    }
 
     try {
       // 計算該團的訂單序號 (格式: {團號}-O{2位數})
@@ -103,7 +108,7 @@ export default function OrdersPage() {
       await addOrder({
         order_number: orderNumber,
         tour_id: orderData.tour_id,
-        code: selectedTour.code,
+        // code 會由 createCloudHook 自動生成（格式：O000001）
         tour_name: selectedTour.name,
         contact_person: orderData.contact_person,
         contact_phone: null,

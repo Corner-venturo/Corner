@@ -8,7 +8,7 @@
  * - 兩欄式章節列表
  * - 自動計算頁碼
  */
-import type { PageTemplate, TemplateData } from './types'
+import type { PageTemplate, TemplateData, TocContentItem } from './types'
 import type { CanvasElement, ShapeElement, TextElement, ImageElement, TextStyle } from '@/features/designer/components/types'
 
 // A5 尺寸（像素，96 DPI）
@@ -62,10 +62,24 @@ interface TocItem {
   title: string
   description: string
   pageNumber: number
+  icon?: string // 圖標 ID（用於自訂目錄）
 }
 
-// 計算目錄項目
+// 計算目錄項目（支援用戶自訂的 tocContent）
 function calculateTocItems(data: TemplateData): TocItem[] {
+  // 如果有用戶自訂的 tocContent，優先使用
+  const customTocContent = data.tocContent as TocContentItem[] | undefined
+  if (customTocContent && customTocContent.length > 0) {
+    return customTocContent.map((item, index) => ({
+      number: String(index + 1).padStart(2, '0'),
+      title: item.name,
+      description: '', // 自訂模式下不顯示描述
+      pageNumber: item.page,
+      icon: item.icon,
+    }))
+  }
+
+  // 否則使用自動計算的模式
   const items: TocItem[] = []
   let currentPage = 3 // 封面=1, 目錄=2, 從第3頁開始
 

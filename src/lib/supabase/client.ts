@@ -1,29 +1,34 @@
-import { createClient } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr'
 import { Database } from './types'
 
 // ============================================
-// 原有的 singleton client (給 stores 使用)
+// Supabase Browser Client（使用 cookies 存 session）
 // ============================================
+// 使用 @supabase/ssr 的 createBrowserClient，這樣：
+// 1. Session 會自動存到 cookies（而不是 localStorage）
+// 2. Server 端（API Routes）可以透過 cookies 讀取 session
+// 3. getServerAuth() 能正常運作
+// ============================================
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-  },
-  // 暫時移除自定義 fetch wrapper 來測試是否是 signal 衝突問題
-})
+// 單例模式：確保整個應用只有一個 client 實例
+let supabaseInstance: ReturnType<typeof createBrowserClient<Database>> | null = null
 
-// ============================================
-// Gemini 新增的 SSR client (給 Server Components 使用)
-// ============================================
+function getSupabaseBrowserClient() {
+  if (supabaseInstance) {
+    return supabaseInstance
+  }
+
+  supabaseInstance = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
+  return supabaseInstance
+}
+
+// 匯出單例供全應用使用
+export const supabase = getSupabaseBrowserClient()
+
+// 為了向後兼容，保留這個函數（但現在它返回同一個單例）
 export function createSupabaseBrowserClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  return getSupabaseBrowserClient()
 }

@@ -13,9 +13,10 @@
 3. [資料隔離規範](#資料隔離規範)
 4. [權限控制規範](#權限控制規範)
 5. [Store 開發規範](#store-開發規範)
-6. [路由與導航規範](#路由與導航規範)
-7. [錯誤處理規範](#錯誤處理規範)
-8. [新功能開發檢查清單](#新功能開發檢查清單)
+6. [數據系統規範](#數據系統規範) ⭐ 新增
+7. [路由與導航規範](#路由與導航規範)
+8. [錯誤處理規範](#錯誤處理規範)
+9. [新功能開發檢查清單](#新功能開發檢查清單)
 
 ---
 
@@ -293,6 +294,288 @@ tableName: 'payment_requests'
 
 ---
 
+## 數據系統規範
+
+> **2026-01-19 新增**：統一快取、即時同步、驗證三大系統
+
+### 系統架構總覽
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         數據系統架構                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │   快取層     │    │  即時同步層  │    │   驗證層    │         │
+│  │    SWR      │◄──►│  Realtime   │    │ Validation  │         │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘         │
+│         │                  │                  │                 │
+│         └────────┬─────────┴─────────┬────────┘                 │
+│                  │                   │                          │
+│                  ▼                   ▼                          │
+│         ┌─────────────────────────────────────┐                 │
+│         │         createEntityHook            │                 │
+│         │        (統一數據存取工廠)             │                 │
+│         └─────────────────┬───────────────────┘                 │
+│                           │                                     │
+│                           ▼                                     │
+│                  ┌─────────────────┐                            │
+│                  │    Supabase     │                            │
+│                  │   (資料來源)     │                            │
+│                  └─────────────────┘                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 6.1 快取層（SWR）
+
+#### 統一入口
+
+**所有數據存取必須透過 `createEntityHook`**，禁止直接使用 SWR 或 Supabase：
+
+```typescript
+// ✅ 正確：使用 createEntityHook
+import { useOrders } from '@/data'
+const { items, loading } = useOrders()
+
+// ❌ 錯誤：直接用 SWR
+import useSWR from 'swr'
+const { data } = useSWR('orders', fetcher)
+
+// ❌ 錯誤：直接查 Supabase
+const { data } = await supabase.from('orders').select()
+```
+
+#### SWR Key 命名規範
+
+**統一格式**：`entity:{tableName}:{type}:{identifier?}`
+
+| 類型 | 格式 | 範例 |
+|------|------|------|
+| 列表 | `entity:{table}:list` | `entity:orders:list` |
+| 精簡列表 | `entity:{table}:slim` | `entity:orders:slim` |
+| 單筆詳情 | `entity:{table}:detail:{id}` | `entity:orders:detail:abc123` |
+| 分頁 | `entity:{table}:paginated:{params}` | `entity:orders:paginated:{...}` |
+| 字典 | `entity:{table}:dictionary` | `entity:orders:dictionary` |
+
+**禁止使用的 Key 格式**：
+```typescript
+// ❌ 禁止：簡短 key（會導致 mutate 無法同步）
+const SWR_KEY = 'orders'
+const SWR_KEY = 'members'
+
+// ✅ 正確：完整 key
+const SWR_KEY = 'entity:orders:list'
+const SWR_KEY = 'entity:order_members:list'
+```
+
+#### 快取策略
+
+| 策略 | 適用場景 | 設定 |
+|------|---------|------|
+| **STATIC** | 國家、城市、景點等靜態資料 | 30 分鐘快取，不自動重新驗證 |
+| **DYNAMIC** | 訂單、成員等業務資料 | 1 分鐘快取，focus 時重新驗證 |
+| **REALTIME** | 訊息、待辦等即時資料 | 3 秒快取，搭配 Realtime 推送 |
+
+```typescript
+// 在 entity 定義時指定策略
+export const orderEntity = createEntityHook<Order>('orders', {
+  cache: CACHE_PRESETS.high,  // DYNAMIC 策略
+})
+
+export const countryEntity = createEntityHook<Country>('countries', {
+  cache: CACHE_PRESETS.static,  // STATIC 策略
+})
+```
+
+#### 去重機制
+
+SWR 自動去重：同一時間內相同 key 的請求只發一次。
+
+```typescript
+// 這兩個組件同時渲染，只會發一次請求
+function ComponentA() {
+  const { items } = useOrders()  // key: entity:orders:list
+}
+
+function ComponentB() {
+  const { items } = useOrders()  // key: entity:orders:list（共用）
+}
+```
+
+---
+
+### 6.2 即時同步層（Realtime）
+
+#### 核心原則
+
+**Realtime 收到事件時，直接更新快取，不重新 fetch**：
+
+```typescript
+// ❌ 錯誤：觸發重新查詢（會越查越多）
+.on('postgres_changes', ..., () => {
+  mutate(swrKey)  // 這會發 HTTP 請求！
+})
+
+// ✅ 正確：直接更新快取（不發請求）
+.on('postgres_changes', ..., (payload) => {
+  if (payload.eventType === 'INSERT') {
+    mutate(swrKey, (current) => [...current, payload.new], false)
+  } else if (payload.eventType === 'UPDATE') {
+    mutate(swrKey, (current) =>
+      current.map(item => item.id === payload.new.id ? payload.new : item),
+      false
+    )
+  } else if (payload.eventType === 'DELETE') {
+    mutate(swrKey, (current) =>
+      current.filter(item => item.id !== payload.old.id),
+      false
+    )
+  }
+})
+```
+
+#### 需要 Realtime 的表格
+
+| 表格 | 原因 | 優先級 |
+|------|------|--------|
+| `orders` | 多人同時操作，付款狀態變更 | P0 |
+| `tours` | 核心實體，狀態/人數變更 | P0 |
+| `receipt_orders` | 收款確認需即時同步 | P1 |
+| `visas` | 簽證狀態流程 | P1 |
+| `messages` | 聊天訊息（已實現）| ✅ 已完成 |
+| `todos` | 待辦事項（已實現）| ✅ 已完成 |
+| `calendar_events` | 行事曆（已實現）| ✅ 已完成 |
+
+#### 不需要 Realtime 的表格
+
+| 表格 | 原因 |
+|------|------|
+| `countries`, `cities`, `attractions` | 靜態資料，幾乎不變 |
+| `customers` | 低頻修改，多人同時編輯機率低 |
+| `suppliers` | 系統配置，變更少 |
+
+#### Realtime 訂閱管理
+
+**同一表格只需一個訂閱**，Supabase channel 同名會自動複用：
+
+```typescript
+// Supabase 會自動管理同名 channel
+const channel = supabase.channel('orders_realtime')  // 同名會複用
+
+// 組件卸載時清理
+useEffect(() => {
+  return () => {
+    supabase.removeChannel(channel)
+  }
+}, [])
+```
+
+#### Realtime 配置（在 createEntityHook 中）
+
+```typescript
+// 未來：在 entity 配置中啟用 Realtime
+export const orderEntity = createEntityHook<Order>('orders', {
+  cache: CACHE_PRESETS.high,
+  realtime: true,  // 啟用 Realtime 同步
+})
+```
+
+---
+
+### 6.3 驗證層（Validation）
+
+#### 統一驗證組件
+
+| 組件 | 用途 | 位置 |
+|------|------|------|
+| `FieldError` | 顯示欄位錯誤訊息 | `@/components/ui/field-error` |
+| `FormField` | 表單欄位包裝器（含 label + error） | `@/components/ui/form-field` |
+| `Label` | 標籤（支援必填標記）| `@/components/ui/label` |
+
+```typescript
+// ✅ 正確：使用統一組件
+import { FormField } from '@/components/ui/form-field'
+import { FieldError } from '@/components/ui/field-error'
+
+<FormField label="姓名" required error={errors.name}>
+  <Input value={name} onChange={...} />
+</FormField>
+
+// ❌ 錯誤：自己寫驗證顯示
+<label>姓名 *</label>
+<Input />
+{error && <span className="text-red-500">{error}</span>}
+```
+
+#### 驗證規則定義
+
+**表單驗證邏輯應集中在 Hook 中**：
+
+```typescript
+// ✅ 正確：驗證邏輯在 Hook
+// hooks/useOrderForm.ts
+function useOrderForm() {
+  const [errors, setErrors] = useState({})
+
+  const validate = () => {
+    const newErrors = {}
+    if (!formData.tour_id) newErrors.tour_id = '請選擇旅遊團'
+    if (!formData.contact_person) newErrors.contact_person = '請輸入聯絡人'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  return { errors, validate, ... }
+}
+
+// ❌ 錯誤：驗證邏輯散落在組件中
+function OrderForm() {
+  const handleSubmit = () => {
+    if (!data.tour_id) {
+      alert('請選擇旅遊團')  // 分散的驗證
+      return
+    }
+  }
+}
+```
+
+#### 錯誤訊息格式
+
+| 類型 | 格式 | 範例 |
+|------|------|------|
+| 必填 | `請輸入{欄位名}` | 請輸入聯絡人 |
+| 格式錯誤 | `{欄位名}格式不正確` | Email 格式不正確 |
+| 範圍錯誤 | `{欄位名}必須在 {min}-{max} 之間` | 人數必須在 1-50 之間 |
+| 選擇 | `請選擇{欄位名}` | 請選擇旅遊團 |
+
+---
+
+### 6.4 數據系統檢查清單
+
+#### 新增 Entity 時
+
+- [ ] 使用 `createEntityHook` 建立
+- [ ] 決定快取策略（STATIC / DYNAMIC / REALTIME）
+- [ ] 決定是否需要 Realtime 同步
+- [ ] SWR key 遵循命名規範
+
+#### 使用數據時
+
+- [ ] 透過 `@/data` 匯入 hooks，不直接查 Supabase
+- [ ] 不在組件中直接使用 `useSWR`
+- [ ] mutate 時使用正確的 key 格式
+
+#### Realtime 實作時
+
+- [ ] 收到事件直接更新快取，不 refetch
+- [ ] 組件卸載時清理訂閱
+- [ ] 考慮 workspace 過濾
+
+---
+
 ## 路由與導航規範
 
 ### 統一使用 router.push
@@ -437,4 +720,5 @@ try {
 
 | 日期 | 版本 | 變更內容 |
 |------|------|----------|
+| 2026-01-19 | 1.1.0 | 新增數據系統規範：快取層（SWR）、即時同步層（Realtime）、驗證層（Validation） |
 | 2025-12-09 | 1.0.0 | 初版建立：整合資料隔離、權限控制、Store 規範 |

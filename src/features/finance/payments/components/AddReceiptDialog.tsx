@@ -8,7 +8,7 @@
 import { logger } from '@/lib/utils/logger'
 import { getTodayString } from '@/lib/utils/format-date'
 import { useEffect, useState } from 'react'
-import { Plus, Save, X, Copy, ExternalLink, Check } from 'lucide-react'
+import { Plus, Save, X, Copy, ExternalLink, Check, Trash2, Lock } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -21,10 +21,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
+import { confirm } from '@/lib/ui/alert-dialog'
 import { usePaymentForm } from '../hooks/usePaymentForm'
 import { PaymentItemRow } from './PaymentItemRow'
 import { RECEIPT_TYPES } from '../types'
 import { Input } from '@/components/ui/input'
+import type { Receipt } from '@/stores'
 
 interface LinkPayResult {
   receiptNumber: string
@@ -41,9 +43,15 @@ interface AddReceiptDialogProps {
   defaultOrderId?: string
   /** 是否為巢狀 Dialog（用於從其他 Dialog 中打開時隱藏背景遮罩） */
   nested?: boolean
+  /** 編輯模式：傳入要編輯的收款單 */
+  editingReceipt?: Receipt | null
+  /** 編輯模式：更新回呼 */
+  onUpdate?: (receiptId: string, data: Partial<Receipt>) => Promise<void>
+  /** 編輯模式：刪除回呼 */
+  onDelete?: (receiptId: string) => Promise<void>
 }
 
-export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false }: AddReceiptDialogProps) {
+export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false, editingReceipt, onUpdate, onDelete }: AddReceiptDialogProps) {
   const { toast } = useToast()
   const {
     tours,
@@ -58,10 +66,18 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     updatePaymentItem,
     resetForm,
     validateForm,
+    setPaymentItems,
   } = usePaymentForm()
+
+  // 是否為編輯模式
+  const isEditMode = !!editingReceipt
+
+  // 是否為已確認狀態（已確認的收款單不可編輯或刪除）
+  const isConfirmed = editingReceipt?.status === '1'
 
   // 提交狀態（防止重複點擊）
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // LinkPay 結果
   const [linkPayResults, setLinkPayResults] = useState<LinkPayResult[]>([])
@@ -85,6 +101,35 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
         invalidateTours(),
         invalidateOrders(),
       ])
+
+      // 編輯模式：載入收款單資料
+      if (editingReceipt) {
+        setFormData({
+          tour_id: editingReceipt.tour_id || '',
+          order_id: editingReceipt.order_id || '',
+          receipt_date: editingReceipt.receipt_date || getTodayString(),
+        })
+        // 載入收款項目
+        setPaymentItems([{
+          id: editingReceipt.id,
+          receipt_type: editingReceipt.receipt_type ?? 0,
+          transaction_date: editingReceipt.receipt_date || getTodayString(),
+          receipt_account: editingReceipt.receipt_account || '',
+          note: editingReceipt.note || '',
+          amount: editingReceipt.receipt_amount || 0,
+          email: editingReceipt.email || '',
+          payment_name: editingReceipt.payment_name || '',
+          pay_dateline: editingReceipt.pay_dateline || '',
+          handler_name: editingReceipt.handler_name || '',
+          account_info: editingReceipt.account_info || '',
+          fees: editingReceipt.fees || 0,
+          card_last_four: editingReceipt.card_last_four || '',
+          auth_code: editingReceipt.auth_code || '',
+          check_number: editingReceipt.check_number || '',
+          check_bank: editingReceipt.check_bank || '',
+        }])
+        return
+      }
 
       // 如果有預設訂單 ID，直接查詢該訂單取得團 ID
       if (defaultOrderId) {
@@ -113,15 +158,15 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     }
 
     initialize()
-  }, [open, defaultTourId, defaultOrderId, resetForm, setFormData])
+  }, [open, defaultTourId, defaultOrderId, resetForm, setFormData, editingReceipt, setPaymentItems])
 
-  // 如果只有一個訂單，自動帶入
+  // 如果只有一個訂單，自動帶入（編輯模式除外）
   useEffect(() => {
-    if (formData.tour_id && filteredOrders.length === 1 && !formData.order_id) {
+    if (!isEditMode && formData.tour_id && filteredOrders.length === 1 && !formData.order_id) {
       const order = filteredOrders[0]
       setFormData(prev => ({ ...prev, order_id: order.id }))
     }
-  }, [formData.tour_id, filteredOrders, formData.order_id, setFormData])
+  }, [isEditMode, formData.tour_id, filteredOrders, formData.order_id, setFormData])
 
   const handleSubmit = async () => {
     // 防止重複提交
@@ -141,7 +186,54 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     setIsSubmitting(true)
 
     try {
-      // 實作儲存邏輯
+      // 編輯模式：呼叫 onUpdate
+      if (isEditMode && editingReceipt && onUpdate) {
+        const item = paymentItems[0] // 編輯模式只有一個項目
+
+        // 收款方式轉換為 payment_method 字串
+        const paymentMethodMap: Record<number, string> = {
+          0: 'transfer',
+          1: 'cash',
+          2: 'card',
+          3: 'check',
+          4: 'linkpay',
+        }
+        const paymentMethod = paymentMethodMap[item.receipt_type] || 'transfer'
+
+        await onUpdate(editingReceipt.id, {
+          tour_id: formData.tour_id || null,
+          order_id: formData.order_id,
+          payment_date: item.transaction_date,
+          payment_method: paymentMethod,
+          receipt_date: item.transaction_date,
+          receipt_type: item.receipt_type,
+          receipt_amount: item.amount,
+          amount: item.amount,
+          receipt_account: item.receipt_account || null,
+          email: item.email || null,
+          payment_name: item.payment_name || null,
+          pay_dateline: item.pay_dateline || null,
+          handler_name: item.handler_name || null,
+          account_info: item.account_info || null,
+          fees: item.fees || null,
+          card_last_four: item.card_last_four || null,
+          auth_code: item.auth_code || null,
+          check_number: item.check_number || null,
+          check_bank: item.check_bank || null,
+          note: item.note || null,
+        })
+
+        toast({
+          title: '收款單更新成功',
+          description: `已更新收款單 ${editingReceipt.receipt_number}`,
+        })
+        resetForm()
+        onOpenChange(false)
+        onSuccess?.()
+        return
+      }
+
+      // 新增模式：原有邏輯
       const { useAuthStore } = await import('@/stores')
       const { createReceipt, updateReceipt } = await import('@/data')
       const { generateReceiptNumber } = await import('@/lib/utils/receipt-number-generator')
@@ -453,13 +545,58 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
     onOpenChange(false)
   }
 
+  const handleDelete = async () => {
+    if (!editingReceipt || !onDelete) return
+
+    const confirmed = await confirm(
+      `確定要刪除收款單 ${editingReceipt.receipt_number} 嗎？此操作無法復原。`,
+      { type: 'warning', title: '刪除收款單' }
+    )
+
+    if (!confirmed) return
+
+    setIsDeleting(true)
+    try {
+      await onDelete(editingReceipt.id)
+      toast({
+        title: '刪除成功',
+        description: `收款單 ${editingReceipt.receipt_number} 已刪除`,
+      })
+      resetForm()
+      onOpenChange(false)
+      onSuccess?.()
+    } catch (error) {
+      logger.error('刪除收款單失敗:', error)
+      toast({
+        title: '刪除失敗',
+        description: '請稍後再試',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col" nested={nested}>
         <DialogHeader>
-          <DialogTitle>新增收款單</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {isEditMode ? '編輯收款單' : '新增收款單'}
+            {isConfirmed && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-morandi-green/20 text-morandi-green text-xs font-medium">
+                <Lock size={12} />
+                已確認
+              </span>
+            )}
+          </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            收款單號將自動產生
+            {isConfirmed
+              ? `${editingReceipt?.receipt_number} - 已確認的收款單無法編輯或刪除`
+              : isEditMode
+                ? `編輯 ${editingReceipt?.receipt_number}`
+                : '收款單號將自動產生'
+            }
           </p>
         </DialogHeader>
 
@@ -624,28 +761,45 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
         {/* 操作按鈕 */}
         <div className="flex justify-between items-center pt-4 border-t border-border">
-          {/* 左側：總金額 */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-morandi-secondary">總金額</span>
-            <span className="text-lg font-semibold text-morandi-gold w-[120px]">
-              NT$ {totalAmount.toLocaleString()}
-            </span>
+          {/* 左側：總金額 + 刪除按鈕 */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-morandi-secondary">總金額</span>
+              <span className="text-lg font-semibold text-morandi-gold w-[120px]">
+                NT$ {totalAmount.toLocaleString()}
+              </span>
+            </div>
+            {/* 刪除按鈕：只在編輯模式且未確認時顯示 */}
+            {isEditMode && !isConfirmed && onDelete && (
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="gap-2 text-morandi-red border-morandi-red hover:bg-morandi-red hover:text-white"
+              >
+                <Trash2 size={16} />
+                {isDeleting ? '刪除中...' : '刪除'}
+              </Button>
+            )}
           </div>
 
           {/* 右側：按鈕 */}
           <div className="flex space-x-2">
             <Button variant="outline" onClick={handleCancel} className="gap-2">
               <X size={16} />
-              {linkPayResults.length > 0 ? '關閉' : '取消'}
+              {linkPayResults.length > 0 ? '關閉' : (isConfirmed ? '關閉' : '取消')}
             </Button>
-            {linkPayResults.length === 0 && (
+            {linkPayResults.length === 0 && !isConfirmed && (
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !formData.tour_id || !formData.order_id || paymentItems.length === 0}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
               >
                 <Save size={16} />
-                {isSubmitting ? '建立中...' : `新增收款單 (共 ${paymentItems.length} 項)`}
+                {isSubmitting
+                  ? (isEditMode ? '更新中...' : '建立中...')
+                  : (isEditMode ? '更新收款單' : `新增收款單 (共 ${paymentItems.length} 項)`)
+                }
               </Button>
             )}
           </div>

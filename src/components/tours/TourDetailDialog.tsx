@@ -18,7 +18,7 @@ import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
-import { MessageSquare, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check, ClipboardList } from 'lucide-react'
+import { MessageSquare, X, Printer, Loader2, Plane, Clock, AlertTriangle, Check, ClipboardList, Bus } from 'lucide-react'
 import { JapanEntryCardPrint } from '@/components/tours/JapanEntryCardPrint'
 import { TourPnrToolDialog } from '@/components/tours/TourPnrToolDialog'
 import { DocumentVersionPicker } from '@/components/documents'
@@ -58,10 +58,16 @@ const TourCheckin = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+const VehicleAssignment = dynamic(
+  () => import('@/components/tours/vehicle-assignment').then(m => m.VehicleAssignment),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
 // 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
 const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'orders', label: '訂單管理' },
+  { value: 'vehicles', label: '分車' },
   { value: 'overview', label: '總覽' },
   { value: 'confirmation', label: '團確單' },
   { value: 'control', label: '團控' },
@@ -380,9 +386,11 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   }
 
   // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
+  // 注意：ordersHasChildDialog 不需要加入，因為 TourOrders 的對話框使用 nested prop，
+  // 會在父 Dialog 內部正確疊加，不需要隱藏父 Dialog
   const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
     showEditDialog || showQuotePicker || showPnrToolDialog || showEntryCardDialog ||
-    showMembersPnrMatchDialog || membersHasChildDialog || ordersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
+    showMembersPnrMatchDialog || membersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
 
   const renderTabContent = () => {
     if (!tour) return null
@@ -434,6 +442,13 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               setForceShowPnr(true)
               handleSuccess()
             }}
+          />
+        )
+      case 'vehicles':
+        return (
+          <VehicleAssignment
+            tourId={tour.id}
+            workspaceId={currentWorkspace?.id || ''}
           />
         )
       case 'confirmation':

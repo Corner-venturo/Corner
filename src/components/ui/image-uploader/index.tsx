@@ -11,6 +11,11 @@ import { useImageUploader } from './useImageUploader'
 import { DropZone } from './DropZone'
 import { ImagePreview } from './ImagePreview'
 
+// 導出新組件
+export { UnsplashSearch } from './UnsplashSearch'
+export { ImagePickerDialog } from './ImagePickerDialog'
+export type { ImagePickerDialogProps } from './ImagePickerDialog'
+
 export interface ImageUploaderProps {
   /** 當前圖片 URL */
   value?: string | null

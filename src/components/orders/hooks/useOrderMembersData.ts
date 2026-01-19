@@ -9,13 +9,16 @@
  * - 新增/刪除成員操作
  * - 新增成員對話框狀態
  * - 訂單選擇對話框狀態（團體模式）
+ * - Realtime 即時同步（2026-01-19 新增）
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { alert, confirm } from '@/lib/ui/alert-dialog'
+import { toast } from 'sonner'
 import type { OrderMember } from '../order-member.types'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface UseOrderMembersDataParams {
   orderId?: string
@@ -254,6 +257,9 @@ export function useOrderMembersData({
     }
   }
 
+  // 追蹤當前訂單 ID 列表（用於 Realtime 過濾）
+  const orderIdsRef = useRef<string[]>([])
+
   /**
    * 初始載入
    */
@@ -262,6 +268,73 @@ export function useOrderMembersData({
     loadTourDepartureDate()
     // 顧客資料由 SWR 自動載入（用於編輯模式搜尋）
   }, [orderId, tourId, mode, loadMembers, loadTourDepartureDate])
+
+  // 更新 orderIdsRef（用於 Realtime 過濾）
+  useEffect(() => {
+    if (mode === 'tour') {
+      orderIdsRef.current = tourOrders.map(o => o.id)
+    } else if (orderId) {
+      orderIdsRef.current = [orderId]
+    }
+  }, [mode, tourOrders, orderId])
+
+  /**
+   * Realtime 訂閱 - 即時同步成員變更
+   */
+  useEffect(() => {
+    // 構建訂閱的 filter
+    // 團體模式：監聽該團所有訂單的成員
+    // 單一訂單模式：監聽該訂單的成員
+    const targetOrderIds = mode === 'tour' ? tourOrders.map(o => o.id) : (orderId ? [orderId] : [])
+    if (targetOrderIds.length === 0) return
+
+    // 建立訂閱頻道
+    const channelName = mode === 'tour' ? `tour-members-${tourId}` : `order-members-${orderId}`
+    const channel = supabase
+      .channel(channelName)
+      .on<OrderMember>(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'order_members',
+        },
+        (payload: RealtimePostgresChangesPayload<OrderMember>) => {
+          // 檢查是否屬於當前監聽的訂單
+          const newRecord = payload.new as OrderMember | undefined
+          const oldRecord = payload.old as { id: string; order_id?: string } | undefined
+
+          // 取得變更記錄的 order_id
+          const recordOrderId = newRecord?.order_id || oldRecord?.order_id
+          if (!recordOrderId || !orderIdsRef.current.includes(recordOrderId)) {
+            return // 不屬於當前監聽的訂單，忽略
+          }
+
+          if (payload.eventType === 'INSERT' && newRecord) {
+            // 新增成員 - 檢查是否已存在（避免重複）
+            setMembers(prev => {
+              if (prev.some(m => m.id === newRecord.id)) return prev
+              toast.success('新成員已加入', { duration: 2000 })
+              return [...prev, newRecord]
+            })
+          } else if (payload.eventType === 'UPDATE' && newRecord) {
+            // 更新成員
+            setMembers(prev =>
+              prev.map(m => m.id === newRecord.id ? { ...m, ...newRecord } : m)
+            )
+          } else if (payload.eventType === 'DELETE' && oldRecord) {
+            // 刪除成員
+            setMembers(prev => prev.filter(m => m.id !== oldRecord.id))
+          }
+        }
+      )
+      .subscribe()
+
+    // 清理訂閱
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [mode, tourId, orderId, tourOrders])
 
   return {
     // 成員資料

@@ -1,0 +1,181 @@
+'use client'
+
+import React, { useState, useCallback } from 'react'
+import { Search, Loader2, ImageIcon } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
+
+const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
+
+interface UnsplashImage {
+  id: string
+  urls: {
+    raw: string
+    full: string
+    regular: string
+    small: string
+    thumb: string
+  }
+  alt_description: string | null
+  user: {
+    name: string
+    links: {
+      html: string
+    }
+  }
+  links: {
+    download_location: string
+  }
+}
+
+interface UnsplashSearchProps {
+  onSelect: (imageUrl: string) => void
+  className?: string
+}
+
+export function UnsplashSearch({ onSelect, className }: UnsplashSearchProps) {
+  const [query, setQuery] = useState('')
+  const [images, setImages] = useState<UnsplashImage[]>([])
+  const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
+
+  const searchImages = useCallback(async () => {
+    if (!query.trim() || !UNSPLASH_ACCESS_KEY) return
+
+    setLoading(true)
+    setSearched(true)
+
+    try {
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
+        {
+          headers: {
+            Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('搜尋失敗')
+      }
+
+      const data = await response.json()
+      setImages(data.results || [])
+    } catch (error) {
+      logger.error('Unsplash 搜尋失敗:', error)
+      setImages([])
+    } finally {
+      setLoading(false)
+    }
+  }, [query])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      searchImages()
+    }
+  }
+
+  const handleSelect = async (image: UnsplashImage) => {
+    // 使用 regular 尺寸（1080px 寬）作為圖片來源
+    const imageUrl = image.urls.regular
+
+    // 通知 Unsplash 下載（API 要求）
+    try {
+      await fetch(image.links.download_location, {
+        headers: {
+          Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
+        },
+      })
+    } catch {
+      // 忽略錯誤，不影響使用
+    }
+
+    onSelect(imageUrl)
+  }
+
+  return (
+    <div className={cn('space-y-3', className)}>
+      {/* 搜尋框 */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-morandi-secondary" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="搜尋圖片（如：Japan travel, beach）"
+            className="pl-9 h-9"
+          />
+        </div>
+        <Button
+          onClick={searchImages}
+          disabled={!query.trim() || loading}
+          className="h-9 px-4 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : '搜尋'}
+        </Button>
+      </div>
+
+      {/* 搜尋結果 */}
+      <div className="min-h-[200px]">
+        {loading ? (
+          <div className="flex items-center justify-center h-[200px]">
+            <Loader2 size={24} className="animate-spin text-morandi-gold" />
+          </div>
+        ) : images.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1">
+            {images.map((image) => (
+              <button
+                key={image.id}
+                type="button"
+                onClick={() => handleSelect(image)}
+                className="relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-morandi-gold transition-all group"
+              >
+                <img
+                  src={image.urls.small}
+                  alt={image.alt_description || '圖片'}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                {/* 攝影師署名 */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-[10px] text-white truncate">
+                    by {image.user.name}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : searched ? (
+          <div className="flex flex-col items-center justify-center h-[200px] text-morandi-secondary">
+            <ImageIcon size={32} className="mb-2 opacity-50" />
+            <p className="text-sm">找不到相關圖片</p>
+            <p className="text-xs">試試其他關鍵字</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[200px] text-morandi-secondary">
+            <ImageIcon size={32} className="mb-2 opacity-50" />
+            <p className="text-sm">輸入關鍵字搜尋免費圖片</p>
+            <p className="text-xs mt-1">圖片來源：Unsplash</p>
+          </div>
+        )}
+      </div>
+
+      {/* Unsplash 版權聲明 */}
+      <p className="text-[10px] text-morandi-muted text-center">
+        Photos provided by{' '}
+        <a
+          href="https://unsplash.com/?utm_source=venturo&utm_medium=referral"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-morandi-secondary"
+        >
+          Unsplash
+        </a>
+      </p>
+    </div>
+  )
+}

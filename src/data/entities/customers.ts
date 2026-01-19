@@ -10,13 +10,15 @@ import type { Customer } from '@/stores/types'
 
 export const customerEntity = createEntityHook<Customer>('customers', {
   list: {
-    select: '*',
+    // 排除 passport_image_url 以避免載入大量 base64 圖片資料
+    // 護照圖片只在詳情頁面需要時才載入
+    select: 'id,code,name,english_name,nickname,phone,alternative_phone,email,address,city,country,national_id,passport_number,passport_romanization,passport_expiry_date,date_of_birth,gender,company,tax_id,member_type,is_vip,vip_level,source,referred_by,notes,is_active,total_orders,total_spent,last_order_date,verification_status,dietary_restrictions,workspace_id,created_at,updated_at,created_by,updated_by',
     orderBy: { column: 'created_at', ascending: false },
   },
   slim: {
     select: 'id,code,name,phone,email',
   },
-  detail: { select: '*' },
+  detail: { select: '*' }, // 詳情頁才載入完整資料（包含 passport_image_url）
   cache: CACHE_PRESETS.medium,
 })
 

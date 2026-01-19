@@ -60,15 +60,15 @@ function createTextStyle(overrides: Partial<TextStyle> = {}): TextStyle {
   }
 }
 
-// 預設飯店資料
+// 預設飯店資料（佔位提示）
 function getDefaultHotel(): HotelData {
   return {
     id: 'default-hotel',
-    nameZh: '星野集團 界 由布院',
-    nameEn: 'Hoshino Resorts KAI Yufuin',
-    location: '大分縣由布市湯布院町川上',
-    description: '位於由布院溫泉的深處，被梯田與群山環繞的溫泉旅館。設計由名建築師隈研吾操刀，將建築與自然景觀完美融合。四季更迭的景色倒映在梯田水面，彷彿置身於畫卷之中。館內提供極致的放鬆體驗，客房內設有露天風呂，可一邊泡湯一邊欣賞由布岳的壯麗景色。',
-    tags: ['露天溫泉', '梯田景觀', '懷石料理', '隈研吾設計'],
+    nameZh: '請從右側面板帶入飯店',
+    nameEn: 'Import hotel from the right panel',
+    location: '點擊「從行程帶入飯店」或「手動新增飯店」',
+    description: '此處將顯示您選擇的飯店介紹文字。您可以在右側面板中編輯飯店名稱、地點、描述和設施標籤等資訊。',
+    tags: ['設施標籤', '將顯示於此'],
     enabled: true,
   }
 }
@@ -78,7 +78,7 @@ export const japaneseStyleV1Hotel: PageTemplate = {
   name: '日系風格 - 飯店介紹',
   description: '優雅的飯店特寫頁面，展示住宿特色',
   thumbnailUrl: '/templates/japanese-style-v1-hotel.png',
-  category: 'info',
+  category: 'hotel',
 
   generateElements: (data: TemplateData): CanvasElement[] => {
     zIndexCounter = 0
@@ -133,21 +133,9 @@ export const japaneseStyleV1Hotel: PageTemplate = {
         objectFit: 'cover',
       }
       elements.push(imageElement)
-    } else {
-      // 無圖片時顯示佔位圖標
-      const placeholderIcon: IconElement = {
-        ...createBaseElement('hotel-placeholder', '圖片佔位'),
-        type: 'icon',
-        x: A5_WIDTH / 2 - 30,
-        y: IMAGE_HEIGHT / 2 - 30,
-        width: 60,
-        height: 60,
-        icon: 'image',
-        size: 60,
-        color: 'rgba(62, 58, 54, 0.2)',
-      }
-      elements.push(placeholderIcon)
     }
+    // 無圖片時只顯示灰色背景區域（圖片區背景已建立），不再顯示佔位 icon
+    // 使用者可從右側面板上傳飯店圖片
 
     // === 圖片底部分隔線 ===
     const imageBorderElement: ShapeElement = {

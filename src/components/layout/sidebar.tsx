@@ -25,12 +25,14 @@ import {
   FileText,
   CircleDot,
   Wifi,
+  FileSpreadsheet,
   ImageIcon,
   Bus,
   CheckSquare,
   Archive,
   ClipboardList,
   Building,
+  Palette,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -69,6 +71,8 @@ const menuItems: MenuItem[] = [
     ],
   },
   { href: '/visas', label: '簽證管理', icon: FileCheck, requiredPermission: 'visas' },
+  { href: '/design', label: '設計', icon: Palette, requiredPermission: 'design' },
+  { href: '/office', label: '文件', icon: FileSpreadsheet, requiredPermission: 'office' },
   // 合約管理和確認單管理已整合到團的操作中，不需要獨立入口
   // { href: '/contracts', label: '合約管理', icon: FileSignature, requiredPermission: 'contracts' },
   // { href: '/confirmations', label: '確認單管理', icon: CircleDot, requiredPermission: 'confirmations' },

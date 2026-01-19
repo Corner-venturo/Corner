@@ -165,12 +165,13 @@ export function TourPnrToolDialog({
 
   const { user } = useAuthStore()
 
-  // 載入參考資料
+  // 不預載參考資料，直接顯示代碼（BR、TPE 等，旅行社人員看得懂）
+  // 如果快取中已有資料會自動顯示名稱，沒有就顯示代碼
   const {
     getAirlineName,
     getAirportName,
     getSSRDescription,
-  } = useReferenceData()
+  } = useReferenceData({ enabled: false })
 
   // 計算出票期限狀態
   const deadlineStatus = useMemo(() => {

@@ -65,19 +65,25 @@ async function fetchDestinations(): Promise<TourDestination[]> {
   return data || []
 }
 
-export function useTourDestinations() {
+interface UseTourDestinationsOptions {
+  /** 是否啟用資料載入（預設 false，需要時才載入） */
+  enabled?: boolean
+}
+
+export function useTourDestinations(options: UseTourDestinationsOptions = {}) {
+  const { enabled = false } = options
   const user = useAuthStore(state => state.user)
 
-  // 使用 SWR 載入國家資料
+  // 使用 SWR 載入國家資料（只在 enabled 時才載入）
   const { data: countriesData = [], isLoading: countriesLoading, error: countriesError } = useSWR<Country[]>(
-    COUNTRIES_CACHE_KEY,
+    enabled ? COUNTRIES_CACHE_KEY : null,
     fetchCountries,
     SWR_CONFIG
   )
 
-  // 使用 SWR 載入目的地資料
+  // 使用 SWR 載入目的地資料（只在 enabled 時才載入）
   const { data: destinations = [], isLoading: destinationsLoading, error: destinationsError } = useSWR<TourDestination[]>(
-    DESTINATIONS_CACHE_KEY,
+    enabled ? DESTINATIONS_CACHE_KEY : null,
     fetchDestinations,
     SWR_CONFIG
   )

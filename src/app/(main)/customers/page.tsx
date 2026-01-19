@@ -271,8 +271,14 @@ export default function CustomersPage() {
     national_id: string
     date_of_birth: string
   }) => {
-    await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
+    // 將空字串日期欄位轉換為 null，避免 PostgreSQL 日期格式錯誤
+    const cleanedData = {
       ...data,
+      passport_expiry_date: data.passport_expiry_date || null,
+      date_of_birth: data.date_of_birth || null,
+    }
+    await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
+      ...cleanedData,
       is_vip: false,
       is_active: true,
       total_spent: 0,

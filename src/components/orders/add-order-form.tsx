@@ -143,7 +143,13 @@ export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: Ad
       {/* 業務和助理 */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-morandi-primary">業務</label>
+          <label className="text-sm font-medium text-morandi-primary">
+            業務
+            {/* 如果有填聯絡人，業務為必填 */}
+            {formData.contact_person?.trim() && (
+              <span className="text-morandi-red ml-1">*</span>
+            )}
+          </label>
           <Combobox
             options={salesPersons.map(emp => ({
               value: emp.display_name || emp.english_name,

@@ -1274,11 +1274,16 @@ export type Database = {
           created_at: string
           created_by: string | null
           current_version_id: string | null
+          design_type: string | null
           id: string
           itinerary_id: string | null
+          itinerary_name: string | null
           name: string
           package_id: string | null
+          status: string | null
+          tour_code: string | null
           tour_id: string | null
+          tour_name: string | null
           type: string
           updated_at: string
           updated_by: string | null
@@ -1288,11 +1293,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_version_id?: string | null
+          design_type?: string | null
           id?: string
           itinerary_id?: string | null
+          itinerary_name?: string | null
           name?: string
           package_id?: string | null
+          status?: string | null
+          tour_code?: string | null
           tour_id?: string | null
+          tour_name?: string | null
           type?: string
           updated_at?: string
           updated_by?: string | null
@@ -1302,11 +1312,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_version_id?: string | null
+          design_type?: string | null
           id?: string
           itinerary_id?: string | null
+          itinerary_name?: string | null
           name?: string
           package_id?: string | null
+          status?: string | null
+          tour_code?: string | null
           tour_id?: string | null
+          tour_name?: string | null
           type?: string
           updated_at?: string
           updated_by?: string | null
@@ -6989,6 +7004,7 @@ export type Database = {
           amount: number
           approved_at: string | null
           approved_by: string | null
+          batch_id: string | null
           budget_warning: boolean | null
           code: string
           created_at: string | null
@@ -6996,6 +7012,7 @@ export type Database = {
           created_by_name: string | null
           expense_type: string | null
           id: string
+          is_special_billing: boolean | null
           items: Json | null
           note: string | null
           order_id: string | null
@@ -7004,6 +7021,7 @@ export type Database = {
           paid_by: string | null
           request_category: string | null
           request_date: string | null
+          request_number: string | null
           request_type: string
           status: string | null
           supplier_id: string | null
@@ -7020,6 +7038,7 @@ export type Database = {
           amount: number
           approved_at?: string | null
           approved_by?: string | null
+          batch_id?: string | null
           budget_warning?: boolean | null
           code: string
           created_at?: string | null
@@ -7027,6 +7046,7 @@ export type Database = {
           created_by_name?: string | null
           expense_type?: string | null
           id?: string
+          is_special_billing?: boolean | null
           items?: Json | null
           note?: string | null
           order_id?: string | null
@@ -7035,6 +7055,7 @@ export type Database = {
           paid_by?: string | null
           request_category?: string | null
           request_date?: string | null
+          request_number?: string | null
           request_type: string
           status?: string | null
           supplier_id?: string | null
@@ -7051,6 +7072,7 @@ export type Database = {
           amount?: number
           approved_at?: string | null
           approved_by?: string | null
+          batch_id?: string | null
           budget_warning?: boolean | null
           code?: string
           created_at?: string | null
@@ -7058,6 +7080,7 @@ export type Database = {
           created_by_name?: string | null
           expense_type?: string | null
           id?: string
+          is_special_billing?: boolean | null
           items?: Json | null
           note?: string | null
           order_id?: string | null
@@ -7066,6 +7089,7 @@ export type Database = {
           paid_by?: string | null
           request_category?: string | null
           request_date?: string | null
+          request_number?: string | null
           request_type?: string
           status?: string | null
           supplier_id?: string | null

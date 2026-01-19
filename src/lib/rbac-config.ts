@@ -92,6 +92,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
       'settings',        // 系統設定
       'confirmations',   // 確認單管理
       'esims',           // eSIM 管理
+      'design',          // 設計管理
     ],
     canManageWorkspace: false,
     canCrossWorkspace: false,
@@ -157,6 +158,7 @@ export const ROLES: Record<UserRole, RoleConfig> = {
       'customers',       // 客戶管理
       'requests',        // 需求單管理
       'confirmations',   // 確認單管理
+      'design',          // 設計管理
     ],
     canManageWorkspace: false,
     canCrossWorkspace: false,

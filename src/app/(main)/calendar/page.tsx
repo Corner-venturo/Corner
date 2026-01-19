@@ -39,6 +39,7 @@ export default function CalendarPage() {
   // Custom hooks for calendar logic
   const {
     filteredEvents,
+    onDatesChange,
     isSuperAdmin,
     workspaces,
     selectedWorkspaceId,
@@ -232,6 +233,7 @@ export default function CalendarPage() {
                 onEventClick={handleEventClick}
                 onMoreLinkClick={info => handleMoreLinkClick(info, filteredEvents)}
                 onEventDrop={handleEventDrop}
+                onDatesSet={onDatesChange}
               />
             </div>
           </div>

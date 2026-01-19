@@ -39,23 +39,18 @@ export default function VisasPage() {
     addTour,
     fetchTours,
     addOrder,
+    fetchOrders,
   } = useVisasData()
 
   // 載入資料
-  // 🔧 優化：移除不必要的 Members/Customers 預載入
-  // - Customers: useCustomerMatch.startCustomerMatch 會在需要時載入
-  // - Members: deleteVisaWithCascade 改為直接查詢
+  // 🔧 優化：只載入 visas，tours/orders 延遲到對話框打開時載入
   useEffect(() => {
     const loadData = async () => {
-      const { invalidateVisas, invalidateOrders } = await import('@/data')
-      await Promise.all([
-        invalidateVisas(),
-        fetchTours(),
-        invalidateOrders(),
-      ])
+      const { invalidateVisas } = await import('@/data')
+      await invalidateVisas()
     }
     loadData()
-  }, [fetchTours])
+  }, [])
 
   // 篩選管理
   const { activeTab, setActiveTab, selectedRows, setSelectedRows, filteredVisas, buttonAvailability, canSelectVisa } =
@@ -387,7 +382,10 @@ export default function VisasPage() {
                       批次下件
                     </Button>
                     <Button
-                      onClick={() => setIsDialogOpen(true)}
+                      onClick={async () => {
+                        await fetchTours() // 按需載入 tours
+                        setIsDialogOpen(true)
+                      }}
                       className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                     >
                       新增簽證
@@ -419,7 +417,7 @@ export default function VisasPage() {
           onDelete={deleteVisa}
           onUpdateStatus={(id, status) => updateVisa(id, { status })}
           onEdit={(visa) => {
-            loadVisaForEdit(visa)
+            loadVisaForEdit(visa) // 編輯不需要載入 tours
           }}
         />
       </div>

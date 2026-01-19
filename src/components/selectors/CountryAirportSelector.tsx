@@ -44,7 +44,7 @@ export function CountryAirportSelector({
     countries: hookCountries,
     loading: destinationsLoading,
     addDestination,
-  } = useTourDestinations()
+  } = useTourDestinations({ enabled: true }) // 組件渲染時就需要資料
 
   // 新增機場代碼狀態
   const [showAddNew, setShowAddNew] = useState(false)

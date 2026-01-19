@@ -40,7 +40,9 @@ export function useToursForm({ state, openDialog, dialog }: UseToursFormParams):
   const router = useRouter()
   const { items: employees, fetchAll: fetchEmployees } = useEmployees()
   const { items: quotes } = useQuotesListSlim()
-  const { destinations, loading: destinationsLoading } = useTourDestinations()
+  // 只在 Dialog 開啟時才載入目的地資料
+  const isDialogOpen = dialog.type === 'create' || dialog.type === 'edit'
+  const { destinations, loading: destinationsLoading } = useTourDestinations({ enabled: isDialogOpen })
 
   // 從提案轉開團的資料
   const [proposalConvertData, setProposalConvertData] = useState<{ proposal: Proposal; package: ProposalPackage } | null>(null)

@@ -86,19 +86,15 @@ const DialogContent = React.forwardRef<
     {/*
       巢狀 Dialog 遮罩設計：
       - 普通 Dialog: bg-black/60 (60% 黑色) + 背景模糊
-      - 巢狀 Dialog: bg-black/30 (30% 黑色，較淡) - 遮住底層 Dialog 但不會讓總體太黑
-      這樣多層 Dialog 疊加時 (60% + 30%)，視覺上比之前 (60% + 40%) 更輕
+      - 巢狀 Dialog: 透明背景，只有 z-index 更高（避免雙重遮罩）
     */}
-    <DialogPrimitive.Overlay
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => e.preventDefault()}
-      className={cn(
-        'fixed inset-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        nested
-          ? 'z-[10001] bg-black/50 backdrop-blur-sm' // 巢狀：遮罩 + 模糊效果
-          : 'z-[9998] bg-black/60 backdrop-blur-sm'
-      )}
-    />
+    {!nested && (
+      <DialogPrimitive.Overlay
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => e.preventDefault()}
+        className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+      />
+    )}
     <DialogPrimitive.Content
       ref={ref}
       aria-describedby={undefined}

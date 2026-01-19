@@ -2,18 +2,18 @@
 
 import { getTodayString } from '@/lib/utils/format-date'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
+import { Combobox } from '@/components/ui/combobox'
 import {
   Select,
   SelectContent,
@@ -21,9 +21,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useOrders, createReceiptOrder } from '@/data'
-import { OrderAllocation, ReceiptPaymentItem, PaymentMethod } from '@/stores/types'
-import { Plus, Trash2, DollarSign, AlertCircle, X, Check } from 'lucide-react'
+import { useOrders, useTours, createReceipt, invalidateReceipts } from '@/data'
+import { useAuthStore } from '@/stores'
+import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
+import { logger } from '@/lib/utils/logger'
+import { PaymentMethod } from '@/stores/types'
+
+// 擴展 OrderAllocation 加入備註
+interface OrderAllocationWithNote {
+  order_id: string
+  order_number: string
+  tour_id: string
+  code: string
+  tour_name: string
+  contact_person: string
+  allocated_amount: number
+  note: string
+}
+import { Plus, DollarSign, AlertCircle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import { CurrencyCell } from '@/components/table-cells'
@@ -43,21 +58,14 @@ const paymentMethods = [
 
 export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogProps) {
   const { items: orders } = useOrders()
+  const { items: tours } = useTours()
+  const { user } = useAuthStore()
 
   const [receiptDate, setReceiptDate] = useState(getTodayString())
-  const [note, setNote] = useState('')
-
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('transfer')
+  const [totalAmount, setTotalAmount] = useState(0)
   // 訂單分配列表
-  const [orderAllocations, setOrderAllocations] = useState<OrderAllocation[]>([])
-
-  // 收款項目
-  const [paymentItems, setPaymentItems] = useState<Partial<ReceiptPaymentItem>[]>([
-    {
-      payment_method: 'cash',
-      amount: 0,
-      transaction_date: getTodayString(),
-    },
-  ])
+  const [orderAllocations, setOrderAllocations] = useState<OrderAllocationWithNote[]>([])
 
   // 可用訂單（未收款或部分收款）
   const availableOrders = useMemo(() => {
@@ -66,10 +74,10 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     )
   }, [orders])
 
-  // 計算總收款金額
-  const totalPaymentAmount = useMemo(() => {
-    return paymentItems.reduce((sum, item) => sum + (item.amount || 0), 0)
-  }, [paymentItems])
+  // 已選擇的訂單 ID
+  const selectedOrderIds = useMemo(() => {
+    return new Set(orderAllocations.filter(a => a.order_id).map(a => a.order_id))
+  }, [orderAllocations])
 
   // 計算已分配金額
   const totalAllocatedAmount = useMemo(() => {
@@ -77,27 +85,26 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   }, [orderAllocations])
 
   // 未分配金額
-  const unallocatedAmount = totalPaymentAmount - totalAllocatedAmount
+  const unallocatedAmount = totalAmount - totalAllocatedAmount
 
-  // 新增訂單分配
-  const addOrderAllocation = () => {
-    if (availableOrders.length === 0) {
-      void alert('沒有可用的訂單', 'warning')
-      return
+  // 初始化（預設兩個空白行）
+  useEffect(() => {
+    if (open) {
+      setReceiptDate(getTodayString())
+      setPaymentMethod('transfer')
+      setTotalAmount(0)
+      setOrderAllocations([
+        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+        { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+      ])
     }
+  }, [open])
 
-    const firstAvailableOrder = availableOrders[0]
+  // 新增訂單分配（空白行）
+  const addOrderAllocation = () => {
     setOrderAllocations(prev => [
       ...prev,
-      {
-        order_id: firstAvailableOrder.id,
-        order_number: firstAvailableOrder.code,
-        tour_id: firstAvailableOrder.tour_id ?? '',
-        code: firstAvailableOrder.code || '',
-        tour_name: firstAvailableOrder.tour_name || '',
-        contact_person: firstAvailableOrder.contact_person ?? '',
-        allocated_amount: 0,
-      },
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
     ])
   }
 
@@ -107,7 +114,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
   }
 
   // 更新訂單分配
-  const updateOrderAllocation = (index: number, updates: Partial<OrderAllocation>) => {
+  const updateOrderAllocation = (index: number, updates: Partial<OrderAllocationWithNote>) => {
     setOrderAllocations(prev =>
       prev.map((allocation, i) => (i === index ? { ...allocation, ...updates } : allocation))
     )
@@ -128,100 +135,137 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
     })
   }
 
-  // 新增收款項目
-  const addPaymentItem = () => {
-    setPaymentItems(prev => [
-      ...prev,
-      {
-        payment_method: 'cash',
-        amount: 0,
-        transaction_date: getTodayString(),
-      },
-    ])
-  }
-
-  // 移除收款項目
-  const removePaymentItem = (index: number) => {
-    if (paymentItems.length > 1) {
-      setPaymentItems(prev => prev.filter((_, i) => i !== index))
-    }
-  }
-
-  // 更新收款項目
-  const updatePaymentItem = (index: number, updates: Partial<ReceiptPaymentItem>) => {
-    setPaymentItems(prev => prev.map((item, i) => (i === index ? { ...item, ...updates } : item)))
-  }
-
-  // 平均分配未分配金額
+  // 平均分配
   const distributeEvenly = () => {
-    if (orderAllocations.length === 0 || unallocatedAmount <= 0) return
+    const validAllocations = orderAllocations.filter(a => a.order_id)
+    if (validAllocations.length === 0 || totalAmount <= 0) return
 
-    const amountPerOrder = Math.floor(unallocatedAmount / orderAllocations.length)
-    const remainder = unallocatedAmount - amountPerOrder * orderAllocations.length
+    const amountPerOrder = Math.floor(totalAmount / validAllocations.length)
+    const remainder = totalAmount - amountPerOrder * validAllocations.length
 
-    setOrderAllocations(prev =>
-      prev.map((allocation, index) => ({
-        ...allocation,
-        allocated_amount:
-          allocation.allocated_amount + amountPerOrder + (index === 0 ? remainder : 0),
-      }))
-    )
+    let validIndex = 0
+    setOrderAllocations(prev => prev.map(allocation => {
+      if (!allocation.order_id) return allocation
+      const amount = amountPerOrder + (validIndex === 0 ? remainder : 0)
+      validIndex++
+      return { ...allocation, allocated_amount: amount }
+    }))
   }
 
   // 重置表單
   const resetForm = () => {
     setReceiptDate(getTodayString())
-    setNote('')
-    setOrderAllocations([])
-    setPaymentItems([
-      {
-        payment_method: 'cash',
-        amount: 0,
-        transaction_date: getTodayString(),
-      },
+    setPaymentMethod('transfer')
+    setTotalAmount(0)
+    setOrderAllocations([
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
+      { order_id: '', order_number: '', tour_id: '', code: '', tour_name: '', contact_person: '', allocated_amount: 0, note: '' },
     ])
   }
 
   // 儲存
   const handleSave = async () => {
-    if (orderAllocations.length === 0) {
-      void alert('請至少新增一個訂單分配', 'warning')
+    // 過濾有選擇訂單且金額 > 0 的分配
+    const validAllocations = orderAllocations.filter(a => a.order_id && a.allocated_amount > 0)
+
+    if (validAllocations.length === 0) {
+      void alert('請至少選擇一個訂單並輸入金額', 'warning')
       return
     }
 
-    if (totalPaymentAmount === 0) {
+    if (totalAmount === 0) {
       void alert('收款金額不能為 0', 'warning')
       return
     }
 
     if (unallocatedAmount !== 0) {
-      void alert(`還有 NT$ ${unallocatedAmount.toLocaleString('zh-TW')} 未分配，請確認分配金額`, 'warning')
+      void alert(`還有 NT$ ${Math.abs(unallocatedAmount).toLocaleString('zh-TW')} ${unallocatedAmount > 0 ? '未分配' : '超出'}，請確認分配金額`, 'warning')
+      return
+    }
+
+    if (!user?.workspace_id) {
+      void alert('無法取得 workspace ID', 'error')
       return
     }
 
     try {
-      await createReceiptOrder({
-        allocation_mode: 'multiple',
-        order_allocations: orderAllocations,
-        receipt_date: receiptDate,
-        payment_items: paymentItems as ReceiptPaymentItem[],
-        total_amount: totalPaymentAmount,
-        status: '已收款',
-        note,
-        created_by: '1',
-      } as unknown as Parameters<typeof createReceiptOrder>[0])
+      // 收款方式轉換
+      const paymentMethodMap: Record<string, string> = {
+        cash: 'cash',
+        transfer: 'transfer',
+        card: 'card',
+        check: 'check',
+      }
 
-      await alert('批量收款單建立成功', 'success')
+      // 為每個訂單分配建立一筆收款單
+      for (const allocation of validAllocations) {
+        const order = orders.find(o => o.id === allocation.order_id)
+        if (!order) continue
+
+        // 取得團號
+        const tour = order.tour_id ? tours.find(t => t.id === order.tour_id) : null
+        const tourCode = tour?.code || ''
+
+        if (!tourCode) {
+          logger.warn(`訂單 ${order.code} 沒有關聯團號，跳過`)
+          continue
+        }
+
+        // 生成收款單號
+        const receiptNumber = generateReceiptNumber(tourCode, [])
+
+        await createReceipt({
+          receipt_number: receiptNumber,
+          workspace_id: user.workspace_id,
+          order_id: allocation.order_id,
+          tour_id: order.tour_id || null,
+          customer_id: order.customer_id || null,
+          order_number: order.order_number || order.code || '',
+          tour_name: order.tour_name || tour?.name || '',
+          receipt_date: receiptDate,
+          payment_date: receiptDate,
+          payment_method: paymentMethodMap[paymentMethod] || 'transfer',
+          receipt_type: paymentMethod === 'cash' ? 1 : 0,
+          receipt_amount: allocation.allocated_amount,
+          amount: allocation.allocated_amount,
+          actual_amount: 0,
+          status: '0',
+          note: allocation.note || null,
+          created_by: user.id,
+          updated_by: user.id,
+          link: null,
+          account_info: null,
+          card_last_four: null,
+          auth_code: null,
+          check_number: null,
+          check_bank: null,
+          check_date: null,
+          linkpay_order_number: null,
+          receipt_account: null,
+          email: null,
+          payment_name: null,
+          pay_dateline: null,
+          handler_name: null,
+          fees: null,
+          deleted_at: null,
+        })
+      }
+
+      // 刷新資料
+      await invalidateReceipts()
+
+      await alert(`成功建立 ${validAllocations.length} 筆收款單`, 'success')
       onOpenChange(false)
       resetForm()
     } catch (error) {
+      logger.error('批量收款建立失敗:', error)
       void alert('建立失敗，請稍後再試', 'error')
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-morandi-gold" />
@@ -230,76 +274,34 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* 收款日期 */}
-          <div>
-            <Label>收款日期</Label>
-            <DatePicker value={receiptDate} onChange={(date) => setReceiptDate(date)} placeholder="選擇日期" />
-          </div>
-
-          {/* 收款項目 */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">收款項目</Label>
-              <Button size="sm" variant="outline" onClick={addPaymentItem}>
-                <Plus className="h-4 w-4 mr-1" />
-                新增收款項目
-              </Button>
+          {/* 基本資訊 */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>收款日期</Label>
+              <DatePicker value={receiptDate} onChange={(date) => setReceiptDate(date)} />
             </div>
-
-            <div className="space-y-2">
-              {paymentItems.map((item, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                  <Select
-                    value={item.payment_method}
-                    onValueChange={value =>
-                      updatePaymentItem(index, { payment_method: value as PaymentMethod })
-                    }
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {paymentMethods.map(method => (
-                        <SelectItem key={method.value} value={method.value}>
-                          {method.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Input
-                    type="number"
-                    placeholder="金額"
-                    value={item.amount || ''}
-                    onChange={e =>
-                      updatePaymentItem(index, { amount: parseFloat(e.target.value) || 0 })
-                    }
-                    className="w-40"
-                  />
-
-                  <DatePicker
-                    value={item.transaction_date}
-                    onChange={(date) => updatePaymentItem(index, { transaction_date: date })}
-                    className="w-40"
-                    placeholder="交易日期"
-                  />
-
-                  {paymentItems.length > 1 && (
-                    <Button size="sm" variant="ghost" onClick={() => removePaymentItem(index)}>
-                      <Trash2 className="h-4 w-4 text-morandi-red" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+            <div>
+              <Label>收款方式</Label>
+              <Select value={paymentMethod} onValueChange={value => setPaymentMethod(value as PaymentMethod)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {paymentMethods.map(method => (
+                    <SelectItem key={method.value} value={method.value}>{method.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <div className="text-right text-sm font-semibold flex items-center justify-end gap-2">
-              總收款金額：
-              <CurrencyCell amount={totalPaymentAmount} className="text-lg text-morandi-gold" />
+            <div>
+              <Label>總金額</Label>
+              <Input
+                type="number"
+                value={totalAmount || ''}
+                onChange={e => setTotalAmount(parseFloat(e.target.value) || 0)}
+              />
             </div>
           </div>
 
-          {/* 訂單分配 */}
+          {/* 訂單分配表格 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">訂單分配</Label>
@@ -308,7 +310,7 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
                   size="sm"
                   variant="outline"
                   onClick={distributeEvenly}
-                  disabled={orderAllocations.length === 0}
+                  disabled={orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
                 >
                   平均分配
                 </Button>
@@ -319,106 +321,130 @@ export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogPro
               </div>
             </div>
 
-            {orderAllocations.length === 0 ? (
-              <div className="text-center py-8 text-morandi-secondary border rounded-lg border-dashed">
-                請新增訂單分配
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {orderAllocations.map((allocation, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 border rounded-lg bg-morandi-container/20"
-                  >
-                    <Select
-                      value={allocation.order_id}
-                      onValueChange={value => selectOrder(index, value)}
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="選擇訂單" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableOrders.map(order => (
-                          <SelectItem key={order.id} value={order.id}>
-                            {order.code} - {order.contact_person} ({order.tour_name})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Input
-                      type="number"
-                      placeholder="分配金額"
-                      value={allocation.allocated_amount || ''}
-                      onChange={e =>
-                        updateOrderAllocation(index, {
-                          allocated_amount: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="w-40"
-                    />
-
-                    <Button size="sm" variant="ghost" onClick={() => removeOrderAllocation(index)}>
-                      <Trash2 className="h-4 w-4 text-morandi-red" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-center justify-between p-3 border rounded-lg bg-morandi-container/10">
-              <div className="text-sm flex items-center gap-2">
-                <span className="text-morandi-secondary">已分配：</span>
-                <CurrencyCell amount={totalAllocatedAmount} className="font-semibold" />
-              </div>
-              <div
-                className={cn(
-                  'text-sm flex items-center gap-2',
-                  unallocatedAmount > 0 && 'text-morandi-gold',
-                  unallocatedAmount < 0 && 'text-morandi-red'
-                )}
-              >
-                <span>未分配：</span>
-                <CurrencyCell amount={unallocatedAmount} className="font-semibold" />
-              </div>
+            <div className="border border-border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-xs text-morandi-primary font-medium bg-morandi-container/40">
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border">訂單</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-40">團名</th>
+                    <th className="text-right py-2.5 px-3 border-b border-r border-border w-32">分配金額</th>
+                    <th className="text-left py-2.5 px-3 border-b border-r border-border w-48">備註</th>
+                    <th className="text-center py-2.5 px-3 border-b border-border w-14"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orderAllocations.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-6 text-morandi-secondary text-sm bg-card">
+                        點擊「新增訂單」開始分配
+                      </td>
+                    </tr>
+                  ) : (
+                    orderAllocations.map((allocation, index) => (
+                      <tr key={index} className="bg-card hover:bg-morandi-container/10">
+                        <td className="py-2 px-3 border-b border-r border-border">
+                          <Combobox
+                            options={availableOrders
+                              .filter(o => !selectedOrderIds.has(o.id) || o.id === allocation.order_id)
+                              .map(order => ({
+                                value: order.id,
+                                label: `${order.code} - ${order.contact_person || '無聯絡人'} (${order.tour_name})`
+                              }))}
+                            value={allocation.order_id}
+                            onChange={value => selectOrder(index, value)}
+                            placeholder="搜尋訂單..."
+                          />
+                        </td>
+                        <td className="py-2 px-3 border-b border-r border-border text-sm text-morandi-secondary">
+                          {allocation.tour_name || '-'}
+                        </td>
+                        <td className="py-2 px-3 border-b border-r border-border">
+                          <input
+                            type="number"
+                            value={allocation.allocated_amount || ''}
+                            onChange={e => updateOrderAllocation(index, { allocated_amount: parseFloat(e.target.value) || 0 })}
+                            className="input-no-focus w-full bg-transparent text-sm text-right"
+                          />
+                        </td>
+                        <td className="py-2 px-3 border-b border-r border-border">
+                          <input
+                            type="text"
+                            value={allocation.note || ''}
+                            onChange={e => updateOrderAllocation(index, { note: e.target.value })}
+                            className="input-no-focus w-full bg-transparent text-sm"
+                          />
+                        </td>
+                        <td className="py-2 px-3 border-b border-border text-center">
+                          <span
+                            onClick={() => removeOrderAllocation(index)}
+                            className="text-morandi-secondary cursor-pointer hover:text-morandi-red text-sm"
+                            title="刪除"
+                          >
+                            ✕
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {/* 總計行 */}
+                  <tr className="bg-morandi-container/20 font-medium">
+                    <td className="py-2.5 px-3 border-r border-border text-sm text-morandi-primary">
+                      共 {orderAllocations.filter(a => a.order_id).length} 筆
+                    </td>
+                    <td className="py-2.5 px-3 border-r border-border"></td>
+                    <td className="py-2.5 px-3 border-r border-border text-right">
+                      <CurrencyCell amount={totalAllocatedAmount} className="text-sm" />
+                    </td>
+                    <td className="py-2.5 px-3 border-r border-border"></td>
+                    <td className="py-2.5 px-3 border-border"></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            {unallocatedAmount !== 0 && (
-              <div className="flex items-center gap-2 p-3 border border-morandi-gold/20 rounded-lg bg-morandi-gold/5 text-sm">
-                <AlertCircle className="h-4 w-4 text-morandi-gold" />
-                <span className="text-morandi-gold">
-                  {unallocatedAmount > 0 ? '還有金額未分配' : '分配金額超過收款金額'}
-                  ，請調整分配金額
-                </span>
+            {/* 未分配提示 */}
+            {unallocatedAmount !== 0 && totalAmount > 0 && (
+              <div className={cn(
+                'flex items-center justify-between px-3 py-2 rounded-lg text-sm',
+                unallocatedAmount > 0 ? 'bg-morandi-gold/10 text-morandi-gold' : 'bg-morandi-red/10 text-morandi-red'
+              )}>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{unallocatedAmount > 0 ? '還有金額未分配' : '分配金額超過總金額'}</span>
+                </div>
+                <div className="font-medium">
+                  未分配：<CurrencyCell amount={Math.abs(unallocatedAmount)} className="inline" />
+                </div>
               </div>
             )}
           </div>
 
-          {/* 備註 */}
-          <div>
-            <Label>備註</Label>
-            <Input
-              placeholder="收款備註（選填）"
-              value={note}
-              onChange={e => setNote(e.target.value)}
-            />
-          </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
-            <X size={16} />
-            取消
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
-            disabled={unallocatedAmount !== 0 || orderAllocations.length === 0}
-          >
-            <Check size={16} />
-            建立批量收款單
-          </Button>
-        </DialogFooter>
+        {/* 操作按鈕 */}
+        <div className="flex items-center gap-4 pt-4 border-t border-border">
+          <div className="flex items-center text-sm">
+            <span className="text-morandi-secondary">共 {orderAllocations.filter(a => a.order_id).length} 筆，總金額</span>
+            <span className="inline-block min-w-[100px] text-right font-semibold text-morandi-gold ml-2">
+              NT$ {totalAmount.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex-1" />
+          <div className="flex space-x-2">
+            <Button variant="outline" className="gap-1" onClick={() => onOpenChange(false)}>
+              <X size={16} />
+              取消
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-morandi-gold hover:bg-morandi-gold-hover gap-1"
+              disabled={unallocatedAmount !== 0 || orderAllocations.filter(a => a.order_id).length === 0 || totalAmount === 0}
+            >
+              <Check size={16} />
+              建立批量收款單
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useProposals } from '@/hooks/cloud-hooks'
 import {
   createProposal,
+  createPackage,
   updateProposal,
   archiveProposal,
   deleteProposal,
@@ -12,6 +13,7 @@ import {
 import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, CreateProposalData, UpdateProposalData } from '@/types/proposal.types'
+import type { CreateProposalWithPackageData } from '@/features/proposals/components/ProposalDialog'
 
 interface UseProposalOperationsReturn {
   // Dialog states
@@ -40,6 +42,10 @@ interface UseProposalOperationsReturn {
   onUpdateProposal: (data: CreateProposalData | UpdateProposalData) => Promise<void>
   onArchiveProposal: (reason: string) => Promise<void>
   handleProposalClick: (proposal: Proposal) => void
+
+  /** 新建提案後自動開啟新增版本（建立後自動設為 true，開啟版本對話框後重設為 false） */
+  autoOpenAddVersion: boolean
+  setAutoOpenAddVersion: (value: boolean) => void
 }
 
 export function useProposalOperations(): UseProposalOperationsReturn {
@@ -52,6 +58,8 @@ export function useProposalOperations(): UseProposalOperationsReturn {
   const [proposalArchiveDialogOpen, setProposalArchiveDialogOpen] = useState(false)
   const [proposalDetailDialogOpen, setProposalDetailDialogOpen] = useState(false)
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
+  // 新建提案後自動開啟新增版本
+  const [autoOpenAddVersion, setAutoOpenAddVersion] = useState(false)
 
   // 編輯提案
   const handleEditProposal = useCallback((proposal: Proposal) => {
@@ -104,25 +112,49 @@ export function useProposalOperations(): UseProposalOperationsReturn {
     [refreshProposals]
   )
 
-  // 新增提案
+  // 新增提案（含第一個版本）
   const handleCreateProposal = useCallback(
-    async (data: CreateProposalData | UpdateProposalData) => {
+    async (data: CreateProposalWithPackageData | UpdateProposalData) => {
       if (!user?.workspace_id || !user?.id) {
         await alert('無法取得使用者資訊', 'error')
         return
       }
 
       try {
-        const newProposal = await createProposal(data as CreateProposalData, user.workspace_id, user.id)
+        // 提取 firstPackage 資料
+        const proposalWithPackage = data as CreateProposalWithPackageData
+        const { firstPackage, ...proposalData } = proposalWithPackage
+
+        // 1. 建立提案
+        const newProposal = await createProposal(proposalData as CreateProposalData, user.workspace_id, user.id)
+
+        // 2. 如果有第一個版本資料，建立版本
+        if (newProposal && firstPackage) {
+          await createPackage(
+            {
+              proposal_id: newProposal.id,
+              version_name: firstPackage.version_name,
+              destination: firstPackage.country ? `${firstPackage.country}${firstPackage.airport_code ? ` (${firstPackage.airport_code})` : ''}` : undefined,
+              start_date: firstPackage.start_date || undefined,
+              end_date: firstPackage.end_date || undefined,
+              group_size: firstPackage.group_size || undefined,
+              notes: firstPackage.notes || undefined,
+            },
+            user.id,
+            user.workspace_id
+          )
+        }
+
         setProposalDialogOpen(false)
         // 刷新列表以顯示新提案
         await refreshProposals()
-        // 自動展開新提案的詳情對話框
+        // 自動展開新提案的詳情對話框（不再需要自動開新增版本）
         if (newProposal) {
           setSelectedProposal(newProposal)
           setProposalDetailDialogOpen(true)
         }
-      } catch {
+      } catch (error) {
+        logger.error('[useProposalOperations] 建立提案失敗:', error)
         await alert('建立提案失敗', 'error')
       }
     },
@@ -199,5 +231,9 @@ export function useProposalOperations(): UseProposalOperationsReturn {
     onUpdateProposal: handleUpdateProposal,
     onArchiveProposal: handleArchiveProposal,
     handleProposalClick,
+
+    // 新建提案後自動開啟新增版本
+    autoOpenAddVersion,
+    setAutoOpenAddVersion,
   }
 }

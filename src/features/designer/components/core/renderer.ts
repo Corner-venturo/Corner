@@ -231,11 +231,28 @@ function renderShapeElement(el: ShapeElement, options: RenderOptions): FabricObj
 function renderTextElement(el: TextElement, options: RenderOptions): FabricObject {
   const { isEditable } = options
 
+  // 先創建一個臨時 Textbox 來計算實際文字寬度
+  const tempTextbox = new Textbox(el.content, {
+    fontFamily: el.style.fontFamily,
+    fontSize: el.style.fontSize,
+    fontWeight: el.style.fontWeight,
+    fontStyle: el.style.fontStyle,
+    charSpacing: el.style.letterSpacing * 10,
+  })
+
+  // 計算實際文字寬度（單行情況）
+  const actualTextWidth = tempTextbox.calcTextWidth() + 4 // 加一點 padding
+
+  // 動態寬度：取 el.width 和實際文字寬度的較大值
+  // 這樣短文字會用實際寬度，長文字（超過 el.width）會換行
+  const templateWidth = el.width || actualTextWidth
+  const finalWidth = Math.max(templateWidth, actualTextWidth)
+
   const textbox = new Textbox(el.content, {
     ...getCommonProps(el, isEditable),
     left: el.x,
     top: el.y,
-    width: el.width,
+    width: finalWidth,
     fontFamily: el.style.fontFamily,
     fontSize: el.style.fontSize,
     fontWeight: el.style.fontWeight,
@@ -246,19 +263,7 @@ function renderTextElement(el: TextElement, options: RenderOptions): FabricObjec
     textAlign: el.style.textAlign,
     originX: 'left',
     originY: 'top',
-    // 文字編輯設定：拉伸只改變寬度，不縮放文字
-    lockScalingY: true,  // 鎖定垂直縮放
     splitByGrapheme: true, // 中文字元分割
-  })
-
-  // 覆寫縮放行為：拉伸時只改變寬度，不縮放文字大小
-  textbox.on('scaling', () => {
-    const newWidth = textbox.width! * textbox.scaleX!
-    textbox.set({
-      width: newWidth,
-      scaleX: 1,
-      scaleY: 1,
-    })
   })
 
   return textbox
@@ -285,8 +290,6 @@ async function renderImageElement(
       htmlImg.onerror = () => reject(new Error('Image load failed'))
       htmlImg.src = el.src
     })
-
-    const fabricImg = new FabricImage(htmlImg)
 
     const targetWidth = el.width
     const targetHeight = el.height
@@ -334,46 +337,60 @@ async function renderImageElement(
       offsetY = (targetHeight - scaledHeight) / 2
     }
 
-    // 建立裁切用的形狀（支援自訂圓角）
-    // 使用 absolutePositioned: true，clipPath 使用畫布絕對座標
-    // 圖片被鎖定時不能移動，所以這種方式可以正確裁切
-    let clipShape: Rect | Path
+    // ========================================
+    // 使用 Canvas 2D API 直接裁切圖片
+    // 這樣選取框就是裁切後的大小
+    // ========================================
 
+    // 1. 建立一個臨時 canvas 來繪製裁切後的圖片
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = targetWidth
+    tempCanvas.height = targetHeight
+    const ctx = tempCanvas.getContext('2d')!
+
+    // 2. 如果有圓角，設定裁切路徑
     if (el.borderRadius && (el.borderRadius.topLeft || el.borderRadius.topRight || el.borderRadius.bottomLeft || el.borderRadius.bottomRight)) {
-      // 使用自訂圓角 Path（圓拱形狀）
-      // absolutePositioned 模式：使用元素的絕對位置
-      const pathData = createRoundedRectPath(el.x, el.y, targetWidth, targetHeight, el.borderRadius)
-      clipShape = new Path(pathData, {
-        originX: 'left',
-        originY: 'top',
-        absolutePositioned: true,
-      })
-    } else {
-      // 預設矩形裁切
-      clipShape = new Rect({
-        left: el.x,
-        top: el.y,
-        width: targetWidth,
-        height: targetHeight,
-        originX: 'left',
-        originY: 'top',
-        absolutePositioned: true,
-      })
+      const br = el.borderRadius
+      const tl = Math.min(br.topLeft || 0, targetWidth / 2, targetHeight / 2)
+      const tr = Math.min(br.topRight || 0, targetWidth / 2, targetHeight / 2)
+      const blr = Math.min(br.bottomRight || 0, targetWidth / 2, targetHeight / 2)
+      const bl = Math.min(br.bottomLeft || 0, targetWidth / 2, targetHeight / 2)
+
+      ctx.beginPath()
+      ctx.moveTo(tl, 0)
+      ctx.lineTo(targetWidth - tr, 0)
+      ctx.quadraticCurveTo(targetWidth, 0, targetWidth, tr)
+      ctx.lineTo(targetWidth, targetHeight - blr)
+      ctx.quadraticCurveTo(targetWidth, targetHeight, targetWidth - blr, targetHeight)
+      ctx.lineTo(bl, targetHeight)
+      ctx.quadraticCurveTo(0, targetHeight, 0, targetHeight - bl)
+      ctx.lineTo(0, tl)
+      ctx.quadraticCurveTo(0, 0, tl, 0)
+      ctx.closePath()
+      ctx.clip()
     }
 
-    // 直接對圖片設定位置和裁切
-    fabricImg.set({
+    // 3. 繪製圖片（帶縮放和偏移）
+    ctx.drawImage(htmlImg, offsetX, offsetY, scaledWidth, scaledHeight)
+
+    // 4. 將裁切後的 canvas 轉為圖片
+    const croppedDataUrl = tempCanvas.toDataURL('image/png')
+
+    // 5. 載入裁切後的圖片到 Fabric.js
+    const croppedImg = await FabricImage.fromURL(croppedDataUrl)
+
+    croppedImg.set({
       ...getCommonProps(el, isEditable),
-      left: el.x + offsetX,
-      top: el.y + offsetY,
-      scaleX,
-      scaleY,
+      left: el.x,
+      top: el.y,
       originX: 'left',
       originY: 'top',
-      clipPath: clipShape,
     })
 
-    return fabricImg
+    // 設定 ID
+    ;(croppedImg as FabricImage & { id: string }).id = el.id
+
+    return croppedImg
   } catch (error) {
     // 圖片載入失敗時顯示佔位符
     logger.error('[Renderer] Failed to load image:', error)

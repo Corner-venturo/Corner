@@ -56,6 +56,7 @@ export interface PaymentRequest {
   supplier_name?: string | null
   status?: string | null // pending, approved, paid
   is_special_billing?: boolean | null // 是否為特殊出帳
+  batch_id?: string | null // 批次 ID：同一批建立的請款單共用此 ID
   note?: string | null // 備註（使用 note 單數形式，與資料庫一致）
   approved_at?: string | null
   approved_by?: string | null

@@ -9,7 +9,6 @@ import { User, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
-import { getPaymentStatusLabel } from '@/constants/status-maps'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 
 interface SimpleOrderTableProps {
@@ -55,7 +54,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
     }
   }
 
-  const gridCols = showTourInfo ? '1fr 1fr 1fr 1fr 1fr 180px' : '1fr 1fr 1fr 1fr 180px'
+  const gridCols = showTourInfo ? '1fr 1fr 1fr 1fr 180px' : '1fr 1fr 1fr 180px'
 
   return (
     <div
@@ -86,10 +85,6 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
             <span className="font-medium text-morandi-secondary">業務</span>
           </div>
           <div className="text-left py-2.5 px-4 text-xs relative">
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-morandi-gold/30"></div>
-            <span className="font-medium text-morandi-secondary">狀態</span>
-          </div>
-          <div className="text-left py-2.5 px-4 text-xs relative">
             <span className="font-medium text-morandi-secondary">操作</span>
           </div>
         </div>
@@ -101,7 +96,6 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
           <div className="grid" style={{ gridTemplateColumns: gridCols }}>
             <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
             {showTourInfo && <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>}
-            <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
             <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
             <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
             <div className="py-2 px-4 text-center text-morandi-secondary/50">-</div>
@@ -139,21 +133,6 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                 <div className="py-2 px-4">
                   <span className="text-xs text-morandi-primary">
                     {order.sales_person}
-                  </span>
-                </div>
-
-                <div className="py-2 px-4">
-                  <span
-                    className={cn(
-                      'text-xs font-medium',
-                      order.payment_status === 'paid'
-                        ? 'text-morandi-green'
-                        : order.payment_status === 'partial'
-                          ? 'text-morandi-gold'
-                          : 'text-morandi-red'
-                    )}
-                  >
-                    {getPaymentStatusLabel(order.payment_status || '')}
                   </span>
                 </div>
 

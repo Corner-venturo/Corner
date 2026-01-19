@@ -223,8 +223,11 @@ export const ToursPage: React.FC = () => {
   }, [operations, newTour, newOrder, searchParams, proposalConvertData, user, clearProposalConvertData, resetForm, closeDialog, refreshProposals, router, setSubmitting])
 
   const handleDeleteTour = useCallback(async () => {
-    await operations.handleDeleteTour(deleteConfirm.tour)
+    const result = await operations.handleDeleteTour(deleteConfirm.tour)
     closeDeleteDialog()
+    if (!result.success && result.error) {
+      await alert(result.error, 'error')
+    }
   }, [operations, deleteConfirm.tour, closeDeleteDialog])
 
   const { handleCreateChannel } = useTourChannelOperations({

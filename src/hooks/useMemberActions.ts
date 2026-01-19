@@ -13,9 +13,10 @@ import type { Database } from '@/lib/supabase/types'
 // Supabase Insert 類型
 type MemberInsert = Database['public']['Tables']['members']['Insert']
 
-// SWR key 與 cloud-hooks 的 useMembers 一致，確保 mutate 時能同步
-const SWR_KEY = 'members'
-const ORDERS_SWR_KEY = 'orders'
+// SWR key 與 @/data 的 createEntityHook 一致，確保 mutate 時能同步
+// members 對應表名是 order_members，orders 對應表名是 orders
+const SWR_KEY = 'entity:order_members:list'
+const ORDERS_SWR_KEY = 'entity:orders:list'
 
 // 使用 @/lib/workspace-helpers 的 getCurrentWorkspaceId
 

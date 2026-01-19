@@ -27,8 +27,8 @@ const RECEIPT_TYPES = {
 } as const
 
 const ALL_RECEIPT_TYPE_OPTIONS = [
-  { value: RECEIPT_TYPES.CASH, label: '現金' },
   { value: RECEIPT_TYPES.BANK_TRANSFER, label: '匯款' },
+  { value: RECEIPT_TYPES.CASH, label: '現金' },
   { value: RECEIPT_TYPES.CREDIT_CARD, label: '刷卡' },
   { value: RECEIPT_TYPES.CHECK, label: '支票' },
   { value: RECEIPT_TYPES.LINK_PAY, label: 'LinkPay' },
@@ -124,7 +124,6 @@ export function PaymentItemForm({
           <Input
             value={item.receipt_account || ''}
             onChange={e => onUpdate(item.id, { receipt_account: e.target.value })}
-            placeholder="請輸入付款人姓名"
           />
         </div>
 

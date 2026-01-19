@@ -14,7 +14,7 @@ export const employeeEntity = createEntityHook<Employee>('employees', {
     orderBy: { column: 'employee_number', ascending: true },
   },
   slim: {
-    select: 'id,employee_number,name,email,phone',
+    select: 'id,employee_number,display_name,chinese_name,email',
   },
   detail: { select: '*' },
   cache: CACHE_PRESETS.low,

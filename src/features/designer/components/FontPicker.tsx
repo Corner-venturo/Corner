@@ -18,19 +18,46 @@ import { cn } from '@/lib/utils'
 
 // 可用字體列表
 const FONTS = [
-  // 中文字體
-  { name: 'Noto Sans TC', label: '思源黑體', category: '中文' },
-  { name: 'Noto Serif TC', label: '思源宋體', category: '中文' },
-  { name: 'LXGW WenKai TC', label: '霞鶩文楷', category: '中文' },
-  { name: 'Taipei Sans TC', label: '台北黑體', category: '中文' },
-  // 英文字體
-  { name: 'Inter', label: 'Inter', category: '英文' },
-  { name: 'Roboto', label: 'Roboto', category: '英文' },
-  { name: 'Open Sans', label: 'Open Sans', category: '英文' },
-  { name: 'Lato', label: 'Lato', category: '英文' },
-  { name: 'Montserrat', label: 'Montserrat', category: '英文' },
-  { name: 'Playfair Display', label: 'Playfair Display', category: '裝飾' },
-  { name: 'Dancing Script', label: 'Dancing Script', category: '手寫' },
+  // 中文字體 - 黑體系列
+  { name: 'Noto Sans TC', label: '思源黑體', category: '中文黑體' },
+  { name: 'Taipei Sans TC', label: '台北黑體', category: '中文黑體' },
+  { name: 'Cubic', label: '俐方體', category: '中文黑體' },
+  // 中文字體 - 宋體/明體系列
+  { name: 'Noto Serif TC', label: '思源宋體', category: '中文宋體' },
+  { name: 'Zhi Mang Xing', label: '芫荽明體', category: '中文宋體' },
+  // 中文字體 - 書法/手寫
+  { name: 'LXGW WenKai TC', label: '霞鶩文楷', category: '中文手寫' },
+  { name: 'Ma Shan Zheng', label: '馬善政楷書', category: '中文手寫' },
+  { name: 'Zhi Mang Xing', label: '芝麻行書', category: '中文手寫' },
+  { name: 'Liu Jian Mao Cao', label: '流建毛草', category: '中文手寫' },
+  { name: 'Long Cang', label: '龍藏', category: '中文手寫' },
+  // 中文字體 - 圓體/可愛
+  { name: 'Zen Maru Gothic', label: '禪丸黑體', category: '中文圓體' },
+  // 日文字體（旅遊手冊常用）
+  { name: 'Noto Sans JP', label: '思源黑體 JP', category: '日文' },
+  { name: 'Noto Serif JP', label: '思源宋體 JP', category: '日文' },
+  { name: 'Zen Kaku Gothic New', label: '禪角黑體', category: '日文' },
+  { name: 'Shippori Mincho', label: '汐風明朝', category: '日文' },
+  { name: 'Kosugi Maru', label: '小杉丸', category: '日文' },
+  // 英文字體 - 無襯線
+  { name: 'Inter', label: 'Inter', category: '英文無襯線' },
+  { name: 'Roboto', label: 'Roboto', category: '英文無襯線' },
+  { name: 'Open Sans', label: 'Open Sans', category: '英文無襯線' },
+  { name: 'Lato', label: 'Lato', category: '英文無襯線' },
+  { name: 'Montserrat', label: 'Montserrat', category: '英文無襯線' },
+  { name: 'Poppins', label: 'Poppins', category: '英文無襯線' },
+  { name: 'Quicksand', label: 'Quicksand', category: '英文無襯線' },
+  // 英文字體 - 襯線
+  { name: 'Playfair Display', label: 'Playfair Display', category: '英文襯線' },
+  { name: 'Merriweather', label: 'Merriweather', category: '英文襯線' },
+  { name: 'Libre Baskerville', label: 'Libre Baskerville', category: '英文襯線' },
+  { name: 'Cormorant Garamond', label: 'Cormorant', category: '英文襯線' },
+  // 英文字體 - 手寫/裝飾
+  { name: 'Dancing Script', label: 'Dancing Script', category: '英文手寫' },
+  { name: 'Pacifico', label: 'Pacifico', category: '英文手寫' },
+  { name: 'Great Vibes', label: 'Great Vibes', category: '英文手寫' },
+  { name: 'Caveat', label: 'Caveat', category: '英文手寫' },
+  { name: 'Satisfy', label: 'Satisfy', category: '英文手寫' },
 ]
 
 // 字體大小選項

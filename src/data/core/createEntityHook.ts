@@ -510,18 +510,18 @@ export function createEntityHook<T extends BaseEntity>(
 
     try {
       // @ts-expect-error - Dynamic table factory
-      const { data: updated, error } = await supabase.from(tableName).update(updateData).eq('id', id).select().single()
+      const { error } = await supabase.from(tableName).update(updateData).eq('id', id)
 
       if (error) {
         logger.error(`[${tableName}] Update error:`, error.message)
-        await invalidate()
+        await invalidate() // 失敗時回滾樂觀更新
         throw error
       }
 
-      await invalidate()
-      return updated as unknown as T
+      // 成功：樂觀更新已生效，直接返回更新後的資料
+      return { id, ...updateData } as unknown as T
     } catch (err) {
-      await invalidate()
+      await invalidate() // 失敗時回滾樂觀更新
       throw err
     }
   }

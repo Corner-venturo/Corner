@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { Button } from '@/components/ui/button'
 import { EnhancedTable, TableColumn } from '@/components/ui/enhanced-table'
-import { Plus, Search, FileDown, Layers, Eye, CheckSquare, Loader2 } from 'lucide-react'
+import { Plus, Search, FileDown, Layers, Edit2, CheckSquare, Loader2 } from 'lucide-react'
 import { alert } from '@/lib/ui/alert-dialog'
 import { DateCell, StatusCell, ActionCell, CurrencyCell } from '@/components/table-cells'
 
@@ -62,7 +62,7 @@ export default function PaymentsPage() {
   const router = useRouter()
 
   // 資料與業務邏輯
-  const { receipts, availableOrders, invalidateReceipts, handleCreateReceipt, handleConfirmReceipt } = usePaymentData()
+  const { receipts, availableOrders, invalidateReceipts, handleCreateReceipt, handleConfirmReceipt, handleUpdateReceipt, handleDeleteReceipt } = usePaymentData()
   const { user } = useAuthStore()
 
   // 檢查是否為可批量確認的角色（管理員、會計、超級管理員）
@@ -80,6 +80,7 @@ export default function PaymentsPage() {
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null)
+  const [editingReceipt, setEditingReceipt] = useState<Receipt | null>(null)
   const [searchFilters, setSearchFilters] = useState<ReceiptSearchFilters>({})
 
   // SWR 自動載入資料，不需要手動 fetch
@@ -91,14 +92,23 @@ export default function PaymentsPage() {
     }
   }, [urlOrderId])
 
-  // 當對話框關閉時，清除 URL 參數
+  // 當對話框關閉時，清除 URL 參數和編輯狀態
   const handleAddDialogClose = (open: boolean) => {
     setIsDialogOpen(open)
-    if (!open && urlOrderId) {
-      // 清除 URL 參數，避免重新開啟
-      router.replace('/finance/payments')
+    if (!open) {
+      setEditingReceipt(null)
+      if (urlOrderId) {
+        // 清除 URL 參數，避免重新開啟
+        router.replace('/finance/payments')
+      }
     }
   }
+
+  // 載入收款單進行編輯
+  const loadReceiptForEdit = useCallback((receipt: Receipt) => {
+    setEditingReceipt(receipt)
+    setIsDialogOpen(true)
+  }, [])
 
   // 篩選後的收款單
   const filteredReceipts = useMemo(() => {
@@ -139,11 +149,16 @@ export default function PaymentsPage() {
     return filtered
   }, [receipts, searchFilters])
 
-  // 事件處理
+  // 事件處理（會計確認對話框用）
   const handleViewDetail = useCallback((receipt: Receipt) => {
     setSelectedReceipt(receipt)
     setIsDetailDialogOpen(true)
   }, [])
+
+  // 處理列點擊 - 開啟編輯對話框
+  const handleRowClick = useCallback((receipt: Receipt) => {
+    loadReceiptForEdit(receipt)
+  }, [loadReceiptForEdit])
 
   const handleSubmit = async (data: { selectedOrderId: string; paymentItems: ReceiptItem[] }) => {
     try {
@@ -173,7 +188,7 @@ export default function PaymentsPage() {
     { key: 'receipt_amount', label: '應收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value)} /> },
     { key: 'actual_amount', label: '實收金額', sortable: true, render: (value) => <CurrencyCell amount={Number(value) || 0} /> },
     { key: 'status', label: '狀態', render: (value) => <StatusCell type="receipt" status={String(value)} /> },
-    { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Eye, label: '檢視', onClick: () => handleViewDetail(row) }]} /> },
+    { key: 'actions', label: '操作', render: (_, row) => <ActionCell actions={[{ icon: Edit2, label: '編輯', onClick: () => loadReceiptForEdit(row) }]} /> },
   ]
 
   return (
@@ -257,15 +272,19 @@ export default function PaymentsPage() {
           defaultSort={{ key: 'receipt_date', direction: 'desc' }}
           searchable
           searchPlaceholder="搜尋收款單號或訂單編號..."
+          onRowClick={handleRowClick}
         />
       </div>
 
-      {/* 新增收款對話框 */}
+      {/* 新增/編輯收款對話框 */}
       <AddReceiptDialog
         open={isDialogOpen}
         onOpenChange={handleAddDialogClose}
         onSuccess={invalidateReceipts}
         defaultOrderId={urlOrderId || undefined}
+        editingReceipt={editingReceipt}
+        onUpdate={handleUpdateReceipt}
+        onDelete={handleDeleteReceipt}
       />
 
       {/* 進階搜尋對話框 */}

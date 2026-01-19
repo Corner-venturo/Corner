@@ -169,6 +169,13 @@ export const MENU_ITEMS: MenuItem[] = [
     category: 'settings',
     canHide: true,
   },
+  {
+    id: 'office',
+    label: '文件',
+    description: '文件管理（試算表、文件）',
+    category: 'business',
+    canHide: true,
+  },
 ]
 
 /**
@@ -230,6 +237,7 @@ export const MENU_HREF_TO_ID_MAP: Record<string, string> = {
   '/esims': 'esims',
   '/attractions': 'attractions',
   '/database': 'database',
+  '/office': 'office',
 }
 
 /**

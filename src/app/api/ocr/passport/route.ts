@@ -33,9 +33,7 @@ function getGoogleVisionKeys(): string[] {
 export async function POST(request: NextRequest) {
   try {
     // 🔒 安全檢查：驗證用戶身份（護照資料敏感）
-    logger.log('🔐 OCR API: 開始認證檢查...')
     const auth = await getServerAuth()
-    logger.log('🔐 OCR API: 認證結果:', auth.success ? '成功' : '失敗', auth.success ? '' : auth.error)
     if (!auth.success) {
       return errorResponse('請先登入', 401, ErrorCode.UNAUTHORIZED)
     }

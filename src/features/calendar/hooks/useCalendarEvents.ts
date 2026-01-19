@@ -8,13 +8,11 @@ import {
   useAuthStore,
   useWorkspaceStore,
 } from '@/stores'
-import { useTours, useCustomers, useEmployees, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
-import { logger } from '@/lib/utils/logger'
+import { useToursForCalendar, useCustomers, useEmployees, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
 import { supabase } from '@/lib/supabase/client'
-import { useCalendarFilters } from './useCalendarFilters'
-import { useCalendarTransform } from './useCalendarTransform'
 import { FullCalendarEvent } from '../types'
 import type { CalendarEvent } from '@/types/calendar.types'
+import type { DatesSetArg } from '@fullcalendar/core'
 
 // 從 ISO 時間字串取得顯示用的時間（HH:MM）
 const getDisplayTime = (isoString: string, allDay?: boolean): string => {
@@ -28,11 +26,26 @@ const getDateInTaipei = (isoString: string): string => {
   return toTaipeiDateString(isoString) || isoString
 }
 
+// 計算初始日期範圍（當前月份 ±1 個月）
+const getInitialDateRange = () => {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const end = new Date(now.getFullYear(), now.getMonth() + 2, 0) // 下個月的最後一天
+  return {
+    start: formatDate(start),
+    end: formatDate(end),
+  }
+}
+
 export function useCalendarEvents() {
-  const { items: tours } = useTours()
+  // 日期範圍狀態（用於分月載入團資料）
+  const [dateRange, setDateRange] = useState(getInitialDateRange)
+
+  // 使用日期範圍載入團資料（只載入需要的月份）
+  const { items: tours } = useToursForCalendar(dateRange)
   const { items: customers } = useCustomers()
   const { settings } = useCalendarStore()
-  const { items: calendarEvents, refresh: refreshCalendarEvents } = useCalendarEventList()
+  const { items: calendarEvents } = useCalendarEventList()
   const { user } = useAuthStore()
   const { items: employees } = useEmployees()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
@@ -52,17 +65,31 @@ export function useCalendarEvents() {
     }
   }, [isSuperAdmin, loadWorkspaces])
 
-  // 確保資料已載入（當用戶登入後才載入）
-  const initializedRef = useRef(false)
-  useEffect(() => {
-    // 等待用戶資料載入後才開始抓取
-    if (!user?.id) return
+  // 當 FullCalendar 視圖日期改變時更新日期範圍
+  const handleDatesChange = useCallback((arg: DatesSetArg) => {
+    // FullCalendar 的 start/end 是 Date 物件，需要擴展範圍以確保跨月團正確顯示
+    const viewStart = arg.start
+    const viewEnd = arg.end
 
-    if (!initializedRef.current) {
-      initializedRef.current = true
-      // 資料由 SWR 自動載入，不需要手動 fetch
+    // 擴展範圍：前後各加 1 個月，確保跨月事件能正確載入
+    const expandedStart = new Date(viewStart)
+    expandedStart.setMonth(expandedStart.getMonth() - 1)
+    const expandedEnd = new Date(viewEnd)
+    expandedEnd.setMonth(expandedEnd.getMonth() + 1)
+
+    const newRange = {
+      start: formatDate(expandedStart),
+      end: formatDate(expandedEnd),
     }
-  }, [user, isSuperAdmin, tours?.length])
+
+    // 只在範圍實際變化時才更新（避免不必要的重新查詢）
+    setDateRange(prev => {
+      if (prev.start === newRange.start && prev.end === newRange.end) {
+        return prev
+      }
+      return newRange
+    })
+  }, [])
 
   // Realtime 訂閱：當其他人新增/修改/刪除行事曆事件時，自動更新
   useEffect(() => {
@@ -301,6 +328,8 @@ export function useCalendarEvents() {
   return {
     filteredEvents,
     allEvents,
+    // 日期範圍變更處理（給 FullCalendar 的 datesSet 使用）
+    onDatesChange: handleDatesChange,
     // Workspace 篩選相關（只有超級管理員可用）
     isSuperAdmin,
     workspaces,

@@ -6,7 +6,7 @@
  * 顯示選中元素的屬性，並提供編輯功能
  */
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import * as fabric from 'fabric'
 import {
   Type,
@@ -18,23 +18,29 @@ import {
   Move,
   Maximize2,
   RotateCw,
+  Upload,
+  Sparkles,
 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { Button } from '@/components/ui/button'
 import { FontPicker, FontWeightPicker, TextAlignPicker } from './FontPicker'
+import { GradientPicker, cssGradientToFabric } from './GradientPicker'
 import { cn } from '@/lib/utils'
 
 interface PropertiesPanelProps {
   canvas: fabric.Canvas | null
   selectedObject: fabric.FabricObject | null
   onUpdate: () => void
+  onImageFill?: (object: fabric.FabricObject) => void  // 圖片填充回調
 }
 
 export function PropertiesPanel({
   canvas,
   selectedObject,
   onUpdate,
+  onImageFill,
 }: PropertiesPanelProps) {
   const [properties, setProperties] = useState<Record<string, unknown>>({})
 
@@ -341,27 +347,59 @@ export function PropertiesPanel({
           </div>
         </div>
 
-        {/* 顏色 */}
+        {/* 顏色/填充 */}
         <div>
           <div className="flex items-center gap-1 mb-2">
             <Palette size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-secondary">顏色</Label>
+            <Label className="text-xs text-morandi-secondary">填充</Label>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Label className="text-[10px] text-morandi-muted w-8">填充</Label>
-              <input
-                type="color"
-                value={String(properties.fill || '#c9aa7c')}
-                onChange={(e) => updateProperty('fill', e.target.value)}
-                className="w-8 h-8 rounded cursor-pointer"
-              />
-              <Input
-                value={String(properties.fill || '#c9aa7c')}
-                onChange={(e) => updateProperty('fill', e.target.value)}
-                className="flex-1 text-sm h-8"
+          <div className="space-y-3">
+            {/* 漸層/純色填充 */}
+            <div>
+              <Label className="text-[10px] text-morandi-muted mb-1 block">顏色/漸層</Label>
+              <GradientPicker
+                value={getFillValue(properties.fill)}
+                onChange={(value, isSolid) => {
+                  if (isSolid) {
+                    // 純色直接設定
+                    updateProperty('fill', value)
+                  } else {
+                    // 漸層需要轉換為 fabric.Gradient
+                    if (selectedObject && canvas) {
+                      const width = (selectedObject.width || 100) * (selectedObject.scaleX || 1)
+                      const height = (selectedObject.height || 100) * (selectedObject.scaleY || 1)
+                      const gradient = cssGradientToFabric(value, width, height)
+                      selectedObject.set('fill', gradient)
+                      // 儲存原始 CSS 值供之後編輯
+                      ;(selectedObject as unknown as Record<string, unknown>).__cssGradient = value
+                      canvas.renderAll()
+                      onUpdate()
+                    }
+                  }
+                }}
               />
             </div>
+
+            {/* 圖片填充（僅形狀支援） */}
+            {isShapeType(properties.type as string) && onImageFill && (
+              <div>
+                <Label className="text-[10px] text-morandi-muted mb-1 block">圖片遮罩</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={() => selectedObject && onImageFill(selectedObject)}
+                >
+                  <Upload size={14} />
+                  上傳圖片填充
+                </Button>
+                <p className="text-[10px] text-morandi-muted mt-1">
+                  上傳圖片後會裁切成此形狀
+                </p>
+              </div>
+            )}
+
+            {/* 邊框顏色 */}
             {properties.stroke !== undefined && (
               <div className="flex items-center gap-2">
                 <Label className="text-[10px] text-morandi-muted w-8">邊框</Label>
@@ -380,6 +418,15 @@ export function PropertiesPanel({
             )}
           </div>
         </div>
+
+        {/* 圖片濾鏡 - 僅圖片類型顯示 */}
+        {properties.type === 'image' && (
+          <ImageFiltersSection
+            canvas={canvas}
+            selectedObject={selectedObject as fabric.FabricImage}
+            onUpdate={onUpdate}
+          />
+        )}
 
         {/* 透明度 */}
         <div>
@@ -435,7 +482,253 @@ function getTypeName(type: string) {
       return '線條'
     case 'group':
       return '群組'
+    case 'path':
+      return '圖案'
+    case 'polygon':
+      return '多邊形'
+    case 'triangle':
+      return '三角形'
     default:
       return '元素'
   }
+}
+
+// 檢查是否為形狀類型（支援圖片遮罩填充）
+function isShapeType(type: string): boolean {
+  return ['rect', 'circle', 'path', 'polygon', 'triangle', 'ellipse'].includes(type)
+}
+
+// 取得填充值（處理漸層和純色）
+function getFillValue(fill: unknown): string {
+  if (!fill) return '#c9aa7c'
+
+  // 如果是字串（純色或 CSS 漸層）
+  if (typeof fill === 'string') {
+    return fill
+  }
+
+  // 如果是 fabric.Gradient 物件，嘗試取得儲存的 CSS 值
+  if (typeof fill === 'object' && fill !== null) {
+    const obj = fill as Record<string, unknown>
+    if (obj.__cssGradient) {
+      return obj.__cssGradient as string
+    }
+    // 嘗試從 colorStops 還原
+    if (obj.colorStops && Array.isArray(obj.colorStops)) {
+      const stops = obj.colorStops as Array<{ offset: number; color: string }>
+      const type = obj.type === 'radial' ? 'radial-gradient' : 'linear-gradient'
+      const stopsStr = stops.map(s => `${s.color} ${Math.round(s.offset * 100)}%`).join(', ')
+      return `${type}(90deg, ${stopsStr})`
+    }
+  }
+
+  return '#c9aa7c'
+}
+
+// 圖片濾鏡區塊
+interface ImageFiltersSectionProps {
+  canvas: fabric.Canvas | null
+  selectedObject: fabric.FabricImage | null
+  onUpdate: () => void
+}
+
+// 濾鏡預設值
+const FILTER_PRESETS = [
+  { id: 'none', label: '原始', icon: '🎨' },
+  { id: 'grayscale', label: '灰階', icon: '⬛' },
+  { id: 'sepia', label: '復古', icon: '🟤' },
+  { id: 'vintage', label: '懷舊', icon: '📷' },
+  { id: 'cool', label: '冷調', icon: '❄️' },
+  { id: 'warm', label: '暖調', icon: '🔥' },
+]
+
+function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageFiltersSectionProps) {
+  const [brightness, setBrightness] = useState(0)
+  const [contrast, setContrast] = useState(0)
+  const [saturation, setSaturation] = useState(0)
+  const [activePreset, setActivePreset] = useState('none')
+
+  // 當選取不同圖片時，讀取現有濾鏡設定
+  useEffect(() => {
+    if (!selectedObject) return
+
+    // 讀取自訂屬性
+    const obj = selectedObject as unknown as Record<string, unknown>
+    setBrightness((obj.__filterBrightness as number) || 0)
+    setContrast((obj.__filterContrast as number) || 0)
+    setSaturation((obj.__filterSaturation as number) || 0)
+    setActivePreset((obj.__filterPreset as string) || 'none')
+  }, [selectedObject])
+
+  // 套用濾鏡
+  const applyFilters = useCallback((
+    brightnessVal: number,
+    contrastVal: number,
+    saturationVal: number,
+    preset: string
+  ) => {
+    if (!selectedObject || !canvas) return
+
+    // 清除現有濾鏡
+    selectedObject.filters = []
+
+    // 套用預設濾鏡
+    switch (preset) {
+      case 'grayscale':
+        selectedObject.filters.push(new fabric.filters.Grayscale())
+        break
+      case 'sepia':
+        selectedObject.filters.push(new fabric.filters.Sepia())
+        break
+      case 'vintage':
+        selectedObject.filters.push(new fabric.filters.Sepia())
+        selectedObject.filters.push(new fabric.filters.Brightness({ brightness: -0.1 }))
+        selectedObject.filters.push(new fabric.filters.Contrast({ contrast: 0.1 }))
+        break
+      case 'cool':
+        // 冷調效果：增加藍色、降低飽和度
+        selectedObject.filters.push(new fabric.filters.Saturation({ saturation: -0.2 }))
+        break
+      case 'warm':
+        // 暖調效果：增加飽和度
+        selectedObject.filters.push(new fabric.filters.Saturation({ saturation: 0.3 }))
+        break
+    }
+
+    // 套用自訂調整（亮度、對比、飽和度）
+    if (brightnessVal !== 0) {
+      selectedObject.filters.push(new fabric.filters.Brightness({ brightness: brightnessVal / 100 }))
+    }
+    if (contrastVal !== 0) {
+      selectedObject.filters.push(new fabric.filters.Contrast({ contrast: contrastVal / 100 }))
+    }
+    if (saturationVal !== 0 && preset !== 'cool' && preset !== 'warm') {
+      selectedObject.filters.push(new fabric.filters.Saturation({ saturation: saturationVal / 100 }))
+    }
+
+    // 套用濾鏡
+    selectedObject.applyFilters()
+
+    // 儲存設定到物件（供下次讀取）
+    const obj = selectedObject as unknown as Record<string, unknown>
+    obj.__filterBrightness = brightnessVal
+    obj.__filterContrast = contrastVal
+    obj.__filterSaturation = saturationVal
+    obj.__filterPreset = preset
+
+    canvas.renderAll()
+    onUpdate()
+  }, [canvas, selectedObject, onUpdate])
+
+  const handlePresetChange = (preset: string) => {
+    setActivePreset(preset)
+    applyFilters(brightness, contrast, saturation, preset)
+  }
+
+  const handleBrightnessChange = (value: number) => {
+    setBrightness(value)
+    applyFilters(value, contrast, saturation, activePreset)
+  }
+
+  const handleContrastChange = (value: number) => {
+    setContrast(value)
+    applyFilters(brightness, value, saturation, activePreset)
+  }
+
+  const handleSaturationChange = (value: number) => {
+    setSaturation(value)
+    applyFilters(brightness, contrast, value, activePreset)
+  }
+
+  const handleReset = () => {
+    setBrightness(0)
+    setContrast(0)
+    setSaturation(0)
+    setActivePreset('none')
+    applyFilters(0, 0, 0, 'none')
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1">
+          <Sparkles size={12} className="text-morandi-secondary" />
+          <Label className="text-xs text-morandi-secondary">濾鏡效果</Label>
+        </div>
+        <button
+          onClick={handleReset}
+          className="text-[10px] text-morandi-gold hover:underline"
+        >
+          重設
+        </button>
+      </div>
+
+      {/* 預設濾鏡 */}
+      <div className="grid grid-cols-3 gap-1 mb-3">
+        {FILTER_PRESETS.map((preset) => (
+          <button
+            key={preset.id}
+            onClick={() => handlePresetChange(preset.id)}
+            className={cn(
+              'flex flex-col items-center gap-0.5 p-1.5 rounded border text-xs transition-colors',
+              activePreset === preset.id
+                ? 'border-morandi-gold bg-morandi-gold/10 text-morandi-gold'
+                : 'border-border hover:border-morandi-gold/50'
+            )}
+          >
+            <span>{preset.icon}</span>
+            <span className="text-[10px]">{preset.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* 自訂調整 */}
+      <div className="space-y-3">
+        {/* 亮度 */}
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-[10px] text-morandi-muted">亮度</Label>
+            <span className="text-[10px] text-morandi-muted">{brightness}</span>
+          </div>
+          <Slider
+            value={[brightness]}
+            onValueChange={([v]) => handleBrightnessChange(v)}
+            min={-100}
+            max={100}
+            step={5}
+          />
+        </div>
+
+        {/* 對比 */}
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-[10px] text-morandi-muted">對比</Label>
+            <span className="text-[10px] text-morandi-muted">{contrast}</span>
+          </div>
+          <Slider
+            value={[contrast]}
+            onValueChange={([v]) => handleContrastChange(v)}
+            min={-100}
+            max={100}
+            step={5}
+          />
+        </div>
+
+        {/* 飽和度 */}
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-[10px] text-morandi-muted">飽和度</Label>
+            <span className="text-[10px] text-morandi-muted">{saturation}</span>
+          </div>
+          <Slider
+            value={[saturation]}
+            onValueChange={([v]) => handleSaturationChange(v)}
+            min={-100}
+            max={100}
+            step={5}
+          />
+        </div>
+      </div>
+    </div>
+  )
 }

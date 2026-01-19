@@ -2,13 +2,10 @@
  * 日系風格 - 備忘錄頁面範本
  *
  * 渲染旅遊提醒/注意事項頁面
- * 支援兩種版面：
- * 1. 項目頁（4 個提醒卡片）
- * 2. 天氣頁（四季資訊 + 備忘錄區）
+ * 使用列表式佈局，更緊湊
  */
 import type { PageTemplate, TemplateData, MemoItem, SeasonInfo, MemoInfoItem } from './types'
 import type { CanvasElement, TextElement, ShapeElement } from '@/features/designer/components/types'
-import { getMemoItemsForPage } from '../definitions/country-presets'
 
 // A5 尺寸
 const PAGE_WIDTH = 559
@@ -20,10 +17,11 @@ const COLORS = {
   ink: '#3e3a36',
   inkLight: '#757068',
   primary: '#8e8070',
+  accent: '#c9aa7c',
   paperWhite: '#fcfbf9',
-  paperOff: '#f7f5f0',
   cardBg: 'rgba(255, 255, 255, 0.6)',
-  border: 'rgba(142, 128, 112, 0.1)',
+  border: 'rgba(142, 128, 112, 0.15)',
+  bulletBg: 'rgba(201, 170, 124, 0.15)',
 }
 
 // 季節標籤
@@ -49,9 +47,10 @@ function createBaseElement(id: string, name: string) {
 }
 
 /**
- * 生成項目頁元素（4 個提醒卡片）
+ * 生成列表式備忘錄頁面元素
+ * 更緊湊的版面，一頁可放 6-8 個項目
  */
-function generateItemPageElements(
+function generateListPageElements(
   items: MemoItem[],
   title: string,
   subtitle: string,
@@ -75,6 +74,21 @@ function generateItemPageElements(
   }
   elements.push(bgShape)
 
+  // 左側裝飾線
+  const decorLine: ShapeElement = {
+    ...createBaseElement('memo-decor-line', '裝飾線'),
+    type: 'shape',
+    variant: 'rectangle',
+    x: PADDING - 8,
+    y: PADDING + 60,
+    width: 3,
+    height: PAGE_HEIGHT - PADDING * 2 - 100,
+    fill: COLORS.accent,
+    cornerRadius: 2,
+    locked: true,
+  }
+  elements.push(decorLine)
+
   // 主標題
   const titleY = PADDING + 10
   const titleEl: TextElement = {
@@ -83,34 +97,34 @@ function generateItemPageElements(
     x: PADDING,
     y: titleY,
     width: PAGE_WIDTH - PADDING * 2,
-    height: 40,
+    height: 36,
     content: title,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 26,
+      fontSize: 22,
       fontWeight: 'bold',
       fontStyle: 'normal',
       textAlign: 'center',
       lineHeight: 1.2,
-      letterSpacing: 4,
+      letterSpacing: 3,
       color: COLORS.ink,
     },
   }
   elements.push(titleEl)
 
   // 副標題
-  const subtitleY = titleY + 40
+  const subtitleY = titleY + 36
   const subtitleEl: TextElement = {
     ...createBaseElement('memo-subtitle', '副標題'),
     type: 'text',
     x: PADDING,
     y: subtitleY,
     width: PAGE_WIDTH - PADDING * 2,
-    height: 20,
+    height: 16,
     content: `— ${subtitle} —`,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 9,
+      fontSize: 8,
       fontWeight: 'normal',
       fontStyle: 'normal',
       textAlign: 'center',
@@ -121,117 +135,142 @@ function generateItemPageElements(
   }
   elements.push(subtitleEl)
 
-  // 提醒卡片區
-  const cardsStartY = subtitleY + 40
-  const cardHeight = 135
-  const cardGap = 14
-  const cardWidth = PAGE_WIDTH - PADDING * 2
+  // 列表區域
+  const listStartY = subtitleY + 32
+  const itemHeight = 78 // 每個項目的高度（縮小以容納更多項目）
+  const contentWidth = PAGE_WIDTH - PADDING * 2 - 16 // 留一點空間給裝飾線
 
   items.forEach((item, index) => {
-    const cardY = cardsStartY + index * (cardHeight + cardGap)
-    const cardId = `memo-card-${index}`
+    const itemY = listStartY + index * itemHeight
+    const itemId = `memo-item-${index}`
 
-    // 卡片背景
-    const cardBg: ShapeElement = {
-      ...createBaseElement(`${cardId}-bg`, `卡片${index + 1}背景`),
+    // 項目背景（淡色區塊）
+    const itemBg: ShapeElement = {
+      ...createBaseElement(`${itemId}-bg`, `項目${index + 1}背景`),
       type: 'shape',
       variant: 'rectangle',
-      x: PADDING,
-      y: cardY,
-      width: cardWidth,
-      height: cardHeight,
-      fill: COLORS.cardBg,
-      stroke: COLORS.border,
-      strokeWidth: 1,
-      cornerRadius: 8,
-      // locked: false - 允許使用者調整
+      x: PADDING + 8,
+      y: itemY,
+      width: contentWidth,
+      height: itemHeight - 8,
+      fill: index % 2 === 0 ? COLORS.cardBg : 'transparent',
+      cornerRadius: 6,
     }
-    elements.push(cardBg)
+    elements.push(itemBg)
 
-    // 標題（含圖標提示）
-    const titleContent = item.titleZh ? `${item.title}` : item.title
+    // 小圓點
+    const bulletDot: ShapeElement = {
+      ...createBaseElement(`${itemId}-bullet`, `項目${index + 1}圓點`),
+      type: 'shape',
+      variant: 'circle',
+      x: PADDING + 18,
+      y: itemY + 12,
+      width: 6,
+      height: 6,
+      fill: COLORS.accent,
+      stroke: 'transparent',
+      strokeWidth: 0,
+    }
+    elements.push(bulletDot)
+
+    // 標題
+    const titleContent = item.titleZh || item.title
     const itemTitle: TextElement = {
-      ...createBaseElement(`${cardId}-title`, `卡片${index + 1}標題`),
+      ...createBaseElement(`${itemId}-title`, `項目${index + 1}標題`),
       type: 'text',
-      x: PADDING + 16,
-      y: cardY + 14,
-      width: cardWidth - 32,
-      height: 24,
+      x: PADDING + 44,
+      y: itemY + 8,
+      width: contentWidth - 44,
+      height: 20,
       content: titleContent,
       style: {
         fontFamily: 'Noto Serif TC',
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: 'bold',
         fontStyle: 'normal',
         textAlign: 'left',
         lineHeight: 1.4,
-        letterSpacing: 1,
+        letterSpacing: 0.5,
         color: COLORS.ink,
       },
     }
     elements.push(itemTitle)
 
-    // 中文標題（如果有）
-    if (item.titleZh) {
-      const titleZhEl: TextElement = {
-        ...createBaseElement(`${cardId}-title-zh`, `卡片${index + 1}中文標題`),
+    // 原文標題（如果有中文標題的話顯示原文）
+    if (item.titleZh && item.title !== item.titleZh) {
+      const originalTitle: TextElement = {
+        ...createBaseElement(`${itemId}-original`, `項目${index + 1}原文`),
         type: 'text',
-        x: PADDING + 16,
-        y: cardY + 36,
-        width: cardWidth - 32,
-        height: 18,
-        content: item.titleZh,
+        x: PADDING + 44,
+        y: itemY + 26,
+        width: contentWidth - 44,
+        height: 14,
+        content: item.title,
         style: {
           fontFamily: 'Noto Serif TC',
-          fontSize: 11,
-          fontWeight: '500',
+          fontSize: 9,
+          fontWeight: 'normal',
           fontStyle: 'normal',
           textAlign: 'left',
-          lineHeight: 1.4,
-          letterSpacing: 0.5,
+          lineHeight: 1.2,
+          letterSpacing: 0.3,
           color: COLORS.primary,
         },
       }
-      elements.push(titleZhEl)
+      elements.push(originalTitle)
     }
 
     // 內容
-    const contentY = item.titleZh ? cardY + 56 : cardY + 42
+    const contentY = item.titleZh && item.title !== item.titleZh ? itemY + 40 : itemY + 30
     const itemContent: TextElement = {
-      ...createBaseElement(`${cardId}-content`, `卡片${index + 1}內容`),
+      ...createBaseElement(`${itemId}-content`, `項目${index + 1}內容`),
       type: 'text',
-      x: PADDING + 16,
+      x: PADDING + 44,
       y: contentY,
-      width: cardWidth - 32,
-      height: cardHeight - (item.titleZh ? 70 : 56),
+      width: contentWidth - 52,
+      height: itemHeight - contentY + itemY - 12,
       content: item.content,
       style: {
         fontFamily: 'Noto Serif TC',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: 'normal',
         fontStyle: 'normal',
         textAlign: 'left',
-        lineHeight: 1.6,
-        letterSpacing: 0.3,
+        lineHeight: 1.55,
+        letterSpacing: 0.2,
         color: COLORS.inkLight,
       },
     }
     elements.push(itemContent)
   })
 
+  // 頁腳分隔線
+  const footerY = PAGE_HEIGHT - PADDING - 24
+  const footerLine: ShapeElement = {
+    ...createBaseElement('memo-footer-line', '頁腳分隔線'),
+    type: 'shape',
+    variant: 'rectangle',
+    x: PADDING,
+    y: footerY,
+    width: PAGE_WIDTH - PADDING * 2,
+    height: 1,
+    fill: COLORS.border,
+    locked: true,
+  }
+  elements.push(footerLine)
+
   // 頁腳左
-  const footerY = PAGE_HEIGHT - PADDING - 16
   const footerLeft: TextElement = {
     ...createBaseElement('memo-footer-left', '頁腳左'),
     type: 'text',
     x: PADDING,
-    y: footerY,
+    y: footerY + 8,
     width: 200,
-    height: 16,
+    height: 14,
     content: footerText,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: 'normal',
       fontStyle: 'normal',
       textAlign: 'left',
@@ -247,19 +286,19 @@ function generateItemPageElements(
     ...createBaseElement('memo-footer-right', '頁碼'),
     type: 'text',
     x: PAGE_WIDTH - PADDING - 60,
-    y: footerY,
+    y: footerY + 8,
     width: 60,
-    height: 16,
+    height: 14,
     content: pageNumber,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: 'bold',
       fontStyle: 'normal',
       textAlign: 'right',
       lineHeight: 1.2,
       letterSpacing: 1,
-      color: COLORS.inkLight,
+      color: COLORS.ink,
     },
   }
   elements.push(footerRight)
@@ -268,7 +307,8 @@ function generateItemPageElements(
 }
 
 /**
- * 生成天氣頁元素（四季 + 備忘錄）
+ * 生成天氣頁元素（選擇的季節 + 備忘錄）
+ * 根據選擇的季節數量動態調整版面
  */
 function generateWeatherPageElements(
   seasons: SeasonInfo[],
@@ -302,34 +342,34 @@ function generateWeatherPageElements(
     x: PADDING,
     y: titleY,
     width: PAGE_WIDTH - PADDING * 2,
-    height: 40,
+    height: 36,
     content: title,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 26,
+      fontSize: 22,
       fontWeight: 'bold',
       fontStyle: 'normal',
       textAlign: 'center',
       lineHeight: 1.2,
-      letterSpacing: 4,
+      letterSpacing: 3,
       color: COLORS.ink,
     },
   }
   elements.push(titleEl)
 
   // 副標題
-  const subtitleY = titleY + 40
+  const subtitleY = titleY + 36
   const subtitleEl: TextElement = {
     ...createBaseElement('weather-subtitle', '副標題'),
     type: 'text',
     x: PADDING,
     y: subtitleY,
     width: PAGE_WIDTH - PADDING * 2,
-    height: 20,
-    content: '— Weather & Tips —',
+    height: 16,
+    content: '— Weather & Emergency Info —',
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 9,
+      fontSize: 8,
       fontWeight: 'normal',
       fontStyle: 'normal',
       textAlign: 'center',
@@ -340,49 +380,24 @@ function generateWeatherPageElements(
   }
   elements.push(subtitleEl)
 
-  // 四季卡片區（2x2 網格）
-  const gridStartY = subtitleY + 40
-  const cardWidth = (PAGE_WIDTH - PADDING * 2 - 16) / 2
-  const cardHeight = 115
-  const cardGap = 12
+  // 季節區域
+  const seasonStartY = subtitleY + 32
+  const contentWidth = PAGE_WIDTH - PADDING * 2
 
-  seasons.forEach((season, index) => {
-    const row = Math.floor(index / 2)
-    const col = index % 2
-    const cardX = PADDING + col * (cardWidth + 16)
-    const cardY = gridStartY + row * (cardHeight + cardGap)
-    const cardId = `season-${season.season}`
-
-    // 卡片背景
-    const cardBg: ShapeElement = {
-      ...createBaseElement(`${cardId}-bg`, `${SEASON_LABELS[season.season]}季背景`),
-      type: 'shape',
-      variant: 'rectangle',
-      x: cardX,
-      y: cardY,
-      width: cardWidth,
-      height: cardHeight,
-      fill: COLORS.cardBg,
-      stroke: COLORS.border,
-      strokeWidth: 1,
-      cornerRadius: 8,
-      // locked: false - 允許使用者調整
-    }
-    elements.push(cardBg)
-
+  // 根據季節數量決定佈局
+  if (seasons.length > 0) {
     // 季節標題
-    const seasonLabel = SEASON_LABELS[season.season] || season.season
     const seasonTitle: TextElement = {
-      ...createBaseElement(`${cardId}-title`, `${seasonLabel}季標題`),
+      ...createBaseElement('season-section-title', '季節標題'),
       type: 'text',
-      x: cardX + 12,
-      y: cardY + 12,
-      width: cardWidth - 24,
-      height: 22,
-      content: `${seasonLabel} (${season.months})`,
+      x: PADDING,
+      y: seasonStartY,
+      width: contentWidth,
+      height: 20,
+      content: '✦ 氣候資訊',
       style: {
         fontFamily: 'Noto Serif TC',
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: 'bold',
         fontStyle: 'normal',
         textAlign: 'left',
@@ -393,86 +408,113 @@ function generateWeatherPageElements(
     }
     elements.push(seasonTitle)
 
-    // 描述
-    const seasonDesc: TextElement = {
-      ...createBaseElement(`${cardId}-desc`, `${seasonLabel}季描述`),
-      type: 'text',
-      x: cardX + 12,
-      y: cardY + 38,
-      width: cardWidth - 24,
-      height: cardHeight - 50,
-      content: season.description,
-      style: {
-        fontFamily: 'Noto Serif TC',
-        fontSize: 10,
-        fontWeight: 'normal',
-        fontStyle: 'normal',
-        textAlign: 'left',
-        lineHeight: 1.6,
-        letterSpacing: 0.3,
-        color: COLORS.inkLight,
-      },
-    }
-    elements.push(seasonDesc)
-  })
+    // 季節列表（橫向排列）
+    const seasonItemWidth = (contentWidth - (seasons.length - 1) * 12) / seasons.length
+    const seasonItemHeight = 120
+    const seasonListY = seasonStartY + 28
+
+    seasons.forEach((season, index) => {
+      const seasonX = PADDING + index * (seasonItemWidth + 12)
+      const seasonId = `season-${season.season}`
+      const seasonLabel = SEASON_LABELS[season.season] || season.season
+
+      // 季節卡片背景
+      const seasonBg: ShapeElement = {
+        ...createBaseElement(`${seasonId}-bg`, `${seasonLabel}季背景`),
+        type: 'shape',
+        variant: 'rectangle',
+        x: seasonX,
+        y: seasonListY,
+        width: seasonItemWidth,
+        height: seasonItemHeight,
+        fill: COLORS.cardBg,
+        stroke: COLORS.border,
+        strokeWidth: 1,
+        cornerRadius: 8,
+      }
+      elements.push(seasonBg)
+
+      // 季節標籤
+      const seasonLabelEl: TextElement = {
+        ...createBaseElement(`${seasonId}-label`, `${seasonLabel}季標籤`),
+        type: 'text',
+        x: seasonX,
+        y: seasonListY + 12,
+        width: seasonItemWidth,
+        height: 24,
+        content: `${seasonLabel}`,
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 18,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'center',
+          lineHeight: 1.2,
+          letterSpacing: 2,
+          color: COLORS.accent,
+        },
+      }
+      elements.push(seasonLabelEl)
+
+      // 月份
+      const seasonMonths: TextElement = {
+        ...createBaseElement(`${seasonId}-months`, `${seasonLabel}季月份`),
+        type: 'text',
+        x: seasonX,
+        y: seasonListY + 38,
+        width: seasonItemWidth,
+        height: 14,
+        content: season.months,
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 9,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+          lineHeight: 1.2,
+          letterSpacing: 0.5,
+          color: COLORS.primary,
+        },
+      }
+      elements.push(seasonMonths)
+
+      // 描述
+      const seasonDesc: TextElement = {
+        ...createBaseElement(`${seasonId}-desc`, `${seasonLabel}季描述`),
+        type: 'text',
+        x: seasonX + 8,
+        y: seasonListY + 56,
+        width: seasonItemWidth - 16,
+        height: seasonItemHeight - 64,
+        content: season.description,
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 9,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+          lineHeight: 1.5,
+          letterSpacing: 0.2,
+          color: COLORS.inkLight,
+        },
+      }
+      elements.push(seasonDesc)
+    })
+  }
 
   // 備忘錄區
-  const infoStartY = gridStartY + 2 * (cardHeight + cardGap) + 24
-  const infoWidth = PAGE_WIDTH - PADDING * 2
+  const infoStartY = seasons.length > 0 ? seasonStartY + 28 + 120 + 32 : seasonStartY
 
-  // 備忘錄標題
-  const infoTitle: TextElement = {
-    ...createBaseElement('info-title', '備忘錄標題'),
-    type: 'text',
-    x: PADDING,
-    y: infoStartY,
-    width: infoWidth,
-    height: 24,
-    content: '✦ 旅の備忘録 ✦',
-    style: {
-      fontFamily: 'Noto Serif TC',
-      fontSize: 14,
-      fontWeight: 'bold',
-      fontStyle: 'normal',
-      textAlign: 'center',
-      lineHeight: 1.2,
-      letterSpacing: 2,
-      color: COLORS.ink,
-    },
-  }
-  elements.push(infoTitle)
-
-  // 分隔線
-  const divider: ShapeElement = {
-    ...createBaseElement('info-divider', '分隔線'),
-    type: 'shape',
-    variant: 'rectangle',
-    x: PADDING + 100,
-    y: infoStartY + 30,
-    width: infoWidth - 200,
-    height: 1,
-    fill: COLORS.border,
-    locked: true,
-  }
-  elements.push(divider)
-
-  // 資訊項目
-  const infoItemStartY = infoStartY + 44
-  const infoItemHeight = 55
-
-  infoItems.forEach((item, index) => {
-    const itemY = infoItemStartY + index * infoItemHeight
-    const itemId = `info-item-${index}`
-
-    // 標題
-    const itemTitle: TextElement = {
-      ...createBaseElement(`${itemId}-title`, `資訊${index + 1}標題`),
+  if (infoItems.length > 0) {
+    // 備忘錄標題
+    const infoTitle: TextElement = {
+      ...createBaseElement('info-section-title', '備忘錄標題'),
       type: 'text',
-      x: PADDING + 16,
-      y: itemY,
-      width: infoWidth - 32,
-      height: 18,
-      content: item.title,
+      x: PADDING,
+      y: infoStartY,
+      width: contentWidth,
+      height: 20,
+      content: '✦ 緊急聯絡 & 實用資訊',
       style: {
         fontFamily: 'Noto Serif TC',
         fontSize: 12,
@@ -480,48 +522,107 @@ function generateWeatherPageElements(
         fontStyle: 'normal',
         textAlign: 'left',
         lineHeight: 1.4,
-        letterSpacing: 0.5,
+        letterSpacing: 1,
         color: COLORS.ink,
       },
     }
-    elements.push(itemTitle)
+    elements.push(infoTitle)
 
-    // 內容
-    const itemContent: TextElement = {
-      ...createBaseElement(`${itemId}-content`, `資訊${index + 1}內容`),
-      type: 'text',
-      x: PADDING + 16,
-      y: itemY + 20,
-      width: infoWidth - 32,
-      height: 32,
-      content: item.content,
-      style: {
-        fontFamily: 'Noto Serif TC',
-        fontSize: 10,
-        fontWeight: 'normal',
-        fontStyle: 'normal',
-        textAlign: 'left',
-        lineHeight: 1.6,
-        letterSpacing: 0.3,
-        color: COLORS.inkLight,
-      },
-    }
-    elements.push(itemContent)
-  })
+    // 資訊項目（列表式）
+    const infoListY = infoStartY + 28
+    const infoItemHeight = 65
+
+    infoItems.forEach((item, index) => {
+      const itemY = infoListY + index * infoItemHeight
+      const itemId = `info-item-${index}`
+
+      // 項目背景
+      const itemBg: ShapeElement = {
+        ...createBaseElement(`${itemId}-bg`, `資訊${index + 1}背景`),
+        type: 'shape',
+        variant: 'rectangle',
+        x: PADDING,
+        y: itemY,
+        width: contentWidth,
+        height: infoItemHeight - 8,
+        fill: index % 2 === 0 ? COLORS.cardBg : 'transparent',
+        cornerRadius: 6,
+      }
+      elements.push(itemBg)
+
+      // 標題
+      const itemTitle: TextElement = {
+        ...createBaseElement(`${itemId}-title`, `資訊${index + 1}標題`),
+        type: 'text',
+        x: PADDING + 12,
+        y: itemY + 8,
+        width: contentWidth - 24,
+        height: 18,
+        content: `▸ ${item.title}`,
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 11,
+          fontWeight: 'bold',
+          fontStyle: 'normal',
+          textAlign: 'left',
+          lineHeight: 1.4,
+          letterSpacing: 0.5,
+          color: COLORS.ink,
+        },
+      }
+      elements.push(itemTitle)
+
+      // 內容
+      const itemContent: TextElement = {
+        ...createBaseElement(`${itemId}-content`, `資訊${index + 1}內容`),
+        type: 'text',
+        x: PADDING + 20,
+        y: itemY + 28,
+        width: contentWidth - 32,
+        height: infoItemHeight - 40,
+        content: item.content,
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 10,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'left',
+          lineHeight: 1.5,
+          letterSpacing: 0.2,
+          color: COLORS.inkLight,
+        },
+      }
+      elements.push(itemContent)
+    })
+  }
+
+  // 頁腳分隔線
+  const footerY = PAGE_HEIGHT - PADDING - 24
+  const footerLine: ShapeElement = {
+    ...createBaseElement('weather-footer-line', '頁腳分隔線'),
+    type: 'shape',
+    variant: 'rectangle',
+    x: PADDING,
+    y: footerY,
+    width: PAGE_WIDTH - PADDING * 2,
+    height: 1,
+    fill: COLORS.border,
+    locked: true,
+  }
+  elements.push(footerLine)
 
   // 頁腳左
-  const footerY = PAGE_HEIGHT - PADDING - 16
   const footerLeft: TextElement = {
     ...createBaseElement('weather-footer-left', '頁腳左'),
     type: 'text',
     x: PADDING,
-    y: footerY,
+    y: footerY + 8,
     width: 200,
-    height: 16,
+    height: 14,
     content: footerText,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: 'normal',
       fontStyle: 'normal',
       textAlign: 'left',
@@ -537,19 +638,19 @@ function generateWeatherPageElements(
     ...createBaseElement('weather-footer-right', '頁碼'),
     type: 'text',
     x: PAGE_WIDTH - PADDING - 60,
-    y: footerY,
+    y: footerY + 8,
     width: 60,
-    height: 16,
+    height: 14,
     content: pageNumber,
     style: {
       fontFamily: 'Noto Serif TC',
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: 'bold',
       fontStyle: 'normal',
       textAlign: 'right',
       lineHeight: 1.2,
       letterSpacing: 1,
-      color: COLORS.inkLight,
+      color: COLORS.ink,
     },
   }
   elements.push(footerRight)
@@ -563,14 +664,49 @@ function generateWeatherPageElements(
 export const japaneseStyleV1Memo: PageTemplate = {
   id: 'japanese-style-v1-memo',
   name: '日系風格 - 備忘錄',
-  description: '旅遊提醒/注意事項頁面',
+  description: '旅遊提醒/注意事項頁面（列表式）',
   thumbnailUrl: '/templates/japanese-style-v1-memo.png',
-  category: 'info',
+  category: 'memo',
 
   generateElements(data: TemplateData): CanvasElement[] {
+    // 檢查是否有自訂的備忘錄內容（新增頁面時選擇的項目）
+    const customMemoContent = (data as { memoPageContent?: {
+      items?: MemoItem[]
+      seasons?: SeasonInfo[]
+      infoItems?: MemoInfoItem[]
+      isWeatherPage?: boolean
+    } }).memoPageContent
+
     const memoSettings = data.memoSettings
+
+    if (customMemoContent) {
+      // 使用自訂內容
+      const title = memoSettings?.title || '旅遊小提醒'
+      const subtitle = memoSettings?.subtitle || 'Travel Tips'
+      const footerText = memoSettings?.footerText || '旅の心得'
+      const pageNumber = `P.${String(data.currentMemoPageIndex || 1).padStart(2, '0')}`
+
+      if (customMemoContent.isWeatherPage) {
+        return generateWeatherPageElements(
+          customMemoContent.seasons || [],
+          customMemoContent.infoItems || [],
+          title,
+          footerText,
+          pageNumber
+        )
+      } else {
+        return generateListPageElements(
+          customMemoContent.items || [],
+          title,
+          subtitle,
+          footerText,
+          pageNumber
+        )
+      }
+    }
+
+    // 舊版相容：使用 memoSettings
     if (!memoSettings) {
-      // 沒有備忘錄設定，返回空白頁
       const emptyText: TextElement = {
         ...createBaseElement('memo-empty', '空白提示'),
         type: 'text',
@@ -593,16 +729,44 @@ export const japaneseStyleV1Memo: PageTemplate = {
       return [emptyText]
     }
 
-    const pageIndex = data.currentMemoPageIndex || 0
-    const { items, isWeatherPage } = getMemoItemsForPage(memoSettings, pageIndex)
+    // 從 memoSettings 取得啟用的項目
+    const enabledItems = memoSettings.items?.filter(i => i.enabled) || []
+    const enabledSeasons = memoSettings.seasons?.filter(s => s.enabled) || []
+    const enabledInfoItems = memoSettings.infoItems?.filter(i => i.enabled) || []
 
-    // 計算頁碼（備忘錄頁碼從行程頁之後開始）
+    const pageIndex = data.currentMemoPageIndex || 0
+    const itemsPerPage = 7 // 列表式可以放更多項目
     const pageNumber = `P.${String(pageIndex + 1).padStart(2, '0')}`
 
-    if (isWeatherPage) {
-      // 天氣頁
-      const enabledSeasons = memoSettings.seasons?.filter(s => s.enabled) || []
-      const enabledInfoItems = memoSettings.infoItems?.filter(i => i.enabled) || []
+    // 計算項目頁數
+    const itemPages = Math.ceil(enabledItems.length / itemsPerPage)
+
+    // 如果沒有任何內容被啟用，顯示提示
+    if (enabledItems.length === 0 && enabledSeasons.length === 0 && enabledInfoItems.length === 0) {
+      const emptyText: TextElement = {
+        ...createBaseElement('memo-empty', '空白提示'),
+        type: 'text',
+        x: PADDING,
+        y: PAGE_HEIGHT / 2 - 20,
+        width: PAGE_WIDTH - PADDING * 2,
+        height: 40,
+        content: '請在右側面板勾選要顯示的項目',
+        style: {
+          fontFamily: 'Noto Serif TC',
+          fontSize: 14,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textAlign: 'center',
+          lineHeight: 1.4,
+          letterSpacing: 0.5,
+          color: COLORS.inkLight,
+        },
+      }
+      return [emptyText]
+    }
+
+    // 如果只有天氣/緊急資訊（沒有一般項目），直接顯示天氣頁
+    if (enabledItems.length === 0 && (enabledSeasons.length > 0 || enabledInfoItems.length > 0)) {
       return generateWeatherPageElements(
         enabledSeasons,
         enabledInfoItems,
@@ -610,15 +774,32 @@ export const japaneseStyleV1Memo: PageTemplate = {
         memoSettings.footerText,
         pageNumber
       )
-    } else {
+    }
+
+    if (pageIndex < itemPages) {
       // 項目頁
-      return generateItemPageElements(
-        items,
+      const start = pageIndex * itemsPerPage
+      const end = start + itemsPerPage
+      const pageItems = enabledItems.slice(start, end)
+
+      return generateListPageElements(
+        pageItems,
         memoSettings.title,
         memoSettings.subtitle,
         memoSettings.footerText,
         pageNumber
       )
+    } else if (enabledSeasons.length > 0 || enabledInfoItems.length > 0) {
+      // 天氣/資訊頁（需要另開一頁備忘錄）
+      return generateWeatherPageElements(
+        enabledSeasons,
+        enabledInfoItems,
+        memoSettings.title,
+        memoSettings.footerText,
+        pageNumber
+      )
     }
+
+    return []
   },
 }

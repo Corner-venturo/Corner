@@ -16,6 +16,7 @@ import { memoryCache } from '@/lib/cache/memory-cache'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom, castRows, castRow } from '@/lib/supabase/typed-client'
 import { canCrossWorkspace, type UserRole } from '@/lib/rbac-config'
+import { shouldCrossWorkspace } from '@/lib/workspace-context'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 // 型別定義
@@ -186,14 +187,14 @@ export function createStore<T extends BaseEntity>(
           // 🔒 Workspace 隔離：若啟用 workspaceScoped，自動過濾 workspace_id
           if (config.workspaceScoped) {
             const { workspaceId, userRole } = getCurrentUserContext()
+            const isSuperAdmin = canCrossWorkspace(userRole)
 
-            // Super Admin 可以跨 workspace 查詢，不加過濾
-            if (!canCrossWorkspace(userRole) && workspaceId) {
-              // 向後相容：同時查詢符合當前 workspace 或 workspace_id 為 NULL 的舊資料
+            // 只有 Super Admin 且明確開啟跨 workspace 模式才不過濾
+            if (shouldCrossWorkspace(isSuperAdmin)) {
+              // 跨 workspace 模式：不加過濾
+            } else if (workspaceId) {
+              // 一般使用者或 Super Admin 預設模式：過濾到自己的 workspace
               query = query.or(`workspace_id.eq.${workspaceId},workspace_id.is.null`)
-              logger.log(`🔒 [${tableName}] Workspace 隔離：查詢 workspace_id=${workspaceId} 或 NULL（舊資料）`)
-            } else if (canCrossWorkspace(userRole)) {
-              logger.log(`🌐 [${tableName}] Super Admin：跨 workspace 查詢`)
             }
           }
 

@@ -12,20 +12,20 @@ import {
   Circle,
   Square,
   Type,
-  Star,
-  Heart,
   ArrowRight,
   MoreHorizontal,
   Sparkles,
   Award,
   Frame,
-  Camera,
-  Plane,
-  Compass,
+  Image as ImageIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getAllStickers, getStickersByCategory, STICKER_CATEGORIES, type StickerDefinition } from './core/sticker-paths'
+import { getStickersByCategory, STICKER_CATEGORIES, type StickerDefinition } from './core/sticker-paths'
+import { IconPicker } from './IconPicker'
+import { ImageLibraryPicker } from './ImageLibraryPicker'
+import { ColorfulIconPicker } from './ColorfulIconPicker'
+import { QRCodeGenerator } from './QRCodeGenerator'
 import type { StickerCategory } from './types'
 
 interface ElementLibraryProps {
@@ -33,6 +33,10 @@ interface ElementLibraryProps {
   onAddShape: (type: 'rectangle' | 'circle') => void
   onAddText: () => void
   onAddSticker: (stickerId: string, category: StickerCategory) => void
+  onAddIcon?: (iconName: string, iconSet: string) => void
+  onAddImage?: (imageUrl: string, attribution?: { name: string; link: string }) => void
+  onAddColorfulIcon?: (iconName: string) => void
+  onAddQRCode?: (dataUrl: string) => void
 }
 
 // 線條樣式選項
@@ -54,6 +58,10 @@ export function ElementLibrary({
   onAddShape,
   onAddText,
   onAddSticker,
+  onAddIcon,
+  onAddImage,
+  onAddColorfulIcon,
+  onAddQRCode,
 }: ElementLibraryProps) {
   const [activeTab, setActiveTab] = useState('elements')
 
@@ -67,10 +75,14 @@ export function ElementLibrary({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid grid-cols-3 mx-2 mt-2">
-          <TabsTrigger value="elements" className="text-xs">基本</TabsTrigger>
-          <TabsTrigger value="lines" className="text-xs">線條</TabsTrigger>
-          <TabsTrigger value="stickers" className="text-xs">圖案</TabsTrigger>
+        <TabsList className="grid grid-cols-7 mx-2 mt-2">
+          <TabsTrigger value="elements" className="text-xs px-1">基本</TabsTrigger>
+          <TabsTrigger value="lines" className="text-xs px-1">線條</TabsTrigger>
+          <TabsTrigger value="stickers" className="text-xs px-1">圖案</TabsTrigger>
+          <TabsTrigger value="colorful" className="text-xs px-1">彩色</TabsTrigger>
+          <TabsTrigger value="icons" className="text-xs px-1">圖示</TabsTrigger>
+          <TabsTrigger value="images" className="text-xs px-1">圖片</TabsTrigger>
+          <TabsTrigger value="qrcode" className="text-xs px-1">QR</TabsTrigger>
         </TabsList>
 
         <div className="flex-1 overflow-auto">
@@ -169,6 +181,34 @@ export function ElementLibrary({
                 </div>
               )
             })}
+          </TabsContent>
+
+          {/* 彩色圖標（使用 Iconify API） */}
+          <TabsContent value="colorful" className="flex-1 h-full m-0 p-0">
+            {onAddColorfulIcon && (
+              <ColorfulIconPicker onSelectIcon={onAddColorfulIcon} />
+            )}
+          </TabsContent>
+
+          {/* 圖示庫 */}
+          <TabsContent value="icons" className="flex-1 h-full m-0 p-0">
+            {onAddIcon && (
+              <IconPicker onSelectIcon={onAddIcon} />
+            )}
+          </TabsContent>
+
+          {/* 圖片庫 (Unsplash + Pexels) */}
+          <TabsContent value="images" className="flex-1 h-full m-0 p-0">
+            {onAddImage && (
+              <ImageLibraryPicker onSelectImage={onAddImage} />
+            )}
+          </TabsContent>
+
+          {/* QR Code 生成器 */}
+          <TabsContent value="qrcode" className="flex-1 h-full m-0 p-0">
+            {onAddQRCode && (
+              <QRCodeGenerator onGenerate={onAddQRCode} />
+            )}
           </TabsContent>
         </div>
       </Tabs>
