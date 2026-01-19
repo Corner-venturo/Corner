@@ -103,6 +103,71 @@ interface DesignType {
 // 印刷標準：300 DPI，含 3mm 出血
 // A5: 148x210mm + 出血 = 154x216mm @ 300DPI = 1819x2551px
 // A4: 210x297mm + 出血 = 216x303mm @ 300DPI = 2551x3579px
+
+// 舊尺寸（96 DPI）與新尺寸（300 DPI）的縮放
+const OLD_A5_WIDTH = 559
+const OLD_A5_HEIGHT = 794
+const NEW_A5_WIDTH = 1819
+const NEW_A5_HEIGHT = 2551
+const LEGACY_SCALE_FACTOR = NEW_A5_WIDTH / OLD_A5_WIDTH // ≈ 3.254
+
+/**
+ * 檢測是否為舊尺寸設計（需要縮放）
+ */
+function isLegacySize(width: number, height: number): boolean {
+  // 舊 A5 尺寸範圍（允許一點誤差）
+  return width < 1000 && height < 1200
+}
+
+/**
+ * 縮放 fabricData 中的所有物件
+ */
+function scaleFabricData(fabricData: Record<string, unknown>, scaleFactor: number): Record<string, unknown> {
+  if (!fabricData || typeof fabricData !== 'object') return fabricData
+
+  const scaled = { ...fabricData }
+
+  // 縮放物件陣列
+  if (Array.isArray(fabricData.objects)) {
+    scaled.objects = fabricData.objects.map((obj: Record<string, unknown>) => {
+      const scaledObj = { ...obj }
+
+      // 縮放位置和尺寸
+      if (typeof obj.left === 'number') scaledObj.left = obj.left * scaleFactor
+      if (typeof obj.top === 'number') scaledObj.top = obj.top * scaleFactor
+      if (typeof obj.width === 'number') scaledObj.width = obj.width * scaleFactor
+      if (typeof obj.height === 'number') scaledObj.height = obj.height * scaleFactor
+      if (typeof obj.scaleX === 'number') scaledObj.scaleX = obj.scaleX * scaleFactor
+      if (typeof obj.scaleY === 'number') scaledObj.scaleY = obj.scaleY * scaleFactor
+
+      // 縮放字體大小
+      if (typeof obj.fontSize === 'number') scaledObj.fontSize = obj.fontSize * scaleFactor
+
+      // 縮放邊框寬度
+      if (typeof obj.strokeWidth === 'number') scaledObj.strokeWidth = obj.strokeWidth * scaleFactor
+
+      // 縮放圓角
+      if (typeof obj.rx === 'number') scaledObj.rx = obj.rx * scaleFactor
+      if (typeof obj.ry === 'number') scaledObj.ry = obj.ry * scaleFactor
+
+      // 縮放線條起點終點
+      if (typeof obj.x1 === 'number') scaledObj.x1 = obj.x1 * scaleFactor
+      if (typeof obj.y1 === 'number') scaledObj.y1 = obj.y1 * scaleFactor
+      if (typeof obj.x2 === 'number') scaledObj.x2 = obj.x2 * scaleFactor
+      if (typeof obj.y2 === 'number') scaledObj.y2 = obj.y2 * scaleFactor
+
+      // 縮放路徑（clipPath 等）
+      if (obj.clipPath && typeof obj.clipPath === 'object') {
+        scaledObj.clipPath = scaleFabricData(obj.clipPath as Record<string, unknown>, scaleFactor)
+      }
+
+      return scaledObj
+    })
+  }
+
+  return scaled
+}
+
 const DESIGN_TYPES: DesignType[] = [
   {
     id: 'brochure-a5',
@@ -1575,7 +1640,7 @@ export default function DesignerPage() {
       const savedTemplateData = versionData.templateData as Record<string, unknown> | null
       const savedStyleId = versionData.styleId as string | null
 
-      // 還原頁面資料
+      // 還原頁面資料（偵測舊尺寸並自動縮放）
       const restoredPages = savedPages.map(page => {
         // 修正舊資料的 templateKey（行程總覽原本錯誤設為 'daily'）
         let fixedTemplateKey = page.templateKey
@@ -1583,15 +1648,38 @@ export default function DesignerPage() {
           fixedTemplateKey = 'itinerary'
         }
 
+        // 檢測是否為舊尺寸（96 DPI），需要縮放到新尺寸（300 DPI）
+        const needsScale = isLegacySize(page.width, page.height)
+        const scaledWidth = needsScale ? NEW_A5_WIDTH : page.width
+        const scaledHeight = needsScale ? NEW_A5_HEIGHT : page.height
+        const scaledFabricData = needsScale && page.fabricData
+          ? scaleFabricData(page.fabricData, LEGACY_SCALE_FACTOR)
+          : page.fabricData
+
+        // 縮放 elements（如果有的話）
+        const scaledElements = needsScale
+          ? page.elements.map(el => ({
+              ...el,
+              x: el.x * LEGACY_SCALE_FACTOR,
+              y: el.y * LEGACY_SCALE_FACTOR,
+              width: el.width ? el.width * LEGACY_SCALE_FACTOR : el.width,
+              height: el.height ? el.height * LEGACY_SCALE_FACTOR : el.height,
+            }))
+          : page.elements
+
+        if (needsScale) {
+          logger.log(`[Legacy Scale] 頁面 "${page.name}" 從 ${page.width}x${page.height} 縮放到 ${scaledWidth}x${scaledHeight}`)
+        }
+
         return {
           id: page.id,
           name: page.name,
           templateKey: fixedTemplateKey,
-          width: page.width,
-          height: page.height,
+          width: scaledWidth,
+          height: scaledHeight,
           backgroundColor: page.backgroundColor,
-          elements: page.elements,
-          fabricData: page.fabricData, // 還原畫布資料
+          elements: scaledElements,
+          fabricData: scaledFabricData, // 縮放後的畫布資料
           memoPageContent: page.memoPageContent, // 還原備忘錄內容
         }
       }) as CanvasPage[]
