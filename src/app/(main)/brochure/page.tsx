@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useSearchParams } from 'next/navigation'
 import * as fabric from 'fabric'
 import {
@@ -2794,6 +2795,12 @@ function BrochurePrintPreview({
 }: BrochurePrintPreviewProps) {
   const [pageImages, setPageImages] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  // 確保 createPortal 只在客戶端執行
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // 生成所有頁面的圖片
   useEffect(() => {
@@ -2832,11 +2839,45 @@ function BrochurePrintPreview({
           tempFabricCanvas.clear()
           tempFabricCanvas.backgroundColor = page.backgroundColor || '#ffffff'
 
-          // 優先使用 elements 渲染（更可靠）
-          // fabricData 在臨時畫布上可能會有問題
-          if (page.elements && page.elements.length > 0) {
-            // 使用 renderPageOnCanvas 渲染
-            console.log(`[PDF Export] Page ${i + 1}: Using renderPageOnCanvas with ${page.elements.length} elements`)
+          // 檢查 fabricData 是否有效（有 objects 陣列且不為空）
+          const fabricDataObjects = fabricData ? (fabricData as { objects?: unknown[] }).objects : undefined
+          const hasValidFabricData = fabricData && Array.isArray(fabricDataObjects) && fabricDataObjects.length > 0
+
+          // 優先使用 fabricData（編輯後的內容），沒有才用 elements（原始模板）
+          if (hasValidFabricData) {
+            // 使用 fabricData（這是用戶編輯後的內容）
+            console.log(`[PDF Export] Page ${i + 1}: Using fabricData (edited content) with ${fabricDataObjects?.length} objects`)
+            try {
+              // Fabric.js 6.x 使用 Promise-based API
+              await Promise.race([
+                (async () => {
+                  await tempFabricCanvas.loadFromJSON(fabricData)
+                  tempFabricCanvas.renderAll()
+                })(),
+                new Promise<void>((_, reject) =>
+                  setTimeout(() => reject(new Error(`Page ${i + 1} fabricData timeout`)), 5000)
+                )
+              ])
+              console.log(`[PDF Export] Page ${i + 1}: fabricData loaded successfully`)
+            } catch (loadErr) {
+              console.warn(`[PDF Export] Page ${i + 1}: fabricData failed, trying elements fallback:`, loadErr)
+              // fabricData 失敗時，嘗試用 elements
+              if (page.elements && page.elements.length > 0) {
+                try {
+                  await renderPageOnCanvas(tempFabricCanvas, page, {
+                    isEditable: false,
+                    canvasWidth,
+                    canvasHeight,
+                  })
+                  console.log(`[PDF Export] Page ${i + 1}: elements fallback succeeded`)
+                } catch {
+                  logger.error(`[PDF Export] Page ${i + 1}: elements fallback also failed`)
+                }
+              }
+            }
+          } else if (page.elements && page.elements.length > 0) {
+            // 沒有 fabricData，使用 elements（原始模板，例如新生成的 memo 頁面）
+            console.log(`[PDF Export] Page ${i + 1}: Using elements (original template) with ${page.elements.length} elements`)
             try {
               await renderPageOnCanvas(tempFabricCanvas, page, {
                 isEditable: false,
@@ -2846,55 +2887,11 @@ function BrochurePrintPreview({
               console.log(`[PDF Export] Page ${i + 1}: renderPageOnCanvas completed`)
             } catch (renderErr) {
               logger.error(`[PDF Export] Page ${i + 1}: renderPageOnCanvas failed:`, renderErr)
-              // 如果 elements 渲染失敗，嘗試用 fabricData
-              const fabricData = (page as CanvasPage & { fabricData?: Record<string, unknown> }).fabricData
-              if (fabricData) {
-                try {
-                  // Fabric.js 6.x 使用 Promise-based API
-                  await Promise.race([
-                    (async () => {
-                      await tempFabricCanvas.loadFromJSON(fabricData)
-                      tempFabricCanvas.renderAll()
-                    })(),
-                    new Promise<void>((_, reject) =>
-                      setTimeout(() => reject(new Error(`Page ${i + 1} fabricData timeout`)), 5000)
-                    )
-                  ])
-                  console.log(`[PDF Export] Page ${i + 1}: fabricData fallback succeeded`)
-                } catch {
-                  logger.error(`[PDF Export] Page ${i + 1}: fabricData also failed`)
-                }
-              }
             }
           } else {
-            // 沒有 elements，嘗試用 fabricData
-            const fabricData = (page as CanvasPage & { fabricData?: Record<string, unknown> }).fabricData
-            if (fabricData) {
-              console.log(`[PDF Export] Page ${i + 1}: Using fabricData (no elements)`)
-              try {
-                // Fabric.js 6.x 使用 Promise-based API
-                await Promise.race([
-                  (async () => {
-                    await tempFabricCanvas.loadFromJSON(fabricData)
-                    tempFabricCanvas.renderAll()
-                  })(),
-                  new Promise<void>((_, reject) =>
-                    setTimeout(() => reject(new Error(`Page ${i + 1} render timeout`)), 5000)
-                  )
-                ])
-                console.log(`[PDF Export] Page ${i + 1}: fabricData loaded successfully`)
-              } catch (loadErr) {
-                console.warn(`[PDF Export] Page ${i + 1}: fabricData failed, rendering blank page:`, loadErr)
-                // fabricData 失敗時，確保畫布只有背景色
-                tempFabricCanvas.clear()
-                tempFabricCanvas.backgroundColor = page.backgroundColor || '#ffffff'
-                tempFabricCanvas.renderAll()
-              }
-            } else {
-              // 沒有 fabricData 也沒有 elements，只渲染背景色
-              console.log(`[PDF Export] Page ${i + 1}: No elements or fabricData, rendering background only`)
-              tempFabricCanvas.renderAll()
-            }
+            // 沒有 fabricData 也沒有 elements，只渲染背景色
+            console.log(`[PDF Export] Page ${i + 1}: No valid fabricData or elements, rendering background only`)
+            tempFabricCanvas.renderAll()
           }
 
           // 等待渲染
@@ -2939,9 +2936,107 @@ function BrochurePrintPreview({
     generateImages()
   }, [pages, canvasWidth, canvasHeight])
 
-  // 處理列印
+  // 處理列印 - 開新視窗列印（參考報價單的做法）
   const handlePrint = () => {
-    window.print()
+    console.log(`[PDF Print] Opening print window with ${pageImages.length} images`)
+    console.log(`[PDF Print] Image lengths:`, pageImages.map((img, i) => `Page ${i+1}: ${img.length}`))
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600')
+    if (!printWindow) {
+      alert('請允許彈出視窗以進行列印')
+      return
+    }
+
+    // 過濾掉空的或太小的圖片（可能是空白頁）
+    const validImages = pageImages.filter((img, index) => {
+      const isValid = img && img.length > 10000 // dataURL 應該至少有這麼長
+      if (!isValid) {
+        console.warn(`[PDF Print] Page ${index + 1} filtered out - length: ${img?.length || 0}`)
+      }
+      return isValid
+    })
+
+    console.log(`[PDF Print] Valid images after filter: ${validImages.length}`)
+
+    const imagesHtml = validImages.map((img, index) =>
+      `<div class="page-container"><img src="${img}" alt="第 ${index + 1} 頁" /></div>`
+    ).join('')
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${documentName || '手冊列印'}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { background: #f5f5f5; }
+          .print-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            text-align: right;
+            z-index: 100;
+          }
+          .print-controls button {
+            padding: 8px 16px;
+            margin-left: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+          }
+          .btn-outline { background: white; border: 1px solid #ddd; }
+          .btn-outline:hover { background: #f5f5f5; }
+          .btn-primary { background: #c9aa7c; color: white; border: none; }
+          .btn-primary:hover { background: #b8996b; }
+          .content { padding: 70px 20px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+          .page-container {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 100%;
+          }
+          .page-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+          }
+          @media print {
+            .print-controls { display: none !important; }
+            body { background: white; }
+            .content { padding: 0; gap: 0; }
+            .page-container {
+              box-shadow: none;
+              page-break-after: always;
+              page-break-inside: avoid;
+            }
+            .page-container:last-child { page-break-after: auto; }
+            .page-container img {
+              width: 100%;
+              max-width: 100%;
+              height: auto;
+            }
+            @page {
+              size: A5 portrait;
+              margin: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-controls">
+          <button class="btn-outline" onclick="window.close()">關閉</button>
+          <button class="btn-primary" onclick="window.print()">列印 / 儲存 PDF</button>
+        </div>
+        <div class="content">
+          ${imagesHtml}
+        </div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
   }
 
   // ESC 鍵關閉
@@ -2955,47 +3050,70 @@ function BrochurePrintPreview({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  return (
+  // 等待客戶端掛載
+  if (!mounted) return null
+
+  return createPortal(
     <>
       {/* 列印專用樣式 */}
       <style>{`
         @media print {
-          /* 隱藏所有非列印內容 - 使用更通用的選擇器適配 Next.js */
-          body * {
-            visibility: hidden;
-          }
-          #brochure-print-overlay,
-          #brochure-print-overlay * {
-            visibility: visible;
-          }
-          #brochure-print-overlay {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            background: white !important;
-            padding: 0 !important;
-          }
-          #brochure-print-overlay .print-controls {
+          /* 隱藏頁面上所有其他內容 - .print-portal 是 body 的直接子元素 */
+          body > *:not(.print-portal) {
             display: none !important;
           }
+
+          /* 列印用的容器 */
+          .print-portal {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            height: auto !important;
+            background: white !important;
+            overflow: visible !important;
+          }
+
+          /* 隱藏控制列 */
+          .print-controls {
+            display: none !important;
+          }
+
+          /* 頁面容器 */
           #brochure-print-pages {
+            display: block !important;
             max-height: none !important;
             overflow: visible !important;
             padding: 0 !important;
-            display: block !important;
+            margin: 0 !important;
+            background: white !important;
           }
-          .brochure-page-image {
+
+          /* 每頁圖片的容器 */
+          #brochure-print-pages > div {
+            display: block !important;
             page-break-after: always;
             page-break-inside: avoid;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            width: 100% !important;
+          }
+
+          #brochure-print-pages > div:last-child {
+            page-break-after: auto;
+          }
+
+          /* 圖片本身 */
+          .brochure-page-image {
+            display: block !important;
             width: 100% !important;
             max-width: 100% !important;
             height: auto !important;
-            display: block !important;
+            page-break-inside: avoid;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          .brochure-page-image:last-child {
-            page-break-after: auto;
-          }
+
           @page {
             size: A5 portrait;
             margin: 0;
@@ -3006,7 +3124,7 @@ function BrochurePrintPreview({
       {/* 預覽 Overlay */}
       <div
         id="brochure-print-overlay"
-        className="fixed inset-0 bg-black/80 z-[9999] flex flex-col"
+        className="print-portal fixed inset-0 bg-black/80 z-[9999] flex flex-col"
         onClick={onClose}
       >
         {/* 控制列 */}
@@ -3070,6 +3188,7 @@ function BrochurePrintPreview({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }
