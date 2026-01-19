@@ -3005,18 +3005,38 @@ function BrochurePrintPreview({
           }
           @media print {
             .print-controls { display: none !important; }
-            body { background: white; }
-            .content { padding: 0; gap: 0; }
+            html, body {
+              background: white !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            .content {
+              padding: 0 !important;
+              gap: 0 !important;
+              margin: 0 !important;
+              display: block !important;
+            }
             .page-container {
-              box-shadow: none;
+              box-shadow: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              width: 100% !important;
+              height: 100vh !important;
               page-break-after: always;
               page-break-inside: avoid;
+              break-after: page;
+              break-inside: avoid;
+              overflow: hidden;
             }
-            .page-container:last-child { page-break-after: auto; }
+            .page-container:last-child {
+              page-break-after: auto;
+              break-after: auto;
+            }
             .page-container img {
-              width: 100%;
-              max-width: 100%;
-              height: auto;
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: contain;
+              display: block !important;
             }
             @page {
               size: A5 portrait;
