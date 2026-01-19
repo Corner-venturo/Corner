@@ -4,10 +4,10 @@
  * 漸層選擇器組件
  *
  * 支援線性漸層和放射漸層
- * 使用 react-gradient-color-picker
+ * 使用 react-best-gradient-color-picker
  */
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -174,7 +174,19 @@ function SolidColorPicker({
   )
 }
 
-// 漸層自訂選擇器 - 使用 state 來延遲載入
+// 漸層自訂選擇器 - 使用 dynamic import
+const DynamicColorPicker = dynamic(
+  () => import('react-best-gradient-color-picker').then((mod) => mod.default),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center h-[180px]">
+        <Loader2 className="animate-spin text-morandi-secondary" size={24} />
+      </div>
+    ),
+    ssr: false,
+  }
+)
+
 function GradientColorPicker({
   value,
   onChange,
@@ -182,97 +194,25 @@ function GradientColorPicker({
   value: string
   onChange: (gradient: string) => void
 }) {
-  const [ColorPickerModule, setColorPickerModule] = useState<{
-    default: React.ComponentType<{
-      value: string
-      onChange: (value: string) => void
-      hideControls?: boolean
-      hideInputs?: boolean
-      hidePresets?: boolean
-      hideColorGuide?: boolean
-      hideAdvancedSliders?: boolean
-      height?: number
-      width?: number
-    }>
-    useColorPicker: (value: string, onChange: (value: string) => void) => { setGradient: (value: string) => void }
-  } | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // 只在 client side 載入
-    import('react-gradient-color-picker')
-      .then((mod) => {
-        setColorPickerModule(mod)
-        setIsLoading(false)
-      })
-      .catch((err) => {
-        console.error('Failed to load color picker:', err)
-        setIsLoading(false)
-      })
-  }, [])
-
-  if (isLoading || !ColorPickerModule) {
-    return (
-      <div className="flex items-center justify-center h-[150px]">
-        <Loader2 className="animate-spin text-morandi-secondary" size={24} />
-      </div>
-    )
-  }
-
-  const { default: ColorPicker, useColorPicker } = ColorPickerModule
-
-  return (
-    <GradientColorPickerInner
-      ColorPicker={ColorPicker}
-      useColorPicker={useColorPicker}
-      value={value}
-      onChange={onChange}
-    />
-  )
-}
-
-// 內部組件，只有在模組載入後才會渲染
-function GradientColorPickerInner({
-  ColorPicker,
-  useColorPicker,
-  value,
-  onChange,
-}: {
-  ColorPicker: React.ComponentType<{
-    value: string
-    onChange: (value: string) => void
-    hideControls?: boolean
-    hideInputs?: boolean
-    hidePresets?: boolean
-    hideColorGuide?: boolean
-    hideAdvancedSliders?: boolean
-    height?: number
-    width?: number
-  }>
-  useColorPicker: (value: string, onChange: (value: string) => void) => { setGradient: (value: string) => void }
-  value: string
-  onChange: (gradient: string) => void
-}) {
-  const { setGradient } = useColorPicker(value, onChange)
-
   return (
     <div className="gradient-picker-wrapper">
-      <ColorPicker
+      <DynamicColorPicker
         value={value}
-        onChange={setGradient}
-        hideControls={false}
+        onChange={onChange}
         hideInputs={false}
+        hideOpacity={true}
         hidePresets={true}
         hideColorGuide={true}
         hideAdvancedSliders={true}
+        hideColorTypeBtns={true}
         height={150}
         width={250}
       />
       <style jsx global>{`
-        .gradient-picker-wrapper .input_color {
+        .gradient-picker-wrapper input {
           font-size: 12px !important;
         }
-        .gradient-picker-wrapper .input_label {
+        .gradient-picker-wrapper label {
           font-size: 10px !important;
         }
       `}</style>
