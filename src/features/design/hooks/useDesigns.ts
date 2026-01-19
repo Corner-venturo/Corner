@@ -109,6 +109,61 @@ export function useDesigns() {
   }
 
   const deleteDesign = async (id: string) => {
+    // 1. 取得所有版本資料，找出使用的圖片
+    const { data: versions } = await supabase
+      .from('brochure_versions')
+      .select('data')
+      .eq('document_id', id)
+
+    // 2. 從版本資料中解析出所有圖片 URL
+    const imageUrls: string[] = []
+    if (versions) {
+      for (const version of versions) {
+        const versionData = version.data as Record<string, unknown>
+        if (versionData?.pages && Array.isArray(versionData.pages)) {
+          for (const page of versionData.pages as Array<{ fabricData?: Record<string, unknown> }>) {
+            if (page.fabricData?.objects && Array.isArray(page.fabricData.objects)) {
+              for (const obj of page.fabricData.objects as Array<{ type?: string; src?: string }>) {
+                if (obj.type === 'image' && obj.src && obj.src.includes('brochure-images')) {
+                  imageUrls.push(obj.src)
+                }
+              }
+            }
+          }
+        }
+        // 也檢查 templateData 中的封面圖片
+        const templateData = versionData?.templateData as Record<string, unknown> | undefined
+        if (templateData?.coverImage && typeof templateData.coverImage === 'string' && templateData.coverImage.includes('brochure-images')) {
+          imageUrls.push(templateData.coverImage)
+        }
+      }
+    }
+
+    // 3. 刪除 Storage 中的圖片
+    if (imageUrls.length > 0) {
+      // 從 URL 中提取檔案路徑
+      const filePaths = imageUrls
+        .map(url => {
+          // URL 格式: https://xxx.supabase.co/storage/v1/object/public/brochure-images/path/to/file.jpg
+          const match = url.match(/brochure-images\/(.+)$/)
+          return match ? match[1] : null
+        })
+        .filter((path): path is string => !!path)
+        // 去除重複
+        .filter((path, index, self) => self.indexOf(path) === index)
+
+      if (filePaths.length > 0) {
+        await supabase.storage.from('brochure-images').remove(filePaths)
+      }
+    }
+
+    // 4. 刪除版本記錄（cascade 會自動處理，但明確刪除更安全）
+    await supabase
+      .from('brochure_versions')
+      .delete()
+      .eq('document_id', id)
+
+    // 5. 刪除文件記錄
     const { error } = await supabase
       .from('brochure_documents')
       .delete()
