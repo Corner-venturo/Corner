@@ -104,19 +104,26 @@ interface DesignType {
 // A5: 148x210mm + 出血 = 154x216mm @ 300DPI = 1819x2551px
 // A4: 210x297mm + 出血 = 216x303mm @ 300DPI = 2551x3579px
 
-// 舊尺寸（96 DPI）與新尺寸（300 DPI）的縮放
-const OLD_A5_WIDTH = 559
-const OLD_A5_HEIGHT = 794
+// 標準 A5 尺寸（300 DPI，含出血）
 const NEW_A5_WIDTH = 1819
 const NEW_A5_HEIGHT = 2551
-const LEGACY_SCALE_FACTOR = NEW_A5_WIDTH / OLD_A5_WIDTH // ≈ 3.254
 
 /**
- * 檢測是否為舊尺寸設計（需要縮放）
+ * 檢測是否需要縮放（不是標準 300 DPI A5 尺寸）
+ * 允許 5% 的誤差範圍
  */
-function isLegacySize(width: number, height: number): boolean {
-  // 舊 A5 尺寸範圍（允許一點誤差）
-  return width < 1000 && height < 1200
+function needsScaling(width: number, height: number): boolean {
+  const tolerance = 0.05 // 5% 誤差
+  const widthMatch = Math.abs(width - NEW_A5_WIDTH) / NEW_A5_WIDTH < tolerance
+  const heightMatch = Math.abs(height - NEW_A5_HEIGHT) / NEW_A5_HEIGHT < tolerance
+  return !(widthMatch && heightMatch)
+}
+
+/**
+ * 計算縮放因子（基於寬度）
+ */
+function calculateScaleFactor(width: number): number {
+  return NEW_A5_WIDTH / width
 }
 
 /**
@@ -1648,27 +1655,44 @@ export default function DesignerPage() {
           fixedTemplateKey = 'itinerary'
         }
 
-        // 檢測是否為舊尺寸（96 DPI），需要縮放到新尺寸（300 DPI）
-        const needsScale = isLegacySize(page.width, page.height)
-        const scaledWidth = needsScale ? NEW_A5_WIDTH : page.width
-        const scaledHeight = needsScale ? NEW_A5_HEIGHT : page.height
-        const scaledFabricData = needsScale && page.fabricData
-          ? scaleFabricData(page.fabricData, LEGACY_SCALE_FACTOR)
+        // 檢測是否需要縮放到標準 A5 尺寸（300 DPI）
+        const shouldScale = needsScaling(page.width, page.height)
+        const scaleFactor = shouldScale ? calculateScaleFactor(page.width) : 1
+        const scaledWidth = shouldScale ? NEW_A5_WIDTH : page.width
+        const scaledHeight = shouldScale ? NEW_A5_HEIGHT : page.height
+        const scaledFabricData = shouldScale && page.fabricData
+          ? scaleFabricData(page.fabricData, scaleFactor)
           : page.fabricData
 
         // 縮放 elements（如果有的話）
-        const scaledElements = needsScale
-          ? page.elements.map(el => ({
-              ...el,
-              x: el.x * LEGACY_SCALE_FACTOR,
-              y: el.y * LEGACY_SCALE_FACTOR,
-              width: el.width ? el.width * LEGACY_SCALE_FACTOR : el.width,
-              height: el.height ? el.height * LEGACY_SCALE_FACTOR : el.height,
-            }))
+        const scaledElements = shouldScale
+          ? page.elements.map(el => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const scaled: any = { ...el }
+              scaled.x = el.x * scaleFactor
+              scaled.y = el.y * scaleFactor
+              // 縮放有寬高的元素
+              if ('width' in el && el.width) scaled.width = el.width * scaleFactor
+              if ('height' in el && el.height) scaled.height = el.height * scaleFactor
+              // 縮放文字元素的字體大小
+              if (el.type === 'text' && 'style' in el) {
+                scaled.style = { ...scaled.style, fontSize: scaled.style.fontSize * scaleFactor }
+              }
+              // 縮放圖標元素的尺寸
+              if (el.type === 'icon' && 'size' in el) {
+                scaled.size = scaled.size * scaleFactor
+              }
+              // 縮放形狀元素的圓角和邊框
+              if (el.type === 'shape') {
+                if (scaled.cornerRadius) scaled.cornerRadius = scaled.cornerRadius * scaleFactor
+                if (scaled.strokeWidth) scaled.strokeWidth = scaled.strokeWidth * scaleFactor
+              }
+              return scaled
+            })
           : page.elements
 
-        if (needsScale) {
-          logger.log(`[Legacy Scale] 頁面 "${page.name}" 從 ${page.width}x${page.height} 縮放到 ${scaledWidth}x${scaledHeight}`)
+        if (shouldScale) {
+          logger.log(`[Auto Scale] 頁面 "${page.name}" 從 ${page.width}x${page.height} 縮放到 ${scaledWidth}x${scaledHeight} (縮放因子: ${scaleFactor.toFixed(3)})`)
         }
 
         return {
