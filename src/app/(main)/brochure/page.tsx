@@ -97,26 +97,32 @@ interface DesignType {
   width: number
   height: number
   category: 'print' | 'social' | 'banner'
+  bleed?: number // 出血區域像素（印刷用）
 }
 
+// 印刷標準：300 DPI，含 3mm 出血
+// A5: 148x210mm + 出血 = 154x216mm @ 300DPI = 1819x2551px
+// A4: 210x297mm + 出血 = 216x303mm @ 300DPI = 2551x3579px
 const DESIGN_TYPES: DesignType[] = [
   {
     id: 'brochure-a5',
     name: '手冊 A5',
-    description: '148 x 210 mm (直式)',
+    description: '148 x 210 mm (含 3mm 出血)',
     icon: <BookOpen size={32} />,
-    width: 559,
-    height: 794,
+    width: 1819,
+    height: 2551,
     category: 'print',
+    bleed: 35, // 3mm @ 300DPI ≈ 35px
   },
   {
     id: 'brochure-a4',
     name: '手冊 A4',
-    description: '210 x 297 mm (直式)',
+    description: '210 x 297 mm (含 3mm 出血)',
     icon: <BookOpen size={32} />,
-    width: 794,
-    height: 1123,
+    width: 2551,
+    height: 3579,
     category: 'print',
+    bleed: 35,
   },
   {
     id: 'ig-square',
@@ -2722,6 +2728,8 @@ export default function DesignerPage() {
                 canvasWidth={canvasWidth}
                 canvasHeight={canvasHeight}
                 zoom={displayZoom}
+                printMode={selectedDesignType?.category === 'print'}
+                dpi={300}
               >
                 <div
                   style={{
@@ -2759,7 +2767,14 @@ export default function DesignerPage() {
 
           {/* Canvas Info (bottom right) */}
           <div className="absolute bottom-4 right-4 bg-card rounded-lg shadow-lg border border-border px-3 py-2 text-sm text-morandi-secondary">
-            {canvasWidth} x {canvasHeight} px
+            {selectedDesignType?.category === 'print' ? (
+              <>
+                {selectedDesignType?.id === 'brochure-a5' ? '148 × 210 mm (A5)' : '210 × 297 mm (A4)'}
+                <span className="text-xs ml-1 opacity-60">含出血</span>
+              </>
+            ) : (
+              `${canvasWidth} × ${canvasHeight} px`
+            )}
           </div>
         </main>
 

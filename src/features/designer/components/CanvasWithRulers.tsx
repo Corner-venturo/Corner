@@ -29,6 +29,10 @@ interface CanvasWithRulersProps {
   canvasHeight: number
   zoom: number
   children: React.ReactNode
+  /** 印刷模式：尺規顯示 mm 而非 px */
+  printMode?: boolean
+  /** DPI（印刷模式用，預設 300） */
+  dpi?: number
 }
 
 // ============================================
@@ -49,11 +53,15 @@ function Ruler({
   length,
   zoom,
   onDragStart,
+  printMode = false,
+  dpi = 300,
 }: {
   orientation: 'horizontal' | 'vertical'
   length: number
   zoom: number
   onDragStart: (e: React.MouseEvent) => void
+  printMode?: boolean
+  dpi?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -96,41 +104,87 @@ function Ruler({
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
 
-    for (let i = 0; i <= length; i += MINOR_TICK_INTERVAL) {
-      const pos = i * zoom
-      const isMajor = i % MAJOR_TICK_INTERVAL === 0
+    if (printMode) {
+      // 印刷模式：顯示 mm
+      // px to mm: px / dpi * 25.4
+      const pxPerMm = dpi / 25.4
+      const lengthMm = length / pxPerMm
+      const majorTickMm = 10 // 每 10mm 一個主刻度
+      const minorTickMm = 5  // 每 5mm 一個次刻度
 
-      if (isHorizontal) {
-        const tickHeight = isMajor ? 6 : 3
-        ctx.beginPath()
-        ctx.moveTo(pos, RULER_SIZE)
-        ctx.lineTo(pos, RULER_SIZE - tickHeight)
-        ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
-        ctx.lineWidth = 0.5
-        ctx.stroke()
+      for (let mm = 0; mm <= lengthMm; mm += minorTickMm) {
+        const px = mm * pxPerMm
+        const pos = px * zoom
+        const isMajor = mm % majorTickMm === 0
 
-        if (isMajor && i > 0) {
-          ctx.fillText(String(i), pos, 1)
+        if (isHorizontal) {
+          const tickHeight = isMajor ? 6 : 3
+          ctx.beginPath()
+          ctx.moveTo(pos, RULER_SIZE)
+          ctx.lineTo(pos, RULER_SIZE - tickHeight)
+          ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
+          ctx.lineWidth = 0.5
+          ctx.stroke()
+
+          if (isMajor && mm > 0) {
+            ctx.fillText(String(mm), pos, 1)
+          }
+        } else {
+          const tickWidth = isMajor ? 6 : 3
+          ctx.beginPath()
+          ctx.moveTo(RULER_SIZE, pos)
+          ctx.lineTo(RULER_SIZE - tickWidth, pos)
+          ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
+          ctx.lineWidth = 0.5
+          ctx.stroke()
+
+          if (isMajor && mm > 0) {
+            ctx.save()
+            ctx.translate(6, pos)
+            ctx.rotate(-Math.PI / 2)
+            ctx.fillText(String(mm), 0, 0)
+            ctx.restore()
+          }
         }
-      } else {
-        const tickWidth = isMajor ? 6 : 3
-        ctx.beginPath()
-        ctx.moveTo(RULER_SIZE, pos)
-        ctx.lineTo(RULER_SIZE - tickWidth, pos)
-        ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
-        ctx.lineWidth = 0.5
-        ctx.stroke()
+      }
+    } else {
+      // 螢幕模式：顯示 px
+      for (let i = 0; i <= length; i += MINOR_TICK_INTERVAL) {
+        const pos = i * zoom
+        const isMajor = i % MAJOR_TICK_INTERVAL === 0
 
-        if (isMajor && i > 0) {
-          ctx.save()
-          ctx.translate(6, pos)
-          ctx.rotate(-Math.PI / 2)
-          ctx.fillText(String(i), 0, 0)
-          ctx.restore()
+        if (isHorizontal) {
+          const tickHeight = isMajor ? 6 : 3
+          ctx.beginPath()
+          ctx.moveTo(pos, RULER_SIZE)
+          ctx.lineTo(pos, RULER_SIZE - tickHeight)
+          ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
+          ctx.lineWidth = 0.5
+          ctx.stroke()
+
+          if (isMajor && i > 0) {
+            ctx.fillText(String(i), pos, 1)
+          }
+        } else {
+          const tickWidth = isMajor ? 6 : 3
+          ctx.beginPath()
+          ctx.moveTo(RULER_SIZE, pos)
+          ctx.lineTo(RULER_SIZE - tickWidth, pos)
+          ctx.strokeStyle = isMajor ? '#c0bbb5' : '#d8d4cf'
+          ctx.lineWidth = 0.5
+          ctx.stroke()
+
+          if (isMajor && i > 0) {
+            ctx.save()
+            ctx.translate(6, pos)
+            ctx.rotate(-Math.PI / 2)
+            ctx.fillText(String(i), 0, 0)
+            ctx.restore()
+          }
         }
       }
     }
-  }, [orientation, length, zoom])
+  }, [orientation, length, zoom, printMode, dpi])
 
   return (
     <canvas
@@ -342,6 +396,8 @@ export function CanvasWithRulers({
   canvasHeight,
   zoom,
   children,
+  printMode = false,
+  dpi = 300,
 }: CanvasWithRulersProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [guides, setGuides] = useState<Guide[]>([])
@@ -492,6 +548,8 @@ export function CanvasWithRulers({
         length={canvasWidth}
         zoom={zoom}
         onDragStart={handleRulerDragStart('horizontal')}
+        printMode={printMode}
+        dpi={dpi}
       />
 
       {/* 垂直尺規 */}
@@ -500,6 +558,8 @@ export function CanvasWithRulers({
         length={canvasHeight}
         zoom={zoom}
         onDragStart={handleRulerDragStart('vertical')}
+        printMode={printMode}
+        dpi={dpi}
       />
 
       {/* 固定參考線 */}
