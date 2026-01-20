@@ -399,8 +399,8 @@ export const japaneseStyleV1Daily: PageTemplate = {
     }
     elements.push(timelineLine)
 
-    // 生成時間軸項目
-    timeline.slice(0, 8).forEach((item, idx) => {
+    // 生成時間軸項目（不限制數量，使用者可自行調整位置）
+    timeline.forEach((item, idx) => {
       const itemY = timelineStartY + idx * 36
 
       // 時間

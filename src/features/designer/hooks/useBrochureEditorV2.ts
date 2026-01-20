@@ -42,6 +42,8 @@ interface UseBrochureEditorV2Return {
   exportCanvasData: () => Record<string, unknown>
   exportThumbnail: (options?: { quality?: number; multiplier?: number }) => string
   updateElementByName: (elementName: string, updates: { text?: string }) => boolean
+  removeObjectByName: (elementName: string) => boolean
+  getObjectByName: (elementName: string) => fabric.FabricObject | null
 
   // 元素操作
   addText: (options?: { content?: string; x?: number; y?: number }) => void
@@ -1777,17 +1779,37 @@ export function useBrochureEditorV2(
   }, [disposeCanvas])
 
   // ============================================
-  // Update Element by Name (直接更新畫布上的元素，不重新渲染)
+  // Update Element by Name (直接更新畫布上的元素，支援群組內元素)
   // ============================================
   const updateElementByName = useCallback((elementName: string, updates: { text?: string }) => {
     const canvas = fabricCanvasRef.current
     if (!canvas) return false
 
     const objects = canvas.getObjects()
-    const targetObj = objects.find(obj => {
+
+    // 先在頂層尋找
+    let targetObj = objects.find(obj => {
       const fabricObj = obj as fabric.FabricObject & { name?: string }
       return fabricObj.name === elementName
     })
+
+    // 如果頂層找不到，搜尋群組內的元素
+    if (!targetObj) {
+      for (const obj of objects) {
+        if (obj.type === 'group') {
+          const group = obj as fabric.Group
+          const groupObjects = group.getObjects()
+          const found = groupObjects.find(item => {
+            const fabricItem = item as fabric.FabricObject & { name?: string }
+            return fabricItem.name === elementName
+          })
+          if (found) {
+            targetObj = found
+            break
+          }
+        }
+      }
+    }
 
     if (targetObj && updates.text !== undefined) {
       // 如果是 Textbox，更新文字內容
@@ -1802,6 +1824,45 @@ export function useBrochureEditorV2(
 
     return false
   }, [markDirty])
+
+  // ============================================
+  // Remove Object by Name (通過名稱刪除物件)
+  // ============================================
+  const removeObjectByName = useCallback((elementName: string) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return false
+
+    const objects = canvas.getObjects()
+    const targetObj = objects.find(obj => {
+      const fabricObj = obj as fabric.FabricObject & { name?: string }
+      return fabricObj.name === elementName
+    })
+
+    if (targetObj) {
+      canvas.remove(targetObj)
+      canvas.renderAll()
+      markDirty()
+      return true
+    }
+
+    return false
+  }, [markDirty])
+
+  // ============================================
+  // Get Object by Name (通過名稱取得物件)
+  // ============================================
+  const getObjectByName = useCallback((elementName: string) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return null
+
+    const objects = canvas.getObjects()
+    const targetObj = objects.find(obj => {
+      const fabricObj = obj as fabric.FabricObject & { name?: string }
+      return fabricObj.name === elementName
+    })
+
+    return targetObj || null
+  }, [])
 
   // ============================================
   // Return
@@ -1819,6 +1880,8 @@ export function useBrochureEditorV2(
     exportCanvasData,
     exportThumbnail,
     updateElementByName,
+    removeObjectByName,
+    getObjectByName,
 
     addText,
     addRectangle,

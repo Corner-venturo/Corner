@@ -818,6 +818,8 @@ export default function DesignerPage() {
     resetZoom,
     fitToContainer,
     updateElementByName,
+    removeObjectByName,
+    getObjectByName,
   } = useBrochureEditorV2({
     width: canvasWidth,
     height: canvasHeight,
@@ -2259,6 +2261,45 @@ export default function DesignerPage() {
       }
     }
 
+    // 檢查是否為行程總覽頁面，且集合/領隊資訊有變化（從無到有需要重新生成頁面）
+    if (currentPage?.templateKey === 'itinerary') {
+      const hadMeetingInfo = Boolean(oldData.meetingTime || oldData.meetingPlace)
+      const hasMeetingInfo = Boolean(newData.meetingTime || newData.meetingPlace)
+      const hadLeaderInfo = Boolean(oldData.leaderName)
+      const hasLeaderInfo = Boolean(newData.leaderName)
+
+      // 從無到有，需要重新生成頁面以創建新元素
+      const meetingInfoAdded = !hadMeetingInfo && hasMeetingInfo
+      const leaderInfoAdded = !hadLeaderInfo && hasLeaderInfo
+      // 從有到無，也需要重新生成頁面以移除元素
+      const meetingInfoRemoved = hadMeetingInfo && !hasMeetingInfo
+      const leaderInfoRemoved = hadLeaderInfo && !hasLeaderInfo
+
+      if ((meetingInfoAdded || leaderInfoAdded || meetingInfoRemoved || leaderInfoRemoved) && selectedStyle?.id) {
+        const templateId = selectedStyle.templates.itinerary
+        if (templateId) {
+          const newPage = generatePageFromTemplate(templateId, newData as TemplateData)
+
+          if (newPage) {
+            // 保留原始頁面 ID 和名稱
+            newPage.id = currentPage.id
+            newPage.name = currentPage.name
+
+            // 更新頁面列表
+            setGeneratedPages(prev => {
+              const updated = [...prev]
+              updated[currentPageIndex] = newPage
+              return updated
+            })
+
+            // 重新載入畫布
+            loadCanvasPage(newPage)
+          }
+        }
+        return // 已重新生成頁面，不需要繼續處理其他欄位
+      }
+    }
+
     // 檢查是否為每日行程頁面，且 dailyDetails 有變化（時間軸編輯）
     if (currentPage?.templateKey === 'daily' && currentDayIndex !== undefined) {
       const oldDetails = (oldData.dailyDetails as Array<Record<string, unknown>>) || []
@@ -2269,34 +2310,131 @@ export default function DesignerPage() {
       const oldTimeline = (oldDayData?.timeline as Array<Record<string, unknown>>) || []
       const newTimeline = (newDayData?.timeline as Array<Record<string, unknown>>) || []
 
-      // 只有在時間軸數量變化時才重新生成頁面
-      if (oldTimeline.length !== newTimeline.length && selectedStyle?.id) {
-        // 時間軸數量變化，需要重新生成頁面
-        const templateId = `${selectedStyle.id}-daily`
-        const newPage = generatePageFromTemplate(templateId, {
-          ...newData,
-          currentDayIndex: currentDayIndex,
-        } as TemplateData)
-
-        if (newPage) {
-          // 保留原始頁面 ID 和名稱
-          newPage.id = currentPage.id
-          newPage.name = currentPage.name
-
-          // 更新頁面列表
-          setGeneratedPages(prev => {
-            const updated = [...prev]
-            updated[currentPageIndex] = newPage
-            return updated
-          })
-
-          // 重新載入畫布
-          loadCanvasPage(newPage)
-        }
-        return // 已重新生成頁面，不需要繼續處理其他欄位
+      // 時間軸常量（與模板定義一致）
+      const TIMELINE_ITEM_GAP = 36 // 每項間距
+      const TIMELINE_COLORS = {
+        ink: '#3e3a36',
+        primary: '#8e8070',
       }
 
-      // 時間軸數量不變，只更新文字內容
+      // 時間軸數量變化 - 使用增量更新（不重新生成頁面）
+      if (oldTimeline.length !== newTimeline.length && canvas) {
+        const oldLen = oldTimeline.length
+        const newLen = newTimeline.length
+
+        if (newLen > oldLen) {
+          // === 新增項目：在「編號最大的項目」下方添加新元素（群組） ===
+          // 這樣用戶把最後一個項目拖到右邊欄位後，新項目會跟著在右邊延伸
+          const lastItemObj = oldLen > 0 ? getObjectByName(`時間軸項目${oldLen}`) : null
+
+          // 計算新項目的起始 Y 位置
+          let baseY: number
+          let timelineX: number
+
+          if (lastItemObj && 'top' in lastItemObj && 'left' in lastItemObj) {
+            // 從最後一個群組的位置往下延伸
+            baseY = (lastItemObj.top as number) + TIMELINE_ITEM_GAP
+            timelineX = lastItemObj.left as number
+          } else {
+            // 如果沒有找到群組，嘗試找舊版的單獨元素
+            const lastTimeObj = oldLen > 0 ? getObjectByName(`時間${oldLen}`) : null
+            if (lastTimeObj && 'top' in lastTimeObj && 'left' in lastTimeObj) {
+              baseY = (lastTimeObj.top as number) + TIMELINE_ITEM_GAP
+              timelineX = lastTimeObj.left as number
+            } else {
+              // 使用預設值
+              baseY = 430
+              timelineX = 38
+            }
+          }
+
+          // 添加新的時間軸項目（群組）
+          for (let idx = oldLen; idx < newLen; idx++) {
+            const item = newTimeline[idx] as Record<string, unknown>
+            const itemY = baseY + (idx - oldLen) * TIMELINE_ITEM_GAP
+
+            // 時間文字（相對於群組的位置）
+            const timeText = new fabric.Textbox(String(item.time || ''), {
+              left: 0,
+              top: 0,
+              width: 45,
+              fontSize: 10,
+              fontFamily: 'Noto Sans TC',
+              fontWeight: '500',
+              fill: TIMELINE_COLORS.primary,
+              textAlign: 'right',
+              lineHeight: 1.6,
+            })
+            ;(timeText as fabric.Textbox & { name: string }).name = `時間${idx + 1}`
+
+            // 圓點（相對於群組的位置）
+            const dot = new fabric.Circle({
+              left: 50,
+              top: 5,
+              radius: 3,
+              fill: TIMELINE_COLORS.primary,
+              stroke: 'transparent',
+              strokeWidth: 0,
+            })
+            ;(dot as fabric.Circle & { name: string }).name = `圓點${idx + 1}`
+
+            // 活動文字（相對於群組的位置）
+            const activityText = new fabric.Textbox(String(item.activity || ''), {
+              left: 64,
+              top: 0,
+              width: 350,
+              fontSize: 11,
+              fontFamily: 'Noto Sans TC',
+              fontWeight: '400',
+              fill: TIMELINE_COLORS.ink,
+              textAlign: 'left',
+              lineHeight: 1.5,
+            })
+            ;(activityText as fabric.Textbox & { name: string }).name = `活動${idx + 1}`
+
+            // 創建群組
+            const group = new fabric.Group([timeText, dot, activityText], {
+              left: timelineX,
+              top: itemY,
+            })
+            ;(group as fabric.Group & { id: string; name: string }).id = `el-daily-item-${idx}-d${currentDayIndex}`
+            ;(group as fabric.Group & { name: string }).name = `時間軸項目${idx + 1}`
+
+            canvas.add(group)
+          }
+
+          // 更新時間軸線的高度
+          const timelineLineObj = getObjectByName('時間軸線')
+          if (timelineLineObj && 'height' in timelineLineObj) {
+            timelineLineObj.set('height', newLen * TIMELINE_ITEM_GAP)
+            canvas.renderAll()
+          }
+
+        } else if (newLen < oldLen) {
+          // === 刪除項目：移除群組（或舊版的單獨元素） ===
+          for (let idx = newLen; idx < oldLen; idx++) {
+            // 先嘗試刪除群組
+            const removed = removeObjectByName(`時間軸項目${idx + 1}`)
+            if (!removed) {
+              // 如果沒有群組，刪除舊版的單獨元素
+              removeObjectByName(`時間${idx + 1}`)
+              removeObjectByName(`圓點${idx + 1}`)
+              removeObjectByName(`活動${idx + 1}`)
+            }
+          }
+
+          // 更新時間軸線的高度
+          const timelineLineObj = getObjectByName('時間軸線')
+          if (timelineLineObj && 'height' in timelineLineObj) {
+            timelineLineObj.set('height', Math.max(newLen * TIMELINE_ITEM_GAP, 36))
+            canvas.renderAll()
+          }
+        }
+
+        canvas.renderAll()
+      }
+
+      // 更新所有現有項目的文字內容
       newTimeline.forEach((item, idx) => {
         const oldItem = oldTimeline[idx] as Record<string, unknown> | undefined
         if (oldItem?.time !== item.time) {
