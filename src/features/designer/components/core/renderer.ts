@@ -27,6 +27,7 @@ import type {
   IconElement,
   LineElement,
   StickerElement,
+  GroupElement,
   FabricObjectWithData,
   GradientFill,
 } from '../types'
@@ -631,6 +632,72 @@ function renderStickerElement(el: StickerElement, options: RenderOptions): Fabri
 }
 
 /**
+ * 渲染群組元素
+ */
+async function renderGroupElement(
+  el: GroupElement,
+  options: RenderOptions
+): Promise<Group | null> {
+  const { isEditable } = options
+
+  if (!el.children || el.children.length === 0) {
+    return null
+  }
+
+  // 渲染所有子元素
+  const childObjects: FabricObject[] = []
+
+  for (const child of el.children) {
+    let childObj: FabricObject | FabricObject[] | null = null
+
+    switch (child.type) {
+      case 'shape':
+        childObj = renderShapeElement(child as ShapeElement, options)
+        break
+      case 'text':
+        childObj = renderTextElement(child as TextElement, options)
+        break
+      case 'image':
+        childObj = await renderImageElement(child as ImageElement, options)
+        break
+      case 'icon':
+        childObj = renderIconElement(child as IconElement, options)
+        break
+      case 'line':
+        childObj = renderLineElement(child as LineElement, options)
+        break
+      case 'sticker':
+        childObj = renderStickerElement(child as StickerElement, options)
+        break
+    }
+
+    if (childObj) {
+      if (Array.isArray(childObj)) {
+        childObjects.push(...childObj)
+      } else {
+        childObjects.push(childObj)
+      }
+    }
+  }
+
+  if (childObjects.length === 0) {
+    return null
+  }
+
+  // 創建群組
+  const group = new Group(childObjects, {
+    left: el.x,
+    top: el.y,
+    ...getCommonProps(el, isEditable),
+  })
+
+  // 設定群組 ID
+  ;(group as Group & { id: string }).id = el.id
+
+  return group
+}
+
+/**
  * 確保必要的字體已載入
  */
 async function ensureFontsLoaded(): Promise<void> {
@@ -709,6 +776,8 @@ export async function renderPageOnCanvas(
         return Promise.resolve(renderLineElement(el as LineElement, options))
       case 'sticker':
         return Promise.resolve(renderStickerElement(el as StickerElement, options))
+      case 'group':
+        return renderGroupElement(el as GroupElement, options)
       default:
         return Promise.resolve(null)
     }

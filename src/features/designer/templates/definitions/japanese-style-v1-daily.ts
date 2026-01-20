@@ -14,6 +14,7 @@ import type {
   ShapeElement,
   ImageElement,
   IconElement,
+  GroupElement,
   MaterialIconName,
 } from '@/features/designer/components/types'
 
@@ -399,17 +400,17 @@ export const japaneseStyleV1Daily: PageTemplate = {
     }
     elements.push(timelineLine)
 
-    // 生成時間軸項目（不限制數量，使用者可自行調整位置）
+    // 生成時間軸項目（群組，不限制數量，使用者可自行調整位置）
     timeline.forEach((item, idx) => {
       const itemY = timelineStartY + idx * 36
 
-      // 時間
+      // 時間（相對於群組位置）
       const timeText: TextElement = {
         id: elId(`time-${idx}`),
         type: 'text',
         name: `時間${idx + 1}`,
-        x: timelineX,
-        y: itemY,
+        x: 0,
+        y: 0,
         width: 45,
         height: 20,
         zIndex: 4,
@@ -429,16 +430,15 @@ export const japaneseStyleV1Daily: PageTemplate = {
           color: COLORS.primary,
         },
       }
-      elements.push(timeText)
 
-      // 圓點
+      // 圓點（相對於群組位置）
       const dot: ShapeElement = {
         id: elId(`dot-${idx}`),
         type: 'shape',
         name: `圓點${idx + 1}`,
         variant: 'circle',
-        x: timelineX + 50,
-        y: itemY + 5,
+        x: 50,
+        y: 5,
         width: 6,
         height: 6,
         zIndex: 5,
@@ -450,15 +450,14 @@ export const japaneseStyleV1Daily: PageTemplate = {
         stroke: 'transparent',
         strokeWidth: 0,
       }
-      elements.push(dot)
 
-      // 活動內容
+      // 活動內容（相對於群組位置）
       const activityText: TextElement = {
         id: elId(`activity-${idx}`),
         type: 'text',
         name: `活動${idx + 1}`,
-        x: timelineX + 64,
-        y: itemY,
+        x: 64,
+        y: 0,
         width: A5_WIDTH - contentPadding - timelineX - 80,
         height: 32,
         zIndex: 4,
@@ -478,7 +477,24 @@ export const japaneseStyleV1Daily: PageTemplate = {
           color: COLORS.ink,
         },
       }
-      elements.push(activityText)
+
+      // 創建群組
+      const timelineGroup: GroupElement = {
+        id: elId(`timeline-item-${idx}`),
+        type: 'group',
+        name: `時間軸項目${idx + 1}`,
+        x: timelineX,
+        y: itemY,
+        width: A5_WIDTH - contentPadding - timelineX,
+        height: 32,
+        zIndex: 4,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true,
+        children: [timeText, dot, activityText],
+      }
+      elements.push(timelineGroup)
     })
 
     // === 底部餐食區域 ===
