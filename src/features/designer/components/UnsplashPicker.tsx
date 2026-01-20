@@ -46,7 +46,7 @@ export function UnsplashPicker({ onSelectImage }: UnsplashPickerProps) {
     try {
       const result = await searchPhotos(query, {
         page: pageNum,
-        perPage: 20,
+        perPage: 30,  // Unsplash 上限
         orientation: 'landscape',
       })
 

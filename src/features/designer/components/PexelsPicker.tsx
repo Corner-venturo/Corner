@@ -44,7 +44,7 @@ export function PexelsPicker({ onSelectImage }: PexelsPickerProps) {
     try {
       const result = await searchPexelsPhotos(query, {
         page: pageNum,
-        perPage: 20,
+        perPage: 80,  // Pexels 上限
         orientation: 'landscape',
       })
 

@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import { supabase } from '@/lib/supabase/client'
 import { useWorkspaceId } from '@/lib/workspace-context'
+import { logger } from '@/lib/utils/logger'
 import type { Design, DesignType } from '../types'
 
 const DESIGNS_KEY = 'designs'
@@ -109,11 +110,18 @@ export function useDesigns() {
   }
 
   const deleteDesign = async (id: string) => {
+    if (!workspaceId) throw new Error('No workspace')
+
     // 1. 取得所有版本資料，找出使用的圖片
-    const { data: versions } = await supabase
+    const { data: versions, error: versionsError } = await supabase
       .from('brochure_versions')
       .select('data')
       .eq('document_id', id)
+
+    if (versionsError) {
+      // 版本查詢失敗，繼續嘗試刪除文件
+      logger.warn('Failed to fetch versions for cleanup:', versionsError)
+    }
 
     // 2. 從版本資料中解析出所有圖片 URL
     const imageUrls: string[] = []
@@ -139,7 +147,7 @@ export function useDesigns() {
       }
     }
 
-    // 3. 刪除 Storage 中的圖片
+    // 3. 刪除 Storage 中的圖片（失敗不阻止刪除流程）
     if (imageUrls.length > 0) {
       // 從 URL 中提取檔案路徑
       const filePaths = imageUrls
@@ -153,21 +161,30 @@ export function useDesigns() {
         .filter((path, index, self) => self.indexOf(path) === index)
 
       if (filePaths.length > 0) {
-        await supabase.storage.from('brochure-images').remove(filePaths)
+        const { error: storageError } = await supabase.storage.from('brochure-images').remove(filePaths)
+        if (storageError) {
+          logger.warn('Failed to delete storage images:', storageError)
+        }
       }
     }
 
     // 4. 刪除版本記錄（cascade 會自動處理，但明確刪除更安全）
-    await supabase
+    const { error: deleteVersionsError } = await supabase
       .from('brochure_versions')
       .delete()
       .eq('document_id', id)
+
+    if (deleteVersionsError) {
+      logger.warn('Failed to delete versions:', deleteVersionsError)
+      // 繼續嘗試刪除文件，可能會因為 cascade 規則而成功
+    }
 
     // 5. 刪除文件記錄
     const { error } = await supabase
       .from('brochure_documents')
       .delete()
       .eq('id', id)
+      .eq('workspace_id', workspaceId)
 
     if (error) throw error
 

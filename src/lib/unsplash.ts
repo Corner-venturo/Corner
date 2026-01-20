@@ -38,6 +38,10 @@ export interface UnsplashSearchResult {
   total: number
   total_pages: number
   results: UnsplashPhoto[]
+  rateLimit?: {
+    limit: number      // 每小時上限
+    remaining: number  // 剩餘次數
+  }
 }
 
 const UNSPLASH_API_URL = 'https://api.unsplash.com'
@@ -83,12 +87,24 @@ export async function searchPhotos(
       throw new Error('Unsplash API 驗證失敗，請檢查 Access Key 是否正確')
     }
     if (response.status === 403) {
-      throw new Error('Unsplash API 額度已用完，請明天再試或升級方案')
+      throw new Error('Unsplash API 額度已用完，請一小時後再試（免費版限制 50 次/小時）')
     }
     throw new Error(`Unsplash API 錯誤: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+
+  // 從 Header 取得 Rate Limit 資訊
+  const limit = response.headers.get('X-Ratelimit-Limit')
+  const remaining = response.headers.get('X-Ratelimit-Remaining')
+
+  return {
+    ...data,
+    rateLimit: limit && remaining ? {
+      limit: parseInt(limit, 10),
+      remaining: parseInt(remaining, 10),
+    } : undefined,
+  }
 }
 
 /**
