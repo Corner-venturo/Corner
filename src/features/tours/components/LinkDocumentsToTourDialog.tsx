@@ -111,11 +111,12 @@ export function LinkDocumentsToTourDialog({
            Object.keys(tourProposalPackage.timeline_data).length > 0
   }, [itineraryType, tourProposalPackage])
 
-  // 取得 tour 關聯的第一筆訂單的業務人員
-  const tourSalesPerson = useMemo(() => {
-    const firstOrder = orders.find(o => o.tour_id === tour.id)
-    return firstOrder?.sales_person || null
+  // 取得該團的第一筆訂單資訊（用於報價單預填客戶資訊）
+  const firstTourOrder = useMemo(() => {
+    return orders.find(o => o.tour_id === tour.id) || null
   }, [orders, tour.id])
+
+  const tourSalesPerson = firstTourOrder?.sales_person || null
 
   // 為 PackageItineraryDialog 建立模擬 Proposal 物件
   const fakeProposal = useMemo((): Proposal => ({
@@ -163,6 +164,11 @@ export function LinkDocumentsToTourDialog({
         tour_id: tour.id,
         categories: DEFAULT_CATEGORIES,
         group_size: tour.max_participants || 20,
+        // 客戶資訊：從訂單取得
+        customer_name: firstTourOrder?.contact_person || tour.name,
+        contact_phone: firstTourOrder?.contact_phone || '',
+        tour_code: tour.code || '',
+        issue_date: new Date().toISOString().split('T')[0],
         // 從訂單取得業務人員
         handler_name: tourSalesPerson || undefined,
       } as Parameters<typeof createQuote>[0])
@@ -188,7 +194,9 @@ export function LinkDocumentsToTourDialog({
         quote_type: 'quick',
         status: 'draft',
         tour_id: tour.id,
-        customer_name: tour.name,
+        // 客戶資訊：優先從訂單取得，否則用團名
+        customer_name: firstTourOrder?.contact_person || tour.name,
+        contact_phone: firstTourOrder?.contact_phone || '',
         tour_code: tour.code || '',
         issue_date: new Date().toISOString().split('T')[0],
         group_size: tour.max_participants || 20,
