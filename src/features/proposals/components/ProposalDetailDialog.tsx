@@ -182,6 +182,7 @@ export function ProposalDetailDialog({
                 onShowAddDialogChange={setShowAddDialog}
                 onOpenItineraryDialog={handleOpenItineraryDialog}
                 onOpenTimelineDialog={handleOpenTimelineDialog}
+                onNavigateAway={() => onOpenChange(false)}
               />
             </div>
           </DialogContent>

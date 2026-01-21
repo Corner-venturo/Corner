@@ -35,9 +35,7 @@ import {
   Zap,
   Clock,
 } from 'lucide-react'
-import { useQuotes, useTours, useOrders, createQuote, updateQuote, invalidateQuotes } from '@/data'
-import { useProposalPackages } from '@/hooks/cloud-hooks'
-import { generateCode } from '@/stores/utils/code-generator'
+import { useQuotes, useTours, useOrders, createQuote, updateQuote, invalidateQuotes, useProposalPackage } from '@/data'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
@@ -73,8 +71,8 @@ export function LinkDocumentsToTourDialog({
   // 訂單（用於取得業務人員）
   const { items: orders } = useOrders()
 
-  // Proposal Packages（用於取得 timeline_data）
-  const { items: proposalPackages, fetchAll: fetchProposalPackages } = useProposalPackages()
+  // Proposal Package（只取單筆，避免載入所有 80+ 筆資料）
+  const { item: fetchedPackage, refresh: refreshPackage } = useProposalPackage(tour.proposal_package_id || null)
 
   // 報價單狀態
   const [isCreatingStandardQuote, setIsCreatingStandardQuote] = useState(false)
@@ -89,22 +87,16 @@ export function LinkDocumentsToTourDialog({
   // 動態建立的 proposal_package（用於沒有 proposal 的旅遊團）
   const [dynamicPackage, setDynamicPackage] = useState<ProposalPackage | null>(null)
 
-  // 載入資料
-  useEffect(() => {
-    if (isOpen) {
-      // SWR 自動處理 quotes 載入
-      fetchProposalPackages()
-    }
-     
-  }, [isOpen])
+  // 載入資料（SWR 自動處理，不需手動 fetch）
+  // useProposalPackage 會自動在 tour.proposal_package_id 存在時載入資料
 
   // 取得 tour 關聯的 proposal_package（透過 proposal_package_id 或動態建立的）
   const tourProposalPackage = useMemo(() => {
     // 優先使用動態建立的 package
     if (dynamicPackage) return dynamicPackage
-    if (!tour.proposal_package_id) return null
-    return proposalPackages.find(p => p.id === tour.proposal_package_id) || null
-  }, [tour, proposalPackages, dynamicPackage])
+    // 使用單筆查詢結果（避免載入所有 packages）
+    return fetchedPackage || null
+  }, [fetchedPackage, dynamicPackage])
 
   // 檢查行程表類型
   const itineraryType = useMemo(() => {
@@ -163,10 +155,8 @@ export function LinkDocumentsToTourDialog({
   const handleCreateStandardQuote = async () => {
     try {
       setIsCreatingStandardQuote(true)
-      const code = generateCode('TP', {}, quotes)
-
+      // 不傳入 code，讓 createEntityHook 自動從資料庫查詢生成（避免前端快取不完整導致 code 重複）
       const newQuote = await createQuote({
-        code,
         name: tour.name,
         quote_type: 'standard',
         status: 'draft',
@@ -192,10 +182,8 @@ export function LinkDocumentsToTourDialog({
   const handleCreateQuickQuote = async () => {
     try {
       setIsCreatingQuickQuote(true)
-      const code = generateCode('TP', { quoteType: 'quick' }, quotes)
-
+      // 不傳入 code，讓 createEntityHook 自動從資料庫查詢生成（避免前端快取不完整導致 code 重複）
       const newQuote = await createQuote({
-        code,
         name: tour.name,
         quote_type: 'quick',
         status: 'draft',
@@ -207,6 +195,12 @@ export function LinkDocumentsToTourDialog({
         // 從訂單取得業務人員
         handler_name: tourSalesPerson || undefined,
       } as Parameters<typeof createQuote>[0])
+
+      logger.log('[handleCreateQuickQuote] 建立的報價單:', {
+        id: newQuote?.id,
+        code: newQuote?.code,
+        quote_type: newQuote?.quote_type,
+      })
 
       if (newQuote?.id) {
         onClose()
@@ -403,12 +397,12 @@ export function LinkDocumentsToTourDialog({
       // 自動鎖定（如果是第一個行程表）
       await autoLockItineraryToTour()
 
-      fetchProposalPackages()
+      refreshPackage()
     } catch (error) {
       logger.error('儲存時間軸資料失敗:', error)
       throw error
     }
-  }, [tourProposalPackage, fetchProposalPackages, autoLockItineraryToTour])
+  }, [tourProposalPackage, refreshPackage, autoLockItineraryToTour])
 
   // 主對話框開啟時，子對話框應關閉
   const mainDialogOpen = isOpen && !timelineDialogOpen && !packageItineraryDialogOpen
@@ -678,7 +672,7 @@ export function LinkDocumentsToTourDialog({
           pkg={tourProposalPackage}
           proposal={fakeProposal}
           onItineraryCreated={(itineraryId?: string) => {
-            fetchProposalPackages()
+            refreshPackage()
             // 自動鎖定（如果是第一個行程表）
             autoLockItineraryToTour(itineraryId)
           }}

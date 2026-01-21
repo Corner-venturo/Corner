@@ -53,6 +53,8 @@ interface PackageListPanelProps {
   onOpenItineraryDialog?: (pkg: ProposalPackage) => void
   /** 開啟時間軸行程表對話框（由父組件管理，用於單一遮罩模式） */
   onOpenTimelineDialog?: (pkg: ProposalPackage) => void
+  /** 當導航離開（如轉開團）時回調，用於關閉父 Dialog */
+  onNavigateAway?: () => void
 }
 
 export function PackageListPanel({
@@ -64,6 +66,7 @@ export function PackageListPanel({
   onChildDialogChange,
   onOpenItineraryDialog,
   onOpenTimelineDialog,
+  onNavigateAway,
 }: PackageListPanelProps) {
   const router = useRouter()
   const { user } = useAuthStore()
@@ -207,6 +210,8 @@ export function PackageListPanel({
 
   // 轉開團 - 導向旅遊團頁面（使用跟直接開團一樣的表單）
   const handleConvertToTour = useCallback((pkg: ProposalPackage) => {
+    // 先關閉父 Dialog（避免轉開團成功後還顯示舊的 Dialog）
+    onNavigateAway?.()
     // 帶上 proposal 和 package 資訊到 /tours 頁面
     const params = new URLSearchParams({
       action: 'create',
@@ -214,7 +219,7 @@ export function PackageListPanel({
       packageId: pkg.id,
     })
     router.push(`/tours?${params.toString()}`)
-  }, [proposal.id, router])
+  }, [proposal.id, router, onNavigateAway])
 
   // 建立或開啟報價單
   const handleQuoteClick = useCallback(

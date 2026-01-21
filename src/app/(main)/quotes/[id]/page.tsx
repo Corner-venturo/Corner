@@ -389,6 +389,10 @@ export default function QuoteDetailPage() {
     return null
   }
 
+  // DEBUG: 追蹤 quote_type 值
+  // eslint-disable-next-line no-console
+  console.log('[QuoteDetailPage] quote.quote_type:', quote.quote_type, 'quote.id:', quote.id)
+
   // 快速報價單使用獨立的編輯器
   if (quote.quote_type === 'quick') {
     return (
