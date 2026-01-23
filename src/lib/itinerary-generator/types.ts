@@ -12,13 +12,26 @@ export interface FlightConstraint {
   departureTime: string   // 出發時間 (HH:mm)
 }
 
+// 住宿安排
+export interface AccommodationPlan {
+  cityId: string          // 住宿城市 ID
+  cityName: string        // 住宿城市名稱（用於顯示）
+  nights: number          // 住幾晚
+}
+
+// 行程風格
+export type ItineraryStyle = 'relax' | 'adventure' | 'culture' | 'food'
+
 // 生成請求參數
 export interface GenerateItineraryRequest {
-  cityId: string                    // 城市 ID
+  cityId: string                    // 主要城市 ID（入境城市）
   numDays: number                   // 天數
   departureDate: string             // 出發日期 (YYYY-MM-DD)
   outboundFlight: FlightConstraint  // 去程航班
   returnFlight: FlightConstraint    // 回程航班
+  // 新增：住宿安排
+  accommodations?: AccommodationPlan[]  // 住宿安排（按順序）
+  style?: ItineraryStyle            // 行程風格
 }
 
 // 生成結果

@@ -73,6 +73,13 @@ interface UseBrochureEditorV2Return {
     y?: number
     size?: number
   }) => Promise<void>
+  addTimeline: (options?: {
+    x?: number
+    y?: number
+    pointCount?: number
+    orientation?: 'vertical' | 'horizontal'
+  }) => void
+  addTimelinePoint: () => void
 
   // 選取操作
   selectedObjectIds: string[]
@@ -1047,8 +1054,18 @@ export function useBrochureEditorV2(
         if (!options?.keepOriginalColor) {
           const color = options?.color || '#3a3633'
           group.getObjects().forEach(obj => {
-            if ('fill' in obj) obj.set('fill', color)
-            if ('stroke' in obj && obj.stroke) obj.set('stroke', color)
+            // 只有當原本有 fill 顏色時才設定 fill（保留 'none' 或空值）
+            if ('fill' in obj) {
+              const currentFill = obj.fill
+              // 如果原本是 'none'、空字串、null 或 transparent，保持不變
+              if (currentFill && currentFill !== 'none' && currentFill !== 'transparent' && currentFill !== '') {
+                obj.set('fill', color)
+              }
+            }
+            // stroke 顏色正常更新
+            if ('stroke' in obj && obj.stroke && obj.stroke !== 'none') {
+              obj.set('stroke', color)
+            }
           })
         }
 
@@ -1109,6 +1126,330 @@ export function useBrochureEditorV2(
       console.error('Failed to add illustration:', error)
     }
   }, [width, height])
+
+  // ============================================
+  // Add Timeline (時間軸 - 使用獨立元素，和模板一致)
+  // ============================================
+  const addTimeline = useCallback((options?: {
+    x?: number
+    y?: number
+    pointCount?: number
+    orientation?: 'vertical' | 'horizontal'
+  }) => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    const pointCount = options?.pointCount || 3
+    const isVertical = options?.orientation !== 'horizontal'
+    const timelineId = `timeline-${Date.now()}`
+    const itemSpacing = 36 // 和模板一致的間距
+
+    // 起始位置
+    const startX = options?.x ?? 100
+    const startY = options?.y ?? 150
+
+    const allElements: fabric.FabricObject[] = []
+
+    if (isVertical) {
+      // 垂直時間軸線（使用矩形模擬細線，和模板一致）
+      const lineHeight = pointCount * itemSpacing
+      const mainLine = new fabric.Rect({
+        left: startX + 52,
+        top: startY + 12,
+        width: 2,
+        height: lineHeight,
+        fill: '#c9aa7c',
+        opacity: 0.4,
+        selectable: true,
+      })
+      const lineWithMeta = mainLine as fabric.Rect & { data: Record<string, unknown> }
+      lineWithMeta.data = { timelineId, role: 'line', orientation: 'vertical', pointCount }
+      allElements.push(mainLine)
+
+      // 時間點
+      for (let i = 0; i < pointCount; i++) {
+        const itemY = startY + i * itemSpacing
+
+        // 時間文字（左側）
+        const timeText = new fabric.IText(`${8 + i * 2}:00`, {
+          left: startX,
+          top: itemY,
+          fontSize: 11,
+          fontFamily: 'Noto Sans TC',
+          fill: '#c9aa7c',
+          textAlign: 'right',
+          width: 45,
+        })
+        const timeWithMeta = timeText as fabric.IText & { data: Record<string, unknown> }
+        timeWithMeta.data = { timelineId, role: 'time', index: i }
+        allElements.push(timeText)
+
+        // 圓點
+        const dot = new fabric.Circle({
+          left: startX + 50,
+          top: itemY + 5,
+          radius: 4,
+          fill: '#c9aa7c',
+          originX: 'center',
+          originY: 'center',
+        })
+        const dotWithMeta = dot as fabric.Circle & { data: Record<string, unknown> }
+        dotWithMeta.data = { timelineId, role: 'dot', index: i }
+        allElements.push(dot)
+
+        // 活動文字（右側）
+        const activityText = new fabric.IText(`活動 ${i + 1}`, {
+          left: startX + 64,
+          top: itemY,
+          fontSize: 11,
+          fontFamily: 'Noto Sans TC',
+          fill: '#3a3633',
+          width: 150,
+        })
+        const activityWithMeta = activityText as fabric.IText & { data: Record<string, unknown> }
+        activityWithMeta.data = { timelineId, role: 'activity', index: i }
+        allElements.push(activityText)
+      }
+    } else {
+      // 水平時間軸
+      const lineWidth = pointCount * 80
+      const mainLine = new fabric.Rect({
+        left: startX,
+        top: startY + 50,
+        width: lineWidth,
+        height: 2,
+        fill: '#c9aa7c',
+        opacity: 0.4,
+        selectable: true,
+      })
+      const lineWithMeta = mainLine as fabric.Rect & { data: Record<string, unknown> }
+      lineWithMeta.data = { timelineId, role: 'line', orientation: 'horizontal', pointCount }
+      allElements.push(mainLine)
+
+      for (let i = 0; i < pointCount; i++) {
+        const itemX = startX + 40 + i * 80
+
+        // 時間文字（上方）
+        const timeText = new fabric.IText(`${8 + i * 2}:00`, {
+          left: itemX,
+          top: startY + 20,
+          fontSize: 11,
+          fontFamily: 'Noto Sans TC',
+          fill: '#c9aa7c',
+          originX: 'center',
+        })
+        const timeWithMeta = timeText as fabric.IText & { data: Record<string, unknown> }
+        timeWithMeta.data = { timelineId, role: 'time', index: i }
+        allElements.push(timeText)
+
+        // 圓點
+        const dot = new fabric.Circle({
+          left: itemX,
+          top: startY + 50,
+          radius: 4,
+          fill: '#c9aa7c',
+          originX: 'center',
+          originY: 'center',
+        })
+        const dotWithMeta = dot as fabric.Circle & { data: Record<string, unknown> }
+        dotWithMeta.data = { timelineId, role: 'dot', index: i }
+        allElements.push(dot)
+
+        // 活動文字（下方）
+        const activityText = new fabric.IText(`活動 ${i + 1}`, {
+          left: itemX,
+          top: startY + 70,
+          fontSize: 11,
+          fontFamily: 'Noto Sans TC',
+          fill: '#3a3633',
+          originX: 'center',
+        })
+        const activityWithMeta = activityText as fabric.IText & { data: Record<string, unknown> }
+        activityWithMeta.data = { timelineId, role: 'activity', index: i }
+        allElements.push(activityText)
+      }
+    }
+
+    // 加入所有元素到 canvas
+    allElements.forEach(el => canvas.add(el))
+
+    // 選取所有元素（方便一起移動）
+    const selection = new fabric.ActiveSelection(allElements, { canvas })
+    canvas.setActiveObject(selection)
+    canvas.renderAll()
+  }, [])
+
+  // ============================================
+  // Add Timeline Point (在選中的時間軸上新增時間點)
+  // ============================================
+  const addTimelinePoint = useCallback(() => {
+    const canvas = fabricCanvasRef.current
+    if (!canvas) return
+
+    // 取得選中的物件
+    const activeObjects = canvas.getActiveObjects()
+    if (activeObjects.length === 0) return
+
+    // 找出時間軸 ID（從選中的任何一個有 timelineId 的元素）
+    let timelineId: string | null = null
+    let orientation: string = 'vertical'
+    let currentPointCount = 0
+
+    for (const obj of activeObjects) {
+      const objWithData = obj as fabric.FabricObject & { data?: Record<string, unknown> }
+      if (objWithData.data?.timelineId) {
+        timelineId = objWithData.data.timelineId as string
+        if (objWithData.data.role === 'line') {
+          orientation = (objWithData.data.orientation as string) || 'vertical'
+          currentPointCount = (objWithData.data.pointCount as number) || 0
+        }
+        break
+      }
+    }
+
+    if (!timelineId) return
+
+    // 找出該時間軸的所有元素
+    const allObjects = canvas.getObjects()
+    const timelineElements = allObjects.filter(obj => {
+      const objWithData = obj as fabric.FabricObject & { data?: Record<string, unknown> }
+      return objWithData.data?.timelineId === timelineId
+    })
+
+    // 找出主線條以取得 orientation 和 pointCount
+    const lineElement = timelineElements.find(obj => {
+      const objWithData = obj as fabric.FabricObject & { data?: Record<string, unknown> }
+      return objWithData.data?.role === 'line'
+    }) as (fabric.Rect & { data: Record<string, unknown> }) | undefined
+
+    if (!lineElement) return
+
+    orientation = (lineElement.data.orientation as string) || 'vertical'
+    currentPointCount = (lineElement.data.pointCount as number) || 0
+    const newIndex = currentPointCount
+    const newPointCount = currentPointCount + 1
+
+    // 找出最後一個圓點的位置
+    const dots = timelineElements.filter(obj => {
+      const objWithData = obj as fabric.FabricObject & { data?: Record<string, unknown> }
+      return objWithData.data?.role === 'dot'
+    }) as fabric.Circle[]
+
+    if (dots.length === 0) return
+
+    // 按 index 排序，取最後一個
+    dots.sort((a, b) => {
+      const aData = (a as fabric.Circle & { data?: Record<string, unknown> }).data
+      const bData = (b as fabric.Circle & { data?: Record<string, unknown> }).data
+      return ((aData?.index as number) || 0) - ((bData?.index as number) || 0)
+    })
+    const lastDot = dots[dots.length - 1]
+
+    const newElements: fabric.FabricObject[] = []
+
+    if (orientation === 'vertical') {
+      const itemSpacing = 36
+      const newY = (lastDot.top || 0) + itemSpacing
+      const baseX = (lineElement.left || 0) - 52
+
+      // 時間文字
+      const timeText = new fabric.IText(`${8 + newIndex * 2}:00`, {
+        left: baseX,
+        top: newY,
+        fontSize: 11,
+        fontFamily: 'Noto Sans TC',
+        fill: '#c9aa7c',
+        textAlign: 'right',
+        width: 45,
+      })
+      const timeWithMeta = timeText as fabric.IText & { data: Record<string, unknown> }
+      timeWithMeta.data = { timelineId, role: 'time', index: newIndex }
+      newElements.push(timeText)
+
+      // 圓點
+      const dot = new fabric.Circle({
+        left: baseX + 50,
+        top: newY + 5,
+        radius: 4,
+        fill: '#c9aa7c',
+        originX: 'center',
+        originY: 'center',
+      })
+      const dotWithMeta = dot as fabric.Circle & { data: Record<string, unknown> }
+      dotWithMeta.data = { timelineId, role: 'dot', index: newIndex }
+      newElements.push(dot)
+
+      // 活動文字
+      const activityText = new fabric.IText(`活動 ${newIndex + 1}`, {
+        left: baseX + 64,
+        top: newY,
+        fontSize: 11,
+        fontFamily: 'Noto Sans TC',
+        fill: '#3a3633',
+        width: 150,
+      })
+      const activityWithMeta = activityText as fabric.IText & { data: Record<string, unknown> }
+      activityWithMeta.data = { timelineId, role: 'activity', index: newIndex }
+      newElements.push(activityText)
+
+      // 延長主線
+      lineElement.set({ height: (lineElement.height || 0) + itemSpacing })
+    } else {
+      const itemSpacing = 80
+      const newX = (lastDot.left || 0) + itemSpacing
+      const baseY = (lineElement.top || 0) - 50
+
+      // 時間文字
+      const timeText = new fabric.IText(`${8 + newIndex * 2}:00`, {
+        left: newX,
+        top: baseY + 20,
+        fontSize: 11,
+        fontFamily: 'Noto Sans TC',
+        fill: '#c9aa7c',
+        originX: 'center',
+      })
+      const timeWithMeta = timeText as fabric.IText & { data: Record<string, unknown> }
+      timeWithMeta.data = { timelineId, role: 'time', index: newIndex }
+      newElements.push(timeText)
+
+      // 圓點
+      const dot = new fabric.Circle({
+        left: newX,
+        top: baseY + 50,
+        radius: 4,
+        fill: '#c9aa7c',
+        originX: 'center',
+        originY: 'center',
+      })
+      const dotWithMeta = dot as fabric.Circle & { data: Record<string, unknown> }
+      dotWithMeta.data = { timelineId, role: 'dot', index: newIndex }
+      newElements.push(dot)
+
+      // 活動文字
+      const activityText = new fabric.IText(`活動 ${newIndex + 1}`, {
+        left: newX,
+        top: baseY + 70,
+        fontSize: 11,
+        fontFamily: 'Noto Sans TC',
+        fill: '#3a3633',
+        originX: 'center',
+      })
+      const activityWithMeta = activityText as fabric.IText & { data: Record<string, unknown> }
+      activityWithMeta.data = { timelineId, role: 'activity', index: newIndex }
+      newElements.push(activityText)
+
+      // 延長主線
+      lineElement.set({ width: (lineElement.width || 0) + itemSpacing })
+    }
+
+    // 更新 pointCount
+    lineElement.data.pointCount = newPointCount
+
+    // 加入新元素
+    newElements.forEach(el => canvas.add(el))
+    lineElement.setCoords()
+    canvas.renderAll()
+  }, [])
 
   // ============================================
   // Delete Selected
@@ -1893,6 +2234,8 @@ export function useBrochureEditorV2(
     addSticker,
     addIcon,
     addIllustration,
+    addTimeline,
+    addTimelinePoint,
 
     selectedObjectIds,
     deleteSelected,

@@ -18,11 +18,10 @@
 
 import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import * as fabric from 'fabric'
 import {
   Save,
-  Clock,
   ZoomIn,
   ZoomOut,
   Palette,
@@ -54,11 +53,13 @@ import { Combobox } from '@/components/ui/combobox'
 import type { Tour, Itinerary } from '@/stores/types'
 import { useBrochureEditorV2 } from '@/features/designer/hooks/useBrochureEditorV2'
 import { LoadingOverlay, SavingIndicator, UnsavedIndicator } from '@/features/designer/components/LoadingOverlay'
-import { VersionHistory } from '@/features/designer/components/VersionHistory'
+// Version history UI hidden - functionality preserved in backend
+// import { VersionHistory } from '@/features/designer/components/VersionHistory'
 import { ElementLibrary } from '@/features/designer/components/ElementLibrary'
 import { EditorToolbar } from '@/features/designer/components/EditorToolbar'
 import { PropertiesPanel } from '@/features/designer/components/PropertiesPanel'
 import { ImageMaskFillDialog } from '@/features/designer/components/ImageMaskFill'
+import { useMaskEditMode } from '@/features/designer/hooks/useMaskEditMode'
 import { LayerPanel } from '@/features/designer/components/LayerPanel'
 import { TemplateDataPanel } from '@/features/designer/components/TemplateDataPanel'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -82,6 +83,7 @@ import {
 import type { CanvasElement } from '@/features/designer/components/types'
 import { STICKER_PATHS } from '@/features/designer/components/core/sticker-paths'
 import { renderPageOnCanvas } from '@/features/designer/components/core/renderer'
+import { generateBrochurePDF } from '@/lib/pdf/brochure-pdf-generator'
 import { getMemoSettingsByCountry, getCountryCodeFromName } from '@/features/designer/templates/definitions/country-presets'
 import type { MemoPageContent } from '@/features/designer/components/PageListSidebar'
 import type { MemoItem, SeasonInfo, MemoInfoItem, MemoSettings } from '@/features/designer/templates/definitions/types'
@@ -174,6 +176,9 @@ function scaleFabricData(fabricData: Record<string, unknown>, scaleFactor: numbe
 
   return scaled
 }
+
+// 頁碼計算工具（從共用模組匯入）
+import { calculatePageNumber, formatPageNumber } from '@/features/designer/utils/page-number'
 
 const DESIGN_TYPES: DesignType[] = [
   {
@@ -692,6 +697,7 @@ function PageThumbnail({ page, scale }: { page: CanvasPage; scale: number }) {
 // ============================================
 export default function DesignerPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   // 支援多種參數格式（URL 參數）
   const urlTourId = searchParams.get('tour_id') || searchParams.get('tourId')
@@ -727,7 +733,6 @@ export default function DesignerPage() {
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
   const [templateData, setTemplateData] = useState<Record<string, unknown> | null>(null)
   const [selectedStyle, setSelectedStyle] = useState<StyleSeries | null>(null)
-  const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [showPageList, setShowPageList] = useState(true)
   const [showLeftPanel, setShowLeftPanel] = useState(false)  // 預設關閉元素庫
   const [showRightPanel, setShowRightPanel] = useState(true)
@@ -741,6 +746,17 @@ export default function DesignerPage() {
   const [showImageEditor, setShowImageEditor] = useState(false)
   const [showDailyImageEditor, setShowDailyImageEditor] = useState(false)
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null)
+
+  // Pan mode state (Space + drag to pan)
+  const [isPanMode, setIsPanMode] = useState(false)
+  const panStateRef = useRef<{ isPanning: boolean; startX: number; startY: number; scrollLeft: number; scrollTop: number }>({
+    isPanning: false,
+    startX: 0,
+    startY: 0,
+    scrollLeft: 0,
+    scrollTop: 0,
+  })
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Document store
   const {
@@ -779,6 +795,8 @@ export default function DesignerPage() {
     addSticker,
     addIcon,
     addIllustration,
+    addTimeline,
+    addTimelinePoint,
     selectedObjectIds,
     deleteSelected,
     copySelected,
@@ -825,18 +843,32 @@ export default function DesignerPage() {
     height: canvasHeight,
   })
 
+  // 遮罩編輯模式（雙擊遮罩圖片進入，可拖曳調整圖片位置）
+  const { isEditingMask } = useMaskEditMode({
+    canvas,
+    onUpdate: () => {
+      // 標記為有變更
+    },
+  })
+
   // 畫布容器 ref（用於自動適應縮放）
   const canvasContainerRef = useRef<HTMLDivElement>(null)
 
   // 側邊欄寬度
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED_PX : SIDEBAR_WIDTH_EXPANDED_PX
 
-  // 計算當前每日行程頁對應的天數索引
+  // 取得當前每日行程頁對應的天數索引
+  // 優先使用頁面自己存的 dayIndex，如果沒有才根據位置計算
   const currentDayIndex = useMemo(() => {
-    const currentPage = generatedPages[currentPageIndex]
+    const currentPage = generatedPages[currentPageIndex] as CanvasPage & { dayIndex?: number }
     if (!currentPage || currentPage.templateKey !== 'daily') return undefined
 
-    // 計算當前頁面之前有多少個 daily 頁面
+    // 優先使用頁面自己記錄的 dayIndex（複製時會保留正確的天數）
+    if (typeof currentPage.dayIndex === 'number') {
+      return currentPage.dayIndex
+    }
+
+    // 回退：根據頁面位置計算（舊行為，向後相容）
     let dailyCount = 0
     for (let i = 0; i < currentPageIndex; i++) {
       if (generatedPages[i]?.templateKey === 'daily') {
@@ -867,6 +899,41 @@ export default function DesignerPage() {
       canvas.off('selection:cleared')
     }
   }, [canvas])
+
+  // ============================================
+  // 頁面切換後更新頁碼
+  // 規則：
+  // - 封面不顯示頁碼
+  // - 目錄前的空白頁不顯示頁碼
+  // - 目錄開始算 p.01
+  // - 目錄後的所有頁面（含空白頁）都顯示頁碼
+  // ============================================
+  useEffect(() => {
+    if (!canvas || !isCanvasReady) return
+
+    // 延遲執行，確保頁面已完全載入
+    const timer = setTimeout(() => {
+      // 計算頁碼（可能為 null，表示不顯示）
+      const pageNumber = calculatePageNumber(currentPageIndex, generatedPages)
+
+      if (pageNumber === null) {
+        // 不應顯示頁碼的頁面：設為空字串
+        const updated = updateElementByName('頁碼', { text: '' })
+        if (updated) {
+          logger.log('Page number hidden for page:', currentPageIndex)
+        }
+      } else {
+        // 應顯示頁碼的頁面：格式化並顯示
+        const pageNumberStr = formatPageNumber(pageNumber)
+        const updated = updateElementByName('頁碼', { text: pageNumberStr })
+        if (updated) {
+          logger.log('Updated page number to:', pageNumberStr)
+        }
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [canvas, isCanvasReady, currentPageIndex, generatedPages, updateElementByName])
 
   // ============================================
   // 雙擊封面占位框時開啟上傳對話框
@@ -918,36 +985,122 @@ export default function DesignerPage() {
     }
     setTemplateData(newTemplateData)
 
-    // 重新生成所有使用 coverImage 的頁面（cover 和 toc）
-    const newPages = generatedPages.map((page) => {
-      // 判斷這個頁面是否需要重新生成（使用 coverImage）
-      const templateKey = page.templateKey
+    // 不要重新生成整個頁面！只更新當前頁面的封面圖片元素
+    // 這樣可以保留用戶對其他元素的位置調整
+    const currentPage = generatedPages[currentPageIndex]
+    if (currentPage && canvas) {
+      const templateKey = currentPage.templateKey
+      // 只有 cover 和 toc 頁面有主封面圖片
       if (templateKey === 'cover' || templateKey === 'toc') {
-        const templateId = selectedStyle.templates[templateKey as keyof typeof selectedStyle.templates]
-        if (templateId) {
-          const newPage = generatePageFromTemplate(templateId, newTemplateData as Parameters<typeof generatePageFromTemplate>[1])
-          // 保留原頁面的 ID 和名稱，避免 React key 重複問題
-          newPage.id = page.id
-          newPage.name = page.name
-          return newPage
+        // 找到封面圖片元素並更新（元素名稱為「封面圖片」或「封面背景」）
+        const coverImageElement = canvas.getObjects().find(obj => {
+          const namedObj = obj as fabric.FabricObject & { name?: string }
+          return namedObj.name === '封面圖片' || namedObj.name === '封面背景'
+        }) as fabric.Image | undefined
+
+        if (coverImageElement && pendingImageUrl) {
+          // 使用與渲染器相同的 objectFit: cover 裁切邏輯
+          try {
+            // 使用舊圖片的尺寸作為目標尺寸（已經是裁切後的正確尺寸）
+            const targetWidth = coverImageElement.width ?? (canvasWidth - 64)
+            const targetHeight = coverImageElement.height ?? 350
+            const position = result.position || { x: 50, y: 50, scale: 1 }
+
+            // 1. 載入原始圖片
+            const htmlImg = new window.Image()
+            if (!pendingImageUrl.startsWith('data:') && !pendingImageUrl.startsWith('blob:')) {
+              htmlImg.crossOrigin = 'anonymous'
+            }
+
+            await new Promise<void>((resolve, reject) => {
+              htmlImg.onload = () => resolve()
+              htmlImg.onerror = () => reject(new Error('Image load failed'))
+              htmlImg.src = pendingImageUrl
+            })
+
+            const originalWidth = htmlImg.naturalWidth || 1
+            const originalHeight = htmlImg.naturalHeight || 1
+
+            // 2. 計算 objectFit: cover 的縮放（圖片完全覆蓋容器）
+            let scale = Math.max(
+              targetWidth / originalWidth,
+              targetHeight / originalHeight
+            )
+            // 套用用戶設定的位置縮放
+            scale *= position.scale
+
+            const scaledWidth = originalWidth * scale
+            const scaledHeight = originalHeight * scale
+
+            // 3. 計算位置偏移（position.x/y 是 0-100 的百分比，50 = 置中）
+            const maxOffsetX = targetWidth - scaledWidth
+            const maxOffsetY = targetHeight - scaledHeight
+            const offsetX = (position.x / 100) * maxOffsetX
+            const offsetY = (position.y / 100) * maxOffsetY
+
+            // 4. 用臨時 canvas 裁切圖片
+            const tempCanvas = document.createElement('canvas')
+            tempCanvas.width = targetWidth
+            tempCanvas.height = targetHeight
+            const ctx = tempCanvas.getContext('2d')!
+            ctx.drawImage(htmlImg, offsetX, offsetY, scaledWidth, scaledHeight)
+
+            // 5. 將裁切後的圖片載入 Fabric.js
+            const croppedDataUrl = tempCanvas.toDataURL('image/png')
+            const newImage = await fabric.Image.fromURL(croppedDataUrl)
+
+            // 保持原有的位置和透明度
+            const originalName = (coverImageElement as fabric.Image & { name?: string }).name || '封面圖片'
+            newImage.set({
+              left: coverImageElement.left ?? 32,
+              top: coverImageElement.top ?? 140,
+              opacity: coverImageElement.opacity ?? 1,
+              originX: 'left',
+              originY: 'top',
+            })
+            ;(newImage as fabric.Image & { name: string; id: string }).name = originalName
+            ;(newImage as fabric.Image & { name: string; id: string }).id = 'el-cover-image'
+
+            // 記住舊圖片的 zIndex
+            const oldIndex = canvas.getObjects().indexOf(coverImageElement)
+
+            // 移除舊的，添加新的
+            canvas.remove(coverImageElement)
+            canvas.add(newImage)
+
+            // 將新圖片移到與舊圖片相同的層級
+            if (oldIndex >= 0 && oldIndex < canvas.getObjects().length) {
+              // 移動到正確位置
+              const objects = canvas.getObjects()
+              canvas.remove(newImage)
+              objects.splice(oldIndex, 0, newImage)
+              canvas.renderAll()
+            }
+
+            canvas.renderAll()
+          } catch (err) {
+            logger.error('Failed to update cover image:', err)
+          }
+        } else if (pendingImageUrl) {
+          // 如果找不到現有的封面圖片元素，回退到重新生成頁面
+          const templateId = selectedStyle.templates[templateKey as keyof typeof selectedStyle.templates]
+          if (templateId) {
+            const newPage = generatePageFromTemplate(templateId, newTemplateData as Parameters<typeof generatePageFromTemplate>[1])
+            newPage.id = currentPage.id
+            newPage.name = currentPage.name
+            const newPages = [...generatedPages]
+            newPages[currentPageIndex] = newPage
+            setGeneratedPages(newPages)
+            await loadCanvasPage(newPage)
+          }
         }
       }
-      return page
-    })
-
-    // 更新 generatedPages
-    setGeneratedPages(newPages)
-
-    // 重新渲染當前頁面
-    const currentPage = newPages[currentPageIndex]
-    if (currentPage) {
-      await loadCanvasPage(currentPage)
     }
 
     // 清理狀態
     setPendingImageUrl(null)
     setShowImageEditor(false)
-  }, [selectedStyle, templateData, loadCanvasPage, generatedPages, currentPageIndex, pendingImageUrl])
+  }, [selectedStyle, templateData, canvas, canvasWidth, loadCanvasPage, generatedPages, currentPageIndex, pendingImageUrl, generatePageFromTemplate])
 
   // ============================================
   // 每日行程封面圖片上傳 - 步驟1：上傳後開啟位置編輯器
@@ -1002,27 +1155,115 @@ export default function DesignerPage() {
     }
     setTemplateData(newTemplateData)
 
-    // 重新生成當前每日行程頁面
-    const templateId = selectedStyle.templates.daily
-    if (templateId) {
-      const currentPage = generatedPages[currentPageIndex]
-      const newPage = generatePageFromTemplate(templateId, newTemplateData as Parameters<typeof generatePageFromTemplate>[1])
-      // 保留原頁面的 ID，避免 React key 重複問題
-      newPage.id = currentPage?.id || newPage.id
-      newPage.name = `第 ${currentDayIndex + 1} 天行程`
+    // 不要重新生成整個頁面！只更新圖片元素
+    // 這樣可以保留用戶對其他元素的位置調整
+    const currentPage = generatedPages[currentPageIndex]
+    if (currentPage && canvas) {
+      // 找到封面圖片元素並更新
+      const coverImageElement = canvas.getObjects().find(obj => {
+        const namedObj = obj as fabric.FabricObject & { name?: string }
+        return namedObj.name === '當日封面'
+      }) as fabric.Image | undefined
 
+      if (coverImageElement && pendingImageUrl) {
+        // 使用與渲染器相同的 objectFit: cover 裁切邏輯
+        try {
+          // 計算目標尺寸（封面高度是 42% 的頁面高度）
+          const targetWidth = canvasWidth
+          const targetHeight = Math.floor(canvasHeight * 0.42)
+          const position = result.position || { x: 50, y: 50, scale: 1 }
+
+          // 1. 載入原始圖片
+          const htmlImg = new window.Image()
+          if (!pendingImageUrl.startsWith('data:') && !pendingImageUrl.startsWith('blob:')) {
+            htmlImg.crossOrigin = 'anonymous'
+          }
+
+          await new Promise<void>((resolve, reject) => {
+            htmlImg.onload = () => resolve()
+            htmlImg.onerror = () => reject(new Error('Image load failed'))
+            htmlImg.src = pendingImageUrl
+          })
+
+          const originalWidth = htmlImg.naturalWidth || 1
+          const originalHeight = htmlImg.naturalHeight || 1
+
+          // 2. 計算 objectFit: cover 的縮放（圖片完全覆蓋容器）
+          let scale = Math.max(
+            targetWidth / originalWidth,
+            targetHeight / originalHeight
+          )
+          // 套用用戶設定的位置縮放
+          scale *= position.scale
+
+          const scaledWidth = originalWidth * scale
+          const scaledHeight = originalHeight * scale
+
+          // 3. 計算位置偏移（position.x/y 是 0-100 的百分比，50 = 置中）
+          const maxOffsetX = targetWidth - scaledWidth
+          const maxOffsetY = targetHeight - scaledHeight
+          const offsetX = (position.x / 100) * maxOffsetX
+          const offsetY = (position.y / 100) * maxOffsetY
+
+          // 4. 用臨時 canvas 裁切圖片
+          const tempCanvas = document.createElement('canvas')
+          tempCanvas.width = targetWidth
+          tempCanvas.height = targetHeight
+          const ctx = tempCanvas.getContext('2d')!
+          ctx.drawImage(htmlImg, offsetX, offsetY, scaledWidth, scaledHeight)
+
+          // 5. 將裁切後的圖片載入 Fabric.js
+          const croppedDataUrl = tempCanvas.toDataURL('image/png')
+          const newImage = await fabric.Image.fromURL(croppedDataUrl)
+
+          // 保持原有的位置和透明度
+          newImage.set({
+            left: coverImageElement.left ?? 0,
+            top: coverImageElement.top ?? 0,
+            opacity: coverImageElement.opacity ?? 0.85,
+            originX: 'left',
+            originY: 'top',
+          })
+          ;(newImage as fabric.Image & { name: string; id: string }).name = '當日封面'
+          ;(newImage as fabric.Image & { name: string; id: string }).id = `el-daily-cover-d${currentDayIndex}`
+
+          // 記住舊圖片的 zIndex
+          const oldIndex = canvas.getObjects().indexOf(coverImageElement)
+
+          // 移除舊的，添加新的
+          canvas.remove(coverImageElement)
+          canvas.add(newImage)
+
+          // 將新圖片移到與舊圖片相同的層級（通常是最底層）
+          if (oldIndex === 0) {
+            canvas.sendObjectToBack(newImage)
+          }
+
+          canvas.renderAll()
+        } catch (err) {
+          logger.error('Failed to update cover image:', err)
+        }
+      } else if (pendingImageUrl) {
+        // 如果找不到現有的封面圖片元素，添加一個新的
+        await addImage(pendingImageUrl, { x: 0, y: 0 })
+      }
+
+      // 更新 generatedPages（保留 dayIndex）
       const newPages = [...generatedPages]
-      newPages[currentPageIndex] = newPage
+      const pageWithDayIndex = currentPage as CanvasPage & { dayIndex?: number }
+      newPages[currentPageIndex] = {
+        ...currentPage,
+        // 保留或設置 dayIndex
+      } as CanvasPage
+      // 使用 Object.assign 來添加 dayIndex（避免類型錯誤）
+      Object.assign(newPages[currentPageIndex], { dayIndex: pageWithDayIndex.dayIndex ?? currentDayIndex })
       setGeneratedPages(newPages)
-
-      // 重新渲染當前頁面
-      await loadCanvasPage(newPage)
     }
 
     // 清理狀態
     setPendingImageUrl(null)
     setShowDailyImageEditor(false)
-  }, [selectedStyle, templateData, loadCanvasPage, generatedPages, currentPageIndex, pendingImageUrl, currentDayIndex])
+  }, [selectedStyle, templateData, generatedPages, currentPageIndex, pendingImageUrl, currentDayIndex, canvas, canvasWidth, canvasHeight, addImage])
 
   // ============================================
   // 頁面管理功能
@@ -1051,18 +1292,20 @@ export default function DesignerPage() {
     setCurrentPageIndex(index)
     const targetPage = updatedPages[index] as CanvasPage & { fabricData?: Record<string, unknown> }
 
-    // 檢查 fabricData 是否有效（必須有 objects 陣列且不為空）
+    // 2025-01-22 修改：放寬 fabricData 有效性判斷
+    // 只要 fabricData 存在且有 objects 陣列結構，就使用它（即使 objects 為空）
+    // 這樣可以保留用戶刪除所有元素後的空白頁面狀態，以及元素位置調整
     const hasValidFabricData = targetPage?.fabricData &&
-      Array.isArray((targetPage.fabricData as { objects?: unknown[] }).objects) &&
-      ((targetPage.fabricData as { objects?: unknown[] }).objects?.length ?? 0) > 0
+      typeof targetPage.fabricData === 'object' &&
+      Array.isArray((targetPage.fabricData as { objects?: unknown[] }).objects)
 
-    // 如果目標頁面有有效的 fabricData，優先使用它
+    // 如果目標頁面有 fabricData，優先使用它（保留用戶的所有編輯）
     if (hasValidFabricData && targetPage.fabricData) {
       await loadCanvasData(targetPage.fabricData)
       // 載入該頁面的歷史記錄
       loadPageHistory(targetPage.id)
     } else if (targetPage) {
-      // 否則使用原始元素重新渲染
+      // 否則使用原始元素重新渲染（首次載入或沒有 fabricData 的頁面）
       await loadCanvasPage(targetPage)
       // 初始化該頁面的歷史（新頁面）
       initPageHistory(targetPage.id)
@@ -1126,16 +1369,18 @@ export default function DesignerPage() {
     saveCurrentPageHistory()
 
     // 生成所有天的頁面
-    const newPages: CanvasPage[] = []
+    const newPages: (CanvasPage & { dayIndex: number })[] = []
     for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
       // 設定 currentDayIndex 來指定第幾天
       const dataWithDay = {
         ...data,
         currentDayIndex: dayIndex,
       }
-      const newPage = generatePageFromTemplate(templateId, dataWithDay)
+      const newPage = generatePageFromTemplate(templateId, dataWithDay) as CanvasPage & { dayIndex: number }
       // 修改頁面名稱以顯示是第幾天
       newPage.name = `第 ${dayIndex + 1} 天行程`
+      // 在頁面上記錄它對應的天數索引（複製時會保留）
+      newPage.dayIndex = dayIndex
       newPages.push(newPage)
     }
 
@@ -1257,6 +1502,24 @@ export default function DesignerPage() {
       id: `${pageToDuplicate.templateKey || 'page'}-${crypto.randomUUID()}`,
       name: `${pageToDuplicate.name} (複製)`,
       elements: [...pageToDuplicate.elements], // 淺複製元素陣列
+    }
+
+    // 明確複製 dayIndex（如果是 daily 頁面）
+    const pageWithDayIndex = pageToDuplicate as CanvasPage & { dayIndex?: number }
+    if (pageToDuplicate.templateKey === 'daily') {
+      if (typeof pageWithDayIndex.dayIndex === 'number') {
+        // 原始頁面有 dayIndex，直接複製
+        (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = pageWithDayIndex.dayIndex
+      } else {
+        // 原始頁面沒有 dayIndex（舊文檔），計算正確的 dayIndex
+        let dailyCount = 0
+        for (let i = 0; i < index; i++) {
+          if (generatedPages[i]?.templateKey === 'daily') {
+            dailyCount++
+          }
+        }
+        (duplicatedPage as CanvasPage & { dayIndex?: number }).dayIndex = dailyCount
+      }
     }
 
     // 如果有 fabricData，也要複製
@@ -1424,12 +1687,12 @@ export default function DesignerPage() {
   const handleSelectDesignType = useCallback(async (type: DesignType) => {
     setSelectedDesignType(type)
 
-    // 其他類型直接進入編輯器
+    // 其他類型直接進入編輯器，建立新的文件
     if (entityId && workspaceId) {
       try {
-        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType)
+        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType, undefined, true)
       } catch (err) {
-        logger.error('Failed to load document:', err)
+        logger.error('Failed to create document:', err)
       }
     }
   }, [entityId, entityType, workspaceId, loadOrCreateDocument])
@@ -1452,23 +1715,9 @@ export default function DesignerPage() {
     const style = styleSeries.find(s => s.id === styleId) || styleSeries[0]
     setSelectedStyle(style)
 
-    // 先檢查是否有存檔
     const effectiveEntityId = selectedTourId
-    if (effectiveEntityId && workspaceId) {
-      try {
-        await loadOrCreateDocument('brochure', effectiveEntityId, workspaceId, 'tour')
 
-        const { currentVersion: loadedVersion } = useDocumentStore.getState()
-        if (loadedVersion) {
-          // 有存檔，直接進入編輯器
-          return
-        }
-      } catch (err) {
-        logger.error('Failed to load document:', err)
-      }
-    }
-
-    // 沒有存檔，載入行程資料並生成封面頁
+    // 每次都建立新的手冊，載入行程資料並生成封面頁
     try {
       let data: TemplateData = {
         mainTitle: '旅遊手冊',
@@ -1542,9 +1791,9 @@ export default function DesignerPage() {
       setCurrentPageIndex(0)
       setTemplateData(data as Record<string, unknown>)
 
-      // 載入或建立文件
+      // 建立新的手冊文件（每次都建立新的副本）
       if (effectiveEntityId && workspaceId) {
-        await loadOrCreateDocument('brochure', effectiveEntityId, workspaceId, 'tour')
+        await loadOrCreateDocument('brochure', effectiveEntityId, workspaceId, 'tour', undefined, true)
       }
     } catch (err) {
       logger.error('Failed to start brochure:', err)
@@ -1565,12 +1814,12 @@ export default function DesignerPage() {
     setSelectedStyle(style)
     setShowTemplateSelector(false)
 
-    // 如果有 entityId，載入或建立文件
+    // 如果有 entityId，建立新的手冊文件
     if (entityId && workspaceId) {
       try {
-        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType)
+        await loadOrCreateDocument('brochure', entityId, workspaceId, entityType, undefined, true)
       } catch (err) {
-        logger.error('Failed to load document:', err)
+        logger.error('Failed to create document:', err)
       }
     }
   }, [entityId, entityType, workspaceId, loadOrCreateDocument])
@@ -1643,6 +1892,7 @@ export default function DesignerPage() {
         elements: CanvasElement[]
         fabricData?: Record<string, unknown>
         memoPageContent?: MemoPageContent // 備忘錄內容
+        dayIndex?: number // 每日行程的天數索引
       }
       const savedPages = versionData.pages as SavedPage[]
       const savedPageIndex = typeof versionData.currentPageIndex === 'number' ? versionData.currentPageIndex : 0
@@ -1651,10 +1901,15 @@ export default function DesignerPage() {
 
       // 還原頁面資料（偵測舊尺寸並自動縮放）
       const restoredPages = savedPages.map(page => {
-        // 修正舊資料的 templateKey（行程總覽原本錯誤設為 'daily'）
+        // 修正舊資料的 templateKey
         let fixedTemplateKey = page.templateKey
+        // 行程總覽原本錯誤設為 'daily'
         if (page.name?.includes('行程總覽') && page.templateKey === 'daily') {
           fixedTemplateKey = 'itinerary'
+        }
+        // 目錄原本錯誤設為 'general'
+        if (page.name?.includes('目錄') && page.templateKey === 'general') {
+          fixedTemplateKey = 'toc'
         }
 
         // 檢測是否需要縮放到標準 A5 尺寸（300 DPI）
@@ -1697,7 +1952,7 @@ export default function DesignerPage() {
           logger.log(`[Auto Scale] 頁面 "${page.name}" 從 ${page.width}x${page.height} 縮放到 ${scaledWidth}x${scaledHeight} (縮放因子: ${scaleFactor.toFixed(3)})`)
         }
 
-        return {
+        const restoredPage: CanvasPage & { dayIndex?: number; memoPageContent?: MemoPageContent } = {
           id: page.id,
           name: page.name,
           templateKey: fixedTemplateKey,
@@ -1706,32 +1961,35 @@ export default function DesignerPage() {
           backgroundColor: page.backgroundColor,
           elements: scaledElements,
           fabricData: scaledFabricData, // 縮放後的畫布資料
-          memoPageContent: page.memoPageContent, // 還原備忘錄內容
         }
+        // 還原備忘錄內容
+        if (page.memoPageContent) {
+          restoredPage.memoPageContent = page.memoPageContent
+        }
+        // 還原每日行程的天數索引
+        if (typeof page.dayIndex === 'number') {
+          restoredPage.dayIndex = page.dayIndex
+        }
+        return restoredPage
       }) as CanvasPage[]
+
+      // 自動修復缺少 dayIndex 的 daily 頁面（舊文檔相容）
+      let dailyCount = 0
+      for (const page of restoredPages) {
+        if (page.templateKey === 'daily') {
+          const pageWithDayIndex = page as CanvasPage & { dayIndex?: number }
+          if (typeof pageWithDayIndex.dayIndex !== 'number') {
+            pageWithDayIndex.dayIndex = dailyCount
+          }
+          dailyCount++
+        }
+      }
 
       setGeneratedPages(restoredPages)
       setCurrentPageIndex(savedPageIndex)
       if (savedTemplateData) {
         setTemplateData(savedTemplateData)
-
-        // 從資料庫取得最新的團名來更新（避免顯示舊的團名）
-        if (entityId && entityType === 'tour') {
-          supabase
-            .from('tours')
-            .select('name, code')
-            .eq('id', entityId)
-            .single()
-            .then(({ data: tourData }) => {
-              if (tourData?.name) {
-                setTemplateData(prev => prev ? {
-                  ...prev,
-                  mainTitle: tourData.name,
-                  tourCode: tourData.code || prev.tourCode,
-                } : prev)
-              }
-            })
-        }
+        // 注意：不從資料庫更新內容，手冊保存後內容就固定了
       }
 
       // 還原選擇的風格
@@ -1742,21 +2000,23 @@ export default function DesignerPage() {
         }
       }
 
-      // 載入當前頁面的畫布資料
-      const currentPageData = savedPages[savedPageIndex]
-      // 檢查 fabricData 是否有效（必須有 objects 陣列且不為空）
+      // 載入當前頁面的畫布資料（使用縮放後的 restoredPages）
+      const currentPageData = restoredPages[savedPageIndex]
+      // 2025-01-22 修改：放寬 fabricData 有效性判斷
+      // 只要 fabricData 存在且有 objects 陣列結構，就使用它（即使 objects 為空）
       const hasValidFabricData = currentPageData?.fabricData &&
-        Array.isArray((currentPageData.fabricData as { objects?: unknown[] }).objects) &&
-        ((currentPageData.fabricData as { objects?: unknown[] }).objects?.length ?? 0) > 0
+        typeof currentPageData.fabricData === 'object' &&
+        Array.isArray((currentPageData.fabricData as { objects?: unknown[] }).objects)
 
       if (hasValidFabricData && currentPageData.fabricData) {
+        // 使用縮放後的 fabricData（保留用戶的所有編輯，包括位置調整）
         loadCanvasData(currentPageData.fabricData).then(() => {
           setLoadingStage('idle', 100)
           // 初始化當前頁面的歷史記錄
           initPageHistory(currentPageData.id)
         })
       } else if (restoredPages[savedPageIndex]) {
-        // 如果沒有有效的 fabricData，使用 elements 重新渲染
+        // 如果沒有 fabricData，使用 elements 重新渲染（首次載入）
         loadCanvasPage(restoredPages[savedPageIndex]).then(() => {
           setLoadingStage('idle', 100)
           // 初始化當前頁面的歷史記錄
@@ -1821,17 +2081,25 @@ export default function DesignerPage() {
     // 組合完整的文件資料
     const documentData = {
       version: 1, // 版本號，方便未來升級格式
-      pages: updatedPages.map(page => ({
-        id: page.id,
-        name: page.name,
-        templateKey: page.templateKey,
-        width: page.width,
-        height: page.height,
-        backgroundColor: page.backgroundColor,
-        elements: page.elements, // 原始元素資料
-        fabricData: (page as { fabricData?: Record<string, unknown> }).fabricData, // Fabric.js 畫布資料
-        memoPageContent: (page as { memoPageContent?: MemoPageContent }).memoPageContent, // 備忘錄內容
-      })),
+      pages: updatedPages.map(page => {
+        const pageWithExtras = page as CanvasPage & {
+          fabricData?: Record<string, unknown>
+          memoPageContent?: MemoPageContent
+          dayIndex?: number
+        }
+        return {
+          id: page.id,
+          name: page.name,
+          templateKey: page.templateKey,
+          width: page.width,
+          height: page.height,
+          backgroundColor: page.backgroundColor,
+          elements: page.elements, // 原始元素資料
+          fabricData: pageWithExtras.fabricData, // Fabric.js 畫布資料
+          memoPageContent: pageWithExtras.memoPageContent, // 備忘錄內容
+          dayIndex: pageWithExtras.dayIndex, // 每日行程的天數索引
+        }
+      }),
       currentPageIndex,
       templateData: templateData || null,
       styleId: selectedStyle?.id || null,
@@ -1861,158 +2129,36 @@ export default function DesignerPage() {
     setIsExporting(true)
 
     try {
-      // 先保存當前頁面的畫布資料
-      const currentCanvasData = exportCanvasData() as Record<string, unknown>
-      const pagesToExport = generatedPages.map((page, i) => {
-        if (i === currentPageIndex) {
-          return { ...page, fabricData: currentCanvasData }
-        }
-        return page
+      logger.log(`[PDF Export] Starting vector PDF export for ${generatedPages.length} pages`)
+
+      // 生成向量 PDF
+      const blob = await generateBrochurePDF(generatedPages, {
+        filename: `${storeDocument?.name || '手冊'}.pdf`,
+        onProgress: (current, total) => {
+          logger.log(`[PDF Export] Progress: ${current}/${total}`)
+        },
       })
 
-      // 生成所有頁面圖片
-      console.log(`[PDF Export] Starting export for ${pagesToExport.length} pages`)
-      const images: string[] = []
+      // 開啟預覽視窗
+      const url = URL.createObjectURL(blob)
+      const printWindow = window.open(url, '_blank')
 
-      const tempCanvasEl = document.createElement('canvas')
-      tempCanvasEl.width = canvasWidth
-      tempCanvasEl.height = canvasHeight
-      tempCanvasEl.style.display = 'none'
-      document.body.appendChild(tempCanvasEl)
-
-      const tempFabricCanvas = new fabric.Canvas(tempCanvasEl, {
-        width: canvasWidth,
-        height: canvasHeight,
-        backgroundColor: '#ffffff',
-        renderOnAddRemove: false,
-      })
-
-      for (let i = 0; i < pagesToExport.length; i++) {
-        const page = pagesToExport[i]
-        const fabricData = (page as CanvasPage & { fabricData?: Record<string, unknown> }).fabricData
-
-        console.log(`[PDF Export] Page ${i + 1}: ${page.name}`)
-
-        try {
-          tempFabricCanvas.clear()
-          tempFabricCanvas.backgroundColor = page.backgroundColor || '#ffffff'
-
-          const fabricDataObjects = fabricData ? (fabricData as { objects?: unknown[] }).objects : undefined
-          const hasValidFabricData = fabricData && Array.isArray(fabricDataObjects) && fabricDataObjects.length > 0
-
-          if (hasValidFabricData) {
-            await Promise.race([
-              (async () => {
-                await tempFabricCanvas.loadFromJSON(fabricData)
-                tempFabricCanvas.renderAll()
-              })(),
-              new Promise<void>((_, reject) =>
-                setTimeout(() => reject(new Error(`Page ${i + 1} timeout`)), 5000)
-              )
-            ])
-          } else if (page.elements && page.elements.length > 0) {
-            await renderPageOnCanvas(tempFabricCanvas, page, {
-              isEditable: false,
-              canvasWidth,
-              canvasHeight,
-            })
-          } else {
-            tempFabricCanvas.renderAll()
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 100))
-
-          const dataUrl = tempFabricCanvas.toDataURL({
-            format: 'png',
-            quality: 1,
-            multiplier: 2,
-          })
-          images.push(dataUrl)
-        } catch (err) {
-          console.error(`[PDF Export] Page ${i + 1} failed:`, err)
-          const dataUrl = tempFabricCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 2 })
-          images.push(dataUrl)
-        }
-      }
-
-      tempFabricCanvas.dispose()
-      document.body.removeChild(tempCanvasEl)
-
-      // 過濾空白頁並開啟列印視窗
-      const validImages = images.filter(img => img && img.length > 10000)
-      console.log(`[PDF Export] Generated ${validImages.length} valid images`)
-
-      const printWindow = window.open('', '_blank', 'width=800,height=600')
       if (!printWindow) {
-        alert('請允許彈出視窗以進行列印')
-        return
+        // 如果無法開啟新視窗，直接下載
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${storeDocument?.name || '手冊'}.pdf`
+        a.click()
       }
 
-      const imagesHtml = validImages.map((img, index) =>
-        `<div class="page-container"><img src="${img}" alt="第 ${index + 1} 頁" /></div>`
-      ).join('')
-
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${storeDocument?.name || '手冊列印'}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { background: #f5f5f5; }
-            .print-controls {
-              position: fixed; top: 0; left: 0; right: 0;
-              padding: 16px; background: white;
-              border-bottom: 1px solid #ddd;
-              text-align: right; z-index: 100;
-            }
-            .print-controls button {
-              padding: 8px 16px; margin-left: 8px;
-              cursor: pointer; border-radius: 6px; font-size: 14px;
-            }
-            .btn-outline { background: white; border: 1px solid #ddd; }
-            .btn-primary { background: #c9aa7c; color: white; border: none; }
-            .content {
-              padding: 70px 20px 20px;
-              display: flex; flex-direction: column;
-              align-items: center; gap: 16px;
-            }
-            .page-container {
-              background: white;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-              max-width: 100%;
-            }
-            .page-container img { display: block; width: 100%; height: auto; }
-            @media print {
-              .print-controls { display: none !important; }
-              html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-              .content { padding: 0 !important; gap: 0 !important; margin: 0 !important; display: block !important; }
-              .page-container {
-                box-shadow: none !important; margin: 0 !important; padding: 0 !important;
-                width: 100% !important; height: 100vh !important;
-                page-break-after: always; page-break-inside: avoid;
-                break-after: page; break-inside: avoid; overflow: hidden;
-              }
-              .page-container:last-child { page-break-after: auto; break-after: auto; }
-              .page-container img { width: 100% !important; height: 100% !important; object-fit: contain; display: block !important; }
-              @page { size: A5 portrait; margin: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-controls">
-            <button class="btn-outline" onclick="window.close()">關閉</button>
-            <button class="btn-primary" onclick="window.print()">列印 / 儲存 PDF</button>
-          </div>
-          <div class="content">${imagesHtml}</div>
-        </body>
-        </html>
-      `)
-      printWindow.document.close()
+      logger.log(`[PDF Export] Generated PDF: ${(blob.size / 1024 / 1024).toFixed(2)} MB`)
+    } catch (error) {
+      logger.error('[PDF Export] Failed:', error)
+      alert('PDF 匯出失敗，請稍後再試')
     } finally {
       setIsExporting(false)
     }
-  }, [generatedPages, currentPageIndex, exportCanvasData, canvasWidth, canvasHeight, isExporting, storeDocument?.name])
+  }, [generatedPages, isExporting, storeDocument?.name])
 
   // ============================================
   // Template Data Change Handler
@@ -2310,8 +2456,11 @@ export default function DesignerPage() {
       const oldTimeline = (oldDayData?.timeline as Array<Record<string, unknown>>) || []
       const newTimeline = (newDayData?.timeline as Array<Record<string, unknown>>) || []
 
-      // 時間軸常量（與模板定義一致）
-      const TIMELINE_ITEM_GAP = 36 // 每項間距
+      // 計算縮放因子（如果畫布是 300 DPI 版本）
+      const scale = canvasWidth > 1000 ? NEW_A5_WIDTH / 559 : 1
+
+      // 時間軸常量（需要根據縮放因子調整）
+      const TIMELINE_ITEM_GAP = 36 * scale // 每項間距
       const TIMELINE_COLORS = {
         ink: '#3e3a36',
         primary: '#8e8070',
@@ -2323,110 +2472,177 @@ export default function DesignerPage() {
         const newLen = newTimeline.length
 
         if (newLen > oldLen) {
-          // === 新增項目：在「編號最大的項目」下方添加新元素（群組） ===
-          // 這樣用戶把最後一個項目拖到右邊欄位後，新項目會跟著在右邊延伸
-          const lastItemObj = oldLen > 0 ? getObjectByName(`時間軸項目${oldLen}`) : null
+          // === 新增項目：在最後一個項目下方添加新元素（單獨元素，不使用群組） ===
+          // 優先使用圓點位置作為錨點（比時間文字更可靠，因為圓點是視覺中心）
+          const lastDotObj = oldLen > 0 ? getObjectByName(`圓點${oldLen}`) : null
+          const lastTimeObj = oldLen > 0 ? getObjectByName(`時間${oldLen}`) : null
 
-          // 計算新項目的起始 Y 位置
-          let baseY: number
-          let timelineX: number
+          // 調試日誌
+          logger.log('Adding timeline item:', {
+            oldLen,
+            newLen,
+            lastDot: lastDotObj ? { left: (lastDotObj as fabric.FabricObject).left, top: (lastDotObj as fabric.FabricObject).top } : null,
+            lastTime: lastTimeObj ? { left: (lastTimeObj as fabric.FabricObject).left, top: (lastTimeObj as fabric.FabricObject).top } : null,
+          })
 
-          if (lastItemObj && 'top' in lastItemObj && 'left' in lastItemObj) {
-            // 從最後一個群組的位置往下延伸
-            baseY = (lastItemObj.top as number) + TIMELINE_ITEM_GAP
-            timelineX = lastItemObj.left as number
-          } else {
-            // 如果沒有找到群組，嘗試找舊版的單獨元素
-            const lastTimeObj = oldLen > 0 ? getObjectByName(`時間${oldLen}`) : null
-            if (lastTimeObj && 'top' in lastTimeObj && 'left' in lastTimeObj) {
-              baseY = (lastTimeObj.top as number) + TIMELINE_ITEM_GAP
-              timelineX = lastTimeObj.left as number
-            } else {
-              // 使用預設值
-              baseY = 430
-              timelineX = 38
-            }
+          // 計算新項目的起始位置
+          // 往回搜尋找到第一個在有效位置的圓點作為錨點
+          let baseY: number = 430 * scale  // 預設值
+          let timelineX: number = 48 * scale  // 預設值
+
+          const isValidPosition = (x: number, y: number) => {
+            return x >= 0 && x < canvasWidth && y >= 0 && y < canvasHeight
           }
 
-          // 添加新的時間軸項目（群組）
+          let foundValidAnchor = false
+          let anchorIndex = oldLen  // 從最後一個開始往回找
+
+          // 往回搜尋有效的圓點錨點
+          while (anchorIndex > 0 && !foundValidAnchor) {
+            const dotObj = getObjectByName(`圓點${anchorIndex}`)
+            if (dotObj && 'left' in dotObj && 'top' in dotObj) {
+              const dotLeft = dotObj.left as number
+              const dotTop = dotObj.top as number
+
+              if (isValidPosition(dotLeft, dotTop)) {
+                // 找到有效的圓點，計算新項目位置
+                // 新項目應該在這個圓點下方 (newLen - anchorIndex) 個間距
+                const stepsFromAnchor = newLen - anchorIndex
+                timelineX = dotLeft - 50 * scale  // 從圓點反推時間文字 X
+                baseY = (dotTop - 5 * scale) + stepsFromAnchor * TIMELINE_ITEM_GAP
+                foundValidAnchor = true
+                logger.log('Found valid anchor at dot', anchorIndex, ':', { dotLeft, dotTop, stepsFromAnchor, timelineX, baseY })
+              } else {
+                logger.log('Dot', anchorIndex, 'invalid position:', { dotLeft, dotTop })
+              }
+            }
+            anchorIndex--
+          }
+
+          if (!foundValidAnchor) {
+            // 沒找到有效錨點，使用預設值
+            baseY = 430 * scale
+            timelineX = 48 * scale // contentPadding(40) + 8
+            logger.log('No valid anchor found, using default:', { baseY, timelineX, scale })
+          }
+
+          // 添加新的時間軸項目（單獨元素，所有尺寸都需要縮放）
           for (let idx = oldLen; idx < newLen; idx++) {
             const item = newTimeline[idx] as Record<string, unknown>
             const itemY = baseY + (idx - oldLen) * TIMELINE_ITEM_GAP
 
-            // 時間文字（相對於群組的位置）
+            // 計算各元素的絕對位置
+            const timeLeft = timelineX
+            const dotLeft = timelineX + 50 * scale
+            const dotTop = itemY + 5 * scale
+            const activityLeft = timelineX + 64 * scale
+
+            logger.log(`Creating timeline item ${idx + 1}:`, {
+              timelineX,
+              itemY,
+              scale,
+              timeLeft,
+              dotLeft,
+              dotTop,
+              activityLeft,
+              dotRadius: 3 * scale,
+            })
+
+            // 時間文字
             const timeText = new fabric.Textbox(String(item.time || ''), {
-              left: 0,
-              top: 0,
-              width: 45,
-              fontSize: 10,
+              left: timeLeft,
+              top: itemY,
+              width: 45 * scale,
+              fontSize: 10 * scale,
               fontFamily: 'Noto Sans TC',
               fontWeight: '500',
               fill: TIMELINE_COLORS.primary,
               textAlign: 'right',
               lineHeight: 1.6,
+              originX: 'left',
+              originY: 'top',
             })
             ;(timeText as fabric.Textbox & { name: string }).name = `時間${idx + 1}`
+            canvas.add(timeText)
 
-            // 圓點（相對於群組的位置）
+            // 圓點（與模板渲染器一致：使用 originX/Y = 'left'/'top'）
+            const isHighlight = (item as { isHighlight?: boolean }).isHighlight
             const dot = new fabric.Circle({
-              left: 50,
-              top: 5,
-              radius: 3,
+              left: dotLeft,
+              top: dotTop,
+              radius: 3 * scale,
               fill: TIMELINE_COLORS.primary,
               stroke: 'transparent',
               strokeWidth: 0,
+              opacity: isHighlight ? 1 : 0.6,
+              originX: 'left',
+              originY: 'top',
             })
             ;(dot as fabric.Circle & { name: string }).name = `圓點${idx + 1}`
+            canvas.add(dot)
 
-            // 活動文字（相對於群組的位置）
+            logger.log(`Added dot ${idx + 1}:`, { left: dot.left, top: dot.top, radius: dot.radius })
+
+            // 活動文字
             const activityText = new fabric.Textbox(String(item.activity || ''), {
-              left: 64,
-              top: 0,
-              width: 350,
-              fontSize: 11,
+              left: timelineX + 64 * scale,
+              top: itemY,
+              width: 350 * scale,
+              fontSize: 11 * scale,
               fontFamily: 'Noto Sans TC',
               fontWeight: '400',
               fill: TIMELINE_COLORS.ink,
               textAlign: 'left',
               lineHeight: 1.5,
+              originX: 'left',
+              originY: 'top',
             })
             ;(activityText as fabric.Textbox & { name: string }).name = `活動${idx + 1}`
-
-            // 創建群組
-            const group = new fabric.Group([timeText, dot, activityText], {
-              left: timelineX,
-              top: itemY,
-            })
-            ;(group as fabric.Group & { id: string; name: string }).id = `el-daily-item-${idx}-d${currentDayIndex}`
-            ;(group as fabric.Group & { name: string }).name = `時間軸項目${idx + 1}`
-
-            canvas.add(group)
+            canvas.add(activityText)
           }
 
-          // 更新時間軸線的高度
-          const timelineLineObj = getObjectByName('時間軸線')
+          // 更新時間軸線的高度（如果不存在則創建）
+          let timelineLineObj = getObjectByName('時間軸線')
           if (timelineLineObj && 'height' in timelineLineObj) {
             timelineLineObj.set('height', newLen * TIMELINE_ITEM_GAP)
-            canvas.renderAll()
+          } else {
+            // 時間軸線不存在，創建一個新的
+            // 時間軸線位置：在圓點左邊 2px（timelineX + 50 是圓點位置，線在 timelineX + 52）
+            const lineX = timelineX + 52 * scale
+            const lineY = baseY + 12 * scale  // 起始點向下偏移 12px
+            const timelineLine = new fabric.Rect({
+              left: lineX,
+              top: lineY,
+              width: 1 * scale,
+              height: newLen * TIMELINE_ITEM_GAP,
+              fill: TIMELINE_COLORS.primary,
+              stroke: 'transparent',
+              strokeWidth: 0,
+              opacity: 0.25,
+              originX: 'left',
+              originY: 'top',
+              selectable: false,
+            })
+            ;(timelineLine as fabric.Rect & { name: string }).name = '時間軸線'
+            canvas.add(timelineLine)
+            // 把線移到底層，讓圓點在線上面
+            canvas.sendObjectToBack(timelineLine)
+            logger.log('Created new timeline line:', { lineX, lineY, height: newLen * TIMELINE_ITEM_GAP })
           }
+          canvas.renderAll()
 
         } else if (newLen < oldLen) {
-          // === 刪除項目：移除群組（或舊版的單獨元素） ===
+          // === 刪除項目：移除單獨元素 ===
           for (let idx = newLen; idx < oldLen; idx++) {
-            // 先嘗試刪除群組
-            const removed = removeObjectByName(`時間軸項目${idx + 1}`)
-            if (!removed) {
-              // 如果沒有群組，刪除舊版的單獨元素
-              removeObjectByName(`時間${idx + 1}`)
-              removeObjectByName(`圓點${idx + 1}`)
-              removeObjectByName(`活動${idx + 1}`)
-            }
+            removeObjectByName(`時間${idx + 1}`)
+            removeObjectByName(`圓點${idx + 1}`)
+            removeObjectByName(`活動${idx + 1}`)
           }
 
-          // 更新時間軸線的高度
+          // 更新時間軸線的高度（最小高度也需要縮放）
           const timelineLineObj = getObjectByName('時間軸線')
           if (timelineLineObj && 'height' in timelineLineObj) {
-            timelineLineObj.set('height', Math.max(newLen * TIMELINE_ITEM_GAP, 36))
+            timelineLineObj.set('height', Math.max(newLen * TIMELINE_ITEM_GAP, 36 * scale))
             canvas.renderAll()
           }
         }
@@ -2434,84 +2650,25 @@ export default function DesignerPage() {
         canvas.renderAll()
       }
 
-      // 更新所有現有項目的文字內容
-      newTimeline.forEach((item, idx) => {
-        const oldItem = oldTimeline[idx] as Record<string, unknown> | undefined
-        if (oldItem?.time !== item.time) {
-          updateElementByName(`時間${idx + 1}`, { text: String(item.time || '') })
-        }
-        if (oldItem?.activity !== item.activity) {
-          updateElementByName(`活動${idx + 1}`, { text: String(item.activity || '') })
-        }
-      })
-
-      // 每日標題變化，直接更新畫布元素
-      if (oldDayData?.title !== newDayData?.title) {
-        updateElementByName('當日標題', { text: String(newDayData?.title || '') })
-      }
-
-      // 餐食變化，直接更新畫布元素
-      const oldMeals = (oldDayData?.meals as Record<string, string>) || {}
-      const newMeals = (newDayData?.meals as Record<string, string>) || {}
-      if (oldMeals.breakfast !== newMeals.breakfast) {
-        updateElementByName('早餐', { text: String(newMeals.breakfast || '') })
-      }
-      if (oldMeals.lunch !== newMeals.lunch) {
-        updateElementByName('午餐', { text: String(newMeals.lunch || '') })
-      }
-      if (oldMeals.dinner !== newMeals.dinner) {
-        updateElementByName('晚餐', { text: String(newMeals.dinner || '') })
-      }
+      // 2025-01-22 修改：不再自動更新畫布上的時間軸文字
+      // 原因：用戶希望「載入行程後，畫布內容就固定了」
+      // 如果需要更新，用戶應該手動在畫布上編輯或重新生成頁面
+      // 保留：新增時間軸項目的邏輯（上方的 newLen > oldLen 處理）
     }
 
-    // 欄位名稱到畫布元素名稱的對應表
-    // 注意：這裡只更新文字內容，不會改變元素位置
-    const fieldToElementMap: Record<string, string> = {
-      // 封面頁
-      destination: '地點',
-      mainTitle: '主標題',
-      subtitle: '副標題',
-      companyName: '公司名稱',
-      tourCode: '團號',
-      travelDates: '日期',
-      // 行程總覽頁
-      meetingTime: '集合文字',
-      meetingPlace: '集合文字',
-      leaderName: '領隊文字',
-      leaderPhone: '領隊文字',
-    }
-
-    // 檢查每個欄位，如果有變更就直接更新對應的畫布元素
-    Object.entries(fieldToElementMap).forEach(([field, elementName]) => {
-      const oldValue = oldData[field]
-      const newValue = newData[field]
-
-      // 只在值有變化時更新
-      if (oldValue !== newValue && newValue !== undefined) {
-        // 特殊處理：集合資訊需要組合
-        if (field === 'meetingTime' || field === 'meetingPlace') {
-          const time = field === 'meetingTime' ? newValue : newData.meetingTime
-          const place = field === 'meetingPlace' ? newValue : newData.meetingPlace
-          const meeting = [time, place].filter(Boolean).join(' ')
-          if (meeting) {
-            updateElementByName(elementName, { text: `集合 ${meeting}` })
-          }
-        }
-        // 特殊處理：領隊資訊需要組合
-        else if (field === 'leaderName' || field === 'leaderPhone') {
-          const name = field === 'leaderName' ? newValue : newData.leaderName
-          const phone = field === 'leaderPhone' ? newValue : newData.leaderPhone
-          if (name) {
-            const text = phone ? `領隊 ${name}  ${phone}` : `領隊 ${name}`
-            updateElementByName(elementName, { text })
-          }
-        }
-        // 一般欄位
-        else {
-          updateElementByName(elementName, { text: String(newValue || '') })
-        }
-      }
-    })
+    // 2025-01-22 修改：停止自動同步 templateData 到畫布元素
+    // 原因：用戶明確要求「載入行程就只有這麼一次，不要再不斷地幫我把版本回朔」
+    // 畫布上的編輯應該被保留，不被 templateData 覆蓋
+    //
+    // 原本的邏輯會在 templateData 變化時自動更新畫布元素文字：
+    // - 每日標題、餐食、封面資訊、集合/領隊資訊等
+    // 現在這些都不再自動更新，用戶的畫布編輯會被保留
+    //
+    // 如果用戶想重新從行程載入資料，應該：
+    // 1. 刪除該頁面
+    // 2. 重新添加相同類型的頁面
+    // 或
+    // 1. 手動在畫布上編輯文字
   }, [templateData, isCanvasReady, updateElementByName, generatedPages, currentPageIndex, currentDayIndex, selectedStyle, loadCanvasPage])
 
   // ============================================
@@ -2655,6 +2812,89 @@ export default function DesignerPage() {
   }, [selectedDesignType, zoom, setZoom])
 
   // ============================================
+  // Space + 拖曳平移畫面
+  // ============================================
+  useEffect(() => {
+    if (!selectedDesignType) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 在輸入框中不觸發
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
+      }
+      // 按下 Space 進入平移模式
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault()
+        setIsPanMode(true)
+      }
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      // 放開 Space 退出平移模式
+      if (e.code === 'Space') {
+        setIsPanMode(false)
+        panStateRef.current.isPanning = false
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [selectedDesignType])
+
+  // Pan mode 滑鼠拖曳處理
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer || !isPanMode) return
+
+    const handleMouseDown = (e: MouseEvent) => {
+      // 只在平移模式下且是左鍵點擊
+      if (!isPanMode || e.button !== 0) return
+
+      e.preventDefault()
+      panStateRef.current = {
+        isPanning: true,
+        startX: e.clientX,
+        startY: e.clientY,
+        scrollLeft: scrollContainer.scrollLeft,
+        scrollTop: scrollContainer.scrollTop,
+      }
+      scrollContainer.style.cursor = 'grabbing'
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!panStateRef.current.isPanning) return
+
+      const dx = e.clientX - panStateRef.current.startX
+      const dy = e.clientY - panStateRef.current.startY
+      scrollContainer.scrollLeft = panStateRef.current.scrollLeft - dx
+      scrollContainer.scrollTop = panStateRef.current.scrollTop - dy
+    }
+
+    const handleMouseUp = () => {
+      panStateRef.current.isPanning = false
+      scrollContainer.style.cursor = isPanMode ? 'grab' : ''
+    }
+
+    scrollContainer.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    // 進入平移模式時改變游標
+    scrollContainer.style.cursor = 'grab'
+
+    return () => {
+      scrollContainer.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      scrollContainer.style.cursor = ''
+    }
+  }, [isPanMode])
+
+  // ============================================
   // Unsaved Changes Warning
   // ============================================
   useEffect(() => {
@@ -2766,11 +3006,11 @@ export default function DesignerPage() {
 
       {/* Header - 72px */}
       <header className="h-[72px] bg-card border-b border-border px-4 flex items-center gap-3 shrink-0">
-        {/* 返回按鈕 */}
+        {/* 返回按鈕 - 回到設計列表 */}
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setSelectedDesignType(null)}
+          onClick={() => router.push('/design')}
           className="gap-2"
         >
           <ArrowLeft size={16} />
@@ -2860,18 +3100,6 @@ export default function DesignerPage() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {entityId && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowVersionHistory(true)}
-              className="gap-1"
-            >
-              <Clock size={14} />
-              版本
-            </Button>
-          )}
-
           <Button
             size="sm"
             onClick={handleSave}
@@ -2992,14 +3220,35 @@ export default function DesignerPage() {
               // QR Code 直接作為圖片插入
               addImage(dataUrl)
             }}
+            onAddTimeline={addTimeline}
+            onAddTimelinePoint={addTimelinePoint}
+            isTimelineSelected={
+              selectedObject != null &&
+              (selectedObject as unknown as { data?: { timelineId?: string } }).data?.timelineId != null
+            }
           />
         )}
 
         {/* Canvas Area */}
         <main ref={canvasContainerRef} className="flex-1 relative overflow-hidden bg-morandi-container/20">
-          {/* Canvas Container - 使用 grid place-items-center 搭配 overflow-auto 實現置中 */}
-          <div className="absolute inset-0 overflow-auto p-8">
-            <div className="min-h-full min-w-full flex items-center justify-center">
+          {/* Canvas Container - 可滾動容器 */}
+          <div
+            ref={scrollContainerRef}
+            className="absolute inset-0 overflow-auto"
+            style={{ overscrollBehavior: 'contain' }}
+          >
+            {/* 內部包裝 - 使用 inline-flex 讓容器跟隨內容大小擴展 */}
+            <div
+              style={{
+                display: 'inline-flex',
+                minWidth: '100%',
+                minHeight: '100%',
+                padding: '32px',
+                boxSizing: 'border-box',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
             {isDualPageMode ? (
               /* 雙頁預覽模式 */
               <DualPagePreview
@@ -3038,6 +3287,14 @@ export default function DesignerPage() {
             )}
             </div>
           </div>
+
+          {/* Mask Edit Mode Indicator */}
+          {isEditingMask && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-morandi-gold text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
+              <span className="font-medium">遮罩編輯模式</span>
+              <span className="ml-2 opacity-80">拖曳移動圖片 · 滾輪縮放 · Esc 退出</span>
+            </div>
+          )}
 
           {/* Quick Actions (bottom left) */}
           <div className="absolute bottom-4 left-4 flex items-center gap-2">
@@ -3079,6 +3336,10 @@ export default function DesignerPage() {
                   canvas={canvas}
                   selectedObject={selectedObject}
                   onUpdate={() => {}}
+                  onImageFill={(obj) => {
+                    setMaskTargetShape(obj)
+                    setShowImageMaskFill(true)
+                  }}
                 />
               </TabsContent>
 
@@ -3127,11 +3388,6 @@ export default function DesignerPage() {
           />
         )}
       </div>
-
-      {/* Version History Panel */}
-      {showVersionHistory && (
-        <VersionHistory onClose={() => setShowVersionHistory(false)} />
-      )}
 
       {/* 封面圖片選擇對話框 */}
       <ImagePickerDialog
@@ -3199,6 +3455,17 @@ export default function DesignerPage() {
           hideModes={['crop', 'adjust']}
         />
       )}
+
+      {/* 圖片遮罩填充對話框 */}
+      <ImageMaskFillDialog
+        open={showImageMaskFill}
+        onOpenChange={setShowImageMaskFill}
+        canvas={canvas}
+        targetShape={maskTargetShape}
+        onComplete={() => {
+          setMaskTargetShape(null)
+        }}
+      />
 
     </div>
   )

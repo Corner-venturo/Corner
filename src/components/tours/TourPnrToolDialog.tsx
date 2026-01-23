@@ -64,8 +64,6 @@ interface TourPnrToolDialogProps {
   tourName: string
   members: OrderMember[]
   onSuccess?: () => void
-  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
-  nested?: boolean
 }
 
 interface PassengerMatch {
@@ -154,7 +152,6 @@ export function TourPnrToolDialog({
   tourName,
   members,
   onSuccess,
-  nested = false,
 }: TourPnrToolDialogProps) {
   const [rawPNR, setRawPNR] = useState('')
   const [parsedPNR, setParsedPNR] = useState<ParsedPNR | null>(null)
@@ -575,7 +572,7 @@ export function TourPnrToolDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent nested={nested} className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />
@@ -767,6 +764,12 @@ export function TourPnrToolDialog({
                               <ArrowRight size={12} className="text-morandi-secondary" />
                               <span>{getAirportName(seg.destination) || seg.destination}</span>
                             </div>
+                            {/* 經停資訊 */}
+                            {seg.via && seg.via.length > 0 && (
+                              <span className="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
+                                經停: {seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}
+                              </span>
+                            )}
                             {seg.departureTime && (
                               <span className="text-morandi-secondary">
                                 {seg.departureTime.slice(0, 2)}:{seg.departureTime.slice(2)}

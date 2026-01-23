@@ -67,11 +67,13 @@ export function ImageMaskFillDialog({
       const clipPath = await cloneShapeAsClipPath(targetShape)
 
       // 載入圖片
-      const img = await fabric.FabricImage.fromURL(imageUrl)
+      const img = await fabric.FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' })
 
       // 計算圖片縮放以填滿形狀
-      const scaleX = shapeWidth / (img.width || 1)
-      const scaleY = shapeHeight / (img.height || 1)
+      const imgWidth = img.width || 1
+      const imgHeight = img.height || 1
+      const scaleX = shapeWidth / imgWidth
+      const scaleY = shapeHeight / imgHeight
       const scale = Math.max(scaleX, scaleY) // 使用較大的縮放以填滿
 
       // 設定圖片屬性
@@ -98,6 +100,8 @@ export function ImageMaskFillDialog({
       onOpenChange(false)
       setImageUrl(null)
       onComplete()
+
+      logger.log('圖片遮罩填充成功', { shapeWidth, shapeHeight, imgWidth, imgHeight, scale })
     } catch (error) {
       logger.error('圖片遮罩填充失敗:', error)
     } finally {
@@ -197,13 +201,16 @@ export function ImageMaskFillDialog({
 async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.FabricObject> {
   // 根據形狀類型建立對應的 clipPath
   const type = shape.type
+  // 取得原始形狀的縮放比例
+  const scaleX = shape.scaleX || 1
+  const scaleY = shape.scaleY || 1
 
   if (type === 'rect') {
     return new fabric.Rect({
-      width: shape.width,
-      height: shape.height,
-      rx: (shape as fabric.Rect).rx || 0,
-      ry: (shape as fabric.Rect).ry || 0,
+      width: (shape.width || 100) * scaleX,
+      height: (shape.height || 100) * scaleY,
+      rx: ((shape as fabric.Rect).rx || 0) * scaleX,
+      ry: ((shape as fabric.Rect).ry || 0) * scaleY,
       originX: 'center',
       originY: 'center',
     })
@@ -211,7 +218,7 @@ async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.
 
   if (type === 'circle') {
     return new fabric.Circle({
-      radius: (shape as fabric.Circle).radius,
+      radius: ((shape as fabric.Circle).radius || 50) * Math.max(scaleX, scaleY),
       originX: 'center',
       originY: 'center',
     })
@@ -219,8 +226,8 @@ async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.
 
   if (type === 'ellipse') {
     return new fabric.Ellipse({
-      rx: (shape as fabric.Ellipse).rx,
-      ry: (shape as fabric.Ellipse).ry,
+      rx: ((shape as fabric.Ellipse).rx || 50) * scaleX,
+      ry: ((shape as fabric.Ellipse).ry || 50) * scaleY,
       originX: 'center',
       originY: 'center',
     })
@@ -228,8 +235,8 @@ async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.
 
   if (type === 'triangle') {
     return new fabric.Triangle({
-      width: shape.width,
-      height: shape.height,
+      width: (shape.width || 100) * scaleX,
+      height: (shape.height || 100) * scaleY,
       originX: 'center',
       originY: 'center',
     })
@@ -237,7 +244,12 @@ async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.
 
   if (type === 'polygon') {
     const polygon = shape as fabric.Polygon
-    return new fabric.Polygon(polygon.points || [], {
+    // 縮放多邊形的點
+    const scaledPoints = (polygon.points || []).map(p => ({
+      x: p.x * scaleX,
+      y: p.y * scaleY,
+    }))
+    return new fabric.Polygon(scaledPoints, {
       originX: 'center',
       originY: 'center',
     })
@@ -245,14 +257,37 @@ async function cloneShapeAsClipPath(shape: fabric.FabricObject): Promise<fabric.
 
   if (type === 'path') {
     const path = shape as fabric.Path
-    return new fabric.Path(path.path, {
+    const clonedPath = new fabric.Path(path.path, {
       originX: 'center',
       originY: 'center',
+      scaleX: scaleX,
+      scaleY: scaleY,
     })
+    return clonedPath
+  }
+
+  if (type === 'group') {
+    // 處理群組：克隆群組並設定為 clipPath
+    const group = shape as fabric.Group
+    const clonedGroup = await group.clone()
+    clonedGroup.set({
+      originX: 'center',
+      originY: 'center',
+      left: 0,
+      top: 0,
+    })
+    return clonedGroup
   }
 
   // 預設：嘗試克隆
-  return shape.clone()
+  const cloned = await shape.clone()
+  cloned.set({
+    originX: 'center',
+    originY: 'center',
+    left: 0,
+    top: 0,
+  })
+  return cloned
 }
 
 /**

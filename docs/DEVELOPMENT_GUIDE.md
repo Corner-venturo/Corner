@@ -1,7 +1,8 @@
 # Venturo 開發指南
 
-> **最後更新**: 2025-11-09
-> **專案狀態**: 核心功能完成，Realtime 同步系統上線
+> **最後更新**: 2026-01-22
+> **專案狀態**: 核心功能完成，純雲端架構
+> **架構**: Supabase 為唯一資料來源（IndexedDB 已棄用）
 
 ---
 
@@ -9,10 +10,11 @@
 
 ### 專案概述
 ```
-專案名稱: Venturo (旅遊團管理系統)
-工作目錄: /Users/william/Projects/venturo-new
+專案名稱: Venturo ERP (旅遊團管理系統)
+工作目錄: /Users/williamchien/Projects/venturo-erp
 開發端口: 3000
-技術棧:   Next.js 15.5.4 + React 19 + TypeScript 5 + Zustand 5 + Supabase
+技術棧:   Next.js 16 + React 19.2 + TypeScript 5 + Zustand 5 + Supabase
+架構模式: 純雲端架構（Supabase 為 Single Source of Truth）
 ```
 
 ### 核心原則
@@ -72,10 +74,11 @@ import { DateCell, StatusCell, ActionCell } from '@/components/table-cells';
 
 ### 開發
 ```bash
-cd /Users/william/Projects/venturo-new
+cd /Users/williamchien/Projects/venturo-erp
 npm run dev          # 啟動開發伺服器 (port 3000)
 npm run build        # 建置專案
 npm run lint         # 執行 ESLint
+npm run type-check   # TypeScript 類型檢查
 ```
 
 ### 資料庫 (詳見 SUPABASE_GUIDE.md)
@@ -103,20 +106,19 @@ find . -name "*-store.ts"  # 查找所有 stores
 - ✅ 應用到 Quotes/Contracts/Itinerary 頁面
 - **總計減少**: 215 行代碼 (-24%)
 
-### Phase 3-4: Realtime 即時同步系統
-- ✅ Realtime Manager 核心架構
-- ✅ Channels 和 Messages 即時同步
-- ✅ 修正所有 stores 的 setTimeout 問題
-- ✅ 改為「按需訂閱」模式（進入頁面才訂閱）
-- ✅ 支援 50 個資料表的 Realtime
-- ✅ 離線優先策略 + 衝突解決
-- ✅ 權限即時更新系統
+### Phase 3-4: 純雲端架構遷移 (2026-01)
+- ✅ 移除 IndexedDB 離線快取
+- ✅ Supabase Auth 整合
+- ✅ RLS 資料隔離（Workspace 層級）
+- ✅ 編號系統重構（新格式：CNX250128A）
+- ✅ Store 系統重構（createCloudStore）
+- ✅ SWR 快取層
 
 **關鍵改進**:
-- 🔄 多裝置同步：公司刪除的資料，家裡立即消失
-- ⚡ 即時更新：團隊成員的變更 < 100ms 同步
-- 📱 離線支援：斷網時可操作，網路恢復自動同步
-- 🔒 權限更新：管理員變更權限，使用者立即生效
+- 🔄 單一資料來源：Supabase 為唯一 Source of Truth
+- ⚡ 即時更新：透過 SWR revalidation
+- 🔒 資料隔離：RLS 確保 Workspace 資料安全
+- 🔑 統一認證：Supabase Auth + JWT
 
 ---
 
@@ -158,19 +160,25 @@ docs/
 ### 關鍵檔案
 ```
 # 狀態管理
-src/stores/core/create-store-new.ts        - Store 工廠函數
+src/stores/core/create-store.ts            - Store 工廠函數（純雲端）
+src/stores/cloud-store-factory.ts          - Cloud Store 工廠
 src/stores/types.ts                        - 所有型別定義
 
-# Realtime 系統
-src/lib/realtime/realtime-manager.ts       - Realtime 訂閱管理
-src/lib/realtime/createRealtimeHook.ts     - Hook 工廠函數
-src/hooks/use-realtime-hooks.ts            - 所有表格的 Realtime Hooks
+# 認證系統
+src/stores/auth-store.ts                   - 認證狀態管理
+src/lib/auth/auth-sync.ts                  - Auth 同步機制
+
+# 編號生成
+src/stores/utils/code-generator.ts         - 編號生成工具
 
 # 組件系統
 src/components/table-cells/index.tsx       - 表格單元格組件
 src/components/layout/list-page-layout.tsx - 列表頁佈局
 src/hooks/useListPageState.ts              - 列表頁狀態管理
 src/lib/status-config.ts                   - 狀態配置
+
+# 類型定義
+src/lib/supabase/types.ts                  - Supabase 自動生成類型
 ```
 
 ---

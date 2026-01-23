@@ -185,8 +185,8 @@ export interface QuoteCategory {
 export interface QuoteItem {
   id: string
   name: string
-  quantity: number
-  unit_price: number
+  quantity: number | null
+  unit_price: number | null
   total: number
   note?: string
   day?: number // 住宿專用：第幾天
@@ -194,9 +194,9 @@ export interface QuoteItem {
   is_group_cost?: boolean // 交通和領隊導遊專用：團體分攤
   // 多身份計價：機票專用
   pricing_type?: 'uniform' | 'by_identity' // uniform: 統一價格, by_identity: 依身份計價
-  adult_price?: number // 成人價
-  child_price?: number // 小朋友價
-  infant_price?: number // 嬰兒價
+  adult_price?: number | null // 成人價
+  child_price?: number | null // 小朋友價
+  infant_price?: number | null // 嬰兒價
   created_at?: string // 可選，向後相容
   updated_at?: string // 可選，向後相容
 }

@@ -30,10 +30,10 @@ export function useCustomerVerify({ onSuccess }: UseCustomerVerifyProps = {}) {
     // 初始化表單資料
     setFormData({
       name: selectedCustomer.name,
-      passport_romanization: selectedCustomer.passport_romanization || '',
+      passport_name: selectedCustomer.passport_name || '',
       passport_number: selectedCustomer.passport_number || '',
-      passport_expiry_date: selectedCustomer.passport_expiry_date || '',
-      date_of_birth: selectedCustomer.date_of_birth || '',
+      passport_expiry: selectedCustomer.passport_expiry || '',
+      birth_date: selectedCustomer.birth_date || '',
       gender: selectedCustomer.gender || '',
       national_id: selectedCustomer.national_id || '',
       email: selectedCustomer.email || '',

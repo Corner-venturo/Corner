@@ -39,6 +39,12 @@ export interface Restaurant {
   rating: number | null
   is_active: boolean
   is_featured: boolean
+  // GPS 資訊
+  latitude: number | null
+  longitude: number | null
+  address: string | null
+  phone: string | null
+  google_maps_url: string | null
   // Join fields
   region_name?: string
   city_name?: string
@@ -67,6 +73,12 @@ export interface MichelinRestaurant {
   thumbnail: string | null
   images: string[] | null
   is_active: boolean | null
+  // GPS 資訊
+  latitude: number | null
+  longitude: number | null
+  address: string | null
+  phone: string | null
+  google_maps_url: string | null
   // Join fields
   region_name?: string
   city_name?: string

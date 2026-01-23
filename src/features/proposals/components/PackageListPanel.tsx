@@ -13,21 +13,12 @@ import {
   DollarSign,
   ClipboardList,
   BookMarked,
-  Clock,
-  Zap,
 } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '@/stores'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { logger } from '@/lib/utils/logger'
-import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 import {
   createPackage,
   updatePackage,
@@ -38,8 +29,7 @@ import { PackageDialog } from './PackageDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
 import { BrochurePreviewDialog } from './BrochurePreviewDialog'
 import { RequirementSyncDialog } from './RequirementSyncDialog'
-import { TimelineItineraryDialog } from './TimelineItineraryDialog'
-import type { Proposal, ProposalPackage, CreatePackageData, TimelineItineraryData } from '@/types/proposal.types'
+import type { Proposal, ProposalPackage, CreatePackageData } from '@/types/proposal.types'
 
 interface PackageListPanelProps {
   proposal: Proposal
@@ -49,10 +39,8 @@ interface PackageListPanelProps {
   onShowAddDialogChange?: (show: boolean) => void
   /** 當任何子 Dialog 開啟/關閉時回調（用於單一遮罩模式） */
   onChildDialogChange?: (isOpen: boolean) => void
-  /** 開啟快速行程表對話框（由父組件管理，用於單一遮罩模式） */
+  /** 開啟行程表對話框（由父組件管理，用於單一遮罩模式） */
   onOpenItineraryDialog?: (pkg: ProposalPackage) => void
-  /** 開啟時間軸行程表對話框（由父組件管理，用於單一遮罩模式） */
-  onOpenTimelineDialog?: (pkg: ProposalPackage) => void
   /** 當導航離開（如轉開團）時回調，用於關閉父 Dialog */
   onNavigateAway?: () => void
 }
@@ -65,7 +53,6 @@ export function PackageListPanel({
   onShowAddDialogChange,
   onChildDialogChange,
   onOpenItineraryDialog,
-  onOpenTimelineDialog,
   onNavigateAway,
 }: PackageListPanelProps) {
   const router = useRouter()
@@ -110,13 +97,11 @@ export function PackageListPanel({
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [brochureDialogOpen, setBrochureDialogOpen] = useState(false)
   const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
-  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
   // 追蹤是否有任何子 Dialog 開啟（用於單一遮罩模式）
   const hasAnyDialogOpen = addDialogOpen || editDialogOpen ||
-    itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen ||
-    timelineDialogOpen
+    itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen
 
   // 通知父組件子 Dialog 狀態變化
   React.useEffect(() => {
@@ -381,39 +366,6 @@ export function PackageListPanel({
     [router, proposal, user, onPackagesChange]
   )
 
-  // 儲存時間軸資料到資料庫
-  const handleSaveTimeline = useCallback(
-    async (timelineData: TimelineItineraryData) => {
-      if (!selectedPackage) return
-
-      try {
-        const jsonData = JSON.parse(JSON.stringify(timelineData))
-
-        const { error } = await supabase
-          .from('proposal_packages')
-          .update({
-            itinerary_type: 'timeline',
-            timeline_data: jsonData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', selectedPackage.id)
-
-        if (error) throw error
-
-        // 如果有關聯報價單，同步餐食和住宿資料
-        if (selectedPackage.quote_id) {
-          await syncTimelineToQuote(selectedPackage.quote_id, timelineData)
-        }
-
-        onPackagesChange()
-      } catch (error) {
-        logger.error('儲存時間軸資料失敗:', error)
-        throw error
-      }
-    },
-    [selectedPackage, onPackagesChange]
-  )
-
   // 已轉團的提案不能再操作
   const isConverted = proposal.status === 'converted'
   const isArchived = proposal.status === 'archived'
@@ -483,85 +435,27 @@ export function PackageListPanel({
                   {/* 操作按鈕 */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      {/* 行程表按鈕 - 下拉選單可選擇/切換類型 */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`p-1.5 rounded transition-colors ${
-                              pkg.itinerary_id || pkg.timeline_data
-                                ? 'text-morandi-green hover:bg-morandi-green/10'
-                                : 'text-morandi-secondary hover:bg-morandi-container/80'
-                            }`}
-                            title="行程表"
-                          >
-                            <FileText size={16} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-52">
-                          {/* 快速行程表選項 */}
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              // 如果目前是時間軸，先切換類型
-                              if (pkg.itinerary_type === 'timeline' && pkg.itinerary_id) {
-                                await supabase
-                                  .from('proposal_packages')
-                                  .update({ itinerary_type: 'simple' })
-                                  .eq('id', pkg.id)
-                                onPackagesChange()
-                              }
-                              if (onOpenItineraryDialog) {
-                                onOpenItineraryDialog(pkg)
-                              } else {
-                                openItineraryDialog(pkg)
-                              }
-                            }}
-                            className="gap-2 cursor-pointer"
-                          >
-                            <Zap size={16} className="text-morandi-secondary" />
-                            <span>快速行程表</span>
-                            {pkg.itinerary_id && (
-                              <span className={`ml-auto text-xs ${pkg.itinerary_type !== 'timeline' ? 'text-morandi-green' : 'text-morandi-muted'}`}>
-                                {pkg.itinerary_type !== 'timeline' ? '使用中' : '已建立'}
-                              </span>
-                            )}
-                          </DropdownMenuItem>
-                          {/* 時間軸行程表選項 */}
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              // 如果目前是快速，先切換類型
-                              if (pkg.itinerary_type !== 'timeline' && pkg.timeline_data) {
-                                await supabase
-                                  .from('proposal_packages')
-                                  .update({ itinerary_type: 'timeline' })
-                                  .eq('id', pkg.id)
-                                onPackagesChange()
-                              }
-                              if (onOpenTimelineDialog) {
-                                onOpenTimelineDialog(pkg)
-                              } else {
-                                setSelectedPackage(pkg)
-                                setTimelineDialogOpen(true)
-                              }
-                            }}
-                            className="gap-2 cursor-pointer"
-                          >
-                            <Clock size={16} className="text-morandi-secondary" />
-                            <span>時間軸行程表</span>
-                            {pkg.timeline_data && (
-                              <span className={`ml-auto text-xs ${pkg.itinerary_type === 'timeline' ? 'text-morandi-green' : 'text-morandi-muted'}`}>
-                                {pkg.itinerary_type === 'timeline' ? '使用中' : '已建立'}
-                              </span>
-                            )}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      {/* 簡易行程預覽 - 只有快速行程表才能用 */}
+                      {/* 行程表按鈕 - 直接開啟（已整合時間軸功能） */}
                       <button
                         onClick={() => {
-                          if (pkg.itinerary_type === 'timeline') {
-                            void alert('時間軸行程表無法使用此功能', 'info')
-                            return
+                          if (onOpenItineraryDialog) {
+                            onOpenItineraryDialog(pkg)
+                          } else {
+                            openItineraryDialog(pkg)
                           }
+                        }}
+                        className={`p-1.5 rounded transition-colors ${
+                          pkg.itinerary_id
+                            ? 'text-morandi-green hover:bg-morandi-green/10'
+                            : 'text-morandi-secondary hover:bg-morandi-container/80'
+                        }`}
+                        title="行程表"
+                      >
+                        <FileText size={16} />
+                      </button>
+                      {/* 簡易行程預覽 */}
+                      <button
+                        onClick={() => {
                           if (pkg.itinerary_id) {
                             setSelectedPackage(pkg)
                             setBrochureDialogOpen(true)
@@ -570,14 +464,12 @@ export function PackageListPanel({
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_type === 'timeline'
-                            ? 'text-morandi-muted cursor-not-allowed'
-                            : pkg.itinerary_id
-                              ? 'text-morandi-green hover:bg-morandi-green/10'
-                              : 'text-morandi-muted cursor-not-allowed'
+                          pkg.itinerary_id
+                            ? 'text-morandi-green hover:bg-morandi-green/10'
+                            : 'text-morandi-muted cursor-not-allowed'
                         }`}
-                        title={pkg.itinerary_type === 'timeline' ? '時間軸行程表無法使用' : '簡易行程預覽'}
-                        disabled={pkg.itinerary_type === 'timeline' || !pkg.itinerary_id}
+                        title="簡易行程預覽"
+                        disabled={!pkg.itinerary_id}
                       >
                         <Book size={16} />
                       </button>
@@ -635,23 +527,19 @@ export function PackageListPanel({
                       {/* 手冊設計 */}
                       <button
                         onClick={() => {
-                          if (pkg.itinerary_type === 'timeline' && pkg.timeline_data) {
-                            // 時間軸行程表：使用 package_id
-                            router.push(`/brochure?package_id=${pkg.id}`)
-                          } else if (pkg.itinerary_id) {
-                            // 快速行程表：使用 itinerary_id
+                          if (pkg.itinerary_id) {
                             router.push(`/brochure?itinerary_id=${pkg.itinerary_id}`)
                           } else {
                             void alert('請先建立行程表', 'info')
                           }
                         }}
                         className={`p-1.5 rounded transition-colors ${
-                          pkg.itinerary_id || (pkg.itinerary_type === 'timeline' && pkg.timeline_data)
+                          pkg.itinerary_id
                             ? 'text-morandi-primary hover:bg-morandi-container/80'
                             : 'text-morandi-muted cursor-not-allowed'
                         }`}
                         title="手冊設計"
-                        disabled={!pkg.itinerary_id && !(pkg.itinerary_type === 'timeline' && pkg.timeline_data)}
+                        disabled={!pkg.itinerary_id}
                       >
                         <BookMarked size={16} />
                       </button>
@@ -762,19 +650,6 @@ export function PackageListPanel({
         proposal={proposal}
         onSyncComplete={onPackagesChange}
       />
-
-      {/* 時間軸編輯器對話框（僅在未使用父組件回調時渲染） */}
-      {!onOpenTimelineDialog && selectedPackage && (
-        <TimelineItineraryDialog
-          isOpen={timelineDialogOpen}
-          onClose={() => {
-            setTimelineDialogOpen(false)
-            setSelectedPackage(null)
-          }}
-          pkg={selectedPackage}
-          onSave={handleSaveTimeline}
-        />
-      )}
     </div>
   )
 }

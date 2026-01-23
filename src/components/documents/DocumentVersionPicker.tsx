@@ -71,8 +71,6 @@ interface DocumentVersionPickerProps {
   onConfirmLock?: () => void
   /** 當前正在編輯的報價單 ID（用於「另存」功能） */
   currentQuoteId?: string
-  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
-  nested?: boolean
 }
 
 export function DocumentVersionPicker({
@@ -82,7 +80,6 @@ export function DocumentVersionPicker({
   mode = 'manage',
   onConfirmLock,
   currentQuoteId,
-  nested = false,
 }: DocumentVersionPickerProps) {
   const router = useRouter()
   const { items: quotes, loading } = useQuotes()
@@ -236,8 +233,17 @@ export function DocumentVersionPicker({
 
   // 已關聯此旅遊團的報價單 - 分開標準和快速
   // 過濾掉沒有實際內容的報價單（沒有金額且沒有項目）
+  // 同時檢查：1) quote.tour_id === tour.id, 2) tour.quote_id === quote.id, 3) tour.locked_quote_id === quote.id
+  const tourQuoteId = (tour as { quote_id?: string | null }).quote_id
+  const tourLockedQuoteId = (tour as { locked_quote_id?: string | null }).locked_quote_id
+
   const linkedQuotes = quotes.filter(q => {
-    if (q.tour_id !== tour.id) return false
+    // 檢查是否關聯到這個團（任一方向都算）
+    const isLinked = q.tour_id === tour.id ||
+      (tourQuoteId && q.id === tourQuoteId) ||
+      (tourLockedQuoteId && q.id === tourLockedQuoteId)
+
+    if (!isLinked) return false
     if ((q as { _deleted?: boolean })._deleted) return false
 
     // 有金額就顯示
@@ -636,7 +642,7 @@ export function DocumentVersionPicker({
       {/* 主對話框：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
       {!hasChildDialogOpen && (
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent nested={nested} className={cn(
+        <DialogContent className={cn(
           'h-[70vh] max-h-[800px] flex flex-col overflow-hidden',
           showItinerary ? 'max-w-[900px]' : 'max-w-[500px]'
         )}>

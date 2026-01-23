@@ -105,8 +105,8 @@ export const useQuoteForm = ({ addQuote }: UseQuoteFormParams) => {
           accommodationItems.push({
             id: `accommodation-day${day}-${Date.now()}-${day}`,
             name: '',
-            quantity: 0,
-            unit_price: 0,
+            quantity: null,
+            unit_price: null,
             total: 0,
             note: '',
             day: day,

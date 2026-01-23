@@ -18,7 +18,7 @@ export const useMealOperations = ({
         id: Date.now().toString(),
         name: '',  // 空白，讓用戶自己填寫
         quantity: 1,
-        unit_price: 0,
+        unit_price: null,
         total: 0,
         note: '',
       }

@@ -718,6 +718,181 @@ export type Database = {
           },
         ]
       }
+      ai_conversations: {
+        Row: {
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          learned_memory_ids: string[] | null
+          messages: Json
+          status: string | null
+          summary: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          learned_memory_ids?: string[] | null
+          messages?: Json
+          status?: string | null
+          summary?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          learned_memory_ids?: string[] | null
+          messages?: Json
+          status?: string | null
+          summary?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_conversations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_memories: {
+        Row: {
+          category: string
+          content: string
+          context: string | null
+          created_at: string | null
+          created_by: string | null
+          emotion: string | null
+          id: string
+          importance: number | null
+          related_feature: string | null
+          source: string | null
+          source_date: string | null
+          tags: string[] | null
+          title: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          context?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          emotion?: string | null
+          id?: string
+          importance?: number | null
+          related_feature?: string | null
+          source?: string | null
+          source_date?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          context?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          emotion?: string | null
+          id?: string
+          importance?: number | null
+          related_feature?: string | null
+          source?: string | null
+          source_date?: string | null
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_memories_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_settings: {
+        Row: {
+          avatar_url: string | null
+          can_learn_from_conversations: boolean | null
+          can_read_erp_data: boolean | null
+          claude_api_key: string | null
+          created_at: string | null
+          id: string
+          model: string | null
+          name: string | null
+          ollama_base_url: string | null
+          openai_api_key: string | null
+          provider: string | null
+          system_prompt: string | null
+          temperature: number | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          can_learn_from_conversations?: boolean | null
+          can_read_erp_data?: boolean | null
+          claude_api_key?: string | null
+          created_at?: string | null
+          id?: string
+          model?: string | null
+          name?: string | null
+          ollama_base_url?: string | null
+          openai_api_key?: string | null
+          provider?: string | null
+          system_prompt?: string | null
+          temperature?: number | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          can_learn_from_conversations?: boolean | null
+          can_read_erp_data?: boolean | null
+          claude_api_key?: string | null
+          created_at?: string | null
+          id?: string
+          model?: string | null
+          name?: string | null
+          ollama_base_url?: string | null
+          openai_api_key?: string | null
+          provider?: string | null
+          system_prompt?: string | null
+          temperature?: number | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       airport_images: {
         Row: {
           airport_code: string
@@ -2145,13 +2320,13 @@ export type Database = {
           credit_limit: number | null
           email: string | null
           employee_count: number | null
+          english_name: string | null
           fax: string | null
           id: string
           industry: string | null
           is_vip: boolean | null
           last_order_date: string | null
           name: string
-          name_en: string | null
           notes: string | null
           payment_terms: string | null
           phone: string | null
@@ -2177,13 +2352,13 @@ export type Database = {
           credit_limit?: number | null
           email?: string | null
           employee_count?: number | null
+          english_name?: string | null
           fax?: string | null
           id?: string
           industry?: string | null
           is_vip?: boolean | null
           last_order_date?: string | null
           name: string
-          name_en?: string | null
           notes?: string | null
           payment_terms?: string | null
           phone?: string | null
@@ -2209,13 +2384,13 @@ export type Database = {
           credit_limit?: number | null
           email?: string | null
           employee_count?: number | null
+          english_name?: string | null
           fax?: string | null
           id?: string
           industry?: string | null
           is_vip?: boolean | null
           last_order_date?: string | null
           name?: string
-          name_en?: string | null
           notes?: string | null
           payment_terms?: string | null
           phone?: string | null
@@ -2374,13 +2549,13 @@ export type Database = {
           created_by: string | null
           department: string | null
           email: string | null
+          english_name: string | null
           id: string
           is_active: boolean | null
           is_primary: boolean | null
           line_id: string | null
           mobile: string | null
           name: string
-          name_en: string | null
           notes: string | null
           phone: string | null
           title: string | null
@@ -2397,13 +2572,13 @@ export type Database = {
           created_by?: string | null
           department?: string | null
           email?: string | null
+          english_name?: string | null
           id?: string
           is_active?: boolean | null
           is_primary?: boolean | null
           line_id?: string | null
           mobile?: string | null
           name: string
-          name_en?: string | null
           notes?: string | null
           phone?: string | null
           title?: string | null
@@ -2420,13 +2595,13 @@ export type Database = {
           created_by?: string | null
           department?: string | null
           email?: string | null
+          english_name?: string | null
           id?: string
           is_active?: boolean | null
           is_primary?: boolean | null
           line_id?: string | null
           mobile?: string | null
           name?: string
-          name_en?: string | null
           notes?: string | null
           phone?: string | null
           title?: string | null
@@ -3021,13 +3196,13 @@ export type Database = {
           address: string | null
           alternative_phone: string | null
           avatar_url: string | null
+          birth_date: string | null
           city: string | null
           code: string
           company: string | null
           country: string | null
           created_at: string | null
           created_by: string | null
-          date_of_birth: string | null
           dietary_restrictions: string | null
           email: string | null
           emergency_contact: Json | null
@@ -3045,10 +3220,10 @@ export type Database = {
           nationality: string | null
           nickname: string | null
           notes: string | null
-          passport_expiry_date: string | null
+          passport_expiry: string | null
           passport_image_url: string | null
+          passport_name: string | null
           passport_number: string | null
-          passport_romanization: string | null
           phone: string | null
           referred_by: string | null
           sex: string | null
@@ -3067,13 +3242,13 @@ export type Database = {
           address?: string | null
           alternative_phone?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           city?: string | null
           code: string
           company?: string | null
           country?: string | null
           created_at?: string | null
           created_by?: string | null
-          date_of_birth?: string | null
           dietary_restrictions?: string | null
           email?: string | null
           emergency_contact?: Json | null
@@ -3091,10 +3266,10 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
-          passport_expiry_date?: string | null
+          passport_expiry?: string | null
           passport_image_url?: string | null
+          passport_name?: string | null
           passport_number?: string | null
-          passport_romanization?: string | null
           phone?: string | null
           referred_by?: string | null
           sex?: string | null
@@ -3113,13 +3288,13 @@ export type Database = {
           address?: string | null
           alternative_phone?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           city?: string | null
           code?: string
           company?: string | null
           country?: string | null
           created_at?: string | null
           created_by?: string | null
-          date_of_birth?: string | null
           dietary_restrictions?: string | null
           email?: string | null
           emergency_contact?: Json | null
@@ -3137,10 +3312,10 @@ export type Database = {
           nationality?: string | null
           nickname?: string | null
           notes?: string | null
-          passport_expiry_date?: string | null
+          passport_expiry?: string | null
           passport_image_url?: string | null
+          passport_name?: string | null
           passport_number?: string | null
-          passport_romanization?: string | null
           phone?: string | null
           referred_by?: string | null
           sex?: string | null
@@ -3537,6 +3712,7 @@ export type Database = {
           attendance: Json | null
           avatar: string | null
           avatar_url: string | null
+          birth_date: string | null
           chinese_name: string | null
           contracts: Json | null
           created_at: string | null
@@ -3547,6 +3723,7 @@ export type Database = {
           english_name: string | null
           hidden_menu_items: string[] | null
           id: string
+          id_number: string | null
           is_active: boolean | null
           job_info: Json | null
           last_login_at: string | null
@@ -3569,6 +3746,7 @@ export type Database = {
           attendance?: Json | null
           avatar?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           chinese_name?: string | null
           contracts?: Json | null
           created_at?: string | null
@@ -3579,6 +3757,7 @@ export type Database = {
           english_name?: string | null
           hidden_menu_items?: string[] | null
           id?: string
+          id_number?: string | null
           is_active?: boolean | null
           job_info?: Json | null
           last_login_at?: string | null
@@ -3601,6 +3780,7 @@ export type Database = {
           attendance?: Json | null
           avatar?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           chinese_name?: string | null
           contracts?: Json | null
           created_at?: string | null
@@ -3611,6 +3791,7 @@ export type Database = {
           english_name?: string | null
           hidden_menu_items?: string[] | null
           id?: string
+          id_number?: string | null
           is_active?: boolean | null
           job_info?: Json | null
           last_login_at?: string | null
@@ -3761,6 +3942,134 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      expense_categories: {
+        Row: {
+          color: string
+          created_at: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          is_system: boolean | null
+          name: string
+          parent_id: string | null
+          sort_order: number | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          color: string
+          created_at?: string | null
+          icon: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name: string
+          parent_id?: string | null
+          sort_order?: number | null
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name?: string
+          parent_id?: string | null
+          sort_order?: number | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expense_monthly_stats: {
+        Row: {
+          category_breakdown: Json | null
+          id: string
+          total_expense: number | null
+          total_income: number | null
+          total_split_owed: number | null
+          total_split_paid: number | null
+          updated_at: string | null
+          user_id: string
+          year_month: string
+        }
+        Insert: {
+          category_breakdown?: Json | null
+          id?: string
+          total_expense?: number | null
+          total_income?: number | null
+          total_split_owed?: number | null
+          total_split_paid?: number | null
+          updated_at?: string | null
+          user_id: string
+          year_month: string
+        }
+        Update: {
+          category_breakdown?: Json | null
+          id?: string
+          total_expense?: number | null
+          total_income?: number | null
+          total_split_owed?: number | null
+          total_split_paid?: number | null
+          updated_at?: string | null
+          user_id?: string
+          year_month?: string
+        }
+        Relationships: []
+      }
+      expense_streaks: {
+        Row: {
+          achievements: Json | null
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_record_date: string | null
+          longest_streak: number | null
+          total_expense_amount: number | null
+          total_income_amount: number | null
+          total_records: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievements?: Json | null
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_record_date?: string | null
+          longest_streak?: number | null
+          total_expense_amount?: number | null
+          total_income_amount?: number | null
+          total_records?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievements?: Json | null
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_record_date?: string | null
+          longest_streak?: number | null
+          total_expense_amount?: number | null
+          total_income_amount?: number | null
+          total_records?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       eyeline_submissions: {
         Row: {
@@ -5876,6 +6185,7 @@ export type Database = {
           description_en: string | null
           dining_options: string[] | null
           display_order: number | null
+          english_name: string | null
           facilities: Json | null
           google_maps_url: string | null
           group_friendly: boolean | null
@@ -5893,7 +6203,6 @@ export type Database = {
           max_group_size: number | null
           min_rooms_for_group: number | null
           name: string
-          name_en: string | null
           name_local: string | null
           notes: string | null
           price_range: string | null
@@ -5932,6 +6241,7 @@ export type Database = {
           description_en?: string | null
           dining_options?: string[] | null
           display_order?: number | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           group_friendly?: boolean | null
@@ -5949,7 +6259,6 @@ export type Database = {
           max_group_size?: number | null
           min_rooms_for_group?: number | null
           name: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           price_range?: string | null
@@ -5988,6 +6297,7 @@ export type Database = {
           description_en?: string | null
           dining_options?: string[] | null
           display_order?: number | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           group_friendly?: boolean | null
@@ -6005,7 +6315,6 @@ export type Database = {
           max_group_size?: number | null
           min_rooms_for_group?: number | null
           name?: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           price_range?: string | null
@@ -6096,9 +6405,10 @@ export type Database = {
           add_ons: string[] | null
           address: string | null
           assigned_room: string | null
-          birthday: string | null
+          birth_date: string | null
           checked_in: boolean | null
           checked_in_at: string | null
+          chinese_name: string
           created_at: string | null
           created_by: string | null
           dietary_requirements: string | null
@@ -6114,8 +6424,6 @@ export type Database = {
           is_child_no_bed: boolean | null
           medical_conditions: string | null
           member_type: string | null
-          name: string
-          name_en: string | null
           national_id: string | null
           notes: string | null
           order_id: string | null
@@ -6137,9 +6445,10 @@ export type Database = {
           add_ons?: string[] | null
           address?: string | null
           assigned_room?: string | null
-          birthday?: string | null
+          birth_date?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
+          chinese_name: string
           created_at?: string | null
           created_by?: string | null
           dietary_requirements?: string | null
@@ -6155,8 +6464,6 @@ export type Database = {
           is_child_no_bed?: boolean | null
           medical_conditions?: string | null
           member_type?: string | null
-          name: string
-          name_en?: string | null
           national_id?: string | null
           notes?: string | null
           order_id?: string | null
@@ -6178,9 +6485,10 @@ export type Database = {
           add_ons?: string[] | null
           address?: string | null
           assigned_room?: string | null
-          birthday?: string | null
+          birth_date?: string | null
           checked_in?: boolean | null
           checked_in_at?: string | null
+          chinese_name?: string
           created_at?: string | null
           created_by?: string | null
           dietary_requirements?: string | null
@@ -6196,8 +6504,6 @@ export type Database = {
           is_child_no_bed?: boolean | null
           medical_conditions?: string | null
           member_type?: string | null
-          name?: string
-          name_en?: string | null
           national_id?: string | null
           notes?: string | null
           order_id?: string | null
@@ -6396,6 +6702,7 @@ export type Database = {
           display_order: number | null
           dress_code: string | null
           email: string | null
+          english_name: string | null
           facilities: Json | null
           google_maps_url: string | null
           green_star: boolean | null
@@ -6412,7 +6719,6 @@ export type Database = {
           michelin_stars: number | null
           min_group_size: number | null
           name: string
-          name_en: string | null
           name_local: string | null
           notes: string | null
           opening_hours: Json | null
@@ -6457,6 +6763,7 @@ export type Database = {
           display_order?: number | null
           dress_code?: string | null
           email?: string | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           green_star?: boolean | null
@@ -6473,7 +6780,6 @@ export type Database = {
           michelin_stars?: number | null
           min_group_size?: number | null
           name: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           opening_hours?: Json | null
@@ -6518,6 +6824,7 @@ export type Database = {
           display_order?: number | null
           dress_code?: string | null
           email?: string | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           green_star?: boolean | null
@@ -6534,7 +6841,6 @@ export type Database = {
           michelin_stars?: number | null
           min_group_size?: number | null
           name?: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           opening_hours?: Json | null
@@ -7424,6 +7730,108 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: []
+      }
+      personal_expenses: {
+        Row: {
+          account_id: string | null
+          amount: number
+          category: string
+          category_id: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          exchange_rate: number | null
+          expense_date: string
+          expense_time: string | null
+          id: string
+          is_foreign_transaction: boolean | null
+          is_settled: boolean | null
+          is_split: boolean | null
+          location: string | null
+          payment_method: string | null
+          receipt_url: string | null
+          settlement_amount: number | null
+          settlement_currency: string | null
+          split_expense_id: string | null
+          split_group_id: string | null
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          category?: string
+          category_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          exchange_rate?: number | null
+          expense_date?: string
+          expense_time?: string | null
+          id?: string
+          is_foreign_transaction?: boolean | null
+          is_settled?: boolean | null
+          is_split?: boolean | null
+          location?: string | null
+          payment_method?: string | null
+          receipt_url?: string | null
+          settlement_amount?: number | null
+          settlement_currency?: string | null
+          split_expense_id?: string | null
+          split_group_id?: string | null
+          tags?: string[] | null
+          title: string
+          type?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          category?: string
+          category_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          exchange_rate?: number | null
+          expense_date?: string
+          expense_time?: string | null
+          id?: string
+          is_foreign_transaction?: boolean | null
+          is_settled?: boolean | null
+          is_split?: boolean | null
+          location?: string | null
+          payment_method?: string | null
+          receipt_url?: string | null
+          settlement_amount?: number | null
+          settlement_currency?: string | null
+          split_expense_id?: string | null
+          split_group_id?: string | null
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       personal_records: {
         Row: {
@@ -8437,6 +8845,7 @@ export type Database = {
           dress_code: string | null
           duration_hours: number | null
           eco_friendly: boolean | null
+          english_name: string | null
           exclusivity_level: string
           expert_credentials: string[] | null
           expert_name: string | null
@@ -8459,7 +8868,6 @@ export type Database = {
           meeting_point_coords: Json | null
           minimum_participants: number | null
           name: string
-          name_en: string | null
           name_local: string | null
           net_price_per_person: number | null
           physical_requirement: string | null
@@ -8514,6 +8922,7 @@ export type Database = {
           dress_code?: string | null
           duration_hours?: number | null
           eco_friendly?: boolean | null
+          english_name?: string | null
           exclusivity_level: string
           expert_credentials?: string[] | null
           expert_name?: string | null
@@ -8536,7 +8945,6 @@ export type Database = {
           meeting_point_coords?: Json | null
           minimum_participants?: number | null
           name: string
-          name_en?: string | null
           name_local?: string | null
           net_price_per_person?: number | null
           physical_requirement?: string | null
@@ -8591,6 +8999,7 @@ export type Database = {
           dress_code?: string | null
           duration_hours?: number | null
           eco_friendly?: boolean | null
+          english_name?: string | null
           exclusivity_level?: string
           expert_credentials?: string[] | null
           expert_name?: string | null
@@ -8613,7 +9022,6 @@ export type Database = {
           meeting_point_coords?: Json | null
           minimum_participants?: number | null
           name?: string
-          name_en?: string | null
           name_local?: string | null
           net_price_per_person?: number | null
           physical_requirement?: string | null
@@ -8782,31 +9190,58 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           customer_id: string | null
+          display_name: string | null
+          email: string | null
+          employee_id: string | null
           id: string
+          identity_verified_at: string | null
           is_beta_tester: boolean | null
+          is_employee: boolean | null
+          is_traveler: boolean | null
+          linked_birthday: string | null
+          linked_id_number: string | null
           name: string | null
           nickname: string | null
           updated_at: string | null
+          workspace_id: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
           customer_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          employee_id?: string | null
           id: string
+          identity_verified_at?: string | null
           is_beta_tester?: boolean | null
+          is_employee?: boolean | null
+          is_traveler?: boolean | null
+          linked_birthday?: string | null
+          linked_id_number?: string | null
           name?: string | null
           nickname?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
           customer_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          employee_id?: string | null
           id?: string
+          identity_verified_at?: string | null
           is_beta_tester?: boolean | null
+          is_employee?: boolean | null
+          is_traveler?: boolean | null
+          linked_birthday?: string | null
+          linked_id_number?: string | null
           name?: string | null
           nickname?: string | null
           updated_at?: string | null
+          workspace_id?: string | null
         }
         Relationships: []
       }
@@ -9213,6 +9648,13 @@ export type Database = {
           notes: string | null
           quantity: number | null
           quote_id: string | null
+          resource_address: string | null
+          resource_google_maps_url: string | null
+          resource_id: string | null
+          resource_latitude: number | null
+          resource_longitude: number | null
+          resource_phone: string | null
+          resource_type: string | null
           total_price: number | null
           unit_price: number | null
           updated_at: string | null
@@ -9232,6 +9674,13 @@ export type Database = {
           notes?: string | null
           quantity?: number | null
           quote_id?: string | null
+          resource_address?: string | null
+          resource_google_maps_url?: string | null
+          resource_id?: string | null
+          resource_latitude?: number | null
+          resource_longitude?: number | null
+          resource_phone?: string | null
+          resource_type?: string | null
           total_price?: number | null
           unit_price?: number | null
           updated_at?: string | null
@@ -9251,6 +9700,13 @@ export type Database = {
           notes?: string | null
           quantity?: number | null
           quote_id?: string | null
+          resource_address?: string | null
+          resource_google_maps_url?: string | null
+          resource_id?: string | null
+          resource_latitude?: number | null
+          resource_longitude?: number | null
+          resource_phone?: string | null
+          resource_type?: string | null
           total_price?: number | null
           unit_price?: number | null
           updated_at?: string | null
@@ -9864,30 +10320,30 @@ export type Database = {
           alliance: string | null
           country: string | null
           created_at: string | null
+          english_name: string | null
           iata_code: string
           icao_code: string | null
           is_active: boolean | null
-          name_en: string | null
           name_zh: string | null
         }
         Insert: {
           alliance?: string | null
           country?: string | null
           created_at?: string | null
+          english_name?: string | null
           iata_code: string
           icao_code?: string | null
           is_active?: boolean | null
-          name_en?: string | null
           name_zh?: string | null
         }
         Update: {
           alliance?: string | null
           country?: string | null
           created_at?: string | null
+          english_name?: string | null
           iata_code?: string
           icao_code?: string | null
           is_active?: boolean | null
-          name_en?: string | null
           name_zh?: string | null
         }
         Relationships: []
@@ -9899,11 +10355,11 @@ export type Database = {
           city_name_zh: string | null
           country_code: string | null
           created_at: string | null
+          english_name: string | null
           iata_code: string
           icao_code: string | null
           latitude: number | null
           longitude: number | null
-          name_en: string | null
           name_zh: string | null
           timezone: string | null
           workspace_id: string | null
@@ -9914,11 +10370,11 @@ export type Database = {
           city_name_zh?: string | null
           country_code?: string | null
           created_at?: string | null
+          english_name?: string | null
           iata_code: string
           icao_code?: string | null
           latitude?: number | null
           longitude?: number | null
-          name_en?: string | null
           name_zh?: string | null
           timezone?: string | null
           workspace_id?: string | null
@@ -9929,11 +10385,11 @@ export type Database = {
           city_name_zh?: string | null
           country_code?: string | null
           created_at?: string | null
+          english_name?: string | null
           iata_code?: string
           icao_code?: string | null
           latitude?: number | null
           longitude?: number | null
-          name_en?: string | null
           name_zh?: string | null
           timezone?: string | null
           workspace_id?: string | null
@@ -10248,6 +10704,7 @@ export type Database = {
           description_en: string | null
           dietary_options: string[] | null
           display_order: number | null
+          english_name: string | null
           facilities: Json | null
           google_maps_url: string | null
           group_friendly: boolean | null
@@ -10267,7 +10724,6 @@ export type Database = {
           menu_images: string[] | null
           min_group_size: number | null
           name: string
-          name_en: string | null
           name_local: string | null
           notes: string | null
           opening_hours: Json | null
@@ -10307,6 +10763,7 @@ export type Database = {
           description_en?: string | null
           dietary_options?: string[] | null
           display_order?: number | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           group_friendly?: boolean | null
@@ -10326,7 +10783,6 @@ export type Database = {
           menu_images?: string[] | null
           min_group_size?: number | null
           name: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           opening_hours?: Json | null
@@ -10366,6 +10822,7 @@ export type Database = {
           description_en?: string | null
           dietary_options?: string[] | null
           display_order?: number | null
+          english_name?: string | null
           facilities?: Json | null
           google_maps_url?: string | null
           group_friendly?: boolean | null
@@ -10385,7 +10842,6 @@ export type Database = {
           menu_images?: string[] | null
           min_group_size?: number | null
           name?: string
-          name_en?: string | null
           name_local?: string | null
           notes?: string | null
           opening_hours?: Json | null
@@ -11086,13 +11542,12 @@ export type Database = {
           currency: string | null
           display_order: number | null
           email: string | null
+          english_name: string | null
           fax: string | null
           id: string
           is_active: boolean | null
           is_preferred: boolean | null
           name: string
-          name_en: string | null
-          note: string | null
           notes: string | null
           payment_terms: string | null
           phone: string | null
@@ -11128,13 +11583,12 @@ export type Database = {
           currency?: string | null
           display_order?: number | null
           email?: string | null
+          english_name?: string | null
           fax?: string | null
           id: string
           is_active?: boolean | null
           is_preferred?: boolean | null
           name: string
-          name_en?: string | null
-          note?: string | null
           notes?: string | null
           payment_terms?: string | null
           phone?: string | null
@@ -11170,13 +11624,12 @@ export type Database = {
           currency?: string | null
           display_order?: number | null
           email?: string | null
+          english_name?: string | null
           fax?: string | null
           id?: string
           is_active?: boolean | null
           is_preferred?: boolean | null
           name?: string
-          name_en?: string | null
-          note?: string | null
           notes?: string | null
           payment_terms?: string | null
           phone?: string | null
@@ -11779,9 +12232,19 @@ export type Database = {
           day_label: string | null
           description: string | null
           expected_cost: number | null
+          google_maps_url: string | null
           id: string
+          latitude: number | null
+          leader_expense: number | null
+          leader_expense_at: string | null
+          leader_expense_note: string | null
+          longitude: number | null
           notes: string | null
           quantity: number | null
+          receipt_images: string[] | null
+          request_id: string | null
+          resource_id: string | null
+          resource_type: string | null
           service_date: string
           service_date_end: string | null
           sheet_id: string
@@ -11806,9 +12269,19 @@ export type Database = {
           day_label?: string | null
           description?: string | null
           expected_cost?: number | null
+          google_maps_url?: string | null
           id?: string
+          latitude?: number | null
+          leader_expense?: number | null
+          leader_expense_at?: string | null
+          leader_expense_note?: string | null
+          longitude?: number | null
           notes?: string | null
           quantity?: number | null
+          receipt_images?: string[] | null
+          request_id?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
           service_date: string
           service_date_end?: string | null
           sheet_id: string
@@ -11833,9 +12306,19 @@ export type Database = {
           day_label?: string | null
           description?: string | null
           expected_cost?: number | null
+          google_maps_url?: string | null
           id?: string
+          latitude?: number | null
+          leader_expense?: number | null
+          leader_expense_at?: string | null
+          leader_expense_note?: string | null
+          longitude?: number | null
           notes?: string | null
           quantity?: number | null
+          receipt_images?: string[] | null
+          request_id?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
           service_date?: string
           service_date_end?: string | null
           sheet_id?: string
@@ -11850,6 +12333,13 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_confirmation_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tour_requests"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tour_confirmation_items_sheet_id_fkey"
             columns: ["sheet_id"]
@@ -12304,11 +12794,11 @@ export type Database = {
           created_at: string | null
           display_order: number | null
           email: string | null
+          english_name: string | null
           id: string
           languages: string[] | null
           license_number: string | null
           name: string
-          name_en: string | null
           national_id: string | null
           notes: string | null
           passport_expiry: string | null
@@ -12324,11 +12814,11 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           email?: string | null
+          english_name?: string | null
           id?: string
           languages?: string[] | null
           license_number?: string | null
           name: string
-          name_en?: string | null
           national_id?: string | null
           notes?: string | null
           passport_expiry?: string | null
@@ -12344,11 +12834,11 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           email?: string | null
+          english_name?: string | null
           id?: string
           languages?: string[] | null
           license_number?: string | null
           name?: string
-          name_en?: string | null
           national_id?: string | null
           notes?: string | null
           passport_expiry?: string | null
@@ -12730,8 +13220,11 @@ export type Database = {
           description: string | null
           estimated_cost: number | null
           final_cost: number | null
+          google_maps_url: string | null
           handler_type: string
           id: string
+          latitude: number | null
+          longitude: number | null
           member_data: Json | null
           member_ids: string[] | null
           note: string | null
@@ -12746,6 +13239,8 @@ export type Database = {
           reply_content: Json | null
           reply_note: string | null
           request_type: string | null
+          resource_id: string | null
+          resource_type: string | null
           response_status: string | null
           service_date: string | null
           service_date_end: string | null
@@ -12789,8 +13284,11 @@ export type Database = {
           description?: string | null
           estimated_cost?: number | null
           final_cost?: number | null
+          google_maps_url?: string | null
           handler_type?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           member_data?: Json | null
           member_ids?: string[] | null
           note?: string | null
@@ -12805,6 +13303,8 @@ export type Database = {
           reply_content?: Json | null
           reply_note?: string | null
           request_type?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
           response_status?: string | null
           service_date?: string | null
           service_date_end?: string | null
@@ -12848,8 +13348,11 @@ export type Database = {
           description?: string | null
           estimated_cost?: number | null
           final_cost?: number | null
+          google_maps_url?: string | null
           handler_type?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           member_data?: Json | null
           member_ids?: string[] | null
           note?: string | null
@@ -12864,6 +13367,8 @@ export type Database = {
           reply_content?: Json | null
           reply_note?: string | null
           request_type?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
           response_status?: string | null
           service_date?: string | null
           service_date_end?: string | null

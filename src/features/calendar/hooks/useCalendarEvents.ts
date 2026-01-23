@@ -270,10 +270,10 @@ export function useCalendarEvents() {
 
     return (customers || [])
       .map(customer => {
-        if (!customer?.date_of_birth) return null
+        if (!customer?.birth_date) return null
 
         // 計算今年的生日日期
-        const birthdayThisYear = `${currentYear}-${customer.date_of_birth.slice(5)}`
+        const birthdayThisYear = `${currentYear}-${customer.birth_date.slice(5)}`
 
         return {
           id: `customer-birthday-${customer.id}`,

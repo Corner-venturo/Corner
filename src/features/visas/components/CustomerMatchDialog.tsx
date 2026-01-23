@@ -24,7 +24,7 @@ interface CustomerMatch {
     id: string
     name: string
     phone: string | null
-    date_of_birth: string | null
+    birth_date: string | null
     national_id: string | null
   }>
 }
@@ -88,12 +88,12 @@ export function CustomerMatchDialog({
                         <div className="font-medium text-morandi-primary">{customer.name}</div>
                         <div className="text-sm text-morandi-secondary space-x-3">
                           {customer.phone && <span>{customer.phone}</span>}
-                          {customer.date_of_birth && (
-                            <DateCell date={customer.date_of_birth} showIcon={false} className="inline text-sm text-morandi-secondary" />
+                          {customer.birth_date && (
+                            <DateCell date={customer.birth_date} showIcon={false} className="inline text-sm text-morandi-secondary" />
                           )}
                           {customer.national_id && <span>{customer.national_id}</span>}
                         </div>
-                        {!customer.phone && !customer.date_of_birth && !customer.national_id && (
+                        {!customer.phone && !customer.birth_date && !customer.national_id && (
                           <div className="text-sm text-morandi-secondary/60">尚無詳細資料</div>
                         )}
                       </div>
@@ -168,9 +168,9 @@ interface AddCustomerFormDialogProps {
     email: string
     national_id: string
     passport_number: string
-    passport_romanization: string
-    passport_expiry_date: string
-    date_of_birth: string
+    passport_name: string
+    passport_expiry: string
+    birth_date: string
     gender: string
     notes: string
     passport_image_url: string
@@ -269,8 +269,8 @@ export function AddCustomerFormDialog({
                 <div className="space-y-1.5">
                   <Label className="text-xs">護照拼音</Label>
                   <Input
-                    value={formData.passport_romanization}
-                    onChange={(e) => onUpdateField('passport_romanization', e.target.value.toUpperCase())}
+                    value={formData.passport_name}
+                    onChange={(e) => onUpdateField('passport_name', e.target.value.toUpperCase())}
                     placeholder="WANG/XIAOMING"
                     className="h-9"
                   />
@@ -280,8 +280,8 @@ export function AddCustomerFormDialog({
                 <div className="space-y-1.5">
                   <Label className="text-xs">護照效期</Label>
                   <DatePicker
-                    value={formData.passport_expiry_date}
-                    onChange={(date) => onUpdateField('passport_expiry_date', date)}
+                    value={formData.passport_expiry}
+                    onChange={(date) => onUpdateField('passport_expiry', date)}
                     className="h-9"
                     placeholder="選擇日期"
                   />
@@ -289,8 +289,8 @@ export function AddCustomerFormDialog({
                 <div className="space-y-1.5">
                   <Label className="text-xs">出生日期</Label>
                   <DatePicker
-                    value={formData.date_of_birth}
-                    onChange={(date) => onUpdateField('date_of_birth', date)}
+                    value={formData.birth_date}
+                    onChange={(date) => onUpdateField('birth_date', date)}
                     className="h-9"
                     placeholder="選擇日期"
                   />

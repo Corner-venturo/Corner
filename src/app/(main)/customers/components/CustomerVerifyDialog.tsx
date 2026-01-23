@@ -24,9 +24,25 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { Customer, UpdateCustomerData } from '@/types/customer.types'
 import { useImageEditor } from '@/hooks/image-editor'
 import { useOcrRecognition } from '@/hooks'
+
+// 從 URL 提取檔名並刪除舊照片
+async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
+  if (!oldUrl) return
+  try {
+    const match = oldUrl.match(/passport-images\/(.+)$/)
+    if (match) {
+      const oldFileName = decodeURIComponent(match[1])
+      await supabase.storage.from('passport-images').remove([oldFileName])
+      logger.log(`已刪除舊護照照片: ${oldFileName}`)
+    }
+  } catch (error) {
+    logger.error('刪除舊護照照片失敗:', error)
+  }
+}
 
 interface CustomerVerifyDialogProps {
   open: boolean
@@ -64,10 +80,10 @@ export function CustomerVerifyDialog({
     if (customer) {
       setFormData({
         name: customer.name || '',
-        passport_romanization: customer.passport_romanization || '',
+        passport_name: customer.passport_name || '',
         passport_number: customer.passport_number || '',
-        passport_expiry_date: customer.passport_expiry_date || '',
-        date_of_birth: customer.date_of_birth || '',
+        passport_expiry: customer.passport_expiry || '',
+        birth_date: customer.birth_date || '',
         national_id: customer.national_id || '',
       })
     }
@@ -117,6 +133,7 @@ export function CustomerVerifyDialog({
   const handleSaveImageTransform = async () => {
     if (!customer?.passport_image_url) return
     imageEditor.setIsSaving(true)
+    const oldUrl = customer.passport_image_url
     try {
       // 創建 canvas 並應用變換
       const img = new Image()
@@ -147,7 +164,9 @@ export function CustomerVerifyDialog({
         canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.9)
       })
 
-      const fileName = `passport_${customer.id}_${Date.now()}.jpg`
+      // 統一格式：passport_{timestamp}_{random}.jpg
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
         .upload(fileName, blob, { upsert: true })
@@ -161,6 +180,9 @@ export function CustomerVerifyDialog({
       await onUpdate(customer.id, {
         passport_image_url: urlData.publicUrl,
       })
+
+      // 上傳成功後刪除舊照片
+      await deleteOldPassportImage(oldUrl)
 
       imageEditor.reset()
       toast.success('圖片已儲存')
@@ -349,8 +371,8 @@ export function CustomerVerifyDialog({
               <div>
                 <label className="text-xs text-morandi-primary">護照英文名</label>
                 <Input
-                  value={formData.passport_romanization || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, passport_romanization: e.target.value }))}
+                  value={formData.passport_name || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, passport_name: e.target.value }))}
                 />
               </div>
               <div>
@@ -363,16 +385,16 @@ export function CustomerVerifyDialog({
               <div>
                 <label className="text-xs text-morandi-primary">護照效期</label>
                 <DatePicker
-                  value={formData.passport_expiry_date || ''}
-                  onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry_date: date }))}
+                  value={formData.passport_expiry || ''}
+                  onChange={(date) => setFormData(prev => ({ ...prev, passport_expiry: date }))}
                   placeholder="選擇日期"
                 />
               </div>
               <div>
                 <label className="text-xs text-morandi-primary">出生日期</label>
                 <DatePicker
-                  value={formData.date_of_birth || ''}
-                  onChange={(date) => setFormData(prev => ({ ...prev, date_of_birth: date }))}
+                  value={formData.birth_date || ''}
+                  onChange={(date) => setFormData(prev => ({ ...prev, birth_date: date }))}
                   placeholder="選擇日期"
                 />
               </div>

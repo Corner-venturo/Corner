@@ -10,7 +10,7 @@ import { logger } from '@/lib/utils/logger'
 export interface Airline {
   iata_code: string
   icao_code: string | null
-  name_en: string | null
+  english_name: string | null
   name_zh: string | null
   country: string | null
   alliance: string | null
@@ -19,7 +19,7 @@ export interface Airline {
 export interface Airport {
   iata_code: string
   icao_code: string | null
-  name_en: string | null
+  english_name: string | null
   name_zh: string | null
   city_code: string | null
   city_name_zh: string | null
@@ -212,7 +212,7 @@ export function getAirlineName(code: string, preferChinese = true): string {
   const airline = getAirline(code)
   if (!airline) return code
   if (preferChinese && airline.name_zh) return airline.name_zh
-  return airline.name_en || code
+  return airline.english_name || code
 }
 
 /**
@@ -229,7 +229,7 @@ export function getAirportName(code: string, preferChinese = true): string {
   const airport = getAirport(code)
   if (!airport) return code
   if (preferChinese && airport.name_zh) return airport.name_zh
-  return airport.name_en || code
+  return airport.english_name || code
 }
 
 /**

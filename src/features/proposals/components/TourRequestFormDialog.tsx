@@ -9,7 +9,7 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Dialog,
@@ -34,7 +34,7 @@ import { usePrintLogo } from '@/features/quotes/components/printable/shared/useP
 import { COMPANY } from '@/lib/constants/company'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
-import { useAuthStore } from '@/stores'
+import { useAuthStore, useEmployeeStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
@@ -118,6 +118,7 @@ export function TourRequestFormDialog({
   const router = useRouter()
   const { user } = useAuthStore()
   const { toast } = useToast()
+  const { items: employees, fetchAll: fetchEmployees } = useEmployeeStore()
 
   // 編輯狀態的項目
   const [items, setItems] = useState<RequestItem[]>(() =>
@@ -155,6 +156,9 @@ export function TourRequestFormDialog({
   // 載入公司 Logo（用於新視窗列印）
   const logoUrl = usePrintLogo(isOpen)
 
+  // 判斷是否有足夠資料（支援 pkg 模式或 tour 模式）
+  const hasValidData = pkg || tour
+
   // 選擇供應商時自動帶入資訊
   const handleSupplierSelect = (supplier: SupplierData) => {
     setSupplierInfo({
@@ -175,12 +179,39 @@ export function TourRequestFormDialog({
   }
 
   // [Planned] 我方資訊 - 待整合 workspace settings
-  const companyInfo = {
+  const [companyInfo, setCompanyInfo] = useState({
     name: '角落旅行社',
-    contactPerson: '',
     phone: '',
     fax: '',
-  }
+    sales: '',
+    assistant: '',
+  })
+
+  // 載入員工清單並預設助理為當前登入者
+  useEffect(() => {
+    if (isOpen) {
+      fetchEmployees()
+      // 預設助理為當前登入者
+      const userName = user?.chinese_name || user?.display_name || user?.name || ''
+      if (userName && !companyInfo.assistant) {
+        setCompanyInfo(prev => ({ ...prev, assistant: userName }))
+      }
+    }
+  }, [isOpen, fetchEmployees, user?.chinese_name, user?.display_name, user?.name])
+
+  // 員工選單：自己排最前面，其他依員工編號排序
+  const sortedEmployees = React.useMemo(() => {
+    const filtered = employees.filter(emp => emp.employee_type !== 'bot' && emp.workspace_id === user?.workspace_id)
+    const currentUserName = user?.chinese_name || user?.display_name || user?.name || ''
+    return filtered.sort((a, b) => {
+      const aIsMe = a.chinese_name === currentUserName || a.display_name === currentUserName
+      const bIsMe = b.chinese_name === currentUserName || b.display_name === currentUserName
+      if (aIsMe && !bIsMe) return -1
+      if (!aIsMe && bIsMe) return 1
+      // 依員工編號排序
+      return (a.employee_number || '').localeCompare(b.employee_number || '')
+    })
+  }, [employees, user?.workspace_id, user?.chinese_name, user?.display_name, user?.name])
 
   // 取得欄位設定
   const columns = CATEGORY_COLUMNS[category] || CATEGORY_COLUMNS.other
@@ -225,7 +256,8 @@ export function TourRequestFormDialog({
     })
   }
 
-  if (!pkg) return null
+  // 沒有足夠資料時不渲染
+  if (!hasValidData) return null
 
   // 生成 HTML 內容（用於列印和儲存）
   const generatePrintHtml = () => {
@@ -289,13 +321,14 @@ export function TourRequestFormDialog({
           <div class="info-section">
             <div class="info-title">我方資訊</div>
             <div class="info-row">公司：${companyInfo.name}</div>
-            ${companyInfo.phone ? `<div class="info-row">電話：${companyInfo.phone}</div>` : ''}
+            ${companyInfo.phone || companyInfo.fax ? `<div class="info-row">${companyInfo.phone ? `電話：${companyInfo.phone}` : ''}${companyInfo.phone && companyInfo.fax ? '　' : ''}${companyInfo.fax ? `傳真：${companyInfo.fax}` : ''}</div>` : ''}
+            ${companyInfo.sales || companyInfo.assistant ? `<div class="info-row">${companyInfo.sales ? `業務：${companyInfo.sales}` : ''}${companyInfo.sales && companyInfo.assistant ? '　' : ''}${companyInfo.assistant ? `助理：${companyInfo.assistant}` : ''}</div>` : ''}
           </div>
           <div class="info-section">
             <div class="info-title">廠商資訊</div>
             <div class="info-row">廠商：${supplierInfo.name}</div>
-            ${supplierInfo.contactPerson ? `<div class="info-row">聯絡人：${supplierInfo.contactPerson}</div>` : ''}
-            ${supplierInfo.phone ? `<div class="info-row">電話：${supplierInfo.phone}</div>` : ''}
+            ${cityInfo.customCity || supplierInfo.contactPerson ? `<div class="info-row">${cityInfo.customCity ? `城市：${cityInfo.customCity}` : ''}${cityInfo.customCity && supplierInfo.contactPerson ? '　' : ''}${supplierInfo.contactPerson ? `聯絡人：${supplierInfo.contactPerson}` : ''}</div>` : ''}
+            ${supplierInfo.phone || supplierInfo.fax ? `<div class="info-row">${supplierInfo.phone ? `電話：${supplierInfo.phone}` : ''}${supplierInfo.phone && supplierInfo.fax ? '　' : ''}${supplierInfo.fax ? `傳真：${supplierInfo.fax}` : ''}</div>` : ''}
           </div>
         </div>
 
@@ -521,7 +554,7 @@ export function TourRequestFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
-      <DialogContent nested className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
+      <DialogContent className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText size={18} className="text-morandi-gold" />
@@ -537,18 +570,58 @@ export function TourRequestFormDialog({
                 <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
                   我方資訊
                 </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-2">
-                    <span className="text-morandi-secondary w-16">公司：</span>
-                    <span>{companyInfo.name}</span>
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-morandi-secondary whitespace-nowrap">公司：</span>
+                    <span className="text-morandi-primary">{companyInfo.name}</span>
                   </div>
-                  <div className="flex gap-2">
-                    <span className="text-morandi-secondary w-16">電話：</span>
-                    <span>{companyInfo.phone}</span>
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">電話：</span>
+                      <input
+                        value={companyInfo.phone}
+                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, phone: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">傳真：</span>
+                      <input
+                        value={companyInfo.fax}
+                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, fax: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <span className="text-morandi-secondary w-16">傳真：</span>
-                    <span>{companyInfo.fax}</span>
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">業務：</span>
+                      <select
+                        value={companyInfo.sales}
+                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, sales: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
+                      >
+                        <option value=""></option>
+                        {sortedEmployees.map(emp => {
+                          const label = [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
+                          return <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>{label}</option>
+                        })}
+                      </select>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">助理：</span>
+                      <select
+                        value={companyInfo.assistant}
+                        onChange={(e) => setCompanyInfo(prev => ({ ...prev, assistant: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold cursor-pointer"
+                      >
+                        <option value=""></option>
+                        {sortedEmployees.map(emp => {
+                          const label = [emp.chinese_name, emp.display_name].filter(Boolean).join(' / ') || ''
+                          return <option key={emp.id} value={emp.chinese_name || emp.display_name || ''}>{label}</option>
+                        })}
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -558,9 +631,9 @@ export function TourRequestFormDialog({
                 <h3 className="font-medium text-morandi-primary border-b border-border pb-1">
                   廠商資訊
                 </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-2 items-center">
-                    <span className="text-morandi-secondary w-16">廠商：</span>
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-morandi-secondary whitespace-nowrap">廠商：</span>
                     <SupplierSearchInput
                       value={supplierInfo.name}
                       onChange={(val) => setSupplierInfo(prev => ({ ...prev, name: val, id: '' }))}
@@ -569,41 +642,41 @@ export function TourRequestFormDialog({
                       className="flex-1"
                     />
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-morandi-secondary w-16">城市：</span>
-                    <Input
-                      value={cityInfo.customCity}
-                      onChange={(e) => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
-                      className="h-7 text-sm flex-1"
-                      placeholder="輸入城市（如：清邁、東京）"
-                    />
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">城市：</span>
+                      <input
+                        value={cityInfo.customCity}
+                        onChange={(e) => setCityInfo(prev => ({ ...prev, customCity: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">聯絡人：</span>
+                      <input
+                        value={supplierInfo.contactPerson}
+                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-morandi-secondary w-16">聯絡人：</span>
-                    <Input
-                      value={supplierInfo.contactPerson}
-                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, contactPerson: e.target.value }))}
-                      className="h-7 text-sm"
-                      placeholder="輸入聯絡人"
-                    />
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-morandi-secondary w-16">電話：</span>
-                    <Input
-                      value={supplierInfo.phone}
-                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
-                      className="h-7 text-sm"
-                      placeholder="輸入電話"
-                    />
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-morandi-secondary w-16">傳真：</span>
-                    <Input
-                      value={supplierInfo.fax}
-                      onChange={(e) => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}
-                      className="h-7 text-sm"
-                      placeholder="輸入傳真"
-                    />
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">電話：</span>
+                      <input
+                        value={supplierInfo.phone}
+                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, phone: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-morandi-secondary whitespace-nowrap">傳真：</span>
+                      <input
+                        value={supplierInfo.fax}
+                        onChange={(e) => setSupplierInfo(prev => ({ ...prev, fax: e.target.value }))}
+                        className="flex-1 min-w-0 h-7 px-1 text-sm bg-transparent border-b border-border/50 focus:outline-none focus:border-morandi-gold"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -622,7 +695,7 @@ export function TourRequestFormDialog({
                 </div>
                 <div>
                   <span className="text-morandi-secondary">出發日期：</span>
-                  <span className="font-medium ml-1">{formatDate(departureDate || pkg.start_date)}</span>
+                  <span className="font-medium ml-1">{formatDate(departureDate || pkg?.start_date)}</span>
                 </div>
                 <div>
                   <span className="text-morandi-secondary">人數：</span>
@@ -646,45 +719,43 @@ export function TourRequestFormDialog({
                 </thead>
                 <tbody>
                   {items.map((item) => (
-                    <tr key={item.id} className="border-t border-border/50">
-                      <td className="px-2 py-1">
-                        <Input
+                    <tr key={item.id} className="border-t border-border/50 hover:bg-morandi-container/10">
+                      <td className="p-0">
+                        <input
                           type="date"
                           value={item.date}
                           onChange={(e) => updateItem(item.id, 'date', e.target.value)}
-                          className="h-8 text-sm"
+                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
                         />
                       </td>
-                      <td className="px-2 py-1">
-                        <Input
+                      <td className="p-0">
+                        <input
                           value={item.title}
                           onChange={(e) => updateItem(item.id, 'title', e.target.value)}
-                          className="h-8 text-sm"
+                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
                         />
                       </td>
-                      <td className="px-2 py-1">
-                        <Input
+                      <td className="p-0">
+                        <input
                           type="number"
                           value={item.quantity}
                           onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                          className="h-8 text-sm text-center"
+                          className="w-full h-9 px-3 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
                         />
                       </td>
-                      <td className="px-2 py-1">
-                        <Input
+                      <td className="p-0">
+                        <input
                           type="number"
-                          value={item.unitPrice}
+                          value={item.unitPrice || ''}
                           onChange={(e) => updateItem(item.id, 'unitPrice', parseInt(e.target.value) || 0)}
-                          className="h-8 text-sm text-right"
-                          placeholder="0"
+                          className="w-full h-9 px-3 text-sm text-right bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
                         />
                       </td>
-                      <td className="px-2 py-1">
-                        <Input
+                      <td className="p-0">
+                        <input
                           value={item.note}
                           onChange={(e) => updateItem(item.id, 'note', e.target.value)}
-                          className="h-8 text-sm"
-                          placeholder="備註"
+                          className="w-full h-9 px-3 text-sm bg-transparent border-0 focus:outline-none focus:bg-morandi-container/20"
                         />
                       </td>
                       <td className="px-2 py-1 text-center">

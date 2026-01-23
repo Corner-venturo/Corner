@@ -61,8 +61,9 @@ export const useQuoteCalculations = ({
             roomTypeName = dayItems[roomIndex].name
           }
           // 記錄人數
-          if (dayItems[roomIndex].quantity && dayItems[roomIndex].quantity > 0) {
-            totalCapacity += dayItems[roomIndex].quantity
+          const qty = dayItems[roomIndex].quantity
+          if (qty && qty > 0) {
+            totalCapacity += qty
             capacityCount++
           }
         }
@@ -161,7 +162,7 @@ export const useQuoteCalculations = ({
             } else {
               // 其他交通費用（如機票、遊覽車等）
               // 成人價格
-              if (item.adult_price !== undefined && item.adult_price > 0) {
+              if (item.adult_price != null && item.adult_price > 0) {
                 costs.adult += item.adult_price
                 costs.single_room += item.adult_price
               } else {
@@ -172,7 +173,7 @@ export const useQuoteCalculations = ({
               }
 
               // 兒童價格（只有填寫時才加）
-              if (item.child_price !== undefined && item.child_price > 0) {
+              if (item.child_price != null && item.child_price > 0) {
                 costs.child_with_bed += item.child_price
                 costs.child_no_bed += item.child_price
               } else if (item.unit_price && item.unit_price > 0) {
@@ -182,7 +183,7 @@ export const useQuoteCalculations = ({
               }
 
               // 嬰兒價格（只有填寫時才加）
-              if (item.infant_price !== undefined && item.infant_price > 0) {
+              if (item.infant_price != null && item.infant_price > 0) {
                 costs.infant += item.infant_price
               }
             }

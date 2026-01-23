@@ -24,10 +24,10 @@ interface NewCustomerData {
   phone: string
   address: string
   passport_number: string
-  passport_romanization: string
-  passport_expiry_date: string
+  passport_name: string
+  passport_expiry: string
   national_id: string
-  date_of_birth: string
+  birth_date: string
 }
 
 const INITIAL_CUSTOMER: NewCustomerData = {
@@ -36,10 +36,10 @@ const INITIAL_CUSTOMER: NewCustomerData = {
   phone: '',
   address: '',
   passport_number: '',
-  passport_romanization: '',
-  passport_expiry_date: '',
+  passport_name: '',
+  passport_expiry: '',
   national_id: '',
-  date_of_birth: '',
+  birth_date: '',
 }
 
 interface CustomerAddDialogProps {
@@ -173,8 +173,8 @@ export function CustomerAddDialog({
 
             <FormField label="護照拼音" labelClassName="text-xs">
               <Input
-                value={newCustomer.passport_romanization}
-                onChange={(e) => updateField('passport_romanization', e.target.value.toUpperCase())}
+                value={newCustomer.passport_name}
+                onChange={(e) => updateField('passport_name', e.target.value.toUpperCase())}
                 placeholder="例如：WANG/XIAOMING"
                 className="h-8 text-sm"
               />
@@ -191,8 +191,8 @@ export function CustomerAddDialog({
               </FormField>
               <FormField label="護照效期" labelClassName="text-xs">
                 <DatePicker
-                  value={newCustomer.passport_expiry_date}
-                  onChange={(date) => updateField('passport_expiry_date', date)}
+                  value={newCustomer.passport_expiry}
+                  onChange={(date) => updateField('passport_expiry', date)}
                   className="h-8 text-sm"
                   placeholder="選擇日期"
                 />
@@ -201,8 +201,8 @@ export function CustomerAddDialog({
 
             <FormField label="出生日期" labelClassName="text-xs">
               <DatePicker
-                value={newCustomer.date_of_birth}
-                onChange={(date) => updateField('date_of_birth', date)}
+                value={newCustomer.birth_date}
+                onChange={(date) => updateField('birth_date', date)}
                 className="h-8 text-sm"
                 placeholder="選擇日期"
               />

@@ -431,6 +431,39 @@ export function generateProposalCode(
 }
 
 /**
+ * 生成需求單編號
+ *
+ * @param tourCode - 團號（如 CNX250128A）
+ * @param existingRequests - 現有需求單列表（同團）
+ * @returns 需求單編號（如 CNX250128A-RQ01）
+ *
+ * @example
+ * generateTourRequestCode('CNX250128A', existingRequests)
+ * // => 'CNX250128A-RQ01', 'CNX250128A-RQ02'...
+ */
+export function generateTourRequestCode(
+  tourCode: string,
+  existingRequests: { code?: string }[]
+): string {
+  const prefix = `${tourCode}-RQ`
+  let maxNumber = 0
+
+  existingRequests.forEach(request => {
+    const code = request.code
+    if (code?.startsWith(prefix)) {
+      const numberPart = code.substring(prefix.length)
+      const number = parseInt(numberPart, 10)
+      if (!isNaN(number) && number > maxNumber) {
+        maxNumber = number
+      }
+    }
+  })
+
+  const nextNumber = (maxNumber + 1).toString().padStart(2, '0')
+  return `${prefix}${nextNumber}`
+}
+
+/**
  * 生成公司請款單編號
  *
  * @param expenseType - 費用類型代碼（如 SAL, ENT, TRV）

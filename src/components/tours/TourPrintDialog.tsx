@@ -382,6 +382,10 @@ export function TourPrintDialog({
           const arrTerminal = seg.arrivalTerminal ? `航站${seg.arrivalTerminal}` : ''
           const directFlight = seg.isDirect ? '/直飛' : ''
           const mealInfo = seg.meal ? `/${seg.meal}` : ''
+          // 經停資訊
+          const viaInfo = seg.via && seg.via.length > 0
+            ? `<div class="via-info">經停: ${seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}</div>`
+            : ''
 
           flightRows.push(`
             <tr class="flight-header">
@@ -401,6 +405,7 @@ export function TourPrintDialog({
               <td class="flight-times">
                 <div>${formatTime(seg.departureTime)} 出發: ${seg.origin ? `${getAirportName(seg.origin)}(${seg.origin})` : '待確認'}${depTerminal ? ` ${depTerminal}` : ''}</div>
                 <div>${formatTime(seg.arrivalTime)} 抵達: ${seg.destination ? `${getAirportName(seg.destination)}(${seg.destination})` : '待確認'}${arrTerminal ? ` ${arrTerminal}` : ''}</div>
+                ${viaInfo}
               </td>
               <td class="flight-extra">
                 ${seg.aircraft ? `<span>/${seg.aircraft}</span>` : ''}
@@ -651,6 +656,15 @@ export function TourPrintDialog({
             }
             .flight-extra span {
               display: block;
+            }
+            .via-info {
+              margin-top: 4px;
+              padding: 3px 8px;
+              background: #fff7e6;
+              border: 1px solid #ffd591;
+              border-radius: 3px;
+              color: #d46b08;
+              font-size: 11px;
             }
             /* Footer styles */
             .footer {

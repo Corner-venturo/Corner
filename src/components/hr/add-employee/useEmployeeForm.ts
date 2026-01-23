@@ -3,7 +3,6 @@ import { logger } from '@/lib/utils/logger'
 import { UI_DELAYS } from '@/lib/constants/timeouts'
 import { useState } from 'react'
 import { useUserStore, userStoreHelpers } from '@/stores/user-store'
-import { hashPassword } from '@/lib/auth'
 import { EmployeeFormData, CreatedEmployeeInfo } from './types'
 import { getCurrentWorkspaceId, isSuperAdmin } from '@/lib/workspace-helpers'
 
@@ -54,7 +53,6 @@ export function useEmployeeForm(onSubmit: () => void) {
 
     try {
       const employee_number = userStoreHelpers.generateUserNumber()
-      const hashedPassword = await hashPassword(formData.defaultPassword)
 
       // 決定 workspace_id
       // super_admin 可以選擇，一般 admin 使用自己的 workspace
@@ -111,7 +109,6 @@ export function useEmployeeForm(onSubmit: () => void) {
         english_name: formData.english_name,
         display_name: formData.display_name,
         chinese_name: formData.chinese_name,
-        password_hash: hashedPassword,
         workspace_id: targetWorkspaceId,
         supabase_user_id: authUserId, // 設定 supabase_user_id（向後相容）
         roles: formData.roles as ('admin' | 'employee' | 'user' | 'tour_leader' | 'sales' | 'accountant' | 'assistant' | 'super_admin')[],

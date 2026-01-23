@@ -107,7 +107,6 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         defaultTourId={tour.id}
         defaultOrderId={selectedOrderForReceipt?.id}
         onSuccess={handleReceiptSuccess}
-        nested
       />
 
       {/* 請款對話框 */}
@@ -117,7 +116,6 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         defaultTourId={tour.id}
         defaultOrderId={selectedOrderForRequest?.id}
         onSuccess={handleRequestSuccess}
-        nested
       />
     </>
   )

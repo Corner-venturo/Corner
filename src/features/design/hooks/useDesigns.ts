@@ -180,16 +180,30 @@ export function useDesigns() {
     }
 
     // 5. 刪除文件記錄
-    const { error } = await supabase
+    logger.log('Deleting brochure_documents:', { id, workspaceId })
+    const { error, data: deletedData } = await supabase
       .from('brochure_documents')
       .delete()
       .eq('id', id)
       .eq('workspace_id', workspaceId)
+      .select()
+      .single()
 
-    if (error) throw error
+    logger.log('Delete result:', { error, deletedData })
+
+    if (error) {
+      // PGRST116 表示沒有找到記錄（可能已被刪除或 RLS 阻止）
+      if (error.code === 'PGRST116') {
+        logger.warn('Document not found or already deleted:', id)
+      } else {
+        logger.error('Delete brochure_documents failed:', error)
+        throw error
+      }
+    }
 
     // 樂觀更新
     await mutate((current) => current?.filter((d) => d.id !== id), false)
+    logger.log('Design deleted successfully:', id)
   }
 
   return {

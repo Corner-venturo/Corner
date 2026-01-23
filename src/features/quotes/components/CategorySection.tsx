@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/utils/logger'
 import React, { useState, useEffect } from 'react'
-import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal, DollarSign } from 'lucide-react'
+import { Plus, Users, Car, Home, UtensilsCrossed, MapPin, MoreHorizontal, DollarSign, ChevronDown, ChevronRight, Map } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CostCategory, CostItem } from '../types'
@@ -79,6 +79,8 @@ interface CategorySectionProps {
   handleRemoveItem: (categoryId: string, itemId: string) => void
   onOpenMealsImportDialog?: () => void
   onOpenActivitiesImportDialog?: () => void
+  // Local 報價相關
+  onOpenLocalPricingDialog?: () => void
 }
 
 export const CategorySection: React.FC<CategorySectionProps> = ({
@@ -100,8 +102,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   handleRemoveItem,
   onOpenMealsImportDialog,
   onOpenActivitiesImportDialog,
+  onOpenLocalPricingDialog,
 }) => {
   const Icon = categoryIcons[category.id]
+
+  // 折疊狀態
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   // 對話框狀態
   const [isCountryDialogOpen, setIsCountryDialogOpen] = useState(false)
@@ -193,10 +199,22 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
   return (
     <React.Fragment>
-      {/* 分類標題行 */}
-      <tr className="bg-morandi-container/40 border-b border-border/60">
-        <td colSpan={2} className="py-3 px-4 text-sm font-semibold text-morandi-charcoal border-l-4 border-l-morandi-gold">
+      {/* 分類標題行 - 有底色但無左邊框，可折疊 */}
+      <tr className="bg-morandi-container/40 border-b border-morandi-container/60">
+        <td colSpan={2} className="py-3 px-4 text-sm font-semibold text-morandi-charcoal">
           <div className="flex items-center space-x-2">
+            {/* 折疊箭頭 */}
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-0.5 hover:bg-morandi-gold/10 rounded transition-colors"
+              title={isCollapsed ? '展開' : '收合'}
+            >
+              {isCollapsed ? (
+                <ChevronRight size={14} className="text-morandi-secondary" />
+              ) : (
+                <ChevronDown size={14} className="text-morandi-secondary" />
+              )}
+            </button>
             <Icon size={16} className="text-morandi-gold" />
             <span>{category.name}</span>
 
@@ -249,13 +267,28 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             </div>
           ) : category.id === 'group-transport' ? (
             <div className="flex gap-1 justify-end">
+              {onOpenLocalPricingDialog && (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={onOpenLocalPricingDialog}
+                  disabled={isReadOnly}
+                  className={cn(
+                    'text-morandi-gold hover:bg-morandi-gold/10',
+                    isReadOnly && 'cursor-not-allowed opacity-60'
+                  )}
+                >
+                  <MapPin size={12} className="mr-1" />
+                  Local
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="xs"
                 onClick={() => handleAddRow(category.id)}
                 disabled={isReadOnly}
                 className={cn(
-                  'text-morandi-gold hover:bg-morandi-gold/10',
+                  'text-morandi-secondary hover:bg-morandi-gold/10',
                   isReadOnly && 'cursor-not-allowed opacity-60'
                 )}
               >
@@ -273,7 +306,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
                 )}
               >
                 <Users size={12} className="mr-1" />
-                新增
+                導遊
               </Button>
             </div>
           ) : category.id === 'transport' ? (
@@ -383,53 +416,55 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         </td>
       </tr>
 
-      {/* 項目明細行 */}
-      {category.id === 'accommodation'
-        ? // 住宿特殊渲染：按天分組，每天內顯示各房型
-          (() => {
-            const accommodationItems = category.items.filter(item => item.day !== undefined)
-            const groupedByDay: Record<number, CostItem[]> = {}
+      {/* 項目明細行 - 折疊時隱藏 */}
+      {!isCollapsed && (
+        category.id === 'accommodation'
+          ? // 住宿特殊渲染：按天分組，每天內顯示各房型
+            (() => {
+              const accommodationItems = category.items.filter(item => item.day !== undefined)
+              const groupedByDay: Record<number, CostItem[]> = {}
 
-            // 按天分組
-            accommodationItems.forEach(item => {
-              const day = item.day!
-              if (!groupedByDay[day]) groupedByDay[day] = []
-              groupedByDay[day].push(item)
-            })
-
-            return Object.keys(groupedByDay)
-              .sort((a, b) => Number(a) - Number(b))
-              .map(dayStr => {
-                const day = Number(dayStr)
-                const dayItems = groupedByDay[day]
-
-                return dayItems.map((item, roomIndex) => (
-                  <AccommodationItemRow
-                    key={item.id}
-                    item={item}
-                    categoryId={category.id}
-                    day={day}
-                    roomIndex={roomIndex}
-                    handleUpdateItem={handleUpdateItem}
-                    handleRemoveItem={handleRemoveItem}
-                  />
-                ))
+              // 按天分組
+              accommodationItems.forEach(item => {
+                const day = item.day!
+                if (!groupedByDay[day]) groupedByDay[day] = []
+                groupedByDay[day].push(item)
               })
-          })()
-        : // 一般分類的渲染
-          category.items.map(item => (
-            <CostItemRow
-              key={item.id}
-              item={item}
-              categoryId={category.id}
-              handleUpdateItem={handleUpdateItem}
-              handleRemoveItem={handleRemoveItem}
-            />
-          ))}
 
-      {/* 小計行 - 只有當該分類有項目時才顯示 */}
-      {category.items.length > 0 && (
-        <tr className="bg-morandi-container/10 border-b border-border">
+              return Object.keys(groupedByDay)
+                .sort((a, b) => Number(a) - Number(b))
+                .map(dayStr => {
+                  const day = Number(dayStr)
+                  const dayItems = groupedByDay[day]
+
+                  return dayItems.map((item, roomIndex) => (
+                    <AccommodationItemRow
+                      key={item.id}
+                      item={item}
+                      categoryId={category.id}
+                      day={day}
+                      roomIndex={roomIndex}
+                      handleUpdateItem={handleUpdateItem}
+                      handleRemoveItem={handleRemoveItem}
+                    />
+                  ))
+                })
+            })()
+          : // 一般分類的渲染
+            category.items.map(item => (
+              <CostItemRow
+                key={item.id}
+                item={item}
+                categoryId={category.id}
+                handleUpdateItem={handleUpdateItem}
+                handleRemoveItem={handleRemoveItem}
+              />
+            ))
+      )}
+
+      {/* 小計行 - 只有當該分類有項目且未折疊時才顯示 */}
+      {!isCollapsed && category.items.length > 0 && (
+        <tr className="border-b border-morandi-container/80">
           <td
             colSpan={4}
             className="py-2 px-4 text-right text-sm font-medium text-morandi-secondary"

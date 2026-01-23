@@ -71,10 +71,10 @@ export function CustomerMatchDialog({
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-morandi-muted">
-                      {customer.passport_romanization && (
+                      {customer.passport_name && (
                         <div>
                           <span className="text-xs text-morandi-muted">護照拼音：</span>
-                          {customer.passport_romanization}
+                          {customer.passport_name}
                         </div>
                       )}
                       {customer.national_id && (
@@ -89,10 +89,10 @@ export function CustomerMatchDialog({
                           {customer.passport_number}
                         </div>
                       )}
-                      {customer.date_of_birth && (
+                      {customer.birth_date && (
                         <div>
                           <span className="text-xs text-morandi-muted">生日：</span>
-                          {customer.date_of_birth}
+                          {customer.birth_date}
                         </div>
                       )}
                       {customer.phone && (

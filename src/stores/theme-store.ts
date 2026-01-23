@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type ThemeType = 'morandi' | 'modern-dark'
+export type ThemeType = 'morandi' | 'modern-dark' | 'nordic'
 
 interface ThemeState {
   // 當前主題
@@ -23,7 +23,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     // 從 localStorage 讀取主題
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('venturo-theme') as ThemeType
-      if (savedTheme && ['morandi', 'modern-dark'].includes(savedTheme)) {
+      if (savedTheme && ['morandi', 'modern-dark', 'nordic'].includes(savedTheme)) {
         set({ currentTheme: savedTheme })
         document.documentElement.setAttribute('data-theme', savedTheme)
       }

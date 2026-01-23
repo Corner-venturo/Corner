@@ -240,7 +240,9 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
             }
 
             // 5. 上傳圖片到 storage (統一使用 passport-images bucket)
-            const fileName = `customers/${Date.now()}_${compressedFile.name}`
+            // 統一格式：passport_{timestamp}_{random}.jpg（根目錄）
+            const random = Math.random().toString(36).substring(2, 8)
+            const fileName = `passport_${Date.now()}_${random}.jpg`
             const { data: uploadData, error: uploadError } = await supabase.storage
               .from('passport-images')
               .upload(fileName, compressedFile)
@@ -252,21 +254,38 @@ export function usePassportUpload(options?: UsePassportUploadOptions) {
 
             // 6. 更新或創建客戶資料
             if (matchedCustomer) {
+              // 記錄舊的護照圖片 URL
+              const oldPassportUrl = matchedCustomer.passport_image_url
+
               // 更新現有客戶
               await supabase
                 .from('customers')
                 .update({
                   passport_image_url: imageUrl,
-                  passport_romanization: ocrData.passport_romanization || matchedCustomer.passport_romanization,
+                  passport_name: ocrData.passport_name || matchedCustomer.passport_name,
                   passport_number: ocrData.passport_number || matchedCustomer.passport_number,
-                  passport_expiry_date: ocrData.passport_expiry_date || matchedCustomer.passport_expiry_date,
-                  date_of_birth: ocrData.date_of_birth || matchedCustomer.date_of_birth,
+                  passport_expiry: ocrData.passport_expiry || matchedCustomer.passport_expiry,
+                  birth_date: ocrData.birth_date || matchedCustomer.birth_date,
                   gender: gender || matchedCustomer.gender,
                   national_id: ocrData.national_id || matchedCustomer.national_id,
                   verification_status: 'unverified',
                   updated_at: new Date().toISOString(),
                 })
                 .eq('id', matchedCustomer.id)
+
+              // 更新成功後刪除舊照片
+              if (oldPassportUrl && oldPassportUrl.includes('passport-images')) {
+                try {
+                  const match = oldPassportUrl.match(/passport-images\/(.+)$/)
+                  if (match) {
+                    const oldFileName = decodeURIComponent(match[1])
+                    await supabase.storage.from('passport-images').remove([oldFileName])
+                    logger.log(`已刪除舊護照照片: ${oldFileName}`)
+                  }
+                } catch (err) {
+                  logger.error('刪除舊護照照片失敗:', err)
+                }
+              }
 
               results.push({
                 success: true,

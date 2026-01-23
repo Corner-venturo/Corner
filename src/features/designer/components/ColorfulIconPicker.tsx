@@ -71,7 +71,7 @@ const POPULAR_ICONS = [
   // ❤️ 愛心符號
   'noto:red-heart', 'noto:sparkling-heart', 'noto:growing-heart', 'noto:star-struck',
   // 🏳️‍🌈 彩虹相關
-  'noto:rainbow-flag', 'noto:rainbow', 'noto:unicorn',
+  'noto:rainbow-flag', 'noto:unicorn', 'noto:performing-arts',
 ]
 
 // localStorage key for recent icons
@@ -236,32 +236,34 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
       </div>
 
       {/* 圖標集選擇 */}
-      <div className="flex flex-wrap gap-1 p-2 border-b border-border">
-        <Button
-          variant={selectedSet === 'all' ? 'default' : 'outline'}
-          size="sm"
-          className={cn(
-            'h-6 px-2 text-[10px]',
-            selectedSet === 'all' && 'bg-morandi-gold hover:bg-morandi-gold-hover'
-          )}
-          onClick={() => setSelectedSet('all')}
-        >
-          全部
-        </Button>
-        {(Object.entries(COLORFUL_ICON_SETS) as [IconSetKey, { name: string }][]).map(([key, { name }]) => (
+      <div className="p-2 border-b border-border overflow-x-auto">
+        <div className="flex gap-1 min-w-max">
           <Button
-            key={key}
-            variant={selectedSet === key ? 'default' : 'outline'}
+            variant={selectedSet === 'all' ? 'default' : 'outline'}
             size="sm"
             className={cn(
-              'h-6 px-2 text-[10px]',
-              selectedSet === key && 'bg-morandi-gold hover:bg-morandi-gold-hover'
+              'h-6 px-2 text-[10px] shrink-0',
+              selectedSet === 'all' && 'bg-morandi-gold hover:bg-morandi-gold-hover'
             )}
-            onClick={() => setSelectedSet(key)}
+            onClick={() => setSelectedSet('all')}
           >
-            {name}
+            全部
           </Button>
-        ))}
+          {(Object.entries(COLORFUL_ICON_SETS) as [IconSetKey, { name: string }][]).map(([key, { name }]) => (
+            <Button
+              key={key}
+              variant={selectedSet === key ? 'default' : 'outline'}
+              size="sm"
+              className={cn(
+                'h-6 px-2 text-[10px] shrink-0',
+                selectedSet === key && 'bg-morandi-gold hover:bg-morandi-gold-hover'
+              )}
+              onClick={() => setSelectedSet(key)}
+            >
+              {name}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* 分類標籤 */}
@@ -273,7 +275,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
               variant={selectedCategory === 'recent' ? 'default' : 'outline'}
               size="sm"
               className={cn(
-                'h-6 px-2 text-[10px]',
+                'h-6 px-2 text-[10px] shrink-0',
                 selectedCategory === 'recent' && 'bg-morandi-gold hover:bg-morandi-gold-hover'
               )}
               onClick={() => {
@@ -289,7 +291,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
             variant={selectedCategory === null && !search ? 'default' : 'outline'}
             size="sm"
             className={cn(
-              'h-6 px-2 text-[10px]',
+              'h-6 px-2 text-[10px] shrink-0',
               selectedCategory === null && !search && 'bg-morandi-gold hover:bg-morandi-gold-hover'
             )}
             onClick={() => {
@@ -306,7 +308,7 @@ export function ColorfulIconPicker({ onSelectIcon }: ColorfulIconPickerProps) {
               variant={selectedCategory === cat.id ? 'default' : 'outline'}
               size="sm"
               className={cn(
-                'h-6 px-2 text-[10px]',
+                'h-6 px-2 text-[10px] shrink-0',
                 selectedCategory === cat.id && 'bg-morandi-gold hover:bg-morandi-gold-hover'
               )}
               onClick={() => searchByCategory(cat.id)}

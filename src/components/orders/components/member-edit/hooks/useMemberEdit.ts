@@ -23,6 +23,23 @@ interface EditFormData {
   remarks?: string
 }
 
+// 從 URL 提取檔名並刪除舊照片
+async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
+  if (!oldUrl) return
+  try {
+    // 從 URL 提取檔名 (格式: .../passport-images/filename.jpg)
+    const match = oldUrl.match(/passport-images\/(.+)$/)
+    if (match) {
+      const oldFileName = decodeURIComponent(match[1])
+      await supabase.storage.from('passport-images').remove([oldFileName])
+      logger.log(`已刪除舊護照照片: ${oldFileName}`)
+    }
+  } catch (error) {
+    // 刪除失敗不影響上傳流程，只記錄錯誤
+    logger.error('刪除舊護照照片失敗:', error)
+  }
+}
+
 // 圖片壓縮函數
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
@@ -82,6 +99,7 @@ export function useMemberEdit(
     if (!editingMember?.passport_image_url) return
 
     imageEditor.setIsSaving(true)
+    const oldUrl = editingMember.passport_image_url
     try {
       const transformedImage = await imageEditor.transformImage(
         editingMember.passport_image_url,
@@ -90,7 +108,9 @@ export function useMemberEdit(
       )
       const response = await fetch(transformedImage)
       const blob = await response.blob()
-      const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+      // 統一格式：passport_{timestamp}_{random}.jpg
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
 
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
@@ -106,6 +126,9 @@ export function useMemberEdit(
         .from('order_members')
         .update({ passport_image_url: urlData.publicUrl })
         .eq('id', editingMember.id)
+
+      // 上傳成功後刪除舊照片
+      await deleteOldPassportImage(oldUrl)
 
       onMemberChange({ ...editingMember, passport_image_url: urlData.publicUrl })
       imageEditor.reset()
@@ -125,13 +148,16 @@ export function useMemberEdit(
   const handleConfirmCrop = async () => {
     if (!editingMember?.passport_image_url) return
 
+    const oldUrl = editingMember.passport_image_url
     try {
       const croppedImage = await imageEditor.confirmCrop(editingMember.passport_image_url)
       if (croppedImage) {
         imageEditor.setIsSaving(true)
         const response = await fetch(croppedImage)
         const blob = await response.blob()
-        const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+        // 統一格式：passport_{timestamp}_{random}.jpg
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
 
         const { error: uploadError } = await supabase.storage
           .from('passport-images')
@@ -147,6 +173,9 @@ export function useMemberEdit(
           .from('order_members')
           .update({ passport_image_url: urlData.publicUrl })
           .eq('id', editingMember.id)
+
+        // 上傳成功後刪除舊照片
+        await deleteOldPassportImage(oldUrl)
 
         onMemberChange({ ...editingMember, passport_image_url: urlData.publicUrl })
         imageEditor.reset()
@@ -167,9 +196,12 @@ export function useMemberEdit(
     const file = e.target.files?.[0]
     if (!file || !editingMember) return
 
+    const oldUrl = editingMember.passport_image_url
     try {
       const compressedFile = await compressImage(file)
-      const fileName = `passport_${editingMember.id}_${Date.now()}.jpg`
+      // 統一格式：passport_{timestamp}_{random}.jpg
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
 
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
@@ -185,6 +217,9 @@ export function useMemberEdit(
         .from('order_members')
         .update({ passport_image_url: urlData.publicUrl })
         .eq('id', editingMember.id)
+
+      // 上傳成功後刪除舊照片
+      await deleteOldPassportImage(oldUrl)
 
       onMemberChange({ ...editingMember, passport_image_url: urlData.publicUrl })
 

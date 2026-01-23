@@ -164,12 +164,12 @@ export default function CustomersPage() {
         ),
       },
       {
-        key: 'passport_romanization',
+        key: 'passport_name',
         label: '護照拼音',
         sortable: false,
         render: (_value, customer: Customer) => (
           <div className="text-xs text-morandi-primary font-mono">
-            {customer.passport_romanization || '-'}
+            {customer.passport_name || '-'}
           </div>
         ),
       },
@@ -192,15 +192,15 @@ export default function CustomersPage() {
         ),
       },
       {
-        key: 'passport_expiry_date',
+        key: 'passport_expiry',
         label: '護照效期',
         sortable: false,
         render: (_value, customer: Customer) => {
-          const expiryInfo = formatPassportExpiryWithStatus(customer.passport_expiry_date)
+          const expiryInfo = formatPassportExpiryWithStatus(customer.passport_expiry)
           return (
             <div className={`text-xs ${expiryInfo.className || 'text-morandi-secondary'}`}>
               <DateCell
-                date={customer.passport_expiry_date}
+                date={customer.passport_expiry}
                 showIcon={false}
                 className={`text-xs ${expiryInfo.className || 'text-morandi-secondary'}`}
               />
@@ -220,12 +220,12 @@ export default function CustomersPage() {
         ),
       },
       {
-        key: 'date_of_birth',
+        key: 'birth_date',
         label: '生日',
         sortable: false,
         render: (_value, customer: Customer) => (
           <DateCell
-            date={customer.date_of_birth}
+            date={customer.birth_date}
             showIcon={false}
             className="text-xs text-morandi-secondary"
           />
@@ -266,16 +266,16 @@ export default function CustomersPage() {
     phone: string
     address: string
     passport_number: string
-    passport_romanization: string
-    passport_expiry_date: string
+    passport_name: string
+    passport_expiry: string
     national_id: string
-    date_of_birth: string
+    birth_date: string
   }) => {
     // 將空字串日期欄位轉換為 null，避免 PostgreSQL 日期格式錯誤
     const cleanedData = {
       ...data,
-      passport_expiry_date: data.passport_expiry_date || null,
-      date_of_birth: data.date_of_birth || null,
+      passport_expiry: data.passport_expiry || null,
+      birth_date: data.birth_date || null,
     }
     await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
       ...cleanedData,

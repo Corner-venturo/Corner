@@ -7,16 +7,32 @@ import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 import type { Visa } from '@/stores/types'
 
+// 從 URL 提取檔名並刪除舊照片（僅處理 storage URL，忽略 base64）
+async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
+  if (!oldUrl || oldUrl.startsWith('data:')) return // 跳過 base64 字串
+  try {
+    const { supabase } = await import('@/lib/supabase/client')
+    const match = oldUrl.match(/passport-images\/(.+)$/)
+    if (match) {
+      const oldFileName = decodeURIComponent(match[1])
+      await supabase.storage.from('passport-images').remove([oldFileName])
+      logger.log(`已刪除舊護照照片: ${oldFileName}`)
+    }
+  } catch (error) {
+    logger.error('刪除舊護照照片失敗:', error)
+  }
+}
+
 export interface PassportOCRResult {
   fileName: string
   success: boolean
   imageBase64?: string
   customer?: {
     name: string
-    passport_romanization: string
+    passport_name: string
     passport_number: string
-    passport_expiry_date: string
-    date_of_birth: string
+    passport_expiry: string
+    birth_date: string
     gender: string
     national_id: string
   }
@@ -190,7 +206,7 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
 
         if (ocr.success && ocr.customer) {
           // 用護照拼音比對「已送件」的簽證
-          const romanization = ocr.customer.passport_romanization?.toUpperCase()
+          const romanization = ocr.customer.passport_name?.toUpperCase()
           const name = ocr.customer.name
 
           // 先找完全匹配的
@@ -298,14 +314,23 @@ export function useBatchPickup({ pendingVisas, updateVisa, onComplete }: UseBatc
                 .single()
 
               if (customer) {
+                // 如果有新圖片且顧客有舊的 storage 圖片，先記錄舊 URL
+                const oldPassportUrl = item.ocrResult.imageBase64 ? customer.passport_image_url : null
+
                 await updateCustomer(customer.id, {
                   passport_number: item.ocrResult.customer.passport_number || customer.passport_number,
-                  passport_romanization: item.ocrResult.customer.passport_romanization || customer.passport_romanization,
-                  passport_expiry_date: item.ocrResult.customer.passport_expiry_date || customer.passport_expiry_date,
-                  date_of_birth: item.ocrResult.customer.date_of_birth || customer.date_of_birth,
+                  passport_name: item.ocrResult.customer.passport_name || customer.passport_name,
+                  passport_expiry: item.ocrResult.customer.passport_expiry || customer.passport_expiry,
+                  birth_date: item.ocrResult.customer.birth_date || customer.birth_date,
                   gender: item.ocrResult.customer.gender || customer.gender,
                   passport_image_url: item.ocrResult.imageBase64 || customer.passport_image_url,
                 })
+
+                // 更新成功後刪除舊照片
+                if (oldPassportUrl) {
+                  await deleteOldPassportImage(oldPassportUrl)
+                }
+
                 logger.log(`✅ 已更新顧客護照資訊: ${customer.name}`)
               }
             }

@@ -78,7 +78,7 @@ export function ImportActivitiesDialog({
         id: `activity-import-${Date.now()}-${index}`,
         name: activity.title, // 只使用景點名稱，不加 Day X 前綴
         quantity: 1,
-        unit_price: 0,
+        unit_price: null,
         total: 0,
         note: '',
         is_group_cost: false,

@@ -75,14 +75,14 @@ export function useMemberActions(): MemberActionsReturn {
       id: generateUUID(),
       created_at: now,
       updated_at: now,
-      name: data.name || '', // 確保 name 不為 undefined
+      chinese_name: data.name || '', // 確保 chinese_name 不為 undefined（標準欄位）
       ...(workspace_id ? { workspace_id } : {}),
     } as Member
 
     // 轉換為 Supabase Insert 類型
     const insertData: MemberInsert = {
       id: newMember.id,
-      name: newMember.name || '',
+      chinese_name: newMember.chinese_name || '',
       order_id: newMember.order_id,
       created_at: newMember.created_at ?? undefined,
       updated_at: newMember.updated_at ?? undefined,

@@ -7,7 +7,7 @@
  * - 交通、餐食、住宿、活動、其他
  */
 
-import { LucideIcon, Plus, Edit2, Trash2, FileOutput } from 'lucide-react'
+import { LucideIcon, Plus, Edit2, Trash2, FileOutput, Navigation } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { TourConfirmationItem, ConfirmationItemCategory } from '@/types/tour-confirmation-sheet.types'
 
@@ -79,6 +79,19 @@ export function ConfirmationSection({
   const sectionTotal = {
     expected: items.reduce((sum, i) => sum + (i.expected_cost || 0), 0),
     actual: items.reduce((sum, i) => sum + (i.actual_cost || 0), 0),
+  }
+
+  // 生成導航連結
+  const getNavigationUrl = (item: TourConfirmationItem) => {
+    // 優先使用儲存的 Google Maps URL
+    if (item.google_maps_url) {
+      return item.google_maps_url
+    }
+    // 使用 GPS 座標
+    if (item.latitude && item.longitude) {
+      return `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`
+    }
+    return null
   }
 
   return (
@@ -156,6 +169,21 @@ export function ConfirmationSection({
                   ))}
                   <td className="px-3 py-2 text-right">
                     <div className="flex items-center justify-end gap-1">
+                      {/* GPS 導航按鈕 */}
+                      {getNavigationUrl(item) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const url = getNavigationUrl(item)
+                            if (url) window.open(url, '_blank')
+                          }}
+                          className="h-7 w-7 p-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                          title="開啟 Google Maps 導航"
+                        >
+                          <Navigation size={14} />
+                        </Button>
+                      )}
                       {onGenerateRequest && (
                         <Button
                           variant="ghost"

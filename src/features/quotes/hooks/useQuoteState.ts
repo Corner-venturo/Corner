@@ -113,8 +113,8 @@ export const useQuoteState = () => {
           newItems.push({
             id: `accommodation-day${day}-${Date.now()}-${day}`,
             name: '', // 飯店名稱（待填）
-            quantity: 0,
-            unit_price: 0,
+            quantity: null,
+            unit_price: null,
             total: 0,
             note: '',
             day: day,
@@ -211,8 +211,8 @@ export const useQuoteState = () => {
               newItems.push({
                 id: `accommodation-day${day}-${Date.now()}-${day}`,
                 name: '',
-                quantity: 0,
-                unit_price: 0,
+                quantity: null,
+                unit_price: null,
                 total: 0,
                 note: '',
                 day: day,
@@ -304,8 +304,8 @@ export const useQuoteState = () => {
     const flightItem: CostItem = {
       id: `flight-adult-${Date.now()}`,
       name: '機票成人',
-      quantity: 0, // 不填數量
-      unit_price: 0, // 不填金額
+      quantity: null, // 不填數量
+      unit_price: null, // 不填金額
       total: 0,
       note: flightNotes.join('\n'),
     }

@@ -16,11 +16,11 @@ import { logger } from '@/lib/utils/logger'
 interface CustomerData {
   name?: string
   english_name?: string
-  passport_romanization?: string
+  passport_name?: string
   passport_number?: string
-  passport_expiry_date?: string | null
+  passport_expiry?: string | null
   national_id?: string
-  date_of_birth?: string | null
+  birth_date?: string | null
   sex?: string
 }
 
@@ -116,7 +116,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
 
       const passportNumber = customerData.passport_number || ''
       const idNumber = customerData.national_id || ''
-      const birthDate = customerData.date_of_birth || null
+      const birthDate = customerData.birth_date || null
       const chineseName = customerData.name || ''
       const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
 
@@ -126,9 +126,9 @@ export function usePassportValidation(): UsePassportValidationReturn {
         workspace_id: workspaceId,
         customer_id: null,
         chinese_name: cleanChineseName || '',
-        passport_name: customerData.passport_romanization || customerData.english_name || '',
+        passport_name: customerData.passport_name || customerData.english_name || '',
         passport_number: passportNumber,
-        passport_expiry: customerData.passport_expiry_date || null,
+        passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,
         id_number: idNumber,
         gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
@@ -166,7 +166,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
           // 也比對姓名+生日（作為輔助比對，但不會因為這個而建立新顧客）
           if (cleanChineseName && birthDate &&
               c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
-              c.date_of_birth === birthDate) return true
+              c.birth_date === birthDate) return true
           return false
         })
 
@@ -175,8 +175,8 @@ export function usePassportValidation(): UsePassportValidationReturn {
             customer_id: existingCustomer.id
           }
 
-          if (!newMember.passport_name && existingCustomer.passport_romanization) {
-            updateData.passport_name = existingCustomer.passport_romanization
+          if (!newMember.passport_name && existingCustomer.passport_name) {
+            updateData.passport_name = existingCustomer.passport_name
           }
 
           await supabase
@@ -198,11 +198,11 @@ export function usePassportValidation(): UsePassportValidationReturn {
             name: customerData.name || '',
             english_name: customerData.english_name || null,
             passport_number: passportNumber || null,
-            passport_romanization: customerData.passport_romanization || null,
-            passport_expiry_date: customerData.passport_expiry_date || null,
+            passport_name: customerData.passport_name || null,
+            passport_expiry: customerData.passport_expiry || null,
             passport_image_url: passportImageUrl || null,
             national_id: idNumber || null,
-            date_of_birth: birthDate || null,
+            birth_date: birthDate || null,
             gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,
             phone: '',
             member_type: 'potential', // 護照建立的客戶預設為潛在客戶
@@ -253,15 +253,15 @@ export function usePassportValidation(): UsePassportValidationReturn {
 
       const passportNumber = customerData.passport_number || ''
       const idNumber = customerData.national_id || ''
-      const birthDate = customerData.date_of_birth || null
+      const birthDate = customerData.birth_date || null
       const chineseName = customerData.name || ''
       const cleanChineseName = chineseName.replace(/\([^)]+\)$/, '').trim()
 
       // 更新成員資料（保留原有的 chinese_name，補上 OCR 辨識到的資料）
       const updateData: Record<string, unknown> = {
-        passport_name: customerData.passport_romanization || customerData.english_name || '',
+        passport_name: customerData.passport_name || customerData.english_name || '',
         passport_number: passportNumber,
-        passport_expiry: customerData.passport_expiry_date || null,
+        passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,
         id_number: idNumber,
         gender: customerData.sex === '男' ? 'M' : customerData.sex === '女' ? 'F' : null,

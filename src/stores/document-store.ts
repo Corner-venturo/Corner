@@ -116,7 +116,7 @@ interface DocumentState {
 
   // Actions
   loadDocument: (type: DocumentType, documentId: string) => Promise<void>
-  loadOrCreateDocument: (type: DocumentType, entityId: string, workspaceId: string, entityType?: BrochureEntityType) => Promise<string>
+  loadOrCreateDocument: (type: DocumentType, entityId: string, workspaceId: string, entityType?: BrochureEntityType, designType?: string, forceCreate?: boolean) => Promise<string>
   saveVersion: (canvasData: Json, thumbnailUrl?: string, designType?: string) => Promise<DocumentVersion | null>
   loadVersion: (versionId: string) => Promise<void>
   restoreVersion: (versionId: string) => Promise<void>
@@ -239,7 +239,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   // ============================================
   // Load or Create Document
   // ============================================
-  loadOrCreateDocument: async (type: DocumentType, entityId: string, workspaceId: string, entityType: BrochureEntityType = 'tour') => {
+  loadOrCreateDocument: async (type: DocumentType, entityId: string, workspaceId: string, entityType: BrochureEntityType = 'tour', designType?: string, forceCreate?: boolean) => {
     const tableName = type === 'brochure' ? 'brochure_documents' : 'itinerary_documents'
 
     // Determine which field to use based on entity type
@@ -256,30 +256,39 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
     })
 
     try {
-      // 1. Try to find existing document for this entity
-      const { data: existingDocs, error: findError } = await supabase
-        .from(tableName)
-        .select('id')
-        .eq(entityField, entityId)
-        .limit(1)
+      // 如果不是強制建立，嘗試查找現有文件
+      if (!forceCreate) {
+        // 1. Try to find existing document for this entity (and design_type if specified)
+        let query = supabase
+          .from(tableName)
+          .select('id')
+          .eq(entityField, entityId)
 
-      if (findError) throw new Error(`搜尋文件失敗: ${findError.message}`)
+        // 如果指定了 designType，也要匹配（這樣 A5 和 A4 可以分開）
+        if (type === 'brochure' && designType) {
+          query = query.eq('design_type', designType)
+        }
 
-      if (existingDocs && existingDocs.length > 0) {
-        // Document exists, load it
-        const documentId = existingDocs[0].id
-        await get().loadDocument(type, documentId)
-        return documentId
+        const { data: existingDocs, error: findError } = await query.limit(1)
+
+        if (findError) throw new Error(`搜尋文件失敗: ${findError.message}`)
+
+        if (existingDocs && existingDocs.length > 0) {
+          // Document exists, load it
+          const documentId = existingDocs[0].id
+          await get().loadDocument(type, documentId)
+          return documentId
+        }
       }
 
-      // 2. Create new document
+      // 2. Create new document (either forceCreate or no existing document)
       set({ loadingProgress: 30 })
 
       const newDoc = {
         [entityField]: entityId,
         workspace_id: workspaceId,
         name: type === 'brochure' ? '新手冊' : '新行程表',
-        ...(type === 'brochure' ? { type: 'full' } : {}),
+        ...(type === 'brochure' ? { type: 'full', design_type: designType || 'brochure_a5' } : {}),
       }
 
       const { data: created, error: createError } = await supabase

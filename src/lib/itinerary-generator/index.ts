@@ -6,6 +6,12 @@
 // 主要生成器
 export { generateItinerary } from './generator'
 
+// Gemini AI 生成器（當資料庫景點不足時使用）
+export {
+  generateItineraryWithGemini,
+  convertToGeminiRequest,
+} from './gemini-generator'
+
 // 類型定義
 export type {
   GenerateItineraryRequest,
@@ -14,6 +20,8 @@ export type {
   DailyTimeSlot,
   SchedulingConfig,
   AttractionWithDistance,
+  AccommodationPlan,
+  ItineraryStyle,
 } from './types'
 
 export { DEFAULT_SCHEDULING_CONFIG } from './types'

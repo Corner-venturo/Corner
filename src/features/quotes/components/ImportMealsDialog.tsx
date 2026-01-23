@@ -107,7 +107,7 @@ export function ImportMealsDialog({
         // 加上 Day X 餐別：前綴，讓需求確認單可以正確解析
         name: `Day ${meal.day} ${meal.type}：${meal.name}`,
         quantity: 1,
-        unit_price: 0,
+        unit_price: null,
         total: 0,
         note: '',
         is_group_cost: false,

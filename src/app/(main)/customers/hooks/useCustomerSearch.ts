@@ -54,11 +54,11 @@ export function useCustomerSearch(customers: Customer[]) {
     }
 
     // 護照拼音
-    if (searchParams.passport_romanization) {
+    if (searchParams.passport_name) {
       result = result.filter(c =>
-        c.passport_romanization
+        c.passport_name
           ?.toLowerCase()
-          .includes(searchParams.passport_romanization!.toLowerCase())
+          .includes(searchParams.passport_name!.toLowerCase())
       )
     }
 
@@ -85,12 +85,12 @@ export function useCustomerSearch(customers: Customer[]) {
     // 護照效期範圍
     if (searchParams.passport_expiry_start) {
       result = result.filter(
-        c => c.passport_expiry_date && c.passport_expiry_date >= searchParams.passport_expiry_start!
+        c => c.passport_expiry && c.passport_expiry >= searchParams.passport_expiry_start!
       )
     }
     if (searchParams.passport_expiry_end) {
       result = result.filter(
-        c => c.passport_expiry_date && c.passport_expiry_date <= searchParams.passport_expiry_end!
+        c => c.passport_expiry && c.passport_expiry <= searchParams.passport_expiry_end!
       )
     }
 

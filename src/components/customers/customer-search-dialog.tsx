@@ -29,7 +29,7 @@ export interface CustomerSearchParams {
   query?: string // 姓名/身份證號/護照號碼
   phone?: string // 電話
   email?: string // Email
-  passport_romanization?: string // 護照拼音
+  passport_name?: string // 護照姓名/拼音（標準欄位）
   is_vip?: boolean // 是否為 VIP
   vip_level?: string // VIP 等級
   source?: string // 客戶來源
@@ -142,8 +142,8 @@ export function CustomerSearchDialog({
                   護照拼音（姓氏/名字）
                 </label>
                 <Input
-                  value={searchParams.passport_romanization || ''}
-                  onChange={e => updateParam('passport_romanization', e.target.value)}
+                  value={searchParams.passport_name || ''}
+                  onChange={e => updateParam('passport_name', e.target.value)}
                   placeholder="例如：WANG/XIAOMING"
                 />
               </div>

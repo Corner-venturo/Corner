@@ -1,11 +1,11 @@
 import { Card } from '@/components/ui/card'
-import { Palette, Check, Sun, Moon } from 'lucide-react'
+import { Palette, Check, Sun, Moon, Snowflake } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Theme } from '../types'
 
 interface AppearanceSettingsProps {
-  currentTheme: 'morandi' | 'modern-dark'
-  onThemeChange: (theme: 'morandi' | 'modern-dark') => void
+  currentTheme: 'morandi' | 'modern-dark' | 'nordic'
+  onThemeChange: (theme: 'morandi' | 'modern-dark' | 'nordic') => void
 }
 
 const themes: Theme[] = [
@@ -35,6 +35,19 @@ const themes: Theme[] = [
       card: '#2f3136',
     },
   },
+  {
+    id: 'nordic' as const,
+    name: '北歐簡約',
+    description: '清新明亮，極簡設計，專注於內容呈現',
+    icon: Snowflake,
+    preview: {
+      bg: '#F8F8F8',
+      primary: '#36454F',
+      secondary: '#6B7B86',
+      accent: '#3C5A47',
+      card: '#FFFFFF',
+    },
+  },
 ]
 
 export function AppearanceSettings({ currentTheme, onThemeChange }: AppearanceSettingsProps) {
@@ -45,7 +58,7 @@ export function AppearanceSettings({ currentTheme, onThemeChange }: AppearanceSe
         <h2 className="text-xl font-semibold">主題設定</h2>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         {themes.map(theme => {
           const Icon = theme.icon
           const is_active = currentTheme === theme.id

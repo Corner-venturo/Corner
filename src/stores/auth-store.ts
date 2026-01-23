@@ -195,24 +195,9 @@ export const useAuthStore = create<AuthState>()(
 
           logger.log(`🔐 登入中: ${username}@${code}`)
 
-          // 使用 API route 驗證登入（繞過 RLS）
-          const response = await fetch('/api/auth/validate-login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, code }),
-          })
-
-          const result = await response.json()
-
-          if (!result.success) {
-            logger.warn(`⚠️ 登入失敗: ${result.message}`)
-            return { success: false, message: result.message }
-          }
-
-          const employeeData = result.employee as EmployeeRow
           const { supabase } = await import('@/lib/supabase/client')
 
-          // Supabase Auth 登入
+          // 1. 直接用 Supabase Auth 登入（唯一的密碼驗證）
           const authEmail = `${code.toLowerCase()}_${username.toLowerCase()}@venturo.com`
           const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: authEmail,
@@ -220,25 +205,43 @@ export const useAuthStore = create<AuthState>()(
           })
 
           if (authError || !authData) {
-            logger.error('❌ Supabase Auth 登入失敗:', authError?.message)
+            logger.warn(`⚠️ 登入失敗: ${authError?.message}`)
             return {
               success: false,
-              message: '登入驗證失敗，請稍後再試或聯繫管理員'
+              message: '帳號或密碼錯誤'
             }
           }
 
-          // 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
+          // 2. 登入成功後，取得員工資料（用 API 繞過 RLS）
+          const response = await fetch('/api/auth/get-employee-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, code }),
+          })
+
+          const result = await response.json()
+
+          if (!result.success) {
+            logger.warn(`⚠️ 取得員工資料失敗: ${result.message}`)
+            // 登出 Supabase Auth
+            await supabase.auth.signOut()
+            return { success: false, message: result.message || '找不到員工資料' }
+          }
+
+          const employeeData = result.employee as EmployeeRow
+
+          // 3. 確保 Auth 同步（處理 RLS 所需的 supabase_user_id）
           await ensureAuthSync({
             employeeId: employeeData.id,
             workspaceId: employeeData.workspace_id ?? undefined,
           })
 
-          // 查詢 workspace 資訊並構建 User 物件
+          // 4. 查詢 workspace 資訊並構建 User 物件
           const workspaceInfo = await fetchWorkspaceInfo(employeeData.workspace_id)
 
           const user = buildUserFromEmployee(employeeData, workspaceInfo)
 
-          // 合併後的權限（用於 authPayload）
+          // 5. 合併後的權限（用於 authPayload）
           const userRoles = (employeeData.roles || []) as UserRole[]
           const mergedPermissions = mergePermissionsWithRoles(employeeData.permissions || [], userRoles)
 

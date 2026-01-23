@@ -45,8 +45,6 @@ interface AddRequestDialogProps {
   defaultTourId?: string
   /** 預設訂單 ID（從快速請款按鈕傳入） */
   defaultOrderId?: string
-  /** 是否為巢狀 Dialog */
-  nested?: boolean
 }
 
 // 類別對應的圖標和顏色
@@ -94,7 +92,7 @@ function getNextThursdayDate(): string {
   return formatDate(nextThursday)
 }
 
-export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false }: AddRequestDialogProps) {
+export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId }: AddRequestDialogProps) {
   // === 共用 Hooks ===
   const {
     formData,
@@ -472,7 +470,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   // === 渲染 ===
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden" nested={nested}>
+      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">

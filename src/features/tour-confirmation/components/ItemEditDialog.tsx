@@ -7,8 +7,10 @@
  * 根據分類顯示不同的欄位
  */
 
-import { useState, useEffect, useMemo } from 'react'
-import { X, Save, Plus } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { X, Save, Plus, Upload, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import {
   Dialog,
   DialogContent,
@@ -73,6 +75,9 @@ export function ItemEditDialog({
   // 表單狀態
   const [formData, setFormData] = useState<Partial<CreateConfirmationItem>>({})
   const [saving, setSaving] = useState(false)
+  const [receiptImages, setReceiptImages] = useState<string[]>([])
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 初始化表單
   useEffect(() => {
@@ -101,7 +106,12 @@ export function ItemEditDialog({
           sort_order: item.sort_order,
           notes: item.notes || undefined,
           workspace_id: item.workspace_id,
+          // 領隊記帳欄位
+          leader_expense: item.leader_expense || undefined,
+          leader_expense_note: item.leader_expense_note || undefined,
         })
+        // 設定收據照片
+        setReceiptImages(item.receipt_images || [])
       } else {
         setFormData({
           sheet_id: sheetId,
@@ -134,6 +144,51 @@ export function ItemEditDialog({
     setFormData((prev) => ({ ...prev, [key]: value }))
   }
 
+  // 上傳收據照片
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !item?.id) return
+
+    setUploadingImage(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${item.id}/${Date.now()}.${fileExt}`
+      const filePath = `receipts/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('tour-documents')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false,
+        })
+
+      if (uploadError) {
+        logger.error('上傳收據失敗:', uploadError)
+        return
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('tour-documents')
+        .getPublicUrl(filePath)
+
+      if (urlData?.publicUrl) {
+        setReceiptImages(prev => [...prev, urlData.publicUrl])
+      }
+    } catch (err) {
+      logger.error('上傳收據失敗:', err)
+    } finally {
+      setUploadingImage(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  // 刪除收據照片
+  const handleRemoveImage = (index: number) => {
+    setReceiptImages(prev => prev.filter((_, i) => i !== index))
+  }
+
   // 儲存
   const handleSave = async () => {
     if (!formData.service_date || !formData.supplier_name || !formData.title) {
@@ -149,6 +204,7 @@ export function ItemEditDialog({
         subtotal,
         expected_cost: formData.expected_cost ?? subtotal,
         workspace_id: workspaceId,
+        receipt_images: receiptImages,
       } as CreateConfirmationItem)
     } finally {
       setSaving(false)
@@ -340,6 +396,88 @@ export function ItemEditDialog({
               </Select>
             </div>
           </div>
+
+          {/* 領隊記帳區 - 僅編輯模式顯示 */}
+          {isEdit && (
+            <div className="border-t border-border pt-4 mt-4">
+              <h4 className="text-sm font-medium text-morandi-primary mb-3 flex items-center gap-2">
+                📝 領隊記帳
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>領隊實際支出</Label>
+                  <Input
+                    type="number"
+                    value={formData.leader_expense ?? ''}
+                    onChange={(e) => updateField('leader_expense', parseFloat(e.target.value) || null)}
+                    className="mt-1"
+                    placeholder="領隊支付金額"
+                  />
+                </div>
+                <div>
+                  <Label>支出備註</Label>
+                  <Input
+                    value={formData.leader_expense_note || ''}
+                    onChange={(e) => updateField('leader_expense_note', e.target.value)}
+                    className="mt-1"
+                    placeholder="領隊備註"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-morandi-secondary mt-2">
+                * 領隊可在 Online App 中填寫實際支出並上傳收據
+              </p>
+
+              {/* 收據照片區 */}
+              <div className="mt-4">
+                <Label className="flex items-center gap-2">
+                  <ImageIcon size={14} />
+                  收據照片
+                </Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {receiptImages.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`收據 ${index + 1}`}
+                        className="w-20 h-20 object-cover rounded-lg border border-border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-morandi-red text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  {/* 上傳按鈕 */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="w-20 h-20 border-2 border-dashed border-morandi-container rounded-lg flex flex-col items-center justify-center text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-colors"
+                  >
+                    {uploadingImage ? (
+                      <span className="text-xs">上傳中...</span>
+                    ) : (
+                      <>
+                        <Upload size={20} />
+                        <span className="text-xs mt-1">上傳</span>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 備註 */}
           <div>

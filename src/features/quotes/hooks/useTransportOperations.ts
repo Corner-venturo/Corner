@@ -127,12 +127,12 @@ export const useTransportOperations = ({
       const newItem: CostItem = {
         id: Date.now().toString(),
         name: '成人',
-        quantity: 0,
-        unit_price: 0,
+        quantity: null,
+        unit_price: null,
         total: 0,
         note: '',
         pricing_type: 'by_identity',
-        adult_price: 0,
+        adult_price: null,
       }
 
       setCategories(prev =>
@@ -156,12 +156,12 @@ export const useTransportOperations = ({
       const newItem: CostItem = {
         id: Date.now().toString(),
         name: '兒童',
-        quantity: 0,
-        unit_price: 0,
+        quantity: null,
+        unit_price: null,
         total: 0,
         note: '',
         pricing_type: 'by_identity',
-        child_price: 0,
+        child_price: null,
       }
 
       setCategories(prev =>
@@ -185,12 +185,12 @@ export const useTransportOperations = ({
       const newItem: CostItem = {
         id: Date.now().toString(),
         name: '嬰兒',
-        quantity: 0,
-        unit_price: 0,
+        quantity: null,
+        unit_price: null,
         total: 0,
         note: '',
         pricing_type: 'by_identity',
-        infant_price: 0,
+        infant_price: null,
       }
 
       setCategories(prev =>

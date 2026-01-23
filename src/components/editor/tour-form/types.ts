@@ -50,6 +50,10 @@ export interface Activity {
   image?: string
   imagePosition?: string | ImagePositionSettings // 圖片顯示位置（支援舊字串格式和新物件格式）
   attraction_id?: string // 關聯的景點 ID（從景點選擇器選擇時會設定）
+  // 時間軸欄位（展開時間軸時使用）
+  id?: string // 唯一識別碼
+  startTime?: string // 開始時間，格式 "0900"
+  endTime?: string // 結束時間，格式 "1030"
 }
 
 export interface Meals {

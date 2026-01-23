@@ -41,8 +41,6 @@ interface AddReceiptDialogProps {
   defaultTourId?: string
   /** 預設訂單 ID（從快速收款按鈕傳入） */
   defaultOrderId?: string
-  /** 是否為巢狀 Dialog（用於從其他 Dialog 中打開時隱藏背景遮罩） */
-  nested?: boolean
   /** 編輯模式：傳入要編輯的收款單 */
   editingReceipt?: Receipt | null
   /** 編輯模式：更新回呼 */
@@ -51,7 +49,7 @@ interface AddReceiptDialogProps {
   onDelete?: (receiptId: string) => Promise<void>
 }
 
-export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, nested = false, editingReceipt, onUpdate, onDelete }: AddReceiptDialogProps) {
+export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId, defaultOrderId, editingReceipt, onUpdate, onDelete }: AddReceiptDialogProps) {
   const { toast } = useToast()
   const {
     tours,
@@ -579,7 +577,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col" nested={nested}>
+      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {isEditMode ? '編輯收款單' : '新增收款單'}

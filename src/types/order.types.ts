@@ -41,14 +41,13 @@ export interface Order extends BaseEntity {
  */
 export interface Member extends BaseEntity {
   order_id: string // 訂單 ID
-  tour_id: string // 旅遊團 ID（重要！）
-  name: string // 姓名
-  name_en: string // 英文姓名/拼音
-  birthday: string // 生日 YYYY-MM-DD
-  passport_number: string // 護照號碼
-  passport_expiry: string // 護照到期日 YYYY-MM-DD
-  id_number: string // 身分證字號
-  gender: 'M' | 'F' | '' // 性別
+  chinese_name: string | null // 中文姓名（標準欄位）
+  birth_date: string | null // 出生日期（標準欄位）YYYY-MM-DD
+  passport_number: string | null // 護照號碼
+  passport_name: string | null // 護照姓名/拼音（標準欄位）
+  passport_expiry: string | null // 護照到期日 YYYY-MM-DD
+  id_number: string | null // 身分證字號
+  gender: string | null // 性別
   age?: number | null // 年齡（可計算，前端使用）
   phone?: string | null // 電話
   email?: string | null // Email
@@ -163,14 +162,13 @@ export interface UpdateOrderData {
  */
 export interface CreateMemberData {
   order_id: string
-  tour_id: string
-  name: string
-  english_name?: string
+  chinese_name: string // 中文姓名（標準欄位）
   gender: Gender
-  date_of_birth: string
-  age_category: AgeCategory
+  birth_date: string // 出生日期（標準欄位）
+  member_type: string // adult/child/infant
   id_number?: string
   passport_number?: string
+  passport_name?: string // 護照姓名（標準欄位）
   passport_expiry?: string
   phone?: string
   email?: string
@@ -188,13 +186,13 @@ export interface CreateMemberData {
  * UpdateMemberData - 更新團員資料
  */
 export interface UpdateMemberData {
-  name?: string
-  english_name?: string
+  chinese_name?: string // 中文姓名（標準欄位）
   gender?: Gender
-  date_of_birth?: string
-  age_category?: AgeCategory
+  birth_date?: string // 出生日期（標準欄位）
+  member_type?: string
   id_number?: string
   passport_number?: string
+  passport_name?: string // 護照姓名（標準欄位）
   passport_expiry?: string
   phone?: string
   email?: string

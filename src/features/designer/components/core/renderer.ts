@@ -633,6 +633,11 @@ function renderStickerElement(el: StickerElement, options: RenderOptions): Fabri
 
 /**
  * 渲染群組元素
+ *
+ * 注意：Fabric.js Group 的子元素位置處理方式特殊
+ * - 子元素的 left/top 是相對於群組的幾何中心
+ * - 創建群組後，Fabric.js 會重新計算子元素的相對位置
+ * - 為避免複雜的計算，我們直接創建子元素（不使用 origin 設置）
  */
 async function renderGroupElement(
   el: GroupElement,
@@ -644,39 +649,52 @@ async function renderGroupElement(
     return null
   }
 
-  // 渲染所有子元素
+  // 直接創建子元素（不使用會設置 origin 的渲染函數）
   const childObjects: FabricObject[] = []
 
   for (const child of el.children) {
-    let childObj: FabricObject | FabricObject[] | null = null
+    let childObj: FabricObject | null = null
 
-    switch (child.type) {
-      case 'shape':
-        childObj = renderShapeElement(child as ShapeElement, options)
-        break
-      case 'text':
-        childObj = renderTextElement(child as TextElement, options)
-        break
-      case 'image':
-        childObj = await renderImageElement(child as ImageElement, options)
-        break
-      case 'icon':
-        childObj = renderIconElement(child as IconElement, options)
-        break
-      case 'line':
-        childObj = renderLineElement(child as LineElement, options)
-        break
-      case 'sticker':
-        childObj = renderStickerElement(child as StickerElement, options)
-        break
+    if (child.type === 'text') {
+      const textEl = child as TextElement
+      childObj = new Textbox(textEl.content || '', {
+        left: textEl.x,
+        top: textEl.y,
+        width: textEl.width,
+        fontSize: textEl.style?.fontSize || 12,
+        fontFamily: textEl.style?.fontFamily || 'Noto Sans TC',
+        fontWeight: textEl.style?.fontWeight || '400',
+        fontStyle: (textEl.style?.fontStyle || 'normal') as 'normal' | 'italic' | 'oblique',
+        fill: textEl.style?.color || '#000000',
+        textAlign: textEl.style?.textAlign || 'left',
+        lineHeight: textEl.style?.lineHeight || 1.2,
+        name: textEl.name,
+      })
+    } else if (child.type === 'shape' && (child as ShapeElement).variant === 'circle') {
+      const shapeEl = child as ShapeElement
+      childObj = new Circle({
+        left: shapeEl.x,
+        top: shapeEl.y,
+        radius: Math.min(shapeEl.width, shapeEl.height) / 2,
+        fill: shapeEl.fill || '#000000',
+        opacity: shapeEl.opacity ?? 1,
+        name: shapeEl.name,
+      })
+    } else if (child.type === 'shape') {
+      const shapeEl = child as ShapeElement
+      childObj = new Rect({
+        left: shapeEl.x,
+        top: shapeEl.y,
+        width: shapeEl.width,
+        height: shapeEl.height,
+        fill: shapeEl.fill || '#000000',
+        opacity: shapeEl.opacity ?? 1,
+        name: shapeEl.name,
+      })
     }
 
     if (childObj) {
-      if (Array.isArray(childObj)) {
-        childObjects.push(...childObj)
-      } else {
-        childObjects.push(childObj)
-      }
+      childObjects.push(childObj)
     }
   }
 
@@ -685,14 +703,23 @@ async function renderGroupElement(
   }
 
   // 創建群組
+  // Fabric.js 預設使用中心點作為 origin，需要調整位置
   const group = new Group(childObjects, {
-    left: el.x,
-    top: el.y,
     ...getCommonProps(el, isEditable),
+    subTargetCheck: true, // 允許選擇群組內的子元素
   })
 
   // 設定群組 ID
   ;(group as Group & { id: string }).id = el.id
+
+  // 調整位置：將群組的左上角放置在 (el.x, el.y)
+  // Fabric.js Group 預設 origin 是 center，所以需要加上 width/2 和 height/2
+  const groupWidth = group.width || 0
+  const groupHeight = group.height || 0
+  group.set({
+    left: el.x + groupWidth / 2,
+    top: el.y + groupHeight / 2,
+  })
 
   return group
 }
@@ -756,6 +783,27 @@ export async function renderPageOnCanvas(
     return
   }
   canvas.backgroundColor = page.backgroundColor
+
+  // ============================================
+  // 優先從 fabricData 載入（保留用戶的位置調整）
+  // 只有在沒有 fabricData 時才從 template elements 生成
+  // ============================================
+  const pageWithFabricData = page as CanvasPage & { fabricData?: Record<string, unknown> }
+  if (pageWithFabricData.fabricData && typeof pageWithFabricData.fabricData === 'object') {
+    // 有 fabricData，從中載入（這是用戶調整過位置的版本）
+    logger.log('Loading page from fabricData (preserving positions)')
+    try {
+      await (canvas as Canvas).loadFromJSON(pageWithFabricData.fabricData)
+      canvas.renderAll()
+      return  // 載入成功，直接返回
+    } catch (err) {
+      logger.warn('Failed to load from fabricData, falling back to elements:', err)
+      // 載入失敗，繼續使用 elements 生成
+    }
+  }
+
+  // 沒有 fabricData 或載入失敗，從 template elements 生成（初次創建）
+  logger.log('Generating page from template elements (initial creation)')
 
   // 按 zIndex 排序
   const sortedElements = [...page.elements].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))

@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
-import bcrypt from 'bcryptjs'
 import { logger } from '@/lib/utils/logger'
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api/response'
 
@@ -13,9 +12,8 @@ interface ChangePasswordRequest {
 
 /**
  * 用戶自行更改密碼
- * 🔒 安全說明 2026-01-12：此 API 透過驗證目前密碼來確認身份
- * 因為用戶可能在首次登入被要求更改密碼，此時尚未完成認證流程
- * 所以不使用 getServerAuth()，而是透過 current_password 驗證
+ * 使用 Supabase Auth 驗證當前密碼，並更新 Supabase Auth 密碼
+ * 不再更新 employees.password_hash（已棄用）
  */
 export async function POST(request: NextRequest) {
   try {
@@ -32,10 +30,10 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdminClient()
 
-    // 1. 查詢員工資料
+    // 1. 查詢員工資料（取得 ID 和 supabase_user_id）
     let query = supabaseAdmin
       .from('employees')
-      .select('id, employee_number, password_hash, workspace_id')
+      .select('id, employee_number, supabase_user_id, workspace_id')
       .ilike('employee_number', employee_number)
 
     // 如果有 workspace_code，先查詢 workspace_id
@@ -43,7 +41,7 @@ export async function POST(request: NextRequest) {
       const { data: workspace } = await supabaseAdmin
         .from('workspaces')
         .select('id')
-        .eq('code', workspace_code.toLowerCase())
+        .ilike('code', workspace_code)
         .single()
 
       if (workspace) {
@@ -58,73 +56,40 @@ export async function POST(request: NextRequest) {
       return errorResponse('找不到此員工', 404, ErrorCode.NOT_FOUND)
     }
 
-    // 2. 驗證目前密碼
-    if (!employee.password_hash) {
-      return errorResponse('帳號尚未設定密碼', 400, ErrorCode.VALIDATION_ERROR)
-    }
+    // 2. 用 Supabase Auth 驗證當前密碼
+    const authEmail = workspace_code
+      ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
+      : `${employee_number.toLowerCase()}@venturo.com`
 
-    const isValidPassword = await bcrypt.compare(current_password, employee.password_hash)
-    if (!isValidPassword) {
+    const { error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+      email: authEmail,
+      password: current_password,
+    })
+
+    if (signInError) {
       return errorResponse('目前密碼錯誤', 401, ErrorCode.UNAUTHORIZED)
     }
 
-    // 3. Hash 新密碼
-    const newPasswordHash = await bcrypt.hash(new_password, 10)
+    // 3. 更新 Supabase Auth 密碼
+    if (!employee.supabase_user_id) {
+      return errorResponse('此帳號尚未綁定登入系統', 400, ErrorCode.VALIDATION_ERROR)
+    }
 
-    // 4. 更新 employees 表（密碼 + must_change_password）
-    const { error: updateError } = await supabaseAdmin
-      .from('employees')
-      .update({
-        password_hash: newPasswordHash,
-        must_change_password: false, // 重要：設為 false
-      })
-      .eq('id', employee.id)
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      employee.supabase_user_id,
+      { password: new_password }
+    )
 
     if (updateError) {
-      logger.error('Failed to update employee password:', updateError)
-      return errorResponse('更新密碼失敗', 500, ErrorCode.DATABASE_ERROR)
+      logger.error('Failed to update password:', updateError)
+      return errorResponse('更新密碼失敗', 500, ErrorCode.OPERATION_FAILED)
     }
 
-    // 5. 同步更新 Supabase Auth 密碼
-    // 嘗試新格式和舊格式的 email
-    const newFormatEmail = workspace_code
-      ? `${workspace_code.toLowerCase()}_${employee_number.toLowerCase()}@venturo.com`
-      : `${employee_number.toLowerCase()}@venturo.com`
-    const oldFormatEmail = `${employee_number.toLowerCase()}@venturo.com`
-
-    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
-
-    if (listError) {
-      logger.warn('Failed to list auth users:', listError)
-      // 不阻止流程，因為 employees 表已更新
-    } else {
-      // 找到對應的 auth user
-      let authUser = users.users.find(
-        u => u.email && u.email.toLowerCase() === newFormatEmail.toLowerCase()
-      )
-
-      if (!authUser && newFormatEmail !== oldFormatEmail) {
-        authUser = users.users.find(
-          u => u.email && u.email.toLowerCase() === oldFormatEmail.toLowerCase()
-        )
-      }
-
-      if (authUser) {
-        const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
-          authUser.id,
-          { password: new_password }
-        )
-
-        if (authUpdateError) {
-          logger.warn('Failed to update Supabase Auth password:', authUpdateError)
-          // 不阻止流程，因為 employees 表已更新
-        } else {
-          logger.log('✅ Supabase Auth password synced for:', authUser.email)
-        }
-      } else {
-        logger.warn('No auth user found for:', newFormatEmail, 'or', oldFormatEmail)
-      }
-    }
+    // 4. 更新 must_change_password 標記
+    await supabaseAdmin
+      .from('employees')
+      .update({ must_change_password: false })
+      .eq('id', employee.id)
 
     logger.log('✅ Password changed for employee:', employee_number)
     return successResponse({ message: '密碼更新成功' })

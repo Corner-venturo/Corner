@@ -83,8 +83,8 @@ export const useCategoryOperations = ({
       const newItem = {
         id: Date.now().toString(),
         name: '',
-        quantity: 0,
-        unit_price: 0,
+        quantity: null,
+        unit_price: null,
         total: 0,
         note: '',
       }

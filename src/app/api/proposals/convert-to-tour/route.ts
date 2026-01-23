@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5.1 更新需求單
+    // 5.1 更新需求單（將 proposal_package_id 對應的需求單補上 tour_id）
     const { error: requestUpdateError } = await supabase
       .from('tour_requests')
       .update({
@@ -216,6 +216,22 @@ export async function POST(request: NextRequest) {
     if (requestUpdateError) {
       logger.warn('更新需求單失敗:', requestUpdateError)
       updateWarnings.push('需求單關聯更新失敗')
+    }
+
+    // 5.2 複製需求確認快照（從套件複製到旅遊團）
+    if (pkgData.confirmed_requirements) {
+      const { error: snapshotUpdateError } = await supabase
+        .from('tours')
+        .update({
+          confirmed_requirements: pkgData.confirmed_requirements,
+        })
+        .eq('id', newTour.id)
+      if (snapshotUpdateError) {
+        logger.warn('複製需求確認快照失敗:', snapshotUpdateError)
+        updateWarnings.push('需求確認快照複製失敗')
+      } else {
+        logger.log('已複製需求確認快照到旅遊團')
+      }
     }
 
     // 6. 更新提案狀態

@@ -11,21 +11,21 @@ export interface NewCustomerFormData {
   phone: string
   address: string
   passport_number: string
-  passport_romanization: string
-  passport_expiry_date: string
+  passport_name: string
+  passport_expiry: string
   national_id: string
-  date_of_birth: string
+  birth_date: string
 }
 
 // 驗證表單資料
 export interface VerifyFormData extends Partial<UpdateCustomerData> {
   name?: string
   nickname?: string
-  passport_romanization?: string
+  passport_name?: string
   passport_number?: string
-  passport_expiry_date?: string
+  passport_expiry?: string
   national_id?: string
-  date_of_birth?: string
+  birth_date?: string
   gender?: string
   dietary_restrictions?: string
 }
@@ -81,10 +81,10 @@ export const INITIAL_NEW_CUSTOMER: NewCustomerFormData = {
   phone: '',
   address: '',
   passport_number: '',
-  passport_romanization: '',
-  passport_expiry_date: '',
+  passport_name: '',
+  passport_expiry: '',
   national_id: '',
-  date_of_birth: '',
+  birth_date: '',
 }
 
 export const INITIAL_IMAGE_EDITOR_STATE: ImageEditorState = {

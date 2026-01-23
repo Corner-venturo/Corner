@@ -174,6 +174,20 @@ export function useTourConfirmationSheet({ tourId }: UseTourConfirmationSheetPro
         booking_reference: item.booking_reference,
         type_data: item.type_data as Json | null,
         notes: item.notes,
+        // 關聯需求單
+        request_id: item.request_id,
+        // 資源關聯（餐廳/飯店/景點）
+        resource_type: item.resource_type,
+        resource_id: item.resource_id,
+        // GPS 資訊（供領隊導航）
+        latitude: item.latitude,
+        longitude: item.longitude,
+        google_maps_url: item.google_maps_url,
+        // 領隊記帳欄位
+        leader_expense: item.leader_expense,
+        leader_expense_note: item.leader_expense_note,
+        leader_expense_at: item.leader_expense_at,
+        receipt_images: item.receipt_images,
       }
 
       const { data, error } = await supabase

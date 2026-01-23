@@ -55,7 +55,7 @@ const WORKSPACE_SCOPED_TABLES = [
   // === 溝通頻道 ===
   'channels', 'messages',
   // === PNR 系統 ===
-  'pnr_records', 'pnr_fare_history', 'pnr_fare_alerts',
+  'pnrs', 'pnr_records', 'pnr_fare_history', 'pnr_fare_alerts',
   'pnr_flight_status_history', 'flight_status_subscriptions',
   'pnr_queue_items', 'pnr_schedule_changes', 'pnr_ai_queries',
   // === 其他 ===

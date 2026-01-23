@@ -12,12 +12,8 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useProposalPackages } from '@/hooks/cloud-hooks'
 import { PackageListPanel } from './PackageListPanel'
-import { TimelineItineraryDialog } from './TimelineItineraryDialog'
 import { PackageItineraryDialog } from './PackageItineraryDialog'
-import { supabase } from '@/lib/supabase/client'
-import { logger } from '@/lib/utils/logger'
-import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
-import type { Proposal, ProposalStatus, ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
+import type { Proposal, ProposalStatus, ProposalPackage } from '@/types/proposal.types'
 
 // 狀態配色
 const STATUS_COLORS: Record<ProposalStatus, string> = {
@@ -60,13 +56,12 @@ export function ProposalDetailDialog({
     }
   }, [autoOpenAddVersion, open])
 
-  // 快速行程表對話框狀態（用於單一遮罩模式）
+  // 行程表對話框狀態（用於單一遮罩模式）
   const [itineraryDialogOpen, setItineraryDialogOpen] = useState(false)
   const [itineraryPackage, setItineraryPackage] = useState<ProposalPackage | null>(null)
 
-  // 時間軸行程表對話框狀態（用於單一遮罩模式）
-  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
-  const [timelinePackage, setTimelinePackage] = useState<ProposalPackage | null>(null)
+  // 追蹤 PackageListPanel 內的子 Dialog 狀態
+  const [packageListChildDialogOpen, setPackageListChildDialogOpen] = useState(false)
 
   // 取得此提案的套件
   const packages = useMemo(() => {
@@ -81,64 +76,22 @@ export function ProposalDetailDialog({
     onPackagesChange?.()
   }, [refreshPackages, onPackagesChange])
 
-  // 開啟快速行程表對話框（由 PackageListPanel 呼叫）
+  // 開啟行程表對話框（由 PackageListPanel 呼叫）
   const handleOpenItineraryDialog = useCallback((pkg: ProposalPackage) => {
     setItineraryPackage(pkg)
     setItineraryDialogOpen(true)
   }, [])
 
-  // 關閉快速行程表對話框
+  // 關閉行程表對話框
   const handleCloseItineraryDialog = useCallback(() => {
     setItineraryDialogOpen(false)
     setItineraryPackage(null)
   }, [])
 
-  // 開啟時間軸行程表對話框（由 PackageListPanel 呼叫）
-  const handleOpenTimelineDialog = useCallback((pkg: ProposalPackage) => {
-    setTimelinePackage(pkg)
-    setTimelineDialogOpen(true)
-  }, [])
-
-  // 關閉時間軸行程表對話框
-  const handleCloseTimelineDialog = useCallback(() => {
-    setTimelineDialogOpen(false)
-    setTimelinePackage(null)
-  }, [])
-
-  // 儲存時間軸資料
-  const handleSaveTimeline = useCallback(async (timelineData: TimelineItineraryData) => {
-    if (!timelinePackage) return
-
-    try {
-      const jsonData = JSON.parse(JSON.stringify(timelineData))
-
-      const { error } = await supabase
-        .from('proposal_packages')
-        .update({
-          itinerary_type: 'timeline',
-          timeline_data: jsonData,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', timelinePackage.id)
-
-      if (error) throw error
-
-      // 如果有關聯報價單，同步餐食和住宿資料
-      if (timelinePackage.quote_id) {
-        await syncTimelineToQuote(timelinePackage.quote_id, timelineData)
-      }
-
-      handlePackagesChange()
-    } catch (error) {
-      logger.error('儲存時間軸資料失敗:', error)
-      throw error
-    }
-  }, [timelinePackage, handlePackagesChange])
-
   if (!proposal) return null
 
   // 任何子 Dialog 開啟時，主 Dialog 關閉但不卸載（避免 ref 問題）
-  const hasChildDialogOpen = itineraryDialogOpen || timelineDialogOpen
+  const hasChildDialogOpen = itineraryDialogOpen || packageListChildDialogOpen
 
   return (
     <>
@@ -180,8 +133,8 @@ export function ProposalDetailDialog({
                 onPackagesChange={handlePackagesChange}
                 showAddDialog={showAddDialog}
                 onShowAddDialogChange={setShowAddDialog}
+                onChildDialogChange={setPackageListChildDialogOpen}
                 onOpenItineraryDialog={handleOpenItineraryDialog}
-                onOpenTimelineDialog={handleOpenTimelineDialog}
                 onNavigateAway={() => onOpenChange(false)}
               />
             </div>
@@ -189,7 +142,7 @@ export function ProposalDetailDialog({
         </Dialog>
       )}
 
-      {/* 快速行程表對話框：放在主對話框外面（單一遮罩模式） */}
+      {/* 行程表對話框：放在主對話框外面（單一遮罩模式） */}
       {itineraryPackage && (
         <PackageItineraryDialog
           isOpen={itineraryDialogOpen}
@@ -197,16 +150,6 @@ export function ProposalDetailDialog({
           pkg={itineraryPackage}
           proposal={proposal}
           onItineraryCreated={handlePackagesChange}
-        />
-      )}
-
-      {/* 時間軸行程表對話框：放在主對話框外面（單一遮罩模式） */}
-      {timelinePackage && (
-        <TimelineItineraryDialog
-          isOpen={timelineDialogOpen}
-          onClose={handleCloseTimelineDialog}
-          pkg={timelinePackage}
-          onSave={handleSaveTimeline}
         />
       )}
     </>

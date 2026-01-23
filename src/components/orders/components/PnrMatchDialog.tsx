@@ -39,11 +39,12 @@ interface TourMember {
 interface SuggestedCustomer {
   id: string
   name: string
-  passport_romanization: string | null
+  passport_name: string | null
   passport_number: string | null
-  passport_expiry_date: string | null
+  passport_expiry: string | null
+  passport_image_url: string | null
   national_id: string | null
-  date_of_birth: string | null
+  birth_date: string | null
   gender: string | null
   score: number
 }
@@ -74,8 +75,6 @@ interface PnrMatchDialogProps {
   /** 團體模式下的訂單列表（用於讓使用者選擇每位旅客屬於哪個訂單） */
   orders?: OrderInfo[]
   onSuccess?: () => void
-  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
-  nested?: boolean
 }
 
 export function PnrMatchDialog({
@@ -87,7 +86,6 @@ export function PnrMatchDialog({
   tourId,
   orders = [],
   onSuccess,
-  nested = false,
 }: PnrMatchDialogProps) {
   const [rawPnr, setRawPnr] = useState('')
   const [parsedPnr, setParsedPnr] = useState<ParsedPNR | null>(null)
@@ -116,8 +114,8 @@ export function PnrMatchDialog({
       // 從客戶資料庫載入所有有護照拼音的客戶
       const { data: customers, error } = await supabase
         .from('customers')
-        .select('id, name, passport_romanization, passport_number, passport_expiry_date, national_id, date_of_birth, gender')
-        .not('passport_romanization', 'is', null)
+        .select('id, name, passport_name, passport_number, passport_expiry, passport_image_url, national_id, birth_date, gender')
+        .not('passport_name', 'is', null)
 
       if (error) throw error
 
@@ -130,10 +128,10 @@ export function PnrMatchDialog({
         const matchedCustomers: SuggestedCustomer[] = []
 
         for (const customer of customers || []) {
-          if (!customer.passport_romanization) continue
+          if (!customer.passport_name) continue
 
-          const normalizedCustomer = normalizeName(customer.passport_romanization)
-          const customerParts = splitPassportName(customer.passport_romanization)
+          const normalizedCustomer = normalizeName(customer.passport_name)
+          const customerParts = splitPassportName(customer.passport_name)
 
           // 完全相符
           if (normalizedPnr === normalizedCustomer) {
@@ -420,11 +418,12 @@ export function PnrMatchDialog({
             workspace_id: workspaceId,
             customer_id: customer.id,
             chinese_name: customer.name,
-            passport_name: customer.passport_romanization,
+            passport_name: customer.passport_name,
             passport_number: customer.passport_number,
-            passport_expiry: customer.passport_expiry_date,
+            passport_expiry: customer.passport_expiry,
+            passport_image_url: customer.passport_image_url,  // 同步護照圖片
             id_number: customer.national_id,
-            birth_date: customer.date_of_birth,
+            birth_date: customer.birth_date,
             gender: customer.gender,
             pnr: recordLocator,
             ticket_number: ticketInfo?.number || null,
@@ -445,79 +444,70 @@ export function PnrMatchDialog({
         }
       }
 
-      // 3. 更新旅遊團的航班資訊
-      let flightUpdated = false
-      if (tourId && parsedPnr.segments.length > 0) {
-        // 將航班資訊分類為去程和回程
-        // 通常第一段（或前半段）是去程，最後一段是回程
-        const segments = parsedPnr.segments
-        const midIndex = Math.ceil(segments.length / 2)
+      // 3. 保存 PNR 記錄到 pnrs 表（讓列印時可以讀取完整航班資訊）
+      if (workspaceId && parsedPnr.segments.length > 0) {
+        try {
+          // 檢查 PNR 是否已存在
+          const { data: existingPNR } = await supabase
+            .from('pnrs')
+            .select('id')
+            .eq('record_locator', recordLocator)
+            .eq('workspace_id', workspaceId)
+            .single()
 
-        // 轉換 segment 為 JSON 格式（使用標準 FlightInfo 欄位名稱）
-        const toJsonSegment = (seg: typeof segments[0]) => ({
-          airline: seg.airline,
-          flightNumber: seg.flightNumber,
-          departureAirport: seg.origin,
-          arrivalAirport: seg.destination,
-          departureDate: seg.departureDate,
-          departureTime: seg.departureTime || null,
-          arrivalTime: seg.arrivalTime || null,
-          status: seg.status,
-          class: seg.class,
-        })
+          // 準備 segment 資料（包含 via 經停資訊）
+          const segmentsData = parsedPnr.segments.map(seg => ({
+            airline: seg.airline,
+            flightNumber: seg.flightNumber,
+            origin: seg.origin,
+            destination: seg.destination,
+            departureDate: seg.departureDate,
+            departureTime: seg.departureTime || null,
+            arrivalTime: seg.arrivalTime || null,
+            status: seg.status,
+            class: seg.class,
+            via: seg.via || [],  // 保留經停資訊
+            isDirect: seg.isDirect,
+          }))
 
-        // 去程航班（取第一段或前幾段）
-        const outboundSegments = segments.slice(0, midIndex)
-        const outboundFlight = outboundSegments.length > 0 ? {
-          airline: outboundSegments[0].airline,
-          flightNumber: outboundSegments[0].flightNumber,
-          departureAirport: outboundSegments[0].origin,
-          arrivalAirport: outboundSegments[outboundSegments.length - 1].destination,
-          departureDate: outboundSegments[0].departureDate,
-          departureTime: outboundSegments[0].departureTime || null,
-          arrivalTime: outboundSegments[outboundSegments.length - 1].arrivalTime || null,
-          status: outboundSegments[0].status,
-          class: outboundSegments[0].class,
-          pnr: recordLocator,
-          segments: outboundSegments.map(toJsonSegment),
-        } : null
-
-        // 回程航班（取最後一段或後幾段）
-        const returnSegments = segments.length > 1 ? segments.slice(midIndex) : []
-        const returnFlight = returnSegments.length > 0 ? {
-          airline: returnSegments[0].airline,
-          flightNumber: returnSegments[0].flightNumber,
-          departureAirport: returnSegments[0].origin,
-          arrivalAirport: returnSegments[returnSegments.length - 1].destination,
-          departureDate: returnSegments[0].departureDate,
-          departureTime: returnSegments[0].departureTime || null,
-          arrivalTime: returnSegments[returnSegments.length - 1].arrivalTime || null,
-          status: returnSegments[0].status,
-          class: returnSegments[0].class,
-          pnr: recordLocator,
-          segments: returnSegments.map(toJsonSegment),
-        } : null
-
-        const { error: tourError } = await supabase
-          .from('tours')
-          .update({
-            outbound_flight: outboundFlight,
-            return_flight: returnFlight,
-          })
-          .eq('id', tourId)
-
-        if (tourError) {
-          logger.error('更新航班資訊失敗:', tourError)
-        } else {
-          flightUpdated = true
+          if (existingPNR) {
+            // PNR 已存在，更新它
+            await supabase
+              .from('pnrs')
+              .update({
+                raw_pnr: rawPnr,
+                passenger_names: parsedPnr.passengerNames,
+                segments: segmentsData,
+                tour_id: tourId || null,
+              })
+              .eq('id', existingPNR.id)
+            logger.info(`PNR ${recordLocator} 已更新`)
+          } else {
+            // PNR 不存在，新建
+            await supabase
+              .from('pnrs')
+              .insert({
+                record_locator: recordLocator,
+                workspace_id: workspaceId,
+                raw_pnr: rawPnr,
+                passenger_names: parsedPnr.passengerNames,
+                segments: segmentsData,
+                tour_id: tourId || null,
+                status: 'active',
+              })
+            logger.info(`PNR ${recordLocator} 已建立`)
+          }
+        } catch (pnrError) {
+          // PNR 保存失敗不阻止其他操作
+          logger.error('保存 PNR 記錄失敗:', pnrError)
         }
       }
 
       // 顯示結果
+      // 注意：不更新 tours 的團體航班，PNR 是個人機票資訊，跟團體航班是分開的
       const messages: string[] = []
       if (updatedCount > 0) messages.push(`${updatedCount} 位團員已更新 PNR`)
       if (createdCount > 0) messages.push(`${createdCount} 位新成員已建立`)
-      if (flightUpdated) messages.push('航班資訊已更新')
       toast.success(`${messages.join('，')}。訂位代號: ${recordLocator}`)
 
       onSuccess?.()
@@ -564,7 +554,7 @@ export function PnrMatchDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent nested={nested} className="max-w-3xl max-h-[85vh] flex flex-col">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plane size={20} className="text-morandi-gold" />
@@ -750,7 +740,7 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                               <option value="">-- 選擇客戶 --</option>
                               {result.suggestedCustomers.map((c) => (
                                 <option key={c.id} value={c.id}>
-                                  {c.name} ({c.passport_romanization}) {c.score}%
+                                  {c.name} ({c.passport_name}) {c.score}%
                                 </option>
                               ))}
                             </select>
@@ -808,9 +798,14 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                   <p className="text-sm font-medium text-blue-700 mb-2">航班資訊：</p>
                   <div className="space-y-1">
                     {parsedPnr.segments.map((seg, i) => (
-                      <p key={i} className="text-xs font-mono text-blue-600">
-                        {seg.airline}{seg.flightNumber} {seg.origin}→{seg.destination} {seg.departureDate} {seg.departureTime}
-                      </p>
+                      <div key={i} className="text-xs font-mono text-blue-600">
+                        <span>{seg.airline}{seg.flightNumber} {seg.origin}→{seg.destination} {seg.departureDate} {seg.departureTime}</span>
+                        {seg.via && seg.via.length > 0 && (
+                          <span className="ml-2 text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded">
+                            經停: {seg.via.map(v => `${v.city}${v.duration ? ` (${v.duration})` : ''}`).join(', ')}
+                          </span>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>

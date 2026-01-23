@@ -17,7 +17,7 @@ import { logger } from '@/lib/utils/logger'
  */
 
 /** PNR 解析來源格式 */
-export type PnrSourceFormat = 'ticket_order_detail' | 'e_ticket' | 'amadeus_pnr' | 'html_confirmation';
+export type PnrSourceFormat = 'ticket_order_detail' | 'e_ticket' | 'amadeus_pnr' | 'html_confirmation' | 'trip_com';
 
 export interface ParsedPNR {
   recordLocator: string;
@@ -133,6 +133,13 @@ export interface FlightSegment {
   meal?: string; // 航班餐食
   isDirect?: boolean; // 是否直飛
   duration?: string; // 飛行時間
+  // === 擴充欄位 (2026-01-22) - 經停資訊 ===
+  via?: Array<{
+    city: string;        // 經停城市
+    airport?: string;    // 機場代碼
+    airportName?: string; // 機場名稱
+    duration?: string;   // 停留時間
+  }>;
 }
 
 /**
@@ -394,6 +401,7 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
           // 加入姓名列表（向後兼容）
           if (name && !result.passengerNames.includes(name)) {
             result.passengerNames.push(name);
+            logger.log('    ✅ 找到旅客:', name);
           }
 
           // 建立詳細旅客資訊
@@ -605,6 +613,14 @@ export function parseAmadeusPNR(rawPNR: string): ParsedPNR {
 
   // 8. 解析票價資訊（在循環結束後處理）
   result.fareData = parseFareFromTelegram(rawPNR);
+
+  // 輸出解析結果摘要
+  logger.log('📋 Amadeus PNR 解析完成:', {
+    訂位代號: result.recordLocator,
+    旅客數: result.passengerNames.length,
+    旅客: result.passengerNames,
+    航班數: result.segments.length,
+  });
 
   return result;
 }
@@ -1524,9 +1540,354 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
 }
 
 /**
+ * 解析 Trip.com 行程確認單
+ *
+ * 格式範例：
+ * 訂單編號 1658109971262128
+ * 哈爾濱 - 廈門
+ * 姓名 艙等 電子機票號碼 預訂參考編號
+ * YU (姓) CHIENHSUN (名) 商務艙 324-4803984291 MHPGJ4
+ *
+ * 航班資訊
+ * 出發 2026年1月25日09:15, 哈爾濱太平國際機場 T2
+ * 抵達 2026年1月25日14:55, 廈門高崎國際機場 T4
+ * 航空公司 山東航空股份有限公司 SC8413
+ * 停留: 濟南 | 濟南遙牆國際機場 | 1小時
+ *
+ * 行李限額
+ * 手提行李 每人2件,每件8公斤
+ * 託運行李 每人30公斤,件數不限
+ */
+export function parseTripComConfirmation(input: string): ParsedPNR {
+  const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
+
+  logger.log('📋 開始解析 Trip.com 確認單，共', lines.length, '行');
+
+  const result: ParsedPNR = {
+    recordLocator: '',
+    passengerNames: [],
+    passengers: [],
+    segments: [],
+    ticketingDeadline: null,
+    cancellationDeadline: null,
+    specialRequests: [],
+    otherInfo: [],
+    contactInfo: [],
+    validation: { isValid: true, errors: [], warnings: [], suggestions: [] },
+    fareData: null,
+    ticketNumbers: [],
+    sourceFormat: 'trip_com',
+  };
+
+  // 行李資訊
+  let carryOnBaggage = '';
+  let checkedBaggage = '';
+
+  // 當前航班
+  let currentSegment: Partial<FlightSegment> | null = null;
+  // 經停資訊（使用 via 結構）
+  let transitStops: Array<{
+    city: string;
+    airport?: string;
+    airportName?: string;
+    duration?: string;
+  }> = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // 1. 解析訂單編號（僅供參考，非訂位代號）
+    const orderMatch = line.match(/訂單編號\s*(\d+)/);
+    if (orderMatch) {
+      result.contactInfo.push(`Trip.com 訂單: ${orderMatch[1]}`);
+      logger.log('  ✅ 找到訂單編號:', orderMatch[1]);
+      continue;
+    }
+
+    // 2. 解析旅客資訊行：YU (姓) CHIENHSUN (名) 商務艙 324-4803984291 MHPGJ4
+    // 格式: 姓 (姓) 名 (名) 艙等 機票號碼 訂位代號
+    const passengerMatch = line.match(/^([A-Z]+)\s*\(姓\)\s*([A-Z]+)\s*\(名\)\s*(\S+艙?)\s+(\d{3}-\d+)\s+([A-Z0-9]{5,6})$/i);
+    if (passengerMatch) {
+      const surname = passengerMatch[1].toUpperCase();
+      const givenName = passengerMatch[2].toUpperCase();
+      const fullName = `${surname}/${givenName}`;
+      const cabin = passengerMatch[3];
+      const ticketNumber = passengerMatch[4];
+      const bookingRef = passengerMatch[5].toUpperCase();
+
+      result.passengerNames.push(fullName);
+      result.passengers.push({
+        index: result.passengers.length + 1,
+        name: fullName,
+        type: 'ADT',
+      });
+      result.ticketNumbers.push({
+        number: ticketNumber,
+        passenger: fullName,
+      });
+
+      // 設定訂位代號（如果還沒設定）
+      if (!result.recordLocator) {
+        result.recordLocator = bookingRef;
+      }
+
+      // 將艙等轉換為代碼
+      const cabinCode = cabin.includes('商務') ? 'C' :
+                       cabin.includes('頭等') ? 'F' :
+                       cabin.includes('豪華經濟') ? 'W' : 'Y';
+
+      // 儲存艙等供航班使用
+      result.otherInfo.push({
+        airline: 'YY',
+        message: `艙等: ${cabin} (${cabinCode})`,
+        raw: line,
+        category: OSICategory.GENERAL,
+      });
+
+      logger.log('  ✅ 找到旅客:', fullName, '艙等:', cabin, '票號:', ticketNumber, '訂位:', bookingRef);
+      continue;
+    }
+
+    // 3. 解析出發資訊：出發 2026年1月25日09:15, 哈爾濱太平國際機場 T2
+    const departureMatch = line.match(/出發\s*(\d{4})年(\d{1,2})月(\d{1,2})日(\d{2}):(\d{2}),?\s*(.+?機場)\s*(T?\d+)?$/);
+    if (departureMatch) {
+      const year = departureMatch[1];
+      const month = departureMatch[2].padStart(2, '0');
+      const day = departureMatch[3].padStart(2, '0');
+      const hour = departureMatch[4];
+      const minute = departureMatch[5];
+      const airport = departureMatch[6].trim();
+      const terminal = departureMatch[7]?.replace('T', '') || '';
+
+      // 轉換日期為 DDMMM 格式
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const departureDate = `${day}${months[parseInt(month) - 1]}`;
+
+      // 提取機場代碼
+      const origin = extractTripComAirportCode(airport);
+
+      currentSegment = {
+        departureDate,
+        departureTime: `${hour}${minute}`,
+        origin,
+        departureTerminal: terminal,
+        status: 'HK',
+        passengers: result.passengerNames.length || 1,
+      };
+
+      logger.log('  ✅ 找到出發:', `${year}-${month}-${day} ${hour}:${minute}`, airport, origin);
+      continue;
+    }
+
+    // 4. 解析抵達資訊：抵達 2026年1月25日14:55, 廈門高崎國際機場 T4
+    const arrivalMatch = line.match(/抵達\s*(\d{4})年(\d{1,2})月(\d{1,2})日(\d{2}):(\d{2}),?\s*(.+?機場)\s*(T?\d+)?$/);
+    if (arrivalMatch && currentSegment) {
+      const hour = arrivalMatch[4];
+      const minute = arrivalMatch[5];
+      const airport = arrivalMatch[6].trim();
+      const terminal = arrivalMatch[7]?.replace('T', '') || '';
+
+      const destination = extractTripComAirportCode(airport);
+
+      currentSegment.arrivalTime = `${hour}${minute}`;
+      currentSegment.destination = destination;
+      currentSegment.arrivalTerminal = terminal;
+
+      logger.log('  ✅ 找到抵達:', `${hour}:${minute}`, airport, destination);
+      continue;
+    }
+
+    // 5. 解析航空公司和航班號：航空公司 山東航空股份有限公司 SC8413
+    const airlineMatch = line.match(/航空公司\s+(.+?)\s+([A-Z]{2})(\d{1,4})$/i);
+    if (airlineMatch && currentSegment) {
+      const airlineName = airlineMatch[1];
+      const airlineCode = airlineMatch[2].toUpperCase();
+      const flightNumber = airlineMatch[3];
+
+      currentSegment.airline = airlineCode;
+      currentSegment.flightNumber = flightNumber;
+
+      // 從 OSI 取得艙等代碼
+      const cabinInfo = result.otherInfo.find(o => o.message.includes('艙等:'));
+      if (cabinInfo) {
+        const cabinMatch = cabinInfo.message.match(/\(([A-Z])\)/);
+        if (cabinMatch) {
+          currentSegment.class = cabinMatch[1];
+        }
+      }
+      if (!currentSegment.class) {
+        currentSegment.class = 'Y'; // 預設經濟艙
+      }
+
+      // 如果有經停，標記為非直飛並附加 via 資訊
+      currentSegment.isDirect = transitStops.length === 0;
+      if (transitStops.length > 0) {
+        currentSegment.via = [...transitStops];
+      }
+
+      // 儲存航班
+      if (currentSegment.destination) {
+        result.segments.push(currentSegment as FlightSegment);
+        const viaInfo = transitStops.length > 0 ? ` (經 ${transitStops.map(s => s.city).join(', ')})` : '';
+        logger.log('  ✅ 找到航班:', airlineCode + flightNumber, '從', currentSegment.origin, '到', currentSegment.destination + viaInfo);
+      }
+
+      // 重置
+      currentSegment = null;
+      transitStops = [];
+      continue;
+    }
+
+    // 6. 解析經停：停留: 濟南 | 濟南遙牆國際機場 | 1小時
+    // 注意：在 Trip.com 格式中，停留資訊出現在航空公司行之後
+    // 所以此時航段已經被 push 到 result.segments，需要更新最後一個航段
+    const transitMatch = line.match(/停留[:：]\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*(.+)/);
+    if (transitMatch) {
+      const city = transitMatch[1].trim();
+      const airportName = transitMatch[2].trim();
+      const duration = transitMatch[3].trim();
+
+      // 提取機場代碼
+      const airportCode = extractTripComAirportCode(airportName);
+
+      const viaInfo = {
+        city,
+        airport: airportCode !== 'XXX' ? airportCode : undefined,
+        airportName,
+        duration,
+      };
+
+      // 更新最後一個航段的 via 資訊
+      if (result.segments.length > 0) {
+        const lastSegment = result.segments[result.segments.length - 1];
+        if (!lastSegment.via) {
+          lastSegment.via = [];
+        }
+        lastSegment.via.push(viaInfo);
+        lastSegment.isDirect = false;
+        logger.log('  ✅ 更新最後航段經停:', city, `(${airportCode})`, duration);
+      } else {
+        // 如果還沒有航段，先暫存
+        transitStops.push(viaInfo);
+        logger.log('  ✅ 找到經停:', city, `(${airportCode})`, duration);
+      }
+      continue;
+    }
+
+    // 7. 解析行李限額
+    const carryOnMatch = line.match(/手提行李\s+(.+)/);
+    if (carryOnMatch) {
+      carryOnBaggage = carryOnMatch[1];
+      result.otherInfo.push({
+        airline: 'YY',
+        message: `手提行李: ${carryOnBaggage}`,
+        raw: line,
+        category: OSICategory.GENERAL,
+      });
+      continue;
+    }
+
+    const checkedMatch = line.match(/託運行李\s+(.+)/);
+    if (checkedMatch) {
+      checkedBaggage = checkedMatch[1];
+      result.otherInfo.push({
+        airline: 'YY',
+        message: `託運行李: ${checkedBaggage}`,
+        raw: line,
+        category: OSICategory.GENERAL,
+      });
+      continue;
+    }
+  }
+
+  // 儲存最後一段航班（如果有）
+  if (currentSegment && currentSegment.airline && currentSegment.destination) {
+    result.segments.push(currentSegment as FlightSegment);
+  }
+
+  logger.log('📋 Trip.com 確認單解析完成:', {
+    旅客數: result.passengerNames.length,
+    航班數: result.segments.length,
+    訂位代號: result.recordLocator,
+    票號數: result.ticketNumbers.length,
+  });
+
+  return result;
+}
+
+/**
+ * 從中文機場名稱提取機場代碼
+ */
+function extractTripComAirportCode(airportName: string): string {
+  // 中文機場對照表
+  const airportMap: Record<string, string> = {
+    '哈爾濱': 'HRB',
+    '哈爾濱太平': 'HRB',
+    '廈門': 'XMN',
+    '廈門高崎': 'XMN',
+    '濟南': 'TNA',
+    '濟南遙牆': 'TNA',
+    '北京首都': 'PEK',
+    '北京大興': 'PKX',
+    '上海浦東': 'PVG',
+    '上海虹橋': 'SHA',
+    '廣州白雲': 'CAN',
+    '深圳寶安': 'SZX',
+    '成都天府': 'TFU',
+    '成都雙流': 'CTU',
+    '杭州蕭山': 'HGH',
+    '南京祿口': 'NKG',
+    '重慶江北': 'CKG',
+    '西安咸陽': 'XIY',
+    '昆明長水': 'KMG',
+    '桃園': 'TPE',
+    '臺灣桃園': 'TPE',
+    '松山': 'TSA',
+    '臺北松山': 'TSA',
+    '高雄': 'KHH',
+    '高雄小港': 'KHH',
+    '東京成田': 'NRT',
+    '東京羽田': 'HND',
+    '大阪關西': 'KIX',
+    '名古屋中部': 'NGO',
+    '福岡': 'FUK',
+    '那霸': 'OKA',
+    '香港': 'HKG',
+    '澳門': 'MFM',
+    '首爾仁川': 'ICN',
+    '首爾金浦': 'GMP',
+    '新加坡樟宜': 'SIN',
+    '曼谷素萬那普': 'BKK',
+    '曼谷廊曼': 'DMK',
+    '清邁': 'CNX',
+    '吉隆坡': 'KUL',
+  };
+
+  // 移除「國際機場」「機場」等後綴
+  const cleanName = airportName.replace(/國際機場|機場/g, '').trim();
+
+  // 嘗試匹配
+  for (const [key, code] of Object.entries(airportMap)) {
+    if (cleanName.includes(key)) {
+      return code;
+    }
+  }
+
+  // 嘗試提取括號中的三字母代碼
+  const codeMatch = airportName.match(/\(([A-Z]{3})\)/);
+  if (codeMatch) {
+    return codeMatch[1];
+  }
+
+  // 返回 XXX 表示未知
+  logger.warn('  ⚠️ 未知機場:', airportName);
+  return 'XXX';
+}
+
+/**
  * 智能檢測並解析 PNR（自動判斷格式）
  *
- * 支援三種格式：
+ * 支援四種格式：
  * 1. 機票訂單明細（開票系統匯出）⭐️ 機票成本以此為準
  *    - 金額（票面價）、附加費、稅金、小計
  *    - 這是「成本價格」，用於計算 flight_cost
@@ -1541,6 +1902,12 @@ export function parseTicketOrderDetail(input: string): ParsedPNR {
  *    - 旅客姓名、航班資訊
  *    - 出票期限
  *    - FA 行機票號碼
+ *
+ * 4. Trip.com 行程確認單 - 中文格式
+ *    - 訂單編號、旅客姓名、艙等、機票號碼、訂位代號
+ *    - 出發/抵達時間、機場、航站
+ *    - 航空公司、航班號
+ *    - 經停資訊、行李限額
  */
 export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation | ParsedPNR {
   // 檢測是否為 HTML 格式
@@ -1553,6 +1920,14 @@ export function parseFlightConfirmation(input: string): ParsedHTMLConfirmation |
   if (input.includes('機票訂單明細') || input.includes('銷售摘要') ||
       (input.includes('金　額') && input.includes('小　計') && input.includes('訂位記錄'))) {
     return parseTicketOrderDetail(input);
+  }
+
+  // 檢測是否為 Trip.com 格式
+  // 特徵：包含「(姓)」「(名)」或「預訂參考編號」或「航班資訊」+中文日期格式
+  if ((input.includes('(姓)') && input.includes('(名)')) ||
+      input.includes('預訂參考編號') ||
+      (input.includes('航班資訊') && /\d{4}年\d{1,2}月\d{1,2}日/.test(input))) {
+    return parseTripComConfirmation(input);
   }
 
   // 檢測是否為電子機票格式（包含 TICKET NUMBER 和 BOOKING REF）

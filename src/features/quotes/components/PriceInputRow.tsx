@@ -23,19 +23,19 @@ export const PriceInputRow: React.FC<PriceInputRowProps> = ({
   indented = false,
 }) => {
   return (
-    <tr className="border-b border-border">
+    <tr className="border-b border-morandi-container/60">
       <td
         className={cn(
-          'py-2 px-3 text-xs font-medium text-morandi-primary border-r border-border',
+          'py-2 px-3 text-xs font-medium text-morandi-primary',
           indented && 'pl-6'
         )}
       >
         {label}
       </td>
-      <td className="py-2 px-2 text-center text-xs text-morandi-primary border-r border-border">
+      <td className="py-2 px-2 text-center text-xs text-morandi-primary">
         {cost.toLocaleString()}
       </td>
-      <td className="py-2 px-2 text-center border-r border-border">
+      <td className="py-2 px-2 text-center">
         <input
           type="text"
           inputMode="decimal"
@@ -43,7 +43,7 @@ export const PriceInputRow: React.FC<PriceInputRowProps> = ({
           onChange={e => onPriceChange(e.target.value)}
           disabled={isReadOnly}
           className={cn(
-            'w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+            'input-no-focus w-full px-1 py-1 text-sm text-center bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
             isReadOnly && 'cursor-not-allowed opacity-60'
           )}
         />

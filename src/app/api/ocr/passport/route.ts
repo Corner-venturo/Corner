@@ -360,10 +360,10 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     name: string
     english_name?: string
     passport_number?: string
-    passport_romanization?: string
+    passport_name?: string
     national_id?: string
-    date_of_birth?: string
-    passport_expiry_date?: string
+    birth_date?: string
+    passport_expiry?: string
     nationality?: string
     sex?: string
     phone?: string
@@ -420,7 +420,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       const givenNamesClean = givenNamesWithDash.replace(/-/g, '')
 
       // 護照拼音：姓/名，不含連字號（定位系統需要）
-      customerData.passport_romanization = `${surname}/${givenNamesClean}`
+      customerData.passport_name = `${surname}/${givenNamesClean}`
       // 內部用：保留連字號以便計算字數
       ;(customerData as Record<string, unknown>)._romanization_with_dash = `${surname}/${givenNamesWithDash}`
       customerData.english_name = `${surname} ${givenNamesClean}`
@@ -428,7 +428,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     } else if (parts.length === 1) {
       // 只有姓氏
       const surname = parts[0].replace(/</g, '')
-      customerData.passport_romanization = surname
+      customerData.passport_name = surname
       customerData.english_name = surname
       customerData.name = surname
     }
@@ -467,7 +467,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     const birthMM = mrzLine2Match[4].substring(2, 4)
     const birthDD = mrzLine2Match[4].substring(4, 6)
     const birthYear = parseInt(birthYY) > 50 ? `19${birthYY}` : `20${birthYY}`
-    customerData.date_of_birth = `${birthYear}-${birthMM}-${birthDD}`
+    customerData.birth_date = `${birthYear}-${birthMM}-${birthDD}`
 
     // 性別
     customerData.sex = mrzLine2Match[6] === 'F' ? '女' : '男'
@@ -477,7 +477,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     const expiryMM = mrzLine2Match[7].substring(2, 4)
     const expiryDD = mrzLine2Match[7].substring(4, 6)
     const expiryYear = parseInt(expiryYY) > 50 ? `19${expiryYY}` : `20${expiryYY}`
-    customerData.passport_expiry_date = `${expiryYear}-${expiryMM}-${expiryDD}`
+    customerData.passport_expiry = `${expiryYear}-${expiryMM}-${expiryDD}`
 
     // 台灣護照：身分證字號（格式：1英文+9數字）
     if (customerData.nationality === 'TWN') {
@@ -527,15 +527,15 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       return `${year}-${month}-${day}`
     }
 
-    if (expiryMatch && !customerData.passport_expiry_date) {
-      customerData.passport_expiry_date = formatDate(expiryMatch)
+    if (expiryMatch && !customerData.passport_expiry) {
+      customerData.passport_expiry = formatDate(expiryMatch)
     }
-    if (birthMatch && !customerData.date_of_birth) {
-      customerData.date_of_birth = formatDate(birthMatch)
+    if (birthMatch && !customerData.birth_date) {
+      customerData.birth_date = formatDate(birthMatch)
     }
 
     // 如果標籤沒找到，再用日期推斷（但排除發照日期）
-    if (!customerData.passport_expiry_date || !customerData.date_of_birth) {
+    if (!customerData.passport_expiry || !customerData.birth_date) {
       const allDateMatches = dateTextSource.match(/(\d{1,2})\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*(\d{4})/gi)
       if (allDateMatches) {
         // 排除已經找到的日期和發照日期
@@ -551,12 +551,12 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
             if (formattedDate === issueDateStr) continue
 
             // 效期：2024 以後的日期（更嚴格）
-            if (year >= 2024 && !customerData.passport_expiry_date) {
-              customerData.passport_expiry_date = formattedDate
+            if (year >= 2024 && !customerData.passport_expiry) {
+              customerData.passport_expiry = formattedDate
             }
             // 生日：1920-2015 之間
-            else if (year >= 1920 && year <= 2015 && !customerData.date_of_birth) {
-              customerData.date_of_birth = formattedDate
+            else if (year >= 1920 && year <= 2015 && !customerData.birth_date) {
+              customerData.birth_date = formattedDate
             }
           }
         }
@@ -646,9 +646,9 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     }
 
     // 策略 2: 如果策略1沒找到，找英文名附近的中文
-    if (!chineseName && customerData.passport_romanization) {
+    if (!chineseName && customerData.passport_name) {
       // 從護照拼音取得姓氏 (例如 "LIN/LI-HUI" -> "LIN")
-      const surname = customerData.passport_romanization.split('/')[0]?.toUpperCase()
+      const surname = customerData.passport_name.split('/')[0]?.toUpperCase()
       if (surname) {
         // 找英文姓氏在文字中的位置（用逗號格式，如 "WANG, WEI"）
         const englishNamePattern = new RegExp(`${surname}[,\\s]+[A-Z-]+`, 'i')
@@ -687,7 +687,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
 
     // 用拼音交叉驗證中文名字數（更嚴格）
     // 使用帶連字號的版本來正確計算音節數
-    const romanizationForValidation = (customerData as Record<string, unknown>)._romanization_with_dash as string || customerData.passport_romanization
+    const romanizationForValidation = (customerData as Record<string, unknown>)._romanization_with_dash as string || customerData.passport_name
     if (chineseName && romanizationForValidation) {
       const validation = validateChineseNameByPinyin(chineseName, romanizationForValidation)
       if (!validation.valid) {
@@ -715,7 +715,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       if (nameMatch) {
         englishName = `${nameMatch[1]} ${nameMatch[2]}`
         customerData.english_name = englishName
-        customerData.passport_romanization = `${nameMatch[1]}/${nameMatch[2]}`
+        customerData.passport_name = `${nameMatch[1]}/${nameMatch[2]}`
         break
       }
     }
@@ -740,17 +740,17 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     }
   } else if (chineseName && chineseNameConfidence === 'low') {
     // 低信心度，加上拼音方便核對
-    if (customerData.passport_romanization) {
-      customerData.name = `${chineseName}(${customerData.passport_romanization})⚠️`
+    if (customerData.passport_name) {
+      customerData.name = `${chineseName}(${customerData.passport_name})⚠️`
     } else {
       customerData.name = `${chineseName}⚠️`
     }
     if (englishName) {
       customerData.english_name = englishName
     }
-  } else if (customerData.passport_romanization) {
+  } else if (customerData.passport_name) {
     // 沒有可靠的中文名，使用 MRZ 拼音（格式化為易讀形式）
-    const [surname, givenName] = customerData.passport_romanization.split('/')
+    const [surname, givenName] = customerData.passport_name.split('/')
     customerData.name = givenName ? `${surname} ${givenName}` : surname
     customerData.english_name = customerData.name
   } else if (englishName) {

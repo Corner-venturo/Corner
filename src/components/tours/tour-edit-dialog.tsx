@@ -69,7 +69,6 @@ export function TourEditDialog({ isOpen, onClose, tour, onSuccess }: TourEditDia
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent
-        nested
         className="max-w-3xl max-h-[90vh] overflow-y-auto"
         aria-describedby={undefined}
         onInteractOutside={e => {

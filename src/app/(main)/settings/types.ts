@@ -18,7 +18,7 @@ export interface ThemePreview {
 }
 
 export interface Theme {
-  id: 'morandi' | 'modern-dark'
+  id: 'morandi' | 'modern-dark' | 'nordic'
   name: string
   description: string
   icon: React.ComponentType<{ className?: string }>

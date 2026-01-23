@@ -58,6 +58,13 @@ export interface PNRSegment {
   meal?: string; // 航班餐食 (e.g., "午餐", "晚餐", "無")
   isDirect?: boolean; // 是否直飛
   duration?: string; // 飛行時間 (e.g., "01小時45分")
+  // === 擴充欄位 (2026-01-22) - 經停資訊 ===
+  via?: Array<{
+    city: string;        // 經停城市
+    airport?: string;    // 機場代碼
+    airportName?: string; // 機場名稱
+    duration?: string;   // 停留時間
+  }>;
 }
 
 export interface CreatePNRInput {

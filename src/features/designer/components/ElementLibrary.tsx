@@ -18,6 +18,8 @@ import {
   Award,
   Frame,
   Image as ImageIcon,
+  Clock,
+  Plus,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -37,6 +39,10 @@ interface ElementLibraryProps {
   onAddImage?: (imageUrl: string, attribution?: { name: string; link: string }) => void
   onAddColorfulIcon?: (iconName: string) => void
   onAddQRCode?: (dataUrl: string) => void
+  // 時間軸
+  onAddTimeline?: (options?: { orientation?: 'vertical' | 'horizontal'; pointCount?: number }) => void
+  onAddTimelinePoint?: () => void
+  isTimelineSelected?: boolean  // 是否選中時間軸（用於顯示新增時間點按鈕）
 }
 
 // 線條樣式選項
@@ -62,6 +68,9 @@ export function ElementLibrary({
   onAddImage,
   onAddColorfulIcon,
   onAddQRCode,
+  onAddTimeline,
+  onAddTimelinePoint,
+  isTimelineSelected,
 }: ElementLibraryProps) {
   const [activeTab, setActiveTab] = useState('elements')
 
@@ -75,10 +84,8 @@ export function ElementLibrary({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid grid-cols-7 mx-2 mt-2">
+        <TabsList className="grid grid-cols-5 mx-2 mt-2">
           <TabsTrigger value="elements" className="text-xs px-1">基本</TabsTrigger>
-          <TabsTrigger value="lines" className="text-xs px-1">線條</TabsTrigger>
-          <TabsTrigger value="stickers" className="text-xs px-1">圖案</TabsTrigger>
           <TabsTrigger value="colorful" className="text-xs px-1">彩色</TabsTrigger>
           <TabsTrigger value="icons" className="text-xs px-1">圖示</TabsTrigger>
           <TabsTrigger value="images" className="text-xs px-1">圖片</TabsTrigger>
@@ -121,73 +128,49 @@ export function ElementLibrary({
                   ))}
                 </div>
               </div>
-            </div>
-          </TabsContent>
 
-          {/* 線條 */}
-          <TabsContent value="lines" className="absolute inset-0 m-0 p-0 overflow-auto">
-            <div className="p-3">
-              <h4 className="text-xs font-medium text-morandi-secondary mb-2">線條樣式</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {LINE_OPTIONS.map((line) => (
-                  <Button
-                    key={line.id}
-                    variant="outline"
-                    size="sm"
-                    className="flex flex-col items-center gap-1 h-16"
-                    onClick={() => onAddLine({ style: line.style, arrow: line.arrow })}
-                  >
-                    <line.icon size={20} className="text-morandi-gold" />
-                    <span className="text-[10px]">{line.name}</span>
-                  </Button>
-                ))}
-              </div>
-
-              {/* 線條預覽 */}
-              <div className="mt-4 p-3 bg-morandi-container/30 rounded-lg space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 border-t-2 border-morandi-gold" />
-                  <span className="text-[10px] text-morandi-secondary">實線</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 border-t-2 border-dashed border-morandi-gold" />
-                  <span className="text-[10px] text-morandi-secondary">虛線</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 border-t-2 border-dotted border-morandi-gold" />
-                  <span className="text-[10px] text-morandi-secondary">點線</span>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* 貼紙/圖案 */}
-          <TabsContent value="stickers" className="absolute inset-0 m-0 p-0 overflow-auto">
-            <div className="p-3 space-y-4">
-              {categories.map(([category, label]) => {
-                const stickers = getStickersByCategory(category)
-                if (stickers.length === 0) return null
-
-                return (
-                  <div key={category}>
-                    <h4 className="text-xs font-medium text-morandi-secondary mb-2 flex items-center gap-1">
-                      {getCategoryIcon(category)}
-                      {label}
-                    </h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {stickers.map((sticker) => (
-                        <StickerButton
-                          key={sticker.id}
-                          sticker={sticker}
-                          onClick={() => onAddSticker(sticker.id, category)}
-                        />
-                      ))}
-                    </div>
+              {/* 時間軸 */}
+              {onAddTimeline && (
+                <div>
+                  <h4 className="text-xs font-medium text-morandi-secondary mb-2">時間軸</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex flex-col items-center gap-1 h-16"
+                      onClick={() => onAddTimeline({ orientation: 'vertical', pointCount: 3 })}
+                    >
+                      <Clock size={20} className="text-morandi-gold" />
+                      <span className="text-[10px]">垂直時間軸</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex flex-col items-center gap-1 h-16"
+                      onClick={() => onAddTimeline({ orientation: 'horizontal', pointCount: 3 })}
+                    >
+                      <Clock size={20} className="text-morandi-gold rotate-90" />
+                      <span className="text-[10px]">水平時間軸</span>
+                    </Button>
                   </div>
-                )
-              })}
+
+                  {/* 新增時間點按鈕（只在選中時間軸時顯示） */}
+                  {isTimelineSelected && onAddTimelinePoint && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full mt-2 gap-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                      onClick={onAddTimelinePoint}
+                    >
+                      <Plus size={14} />
+                      新增時間點
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </TabsContent>
+
 
           {/* 彩色圖標（使用 Iconify API） */}
           <TabsContent value="colorful" className="absolute inset-0 m-0 p-0 overflow-auto">

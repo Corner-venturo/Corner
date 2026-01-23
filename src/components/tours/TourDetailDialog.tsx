@@ -63,12 +63,29 @@ const VehicleAssignment = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
+const TourRequirementsTab = dynamic(
+  () => import('@/components/tours/tour-requirements-tab').then(m => m.TourRequirementsTab),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourRoomsTab = dynamic(
+  () => import('@/components/tours/tour-rooms-tab').then(m => m.TourRoomsTab),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourRequestFormDialog = dynamic(
+  () => import('@/features/proposals/components/TourRequestFormDialog').then(m => m.TourRequestFormDialog),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
 // 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
 const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'orders', label: '訂單管理' },
   { value: 'vehicles', label: '分車' },
+  { value: 'rooms', label: '分房' },
   { value: 'overview', label: '總覽' },
+  { value: 'requirements', label: '需求總覽' },
   { value: 'confirmation', label: '團確單' },
   { value: 'control', label: '團控' },
   { value: 'checkin', label: '報到' },
@@ -113,6 +130,15 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   const [ordersHasChildDialog, setOrdersHasChildDialog] = useState(false)
   const [paymentsHasChildDialog, setPaymentsHasChildDialog] = useState(false)
   const [costsHasChildDialog, setCostsHasChildDialog] = useState(false)
+
+  // 需求單 Dialog 狀態（從 TourRequirementsTab 提升）
+  const [showRequirementsRequestDialog, setShowRequirementsRequestDialog] = useState(false)
+  const [requirementsRequestData, setRequirementsRequestData] = useState<{
+    category: string
+    supplierName: string
+    items: { serviceDate: string | null; title: string; quantity: number; note?: string }[]
+    startDate: string | null
+  } | null>(null)
   const [entryCardSettings, setEntryCardSettings] = useState({
     flightNumber: '',
     hotelName: '',
@@ -386,11 +412,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   }
 
   // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
-  // 注意：ordersHasChildDialog 不需要加入，因為 TourOrders 的對話框使用 nested prop，
-  // 會在父 Dialog 內部正確疊加，不需要隱藏父 Dialog
   const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
     showEditDialog || showQuotePicker || showPnrToolDialog || showEntryCardDialog ||
-    showMembersPnrMatchDialog || membersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog
+    showMembersPnrMatchDialog || membersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog ||
+    ordersHasChildDialog || showRequirementsRequestDialog
 
   const renderTabContent = () => {
     if (!tour) return null
@@ -451,12 +476,35 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             workspaceId={currentWorkspace?.id || ''}
           />
         )
+      case 'rooms':
+        return (
+          <TourRoomsTab
+            tourId={tour.id}
+            workspaceId={currentWorkspace?.id || ''}
+          />
+        )
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
       case 'control':
         return <TourControlSheet tourId={tour.id} />
       case 'checkin':
         return <TourCheckin tour={tour} />
+      case 'requirements':
+        return (
+          <TourRequirementsTab
+            tourId={tour.id}
+            quoteId={tour.quote_id}
+            onOpenRequestDialog={(data) => {
+              setRequirementsRequestData({
+                category: data.category,
+                supplierName: data.supplierName,
+                items: data.items,
+                startDate: data.startDate,
+              })
+              setShowRequirementsRequestDialog(true)
+            }}
+          />
+        )
       default:
         return <TourOverview tour={tour} />
     }
@@ -600,7 +648,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             tour={tour}
             open={showConfirmationDialog}
             onClose={() => setShowConfirmationDialog(false)}
-            nested
           />
 
           <CreateChannelDialog
@@ -629,14 +676,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             isOpen={showQuotePicker}
             onClose={() => setShowQuotePicker(false)}
             tour={tour}
-            nested
           />
 
           {/* PNR 電報工具 */}
           <TourPnrToolDialog
             isOpen={showPnrToolDialog}
             onClose={() => setShowPnrToolDialog(false)}
-            nested
             tourId={tour.id}
             tourCode={tour.code || ''}
             tourName={tour.name}
@@ -656,7 +701,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
           <PnrMatchDialog
             isOpen={showMembersPnrMatchDialog}
             onClose={() => setShowMembersPnrMatchDialog(false)}
-            nested
             members={tourMembers.map(m => ({
               id: m.id,
               chinese_name: m.chinese_name ?? null,
@@ -673,9 +717,28 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             }}
           />
 
+          {/* 需求單對話框（從 TourRequirementsTab 提升） */}
+          {requirementsRequestData && (
+            <TourRequestFormDialog
+              isOpen={showRequirementsRequestDialog}
+              onClose={() => {
+                setShowRequirementsRequestDialog(false)
+                setRequirementsRequestData(null)
+              }}
+              tour={tour}
+              category={requirementsRequestData.category}
+              supplierName={requirementsRequestData.supplierName}
+              items={requirementsRequestData.items}
+              tourCode={tour.code || ''}
+              tourName={tour.name}
+              departureDate={requirementsRequestData.startDate || undefined}
+              pax={tour.current_participants || tour.max_participants || undefined}
+            />
+          )}
+
           {/* 入境卡列印對話框 */}
           <EntryCardDialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
-            <EntryCardDialogContent nested className="max-w-[95vw] max-h-[95vh] overflow-auto">
+            <EntryCardDialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
               <div className="no-print flex items-center justify-between mb-4">
                 <EntryCardDialogHeader>
                   <EntryCardDialogTitle>列印日本入境卡</EntryCardDialogTitle>

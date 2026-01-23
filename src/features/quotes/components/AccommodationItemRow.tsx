@@ -1,5 +1,6 @@
 import React from 'react'
 import { CostItem } from '../types'
+import { CalcInput } from '@/components/ui/calc-input'
 
 interface AccommodationItemRowProps {
   item: CostItem
@@ -23,8 +24,11 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
   handleUpdateItem,
   handleRemoveItem,
 }) => {
+  // 簡潔輸入框樣式（右側多留空間避免被 table-divider 遮到）
+  const inputClass = 'input-no-focus w-full pl-1 pr-3 py-1 text-sm bg-transparent'
+
   return (
-    <tr className="border-b border-border hover:bg-morandi-container/10 transition-colors">
+    <tr className="border-b border-morandi-container/60 hover:bg-morandi-container/5 transition-colors">
       {/* 分類欄：第一個房型顯示天數 */}
       <td className="py-3 px-4 text-sm text-morandi-primary text-center table-divider">
         {roomIndex === 0 ? `DAY${day}` : ''}
@@ -36,37 +40,27 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
           type="text"
           value={item.name}
           onChange={e => handleUpdateItem(categoryId, item.id, 'name', e.target.value)}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
+          className={`${inputClass} text-center`}
           placeholder="房型名稱"
         />
       </td>
 
       {/* 人數欄 */}
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={item.quantity && item.quantity !== 1 ? item.quantity : ''}
-          onChange={e => {
-            const val = e.target.value.trim()
-            handleUpdateItem(categoryId, item.id, 'quantity', val === '' ? null : Number(val) || 0)
-          }}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
-          placeholder="人數"
+        <CalcInput
+          value={item.quantity}
+          onChange={val => handleUpdateItem(categoryId, item.id, 'quantity', val)}
+          className={`${inputClass} text-center`}
+          placeholder="人"
         />
       </td>
 
       {/* 單價欄 */}
       <td className="py-3 px-4 text-sm text-morandi-secondary text-center table-divider">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={item.unit_price ?? ''}
-          onChange={e => {
-            const val = e.target.value.trim()
-            handleUpdateItem(categoryId, item.id, 'unit_price', val === '' ? null : Number(val) || 0)
-          }}
-          className="w-full px-1 py-1 text-sm text-center bg-transparent border-0 focus:outline-none focus:bg-card"
+        <CalcInput
+          value={item.unit_price}
+          onChange={val => handleUpdateItem(categoryId, item.id, 'unit_price', val)}
+          className={`${inputClass} text-center`}
           placeholder="單價"
         />
       </td>
@@ -83,7 +77,7 @@ export const AccommodationItemRow: React.FC<AccommodationItemRowProps> = ({
             type="text"
             value={item.note || ''}
             onChange={e => handleUpdateItem(categoryId, item.id, 'note', e.target.value)}
-            className="flex-1 px-1 py-1 text-sm bg-transparent border-0 focus:outline-none focus:bg-card"
+            className={`${inputClass} flex-1`}
             placeholder="備註"
           />
           <button

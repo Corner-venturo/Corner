@@ -30,7 +30,12 @@ import type {
   ConfirmationItemCategory,
   CreateConfirmationItem,
   CostSummary,
+  ResourceType,
 } from '@/types/tour-confirmation-sheet.types'
+import type { Database } from '@/lib/supabase/types'
+
+// tour_requests Row type
+type TourRequestRow = Database['public']['Tables']['tour_requests']['Row']
 
 // 新行的初始狀態
 const EMPTY_NEW_ITEM = {
@@ -111,6 +116,10 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [itineraryLoading, setItineraryLoading] = useState(false)
 
+  // 需求單資料（用於帶入資源關聯）
+  const [tourRequests, setTourRequests] = useState<TourRequestRow[]>([])
+  const [requestsLoading, setRequestsLoading] = useState(false)
+
   // 載入行程表
   useEffect(() => {
     const loadItinerary = async () => {
@@ -130,6 +139,28 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
       }
     }
     loadItinerary()
+  }, [tour.id])
+
+  // 載入需求單（包含已確認的需求單）
+  useEffect(() => {
+    const loadTourRequests = async () => {
+      if (!tour.id) return
+      setRequestsLoading(true)
+      try {
+        const { data } = await supabase
+          .from('tour_requests')
+          .select('*')
+          .eq('tour_id', tour.id)
+          .in('status', ['confirmed', 'replied'])
+          .order('service_date')
+        if (data) {
+          setTourRequests(data)
+        }
+      } finally {
+        setRequestsLoading(false)
+      }
+    }
+    loadTourRequests()
   }, [tour.id])
 
   // 當開始新增時，聚焦到第一個輸入框
@@ -481,6 +512,80 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
     }
   }
 
+  // 從需求單帶入（包含資源關聯）
+  const handleImportFromRequests = async (category: ConfirmationItemCategory) => {
+    if (!sheet?.id) return
+
+    // 根據分類過濾需求單
+    const categoryMap: Record<ConfirmationItemCategory, string[]> = {
+      transport: ['transport', 'vehicle'],
+      meal: ['meal', 'restaurant'],
+      accommodation: ['accommodation', 'hotel'],
+      activity: ['activity', 'attraction'],
+      other: ['other'],
+    }
+
+    const filteredRequests = tourRequests.filter(
+      (req) => categoryMap[category].includes(req.category)
+    )
+
+    if (filteredRequests.length === 0) return
+
+    setSavingNew(true)
+    try {
+      for (const req of filteredRequests) {
+        await addItem({
+          sheet_id: sheet.id,
+          category,
+          service_date: req.service_date || '',
+          service_date_end: req.service_date_end || null,
+          day_label: null,
+          supplier_name: req.supplier_name || '',
+          supplier_id: req.supplier_id || null,
+          title: req.title,
+          description: req.description || null,
+          unit_price: null,
+          currency: req.currency || 'TWD',
+          quantity: req.quantity || null,
+          subtotal: null,
+          expected_cost: req.quoted_cost || req.estimated_cost || null,
+          actual_cost: req.final_cost || null,
+          contact_info: null,
+          booking_reference: null,
+          booking_status: req.status === 'confirmed' ? 'confirmed' : 'pending',
+          type_data: null,
+          sort_order: 0,
+          notes: req.note || null,
+          workspace_id: workspaceId,
+          // 關聯需求單
+          request_id: req.id,
+          // 資源關聯（餐廳/飯店/景點）
+          resource_type: req.resource_type as ResourceType | null,
+          resource_id: req.resource_id || null,
+          // GPS 資訊（供領隊導航）
+          latitude: req.latitude || null,
+          longitude: req.longitude || null,
+          google_maps_url: req.google_maps_url || null,
+        })
+      }
+      handleCancelAdd()
+    } finally {
+      setSavingNew(false)
+    }
+  }
+
+  // 檢查某分類是否有可帶入的需求單
+  const hasRequestsForCategory = (category: ConfirmationItemCategory): boolean => {
+    const categoryMap: Record<ConfirmationItemCategory, string[]> = {
+      transport: ['transport', 'vehicle'],
+      meal: ['meal', 'restaurant'],
+      accommodation: ['accommodation', 'hotel'],
+      activity: ['activity', 'attraction'],
+      other: ['other'],
+    }
+    return tourRequests.some((req) => categoryMap[category].includes(req.category))
+  }
+
   // 儲存新項目（inline）
   const handleSaveNewItem = async () => {
     if (!sheet?.id || !addingCategory) return
@@ -655,8 +760,22 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                     </td>
                     <td className="px-2 py-1.5 text-right">
                       <div className="flex items-center gap-1 justify-end">
+                        {/* 從需求單帶入按鈕（優先顯示，包含資源關聯） */}
+                        {hasRequestsForCategory(cat.key) && items.length === 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleImportFromRequests(cat.key)}
+                            disabled={savingNew}
+                            className="h-6 px-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                            title="從需求單帶入（含 GPS 資訊）"
+                          >
+                            <Download size={12} className="mr-1" />
+                            需求單
+                          </Button>
+                        )}
                         {/* 從行程表帶入按鈕 */}
-                        {canImport && importHandler && items.length === 0 && (
+                        {canImport && importHandler && items.length === 0 && !hasRequestsForCategory(cat.key) && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -666,7 +785,7 @@ export function TourConfirmationSheetPage({ tour }: TourConfirmationSheetPagePro
                             title="從行程表帶入"
                           >
                             <Download size={12} className="mr-1" />
-                            帶入
+                            行程表
                           </Button>
                         )}
                         <Button

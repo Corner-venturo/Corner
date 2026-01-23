@@ -119,12 +119,12 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
         // 空字串轉 null（日期欄位不接受空字串）
         const customerUpdateData: Record<string, unknown> = {
           name: editFormData.chinese_name || null,
-          passport_romanization: editFormData.passport_name || null,
-          date_of_birth: editFormData.birth_date || null,
+          passport_name: editFormData.passport_name || null,
+          birth_date: editFormData.birth_date || null,
           gender: editFormData.gender || null,
           national_id: editFormData.id_number || null,
           passport_number: editFormData.passport_number || null,
-          passport_expiry_date: editFormData.passport_expiry || null,
+          passport_expiry: editFormData.passport_expiry || null,
         }
 
         // 儲存時自動更新驗證狀態為 verified（無論是編輯或驗證模式）
@@ -155,16 +155,21 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           // 3. 備用：姓名+生日比對
           if (cleanChineseName && birthDate &&
               c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
-              c.date_of_birth === birthDate) return true
+              c.birth_date === birthDate) return true
           return false
         })
 
         if (existingCustomer) {
-          // 找到現有顧客，關聯到成員
+          // 找到現有顧客，關聯到成員（同時同步護照圖片）
           newCustomerId = existingCustomer.id
+          const memberUpdate: Record<string, unknown> = { customer_id: existingCustomer.id }
+          // 如果客戶有護照圖片且成員沒有，同步過來
+          if (existingCustomer.passport_image_url && !editingMember.passport_image_url) {
+            memberUpdate.passport_image_url = existingCustomer.passport_image_url
+          }
           await supabase
             .from('order_members')
-            .update({ customer_id: existingCustomer.id })
+            .update(memberUpdate)
             .eq('id', editingMember.id)
 
           // 同時更新顧客資料
@@ -172,12 +177,12 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
             .from('customers')
             .update({
               name: editFormData.chinese_name || existingCustomer.name,
-              passport_romanization: editFormData.passport_name || existingCustomer.passport_romanization,
-              date_of_birth: editFormData.birth_date || existingCustomer.date_of_birth,
+              passport_name: editFormData.passport_name || existingCustomer.passport_name,
+              birth_date: editFormData.birth_date || existingCustomer.birth_date,
               gender: editFormData.gender || existingCustomer.gender,
               national_id: editFormData.id_number || existingCustomer.national_id,
               passport_number: editFormData.passport_number || existingCustomer.passport_number,
-              passport_expiry_date: editFormData.passport_expiry || existingCustomer.passport_expiry_date,
+              passport_expiry: editFormData.passport_expiry || existingCustomer.passport_expiry,
               verification_status: 'verified',
             })
             .eq('id', existingCustomer.id)
@@ -187,11 +192,11 @@ export function useMemberEditDialog({ members, setMembers }: UseMemberEditDialog
           // 沒找到，建立新顧客
           const newCustomer = await createCustomer({
             name: editFormData.chinese_name || '',
-            passport_romanization: editFormData.passport_name || '',
+            passport_name: editFormData.passport_name || '',
             passport_number: passportNumber || null,
-            passport_expiry_date: editFormData.passport_expiry || null,
+            passport_expiry: editFormData.passport_expiry || null,
             national_id: idNumber || null,
-            date_of_birth: birthDate || null,
+            birth_date: birthDate || null,
             gender: editFormData.gender || null,
             phone: '',
             is_vip: false,

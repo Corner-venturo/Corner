@@ -37,15 +37,12 @@ interface ItineraryVersionPickerProps {
   isOpen: boolean
   onClose: () => void
   tour: Tour
-  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
-  nested?: boolean
 }
 
 export function ItineraryVersionPicker({
   isOpen,
   onClose,
   tour,
-  nested = false,
 }: ItineraryVersionPickerProps) {
   const router = useRouter()
   const { items: itineraries, loading } = useItineraries()
@@ -221,7 +218,7 @@ export function ItineraryVersionPicker({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent nested={nested} className="max-w-[400px] max-h-[500px] overflow-hidden p-0">
+      <DialogContent className="max-w-[400px] max-h-[500px] overflow-hidden p-0">
         <DialogHeader className="px-4 py-3 border-b border-border bg-morandi-container/20">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-morandi-primary" />

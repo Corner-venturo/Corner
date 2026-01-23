@@ -36,7 +36,7 @@ export const AddPaymentDialog = React.memo(function AddPaymentDialog({
 }: AddPaymentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent nested className="max-w-md">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>新增收款紀錄</DialogTitle>
         </DialogHeader>

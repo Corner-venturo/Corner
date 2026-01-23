@@ -192,6 +192,7 @@ export function useRestaurantSelector({
               specialties, price_range, avg_price_lunch, avg_price_dinner,
               group_friendly, max_group_size, group_menu_available,
               private_room, thumbnail, images, rating, is_active, is_featured,
+              latitude, longitude, address, phone, google_maps_url,
               regions(name),
               cities!inner(name)
             `)
@@ -218,7 +219,7 @@ export function useRestaurantSelector({
           const { data: restaurantData } = await restaurantQuery
 
           if (restaurantData) {
-             
+
             restaurantData.forEach((item: any) => {
               results.push({
                 id: item.id,
@@ -244,6 +245,12 @@ export function useRestaurantSelector({
                 rating: item.rating,
                 is_active: item.is_active ?? true,
                 is_featured: item.is_featured ?? false,
+                // GPS 資訊
+                latitude: item.latitude,
+                longitude: item.longitude,
+                address: item.address,
+                phone: item.phone,
+                google_maps_url: item.google_maps_url,
                 source: 'restaurant' as const,
                 region_name: item.regions?.name || '',
                 city_name: item.cities?.name || '',
@@ -263,6 +270,7 @@ export function useRestaurantSelector({
               price_range, avg_price_lunch, avg_price_dinner,
               max_group_size, group_menu_available,
               thumbnail, images, is_active,
+              latitude, longitude, address, phone, google_maps_url,
               cities!inner(name)
             `)
             .eq('is_active', true)
@@ -277,7 +285,7 @@ export function useRestaurantSelector({
           const { data: michelinData } = await michelinQuery
 
           if (michelinData) {
-             
+
             michelinData.forEach((item: any) => {
               results.push({
                 id: item.id,
@@ -301,6 +309,12 @@ export function useRestaurantSelector({
                 thumbnail: item.thumbnail,
                 images: item.images,
                 is_active: item.is_active ?? true,
+                // GPS 資訊
+                latitude: item.latitude,
+                longitude: item.longitude,
+                address: item.address,
+                phone: item.phone,
+                google_maps_url: item.google_maps_url,
                 source: 'michelin' as const,
                 city_name: item.cities?.name || '',
               })

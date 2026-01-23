@@ -56,6 +56,9 @@ export type ConfirmationSheetStatus = 'draft' | 'confirmed' | 'in_progress' | 'c
 export interface TourConfirmationItem extends BaseEntity {
   sheet_id: string // FK to tour_confirmation_sheets
 
+  // 關聯需求單
+  request_id: string | null // FK to tour_requests
+
   // 分類
   category: ConfirmationItemCategory
 
@@ -68,6 +71,15 @@ export interface TourConfirmationItem extends BaseEntity {
   supplier_name: string
   supplier_id: string | null // FK to suppliers（可選）
 
+  // 資源關聯（餐廳/飯店/景點等）
+  resource_type: ResourceType | null
+  resource_id: string | null
+
+  // GPS 資訊（供領隊導航使用）
+  latitude: number | null
+  longitude: number | null
+  google_maps_url: string | null
+
   // 內容描述（依類型不同）
   title: string // 主要名稱
   description: string | null // 詳細描述
@@ -79,6 +91,12 @@ export interface TourConfirmationItem extends BaseEntity {
   subtotal: number | null
   expected_cost: number | null
   actual_cost: number | null
+
+  // 領隊記帳欄位
+  leader_expense: number | null // 領隊實際支出
+  leader_expense_note: string | null // 支出備註
+  leader_expense_at: string | null // 記帳時間
+  receipt_images: string[] // 收據照片
 
   // 聯絡資訊
   contact_info: ContactInfo | null
@@ -105,6 +123,13 @@ export type ConfirmationItemCategory =
   | 'accommodation' // 住宿
   | 'activity'      // 活動
   | 'other'         // 其他
+
+// 資源類型
+export type ResourceType =
+  | 'restaurant'    // 餐廳
+  | 'hotel'         // 飯店
+  | 'attraction'    // 景點
+  | 'supplier'      // 供應商
 
 export type BookingStatus =
   | 'pending'       // 待處理
@@ -190,10 +215,36 @@ export type CreateConfirmationSheet = Omit<
 
 export type UpdateConfirmationSheet = Partial<CreateConfirmationSheet>
 
+// 新欄位設為可選（向後相容）
 export type CreateConfirmationItem = Omit<
   TourConfirmationItem,
-  'id' | 'created_at' | 'updated_at'
->
+  | 'id'
+  | 'created_at'
+  | 'updated_at'
+  // 以下新欄位設為可選
+  | 'request_id'
+  | 'resource_type'
+  | 'resource_id'
+  | 'latitude'
+  | 'longitude'
+  | 'google_maps_url'
+  | 'leader_expense'
+  | 'leader_expense_note'
+  | 'leader_expense_at'
+  | 'receipt_images'
+> & {
+  // 這些新欄位設為可選，以便現有代碼可以正常運作
+  request_id?: string | null
+  resource_type?: ResourceType | null
+  resource_id?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  google_maps_url?: string | null
+  leader_expense?: number | null
+  leader_expense_note?: string | null
+  leader_expense_at?: string | null
+  receipt_images?: string[]
+}
 
 export type UpdateConfirmationItem = Partial<CreateConfirmationItem>
 

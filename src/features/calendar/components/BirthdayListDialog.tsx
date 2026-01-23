@@ -11,7 +11,7 @@ import { formatYearMonth } from '@/lib/utils/format-date'
 interface BirthdayPerson {
   id: string
   name: string
-  date_of_birth: string
+  birth_date: string
   day: number
 }
 
@@ -46,20 +46,20 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
       // 查詢客戶生日
       const { data: customers } = await supabase
         .from('customers')
-        .select('id, name, date_of_birth')
-        .not('date_of_birth', 'is', null)
+        .select('id, name, birth_date')
+        .not('birth_date', 'is', null)
 
       if (customers) {
         customers.forEach(customer => {
-          if (customer.date_of_birth) {
-            // date_of_birth 格式: YYYY-MM-DD
-            const birthMonth = customer.date_of_birth.slice(5, 7)
+          if (customer.birth_date) {
+            // birth_date 格式: YYYY-MM-DD
+            const birthMonth = customer.birth_date.slice(5, 7)
             if (birthMonth === monthStr) {
-              const day = parseInt(customer.date_of_birth.slice(8, 10), 10)
+              const day = parseInt(customer.birth_date.slice(8, 10), 10)
               results.push({
                 id: customer.id,
                 name: customer.name,
-                date_of_birth: customer.date_of_birth,
+                birth_date: customer.birth_date,
                 day,
               })
             }
@@ -182,7 +182,7 @@ export function BirthdayListDialog({ open, onClose, initialMonth }: BirthdayList
                       {person.day}
                     </div>
                     <div className="text-xs text-morandi-secondary">
-                      {formatBirthday(person.date_of_birth)}
+                      {formatBirthday(person.birth_date)}
                     </div>
                   </div>
 

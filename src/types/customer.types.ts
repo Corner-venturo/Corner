@@ -24,10 +24,10 @@ export interface Customer extends BaseEntity {
   country?: string | null // 國家
   national_id?: string | null // 身分證字號
   passport_number?: string | null // 護照號碼
-  passport_romanization?: string | null // 護照拼音（格式：姓氏/名字，例如：WANG/XIAOMING）
-  passport_expiry_date?: string | null // 護照效期 (ISO 8601)
-  passport_image_url?: string | null // 護照圖片（base64 或 URL）
-  date_of_birth?: string | null // 出生日期 (ISO 8601)
+  passport_name?: string | null // 護照姓名/拼音（標準欄位）
+  passport_expiry?: string | null // 護照效期（標準欄位）
+  passport_image_url?: string | null // 護照圖片
+  birth_date?: string | null // 出生日期（標準欄位）
   gender?: string | null // 性別
   company?: string | null // 公司名稱
   tax_id?: string | null // 統編
@@ -108,10 +108,10 @@ export interface CreateCustomerData {
   country?: string
   national_id?: string
   passport_number?: string
-  passport_romanization?: string
-  passport_expiry_date?: string
+  passport_name?: string // 護照姓名（標準欄位）
+  passport_expiry?: string // 護照效期（標準欄位）
   passport_image_url?: string | null
-  date_of_birth?: string
+  birth_date?: string // 出生日期（標準欄位）
   gender?: string
   company?: string
   tax_id?: string
@@ -143,10 +143,10 @@ export interface UpdateCustomerData {
   country?: string | null
   national_id?: string | null
   passport_number?: string | null
-  passport_romanization?: string | null
-  passport_expiry_date?: string | null
+  passport_name?: string | null // 護照姓名（標準欄位）
+  passport_expiry?: string | null // 護照效期（標準欄位）
   passport_image_url?: string | null
-  date_of_birth?: string | null
+  birth_date?: string | null // 出生日期（標準欄位）
   gender?: string | null
   company?: string | null
   tax_id?: string | null

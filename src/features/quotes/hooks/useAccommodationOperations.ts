@@ -28,8 +28,8 @@ export const useAccommodationOperations = ({
       newItems.push({
         id: `accommodation-day${day}-${timestamp}`,
         name: '',
-        quantity: 0,
-        unit_price: 0,
+        quantity: null,
+        unit_price: null,
         total: 0,
         note: '',
         day: day,
@@ -60,8 +60,8 @@ export const useAccommodationOperations = ({
     const newAccommodationItem: CostItem = {
       id: `accommodation-day${newDayCount}-${timestamp}`,
       name: '',
-      quantity: 0,
-      unit_price: 0,
+      quantity: null,
+      unit_price: null,
       total: 0,
       note: '',
       day: newDayCount,

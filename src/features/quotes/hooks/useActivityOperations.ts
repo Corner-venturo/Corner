@@ -37,7 +37,7 @@ export const useActivityOperations = ({
         id: Date.now().toString(),
         name: `Day ${actualDay} - `,
         quantity: 1,
-        unit_price: 0,
+        unit_price: null,
         total: 0,
         note: '',
       }

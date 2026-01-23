@@ -14,7 +14,7 @@ import type { BaseEntity, SyncableEntity } from './base.types'
 
 export interface Supplier extends SyncableEntity {
   name: string
-  name_en?: string | null
+  english_name?: string | null // 英文名稱（標準欄位）
   code?: string | null // 供應商代碼（會計用）
   type: SupplierType
 

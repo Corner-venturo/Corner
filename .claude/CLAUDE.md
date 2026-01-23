@@ -41,11 +41,12 @@ Read /Users/williamchien/Projects/SITEMAP.md
 | **程式碼** | `docs/CODE_STANDARDS.md` | 日期處理、閉包陷阱、禁止項目 |
 | **架構** | `docs/ARCHITECTURE_STANDARDS.md` | 五層架構、資料隔離、核心哲學 |
 | **資料庫** | `docs/DATABASE_DESIGN_STANDARDS.md` | 命名規範、表格分類 |
+| **欄位命名** | `docs/FIELD_NAMING_STANDARDS.md` | 欄位語意一致性、標準欄位名 |
 | **RLS** | `docs/SUPABASE_RLS_POLICY.md` | Row Level Security 規範 |
 
 ---
 
-## 🚨🚨🚨 五大禁令 (Zero Tolerance) 🚨🚨🚨
+## 🚨🚨🚨 六大禁令 (Zero Tolerance) 🚨🚨🚨
 
 | 禁令 | 說明 |
 |------|------|
@@ -54,10 +55,13 @@ Read /Users/williamchien/Projects/SITEMAP.md
 | **禁止盲目修改** | 每次修改前必須先讀取並理解現有代碼 |
 | **禁止自訂版面** | 列表頁面必須使用 `ListPageLayout` / `EnhancedTable` |
 | **禁止詳細頁跳轉** | 不建立 `/xxx/[id]/page.tsx`，用 Dialog 或展開 |
+| **禁止自創欄位名** | 新欄位必須查閱 `docs/FIELD_NAMING_STANDARDS.md` |
 
 **額外禁止**：
 - ❌ `console.log/error/warn` → 必須用 `logger`
 - ❌ 新增 `as any` → 使用明確類型或 `unknown` + type guard
+- ❌ 使用 `birthday` → 使用 `birth_date`
+- ❌ 使用 `name_en` → 使用 `english_name`
 
 ---
 

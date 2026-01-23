@@ -24,13 +24,21 @@ import {
   ImportMealsDialog,
   ImportActivitiesDialog,
   QuickQuoteDetail,
+  LocalPricingDialog,
 } from '@/features/quotes/components'
+import type { LocalTier } from '@/features/quotes/components/LocalPricingDialog'
 import { NotFoundState } from '@/components/ui/not-found-state'
 import type { MealDiff } from '@/features/quotes/components'
 import type { CostItem } from '@/features/quotes/types'
 import type { Itinerary, CreateInput, Tour } from '@/stores/types'
 // TourType imported above from @/types/tour.types
 import { EditingWarningBanner } from '@/components/EditingWarningBanner'
+import {
+  calculateTierParticipantCounts,
+  calculateTierCosts,
+  calculateIdentityProfits,
+  generateUniqueId,
+} from '@/features/quotes/utils/priceCalculations'
 
 export default function QuoteDetailPage() {
 
@@ -213,6 +221,8 @@ export default function QuoteDetailPage() {
   const [showImportMealsDialog, setShowImportMealsDialog] = React.useState(false)
   // 匯入景點對話框
   const [showImportActivitiesDialog, setShowImportActivitiesDialog] = React.useState(false)
+  // Local 報價對話框
+  const [showLocalPricingDialog, setShowLocalPricingDialog] = React.useState(false)
 
   // 處理狀態變更
   const handleStatusChange = React.useCallback((status: 'proposed' | 'approved', showLinkDialog?: boolean) => {
@@ -294,6 +304,91 @@ export default function QuoteDetailPage() {
     }
     setShowImportActivitiesDialog(true)
   }, [quote])
+
+  // 計算總人數（成人 + 兒童佔床 + 兒童不佔床 + 單人房）
+  const totalParticipants = React.useMemo(() => {
+    return (participantCounts.adult || 0) +
+           (participantCounts.child_with_bed || 0) +
+           (participantCounts.child_no_bed || 0) +
+           (participantCounts.single_room || 0)
+  }, [participantCounts])
+
+  // 處理 Local 報價確認
+  const handleLocalPricingConfirm = React.useCallback((tiers: LocalTier[], _matchedTierIndex: number) => {
+    // 產生檻次表：第一個使用目前總人數，後續使用 Local 報價的檻次
+    const sortedTiers = [...tiers].sort((a, b) => a.participants - b.participants)
+
+    // 找到目前人數對應的檻次索引
+    let currentTierIdx = 0
+    for (let i = 0; i < sortedTiers.length; i++) {
+      if (sortedTiers[i].participants <= totalParticipants) {
+        currentTierIdx = i
+      }
+    }
+    const currentLocalPrice = sortedTiers[currentTierIdx]?.unitPrice || 0
+
+    // 先計算 baseCosts（不含 Local，用現有 categories）
+    // 然後再創建 Local 項目
+
+    // 產生檻次表
+    const newTierPricings = sortedTiers.map((tier, index) => {
+      // 第一個檻次使用目前總人數（並對應到符合的 Local 單價）
+      const participantCount = index === 0 ? totalParticipants : tier.participants
+      // 該檻次對應的 Local 單價（每人）
+      const localUnitPrice = index === 0 ? currentLocalPrice : tier.unitPrice
+
+      // 計算新的人數分布（保持原始比例）
+      const newCounts = calculateTierParticipantCounts(participantCount, participantCounts)
+
+      // 計算新的成本（不含 Local）
+      const baseCosts = calculateTierCosts(categories, newCounts, participantCounts)
+
+      // 加上 Local 單價
+      const newCosts = {
+        adult: baseCosts.adult + localUnitPrice,
+        child_with_bed: baseCosts.child_with_bed + localUnitPrice,
+        child_no_bed: baseCosts.child_no_bed + localUnitPrice,
+        single_room: baseCosts.single_room + localUnitPrice,
+        infant: baseCosts.infant, // 嬰兒不算 Local
+      }
+
+      return {
+        id: generateUniqueId(),
+        participant_count: participantCount,
+        participant_counts: newCounts,
+        identity_costs: newCosts,
+        selling_prices: { ...sellingPrices },
+        identity_profits: calculateIdentityProfits(sellingPrices, newCosts),
+      }
+    })
+
+    // 在團體分攤創建 Local 報價項目（顯示用，total=0 不參與計算）
+    setCategories(prev => {
+      const newCategories = [...prev]
+      const groupTransportCategory = newCategories.find(cat => cat.id === 'group-transport')
+      if (groupTransportCategory) {
+        // 移除舊的 Local 報價項目
+        groupTransportCategory.items = groupTransportCategory.items.filter(
+          item => !item.name.startsWith('Local 報價')
+        )
+
+        // 新增 Local 報價項目（顯示用）
+        const newItem: CostItem = {
+          id: `local-${Date.now()}`,
+          name: 'Local 報價',
+          quantity: 1,
+          unit_price: currentLocalPrice,
+          total: 0, // 不參與計算，砍次表會單獨處理
+          note: `目前適用: $${currentLocalPrice.toLocaleString()}/人 | ${sortedTiers.map(t => `${t.participants}人=$${t.unitPrice.toLocaleString()}`).join(' / ')}`,
+        }
+        groupTransportCategory.items.push(newItem)
+      }
+      return newCategories
+    })
+
+    setTierPricings(newTierPricings)
+    toast.success(`Local 報價已套用，產生 ${newTierPricings.length} 個檻次`)
+  }, [totalParticipants, participantCounts, categories, sellingPrices, setCategories, setTierPricings])
   const [previewParticipantCounts, setPreviewParticipantCounts] =
     React.useState<ParticipantCounts | null>(null)
   const [previewSellingPrices, setPreviewSellingPrices] = React.useState<SellingPrices | null>(null)
@@ -474,7 +569,7 @@ export default function QuoteDetailPage() {
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-70 table-divider">
                         項目
                       </th>
-                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-16 table-divider">
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-20 table-divider">
                         數量
                       </th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-morandi-charcoal w-28 table-divider">
@@ -510,6 +605,7 @@ export default function QuoteDetailPage() {
                         handleRemoveItem={categoryOps.handleRemoveItem}
                         onOpenMealsImportDialog={handleOpenMealsImportDialog}
                         onOpenActivitiesImportDialog={handleOpenActivitiesImportDialog}
+                        onOpenLocalPricingDialog={category.id === 'group-transport' ? () => setShowLocalPricingDialog(true) : undefined}
                       />
                     ))}
                   </tbody>
@@ -592,6 +688,14 @@ export default function QuoteDetailPage() {
         onClose={() => setShowImportActivitiesDialog(false)}
         activities={syncOps.itineraryActivitiesData}
         onImport={handleImportActivities}
+      />
+
+      {/* Local 報價對話框 */}
+      <LocalPricingDialog
+        isOpen={showLocalPricingDialog}
+        onClose={() => setShowLocalPricingDialog(false)}
+        totalParticipants={totalParticipants}
+        onConfirm={handleLocalPricingConfirm}
       />
     </div>
   )

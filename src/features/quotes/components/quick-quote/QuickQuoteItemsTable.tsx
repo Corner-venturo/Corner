@@ -284,10 +284,10 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
     isComposingRef.current = true
   }, [])
 
-  // 儲存格樣式
-  const cellClass = "px-2 py-1.5 border border-morandi-gold/20"
-  const headerCellClass = "px-2 py-2 text-left font-medium text-morandi-secondary text-xs border border-morandi-gold/20 bg-morandi-container/30"
-  const inputClass = "w-full h-7 bg-transparent border-0 outline-none focus:ring-0 text-sm"
+  // 儲存格樣式（簡潔版，參考請款單）
+  const cellClass = "px-2 py-1.5"
+  const headerCellClass = "px-2 py-2 text-left font-medium text-morandi-secondary text-xs"
+  const inputClass = "input-no-focus w-full h-7 px-1 bg-transparent text-sm"
 
   return (
     <div className="space-y-3">
@@ -306,9 +306,9 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <table className="w-full text-sm border-collapse">
+          <table className="w-full text-sm">
             <thead>
-              <tr>
+              <tr className="border-b border-morandi-container/60">
                 {isEditing && <th className={`${headerCellClass} w-8`}></th>}
                 <th className={headerCellClass}>摘要</th>
                 <th className={`${headerCellClass} text-center w-20`}>數量</th>

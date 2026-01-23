@@ -8,6 +8,22 @@ import { alert, confirm } from '@/lib/ui/alert-dialog'
 import { convertPdfToImages, compressImage } from '../utils/passport-utils'
 import type { ProcessedFile } from './useMemberView'
 
+// 從 URL 提取檔名並刪除舊照片
+async function deleteOldPassportImage(oldUrl: string | null | undefined): Promise<void> {
+  if (!oldUrl) return
+  try {
+    const { supabase } = await import('@/lib/supabase/client')
+    const match = oldUrl.match(/passport-images\/(.+)$/)
+    if (match) {
+      const oldFileName = decodeURIComponent(match[1])
+      await supabase.storage.from('passport-images').remove([oldFileName])
+      logger.log(`已刪除舊護照照片: ${oldFileName}`)
+    }
+  } catch (error) {
+    logger.error('刪除舊護照照片失敗:', error)
+  }
+}
+
 interface UsePassportUploadProps {
   order_id: string
   workspace_id: string | null
@@ -153,12 +169,12 @@ export function usePassportUpload({
         const {
           passport_number = '',
           national_id = '',
-          date_of_birth = null,
+          birth_date = null,
           name = '',
         } = item.customer
         const cleanChineseName = name.replace(/\([^)]+\)$/, '').trim()
         const nameBirthKey =
-          cleanChineseName && date_of_birth ? `${cleanChineseName}|${date_of_birth}` : ''
+          cleanChineseName && birth_date ? `${cleanChineseName}|${birth_date}` : ''
 
         let existingMemberId: string | undefined
         let duplicateReason = ''
@@ -180,10 +196,10 @@ export function usePassportUpload({
             existingMemberId,
             newData: {
               name: cleanChineseName,
-              name_en: item.customer.passport_romanization || item.customer.english_name || '',
+              name_en: item.customer.passport_name || item.customer.english_name || '',
               passport_number,
-              passport_expiry: item.customer.passport_expiry_date || null,
-              birthday: date_of_birth,
+              passport_expiry: item.customer.passport_expiry || null,
+              birthday: birth_date,
               id_number: national_id,
               gender: item.customer.sex === '男' ? 'M' : item.customer.sex === '女' ? 'F' : null,
             },
@@ -196,7 +212,9 @@ export function usePassportUpload({
         let passport_image_url: string | null = null
         if (compressedFiles[i]) {
           const file = compressedFiles[i]
-          const fileName = `${workspace_id}/${order_id}/${Date.now()}_${i}.${file.name.split('.').pop() || 'jpg'}`
+          // 統一格式：passport_{timestamp}_{random}.jpg（根目錄）
+          const random = Math.random().toString(36).substring(2, 8)
+          const fileName = `passport_${Date.now()}_${random}.jpg`
           const { data: uploadData, error: uploadError } = await uploadPassportImage(fileName, file)
           if (uploadError) logger.error('護照照片上傳失敗:', uploadError)
           else passport_image_url = uploadData?.publicUrl || null
@@ -206,10 +224,10 @@ export function usePassportUpload({
           order_id,
           workspace_id,
           name: cleanChineseName,
-          name_en: item.customer.passport_romanization || item.customer.english_name || '',
+          name_en: item.customer.passport_name || item.customer.english_name || '',
           passport_number,
-          passport_expiry: item.customer.passport_expiry_date || null,
-          birthday: date_of_birth,
+          passport_expiry: item.customer.passport_expiry || null,
+          birthday: birth_date,
           id_number: national_id,
           gender: (item.customer.sex === '男'
             ? 'M'
@@ -237,9 +255,9 @@ export function usePassportUpload({
             (passport_number && c.passport_number === passport_number) ||
             (national_id && c.national_id === national_id) ||
             (cleanChineseName &&
-              date_of_birth &&
+              birth_date &&
               c.name?.replace(/\([^)]+\)$/, '').trim() === cleanChineseName &&
-              c.date_of_birth === date_of_birth)
+              c.birth_date === birth_date)
         )
 
         if (existingCustomer) {
@@ -254,11 +272,11 @@ export function usePassportUpload({
                 newPassportUrl: passport_image_url,
                 ocrData: {
                   passport_number,
-                  passport_romanization:
-                    item.customer.passport_romanization || item.customer.english_name || '',
-                  passport_expiry_date: item.customer.passport_expiry_date || null,
+                  passport_name:
+                    item.customer.passport_name || item.customer.english_name || '',
+                  passport_expiry: item.customer.passport_expiry || null,
                   national_id,
-                  date_of_birth,
+                  birth_date,
                 },
               })
             }
@@ -278,10 +296,16 @@ export function usePassportUpload({
         if (shouldReplace) {
           for (const dup of duplicateItems) {
             try {
+              // 先找出舊成員的護照圖片 URL
+              const oldMember = existingMembers.find((m) => m.id === dup.existingMemberId)
+              const oldPassportUrl = oldMember?.passport_image_url
+
               let passport_image_url: string | null = null
               if (compressedFiles[dup.fileIndex]) {
                 const file = compressedFiles[dup.fileIndex]
-                const fileName = `${workspace_id}/${order_id}/${Date.now()}_replace_${dup.fileIndex}.${file.name.split('.').pop() || 'jpg'}`
+                // 統一格式：passport_{timestamp}_{random}.jpg（根目錄）
+                const random = Math.random().toString(36).substring(2, 8)
+                const fileName = `passport_${Date.now()}_${random}.jpg`
                 const { data: uploadData, error: uploadError } = await uploadPassportImage(
                   fileName,
                   file
@@ -294,6 +318,12 @@ export function usePassportUpload({
                 ...dup.newData,
                 ...(passport_image_url ? { passport_image_url } : {}),
               } as Partial<Member>)
+
+              // 更新成功後刪除舊照片
+              if (passport_image_url) {
+                await deleteOldPassportImage(oldPassportUrl)
+              }
+
               replacedCount++
             } catch (err) {
               logger.error('替換成員資料失敗:', err)
@@ -314,18 +344,25 @@ export function usePassportUpload({
           const { updateCustomer } = await import('@/data')
           for (const item of customersToUpdate) {
             try {
+              // 先記錄舊的護照圖片 URL
+              const oldPassportUrl = item.customer.passport_image_url
+
               await updateCustomer(item.customer.id, {
                 passport_image_url: item.newPassportUrl,
                 passport_number:
                   (item.ocrData.passport_number as string) || item.customer.passport_number,
-                passport_romanization:
-                  (item.ocrData.passport_romanization as string) ||
-                  item.customer.passport_romanization,
-                passport_expiry_date:
-                  (item.ocrData.passport_expiry_date as string) ||
-                  item.customer.passport_expiry_date,
+                passport_name:
+                  (item.ocrData.passport_name as string) ||
+                  item.customer.passport_name,
+                passport_expiry:
+                  (item.ocrData.passport_expiry as string) ||
+                  item.customer.passport_expiry,
                 verification_status: 'unverified',
               })
+
+              // 更新成功後刪除舊照片
+              await deleteOldPassportImage(oldPassportUrl)
+
               customerUpdatedCount++
             } catch (err) {
               logger.error('更新顧客護照失敗:', err)

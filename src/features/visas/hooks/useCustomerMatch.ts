@@ -12,7 +12,7 @@ interface CustomerMatch {
     id: string
     name: string
     phone: string | null
-    date_of_birth: string | null
+    birth_date: string | null
     national_id: string | null
   }>
 }
@@ -23,9 +23,9 @@ interface NewCustomerForm {
   email: string
   national_id: string
   passport_number: string
-  passport_romanization: string
-  passport_expiry_date: string
-  date_of_birth: string
+  passport_name: string
+  passport_expiry: string
+  birth_date: string
   gender: string
   notes: string
   passport_image_url: string
@@ -46,9 +46,9 @@ export function useCustomerMatch() {
     email: '',
     national_id: '',
     passport_number: '',
-    passport_romanization: '',
-    passport_expiry_date: '',
-    date_of_birth: '',
+    passport_name: '',
+    passport_expiry: '',
+    birth_date: '',
     gender: '',
     notes: '',
     passport_image_url: '',
@@ -88,9 +88,9 @@ export function useCustomerMatch() {
       email: '',
       national_id: '',
       passport_number: '',
-      passport_romanization: '',
-      passport_expiry_date: '',
-      date_of_birth: '',
+      passport_name: '',
+      passport_expiry: '',
+      birth_date: '',
       gender: '',
       notes: '',
       passport_image_url: '',
@@ -154,10 +154,10 @@ export function useCustomerMatch() {
         email: newCustomerForm.email || null,
         national_id: newCustomerForm.national_id || null,
         passport_number: newCustomerForm.passport_number || null,
-        passport_romanization: newCustomerForm.passport_romanization || null,
-        passport_expiry_date: newCustomerForm.passport_expiry_date || null,
+        passport_name: newCustomerForm.passport_name || null,
+        passport_expiry: newCustomerForm.passport_expiry || null,
         passport_image_url: newCustomerForm.passport_image_url || null,
-        date_of_birth: newCustomerForm.date_of_birth || null,
+        birth_date: newCustomerForm.birth_date || null,
         gender: newCustomerForm.gender || null,
         notes: newCustomerForm.notes || null,
         source: 'other',
@@ -198,7 +198,7 @@ export function useCustomerMatch() {
     // 直接從 Supabase 查詢符合姓名的客戶
     const { data: matchedCustomers } = await supabase
       .from('customers')
-      .select('id, name, phone, date_of_birth, national_id')
+      .select('id, name, phone, birth_date, national_id')
       .in('name', namesToMatch)
 
     // 為每個人找同名的客戶
@@ -209,7 +209,7 @@ export function useCustomerMatch() {
           id: c.id,
           name: c.name,
           phone: c.phone,
-          date_of_birth: c.date_of_birth || null,
+          birth_date: c.birth_date || null,
           national_id: c.national_id || null,
         }))
 

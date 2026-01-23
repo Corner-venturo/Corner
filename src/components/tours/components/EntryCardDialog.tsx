@@ -27,8 +27,6 @@ interface EntryCardDialogProps {
   settings?: EntryCardSettings
   onOpenChange: (open: boolean) => void
   onSettingsChange?: (settings: EntryCardSettings) => void
-  /** 是否為嵌套 Dialog（從其他 Dialog 打開時設為 true） */
-  nested?: boolean
 }
 
 const defaultSettings: EntryCardSettings = {
@@ -45,7 +43,6 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
   settings: externalSettings,
   onOpenChange,
   onSettingsChange: externalOnSettingsChange,
-  nested = false,
 }) => {
   // Use internal state if no external settings provided
   const [internalSettings, setInternalSettings] = useState<EntryCardSettings>(defaultSettings)
@@ -53,7 +50,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
   const onSettingsChange = externalOnSettingsChange ?? setInternalSettings
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent nested={nested} className="max-w-[95vw] max-h-[95vh] overflow-auto">
+      <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
         <div className="no-print flex items-center justify-between mb-4">
           <DialogHeader>
             <DialogTitle>列印日本入境卡</DialogTitle>

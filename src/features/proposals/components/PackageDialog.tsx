@@ -153,7 +153,6 @@ export function PackageDialog({
       submitLabel={mode === 'create' ? '建立' : '儲存'}
       loading={submitting}
       maxWidth="md"
-      nested
     >
       <div className="space-y-4">
         <div>

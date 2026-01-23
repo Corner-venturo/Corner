@@ -13,8 +13,26 @@ import type {
   DailyTimeSlot,
   SchedulingConfig,
   AttractionWithDistance,
+  AccommodationPlan,
+  ItineraryStyle,
 } from './types'
 import { DEFAULT_SCHEDULING_CONFIG } from './types'
+
+// 風格對應的每日景點數量
+const STYLE_ATTRACTIONS_PER_DAY: Record<ItineraryStyle, { min: number; max: number }> = {
+  relax: { min: 2, max: 3 },
+  adventure: { min: 3, max: 5 },
+  culture: { min: 2, max: 4 },
+  food: { min: 3, max: 4 },
+}
+
+// 風格對應的景點類型優先順序
+const STYLE_CATEGORY_PRIORITY: Record<ItineraryStyle, string[]> = {
+  relax: ['景點', '咖啡廳', '公園', '溫泉'],
+  adventure: ['戶外', '自然', '體驗', '景點'],
+  culture: ['寺廟', '神社', '博物館', '古蹟', '景點'],
+  food: ['餐廳', '市場', '小吃', '景點'],
+}
 import {
   optimizeAttractionOrder,
   calculateDistancesBetweenAttractions,
@@ -228,6 +246,72 @@ function generateRecommendations(activities: DailyActivity[]): string[] {
 }
 
 /**
+ * 根據住宿安排計算每天屬於哪個城市
+ * 返回 dayNumber -> cityId 的映射
+ */
+function calculateDailyCityMapping(
+  numDays: number,
+  accommodations: AccommodationPlan[] | undefined,
+  defaultCityId: string
+): Map<number, { cityId: string; cityName: string }> {
+  const mapping = new Map<number, { cityId: string; cityName: string }>()
+
+  if (!accommodations || accommodations.length === 0) {
+    // 沒有住宿安排，全部使用預設城市
+    for (let day = 1; day <= numDays; day++) {
+      mapping.set(day, { cityId: defaultCityId, cityName: '' })
+    }
+    return mapping
+  }
+
+  // 根據住宿安排分配每天的城市
+  let currentDay = 1
+  for (const acc of accommodations) {
+    // 每個城市住 N 晚，對應 N+1 天的行程（住宿當晚 + 第二天整天）
+    // 但最後一個城市只算住宿晚數
+    for (let i = 0; i < acc.nights && currentDay <= numDays; i++) {
+      mapping.set(currentDay, { cityId: acc.cityId, cityName: acc.cityName })
+      currentDay++
+    }
+  }
+
+  // 如果還有剩餘天數，使用最後一個城市
+  const lastCity = accommodations[accommodations.length - 1]
+  while (currentDay <= numDays) {
+    mapping.set(currentDay, { cityId: lastCity.cityId, cityName: lastCity.cityName })
+    currentDay++
+  }
+
+  return mapping
+}
+
+/**
+ * 根據風格篩選和排序景點
+ */
+function filterAndSortByStyle(
+  attractions: Attraction[],
+  style: ItineraryStyle | undefined
+): Attraction[] {
+  if (!style) return attractions
+
+  const priorities = STYLE_CATEGORY_PRIORITY[style]
+
+  // 根據優先順序排序
+  return [...attractions].sort((a, b) => {
+    const aCategory = a.category || '其他'
+    const bCategory = b.category || '其他'
+
+    const aPriority = priorities.findIndex(p => aCategory.includes(p))
+    const bPriority = priorities.findIndex(p => bCategory.includes(p))
+
+    const aScore = aPriority === -1 ? 999 : aPriority
+    const bScore = bPriority === -1 ? 999 : bPriority
+
+    return aScore - bScore
+  })
+}
+
+/**
  * 主要生成函數
  */
 export async function generateItinerary(
@@ -246,35 +330,75 @@ export async function generateItinerary(
     config
   )
 
-  // 2. 篩選並優化景點順序
-  const cityAttractions = attractions.filter(
-    a => a.city_id === request.cityId && a.is_active
+  // 2. 計算每天屬於哪個城市
+  const dailyCityMapping = calculateDailyCityMapping(
+    request.numDays,
+    request.accommodations,
+    request.cityId
   )
 
-  if (cityAttractions.length === 0) {
-    warnings.push('資料庫中沒有此城市的景點資料，建議放慢腳步享受旅程')
+  // 3. 收集所有涉及的城市 ID
+  const involvedCityIds = new Set<string>()
+  involvedCityIds.add(request.cityId) // 入境城市
+  if (request.accommodations) {
+    request.accommodations.forEach(acc => involvedCityIds.add(acc.cityId))
   }
 
-  // 3. 優化景點順序
-  const optimizedAttractions = optimizeAttractionOrder(cityAttractions)
+  // 4. 按城市分組景點
+  const attractionsByCity = new Map<string, AttractionWithDistance[]>()
+  for (const cityId of involvedCityIds) {
+    let cityAttractions = attractions.filter(
+      a => a.city_id === cityId && a.is_active
+    )
 
-  // 4. 計算景點間的距離和車程
-  const attractionsWithDistance = calculateDistancesBetweenAttractions(
-    optimizedAttractions,
-    undefined,
-    undefined,
-    config
-  )
+    // 根據風格篩選和排序
+    cityAttractions = filterAndSortByStyle(cityAttractions, request.style)
 
-  // 5. 分配景點到每天
+    // 優化景點順序
+    const optimized = optimizeAttractionOrder(cityAttractions)
+
+    // 計算距離
+    const withDistance = calculateDistancesBetweenAttractions(
+      optimized,
+      undefined,
+      undefined,
+      config
+    )
+
+    attractionsByCity.set(cityId, withDistance)
+  }
+
+  // 5. 檢查景點數量
+  let totalAttractionsInDb = 0
+  for (const [cityId, cityAttractions] of attractionsByCity) {
+    totalAttractionsInDb += cityAttractions.length
+    if (cityAttractions.length === 0) {
+      const cityName = request.accommodations?.find(a => a.cityId === cityId)?.cityName || '目的地'
+      warnings.push(`${cityName}的景點資料較少，建議放慢腳步享受旅程`)
+    }
+  }
+
+  // 6. 分配景點到每天（根據住宿城市）
   const dailyItinerary: DailyItineraryDay[] = []
-  let attractionPointer = 0
+  const cityAttractionPointers = new Map<string, number>() // 追蹤每個城市用到第幾個景點
   let totalAttractionsUsed = 0
   let suggestedRelaxDays = 0
 
+  // 根據風格決定每天景點數量
+  const styleConfig = request.style ? STYLE_ATTRACTIONS_PER_DAY[request.style] : { min: 2, max: 4 }
+
   for (const slot of timeSlots) {
+    // 取得這一天的城市
+    const dayCity = dailyCityMapping.get(slot.dayNumber)
+    const cityId = dayCity?.cityId || request.cityId
+    const cityName = dayCity?.cityName || ''
+
+    // 取得該城市的景點
+    const cityAttractions = attractionsByCity.get(cityId) || []
+    const pointer = cityAttractionPointers.get(cityId) || 0
+
     // 取得這一天可用的景點
-    const availableAttractions = attractionsWithDistance.slice(attractionPointer)
+    const availableAttractions = cityAttractions.slice(pointer)
 
     const { itinerary, usedAttractions } = generateDailyItinerary(
       slot,
@@ -282,8 +406,13 @@ export async function generateItinerary(
       config
     )
 
+    // 更新住宿資訊
+    if (cityName && !slot.isLastDay) {
+      itinerary.accommodation = `${cityName}精選飯店`
+    }
+
     dailyItinerary.push(itinerary)
-    attractionPointer += usedAttractions
+    cityAttractionPointers.set(cityId, pointer + usedAttractions)
     totalAttractionsUsed += usedAttractions
 
     // 檢查是否建議放鬆（景點不足）
@@ -292,22 +421,30 @@ export async function generateItinerary(
     }
   }
 
-  // 6. 計算總時間
+  // 7. 計算總時間
   let totalDuration = 0
-  for (const attraction of attractionsWithDistance.slice(0, totalAttractionsUsed)) {
-    totalDuration += attraction.duration_minutes || DEFAULT_ATTRACTION_DURATION
-    if (attraction.travelTimeMinutes) {
-      totalDuration += attraction.travelTimeMinutes
+  for (const [, cityAttractions] of attractionsByCity) {
+    const pointer = cityAttractionPointers.get(cityAttractions[0]?.city_id || '') || 0
+    for (const attraction of cityAttractions.slice(0, pointer)) {
+      totalDuration += attraction.duration_minutes || DEFAULT_ATTRACTION_DURATION
+      if (attraction.travelTimeMinutes) {
+        totalDuration += attraction.travelTimeMinutes
+      }
     }
   }
 
-  // 7. 生成警告
+  // 8. 生成警告
   if (totalAttractionsUsed < request.numDays * 2) {
-    warnings.push(`此城市景點較少，部分天數建議自由探索`)
+    warnings.push(`景點較少，部分天數建議自由探索`)
   }
 
-  if (attractionPointer < attractionsWithDistance.length) {
-    warnings.push(`還有 ${attractionsWithDistance.length - attractionPointer} 個景點未能安排，可考慮延長行程`)
+  // 檢查住宿安排
+  if (request.accommodations && request.accommodations.length > 0) {
+    const totalNights = request.accommodations.reduce((sum, a) => sum + a.nights, 0)
+    const expectedNights = request.numDays - 1
+    if (totalNights !== expectedNights) {
+      warnings.push(`住宿晚數（${totalNights}）與行程夜數（${expectedNights}）不符`)
+    }
   }
 
   return {
@@ -316,7 +453,7 @@ export async function generateItinerary(
     stats: {
       totalAttractions: totalAttractionsUsed,
       totalDuration,
-      attractionsInDb: cityAttractions.length,
+      attractionsInDb: totalAttractionsInDb,
       suggestedRelaxDays,
     },
     warnings,

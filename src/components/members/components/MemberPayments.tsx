@@ -57,11 +57,11 @@ export function MemberPayments({
                 >
                   <td className="px-3 py-3 font-medium text-primary">{customer.name}</td>
                   <td className="px-3 py-3 text-muted-foreground">
-                    {customer.passport_romanization || '-'}
+                    {customer.passport_name || '-'}
                   </td>
                   <td className="px-3 py-3 font-mono text-xs">{customer.national_id || '-'}</td>
                   <td className="px-3 py-3 font-mono text-xs">{customer.passport_number || '-'}</td>
-                  <td className="px-3 py-3">{customer.date_of_birth || '-'}</td>
+                  <td className="px-3 py-3">{customer.birth_date || '-'}</td>
                   <td className="px-3 py-3">
                     {customer.gender === 'M' ? '男' : customer.gender === 'F' ? '女' : '-'}
                   </td>

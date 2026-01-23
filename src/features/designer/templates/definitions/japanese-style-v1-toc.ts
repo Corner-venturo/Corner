@@ -65,9 +65,9 @@ interface TocItem {
   icon?: string // 圖標 ID（用於自訂目錄）
 }
 
-// 計算目錄項目（支援用戶自訂的 tocContent）
+// 計算目錄項目（支援用戶自訂的 tocContent 或 tocItems）
 function calculateTocItems(data: TemplateData): TocItem[] {
-  // 如果有用戶自訂的 tocContent，優先使用
+  // 優先使用 tocContent（模板格式）
   const customTocContent = data.tocContent as TocContentItem[] | undefined
   if (customTocContent && customTocContent.length > 0) {
     return customTocContent.map((item, index) => ({
@@ -79,73 +79,32 @@ function calculateTocItems(data: TemplateData): TocItem[] {
     }))
   }
 
-  // 否則使用自動計算的模式
-  const items: TocItem[] = []
-  let currentPage = 3 // 封面=1, 目錄=2, 從第3頁開始
-
-  // 行程總覽
-  items.push({
-    number: '01',
-    title: '行程總覽',
-    description: '航班資訊、集合地點、每日行程概要',
-    pageNumber: currentPage,
-  })
-  currentPage += 1
-
-  // 每日行程
-  const dailyCount = data.dailyDetails?.length || 3
-  if (dailyCount > 0) {
-    items.push({
-      number: String(items.length + 1).padStart(2, '0'),
-      title: '每日行程',
-      description: `第一天至第${dailyCount}天的詳細行程安排`,
-      pageNumber: currentPage,
-    })
-    currentPage += dailyCount
+  // 其次使用 tocItems（側邊欄編輯器格式）
+  // 這是側邊欄 TocEditor 存儲的格式
+  interface SidebarTocItem {
+    pageId: string
+    displayName: string
+    icon: string
+    enabled: boolean
+    pageNumber: number
+  }
+  const tocItems = data.tocItems as SidebarTocItem[] | undefined
+  if (tocItems && tocItems.length > 0) {
+    // 只顯示啟用的項目
+    return tocItems
+      .filter(item => item.enabled)
+      .map((item, index) => ({
+        number: String(index + 1).padStart(2, '0'),
+        title: item.displayName,
+        description: '', // 使用側邊欄編輯時不顯示描述
+        pageNumber: item.pageNumber,
+        icon: item.icon,
+      }))
   }
 
-  // 飯店介紹
-  const hotelCount = data.hotels?.filter(h => h.enabled !== false)?.length || 0
-  if (hotelCount > 0) {
-    items.push({
-      number: String(items.length + 1).padStart(2, '0'),
-      title: '住宿介紹',
-      description: `${hotelCount} 間精選飯店的特色與設施`,
-      pageNumber: currentPage,
-    })
-    currentPage += hotelCount
-  }
-
-  // 景點介紹
-  const attractionCount = data.attractions?.filter(a => a.enabled !== false)?.length || 0
-  if (attractionCount > 0) {
-    const attractionPages = Math.ceil(attractionCount / 2) // 每頁 2 個景點
-    items.push({
-      number: String(items.length + 1).padStart(2, '0'),
-      title: '景點介紹',
-      description: `${attractionCount} 個精選景點的特色與資訊`,
-      pageNumber: currentPage,
-    })
-    currentPage += attractionPages
-  }
-
-  // 備忘錄
-  const memoEnabled = data.memoSettings?.items?.some(i => i.enabled)
-  if (memoEnabled) {
-    const memoItemCount = data.memoSettings?.items?.filter(i => i.enabled)?.length || 0
-    const memoPages = Math.ceil(memoItemCount / 6) + (data.memoSettings?.seasons?.some(s => s.enabled) ? 1 : 0)
-    items.push({
-      number: String(items.length + 1).padStart(2, '0'),
-      title: '旅遊提醒',
-      description: '行前注意事項、禮儀須知、緊急聯絡',
-      pageNumber: currentPage,
-    })
-    currentPage += memoPages
-  }
-
-  // 注意：已移除「旅行筆記」固定項目，因為沒有對應的實際頁面
-
-  return items
+  // 沒有設定任何目錄項目時，返回空陣列（不自動生成）
+  // 用戶需要透過側邊欄「載入頁面列表」來初始化目錄
+  return []
 }
 
 export const japaneseStyleV1Toc: PageTemplate = {
@@ -153,7 +112,7 @@ export const japaneseStyleV1Toc: PageTemplate = {
   name: '日系風格 - 目錄',
   description: '優雅的目錄頁面，自動列出所有章節與頁碼',
   thumbnailUrl: '/templates/japanese-style-v1-toc.png',
-  category: 'general',
+  category: 'toc',
 
   generateElements: (data: TemplateData): CanvasElement[] => {
     zIndexCounter = 0

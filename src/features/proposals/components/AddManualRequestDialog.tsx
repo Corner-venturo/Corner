@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { X, Save, Loader2 } from 'lucide-react'
+import { X, Save, Loader2, Search } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuthStore } from '@/stores'
 import { useToast } from '@/components/ui/use-toast'
@@ -36,6 +36,9 @@ import {
   WORKSPACE_TYPE_CONFIG,
   type WorkspaceType,
 } from '@/hooks/useSupplierWorkspaces'
+import { RestaurantSelector, type CombinedRestaurant } from '@/components/editor/RestaurantSelector'
+import { HotelSelector } from '@/components/editor/hotel-selector'
+import { AttractionSelector } from '@/components/editor/attraction-selector'
 
 // 需求類別
 const CATEGORIES = [
@@ -83,7 +86,19 @@ export function AddManualRequestDialog({
     quantity: 1,
     description: '',
     recipientWorkspaceId: '', // 跨公司需求單：指定供應商 workspace
+    // 資源關聯欄位
+    resourceType: '' as '' | 'restaurant' | 'hotel' | 'attraction',
+    resourceId: '',
+    resourceName: '', // 用於顯示
+    latitude: null as number | null,
+    longitude: null as number | null,
+    googleMapsUrl: '',
   })
+
+  // 資源選擇器狀態
+  const [showRestaurantSelector, setShowRestaurantSelector] = useState(false)
+  const [showHotelSelector, setShowHotelSelector] = useState(false)
+  const [showAttractionSelector, setShowAttractionSelector] = useState(false)
 
   // 取得對應類別的供應商 workspace
   const supplierType = getCategorySupplierType(formData.category)
@@ -102,8 +117,85 @@ export function AddManualRequestDialog({
       quantity: 1,
       description: '',
       recipientWorkspaceId: '',
+      resourceType: '',
+      resourceId: '',
+      resourceName: '',
+      latitude: null,
+      longitude: null,
+      googleMapsUrl: '',
     })
+    setShowRestaurantSelector(false)
+    setShowHotelSelector(false)
+    setShowAttractionSelector(false)
   }, [startDate])
+
+  // 處理餐廳選擇
+  const handleRestaurantSelect = useCallback((restaurants: CombinedRestaurant[]) => {
+    if (restaurants.length === 0) return
+    const restaurant = restaurants[0]
+    setFormData(prev => ({
+      ...prev,
+      resourceType: 'restaurant',
+      resourceId: restaurant.id,
+      resourceName: restaurant.name,
+      title: prev.title || restaurant.name,
+      supplierName: prev.supplierName || restaurant.name,
+      latitude: restaurant.latitude,
+      longitude: restaurant.longitude,
+      googleMapsUrl: restaurant.google_maps_url || '',
+    }))
+    setShowRestaurantSelector(false)
+  }, [])
+
+  // 處理飯店選擇
+  const handleHotelSelect = useCallback((hotels: Array<{
+    id: string
+    name: string
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    google_maps_url?: string | null
+  }>) => {
+    if (hotels.length === 0) return
+    const hotel = hotels[0]
+    setFormData(prev => ({
+      ...prev,
+      resourceType: 'hotel',
+      resourceId: hotel.id,
+      resourceName: hotel.name,
+      title: prev.title || hotel.name,
+      supplierName: prev.supplierName || hotel.name,
+      latitude: hotel.latitude ?? null,
+      longitude: hotel.longitude ?? null,
+      googleMapsUrl: hotel.google_maps_url || '',
+    }))
+    setShowHotelSelector(false)
+  }, [])
+
+  // 處理景點選擇
+  const handleAttractionSelect = useCallback((attractions: Array<{
+    id: string
+    name: string
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    google_maps_url?: string | null
+  }>) => {
+    if (attractions.length === 0) return
+    const attraction = attractions[0]
+    setFormData(prev => ({
+      ...prev,
+      resourceType: 'attraction',
+      resourceId: attraction.id,
+      resourceName: attraction.name,
+      title: prev.title || attraction.name,
+      supplierName: prev.supplierName || attraction.name,
+      latitude: attraction.latitude ?? null,
+      longitude: attraction.longitude ?? null,
+      googleMapsUrl: attraction.google_maps_url || '',
+    }))
+    setShowAttractionSelector(false)
+  }, [])
 
   // 儲存需求
   const handleSave = useCallback(async () => {
@@ -141,6 +233,12 @@ export function AddManualRequestDialog({
         // 跨公司需求：指定供應商 workspace
         recipient_workspace_id: formData.recipientWorkspaceId || null,
         response_status: formData.recipientWorkspaceId ? 'pending' : null,
+        // 資源關聯（餐廳/飯店/景點）
+        resource_type: formData.resourceType || null,
+        resource_id: formData.resourceId || null,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        google_maps_url: formData.googleMapsUrl || null,
         // 狀態
         status: 'draft',
         handler_type: formData.recipientWorkspaceId ? 'external' : 'internal',
@@ -172,6 +270,7 @@ export function AddManualRequestDialog({
   }, [resetForm, onClose])
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className={DIALOG_SIZES.md}>
         <DialogHeader>
@@ -236,6 +335,54 @@ export function AddManualRequestDialog({
               </Select>
               <p className="text-xs text-morandi-secondary">
                 選擇後，需求單將發送給該供應商，供應商可在系統中回覆派車/派人
+              </p>
+            </div>
+          )}
+
+          {/* 資源選擇（餐廳/飯店/景點）- 只在對應類別時顯示 */}
+          {(formData.category === 'restaurant' || formData.category === 'hotel' || formData.category === 'activity') && (
+            <div className="space-y-2">
+              <Label>從資料庫選擇</Label>
+              <div className="flex items-center gap-2">
+                {formData.resourceName ? (
+                  <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
+                    <span className="text-sm">{formData.resourceName}</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        resourceType: '',
+                        resourceId: '',
+                        resourceName: '',
+                        latitude: null,
+                        longitude: null,
+                        googleMapsUrl: '',
+                      }))}
+                      className="ml-auto text-morandi-secondary hover:text-morandi-red"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (formData.category === 'restaurant') setShowRestaurantSelector(true)
+                      else if (formData.category === 'hotel') setShowHotelSelector(true)
+                      else if (formData.category === 'activity') setShowAttractionSelector(true)
+                    }}
+                    className="gap-2"
+                  >
+                    <Search size={16} />
+                    {formData.category === 'restaurant' && '選擇餐廳'}
+                    {formData.category === 'hotel' && '選擇飯店'}
+                    {formData.category === 'activity' && '選擇景點'}
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-morandi-secondary">
+                選擇後會自動帶入名稱及 GPS 資訊
               </p>
             </div>
           )}
@@ -320,5 +467,27 @@ export function AddManualRequestDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* 餐廳選擇器 */}
+    <RestaurantSelector
+      isOpen={showRestaurantSelector}
+      onClose={() => setShowRestaurantSelector(false)}
+      onSelect={handleRestaurantSelect}
+    />
+
+    {/* 飯店選擇器 */}
+    <HotelSelector
+      isOpen={showHotelSelector}
+      onClose={() => setShowHotelSelector(false)}
+      onSelect={handleHotelSelect}
+    />
+
+    {/* 景點選擇器 */}
+    <AttractionSelector
+      isOpen={showAttractionSelector}
+      onClose={() => setShowAttractionSelector(false)}
+      onSelect={handleAttractionSelect}
+    />
+    </>
   )
 }

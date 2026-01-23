@@ -59,7 +59,7 @@ export function CustomerDetailDialog({
             <div>
               <label className="text-xs text-morandi-primary">生日</label>
               <DateCell
-                date={customer.date_of_birth}
+                date={customer.birth_date}
                 showIcon={false}
               />
             </div>
@@ -71,12 +71,12 @@ export function CustomerDetailDialog({
             </div>
             <div>
               <label className="text-xs text-morandi-primary">護照拼音</label>
-              <div className="font-mono">{customer.passport_romanization || '-'}</div>
+              <div className="font-mono">{customer.passport_name || '-'}</div>
             </div>
             <div>
               <label className="text-xs text-morandi-primary">護照效期</label>
               <DateCell
-                date={customer.passport_expiry_date}
+                date={customer.passport_expiry}
                 showIcon={false}
               />
             </div>

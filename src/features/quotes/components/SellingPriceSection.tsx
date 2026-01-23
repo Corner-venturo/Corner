@@ -132,18 +132,18 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
       {/* 主要售價表格 */}
       <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-morandi-container/40 border-b border-border/60">
+          <thead className="border-b border-morandi-container/60">
             <tr>
-              <th className="text-left py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border">
+              <th className="text-left py-3 px-4 text-sm font-medium text-morandi-secondary">
                 身份
               </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border">
+              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
                 成本
               </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary border-r border-border">
+              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
                 售價
               </th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-primary">
+              <th className="text-center py-3 px-4 text-sm font-medium text-morandi-secondary">
                 利潤
               </th>
             </tr>
@@ -194,8 +194,8 @@ export const SellingPriceSection: React.FC<SellingPriceSectionProps> = ({
             {accommodationSummary.length > 1 &&
               accommodationSummary.slice(1).map(room => (
                 <React.Fragment key={room.name}>
-                  <tr className="bg-morandi-container/20 border-b border-border/40">
-                    <td colSpan={4} className="py-2 px-3 text-xs font-medium text-morandi-primary">
+                  <tr className="border-b border-morandi-container/60">
+                    <td colSpan={4} className="py-2 px-3 text-xs font-medium text-morandi-secondary">
                       {room.name}
                     </td>
                   </tr>

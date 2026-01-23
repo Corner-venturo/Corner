@@ -16,7 +16,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown, Wand2, Sparkles, Eye, Edit2, Printer } from 'lucide-react'
+import { FileText, Loader2, Save, AlertCircle, X, Plane, Search, Trash2, FilePlus, History, ChevronDown, Wand2, Sparkles, Eye, Edit2, Printer, Clock, Plus } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,11 +32,11 @@ import { dynamicFrom } from '@/lib/supabase/typed-client'
 import type { Json } from '@/lib/supabase/types'
 import type { Itinerary, ItineraryVersionRecord } from '@/stores/types'
 import type { ProposalPackage, Proposal } from '@/types/proposal.types'
+import type { Activity } from '@/components/editor/tour-form/types'
 import { logger } from '@/lib/utils/logger'
 import { alert } from '@/lib/ui/alert-dialog'
 import { stripHtml } from '@/lib/utils/string-utils'
 import { syncItineraryToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { useCities, type City } from '@/data'
 import { isFeatureAvailable } from '@/lib/feature-restrictions'
 import { toast } from 'sonner'
 
@@ -111,11 +111,20 @@ export function PackageItineraryDialog({
   // AI 排行程狀態
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
   const [aiGenerating, setAiGenerating] = useState(false)
-  const [aiCityId, setAiCityId] = useState<string>('')
   const [aiArrivalTime, setAiArrivalTime] = useState('11:00')
   const [aiDepartureTime, setAiDepartureTime] = useState('14:00')
-  const { items: cities, loading: citiesLoading } = useCities()
+  const [aiTheme, setAiTheme] = useState<string>('classic')
   const showAiGenerate = isFeatureAvailable('ai_suggest', currentUser?.workspace_code)
+
+  // AI 主題選項
+  const AI_THEMES = [
+    { value: 'classic', label: '經典景點', description: '必訪名勝、熱門打卡點' },
+    { value: 'foodie', label: '美食探索', description: '在地美食、特色餐廳' },
+    { value: 'culture', label: '文青之旅', description: '文化體驗、藝術展覽' },
+    { value: 'nature', label: '自然風光', description: '山林步道、自然景觀' },
+    { value: 'family', label: '親子同樂', description: '適合全家的輕鬆行程' },
+    { value: 'relax', label: '悠閒慢旅', description: '不趕行程、深度體驗' },
+  ]
 
   // 追蹤是否已初始化每日行程（防止無限迴圈）
   const hasInitializedDailyScheduleRef = React.useRef(false)
@@ -211,6 +220,14 @@ export function PackageItineraryDialog({
     return Math.max(1, Math.min(diffDays, 30))
   }
 
+  // 簡化版活動類型（只包含時間軸需要的欄位）
+  interface SimpleActivity {
+    id: string
+    title: string
+    startTime?: string  // 格式 "0900"
+    endTime?: string    // 格式 "1030"
+  }
+
   const [dailySchedule, setDailySchedule] = useState<Array<{
     day: number
     route: string
@@ -218,7 +235,13 @@ export function PackageItineraryDialog({
     accommodation: string
     sameAsPrevious: boolean
     hotelBreakfast: boolean
+    activities?: SimpleActivity[]  // 時間軸活動
   }>>([])
+
+  // 時間軸模式切換
+  const [isTimelineMode, setIsTimelineMode] = useState(false)
+  // 時間軸模式下選中的天數（分頁用）
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0)
 
   // 從行程表或版本記錄載入每日行程（直接函數，不用 useCallback）
   const loadDailyDataFromItinerary = (
@@ -233,6 +256,7 @@ export function PackageItineraryDialog({
       title?: string
       meals?: { breakfast?: string; lunch?: string; dinner?: string }
       accommodation?: string
+      activities?: Array<{ id?: string; title?: string; startTime?: string; endTime?: string }>
     }>
 
     let dailyData: DailyData | null = null
@@ -252,6 +276,13 @@ export function PackageItineraryDialog({
         if (idx > 0 && dailyData![idx - 1]?.accommodation) {
           sameAsPrevious = day.accommodation === dailyData![idx - 1].accommodation
         }
+        // 載入活動（如果有的話）
+        const activities = (day.activities || []).map((act, actIdx) => ({
+          id: act.id || `activity-${idx}-${actIdx}`,
+          title: act.title || '',
+          startTime: act.startTime || '',
+          endTime: act.endTime || '',
+        }))
         return {
           day: idx + 1,
           route: day.title || '',
@@ -263,9 +294,14 @@ export function PackageItineraryDialog({
           accommodation: sameAsPrevious ? '' : (day.accommodation || ''),
           sameAsPrevious,
           hotelBreakfast: isHotelBreakfast,
+          activities: activities.length > 0 ? activities : undefined,
         }
       })
       setDailySchedule(loadedSchedule)
+      // 如果有任何一天有活動，自動開啟時間軸模式
+      if (loadedSchedule.some(d => d.activities && d.activities.length > 0)) {
+        setIsTimelineMode(true)
+      }
     } else {
       // 使用傳入的天數初始化
       setDailySchedule(Array.from({ length: days }, (_, i) => ({
@@ -275,6 +311,7 @@ export function PackageItineraryDialog({
         accommodation: '',
         sameAsPrevious: false,
         hotelBreakfast: false,
+        activities: undefined,
       })))
     }
 
@@ -309,10 +346,11 @@ export function PackageItineraryDialog({
           accommodation: '',
           sameAsPrevious: false,
           hotelBreakfast: false,
+          activities: undefined,
         })))
       }
     }
-   
+
   }, [isDataLoading, isOpen, directLoadedItinerary])
 
   // 處理版本切換
@@ -340,6 +378,53 @@ export function PackageItineraryDialog({
           ...newSchedule[index],
           meals: { ...newSchedule[index].meals, [mealType]: value as string }
         }
+      }
+      return newSchedule
+    })
+  }
+
+  // 時間軸模式：新增活動
+  const addActivity = (dayIndex: number) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const activities = newSchedule[dayIndex].activities || []
+      const newActivity: SimpleActivity = {
+        id: `activity-${dayIndex}-${Date.now()}`,
+        title: '',
+        startTime: '',
+        endTime: '',
+      }
+      newSchedule[dayIndex] = {
+        ...newSchedule[dayIndex],
+        activities: [...activities, newActivity],
+      }
+      return newSchedule
+    })
+  }
+
+  // 時間軸模式：移除活動
+  const removeActivity = (dayIndex: number, activityIndex: number) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const activities = [...(newSchedule[dayIndex].activities || [])]
+      activities.splice(activityIndex, 1)
+      newSchedule[dayIndex] = {
+        ...newSchedule[dayIndex],
+        activities: activities.length > 0 ? activities : undefined,
+      }
+      return newSchedule
+    })
+  }
+
+  // 時間軸模式：更新活動
+  const updateActivity = (dayIndex: number, activityIndex: number, field: keyof SimpleActivity, value: string) => {
+    setDailySchedule(prev => {
+      const newSchedule = [...prev]
+      const activities = [...(newSchedule[dayIndex].activities || [])]
+      activities[activityIndex] = { ...activities[activityIndex], [field]: value }
+      newSchedule[dayIndex] = {
+        ...newSchedule[dayIndex],
+        activities,
       }
       return newSchedule
     })
@@ -435,25 +520,64 @@ export function PackageItineraryDialog({
     setReturnFlightNumber('')
   }
 
-  // 打開 AI 排行程對話框
-  const openAiDialog = useCallback(() => {
-    // SWR 自動載入 cities，不需要手動 fetch
-    // 嘗試根據目的地找到城市 ID
-    if (pkg.destination && cities.length > 0) {
-      const matchedCity = cities.find(
-        (c: City) => c.name === pkg.destination || c.name?.includes(pkg.destination || '')
-      )
-      if (matchedCity) {
-        setAiCityId(matchedCity.id)
+  // 檢查住宿是否填寫完整（AI 排行程前置條件）
+  const getAccommodationStatus = useCallback(() => {
+    const requiredDays = dailySchedule.length - 1 // 最後一天不需要住宿
+    let filledCount = 0
+    const accommodations: string[] = []
+
+    for (let i = 0; i < requiredDays; i++) {
+      const day = dailySchedule[i]
+      if (day.accommodation || day.sameAsPrevious) {
+        filledCount++
+        // 取得實際住宿名稱
+        if (day.sameAsPrevious) {
+          accommodations.push(accommodations[accommodations.length - 1] || '')
+        } else {
+          accommodations.push(day.accommodation)
+        }
+      } else {
+        accommodations.push('')
       }
     }
+
+    return {
+      isComplete: filledCount >= requiredDays,
+      filledCount,
+      requiredDays,
+      accommodations,
+    }
+  }, [dailySchedule])
+
+  // 打開 AI 排行程對話框
+  const openAiDialog = useCallback(() => {
+    // 移除住宿檢查限制，改為在 AI 對話框中讓用戶選擇住宿城市
+    // const status = getAccommodationStatus()
+    // if (!status.isComplete) {
+    //   toast.error(`請先填寫住宿（已填 ${status.filledCount}/${status.requiredDays} 天）`)
+    //   return
+    // }
+
+    // 嘗試從航班帶入時間
+    if (formData.outboundFlight?.arrivalTime) {
+      setAiArrivalTime(formData.outboundFlight.arrivalTime)
+    }
+    if (formData.returnFlight?.departureTime) {
+      setAiDepartureTime(formData.returnFlight.departureTime)
+    }
+
     setAiDialogOpen(true)
-  }, [cities, pkg.destination])
+  }, [formData.outboundFlight?.arrivalTime, formData.returnFlight?.departureTime])
 
   // AI 排行程生成
   const handleAiGenerate = useCallback(async () => {
-    if (!aiCityId) {
-      toast.error('請選擇城市')
+    // 取得目的地：優先使用 destination，其次是 main_city_id 或 country_id
+    const destinationName = pkg.destination || ''
+    const cityId = pkg.main_city_id || ''
+    const countryId = pkg.country_id || ''
+
+    if (!destinationName && !cityId && !countryId) {
+      toast.error('請先設定目的地')
       return
     }
     if (!pkg.start_date) {
@@ -461,46 +585,79 @@ export function PackageItineraryDialog({
       return
     }
 
+    // 移除住宿檢查限制，改為可選
+    const status = getAccommodationStatus()
+
     setAiGenerating(true)
     try {
       const numDays = dailySchedule.length
+
+      // Debug: 顯示發送的資料
+      console.log('[AI Generate] Request:', {
+        destination: destinationName,
+        cityId,
+        countryId,
+        numDays,
+        departureDate: pkg.start_date,
+        theme: aiTheme,
+      })
+
       const response = await fetch('/api/itineraries/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cityId: aiCityId,
+          destination: destinationName,
+          cityId: cityId,           // 新增：直接傳城市 ID
+          countryId: countryId,     // 新增：傳國家 ID
           numDays,
           departureDate: pkg.start_date,
-          outboundFlight: { arrivalTime: aiArrivalTime },
-          returnFlight: { departureTime: aiDepartureTime },
+          arrivalTime: aiArrivalTime,
+          departureTime: aiDepartureTime,
+          theme: aiTheme,
+          accommodations: status.isComplete ? status.accommodations : undefined, // 住宿變為可選
         }),
       })
 
       const result = await response.json()
+
+      // Debug: 顯示 API 回應
+      console.log('[AI Generate] API Response:', result)
+      console.log('[AI Generate] Generated by:', result.data?.generatedBy)
 
       if (!response.ok) {
         throw new Error(result.error || '生成失敗')
       }
 
       if (result.success && result.data?.dailyItinerary) {
-        // 轉換 AI 結果為 dailySchedule 格式
+        // 轉換 AI 結果為 dailySchedule 格式，保留原有住宿資訊
         interface GeneratedDay {
           title: string
           meals: { breakfast?: string; lunch?: string; dinner?: string }
-          accommodation: string
+          activities?: Array<{ id?: string; title: string; startTime?: string; endTime?: string }>
         }
-        const newSchedule = result.data.dailyItinerary.map((day: GeneratedDay, index: number) => ({
-          day: index + 1,
-          route: day.title || '',
-          meals: {
-            breakfast: day.meals?.breakfast || '',
-            lunch: day.meals?.lunch || '',
-            dinner: day.meals?.dinner || '',
-          },
-          accommodation: day.accommodation || '',
-          sameAsPrevious: false,
-          hotelBreakfast: day.meals?.breakfast === '飯店早餐',
-        }))
+        const newSchedule = dailySchedule.map((existingDay, index) => {
+          const aiDay = result.data.dailyItinerary[index] as GeneratedDay | undefined
+          if (!aiDay) return existingDay
+
+          return {
+            ...existingDay,
+            route: aiDay.title || existingDay.route,
+            meals: {
+              breakfast: aiDay.meals?.breakfast || existingDay.meals.breakfast,
+              lunch: aiDay.meals?.lunch || existingDay.meals.lunch,
+              dinner: aiDay.meals?.dinner || existingDay.meals.dinner,
+            },
+            hotelBreakfast: aiDay.meals?.breakfast === '飯店早餐',
+            // 保留原有住宿，不覆蓋
+            // 如果 AI 回傳活動，也填入
+            activities: aiDay.activities?.map((act, actIdx) => ({
+              id: act.id || `ai-${index}-${actIdx}-${Date.now()}`,
+              title: act.title,
+              startTime: act.startTime || '',
+              endTime: act.endTime || '',
+            })) || existingDay.activities,
+          }
+        })
 
         setDailySchedule(newSchedule)
         toast.success(`成功生成 ${newSchedule.length} 天行程！`)
@@ -513,7 +670,7 @@ export function PackageItineraryDialog({
     } finally {
       setAiGenerating(false)
     }
-  }, [aiCityId, aiArrivalTime, aiDepartureTime, pkg.start_date, dailySchedule.length])
+  }, [pkg.destination, pkg.start_date, aiArrivalTime, aiDepartureTime, aiTheme, dailySchedule, getAccommodationStatus])
 
   // 產生簡易行程表的每日資料（用於預覽和列印）
   const getPreviewDailyData = useCallback(() => {
@@ -707,13 +864,22 @@ export function PackageItineraryDialog({
           accommodation = getPreviousAccommodation(idx) || '續住'
         }
 
+        // 轉換活動格式
+        const formattedActivities = (day.activities || []).map(act => ({
+          icon: '',
+          title: act.title,
+          description: '',
+          startTime: act.startTime,
+          endTime: act.endTime,
+        }))
+
         return {
           dayLabel: `Day ${day.day}`,
           date: dateLabel,
           title: title,
           highlight: '',
           description: '',
-          activities: [],
+          activities: formattedActivities,
           recommendations: [],
           meals: {
             breakfast,
@@ -925,13 +1091,22 @@ export function PackageItineraryDialog({
           accommodation = getPreviousAccommodation(idx) || '續住'
         }
 
+        // 轉換活動格式
+        const formattedActivities = (day.activities || []).map(act => ({
+          icon: '',
+          title: act.title,
+          description: '',
+          startTime: act.startTime,
+          endTime: act.endTime,
+        }))
+
         return {
           dayLabel: `Day ${day.day}`,
           date: dateLabel,
           title: title,
           highlight: '',
           description: '',
-          activities: [],
+          activities: formattedActivities,
           recommendations: [],
           meals: { breakfast, lunch: day.meals.lunch, dinner: day.meals.dinner },
           accommodation,
@@ -983,6 +1158,8 @@ export function PackageItineraryDialog({
 
   return (
     <>
+    {/* 主對話框：AI 對話框開啟時不渲染（避免多重遮罩） */}
+    {!aiDialogOpen && (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         {/* 載入中 */}
@@ -1521,100 +1698,343 @@ export function PackageItineraryDialog({
 
             {/* 右側：每日行程輸入 */}
             <div className="w-1/2 pl-6 overflow-y-auto">
-              <h3 className="text-sm font-bold text-morandi-primary mb-4">每日行程</h3>
-              <div className="space-y-3">
-                {dailySchedule.map((day, idx) => {
-                  const isFirst = idx === 0
-                  const isLast = idx === dailySchedule.length - 1
-                  let dateLabel = ''
-                  if (pkg.start_date) {
-                    const date = new Date(pkg.start_date)
-                    date.setDate(date.getDate() + idx)
-                    dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
-                  }
-                  return (
-                    <div key={idx} className="p-3 rounded-lg border border-morandi-muted/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-morandi-gold text-white text-xs font-bold px-2 py-0.5 rounded">
-                          Day {day.day}
-                        </span>
-                        {dateLabel && <span className="text-xs text-morandi-secondary">({dateLabel})</span>}
-                      </div>
-                      <Input
-                        value={day.route || ''}
-                        onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
-                        placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '今日行程標題'}
-                        className="h-8 text-sm mb-2"
-                      />
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="relative">
-                          <Input
-                            value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
-                            onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
-                            placeholder={isFirst ? '溫暖的家' : '早餐'}
-                            className="h-8 text-xs"
-                            disabled={day.hotelBreakfast}
-                          />
-                          {!isFirst && (
-                            <label className="flex items-center gap-1 mt-1 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={day.hotelBreakfast}
-                                onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
-                                className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                              />
-                              <span className="text-[10px] text-morandi-secondary">飯店早餐</span>
-                            </label>
-                          )}
-                        </div>
-                        <Input
-                          value={day.meals.lunch || ''}
-                          onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
-                          placeholder="午餐"
-                          className="h-8 text-xs"
-                        />
-                        <Input
-                          value={day.meals.dinner || ''}
-                          onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
-                          placeholder="晚餐"
-                          className="h-8 text-xs"
-                        />
-                      </div>
-                      {!isLast && (
-                        <div className="mt-2">
-                          <Input
-                            value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || '續住'})` : (day.accommodation || '')}
-                            onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
-                            placeholder="住宿飯店"
-                            className="h-8 text-xs"
-                            disabled={day.sameAsPrevious}
-                          />
-                          {idx > 0 && (
-                            <label className="flex items-center gap-1 mt-1 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={day.sameAsPrevious}
-                                onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
-                                className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
-                              />
-                              <span className="text-[10px] text-morandi-secondary">續住</span>
-                            </label>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-morandi-primary">
+                  {isTimelineMode ? '時間軸行程' : '每日行程'}
+                </h3>
+                {/* 時間軸模式切換按鈕 */}
+                <button
+                  type="button"
+                  onClick={() => setIsTimelineMode(!isTimelineMode)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full transition-all ${
+                    isTimelineMode
+                      ? 'bg-morandi-gold text-white shadow-sm'
+                      : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50 border border-morandi-container'
+                  }`}
+                  title={isTimelineMode ? '切換簡易模式' : '切換時間軸模式'}
+                >
+                  <Clock size={12} />
+                  <span>{isTimelineMode ? '簡易模式' : '時間軸'}</span>
+                </button>
               </div>
+
+              {/* 簡易模式 */}
+              {!isTimelineMode && (
+                <div className="space-y-3">
+                  {dailySchedule.map((day, idx) => {
+                    const isFirst = idx === 0
+                    const isLast = idx === dailySchedule.length - 1
+                    let dateLabel = ''
+                    if (pkg.start_date) {
+                      const date = new Date(pkg.start_date)
+                      date.setDate(date.getDate() + idx)
+                      dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
+                    }
+                    return (
+                      <div key={idx} className="p-3 rounded-lg border border-morandi-muted/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-morandi-gold text-white text-xs font-bold px-2 py-0.5 rounded">
+                            Day {day.day}
+                          </span>
+                          {dateLabel && <span className="text-xs text-morandi-secondary">({dateLabel})</span>}
+                        </div>
+                        <Input
+                          value={day.route || ''}
+                          onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
+                          placeholder={isFirst ? '抵達目的地' : isLast ? '返回台灣' : '今日行程標題'}
+                          className="h-8 text-sm mb-2"
+                        />
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="relative">
+                            <Input
+                              value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
+                              onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
+                              placeholder="早餐"
+                              className="h-8 text-xs"
+                              disabled={day.hotelBreakfast}
+                            />
+                            {!isFirst && (
+                              <label className="flex items-center gap-1 mt-1 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={day.hotelBreakfast}
+                                  onChange={e => updateDaySchedule(idx, 'hotelBreakfast', e.target.checked)}
+                                  className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
+                                />
+                                <span className="text-[10px] text-morandi-secondary">飯店早餐</span>
+                              </label>
+                            )}
+                          </div>
+                          <Input
+                            value={day.meals.lunch || ''}
+                            onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
+                            placeholder="午餐"
+                            className="h-8 text-xs"
+                          />
+                          <Input
+                            value={day.meals.dinner || ''}
+                            onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
+                            placeholder="晚餐"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                        {!isLast && (
+                          <div className="mt-2">
+                            <Input
+                              value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || '續住'})` : (day.accommodation || '')}
+                              onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
+                              placeholder="住宿飯店"
+                              className="h-8 text-xs"
+                              disabled={day.sameAsPrevious}
+                            />
+                            {idx > 0 && (
+                              <label className="flex items-center gap-1 mt-1 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={day.sameAsPrevious}
+                                  onChange={e => updateDaySchedule(idx, 'sameAsPrevious', e.target.checked)}
+                                  className="w-3 h-3 rounded border-border text-morandi-gold focus:ring-morandi-gold"
+                                />
+                                <span className="text-[10px] text-morandi-secondary">續住</span>
+                              </label>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* 時間軸模式 - 分頁式完整界面 */}
+              {isTimelineMode && (
+                <div className="flex flex-col h-full">
+                  {/* 天數分頁 Tab */}
+                  <div className="flex gap-1 mb-4 pb-3 border-b border-morandi-container overflow-x-auto">
+                    {dailySchedule.map((day, idx) => {
+                      const isSelected = selectedDayIndex === idx
+                      const hasActivities = day.activities && day.activities.length > 0
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setSelectedDayIndex(idx)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap ${
+                            isSelected
+                              ? 'bg-morandi-gold text-white shadow-sm'
+                              : 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                          }`}
+                        >
+                          Day {day.day}
+                          {hasActivities && (
+                            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-morandi-gold'}`} />
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* 選中天的內容 */}
+                  {dailySchedule[selectedDayIndex] && (() => {
+                    const day = dailySchedule[selectedDayIndex]
+                    const idx = selectedDayIndex
+                    let dateLabel = ''
+                    if (pkg.start_date) {
+                      const date = new Date(pkg.start_date)
+                      date.setDate(date.getDate() + idx)
+                      const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+                      dateLabel = `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`
+                    }
+
+                    return (
+                      <div className="flex-1 overflow-y-auto">
+                        {/* Day 標題資訊 */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg font-bold text-morandi-gold">Day {day.day}</span>
+                            {dateLabel && <span className="text-sm text-morandi-secondary">{dateLabel}</span>}
+                          </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => addActivity(idx)}
+                            className="h-7 px-2 text-xs gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
+                          >
+                            <Plus size={12} />
+                            新增活動
+                          </Button>
+                        </div>
+
+                        {/* 今日標題 + 餐食 + 住宿 */}
+                        <div className="border border-border rounded-lg p-3 mb-3 space-y-2">
+                          {/* 今日標題 */}
+                          <Input
+                            value={day.route || ''}
+                            onChange={e => updateDaySchedule(idx, 'route', e.target.value)}
+                            placeholder={idx === 0 ? '抵達目的地' : idx === dailySchedule.length - 1 ? '返回台灣' : '今日行程標題'}
+                            className="h-8 text-xs"
+                          />
+
+                          {/* 餐食 */}
+                          <div className="grid grid-cols-3 gap-2">
+                            {/* 早餐 */}
+                            <div className="group relative">
+                              <input
+                                type="text"
+                                value={day.hotelBreakfast ? '飯店早餐' : (day.meals.breakfast || '')}
+                                onChange={e => updateDaySchedule(idx, 'meals.breakfast', e.target.value)}
+                                placeholder="早餐"
+                                disabled={day.hotelBreakfast}
+                                className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                              />
+                              {idx > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => updateDaySchedule(idx, 'hotelBreakfast', !day.hotelBreakfast)}
+                                  className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded transition-all ${
+                                    day.hotelBreakfast
+                                      ? 'bg-morandi-gold text-white'
+                                      : 'text-morandi-secondary opacity-0 group-hover:opacity-100 hover:text-morandi-gold'
+                                  }`}
+                                >
+                                  飯店
+                                </button>
+                              )}
+                            </div>
+                            {/* 午餐 */}
+                            <input
+                              type="text"
+                              value={day.meals.lunch || ''}
+                              onChange={e => updateDaySchedule(idx, 'meals.lunch', e.target.value)}
+                              placeholder="午餐"
+                              className="h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                            />
+                            {/* 晚餐 */}
+                            <input
+                              type="text"
+                              value={day.meals.dinner || ''}
+                              onChange={e => updateDaySchedule(idx, 'meals.dinner', e.target.value)}
+                              placeholder="晚餐"
+                              className="h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold"
+                            />
+                          </div>
+
+                          {/* 住宿 */}
+                          {idx < dailySchedule.length - 1 && (
+                            <div className="group relative">
+                              <input
+                                type="text"
+                                value={day.sameAsPrevious ? `同上 (${getPreviousAccommodation(idx) || '續住'})` : (day.accommodation || '')}
+                                onChange={e => updateDaySchedule(idx, 'accommodation', e.target.value)}
+                                placeholder="住宿飯店"
+                                disabled={day.sameAsPrevious}
+                                className="w-full h-8 px-3 text-xs border border-border rounded-lg bg-transparent focus:outline-none focus:ring-1 focus:ring-morandi-gold disabled:text-morandi-secondary"
+                              />
+                              {idx > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => updateDaySchedule(idx, 'sameAsPrevious', !day.sameAsPrevious)}
+                                  className={`absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded transition-all ${
+                                    day.sameAsPrevious
+                                      ? 'bg-morandi-gold text-white'
+                                      : 'text-morandi-secondary opacity-0 group-hover:opacity-100 hover:text-morandi-gold'
+                                  }`}
+                                >
+                                  續住
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 活動表格 */}
+                        <div className="border border-border rounded-lg overflow-hidden">
+                          {/* 表頭 */}
+                          <div className="flex items-center bg-morandi-container/30 text-[10px] text-morandi-secondary font-medium">
+                            <div className="w-[100px] px-2 py-1.5 text-center border-r border-morandi-container/50">時間</div>
+                            <div className="flex-1 px-2 py-1.5">活動內容</div>
+                          </div>
+
+                          {/* 活動列表 */}
+                          {(day.activities && day.activities.length > 0) ? (
+                            day.activities.map((activity, actIdx) => (
+                              <div
+                                key={activity.id}
+                                className="group flex items-stretch border-t border-morandi-container/50 hover:bg-morandi-gold/5"
+                              >
+                                {/* 時間 */}
+                                <div className="w-[100px] flex items-center justify-center border-r border-morandi-container/50">
+                                  <input
+                                    type="text"
+                                    maxLength={5}
+                                    value={activity.startTime ? `${activity.startTime.slice(0, 2)}:${activity.startTime.slice(2)}` : ''}
+                                    onChange={e => {
+                                      let val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4)
+                                      updateActivity(idx, actIdx, 'startTime', val)
+                                    }}
+                                    placeholder="09:00"
+                                    className="w-[42px] px-0.5 py-2 text-xs text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+                                  />
+                                  <span className="text-morandi-muted text-[10px]">~</span>
+                                  <input
+                                    type="text"
+                                    maxLength={5}
+                                    value={activity.endTime ? `${activity.endTime.slice(0, 2)}:${activity.endTime.slice(2)}` : ''}
+                                    onChange={e => {
+                                      let val = e.target.value.replace(/[^0-9]/g, '').slice(0, 4)
+                                      updateActivity(idx, actIdx, 'endTime', val)
+                                    }}
+                                    placeholder="10:30"
+                                    className="w-[42px] px-0.5 py-2 text-xs text-center bg-transparent border-0 focus:outline-none focus:bg-white"
+                                  />
+                                </div>
+
+                                {/* 活動名稱 */}
+                                <div className="flex-1 flex items-center">
+                                  <textarea
+                                    value={activity.title}
+                                    onChange={e => updateActivity(idx, actIdx, 'title', e.target.value)}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault()
+                                      }
+                                    }}
+                                    placeholder="景點名稱"
+                                    rows={1}
+                                    className="flex-1 px-2 py-2 text-xs bg-transparent border-0 focus:outline-none focus:bg-white resize-none leading-tight"
+                                    style={{ minHeight: '32px' }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeActivity(idx, actIdx)}
+                                    className="hidden group-hover:block p-1 mr-1 text-morandi-muted hover:text-morandi-red transition-colors"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-4 text-xs text-morandi-muted">
+                              點擊「新增活動」加入景點
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         )}
       </DialogContent>
     </Dialog>
+    )}
 
     {/* AI 排行程設定對話框 */}
     <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles size={18} className="text-morandi-gold" />
@@ -1622,27 +2042,28 @@ export function PackageItineraryDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label className="text-xs text-morandi-primary">選擇城市</Label>
-            <select
-              value={aiCityId}
-              onChange={(e) => setAiCityId(e.target.value)}
-              className="w-full h-9 px-3 rounded-md border border-border bg-background text-sm"
-              disabled={citiesLoading}
-            >
-              <option value="">
-                {citiesLoading ? '載入中...' : '請選擇城市'}
-              </option>
-              {cities.map((city: City) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
+          {/* 基本資訊（唯讀） */}
+          <div className="flex items-center gap-4 p-3 bg-morandi-container/30 rounded-lg">
+            <div className="flex-1">
+              <div className="text-[10px] text-morandi-secondary">目的地</div>
+              <div className="text-sm font-medium">{pkg.destination || pkg.country_id || '未設定'}</div>
+            </div>
+            <div className="flex-1">
+              <div className="text-[10px] text-morandi-secondary">天數</div>
+              <div className="text-sm font-medium">{dailySchedule.length} 天</div>
+            </div>
+            <div className="flex-1">
+              <div className="text-[10px] text-morandi-secondary">住宿狀態</div>
+              <div className="text-sm font-medium text-morandi-green">
+                ✓ 已填寫 {getAccommodationStatus().filledCount}/{getAccommodationStatus().requiredDays} 天
+              </div>
+            </div>
           </div>
+
+          {/* 時間設定 */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">抵達當地時間</Label>
+            <div className="space-y-1">
+              <Label className="text-xs text-morandi-secondary">第一天抵達時間</Label>
               <Input
                 type="time"
                 value={aiArrivalTime}
@@ -1650,8 +2071,8 @@ export function PackageItineraryDialog({
                 className="h-9"
               />
             </div>
-            <div className="space-y-2">
-              <Label className="text-xs text-morandi-primary">離開當地時間</Label>
+            <div className="space-y-1">
+              <Label className="text-xs text-morandi-secondary">最後一天離開時間</Label>
               <Input
                 type="time"
                 value={aiDepartureTime}
@@ -1660,8 +2081,36 @@ export function PackageItineraryDialog({
               />
             </div>
           </div>
+
+          {/* 行程風格選擇 */}
+          <div className="space-y-2">
+            <Label className="text-xs text-morandi-secondary">行程風格</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {AI_THEMES.map((theme) => (
+                <button
+                  key={theme.value}
+                  type="button"
+                  onClick={() => setAiTheme(theme.value)}
+                  className={`p-2 rounded-lg border text-left transition-all ${
+                    aiTheme === theme.value
+                      ? 'border-morandi-gold bg-morandi-gold/10'
+                      : 'border-border hover:border-morandi-gold/50'
+                  }`}
+                >
+                  <div className={`text-xs font-medium ${aiTheme === theme.value ? 'text-morandi-gold' : ''}`}>
+                    {theme.label}
+                  </div>
+                  <div className="text-[10px] text-morandi-secondary mt-0.5">
+                    {theme.description}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 說明 */}
           <p className="text-xs text-morandi-secondary">
-            AI 將根據景點資料庫，為您生成 {dailySchedule.length} 天的行程建議
+            AI 將根據您的住宿地點和選擇的風格，為每一天安排合適的景點和路線
           </p>
         </div>
         <div className="flex justify-end gap-2">
@@ -1675,7 +2124,7 @@ export function PackageItineraryDialog({
           </Button>
           <Button
             onClick={handleAiGenerate}
-            disabled={aiGenerating || !aiCityId}
+            disabled={aiGenerating}
             className="gap-1 bg-morandi-gold hover:bg-morandi-gold-hover text-white"
           >
             {aiGenerating ? (

@@ -105,18 +105,20 @@ export function useBasicInfoForm(employee: Employee, setIsEditing: (editing: boo
     setPasswordUpdateLoading(true)
 
     try {
-      const { hashPassword } = await import('@/lib/auth')
-      const hashedPassword = await hashPassword(passwordData.newPassword)
+      // 呼叫 API 更新 Supabase Auth 密碼
+      const response = await fetch('/api/auth/reset-employee-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_id: employee.id,
+          new_password: passwordData.newPassword,
+        }),
+      })
 
-      const { supabase } = await import('@/lib/supabase/client')
+      const result = await response.json()
 
-      const { error } = await supabase
-        .from('employees')
-        .update({ password_hash: hashedPassword })
-        .eq('employee_number', employee.employee_number)
-
-      if (error) {
-        alert('密碼更新失敗：' + error.message)
+      if (!result.success) {
+        alert('密碼更新失敗：' + result.error)
         return
       }
 

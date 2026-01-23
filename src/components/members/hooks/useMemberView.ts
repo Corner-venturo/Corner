@@ -199,11 +199,11 @@ export function useMemberView({ order_id, departure_date, member_count }: UseMem
       const customerGender = customer.gender as 'M' | 'F' | '' | null
       updatedMembers[pendingMemberIndex] = {
         ...pendingMemberData,
-        name_en: customer.passport_romanization || pendingMemberData.name_en,
+        name_en: customer.passport_name || pendingMemberData.name_en,
         passport_number: customer.passport_number || pendingMemberData.passport_number,
-        passport_expiry: customer.passport_expiry_date || pendingMemberData.passport_expiry,
+        passport_expiry: customer.passport_expiry || pendingMemberData.passport_expiry,
         id_number: customer.national_id || pendingMemberData.id_number,
-        birthday: customer.date_of_birth || pendingMemberData.birthday,
+        birthday: customer.birth_date || pendingMemberData.birthday,
         gender: customerGender || pendingMemberData.gender,
         customer_id: customer.id,
       }

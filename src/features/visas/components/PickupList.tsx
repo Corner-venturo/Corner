@@ -61,7 +61,7 @@ export function PickupList({
                       {item.ocrResult.customer.name || '(無法辨識姓名)'}
                     </div>
                     <div className="text-xs text-morandi-secondary">
-                      {item.ocrResult.customer.passport_romanization}
+                      {item.ocrResult.customer.passport_name}
                       {item.ocrResult.customer.passport_number && (
                         <span className="ml-2">護照: {item.ocrResult.customer.passport_number}</span>
                       )}

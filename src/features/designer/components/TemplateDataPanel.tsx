@@ -58,6 +58,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useState } from 'react'
 import type { MealIconType, DailyItinerary, TimelineItem, DailyDetailData, VehicleData, VehicleMemberData, GroupType, CountryCode, VehicleColumnSettings, HotelData } from '../templates/definitions/types'
 import { getMemoSettingsByCountry, countryNames } from '../templates/definitions/country-presets'
+import { calculatePageNumberForToc } from '../utils/page-number'
 
 // 餐食圖標選項
 const MEAL_ICON_OPTIONS: { value: MealIconType; label: string }[] = [
@@ -731,22 +732,22 @@ function TocEditor({
 
   // 初始化 TOC 項目（如果還沒有）
   const initializeTocItems = () => {
-    const newTocItems: TocItem[] = availablePages.map((page, idx) => {
+    const newTocItems: TocItem[] = availablePages.map((page) => {
       // 尋找現有項目
       const existingItem = tocItems.find((item) => item.pageId === page.id)
       if (existingItem) {
-        // 更新頁碼
-        const pageIndex = pages.findIndex((p) => p.id === page.id)
-        return { ...existingItem, pageNumber: pageIndex + 1 }
+        // 更新頁碼（使用新的頁碼計算邏輯）
+        const pageNumber = calculatePageNumberForToc(page.id, pages)
+        return { ...existingItem, pageNumber }
       }
       // 建立新項目
-      const pageIndex = pages.findIndex((p) => p.id === page.id)
+      const pageNumber = calculatePageNumberForToc(page.id, pages)
       return {
         pageId: page.id,
         displayName: page.name,
         icon: getDefaultIcon(page.templateKey),
         enabled: true,
-        pageNumber: pageIndex + 1,
+        pageNumber,
       }
     })
 
@@ -809,11 +810,11 @@ function TocEditor({
     },
   })
 
-  // 刷新頁碼
+  // 刷新頁碼（使用新的頁碼計算邏輯）
   const refreshPageNumbers = () => {
     const newTocItems = tocItems.map((item) => {
-      const pageIndex = pages.findIndex((p) => p.id === item.pageId)
-      return { ...item, pageNumber: pageIndex >= 0 ? pageIndex + 1 : 0 }
+      const pageNumber = calculatePageNumberForToc(item.pageId, pages)
+      return { ...item, pageNumber }
     })
     onTemplateDataChange({
       ...templateData,
