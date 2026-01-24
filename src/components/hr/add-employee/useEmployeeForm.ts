@@ -150,16 +150,17 @@ export function useEmployeeForm(onSubmit: () => void) {
 
       const newEmployee = await addUser(dbEmployeeData)
 
-      // 自動加入該 workspace 的所有頻道
+      // 自動加入該 workspace 的公開頻道（排除私密頻道和 DM）
       if (newEmployee?.id) {
         try {
-          // 取得該 workspace 的所有頻道
+          // 只取得公開頻道（排除 DIRECT 和 PRIVATE）
           const { data: channels } = await supabase
             .from('channels')
             .select('id')
             .eq('workspace_id', targetWorkspaceId)
+            .in('channel_type', ['PUBLIC'])
 
-          // 將新員工加入所有頻道
+          // 將新員工加入公開頻道
           if (channels && channels.length > 0) {
             const channelMembers = channels.map(channel => ({
               workspace_id: targetWorkspaceId,
@@ -170,7 +171,7 @@ export function useEmployeeForm(onSubmit: () => void) {
             }))
 
             await supabase.from('channel_members').insert(channelMembers)
-            logger.log(`✅ 已將新員工加入 ${channels.length} 個頻道`)
+            logger.log(`✅ 已將新員工加入 ${channels.length} 個公開頻道`)
           }
         } catch (channelError) {
           logger.error('⚠️ 加入頻道失敗（不影響員工建立）:', channelError)

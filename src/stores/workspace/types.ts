@@ -48,6 +48,8 @@ export interface Channel {
   tour_id?: string | null
   order?: number | null
   updated_at?: string | null
+  /** DM 頻道專用：對方的 employee ID（從創建者角度）*/
+  dm_target_id?: string | null
   _deleted?: boolean | null
   _needs_sync?: boolean | null
   _synced_at?: string | null

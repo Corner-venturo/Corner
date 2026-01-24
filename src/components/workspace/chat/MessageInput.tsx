@@ -12,6 +12,7 @@ import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
 import { logger } from '@/lib/utils/logger'
 import { useEmployees } from '@/data'
+import { useAuthStore } from '@/stores/auth-store'
 
 // 系統機器人 ID
 const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -72,30 +73,50 @@ export function MessageInput({
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
   const { items: employees } = useEmployees()
+  const { user } = useAuthStore()
 
   const isAnnouncementChannel = !!channel.is_announcement
   const isDisabled = isAnnouncementChannel && !isAdmin
 
-  // 解析 DM 頻道名稱，取得對方名字
-  const displayChannelName = useMemo(() => {
-    if (channelName.startsWith('dm:') || channel.type === 'direct') {
-      const parts = channelName.replace('dm:', '').split(':')
+  // 取得 DM 對方的 ID
+  // 使用 dm_target_id 欄位，若該欄位是自己則對方是 created_by
+  const dmTargetId = useMemo(() => {
+    if (channel.type !== 'direct') return null
 
+    // 優先使用 dm_target_id 欄位
+    if (channel.dm_target_id) {
+      // 如果 dm_target_id 是自己，對方就是創建者
+      if (channel.dm_target_id === user?.id) {
+        return channel.created_by
+      }
+      return channel.dm_target_id
+    }
+
+    // 向後相容：舊頻道沒有 dm_target_id，從名稱解析
+    const parts = channel.name.replace('dm:', '').split(':')
+    return parts.find(id => id !== user?.id) || null
+  }, [channel.type, channel.dm_target_id, channel.created_by, channel.name, user?.id])
+
+  // 取得 DM 對方名字
+  const displayChannelName = useMemo(() => {
+    if (channel.type === 'direct') {
       // 檢查是否是機器人
-      if (parts.includes(SYSTEM_BOT_ID)) {
+      if (dmTargetId === SYSTEM_BOT_ID) {
         return 'VENTURO 機器人'
       }
 
-      // 查找員工名字
-      const employee = employees.find(e => parts.includes(e.id))
-      if (employee) {
-        return employee.chinese_name || employee.display_name || '同事'
+      // 用 dmTargetId 查詢員工名稱
+      if (dmTargetId) {
+        const emp = employees.find(e => e.id === dmTargetId)
+        if (emp) {
+          return emp.chinese_name || emp.display_name || '同事'
+        }
       }
 
       return '私訊'
     }
     return channelName
-  }, [channelName, channel.type, employees])
+  }, [channel.type, dmTargetId, employees, channelName])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -270,12 +291,11 @@ export function MessageInput({
 
   // 檢查是否為機器人 DM 頻道
   const isBotDM = useMemo(() => {
-    if (channel.type === 'direct' || channelName.startsWith('dm:')) {
-      const parts = channelName.replace('dm:', '').split(':')
-      return parts.includes(SYSTEM_BOT_ID)
+    if (channel.type === 'direct') {
+      return dmTargetId === SYSTEM_BOT_ID
     }
     return false
-  }, [channel.type, channelName])
+  }, [channel.type, dmTargetId])
 
   // 根據頻道類型選擇不同的快捷操作
   const quickActions: QuickAction[] = useMemo(() => {
