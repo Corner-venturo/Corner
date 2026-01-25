@@ -220,8 +220,7 @@ export function DocumentVersionPicker({
     }
   }, [isOpen])
 
-  // 檢查是否有子 Dialog 開啟（單一遮罩模式）
-  const hasChildDialogOpen = timelineDialogOpen || packageItineraryDialogOpen || !!previewQuote
+  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
   // 編輯時自動聚焦
   useEffect(() => {
@@ -639,10 +638,9 @@ export function DocumentVersionPicker({
 
   return (
     <>
-      {/* 主對話框：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-      {!hasChildDialogOpen && (
+      {/* 主對話框：使用 level={2}（作為 TourDetailDialog 的子 Dialog） */}
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className={cn(
+        <DialogContent level={2} className={cn(
           'h-[70vh] max-h-[800px] flex flex-col overflow-hidden',
           showItinerary ? 'max-w-[900px]' : 'max-w-[500px]'
         )}>
@@ -822,11 +820,10 @@ export function DocumentVersionPicker({
           </div>
         </DialogContent>
       </Dialog>
-      )}
 
-      {/* 預覽 Dialog（第三層嵌套：TourDetailDialog → DocumentVersionPicker → Preview） */}
+      {/* 預覽 Dialog（第三層：TourDetailDialog → DocumentVersionPicker → Preview） */}
       <Dialog open={!!previewQuote} onOpenChange={open => !open && setPreviewQuote(null)}>
-        <DialogContent nested className="max-w-md">
+        <DialogContent level={3} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-morandi-gold" />

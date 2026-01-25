@@ -58,18 +58,8 @@ const TourCheckin = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-const VehicleAssignment = dynamic(
-  () => import('@/components/tours/vehicle-assignment').then(m => m.VehicleAssignment),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
 const TourRequirementsTab = dynamic(
   () => import('@/components/tours/tour-requirements-tab').then(m => m.TourRequirementsTab),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
-
-const TourRoomsTab = dynamic(
-  () => import('@/components/tours/tour-rooms-tab').then(m => m.TourRoomsTab),
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
@@ -79,11 +69,10 @@ const TourRequestFormDialog = dynamic(
 )
 
 // 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
+// 分車/分房已移至團員名單工具列（概念上是針對團員的操作）
 const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'orders', label: '訂單管理' },
-  { value: 'vehicles', label: '分車' },
-  { value: 'rooms', label: '分房' },
   { value: 'overview', label: '總覽' },
   { value: 'requirements', label: '需求總覽' },
   { value: 'confirmation', label: '團確單' },
@@ -125,11 +114,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
   // 團員名單內的 PNR 配對 Dialog（需要父組件控制以避免多重遮罩）
   const [showMembersPnrMatchDialog, setShowMembersPnrMatchDialog] = useState(false)
 
-  // 子組件內的 Dialog 狀態（用於避免多重遮罩）
-  const [membersHasChildDialog, setMembersHasChildDialog] = useState(false)
-  const [ordersHasChildDialog, setOrdersHasChildDialog] = useState(false)
-  const [paymentsHasChildDialog, setPaymentsHasChildDialog] = useState(false)
-  const [costsHasChildDialog, setCostsHasChildDialog] = useState(false)
+  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
   // 需求單 Dialog 狀態（從 TourRequirementsTab 提升）
   const [showRequirementsRequestDialog, setShowRequirementsRequestDialog] = useState(false)
@@ -411,12 +396,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     }
   }
 
-  // 檢查是否有任何子 Dialog 開啟（用於避免多重遮罩）
-  const hasChildDialogOpen = showCloseDialog || showConfirmationDialog || showCreateChannelDialog ||
-    showEditDialog || showQuotePicker || showPnrToolDialog || showEntryCardDialog ||
-    showMembersPnrMatchDialog || membersHasChildDialog || paymentsHasChildDialog || costsHasChildDialog ||
-    ordersHasChildDialog || showRequirementsRequestDialog
-
   const renderTabContent = () => {
     if (!tour) return null
 
@@ -437,11 +416,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
               triggerAdd={triggerPaymentAdd}
               onTriggerAddComplete={() => setTriggerPaymentAdd(false)}
               showSummary={false}
-              onChildDialogChange={setPaymentsHasChildDialog}
             />
 
             {/* 成本支出 */}
-            <TourCosts tour={tour} showSummary={false} onChildDialogChange={setCostsHasChildDialog} />
+            <TourCosts tour={tour} showSummary={false} />
 
             {/* 文件確認 */}
             <div>
@@ -451,7 +429,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
           </div>
         )
       case 'orders':
-        return <TourOrders tour={tour} onChildDialogChange={setOrdersHasChildDialog} />
+        return <TourOrders tour={tour} />
       case 'members':
         return (
           <OrderMembersExpandable
@@ -460,27 +438,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             mode="tour"
             forceShowPnr={forceShowPnr}
             tour={tour}
-            onChildDialogChange={setMembersHasChildDialog}
             showPnrMatchDialog={showMembersPnrMatchDialog}
             onPnrMatchDialogChange={setShowMembersPnrMatchDialog}
             onPnrMatchSuccess={() => {
               setForceShowPnr(true)
               handleSuccess()
             }}
-          />
-        )
-      case 'vehicles':
-        return (
-          <VehicleAssignment
-            tourId={tour.id}
-            workspaceId={currentWorkspace?.id || ''}
-          />
-        )
-      case 'rooms':
-        return (
-          <TourRoomsTab
-            tourId={tour.id}
-            workspaceId={currentWorkspace?.id || ''}
           />
         )
       case 'confirmation':
@@ -512,10 +475,9 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
   return (
     <>
-      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-      {!hasChildDialogOpen && (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-          <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col [&>button:last-child]:hidden">
+      {/* 主 Dialog：使用 level={1}，子 Dialog 使用 level={2} 以上 */}
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent level={1} className="max-w-[95vw] w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col [&>button:last-child]:hidden">
             {/* Accessibility: Hidden title for screen readers */}
             <VisuallyHidden>
               <DialogTitle>
@@ -632,9 +594,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
-      {/* 子 Dialogs：放在主 Dialog 外面，避免多重遮罩 */}
+      {/* 子 Dialogs：使用 level={2}，放在主 Dialog 外面 */}
       {tour && (
         <>
           <TourCloseDialog
@@ -738,7 +699,7 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
 
           {/* 入境卡列印對話框 */}
           <EntryCardDialog open={showEntryCardDialog} onOpenChange={setShowEntryCardDialog}>
-            <EntryCardDialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
+            <EntryCardDialogContent level={2} className="max-w-[95vw] max-h-[95vh] overflow-auto">
               <div className="no-print flex items-center justify-between mb-4">
                 <EntryCardDialogHeader>
                   <EntryCardDialogTitle>列印日本入境卡</EntryCardDialogTitle>

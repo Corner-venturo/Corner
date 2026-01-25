@@ -303,41 +303,137 @@ const { isDirty, markDirty, reset } = useManagedDialogState()
 </ManagedDialog>
 ```
 
-### 單一遮罩規範
+### 🔴 Dialog 層級系統（重要）
 
-當 Dialog A 內部開啟 Dialog B 時，必須避免多層遮罩疊加：
+為了解決多層 Dialog 的遮罩疊加問題，所有 Dialog 必須明確指定 `level` 屬性。
+
+#### 層級定義
+
+| Level | Z-Index | 遮罩 | 使用場景 |
+|-------|---------|------|----------|
+| **Level 1** | 9000-9010 | `bg-black/60` + blur | 從頁面直接打開的主 Dialog |
+| **Level 2** | 9100-9110 | `bg-black/30` + blur | 從 Level 1 Dialog 內打開的子 Dialog |
+| **Level 3** | 9200-9210 | `bg-black/30` + blur | 從 Level 2 Dialog 內打開的孫 Dialog |
+| **Level 4-5** | 9300+ | `bg-black/30` + blur | 極少用的更深層嵌套 |
+
+#### 使用方式
 
 ```tsx
-// ✅ 正確：父 Dialog 在子 Dialog 開啟時不渲染
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+
+// ✅ Level 1：從頁面直接打開（如 TourDetailDialog, CustomerDetailDialog）
+<Dialog open={open} onOpenChange={onOpenChange}>
+  <DialogContent level={1} className="max-w-4xl">
+    <DialogHeader>
+      <DialogTitle>旅遊團詳情</DialogTitle>
+    </DialogHeader>
+    {/* 內容 */}
+  </DialogContent>
+</Dialog>
+
+// ✅ Level 2：從主 Dialog 內打開（如 AddRequestDialog, TourEditDialog）
+<Dialog open={open} onOpenChange={onOpenChange}>
+  <DialogContent level={2} className="max-w-md">
+    <DialogHeader>
+      <DialogTitle>新增請款單</DialogTitle>
+    </DialogHeader>
+    {/* 內容 */}
+  </DialogContent>
+</Dialog>
+
+// ✅ Level 3：從子 Dialog 內打開
+<Dialog open={open} onOpenChange={onOpenChange}>
+  <DialogContent level={3} className="max-w-sm">
+    <DialogHeader>
+      <DialogTitle>確認刪除</DialogTitle>
+    </DialogHeader>
+    {/* 內容 */}
+  </DialogContent>
+</Dialog>
+```
+
+#### 常見 Dialog 層級對照表
+
+| Dialog | Level | 說明 |
+|--------|-------|------|
+| `TourDetailDialog` | 1 | 從旅遊團列表打開 |
+| `ProposalDetailDialog` | 1 | 從提案列表打開 |
+| `CustomerDetailDialog` | 1 | 從客戶列表打開 |
+| `ReceiptDetailDialog` | 1 | 從收款單列表打開 |
+| `TourEditDialog` | 2 | 從 TourDetailDialog 打開 |
+| `AddRequestDialog` | 2 | 從 TourDetailDialog 打開 |
+| `AddReceiptDialog` | 2 | 從 TourDetailDialog 打開 |
+| `TourPnrToolDialog` | 2 | 從 TourDetailDialog 打開 |
+| `TourRoomManager` | 2 | 從 TourDetailDialog 打開 |
+| `TourVehicleManager` | 2 | 從 TourDetailDialog 打開 |
+| `ContractDialog` | 2 | 從 TourDetailDialog 打開 |
+| 新增車輛 Dialog | 3 | 從 TourVehicleManager 打開 |
+| AI 對話 Dialog | 3 | 從 PackageItineraryDialog 打開 |
+
+#### ❌ 禁止的做法
+
+```tsx
+// ❌ 不要使用條件渲染隱藏父 Dialog（已棄用）
+{!childDialogOpen && (
+  <Dialog open={open}>
+    <DialogContent>...</DialogContent>
+  </Dialog>
+)}
+
+// ❌ 不要忘記設定 level
+<DialogContent className="max-w-md">  // 缺少 level
+  ...
+</DialogContent>
+
+// ❌ 不要在子 Dialog 使用 level={1}
+<DialogContent level={1}>  // 子 Dialog 應該用 level={2}
+  ...
+</DialogContent>
+```
+
+#### ✅ 正確的嵌套 Dialog 結構
+
+```tsx
 export function ParentDialog({ open, onOpenChange }) {
   const [childDialogOpen, setChildDialogOpen] = useState(false)
 
   return (
     <>
-      {/* 子 Dialog 開啟時，父 Dialog 完全不渲染 */}
-      {!childDialogOpen && (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent>
-            <Button onClick={() => setChildDialogOpen(true)}>
-              開啟子視窗
-            </Button>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* 主 Dialog：level={1} */}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent level={1} className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>主視窗</DialogTitle>
+          </DialogHeader>
+          <Button onClick={() => setChildDialogOpen(true)}>
+            開啟子視窗
+          </Button>
+        </DialogContent>
+      </Dialog>
 
-      {/* 子 Dialog 放在父 Dialog 外面 */}
-      <ChildDialog
-        open={childDialogOpen}
-        onOpenChange={setChildDialogOpen}
-      />
+      {/* 子 Dialog：level={2}，放在外層 */}
+      <Dialog open={childDialogOpen} onOpenChange={setChildDialogOpen}>
+        <DialogContent level={2} className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>子視窗</DialogTitle>
+          </DialogHeader>
+          {/* 子內容 */}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
 ```
 
-**關鍵規則**：
-1. 子 Dialog 放在父 Dialog 的 JSX 外面（用 `<>` 包裹）
-2. 父 Dialog 使用 `{!childDialogOpen && <Dialog>}` 條件渲染
+#### 開發檢查清單
+
+新增或修改 Dialog 時，請確認：
+
+- [ ] 這個 Dialog 是從頁面直接打開嗎？ → 使用 `level={1}`
+- [ ] 這個 Dialog 是從另一個 Dialog 內打開嗎？ → 使用 `level={2}`
+- [ ] 這個 Dialog 是從子 Dialog 內打開嗎？ → 使用 `level={3}`
+- [ ] 是否在 `DialogContent` 上明確設定 `level` 屬性？
+- [ ] 子 Dialog 是否放在父 Dialog 的 JSX 外面？（用 `<>` 包裹）
 
 ---
 

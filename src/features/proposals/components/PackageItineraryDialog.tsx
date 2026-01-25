@@ -1158,10 +1158,9 @@ export function PackageItineraryDialog({
 
   return (
     <>
-    {/* 主對話框：AI 對話框開啟時不渲染（避免多重遮罩） */}
-    {!aiDialogOpen && (
+    {/* 主對話框：使用 level={2}（作為子 Dialog 使用） */}
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent level={2} className="max-w-4xl max-h-[90vh] overflow-hidden">
         {/* 載入中 */}
         {isDataLoading ? (
           <div className="h-64 flex items-center justify-center">
@@ -2030,11 +2029,10 @@ export function PackageItineraryDialog({
         )}
       </DialogContent>
     </Dialog>
-    )}
 
-    {/* AI 排行程設定對話框 */}
+    {/* AI 排行程設定對話框（level={3}） */}
     <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={3} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles size={18} className="text-morandi-gold" />

@@ -305,7 +305,7 @@ export function VehicleAssignment({ tourId, workspaceId }: VehicleAssignmentProp
 
       {/* 新增車輛對話框 */}
       <Dialog open={showAddVehicle} onOpenChange={setShowAddVehicle}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={3} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>新增車輛</DialogTitle>
           </DialogHeader>
@@ -410,7 +410,7 @@ export function VehicleAssignment({ tourId, workspaceId }: VehicleAssignmentProp
 
       {/* 編輯車輛對話框 */}
       <Dialog open={!!editingVehicle} onOpenChange={(open) => !open && setEditingVehicle(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={3} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>編輯 {editingVehicle?.vehicle_name}</DialogTitle>
           </DialogHeader>

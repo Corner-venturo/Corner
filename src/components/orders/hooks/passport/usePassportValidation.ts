@@ -12,6 +12,7 @@ import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { createCustomer, invalidateCustomers } from '@/data'
 import { logger } from '@/lib/utils/logger'
+import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
 
 interface CustomerData {
   name?: string
@@ -68,6 +69,8 @@ interface UsePassportValidationReturn {
 
 export function usePassportValidation(): UsePassportValidationReturn {
   // 上傳護照照片
+  // 統一使用平坦路徑格式：passport_{timestamp}_{random}.jpg（根目錄）
+  // 這與其他上傳功能保持一致，避免巢狀目錄造成的潛在問題
   const uploadPassportImage = useCallback(async (
     file: File,
     workspaceId: string,
@@ -75,19 +78,19 @@ export function usePassportValidation(): UsePassportValidationReturn {
     index: number
   ): Promise<string | null> => {
     try {
-      const timestamp = Date.now()
-      const fileExt = file.name.split('.').pop() || 'jpg'
-      const fileName = `${workspaceId}/${orderId}/${timestamp}_${index}.${fileExt}`
+      // 統一格式：passport_{timestamp}_{random}.jpg（根目錄）
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
 
       const { error: uploadError } = await supabase.storage
         .from('passport-images')
         .upload(fileName, file, {
-          contentType: file.type,
-          upsert: false,
+          contentType: 'image/jpeg',
+          upsert: true, // 改為 upsert: true，避免檔名衝突導致失敗
         })
 
       if (uploadError) {
-        logger.error('上傳護照照片失敗:', uploadError)
+        logger.error('上傳護照照片失敗:', uploadError, { fileName, workspaceId, orderId, index })
         return null
       }
 
@@ -95,7 +98,11 @@ export function usePassportValidation(): UsePassportValidationReturn {
         .from('passport-images')
         .getPublicUrl(fileName)
 
-      return urlData?.publicUrl || null
+      const publicUrl = urlData?.publicUrl || null
+      if (publicUrl) {
+        logger.info(`護照照片上傳成功: ${fileName}`)
+      }
+      return publicUrl
     } catch (error) {
       logger.error('上傳護照照片異常:', error)
       return null
@@ -189,6 +196,9 @@ export function usePassportValidation(): UsePassportValidationReturn {
               .from('customers')
               .update({ passport_image_url: passportImageUrl })
               .eq('id', existingCustomer.id)
+
+            // 同步護照照片到其他關聯的訂單成員
+            await syncPassportImageToMembers(existingCustomer.id, passportImageUrl)
           }
 
           matchedCustomer = true

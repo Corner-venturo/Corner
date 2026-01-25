@@ -187,7 +187,7 @@ export function TourDocuments({ orderFilter, showSummary = true }: TourDocuments
 
       {/* 上傳文件對話框 */}
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={2} className="max-w-md">
           <DialogHeader>
             <DialogTitle>上傳文件</DialogTitle>
           </DialogHeader>

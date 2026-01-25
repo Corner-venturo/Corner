@@ -73,10 +73,7 @@ export const TourPayments = React.memo(function TourPayments({
     handleIssueInvoice,
   } = useTourPayments({ tour, orderFilter, triggerAdd, onTriggerAddComplete })
 
-  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  React.useEffect(() => {
-    onChildDialogChange?.(isAddDialogOpen || isInvoiceDialogOpen)
-  }, [isAddDialogOpen, isInvoiceDialogOpen, onChildDialogChange])
+  // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
   return (
     <div className="space-y-4">

@@ -77,7 +77,7 @@ export function PassportImageEnhancer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent level={2} className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles size={18} className="text-morandi-gold" />

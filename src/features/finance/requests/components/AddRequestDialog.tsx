@@ -470,7 +470,7 @@ export function AddRequestDialog({ open, onOpenChange, onSuccess, defaultTourId,
   // === 渲染 ===
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden">
+      <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>新增請款單</DialogTitle>
           <p className="text-sm text-morandi-secondary">

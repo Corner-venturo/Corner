@@ -30,6 +30,37 @@ export const DIALOG_SIZES = {
 
 export type DialogSize = keyof typeof DIALOG_SIZES
 
+/**
+ * Dialog 層級系統
+ *
+ * 用於處理巢狀 Dialog 的 z-index 層級：
+ * - Level 1: 主 Dialog（從頁面打開）- 有黑色遮罩
+ * - Level 2: 子 Dialog（從主 Dialog 打開）- 透明遮罩
+ * - Level 3: 孫 Dialog（從子 Dialog 打開）- 透明遮罩
+ * - Level 4: 曾孫 Dialog - 透明遮罩
+ * - Level 5: 極少用 - 透明遮罩
+ *
+ * 使用範例：
+ * - 頂層 Dialog: <DialogContent level={1}>
+ * - 子 Dialog:   <DialogContent level={2}>
+ * - 孫 Dialog:   <DialogContent level={3}>
+ */
+export type DialogLevel = 1 | 2 | 3 | 4 | 5
+
+/**
+ * 每個層級的 z-index 設定
+ * - overlay: 遮罩層
+ * - content: Dialog 內容
+ * - close: 關閉按鈕
+ */
+const DIALOG_Z_INDEX = {
+  1: { overlay: 9000, content: 9010, close: 9011 },
+  2: { overlay: 9100, content: 9110, close: 9111 },
+  3: { overlay: 9200, content: 9210, close: 9211 },
+  4: { overlay: 9300, content: 9310, close: 9311 },
+  5: { overlay: 9400, content: 9410, close: 9411 },
+} as const
+
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger
@@ -47,7 +78,7 @@ const DialogOverlay = React.forwardRef<
     onDragOver={(e) => e.preventDefault()}
     onDrop={(e) => e.preventDefault()}
     className={cn(
-      'fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 z-[9000] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
     )}
     {...props}
@@ -72,8 +103,19 @@ interface DialogContentProps
    */
   size?: DialogSize
   /**
-   * 巢狀 Dialog（用於從其他 Dialog 中打開時，使用更高的 z-index 層級）
-   * @default false
+   * Dialog 層級（1-5）
+   * @default 1
+   *
+   * 使用指南：
+   * - 1: 主 Dialog（從頁面打開）
+   * - 2: 子 Dialog（從主 Dialog 打開）
+   * - 3: 孫 Dialog（從子 Dialog 打開）
+   * - 4+: 更深層的巢狀（極少用）
+   */
+  level?: DialogLevel
+  /**
+   * @deprecated 請使用 level={2} 代替
+   * 保留向後兼容：nested={true} 等同於 level={2}
    */
   nested?: boolean
 }
@@ -81,46 +123,55 @@ interface DialogContentProps
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, size = 'lg', nested = false, ...props }, ref) => (
-  <DialogPortal>
-    {/*
-      巢狀 Dialog 遮罩設計：
-      - 普通 Dialog: bg-black/60 (60% 黑色) + 背景模糊
-      - 巢狀 Dialog: 透明背景，只有 z-index 更高（避免雙重遮罩）
-    */}
-    {!nested && (
+>(({ className, children, size = 'lg', level, nested = false, ...props }, ref) => {
+  // 向後兼容：nested={true} 等同於 level={2}
+  const effectiveLevel: DialogLevel = level ?? (nested ? 2 : 1)
+  const zIndex = DIALOG_Z_INDEX[effectiveLevel]
+  const showOverlay = effectiveLevel === 1
+
+  return (
+    <DialogPortal>
+      {/*
+        Dialog 遮罩設計：
+        - Level 1: bg-black/60 (60% 黑色) + 背景模糊
+        - Level 2+: 透明遮罩（避免多重黑色疊加）
+      */}
       <DialogPrimitive.Overlay
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => e.preventDefault()}
-        className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+        className={cn(
+          'fixed inset-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          showOverlay ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/30 backdrop-blur-sm'
+        )}
+        style={{ zIndex: zIndex.overlay }}
       />
-    )}
-    <DialogPrimitive.Content
-      ref={ref}
-      aria-describedby={undefined}
-      onOpenAutoFocus={(e) => e.preventDefault()}
-      onInteractOutside={(e) => e.preventDefault()}
-      onPointerDownOutside={(e) => e.preventDefault()}
-      aria-labelledby={undefined}
-      className={cn(
-        'fixed left-[50%] top-[50%] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
-        nested ? 'z-[10002]' : 'z-[9999]',
-        DIALOG_SIZES[size],
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className={cn(
-        'absolute right-4 top-4 rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer',
-        nested ? 'z-[10003]' : 'z-[10000]'
-      )}>
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+      <DialogPrimitive.Content
+        ref={ref}
+        aria-describedby={undefined}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        aria-labelledby={undefined}
+        className={cn(
+          'fixed left-[50%] top-[50%] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-8 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-xl',
+          DIALOG_SIZES[size],
+          className
+        )}
+        style={{ zIndex: zIndex.content }}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close
+          className="absolute right-4 top-4 rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer"
+          style={{ zIndex: zIndex.close }}
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -173,4 +224,6 @@ export {
   DialogDescription,
   // Types
   type DialogContentProps,
+  // Constants
+  DIALOG_Z_INDEX,
 }

@@ -225,10 +225,9 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
 
   return (
     <>
-    {/* 主 Dialog：新增車輛 Dialog 開啟時不渲染（避免多重遮罩） */}
-    {!showAddVehicle && (
+    {/* 主 Dialog：level={2} 因為從 TourDetailDialog 打開 */}
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent level={2} className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-4 border-b border-border">
           <DialogTitle className="flex items-center gap-2 text-morandi-primary">
             <Bus className="h-5 w-5 text-morandi-gold" />
@@ -419,11 +418,10 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
         </div>
       </DialogContent>
     </Dialog>
-    )}
 
-    {/* 新增車輛 Dialog - 放在主 Dialog 外面（避免多重遮罩） */}
+    {/* 新增車輛 Dialog：level={3} 因為是 level={2} Dialog 的子 Dialog */}
     <Dialog open={showAddVehicle} onOpenChange={setShowAddVehicle}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent level={3} className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-morandi-primary">
             <Plus className="h-5 w-5 text-morandi-gold" />

@@ -1,11 +1,19 @@
 # Claude Code 工作規範 (Venturo ERP)
 
-> **最後更新**: 2026-01-23
+> **最後更新**: 2026-01-25
 > **文件類型**: Claude 專用工作流程與快速指令
 
 ---
 
 ## 🚨🚨🚨 對話開始必做 (P0) 🚨🚨🚨
+
+### 第零步：查閱跨系統影響地圖
+
+```
+Read /Users/williamchien/Projects/CROSS_SYSTEM_MAP.md
+```
+
+**為什麼最優先？** 改 ERP 可能影響 Online，先知道影響範圍再動手！
 
 ### 第一步：理解 Venturo 願景
 
@@ -62,6 +70,7 @@ Read /Users/williamchien/Projects/SITEMAP.md
 - ❌ 新增 `as any` → 使用明確類型或 `unknown` + type guard
 - ❌ 使用 `birthday` → 使用 `birth_date`
 - ❌ 使用 `name_en` → 使用 `english_name`
+- ❌ Dialog 不設定 `level` → 所有 DialogContent 必須設定 `level={1|2|3}`
 
 ---
 
@@ -69,8 +78,11 @@ Read /Users/williamchien/Projects/SITEMAP.md
 
 ### `修復多重遮罩` / `fix-overlay`
 檢查並修復巢狀 Dialog 的遮罩疊加問題。
-- 搜尋 `Dialog.*open=` 和巢狀 Dialog
-- 套用單一遮罩模式（父 Dialog 在子 Dialog 開啟時不渲染）
+- 所有 Dialog 必須設定 `level` 屬性
+- Level 1: 從頁面直接打開的主 Dialog
+- Level 2: 從 Level 1 Dialog 打開的子 Dialog
+- Level 3: 從 Level 2 Dialog 打開的孫 Dialog
+- 詳見 `docs/COMPONENT_GUIDE.md` 的「Dialog 層級系統」章節
 
 ### `CARD 檢查` / `card-check`
 對功能模組進行四維度審計：

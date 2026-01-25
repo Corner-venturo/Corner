@@ -95,7 +95,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
   if (loading && !data) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent level={2} className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <VisuallyHidden>
             <DialogTitle>載入出團資料中</DialogTitle>
           </VisuallyHidden>
@@ -117,7 +117,7 @@ export function TourDepartureDialog({ tour, open, onOpenChange }: TourDepartureD
       />
 
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent level={2} className="max-w-5xl max-h-[90vh] overflow-y-auto p-0">
           {/* Header */}
           <div className="px-6 py-4 border-b border-border">
             <DialogHeader>

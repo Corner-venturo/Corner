@@ -17,6 +17,8 @@ import {
   Save,
   FlipHorizontal,
   X,
+  Upload,
+  ImageOff,
 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -60,6 +62,7 @@ export function CustomerVerifyDialog({
   // 表單資料
   const [formData, setFormData] = useState<Partial<UpdateCustomerData>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null)
 
   // 圖片編輯 Hook
   const imageEditor = useImageEditor()
@@ -71,9 +74,57 @@ export function CustomerVerifyDialog({
   // 重置狀態
   const handleClose = useCallback(() => {
     setFormData({})
+    setLocalImageUrl(null)
     imageEditor.reset()
     onOpenChange(false)
   }, [imageEditor, onOpenChange])
+
+  // 上傳新照片
+  const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !customer) return
+
+    try {
+      // 統一格式：passport_{timestamp}_{random}.jpg
+      const random = Math.random().toString(36).substring(2, 8)
+      const fileName = `passport_${Date.now()}_${random}.jpg`
+
+      const { error: uploadError } = await supabase.storage
+        .from('passport-images')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('passport-images')
+        .getPublicUrl(fileName)
+
+      const newUrl = urlData.publicUrl
+
+      // 更新顧客資料
+      await onUpdate(customer.id, { passport_image_url: newUrl })
+
+      // 更新本地顯示
+      setLocalImageUrl(newUrl)
+
+      toast.success('護照照片已上傳')
+
+      // 自動進行 OCR 辨識
+      try {
+        await recognizePassport(newUrl, (result) => {
+          setFormData(prev => ({
+            ...prev,
+            ...result,
+          }))
+        })
+      } catch {
+        // OCR 失敗不影響上傳成功
+      }
+    } catch (error) {
+      logger.error('上傳護照照片失敗:', error)
+      toast.error('上傳失敗，請稍後再試')
+    }
+  }
 
   // 初始化表單（當 customer 改變時）
   const initFormData = useCallback(() => {
@@ -219,7 +270,7 @@ export function CustomerVerifyDialog({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-morandi-primary">護照照片</h3>
-              {customer.passport_image_url && !imageEditor.isCropMode && (
+              {(localImageUrl || customer.passport_image_url) && !imageEditor.isCropMode && (
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
@@ -253,7 +304,7 @@ export function CustomerVerifyDialog({
             </div>
 
             {/* 工具列 */}
-            {customer.passport_image_url && !imageEditor.isCropMode && (
+            {(localImageUrl || customer.passport_image_url) && !imageEditor.isCropMode && (
               <div className="flex items-center justify-between bg-muted rounded-lg p-2">
                 <div className="flex items-center gap-1">
                   <button
@@ -316,7 +367,7 @@ export function CustomerVerifyDialog({
             )}
 
             {/* 圖片容器 */}
-            {customer.passport_image_url && (
+            {(localImageUrl || customer.passport_image_url) ? (
               <div
                 ref={imageContainerRef}
                 className={`relative overflow-hidden rounded-lg border bg-muted ${
@@ -332,7 +383,7 @@ export function CustomerVerifyDialog({
                 onMouseLeave={(e) => imageEditor.handleMouseLeave(e, imageContainerRef.current)}
               >
                 <img
-                  src={customer.passport_image_url}
+                  src={localImageUrl || customer.passport_image_url!}
                   alt="護照"
                   className="absolute w-full h-full object-contain transition-transform"
                   style={{
@@ -353,7 +404,38 @@ export function CustomerVerifyDialog({
                     }}
                   />
                 )}
+                {/* 重新上傳按鈕 */}
+                <label
+                  htmlFor="customer-passport-reupload"
+                  className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg cursor-pointer shadow-sm border"
+                  title="更換照片"
+                >
+                  <Upload size={16} className="text-morandi-gold" />
+                  <input
+                    id="customer-passport-reupload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleUploadPhoto}
+                  />
+                </label>
               </div>
+            ) : (
+              <label
+                htmlFor="customer-passport-upload"
+                className="w-full h-80 bg-morandi-container/30 rounded-lg flex flex-col items-center justify-center text-morandi-primary border-2 border-dashed border-morandi-secondary/30 hover:border-morandi-gold hover:bg-morandi-gold/5 cursor-pointer transition-all"
+              >
+                <ImageOff size={48} className="mb-3 text-morandi-muted" />
+                <span className="text-sm font-medium">點擊上傳護照照片</span>
+                <span className="text-xs mt-1 text-morandi-muted">支援 JPG、PNG</span>
+                <input
+                  id="customer-passport-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleUploadPhoto}
+                />
+              </label>
             )}
           </div>
 

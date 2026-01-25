@@ -145,7 +145,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
   if (!tour.contract_content) {
     return (
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent>
+        <DialogContent level={2}>
           <DialogHeader>
             <DialogTitle>無合約資料</DialogTitle>
           </DialogHeader>
@@ -157,7 +157,7 @@ export function ContractViewDialog({ isOpen, onClose, tour }: ContractViewDialog
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent level={2} className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSignature size={20} />

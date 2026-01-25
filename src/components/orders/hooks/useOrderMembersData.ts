@@ -20,6 +20,9 @@ import { toast } from 'sonner'
 import type { OrderMember } from '../order-member.types'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
+// 快取已同步的顧客 ID，避免重複同步
+const syncedCustomerIds = new Set<string>()
+
 interface UseOrderMembersDataParams {
   orderId?: string
   tourId: string
@@ -140,27 +143,69 @@ export function useOrderMembersData({
         .map(m => m.customer_id)
         .filter(Boolean) as string[]
 
-      // 如果有 customer_id，批次查詢顧客驗證狀態
-      let customerStatusMap: Record<string, string> = {}
+      // 如果有 customer_id，批次查詢顧客驗證狀態和護照照片
+      let customerDataMap: Record<string, { verification_status: string; passport_image_url: string | null }> = {}
       if (customerIds.length > 0) {
         const { data: customersData } = await supabase
           .from('customers')
-          .select('id, verification_status')
+          .select('id, verification_status, passport_image_url')
           .in('id', customerIds)
 
         if (customersData) {
-          customerStatusMap = Object.fromEntries(
-            customersData.map(c => [c.id, c.verification_status || ''])
+          customerDataMap = Object.fromEntries(
+            customersData.map(c => [c.id, {
+              verification_status: c.verification_status || '',
+              passport_image_url: c.passport_image_url || null,
+            }])
           )
         }
       }
 
       // 合併驗證狀態和訂單編號到成員
-      const membersWithStatus = membersData.map(m => ({
-        ...m,
-        customer_verification_status: m.customer_id ? customerStatusMap[m.customer_id] || null : null,
-        order_code: mode === 'tour' ? orderCodeMap[m.order_id] || null : null,
-      }))
+      // 同時填補 passport_image_url（從顧客取得）並背景同步到資料庫
+      const membersToSync: Array<{ memberId: string; customerId: string; url: string }> = []
+
+      const membersWithStatus = membersData.map(m => {
+        const customerData = m.customer_id ? customerDataMap[m.customer_id] : null
+        let passportImageUrl = m.passport_image_url
+
+        // 如果成員沒有護照照片但顧客有，使用顧客的並標記需要同步
+        if (!passportImageUrl && customerData?.passport_image_url && m.customer_id) {
+          passportImageUrl = customerData.passport_image_url
+          // 只有尚未同步過的顧客才加入同步列表
+          if (!syncedCustomerIds.has(m.customer_id)) {
+            membersToSync.push({
+              memberId: m.id,
+              customerId: m.customer_id,
+              url: customerData.passport_image_url,
+            })
+          }
+        }
+
+        return {
+          ...m,
+          customer_verification_status: customerData?.verification_status || null,
+          passport_image_url: passportImageUrl,
+          order_code: mode === 'tour' ? orderCodeMap[m.order_id] || null : null,
+        }
+      })
+
+      // 背景同步：將顧客的護照照片同步到成員資料庫（一次性修復）
+      if (membersToSync.length > 0) {
+        const uniqueCustomerIds = [...new Set(membersToSync.map(m => m.customerId))]
+        uniqueCustomerIds.forEach(id => syncedCustomerIds.add(id))
+
+        // 背景執行，不阻塞 UI
+        void (async () => {
+          for (const item of membersToSync) {
+            await supabase
+              .from('order_members')
+              .update({ passport_image_url: item.url })
+              .eq('id', item.memberId)
+          }
+          logger.info(`背景同步 ${membersToSync.length} 個成員的護照照片`)
+        })()
+      }
 
       setMembers(membersWithStatus)
     } catch (error) {

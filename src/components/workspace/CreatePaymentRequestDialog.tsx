@@ -111,7 +111,7 @@ export function CreatePaymentRequestDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[600px]">
+      <DialogContent level={1} className="max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
             {isBatch ? `批次請款 (${itemsArray.length} 筆)` : '建立請款單'}

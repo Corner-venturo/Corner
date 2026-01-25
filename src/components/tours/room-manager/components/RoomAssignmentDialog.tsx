@@ -103,7 +103,7 @@ export function RoomAssignmentDialog({
       onOpenChange(isOpen)
       if (!isOpen) resetRoomRows()
     }}>
-      <DialogContent className="max-w-4xl w-full">
+      <DialogContent level={3} className="max-w-4xl w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BedDouble className="h-5 w-5 text-morandi-gold" />

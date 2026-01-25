@@ -186,7 +186,7 @@ export function BrochurePreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent level={2} className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0 flex flex-row items-center justify-between">
           <DialogTitle className="flex items-center gap-2">
             <span>簡易行程表</span>

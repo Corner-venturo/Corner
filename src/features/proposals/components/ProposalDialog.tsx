@@ -126,6 +126,7 @@ export function ProposalDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        level={1}
         className="max-w-lg w-[90vw] max-h-[85vh] overflow-hidden flex flex-col"
         aria-describedby={undefined}
       >

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { supabase } from '@/lib/supabase/client'
+import { useReferenceData } from '@/lib/pnr'
 import type { Tour } from '@/stores/types'
 import type { OrderMember, ExportColumnsConfig } from '@/components/orders/order-member.types'
 import type { PNR, PNRSegment } from '@/types/pnr.types'
@@ -91,51 +92,7 @@ const STATUS_NAMES: Record<string, string> = {
   WL: '候補',
 }
 
-// 機場代碼對照表
-const AIRPORT_NAMES: Record<string, string> = {
-  TPE: '台灣桃園機場',
-  TSA: '台北松山機場',
-  KHH: '高雄小港機場',
-  RMQ: '台中清泉崗機場',
-  XMN: '廈門高崎國際機場',
-  PVG: '上海浦東國際機場',
-  SHA: '上海虹橋機場',
-  PEK: '北京首都機場',
-  PKX: '北京大興機場',
-  CAN: '廣州白雲機場',
-  HKG: '香港國際機場',
-  NRT: '東京成田機場',
-  HND: '東京羽田機場',
-  KIX: '大阪關西機場',
-  ICN: '首爾仁川機場',
-  BKK: '曼谷素萬那普機場',
-  SIN: '新加坡樟宜機場',
-  OKA: '沖繩那霸機場',
-  FUK: '福岡機場',
-  NGO: '名古屋中部機場',
-  CTS: '札幌新千歲機場',
-}
-
-// 航空公司代碼對照表
-const AIRLINE_NAMES: Record<string, string> = {
-  BR: '長榮航空',
-  CI: '中華航空',
-  CX: '國泰航空',
-  MF: '廈門航空',
-  CA: '中國國際航空',
-  MU: '中國東方航空',
-  CZ: '中國南方航空',
-  NH: '全日空',
-  JL: '日本航空',
-  MM: '樂桃航空',
-  IT: '台灣虎航',
-  SQ: '新加坡航空',
-  TG: '泰國航空',
-  KE: '大韓航空',
-  OZ: '韓亞航空',
-  UA: '美國聯合航空',
-  AA: '美國航空',
-}
+// 機場和航空公司名稱從 useReferenceData hook 取得（統一從資料庫 ref_airports, ref_airlines 表讀取）
 
 export function TourPrintDialog({
   isOpen,
@@ -150,6 +107,9 @@ export function TourPrintDialog({
   )
   const [pnrData, setPnrData] = useState<PNR[]>([])
   const [loadingPnr, setLoadingPnr] = useState(false)
+
+  // 從資料庫取得機場和航空公司名稱（統一來源）
+  const { getAirportName, getAirlineName } = useReferenceData({ enabled: false })
 
   // 載入 PNR 資料 - 先用 tour_id，再用成員的 PNR 代號
   useEffect(() => {
@@ -235,11 +195,7 @@ export function TourPrintDialog({
     }
   }
 
-  // 取得機場名稱
-  const getAirportName = (code: string) => AIRPORT_NAMES[code] || code
-
-  // 取得航空公司名稱
-  const getAirlineName = (code: string) => AIRLINE_NAMES[code] || code
+  // getAirportName 和 getAirlineName 來自 useReferenceData hook（統一從資料庫讀取）
 
   // 取得艙等名稱
   const getClassName = (code: string) => CLASS_NAMES[code] || code
@@ -879,7 +835,7 @@ export function TourPrintDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={2} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Printer size={18} />

@@ -141,7 +141,7 @@ export function ContractDialog({ isOpen, onClose, tour, mode }: ContractDialogPr
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className={viewMode === 'form' ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
+      <DialogContent level={2} className={viewMode === 'form' ? "max-w-4xl max-h-[90vh] overflow-hidden" : "max-w-md h-[500px] flex flex-col overflow-hidden"}>
 
         {/* ==================== 主視圖 ==================== */}
         {viewMode === 'main' && (

@@ -290,24 +290,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 如果還是沒有城市名稱，嘗試從原始 body.cityId 推斷（可能是城市代碼如 FUK）
+    // 如果還是沒有城市名稱，嘗試從 ref_airports 表查詢（統一資料來源）
     if (cityName === '未知城市' && body.cityId) {
-      // 常見城市代碼對應
-      const cityCodeMap: Record<string, string> = {
-        'FUK': '福岡',
-        'KIX': '大阪',
-        'NRT': '東京',
-        'HND': '東京',
-        'CTS': '札幌',
-        'OKA': '沖繩',
-        'TPE': '台北',
-        'KHH': '高雄',
-        'BKK': '曼谷',
-        'CNX': '清邁',
-        'SGN': '胡志明市',
-        'HAN': '河內',
+      const { data: airportData } = await supabase
+        .from('ref_airports')
+        .select('city_name_zh, name_zh')
+        .eq('iata_code', body.cityId.toUpperCase())
+        .single()
+
+      if (airportData) {
+        cityName = airportData.city_name_zh || airportData.name_zh || body.cityId
+      } else {
+        // 資料庫沒有此機場代碼，使用原始輸入
+        logger.warn(`[Itinerary] 機場代碼 "${body.cityId}" 不在 ref_airports 表中`)
+        cityName = body.cityId
       }
-      cityName = cityCodeMap[body.cityId.toUpperCase()] || body.cityId
     }
 
     logger.log(`[Itinerary] 解析結果: cityName=${cityName}, countryName=${countryName}`)

@@ -144,17 +144,17 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
   )
 
   // 上傳護照照片到 Supabase Storage
+  // 統一使用 passport-images bucket，路徑格式：passport_{timestamp}_{random}.jpg（根目錄）
   const uploadPassportImage = useCallback(
     async (
       fileName: string,
       file: File
     ): Promise<{ data: { publicUrl: string } | null; error: Error | null }> => {
       try {
-        const filePath = `passports/${fileName}`
-
+        // 統一使用 passport-images bucket 和平坦路徑
         const { error: uploadError } = await supabase.storage
-          .from('member-documents')
-          .upload(filePath, file, { upsert: true })
+          .from('passport-images')
+          .upload(fileName, file, { upsert: true })
 
         if (uploadError) {
           logger.error('上傳護照照片失敗:', uploadError)
@@ -163,8 +163,8 @@ export function useMembers({ orderId, tourId }: UseMembersOptions = {}): UseMemb
 
         // 取得公開 URL
         const { data: urlData } = supabase.storage
-          .from('member-documents')
-          .getPublicUrl(filePath)
+          .from('passport-images')
+          .getPublicUrl(fileName)
 
         return {
           data: { publicUrl: urlData?.publicUrl || '' },

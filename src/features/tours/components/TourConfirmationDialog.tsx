@@ -31,7 +31,7 @@ export function TourConfirmationDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[95vw] w-[1400px] max-h-[90vh] overflow-y-auto">
+      <DialogContent level={2} className="max-w-[95vw] w-[1400px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             團確單管理 - {tour.code} {tour.name}

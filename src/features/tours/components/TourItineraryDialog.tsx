@@ -229,15 +229,13 @@ export function TourItineraryDialog({
     }
   }, [tourProposalPackage, refreshPackage])
 
-  // 任何子 Dialog 開啟時，主 Dialog 關閉
-  const hasChildDialogOpen = timelineDialogOpen || packageItineraryDialogOpen
+  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
   return (
     <>
-      {/* 主對話框：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-      {!hasChildDialogOpen && (
+      {/* 主對話框：使用 level={1} */}
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-          <DialogContent className="max-w-md">
+          <DialogContent level={1} className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-morandi-gold" />
@@ -309,9 +307,8 @@ export function TourItineraryDialog({
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
-      {/* 快速行程表對話框 */}
+      {/* 快速行程表對話框（level={2}） */}
       {tourProposalPackage && (
         <PackageItineraryDialog
           isOpen={packageItineraryDialogOpen}

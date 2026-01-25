@@ -298,7 +298,7 @@ export function TourCloseDialog({ tour, open, onOpenChange, onSuccess }: TourClo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent level={2} className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>團體結算 - {tour.name}</DialogTitle>
         </DialogHeader>

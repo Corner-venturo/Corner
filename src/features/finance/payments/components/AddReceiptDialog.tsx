@@ -577,7 +577,7 @@ export function AddReceiptDialog({ open, onOpenChange, onSuccess, defaultTourId,
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
+      <DialogContent level={2} className="max-w-[95vw] w-[95vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {isEditMode ? '編輯收款單' : '新增收款單'}

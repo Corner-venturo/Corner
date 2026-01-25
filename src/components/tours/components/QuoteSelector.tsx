@@ -46,7 +46,7 @@ export function QuoteSelector({
 }: QuoteSelectorProps) {
   return (
     <Dialog open={showQuoteSelector} onOpenChange={setShowQuoteSelector}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={2} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg text-morandi-primary flex items-center gap-2">
             <Calculator className="h-5 w-5 text-morandi-gold" />

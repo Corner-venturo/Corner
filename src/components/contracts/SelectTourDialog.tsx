@@ -79,7 +79,7 @@ export const SelectTourDialog: React.FC<SelectTourDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent level={1} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>選擇團體建立合約</DialogTitle>
         </DialogHeader>

@@ -90,15 +90,13 @@ export function ProposalDetailDialog({
 
   if (!proposal) return null
 
-  // 任何子 Dialog 開啟時，主 Dialog 關閉但不卸載（避免 ref 問題）
-  const hasChildDialogOpen = itineraryDialogOpen || packageListChildDialogOpen
+  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
   return (
     <>
-      {/* 主對話框：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-      {!hasChildDialogOpen && (
+      {/* 主對話框：使用 level={1} */}
       <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
+          <DialogContent level={1} className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-6">
             <VisuallyHidden>
               <DialogTitle>提案詳情 - {proposal.code}</DialogTitle>
             </VisuallyHidden>
@@ -140,9 +138,8 @@ export function ProposalDetailDialog({
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
-      {/* 行程表對話框：放在主對話框外面（單一遮罩模式） */}
+      {/* 行程表對話框（level={2}） */}
       {itineraryPackage && (
         <PackageItineraryDialog
           isOpen={itineraryDialogOpen}

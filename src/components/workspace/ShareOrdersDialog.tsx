@@ -129,7 +129,7 @@ export function ShareOrdersDialog({ channelId, open, onClose, onSuccess }: Share
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-[900px] max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent level={1} className="max-w-[900px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
             <Receipt className="text-morandi-gold" size={20} />

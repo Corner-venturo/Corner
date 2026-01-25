@@ -106,8 +106,7 @@ export function RequirementSyncDialog({
     setRequestDialogOpen(true)
   }, [])
 
-  // 判斷是否有子 Dialog 開啟
-  const hasChildDialogOpen = requestDialogOpen
+  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
 
   // 來源資訊
   const source = tour
@@ -132,10 +131,9 @@ export function RequirementSyncDialog({
 
   return (
     <>
-      {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-      {!hasChildDialogOpen && (
+      {/* 主 Dialog：使用 level={2} */}
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
-          <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogContent level={2} className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
             <DialogHeader className="flex flex-row items-center justify-between">
               <DialogTitle className="flex items-center gap-2">
                 <ClipboardList size={18} className="text-morandi-gold" />
@@ -166,9 +164,8 @@ export function RequirementSyncDialog({
             </div>
           </DialogContent>
         </Dialog>
-      )}
 
-      {/* 需求單 Dialog */}
+      {/* 需求單 Dialog（level={3}） */}
       {selectedRequestData && (
         <TourRequestFormDialog
           isOpen={requestDialogOpen}

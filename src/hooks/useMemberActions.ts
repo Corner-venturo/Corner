@@ -10,8 +10,8 @@ import { getCurrentWorkspaceId } from '@/lib/workspace-helpers'
 import type { Member } from '@/stores/types'
 import type { Database } from '@/lib/supabase/types'
 
-// Supabase Insert 類型
-type MemberInsert = Database['public']['Tables']['members']['Insert']
+// Supabase Insert 類型（使用 order_members 表）
+type OrderMemberInsert = Database['public']['Tables']['order_members']['Insert']
 
 // SWR key 與 @/data 的 createEntityHook 一致，確保 mutate 時能同步
 // members 對應表名是 order_members，orders 對應表名是 orders
@@ -79,15 +79,28 @@ export function useMemberActions(): MemberActionsReturn {
       ...(workspace_id ? { workspace_id } : {}),
     } as Member
 
-    // 轉換為 Supabase Insert 類型
-    const insertData: MemberInsert = {
+    // 轉換為 Supabase Insert 類型（保留所有傳入的欄位）
+    // 注意：使用 order_members 表而非 members 表
+    const memberData = newMember as unknown as Record<string, unknown>
+    const insertData: OrderMemberInsert = {
       id: newMember.id,
       chinese_name: newMember.chinese_name || '',
       order_id: newMember.order_id,
-      created_at: newMember.created_at ?? undefined,
-      updated_at: newMember.updated_at ?? undefined,
+      member_type: (memberData.member_type as string) || 'adult',
+      // 基本資料
+      passport_image_url: (memberData.passport_image_url as string | null) ?? null,
+      passport_number: newMember.passport_number ?? null,
+      passport_name: newMember.passport_name ?? (memberData.name_en as string | null) ?? null,
+      passport_expiry: newMember.passport_expiry ?? null,
+      id_number: (memberData.id_number as string | null) ?? null,
+      gender: newMember.gender ?? null,
+      birth_date: (memberData.birthday as string | null) ?? (memberData.birth_date as string | null) ?? null,
+      // 其他常用欄位
+      pnr: (memberData.reservation_code as string | null) ?? (memberData.pnr as string | null) ?? null,
+      customer_id: (memberData.customer_id as string | null) ?? null,
+      workspace_id: workspace_id ?? null,
     }
-    const { error } = await supabase.from('members').insert(insertData)
+    const { error } = await supabase.from('order_members').insert(insertData)
     if (error) throw error
 
     // 觸發 SWR revalidate，讓其他頁面的 useMembers() 同步
@@ -104,11 +117,20 @@ export function useMemberActions(): MemberActionsReturn {
   const update = async (id: string, updates: Partial<Member>): Promise<void> => {
     const updatedData = {
       ...updates,
-      updated_at: new Date().toISOString(),
+      // 處理欄位名稱對應
+      ...(updates.passport_name !== undefined || (updates as Record<string, unknown>).name_en !== undefined
+        ? { passport_name: updates.passport_name ?? (updates as Record<string, unknown>).name_en }
+        : {}),
+      ...(updates.birthday !== undefined || (updates as Record<string, unknown>).birth_date !== undefined
+        ? { birth_date: updates.birthday ?? (updates as Record<string, unknown>).birth_date }
+        : {}),
+      ...((updates as Record<string, unknown>).reservation_code !== undefined || (updates as Record<string, unknown>).pnr !== undefined
+        ? { pnr: (updates as Record<string, unknown>).reservation_code ?? (updates as Record<string, unknown>).pnr }
+        : {}),
     }
 
     const { error } = await supabase
-      .from('members')
+      .from('order_members')
       .update(updatedData as Record<string, unknown>)
       .eq('id', id)
     if (error) throw error
@@ -121,14 +143,14 @@ export function useMemberActions(): MemberActionsReturn {
     let memberOrderId = orderId
     if (!memberOrderId) {
       const { data: member } = await supabase
-        .from('members')
+        .from('order_members')
         .select('order_id')
         .eq('id', id)
         .single()
       memberOrderId = member?.order_id ?? undefined
     }
 
-    const { error } = await supabase.from('members').delete().eq('id', id)
+    const { error } = await supabase.from('order_members').delete().eq('id', id)
     if (error) throw error
 
     mutate(SWR_KEY)

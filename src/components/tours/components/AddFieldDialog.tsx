@@ -25,7 +25,7 @@ export function AddFieldDialog({ open, onOpenChange, onAdd }: AddFieldDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent level={2}>
         <DialogHeader>
           <DialogTitle>新增自訂欄位</DialogTitle>
         </DialogHeader>

@@ -269,7 +269,7 @@ export function RequestDetailDialog({ request, open, onOpenChange }: RequestDeta
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent level={2} className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>

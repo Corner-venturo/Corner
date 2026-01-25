@@ -392,7 +392,7 @@ export function TourRoomsTab({ tourId, workspaceId }: TourRoomsTabProps) {
 
       {/* 新增房間對話框 */}
       <Dialog open={showAddRoom} onOpenChange={setShowAddRoom}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={2} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>新增房間（第 {currentNight} 晚）</DialogTitle>
           </DialogHeader>
@@ -481,7 +481,7 @@ export function TourRoomsTab({ tourId, workspaceId }: TourRoomsTabProps) {
 
       {/* 編輯房間對話框 */}
       <Dialog open={!!editingRoom} onOpenChange={(open) => !open && setEditingRoom(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent level={2} className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>編輯房間</DialogTitle>
           </DialogHeader>

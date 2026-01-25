@@ -12,6 +12,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { Plus, Printer, Hotel, Bus, Coins, Settings, Pencil, Plane } from 'lucide-react'
+import { prompt } from '@/lib/ui/alert-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -218,16 +219,7 @@ export function OrderMembersExpandable({
     prevShowPnrMatchDialog.current = showPnrMatchDialog
   }, [isParentControlledPnrDialog, showPnrMatchDialog, membersData])
 
-  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  // 只包含需要獨占全屏的大型 Dialog（分房、分車）
-  // 其他小型 Dialog（新增成員、編輯成員等）使用 nested 模式在父 Dialog 內顯示
-  // 當 PNR Dialog 由父組件控制時，不包含在此計算中（父組件會處理）
-  const hasChildDialogOpen = (!isParentControlledPnrDialog && showPnrMatchDialog) ||
-    roomVehicle.showRoomManager || roomVehicle.showVehicleManager
-
-  useEffect(() => {
-    onChildDialogChange?.(hasChildDialogOpen)
-  }, [hasChildDialogOpen, onChildDialogChange])
+  // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
   // 從 members 資料初始化 pnrValues
   React.useEffect(() => {
@@ -329,8 +321,11 @@ export function OrderMembersExpandable({
               variant="ghost"
               size="sm"
               className="h-8 px-2"
-              onClick={() => {
-                const name = prompt('輸入費用欄位名稱（例如：簽證費、小費）')
+              onClick={async () => {
+                const name = await prompt('輸入費用欄位名稱（例如：簽證費、小費）', {
+                  title: '新增費用欄位',
+                  placeholder: '例如：簽證費、小費',
+                })
                 if (name?.trim()) {
                   setCustomCostFields([...customCostFields, { id: `cost_${Date.now()}`, name: name.trim(), values: {} }])
                 }

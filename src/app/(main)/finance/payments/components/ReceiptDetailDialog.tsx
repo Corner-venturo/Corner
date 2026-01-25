@@ -181,10 +181,9 @@ export function ReceiptDetailDialog({
 
   return (
     <>
-    {/* 主 Dialog：子 Dialog 開啟時完全不渲染（避免多重遮罩） */}
-    {!showLinkPayDialog && (
+    {/* 主 Dialog：level={1} 從財務頁面直接打開 */}
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent level={1} className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-morandi-gold" />
@@ -447,9 +446,8 @@ export function ReceiptDetailDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-    )}
 
-    {/* LinkPay 建立對話框 - 放在外層避免多重遮罩 */}
+    {/* LinkPay 建立對話框：level={2} 子 Dialog */}
     {isLinkPay && (
       <CreateLinkPayDialog
         isOpen={showLinkPayDialog}

@@ -26,10 +26,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   const [requestDialogOpen, setRequestDialogOpen] = useState(false)
   const [selectedOrderForRequest, setSelectedOrderForRequest] = useState<Order | null>(null)
 
-  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  useEffect(() => {
-    onChildDialogChange?.(receiptDialogOpen || requestDialogOpen)
-  }, [receiptDialogOpen, requestDialogOpen, onChildDialogChange])
+  // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
   useEffect(() => {
     const fetchOrders = async () => {

@@ -147,7 +147,7 @@ export function ReceiptConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[800px] flex flex-col">
+      <DialogContent level={2} className="max-w-[800px] flex flex-col">
         <DialogHeader>
           <DialogTitle>收款單詳情</DialogTitle>
           <p className="text-sm text-muted-foreground">

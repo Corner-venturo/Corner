@@ -27,6 +27,7 @@ import { useCustomers } from '@/hooks/cloud-hooks'
 import type { Customer, CreateCustomerData } from '@/types/customer.types'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { supabase } from '@/lib/supabase/client'
+import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
 import { useRouter } from 'next/navigation'
 
 // 本地組件和 Hooks
@@ -81,11 +82,14 @@ export default function CustomersPage() {
 
         if (member?.passport_image_url) {
           passportImageUrl = member.passport_image_url
-          // 同時更新顧客的護照圖片（背景執行）
-          void supabase
-            .from('customers')
-            .update({ passport_image_url: passportImageUrl })
-            .eq('id', customer.id)
+          // 同時更新顧客的護照圖片並同步到其他成員（背景執行）
+          void (async () => {
+            await supabase
+              .from('customers')
+              .update({ passport_image_url: passportImageUrl })
+              .eq('id', customer.id)
+            await syncPassportImageToMembers(customer.id, passportImageUrl)
+          })()
         }
       } catch {
         // 找不到關聯的訂單成員，忽略錯誤

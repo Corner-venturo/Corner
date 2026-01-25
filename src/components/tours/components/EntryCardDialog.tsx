@@ -50,7 +50,7 @@ export const EntryCardDialog: React.FC<EntryCardDialogProps> = ({
   const onSettingsChange = externalOnSettingsChange ?? setInternalSettings
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-auto">
+      <DialogContent level={2} className="max-w-[95vw] max-h-[95vh] overflow-auto">
         <div className="no-print flex items-center justify-between mb-4">
           <DialogHeader>
             <DialogTitle>列印日本入境卡</DialogTitle>

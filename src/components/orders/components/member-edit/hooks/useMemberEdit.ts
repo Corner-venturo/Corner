@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { useImageEditor } from '@/hooks/image-editor'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { syncPassportImageToMembers } from '@/lib/utils/sync-passport-image'
 import type { OrderMember } from '../../../order-member.types'
 
 interface EditFormData {
@@ -127,6 +128,15 @@ export function useMemberEdit(
         .update({ passport_image_url: urlData.publicUrl })
         .eq('id', editingMember.id)
 
+      // 如果成員有關聯顧客，同步護照照片到顧客和其他關聯成員
+      if (editingMember.customer_id) {
+        await supabase
+          .from('customers')
+          .update({ passport_image_url: urlData.publicUrl })
+          .eq('id', editingMember.customer_id)
+        await syncPassportImageToMembers(editingMember.customer_id, urlData.publicUrl)
+      }
+
       // 上傳成功後刪除舊照片
       await deleteOldPassportImage(oldUrl)
 
@@ -174,6 +184,15 @@ export function useMemberEdit(
           .update({ passport_image_url: urlData.publicUrl })
           .eq('id', editingMember.id)
 
+        // 如果成員有關聯顧客，同步護照照片到顧客和其他關聯成員
+        if (editingMember.customer_id) {
+          await supabase
+            .from('customers')
+            .update({ passport_image_url: urlData.publicUrl })
+            .eq('id', editingMember.customer_id)
+          await syncPassportImageToMembers(editingMember.customer_id, urlData.publicUrl)
+        }
+
         // 上傳成功後刪除舊照片
         await deleteOldPassportImage(oldUrl)
 
@@ -217,6 +236,15 @@ export function useMemberEdit(
         .from('order_members')
         .update({ passport_image_url: urlData.publicUrl })
         .eq('id', editingMember.id)
+
+      // 如果成員有關聯顧客，同步護照照片到顧客和其他關聯成員
+      if (editingMember.customer_id) {
+        await supabase
+          .from('customers')
+          .update({ passport_image_url: urlData.publicUrl })
+          .eq('id', editingMember.customer_id)
+        await syncPassportImageToMembers(editingMember.customer_id, urlData.publicUrl)
+      }
 
       // 上傳成功後刪除舊照片
       await deleteOldPassportImage(oldUrl)

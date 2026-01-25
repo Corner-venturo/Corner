@@ -1407,9 +1407,10 @@ table input[type='number'] {
 
 table input[type='text']:focus,
 table input[type='number']:focus {
-  background-color: white;
-  border: 1px solid var(--input-border-focus);
+  background-color: transparent;
+  border: none;
   box-shadow: none;
+  outline: none;
 }
 
 /* 無 focus 樣式的輸入框（用於文青風表格等場景） */

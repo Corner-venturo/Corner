@@ -99,14 +99,7 @@ export function PackageListPanel({
   const [requirementDialogOpen, setRequirementDialogOpen] = useState(false)
   const [selectedPackage, setSelectedPackage] = useState<ProposalPackage | null>(null)
 
-  // 追蹤是否有任何子 Dialog 開啟（用於單一遮罩模式）
-  const hasAnyDialogOpen = addDialogOpen || editDialogOpen ||
-    itineraryDialogOpen || brochureDialogOpen || requirementDialogOpen
-
-  // 通知父組件子 Dialog 狀態變化
-  React.useEffect(() => {
-    onChildDialogChange?.(hasAnyDialogOpen)
-  }, [hasAnyDialogOpen, onChildDialogChange])
+  // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
   // 新增套件
   const handleCreatePackage = useCallback(

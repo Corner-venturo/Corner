@@ -71,7 +71,7 @@ export function CreateReceiptDialog({ order, open, onClose, onSuccess }: CreateR
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-[500px]">
+      <DialogContent level={1} className="max-w-[500px]">
         <DialogHeader className="pb-3 border-b border-morandi-gold/20">
           <DialogTitle className="flex items-center gap-2">
             <DollarSign className="text-morandi-gold" size={20} />

@@ -77,7 +77,7 @@ export function CustomCostFieldsSection({
 
       {/* 新增欄位對話框 */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={2} className="max-w-md">
           <DialogHeader>
             <DialogTitle>新增自訂費用欄位</DialogTitle>
           </DialogHeader>

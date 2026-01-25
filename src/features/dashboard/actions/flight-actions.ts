@@ -1,6 +1,55 @@
 'use server'
 
 import { logger } from '@/lib/utils/logger'
+import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+
+// ============================================
+// 機場/航空公司名稱快取（統一從資料庫讀取）
+// ============================================
+interface RefCache {
+  airports: Map<string, string>  // iata_code -> name_zh
+  airlines: Map<string, string>  // iata_code -> name_zh
+  lastFetched: number
+}
+
+const CACHE_TTL = 60 * 60 * 1000 // 1 小時
+let refCache: RefCache = {
+  airports: new Map(),
+  airlines: new Map(),
+  lastFetched: 0,
+}
+
+/**
+ * 載入參考資料（機場、航空公司名稱）
+ */
+async function loadReferenceData(): Promise<void> {
+  const now = Date.now()
+  if (refCache.lastFetched > 0 && now - refCache.lastFetched < CACHE_TTL) {
+    return // 快取有效
+  }
+
+  const supabase = getSupabaseAdminClient()
+
+  const [airportsResult, airlinesResult] = await Promise.all([
+    supabase.from('ref_airports').select('iata_code, name_zh'),
+    supabase.from('ref_airlines').select('iata_code, name_zh').eq('is_active', true),
+  ])
+
+  if (airportsResult.data) {
+    refCache.airports = new Map(
+      airportsResult.data.map(row => [row.iata_code, row.name_zh || row.iata_code])
+    )
+  }
+
+  if (airlinesResult.data) {
+    refCache.airlines = new Map(
+      airlinesResult.data.map(row => [row.iata_code, row.name_zh || row.iata_code])
+    )
+  }
+
+  refCache.lastFetched = now
+  logger.log(`✅ 航班參考資料已載入: ${refCache.airports.size} 機場, ${refCache.airlines.size} 航空公司`)
+}
 
 // 航班資料介面
 export interface FlightData {
@@ -133,124 +182,17 @@ function getStatusText(status: string): string {
 }
 
 /**
- * 機場中文名稱對照表
+ * 機場中文名稱（從快取讀取，統一資料來源）
  */
 function getAirportChineseName(iataCode: string, englishName: string): string {
-  const airportMap: Record<string, string> = {
-    // 台灣機場
-    TPE: '桃園國際機場',
-    TSA: '台北松山機場',
-    KHH: '高雄小港機場',
-    RMQ: '台中清泉崗機場',
-    TNN: '台南機場',
-    // 日本機場
-    NRT: '東京成田機場',
-    HND: '東京羽田機場',
-    KIX: '大阪關西機場',
-    ITM: '大阪伊丹機場',
-    NGO: '名古屋中部機場',
-    CTS: '札幌新千歲機場',
-    FUK: '福岡機場',
-    OKA: '沖繩那霸機場',
-    KMQ: '小松機場',
-    SDJ: '仙台機場',
-    HIJ: '廣島機場',
-    KOJ: '鹿兒島機場',
-    // 韓國機場
-    ICN: '仁川國際機場',
-    GMP: '首爾金浦機場',
-    PUS: '釜山金海機場',
-    CJU: '濟州機場',
-    // 中國機場
-    PVG: '上海浦東機場',
-    SHA: '上海虹橋機場',
-    PEK: '北京首都機場',
-    PKX: '北京大興機場',
-    CAN: '廣州白雲機場',
-    SZX: '深圳寶安機場',
-    CTU: '成都天府機場',
-    // 香港/澳門
-    HKG: '香港國際機場',
-    MFM: '澳門機場',
-    // 東南亞機場
-    SIN: '新加坡樟宜機場',
-    BKK: '曼谷素萬那普機場',
-    DMK: '曼谷廊曼機場',
-    SGN: '胡志明市機場',
-    HAN: '河內機場',
-    DPS: '峇里島機場',
-    MNL: '馬尼拉機場',
-    KUL: '吉隆坡機場',
-    // 其他常見機場
-    LAX: '洛杉磯機場',
-    SFO: '舊金山機場',
-    JFK: '紐約乍甘迺迪機場',
-    LHR: '倫敦希斯洛機場',
-    CDG: '巴黎戴高樂機場',
-    FRA: '法蘭克福機場',
-    SYD: '雪梨機場',
-    AKL: '奧克蘭機場',
-  }
-  return airportMap[iataCode] || englishName
+  return refCache.airports.get(iataCode) || englishName
 }
 
 /**
- * 航空公司中文名稱對照表
+ * 航空公司中文名稱（從快取讀取，統一資料來源）
  */
 function getAirlineChineseName(iataCode: string, englishName: string): string {
-  const airlineMap: Record<string, string> = {
-    // 台灣航空公司
-    CI: '中華航空',
-    BR: '長榮航空',
-    IT: '台灣虎航',
-    JX: '星宇航空',
-    B7: '立榮航空',
-    AE: '華信航空',
-    // 日本航空公司
-    JL: '日本航空',
-    NH: '全日空',
-    MM: '樂桃航空',
-    GK: '捷星日本',
-    BC: '天馬航空',
-    // 韓國航空公司
-    KE: '大韓航空',
-    OZ: '韓亞航空',
-    TW: '德威航空',
-    LJ: '真航空',
-    ZE: '易斯達航空',
-    // 中國航空公司
-    CA: '中國國際航空',
-    MU: '中國東方航空',
-    CZ: '中國南方航空',
-    HU: '海南航空',
-    SC: '山東航空',
-    FM: '上海航空',
-    // 香港/澳門航空公司
-    CX: '國泰航空',
-    HX: '香港航空',
-    UO: '香港快運',
-    NX: '澳門航空',
-    // 東南亞航空公司
-    SQ: '新加坡航空',
-    TR: '酷航',
-    TG: '泰國航空',
-    VN: '越南航空',
-    VJ: '越捷航空',
-    MH: '馬來西亞航空',
-    AK: '亞洲航空',
-    PR: '菲律賓航空',
-    // 歐美航空公司
-    AA: '美國航空',
-    UA: '聯合航空',
-    DL: '達美航空',
-    BA: '英國航空',
-    AF: '法國航空',
-    LH: '漢莎航空',
-    EK: '阿聯酋航空',
-    QR: '卡達航空',
-    TK: '土耳其航空',
-  }
-  return airlineMap[iataCode] || englishName
+  return refCache.airlines.get(iataCode) || englishName
 }
 
 /**
@@ -339,6 +281,9 @@ export async function searchFlightAction(
   flightNumber: string,
   flightDate: string
 ): Promise<{ data?: FlightData; segments?: FlightData[]; error?: string; warning?: string }> {
+  // 載入機場/航空公司參考資料（從資料庫，有快取）
+  await loadReferenceData()
+
   const apiKey = getApiKey()
 
   if (!apiKey) {
@@ -423,6 +368,9 @@ export async function searchAirportDeparturesAction(
   date: string,
   destinationFilter?: string
 ): Promise<{ data?: AirportFlightItem[]; error?: string }> {
+  // 載入機場/航空公司參考資料（從資料庫，有快取）
+  await loadReferenceData()
+
   const apiKey = getApiKey()
 
   if (!apiKey) {
@@ -544,6 +492,9 @@ export async function searchAirportArrivalsAction(
   date: string,
   originFilter?: string
 ): Promise<{ data?: AirportFlightItem[]; error?: string }> {
+  // 載入機場/航空公司參考資料（從資料庫，有快取）
+  await loadReferenceData()
+
   const apiKey = getApiKey()
 
   if (!apiKey) {

@@ -70,7 +70,7 @@ export function EditRoomDialog({ room, open, onOpenChange, onSuccess }: EditRoom
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent level={3} className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Pencil className="h-5 w-5 text-morandi-blue" />

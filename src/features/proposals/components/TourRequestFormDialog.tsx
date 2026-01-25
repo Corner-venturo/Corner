@@ -554,7 +554,7 @@ export function TourRequestFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={true}>
-      <DialogContent className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
+      <DialogContent level={2} className={`${DIALOG_SIZES['4xl']} max-h-[85vh] overflow-hidden flex flex-col`}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText size={18} className="text-morandi-gold" />

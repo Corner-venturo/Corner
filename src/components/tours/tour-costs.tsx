@@ -209,10 +209,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  // 通知父組件有子 Dialog 開啟（避免多重遮罩）
-  React.useEffect(() => {
-    onChildDialogChange?.(isAddDialogOpen)
-  }, [isAddDialogOpen, onChildDialogChange])
+  // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
   const [newCost, setNewCost] = useState({
     amount: 0,
@@ -446,7 +443,7 @@ export const TourCosts = React.memo(function TourCosts({ tour, orderFilter, show
 
       {/* 新增成本對話框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent level={2} className="max-w-md">
           <DialogHeader>
             <DialogTitle>新增成本支出</DialogTitle>
           </DialogHeader>

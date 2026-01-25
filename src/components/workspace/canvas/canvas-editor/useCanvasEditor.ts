@@ -10,6 +10,7 @@ import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEditorState } from '../shared/useCanvasState'
 import { CANVAS_LIMITS, IMAGE_QUALITY, UPLOAD_DELAYS, EDITOR_CLASSES } from '../shared/constants'
+import { prompt } from '@/lib/ui/alert-dialog'
 
 export function useCanvasEditor(storageKey: string) {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -250,15 +251,21 @@ export function useCanvasEditor(storageKey: string) {
     [processImageFile, setIsDragging]
   )
 
-  const setLink = useCallback(() => {
-    const url = window.prompt('輸入網址:')
+  const setLink = useCallback(async () => {
+    const url = await prompt('輸入網址', {
+      title: '插入連結',
+      placeholder: 'https://...',
+    })
     if (url) {
       editor?.chain().focus().setLink({ href: url }).run()
     }
   }, [editor])
 
-  const addImage = useCallback(() => {
-    const url = window.prompt('輸入圖片網址:')
+  const addImage = useCallback(async () => {
+    const url = await prompt('輸入圖片網址', {
+      title: '插入圖片',
+      placeholder: 'https://...',
+    })
     if (url) {
       editor?.chain().focus().setImage({ src: url }).run()
     }

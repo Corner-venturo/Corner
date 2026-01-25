@@ -583,10 +583,9 @@ export function TimelineItineraryDialog({
 
   return (
     <>
-    {/* 父 Dialog：子 Dialog 開啟時完全不渲染，避免多重遮罩 */}
-    {!attractionSelectorOpen && (
+    {/* 父 Dialog：使用 level={2}（作為子 Dialog 使用） */}
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className={DIALOG_SIZES['4xl']}>
+      <DialogContent level={2} className={DIALOG_SIZES['4xl']}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Clock size={18} className="text-morandi-gold" />
@@ -963,9 +962,8 @@ export function TimelineItineraryDialog({
         </div>
       </DialogContent>
     </Dialog>
-    )}
 
-    {/* 景點選擇器（放在父 Dialog 外面） */}
+    {/* 景點選擇器（level={3}） */}
     <AttractionSelector
       isOpen={attractionSelectorOpen}
       onClose={() => {
