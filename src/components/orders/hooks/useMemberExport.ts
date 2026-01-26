@@ -182,12 +182,72 @@ export function useMemberExport(members: OrderMember[]) {
     )
   }
 
+  const handleExportExcel = async (tourName?: string) => {
+    const selectedCols = Object.entries(exportColumns)
+      .filter(([, selected]) => selected)
+      .map(([key]) => key)
+
+    if (selectedCols.length === 0) {
+      void alert('請至少選擇一個欄位', 'warning')
+      return
+    }
+
+    // 動態載入 xlsx（避免污染首屏 bundle）
+    const XLSX = await import('xlsx')
+
+    // 轉換資料
+    const data = members.map((member, idx) => {
+      const row: Record<string, string | number> = { '序': idx + 1 }
+      selectedCols.forEach(col => {
+        const label = EXPORT_COLUMN_LABELS[col]
+        if (col === 'gender') {
+          row[label] = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+        } else if (col === 'balance') {
+          row[label] = (member.total_payable || 0) - (member.deposit_amount || 0)
+        } else if (col === 'total_payable' || col === 'deposit_amount') {
+          row[label] = (member[col as keyof OrderMember] as number) || 0
+        } else {
+          row[label] = (member[col as keyof OrderMember] as string) || ''
+        }
+      })
+      return row
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet(data)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, '團員名單')
+
+    // 設定欄寬
+    const colWidths = [{ wch: 5 }] // 序號欄
+    selectedCols.forEach(col => {
+      if (['chinese_name', 'passport_name'].includes(col)) {
+        colWidths.push({ wch: 20 })
+      } else if (['remarks', 'special_meal'].includes(col)) {
+        colWidths.push({ wch: 25 })
+      } else if (['total_payable', 'deposit_amount', 'balance'].includes(col)) {
+        colWidths.push({ wch: 12 })
+      } else {
+        colWidths.push({ wch: 15 })
+      }
+    })
+    worksheet['!cols'] = colWidths
+
+    const today = new Date().toISOString().split('T')[0].replace(/-/g, '')
+    const fileName = tourName
+      ? `${tourName}_團員名單_${today}.xlsx`
+      : `團員名單_${today}.xlsx`
+    XLSX.writeFile(workbook, fileName)
+
+    setIsExportDialogOpen(false)
+  }
+
   return {
     isExportDialogOpen,
     setIsExportDialogOpen,
     exportColumns,
     setExportColumns,
     handleExportPrint,
+    handleExportExcel,
     toggleAllColumns,
   }
 }

@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { Printer, X, Plane, Hotel, Users, Check, Loader2 } from 'lucide-react'
+import { Printer, X, Plane, Hotel, Users, Check, Loader2, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -287,6 +287,64 @@ export function TourPrintDialog({
       </html>
     `
     openPrintWindow(printContent)
+  }
+
+  // ==================== 匯出 Excel ====================
+  const handleExportExcel = async () => {
+    const selectedColumns = Object.entries(columns)
+      .filter(([, selected]) => selected)
+      .map(([key]) => key as keyof ExportColumnsConfig)
+
+    if (selectedColumns.length === 0) return
+
+    // 動態載入 xlsx（避免污染首屏 bundle）
+    const XLSX = await import('xlsx')
+
+    // 轉換資料
+    const data = members.map((member, idx) => {
+      const row: Record<string, string | number> = { '序': idx + 1 }
+      selectedColumns.forEach(col => {
+        const label = COLUMN_LABELS[col]
+        switch (col) {
+          case 'gender':
+            row[label] = member.gender === 'M' ? '男' : member.gender === 'F' ? '女' : ''
+            break
+          case 'balance':
+            row[label] = (member.total_payable || 0) - (member.deposit_amount || 0)
+            break
+          case 'total_payable':
+          case 'deposit_amount':
+            row[label] = member[col] || 0
+            break
+          default:
+            row[label] = member[col as keyof OrderMember] as string || ''
+        }
+      })
+      return row
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet(data)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, '團員名單')
+
+    // 設定欄寬
+    const colWidths = [{ wch: 5 }] // 序號欄
+    selectedColumns.forEach(col => {
+      if (['chinese_name', 'passport_name'].includes(col)) {
+        colWidths.push({ wch: 20 })
+      } else if (['remarks', 'special_meal'].includes(col)) {
+        colWidths.push({ wch: 25 })
+      } else if (['total_payable', 'deposit_amount', 'balance'].includes(col)) {
+        colWidths.push({ wch: 12 })
+      } else {
+        colWidths.push({ wch: 15 })
+      }
+    })
+    worksheet['!cols'] = colWidths
+
+    const today = new Date().toISOString().split('T')[0].replace(/-/g, '')
+    const fileName = `${tour.code}_團員名單_${today}.xlsx`
+    XLSX.writeFile(workbook, fileName)
   }
 
   // ==================== 列印航班確認單 ====================
@@ -888,9 +946,13 @@ export function TourPrintDialog({
                 <X size={16} className="mr-1" />
                 取消
               </Button>
+              <Button variant="outline" onClick={handleExportExcel}>
+                <FileSpreadsheet size={16} className="mr-1" />
+                Excel
+              </Button>
               <Button onClick={handlePrintMembers} className="bg-morandi-gold hover:bg-morandi-gold-hover text-white">
                 <Printer size={16} className="mr-1" />
-                列印 ({members.length} 人)
+                列印
               </Button>
             </div>
           </TabsContent>
