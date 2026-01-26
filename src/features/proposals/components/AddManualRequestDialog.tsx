@@ -272,180 +272,180 @@ export function AddManualRequestDialog({
   return (
     <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className={DIALOG_SIZES.md}>
+      <DialogContent level={3} className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>手動新增需求</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          {/* 需求類別 */}
-          <div className="space-y-2">
-            <Label required>需求類別</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="選擇類別" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat.key} value={cat.key}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 供應商 */}
-          <div className="space-y-2">
-            <Label>供應商/廠商名稱</Label>
-            <Input
-              value={formData.supplierName}
-              onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
-              placeholder="例如：車行名稱、領隊姓名"
-            />
-          </div>
-
-          {/* 跨公司需求：指定供應商 Workspace */}
-          {(formData.category === 'transport' || formData.category === 'guide') && (
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4 py-4">
+          {/* 左欄 */}
+          <div className="space-y-4">
+            {/* 需求類別 */}
             <div className="space-y-2">
-              <Label>發送給供應商（跨公司需求）</Label>
+              <Label required>需求類別</Label>
               <Select
-                value={formData.recipientWorkspaceId}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, recipientWorkspaceId: value === 'none' ? '' : value }))}
+                value={formData.category}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={loadingWorkspaces ? '載入中...' : '選擇供應商（選填）'} />
+                  <SelectValue placeholder="選擇類別" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">不發送（內部處理）</SelectItem>
-                  {supplierWorkspaces.map((ws) => (
-                    <SelectItem key={ws.id} value={ws.id}>
-                      {ws.name}
-                      {ws.type && (
-                        <span className="ml-2 text-xs text-morandi-secondary">
-                          ({WORKSPACE_TYPE_CONFIG[ws.type as WorkspaceType]?.label || ws.type})
-                        </span>
-                      )}
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.key} value={cat.key}>
+                      {cat.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-morandi-secondary">
-                選擇後，需求單將發送給該供應商，供應商可在系統中回覆派車/派人
-              </p>
             </div>
-          )}
 
-          {/* 資源選擇（餐廳/飯店/景點）- 只在對應類別時顯示 */}
-          {(formData.category === 'restaurant' || formData.category === 'hotel' || formData.category === 'activity') && (
+            {/* 項目說明 */}
             <div className="space-y-2">
-              <Label>從資料庫選擇</Label>
-              <div className="flex items-center gap-2">
-                {formData.resourceName ? (
-                  <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
-                    <span className="text-sm">{formData.resourceName}</span>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        resourceType: '',
-                        resourceId: '',
-                        resourceName: '',
-                        latitude: null,
-                        longitude: null,
-                        googleMapsUrl: '',
-                      }))}
-                      className="ml-auto text-morandi-secondary hover:text-morandi-red"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      if (formData.category === 'restaurant') setShowRestaurantSelector(true)
-                      else if (formData.category === 'hotel') setShowHotelSelector(true)
-                      else if (formData.category === 'activity') setShowAttractionSelector(true)
-                    }}
-                    className="gap-2"
-                  >
-                    <Search size={16} />
-                    {formData.category === 'restaurant' && '選擇餐廳'}
-                    {formData.category === 'hotel' && '選擇飯店'}
-                    {formData.category === 'activity' && '選擇景點'}
-                  </Button>
-                )}
+              <Label required>項目說明</Label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="例如：機場接送、全程領隊"
+              />
+            </div>
+
+            {/* 供應商 */}
+            <div className="space-y-2">
+              <Label>供應商/廠商名稱</Label>
+              <Input
+                value={formData.supplierName}
+                onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
+                placeholder="例如：車行名稱、領隊姓名"
+              />
+            </div>
+
+            {/* 跨公司需求：指定供應商 Workspace */}
+            {(formData.category === 'transport' || formData.category === 'guide') && (
+              <div className="space-y-2">
+                <Label>發送給供應商</Label>
+                <Select
+                  value={formData.recipientWorkspaceId}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, recipientWorkspaceId: value === 'none' ? '' : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingWorkspaces ? '載入中...' : '選擇供應商（選填）'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">不發送（內部處理）</SelectItem>
+                    {supplierWorkspaces.map((ws) => (
+                      <SelectItem key={ws.id} value={ws.id}>
+                        {ws.name}
+                        {ws.type && (
+                          <span className="ml-2 text-xs text-morandi-secondary">
+                            ({WORKSPACE_TYPE_CONFIG[ws.type as WorkspaceType]?.label || ws.type})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+            )}
+
+            {/* 資源選擇（餐廳/飯店/景點）*/}
+            {(formData.category === 'restaurant' || formData.category === 'hotel' || formData.category === 'activity') && (
+              <div className="space-y-2">
+                <Label>從資料庫選擇</Label>
+                <div className="flex items-center gap-2">
+                  {formData.resourceName ? (
+                    <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-morandi-container/30 rounded-lg">
+                      <span className="text-sm">{formData.resourceName}</span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          resourceType: '',
+                          resourceId: '',
+                          resourceName: '',
+                          latitude: null,
+                          longitude: null,
+                          googleMapsUrl: '',
+                        }))}
+                        className="ml-auto text-morandi-secondary hover:text-morandi-red"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        if (formData.category === 'restaurant') setShowRestaurantSelector(true)
+                        else if (formData.category === 'hotel') setShowHotelSelector(true)
+                        else if (formData.category === 'activity') setShowAttractionSelector(true)
+                      }}
+                      className="gap-2"
+                    >
+                      <Search size={16} />
+                      {formData.category === 'restaurant' && '選擇餐廳'}
+                      {formData.category === 'hotel' && '選擇飯店'}
+                      {formData.category === 'activity' && '選擇景點'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 右欄 */}
+          <div className="space-y-4">
+            {/* 日期範圍 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>開始日期</Label>
+                <Input
+                  type="date"
+                  value={formData.serviceDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, serviceDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>結束日期</Label>
+                <Input
+                  type="date"
+                  value={formData.serviceDateEnd}
+                  onChange={(e) => setFormData(prev => ({ ...prev, serviceDateEnd: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            {/* 數量 */}
+            <div className="space-y-2">
+              <Label>數量</Label>
+              <Input
+                type="number"
+                min={1}
+                value={formData.quantity}
+                onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                className="w-24"
+              />
               <p className="text-xs text-morandi-secondary">
-                選擇後會自動帶入名稱及 GPS 資訊
+                {formData.category === 'transport' && '台數'}
+                {formData.category === 'guide' && '人數'}
+                {formData.category === 'hotel' && '間數'}
+                {formData.category === 'restaurant' && '人數'}
+                {formData.category === 'activity' && '人數'}
+                {formData.category === 'other' && '數量'}
               </p>
             </div>
-          )}
 
-          {/* 項目說明 */}
-          <div className="space-y-2">
-            <Label required>項目說明</Label>
-            <Input
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="例如：機場接送、全程領隊"
-            />
-          </div>
-
-          {/* 日期範圍 */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* 備註 */}
             <div className="space-y-2">
-              <Label>開始日期</Label>
-              <Input
-                type="date"
-                value={formData.serviceDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, serviceDate: e.target.value }))}
+              <Label>備註說明</Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="其他需求說明..."
+                rows={4}
               />
             </div>
-            <div className="space-y-2">
-              <Label>結束日期</Label>
-              <Input
-                type="date"
-                value={formData.serviceDateEnd}
-                onChange={(e) => setFormData(prev => ({ ...prev, serviceDateEnd: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          {/* 數量 */}
-          <div className="space-y-2">
-            <Label>數量</Label>
-            <Input
-              type="number"
-              min={1}
-              value={formData.quantity}
-              onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-              className="w-24"
-            />
-            <p className="text-xs text-morandi-secondary">
-              {formData.category === 'transport' && '台數（如需 3 台車則填 3）'}
-              {formData.category === 'guide' && '人數（如需 2 位領隊則填 2）'}
-              {formData.category === 'hotel' && '間數'}
-              {formData.category === 'restaurant' && '人數'}
-              {formData.category === 'activity' && '人數'}
-              {formData.category === 'other' && '數量'}
-            </p>
-          </div>
-
-          {/* 備註 */}
-          <div className="space-y-2">
-            <Label>備註說明</Label>
-            <Textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="其他需求說明..."
-              rows={3}
-            />
           </div>
         </div>
 
