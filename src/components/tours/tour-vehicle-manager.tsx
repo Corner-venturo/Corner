@@ -233,15 +233,69 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             <Bus className="h-5 w-5 text-morandi-gold" />
             分車管理
             {vehicles.length > 0 && (
-              <span className="ml-auto text-sm font-normal text-morandi-muted">
-                已分配 {totalAssigned}/{members.length} 人
+              <span className="text-sm font-normal text-morandi-muted ml-2">
+                {vehicles.length} 輛車 · {totalAssigned}/{members.length} 人
               </span>
             )}
+            <div className="flex items-center gap-2 ml-auto">
+              <Button
+                variant="outline"
+                onClick={() => setShowAddVehicle(true)}
+                className="gap-1.5"
+              >
+                <Plus className="h-4 w-4" />
+                新增車輛
+              </Button>
+            </div>
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden grid grid-cols-3 gap-4 mt-4">
-          {/* 左側：車輛列表 */}
+          {/* 左側：待分配團員 */}
+          <div className="flex flex-col min-h-0 bg-morandi-container rounded-lg p-3 border border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <Users className="h-4 w-4 text-morandi-secondary" />
+              <h3 className="font-medium text-morandi-primary text-sm">待分配</h3>
+              <span className="ml-auto text-xs px-1.5 py-0.5 bg-card rounded text-morandi-secondary border border-border">
+                {unassignedMembers.length}
+              </span>
+            </div>
+
+            <div className="flex-1 overflow-auto space-y-1.5">
+              {unassignedMembers.map(member => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-2 bg-card rounded border border-border hover:border-morandi-gold transition-colors"
+                >
+                  <span className="text-sm text-morandi-primary">
+                    {member.chinese_name || member.passport_name || '未知'}
+                  </span>
+                  <div className="flex gap-1 flex-wrap justify-end">
+                    {vehicles.filter(v => !v.is_full).map(vehicle => (
+                      <button
+                        key={vehicle.id}
+                        className="text-xs px-2 py-1 rounded border border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-all"
+                        onClick={() => handleAssignMember(vehicle.id, member.id)}
+                      >
+                        {vehicle.vehicle_name}
+                      </button>
+                    ))}
+                    {vehicles.filter(v => !v.is_full).length === 0 && (
+                      <span className="text-xs text-morandi-muted">無可用車輛</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {unassignedMembers.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-6 text-morandi-muted">
+                  <Check className="h-6 w-6 mb-1" />
+                  <span className="text-xs">全部已分配</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 右側：車輛列表 */}
           <div className="col-span-2 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -252,14 +306,6 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
                   </p>
                 )}
               </div>
-              <Button
-                size="sm"
-                onClick={() => setShowAddVehicle(true)}
-                className="btn-morandi-primary h-8"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                新增車輛
-              </Button>
             </div>
 
             <div className="flex-1 overflow-auto space-y-2">
@@ -372,49 +418,6 @@ export function TourVehicleManager({ tourId, members, open, onOpenChange }: Tour
             </div>
           </div>
 
-          {/* 右側：未分配團員 */}
-          <div className="flex flex-col min-h-0 bg-morandi-container rounded-lg p-3 border border-border">
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="h-4 w-4 text-morandi-secondary" />
-              <h3 className="font-medium text-morandi-primary text-sm">待分配</h3>
-              <span className="ml-auto text-xs px-1.5 py-0.5 bg-card rounded text-morandi-secondary border border-border">
-                {unassignedMembers.length}
-              </span>
-            </div>
-
-            <div className="flex-1 overflow-auto space-y-1.5">
-              {unassignedMembers.map(member => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-2 bg-card rounded border border-border hover:border-morandi-gold transition-colors"
-                >
-                  <span className="text-sm text-morandi-primary">
-                    {member.chinese_name || member.passport_name || '未知'}
-                  </span>
-                  <div className="flex gap-1 flex-wrap justify-end">
-                    {vehicles.filter(v => !v.is_full).map(vehicle => (
-                      <button
-                        key={vehicle.id}
-                        className="text-xs px-2 py-1 rounded border border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-all"
-                        onClick={() => handleAssignMember(vehicle.id, member.id)}
-                      >
-                        {vehicle.vehicle_name}
-                      </button>
-                    ))}
-                    {vehicles.filter(v => !v.is_full).length === 0 && (
-                      <span className="text-xs text-morandi-muted">無可用車輛</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {unassignedMembers.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-6 text-morandi-muted">
-                  <Check className="h-6 w-6 mb-1" />
-                  <span className="text-xs">全部已分配</span>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

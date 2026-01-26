@@ -68,16 +68,16 @@ const TourRequestFormDialog = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-// 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽延後（減少初始載入）
+// 🔧 優化：調整頁籤順序，團員名單優先（最常用），總覽置末（減少初始載入）
 // 分車/分房已移至團員名單工具列（概念上是針對團員的操作）
 const tabs = [
   { value: 'members', label: '團員名單' },
   { value: 'orders', label: '訂單管理' },
-  { value: 'overview', label: '總覽' },
   { value: 'requirements', label: '需求總覽' },
   { value: 'confirmation', label: '團確單' },
   { value: 'control', label: '團控' },
   { value: 'checkin', label: '報到' },
+  { value: 'overview', label: '總覽' },
 ]
 
 interface TourDetailDialogProps {

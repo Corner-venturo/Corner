@@ -219,13 +219,14 @@ export function TourRoomManager({ tourId, tour, members, open, onOpenChange, onC
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setAddRoomOpen(true)}
-                  className="flex items-center gap-1.5 text-sm font-normal px-4 py-1.5 rounded-md border border-border text-morandi-secondary hover:border-morandi-gold hover:text-morandi-gold transition-all"
+                  className="gap-1.5"
                 >
                   <Plus className="h-4 w-4" />
                   新增房間
-                </button>
+                </Button>
                 <Button
                   onClick={handleSortAndClose}
                   disabled={isSorting}
