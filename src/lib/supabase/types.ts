@@ -2055,6 +2055,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          dm_target_id: string | null
           group_id: string | null
           id: string
           is_announcement: boolean
@@ -2081,6 +2082,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          dm_target_id?: string | null
           group_id?: string | null
           id?: string
           is_announcement?: boolean
@@ -2107,6 +2109,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          dm_target_id?: string | null
           group_id?: string | null
           id?: string
           is_announcement?: boolean
@@ -2128,6 +2131,13 @@ export type Database = {
           {
             foreignKeyName: "channels_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channels_dm_target_id_fkey"
+            columns: ["dm_target_id"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
@@ -3001,6 +3011,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_assigned_itineraries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "customer_assigned_itineraries_workspace_id_fkey"
@@ -5046,6 +5063,65 @@ export type Database = {
           },
         ]
       }
+      invoice_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_id: string
+          order_id: string
+          workspace_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id: string
+          order_id: string
+          workspace_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id?: string
+          order_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_orders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "travel_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itineraries: {
         Row: {
           _deleted: boolean | null
@@ -6535,6 +6611,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "members_tour_id_fkey"
@@ -10122,6 +10205,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
           },
         ]
       }
@@ -14125,6 +14215,7 @@ export type Database = {
           id: string
           invoice_date: string
           invoice_number: string | null
+          is_batch: boolean | null
           items: Json
           merchant_id: string | null
           order_id: string | null
@@ -14140,6 +14231,7 @@ export type Database = {
           void_date: string | null
           void_reason: string | null
           voided_by: string | null
+          workspace_id: string | null
         }
         Insert: {
           allowance_amount?: number | null
@@ -14158,6 +14250,7 @@ export type Database = {
           id?: string
           invoice_date: string
           invoice_number?: string | null
+          is_batch?: boolean | null
           items?: Json
           merchant_id?: string | null
           order_id?: string | null
@@ -14173,6 +14266,7 @@ export type Database = {
           void_date?: string | null
           void_reason?: string | null
           voided_by?: string | null
+          workspace_id?: string | null
         }
         Update: {
           allowance_amount?: number | null
@@ -14191,6 +14285,7 @@ export type Database = {
           id?: string
           invoice_date?: string
           invoice_number?: string | null
+          is_batch?: boolean | null
           items?: Json
           merchant_id?: string | null
           order_id?: string | null
@@ -14206,6 +14301,7 @@ export type Database = {
           void_date?: string | null
           void_reason?: string | null
           voided_by?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -14230,6 +14326,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "travel_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
             foreignKeyName: "travel_invoices_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
@@ -14248,6 +14351,13 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_invoices_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -15918,6 +16028,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "usa_esta_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
             foreignKeyName: "usa_esta_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
@@ -16828,6 +16945,64 @@ export type Database = {
         }
         Relationships: []
       }
+      orders_invoice_summary: {
+        Row: {
+          contact_person: string | null
+          invoiceable_amount: number | null
+          invoiced_amount: number | null
+          order_id: string | null
+          order_number: string | null
+          paid_amount: number | null
+          total_amount: number | null
+          tour_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          contact_person?: string | null
+          invoiceable_amount?: never
+          invoiced_amount?: never
+          order_id?: string | null
+          order_number?: string | null
+          paid_amount?: never
+          total_amount?: number | null
+          tour_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          contact_person?: string | null
+          invoiceable_amount?: never
+          invoiced_amount?: never
+          order_id?: string | null
+          order_number?: string | null
+          paid_amount?: never
+          total_amount?: number | null
+          tour_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_requests_progress: {
         Row: {
           cancelled_requests: number | null
@@ -17029,6 +17204,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          dm_target_id: string | null
           group_id: string | null
           id: string
           is_announcement: boolean
@@ -17052,6 +17228,14 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      get_order_invoiceable_amount: {
+        Args: { p_order_id: string }
+        Returns: number
+      }
+      get_order_invoiced_amount: {
+        Args: { p_order_id: string }
+        Returns: number
       }
       get_tour_conversations: {
         Args: { p_workspace_id: string }

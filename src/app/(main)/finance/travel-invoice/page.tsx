@@ -6,19 +6,23 @@
  */
 
 import { useEffect, useState, useMemo } from 'react'
-import { FileText, Eye } from 'lucide-react'
+import { FileText, Eye, ListChecks } from 'lucide-react'
 import { ResponsiveHeader } from '@/components/layout/responsive-header'
 import { EnhancedTable, TableColumn as Column } from '@/components/ui/enhanced-table'
 import { ContentContainer } from '@/components/layout/content-container'
+import { Button } from '@/components/ui/button'
 import { useTravelInvoiceStore, TravelInvoice } from '@/stores/useTravelInvoiceStore'
+import { useToursListSlim } from '@/hooks/useListSlim'
 import { StatusCell, DateCell, CurrencyCell, ActionCell } from '@/components/table-cells'
 import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import { TravelInvoiceDetailDialog } from './components/TravelInvoiceDetailDialog'
+import { BatchInvoiceDialog } from '@/features/finance/travel-invoice/components/BatchInvoiceDialog'
 
 // 狀態標籤定義
 const statusTabs = [
   { value: 'all', label: '全部' },
   { value: 'pending', label: '待處理' },
+  { value: 'scheduled', label: '預約中' },
   { value: 'issued', label: '已開立' },
   { value: 'voided', label: '已作廢' },
   { value: 'allowance', label: '已折讓' },
@@ -32,6 +36,8 @@ const getStatusVariant = (status: string): 'default' | 'success' | 'warning' | '
       return 'success'
     case 'pending':
       return 'warning'
+    case 'scheduled':
+      return 'info'
     case 'voided':
     case 'failed':
       return 'error'
@@ -47,6 +53,8 @@ const getStatusLabel = (status: string): string => {
   switch (status) {
     case 'pending':
       return '待處理'
+    case 'scheduled':
+      return '預約中'
     case 'issued':
       return '已開立'
     case 'voided':
@@ -62,15 +70,25 @@ const getStatusLabel = (status: string): string => {
 
 export default function TravelInvoicePage() {
   const { invoices, isLoading, error, fetchInvoices } = useTravelInvoiceStore()
+  const { items: tours } = useToursListSlim()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<TravelInvoice | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchInvoices()
   }, [fetchInvoices])
+
+  // 轉換 tours 為 Combobox 選項格式
+  const tourOptions = useMemo(() => {
+    return tours.map(tour => ({
+      value: tour.id,
+      label: `${tour.code} - ${tour.name}`,
+    }))
+  }, [tours])
 
   // 篩選發票
   const filteredInvoices = useMemo(() => {
@@ -198,6 +216,16 @@ export default function TravelInvoicePage() {
         tabs={statusTabs}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        customActions={
+          <Button
+            variant="outline"
+            onClick={() => setIsBatchDialogOpen(true)}
+            className="gap-2"
+          >
+            <ListChecks size={16} />
+            批次開立
+          </Button>
+        }
       />
 
       <div className="flex-1 overflow-hidden">
@@ -223,6 +251,16 @@ export default function TravelInvoicePage() {
         invoice={selectedInvoice}
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
+      />
+
+      {/* 批次開立 Dialog */}
+      <BatchInvoiceDialog
+        open={isBatchDialogOpen}
+        onOpenChange={setIsBatchDialogOpen}
+        tours={tourOptions}
+        onSuccess={() => {
+          fetchInvoices()
+        }}
       />
     </div>
   )

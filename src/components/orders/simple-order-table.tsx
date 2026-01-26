@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores'
 import { deleteOrder } from '@/data'
-import { User, Trash2 } from 'lucide-react'
+import { User, Trash2, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Order, Tour } from '@/stores/types'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
@@ -20,6 +20,8 @@ interface SimpleOrderTableProps {
   onQuickReceipt?: (order: Order) => void
   /** 快速請款 callback（若提供則開對話框，否則跳轉頁面） */
   onQuickPaymentRequest?: (order: Order) => void
+  /** 開發票 callback */
+  onQuickInvoice?: (order: Order) => void
 }
 
 export const SimpleOrderTable = React.memo(function SimpleOrderTable({
@@ -29,6 +31,7 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
   className,
   onQuickReceipt,
   onQuickPaymentRequest,
+  onQuickInvoice,
 }: SimpleOrderTableProps) {
   const router = useRouter()
   const workspaceId = useAuthStore(state => state.user?.workspace_id) || ''
@@ -175,6 +178,22 @@ export const SimpleOrderTable = React.memo(function SimpleOrderTable({
                     >
                       $
                     </Button>
+
+                    {/* 開發票按鈕 */}
+                    {onQuickInvoice && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={e => {
+                          e.stopPropagation()
+                          onQuickInvoice(order)
+                        }}
+                        className="h-8 w-8 p-0 text-morandi-secondary hover:text-morandi-gold hover:bg-morandi-gold/10"
+                        title="開發票"
+                      >
+                        <FileText size={14} />
+                      </Button>
+                    )}
 
                     {/* 快速請款按鈕 */}
                     <Button

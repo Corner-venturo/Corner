@@ -230,6 +230,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     barcode?: string
     qrcodeL?: string
     qrcodeR?: string
+    isScheduled?: boolean // 是否為預約開立
   }
 }> {
   const transactionNo = generateTransactionNo()
@@ -244,11 +245,19 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
   // 判斷是 B2B 還是 B2C
   const category = params.buyerInfo.buyerUBN ? 'B2B' : 'B2C'
 
+  // 判斷是即時開立還是預約開立
+  // 比較日期（只比較年月日，忽略時間）
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const invoiceDateObj = new Date(params.invoiceDate)
+  invoiceDateObj.setHours(0, 0, 0, 0)
+  const isScheduled = invoiceDateObj.getTime() > today.getTime()
+
   const postData: Record<string, unknown> = {
     Version: '1.1',
     TimeStamp: Math.floor(Date.now() / 1000),
     MerchantOrderNo: transactionNo,
-    Status: 1, // 1: 即時開立
+    Status: isScheduled ? 3 : 1, // 1: 即時開立, 3: 預約開立
     Category: category,
     BuyerName: params.buyerInfo.buyerName,
     BuyerEmail: params.buyerInfo.buyerEmail || 'no-reply@example.com', // 必填
@@ -274,6 +283,12 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     postData.BuyerPhone = params.buyerInfo.buyerMobile
   }
 
+  // 預約開立：設定預約日期
+  if (isScheduled) {
+    postData.CreateStatusTime = formatInvoiceDate(params.invoiceDate)
+    logger.log('[NewebPay] 預約開立發票，預定日期:', params.invoiceDate)
+  }
+
   logger.log('[NewebPay] 開立收據 PostData:', postData)
 
   try {
@@ -285,7 +300,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     if (result.Status === 'SUCCESS' || result.Status === '1') {
       return {
         success: true,
-        message: '開立成功',
+        message: isScheduled ? `已預約於 ${params.invoiceDate} 開立` : '開立成功',
         data: {
           transactionNo,
           invoiceNumber: result.InvoiceNumber || result.InvoiceNo || '',
@@ -293,6 +308,7 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
           barcode: result.Barcode,
           qrcodeL: result.QRcodeL,
           qrcodeR: result.QRcodeR,
+          isScheduled, // 是否為預約開立
         },
       }
     } else {

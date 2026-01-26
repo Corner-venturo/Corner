@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddReceiptDialog } from '@/features/finance/payments'
 import { AddRequestDialog } from '@/features/finance/requests/components/AddRequestDialog'
+import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order as OrderType } from '@/types/order.types'
 import { logger } from '@/lib/utils/logger'
 
@@ -25,6 +26,10 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
   // 請款對話框狀態
   const [requestDialogOpen, setRequestDialogOpen] = useState(false)
   const [selectedOrderForRequest, setSelectedOrderForRequest] = useState<Order | null>(null)
+
+  // 發票對話框狀態
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false)
+  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<Order | null>(null)
 
   // 注意：已移除 onChildDialogChange 邏輯，改用 Dialog level 系統處理多重遮罩
 
@@ -62,6 +67,12 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
     setRequestDialogOpen(true)
   }, [])
 
+  // 處理開發票
+  const handleQuickInvoice = useCallback((order: Order) => {
+    setSelectedOrderForInvoice(order)
+    setInvoiceDialogOpen(true)
+  }, [])
+
   // 收款成功後重新載入訂單
   const handleReceiptSuccess = useCallback(async () => {
     const { data, error } = await supabase
@@ -95,6 +106,7 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         showTourInfo={false}
         onQuickReceipt={handleQuickReceipt}
         onQuickPaymentRequest={handleQuickPaymentRequest}
+        onQuickInvoice={handleQuickInvoice}
       />
 
       {/* 收款對話框 */}
@@ -113,6 +125,17 @@ export function TourOrders({ tour, onChildDialogChange }: TourOrdersProps) {
         defaultTourId={tour.id}
         defaultOrderId={selectedOrderForRequest?.id}
         onSuccess={handleRequestSuccess}
+      />
+
+      {/* 發票對話框 */}
+      <InvoiceDialog
+        open={invoiceDialogOpen}
+        onOpenChange={open => {
+          setInvoiceDialogOpen(open)
+          if (!open) handleReceiptSuccess()
+        }}
+        defaultOrderId={selectedOrderForInvoice?.id}
+        defaultTourId={tour.id}
       />
     </>
   )

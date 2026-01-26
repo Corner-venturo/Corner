@@ -9,6 +9,7 @@ import { useWorkspaceChannels } from '@/stores/workspace-store'
 import { ShoppingCart, AlertCircle, CheckCircle, Clock, Shield, Wifi } from 'lucide-react'
 import { SimpleOrderTable } from '@/components/orders/simple-order-table'
 import { AddOrderForm } from '@/components/orders/add-order-form'
+import { InvoiceDialog } from '@/components/finance/invoice-dialog'
 import type { Order } from '@/stores/types'
 import { logger } from '@/lib/utils/logger'
 
@@ -26,6 +27,10 @@ export default function OrdersPage() {
     orderId: string
     tourId: string
   } | null>(null)
+
+  // 發票對話框狀態
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
+  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<Order | null>(null)
 
   // 🔥 載入 workspace（只執行一次）
   useEffect(() => {
@@ -160,7 +165,16 @@ export default function OrdersPage() {
 
       <div className="flex-1 overflow-auto flex flex-col">
         {/* 訂單列表 */}
-        <SimpleOrderTable className="flex-1" orders={sortedOrders} tours={tours} showTourInfo={true} />
+        <SimpleOrderTable
+          className="flex-1"
+          orders={sortedOrders}
+          tours={tours}
+          showTourInfo={true}
+          onQuickInvoice={order => {
+            setSelectedOrderForInvoice(order)
+            setIsInvoiceDialogOpen(true)
+          }}
+        />
       </div>
 
       {/* 新增訂單對話框 */}
@@ -189,6 +203,17 @@ export default function OrdersPage() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* 發票對話框 */}
+      <InvoiceDialog
+        open={isInvoiceDialogOpen}
+        onOpenChange={open => {
+          setIsInvoiceDialogOpen(open)
+          if (!open) setSelectedOrderForInvoice(null)
+        }}
+        defaultOrderId={selectedOrderForInvoice?.id}
+        defaultTourId={selectedOrderForInvoice?.tour_id || undefined}
+      />
     </div>
   )
 }

@@ -192,7 +192,7 @@ export function useInvoiceDialog({
     }
 
     try {
-      await issueInvoice({
+      const result = await issueInvoice({
         invoice_date: invoiceDate,
         total_amount: totalAmount,
         tax_type: 'dutiable',
@@ -202,7 +202,14 @@ export function useInvoiceDialog({
         tour_id: tourId || undefined,
         created_by: 'current_user',
       })
-      toast({ title: '成功', description: `代轉發票 ${customNo} 開立成功` })
+
+      // 根據是否預約顯示不同訊息
+      const isScheduled = result?.isScheduled
+      const message = result?.message || (isScheduled ? `已預約於 ${invoiceDate} 開立` : '開立成功')
+      toast({
+        title: isScheduled ? '預約成功' : '開立成功',
+        description: `代轉發票 ${customNo} ${message}`,
+      })
       onOpenChange(false)
     } catch (error) {
       toast({

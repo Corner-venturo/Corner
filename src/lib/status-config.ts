@@ -145,7 +145,7 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
     },
   },
 
-  // 發票狀態
+  // 發票狀態（含代轉發票）
   invoice: {
     draft: {
       color: 'text-morandi-secondary',
@@ -155,9 +155,39 @@ export const STATUS_CONFIGS: Record<StatusType, Record<string, StatusConfig>> = 
     },
     pending: {
       color: 'text-morandi-gold',
-      label: '待審核',
+      label: '待處理',
       icon: Clock,
       bgColor: 'bg-morandi-gold/10',
+    },
+    scheduled: {
+      color: 'text-status-info',
+      label: '預約中',
+      icon: Clock,
+      bgColor: 'bg-status-info/10',
+    },
+    issued: {
+      color: 'text-morandi-green',
+      label: '已開立',
+      icon: CheckCircle,
+      bgColor: 'bg-morandi-green/10',
+    },
+    voided: {
+      color: 'text-morandi-red',
+      label: '已作廢',
+      icon: XCircle,
+      bgColor: 'bg-morandi-red/10',
+    },
+    allowance: {
+      color: 'text-status-info',
+      label: '已折讓',
+      icon: FileText,
+      bgColor: 'bg-status-info/10',
+    },
+    failed: {
+      color: 'text-morandi-red',
+      label: '失敗',
+      icon: AlertCircle,
+      bgColor: 'bg-morandi-red/10',
     },
     approved: {
       color: 'text-morandi-green',

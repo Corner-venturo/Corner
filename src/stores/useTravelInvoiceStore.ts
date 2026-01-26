@@ -49,6 +49,16 @@ export interface BuyerInfo {
   printFlag?: 'Y' | 'N'
 }
 
+// 開立發票 API 回應
+export interface IssueInvoiceResponse {
+  id: string
+  transactionNo: string
+  invoiceNumber: string
+  randomNum: string
+  isScheduled?: boolean
+  message?: string
+}
+
 export interface TravelInvoice {
   id: string
   transactionNo: string
@@ -78,9 +88,22 @@ export interface TravelInvoice {
   updated_at: string
 }
 
+export interface InvoiceableOrder {
+  order_id: string
+  order_number: string
+  contact_person: string
+  tour_id: string
+  workspace_id: string
+  total_amount: number
+  paid_amount: number
+  invoiced_amount: number
+  invoiceable_amount: number
+}
+
 interface TravelInvoiceState {
   invoices: TravelInvoice[]
   currentInvoice: TravelInvoice | null
+  invoiceableOrders: InvoiceableOrder[]
   isLoading: boolean
   error: string | null
 
@@ -93,6 +116,7 @@ interface TravelInvoiceState {
     limit?: number
   }) => Promise<void>
   fetchInvoiceById: (id: string) => Promise<void>
+  fetchInvoiceableOrders: (tourId?: string, hasInvoiceable?: boolean) => Promise<void>
   issueInvoice: (data: {
     invoice_date: string
     total_amount: number
@@ -100,8 +124,18 @@ interface TravelInvoiceState {
     buyerInfo: BuyerInfo
     items: TravelInvoiceItem[]
     order_id?: string
+    orders?: { order_id: string; amount: number }[]
     tour_id?: string
     created_by: string
+    workspace_id?: string
+  }) => Promise<IssueInvoiceResponse>
+  batchIssueInvoice: (data: {
+    tour_id: string
+    order_ids: string[]
+    invoice_date: string
+    buyerInfo: BuyerInfo
+    created_by: string
+    workspace_id?: string
   }) => Promise<TravelInvoice>
   voidInvoice: (invoiceId: string, voidReason: string, operatedBy: string) => Promise<void>
   allowanceInvoice: (
@@ -117,8 +151,54 @@ interface TravelInvoiceState {
 export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
   invoices: [],
   currentInvoice: null,
+  invoiceableOrders: [],
   isLoading: false,
   error: null,
+
+  fetchInvoiceableOrders: async (tourId, hasInvoiceable = true) => {
+    set({ isLoading: true, error: null })
+    try {
+      const params = new URLSearchParams()
+      if (tourId) params.append('tour_id', tourId)
+      if (hasInvoiceable) params.append('has_invoiceable', 'true')
+
+      const response = await fetch(`/api/travel-invoice/orders?${params.toString()}`)
+      if (!response.ok) throw new Error('查詢可開發票訂單失敗')
+
+      const result = await response.json()
+      set({ invoiceableOrders: result.data, isLoading: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '查詢可開發票訂單失敗'
+      set({ error: errorMessage, isLoading: false })
+      throw error
+    }
+  },
+
+  batchIssueInvoice: async data => {
+    set({ isLoading: true, error: null })
+    try {
+      const response = await fetch('/api/travel-invoice/batch-issue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.message || result.error || '批次開立發票失敗')
+      }
+
+      // 重新載入發票列表和可開發票訂單
+      await Promise.all([get().fetchInvoices(), get().fetchInvoiceableOrders(data.tour_id)])
+      set({ isLoading: false })
+
+      return result.data
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '批次開立發票失敗'
+      set({ error: errorMessage, isLoading: false })
+      throw error
+    }
+  },
 
   fetchInvoices: async (filters = {}) => {
     set({ isLoading: true, error: null })
@@ -134,7 +214,9 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       if (!response.ok) throw new Error('查詢發票失敗')
 
       const result = await response.json()
-      set({ invoices: result.data, isLoading: false })
+      // API 返回 { success, data: { data: [...], pagination: {...} } }
+      const invoicesData = result.data?.data ?? result.data ?? []
+      set({ invoices: Array.isArray(invoicesData) ? invoicesData : [], isLoading: false })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '查詢發票失敗'
       set({ error: errorMessage, isLoading: false })
@@ -149,8 +231,10 @@ export const useTravelInvoiceStore = create<TravelInvoiceState>((set, get) => ({
       if (!response.ok) throw new Error('查詢發票失敗')
 
       const result = await response.json()
-      if (result.data && result.data.length > 0) {
-        set({ currentInvoice: result.data[0], isLoading: false })
+      // API 返回 { success, data: { data: [...], pagination: {...} } }
+      const invoicesData = result.data?.data ?? result.data ?? []
+      if (Array.isArray(invoicesData) && invoicesData.length > 0) {
+        set({ currentInvoice: invoicesData[0], isLoading: false })
       } else {
         throw new Error('找不到發票')
       }

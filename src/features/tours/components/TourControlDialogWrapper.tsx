@@ -10,9 +10,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { TourControlFormDialog } from '@/features/proposals/components/TourControlFormDialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import type { Tour } from '@/stores/types'
 import type { Proposal, ProposalPackage } from '@/types/proposal.types'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertTriangle } from 'lucide-react'
 
 interface TourControlDialogWrapperProps {
   tour: Tour | null
@@ -137,32 +139,36 @@ export function TourControlDialogWrapper({
   // 載入中
   if (loading) {
     return (
-      // eslint-disable-next-line venturo/no-custom-modal -- 載入狀態需要簡單遮罩
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-card rounded-lg p-6 flex items-center gap-3">
-          <Loader2 className="animate-spin text-morandi-gold" size={24} />
-          <span>載入團控表資料...</span>
-        </div>
-      </div>
+      <Dialog open={true} onOpenChange={() => onClose()}>
+        <DialogContent level={1} className="max-w-sm">
+          <div className="flex items-center justify-center gap-3 py-4">
+            <Loader2 className="animate-spin text-morandi-gold" size={24} />
+            <span>載入團控表資料...</span>
+          </div>
+        </DialogContent>
+      </Dialog>
     )
   }
 
   // 錯誤訊息
   if (error) {
     return (
-      // eslint-disable-next-line venturo/no-custom-modal -- 錯誤狀態需要簡單遮罩
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-card rounded-lg p-6 max-w-md">
-          <h3 className="text-lg font-medium text-morandi-red mb-2">無法開啟團控表</h3>
-          <p className="text-morandi-secondary mb-4">{error}</p>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-morandi-gold hover:bg-morandi-gold-hover text-white rounded"
-          >
-            關閉
-          </button>
-        </div>
-      </div>
+      <Dialog open={true} onOpenChange={() => onClose()}>
+        <DialogContent level={1} className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-morandi-red">
+              <AlertTriangle size={20} />
+              無法開啟團控表
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-morandi-secondary py-2">{error}</p>
+          <div className="flex justify-end pt-2">
+            <Button onClick={onClose}>
+              關閉
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     )
   }
 
