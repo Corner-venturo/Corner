@@ -33,32 +33,43 @@ export async function POST(request: NextRequest) {
       return ApiError.validation('缺少團別 ID')
     }
 
-    // 驗證訂單可開金額
+    // 取得 Supabase client
     const supabase = getSupabaseAdminClient()
 
+    // 如果沒有 workspace_id，從 tour 取得
+    let finalWorkspaceId = workspace_id
+    if (!finalWorkspaceId && tour_id) {
+      const { data: tourData } = await supabase
+        .from('tours')
+        .select('workspace_id')
+        .eq('id', tour_id)
+        .single()
+      finalWorkspaceId = tourData?.workspace_id
+    }
+
+    // 記錄訂單可開金額（僅供追蹤，不阻擋開立）
     for (const orderItem of orderItems) {
       // 計算訂單可開金額
       const { data: orderData, error: orderError } = await supabase
         .rpc('get_order_invoiceable_amount', { p_order_id: orderItem.order_id })
 
       if (orderError) {
-        logger.error('查詢訂單可開金額失敗:', orderError)
-        return ApiError.internal('查詢訂單資訊失敗')
-      }
+        logger.warn('查詢訂單可開金額失敗，繼續開立:', orderError)
+      } else {
+        const invoiceableAmount = orderData as number
+        if (orderItem.amount > invoiceableAmount) {
+          const { data: order } = await supabase
+            .from('orders')
+            .select('order_number')
+            .eq('id', orderItem.order_id)
+            .single()
 
-      const invoiceableAmount = orderData as number
-
-      if (orderItem.amount > invoiceableAmount) {
-        const { data: order } = await supabase
-          .from('orders')
-          .select('order_number')
-          .eq('id', orderItem.order_id)
-          .single()
-
-        return ApiError.validation(
-          `訂單 ${order?.order_number || orderItem.order_id} 可開金額不足：` +
-          `可開 ${invoiceableAmount}，要求 ${orderItem.amount}`
-        )
+          // 僅記錄警告，不阻擋開立（前端已確認）
+          logger.warn(
+            `[超開發票] 訂單 ${order?.order_number || orderItem.order_id} ` +
+            `可開金額 ${invoiceableAmount}，實際開立 ${orderItem.amount}`
+          )
+        }
       }
     }
 
@@ -103,7 +114,7 @@ export async function POST(request: NextRequest) {
       qrcode_r: result.data!.qrcodeR || null,
       order_id: order_id || null, // 向後兼容
       tour_id: tour_id || null,
-      workspace_id: workspace_id || null,
+      workspace_id: finalWorkspaceId || null,
       is_batch: orderItems.length > 1,
       created_by,
     }
@@ -123,22 +134,24 @@ export async function POST(request: NextRequest) {
     }
 
     // 建立發票-訂單關聯
-    if (orderItems.length > 0) {
-      const invoiceOrdersData = orderItems.map((o: { order_id: string; amount: number }) => ({
-        invoice_id: invoiceRecord.id,
-        order_id: o.order_id,
-        amount: o.amount,
-        workspace_id: workspace_id || null,
-        created_by,
-      }))
+    if (orderItems.length > 0 && finalWorkspaceId) {
+        const invoiceOrdersData = orderItems.map((o: { order_id: string; amount: number }) => ({
+          invoice_id: invoiceRecord.id,
+          order_id: o.order_id,
+          amount: o.amount,
+          workspace_id: finalWorkspaceId,
+          created_by,
+        }))
 
-      const { error: ioError } = await supabase
-        .from('invoice_orders')
-        .insert(invoiceOrdersData)
+        const { error: ioError } = await supabase
+          .from('invoice_orders')
+          .insert(invoiceOrdersData)
 
-      if (ioError) {
+        if (ioError) {
         logger.error('建立發票-訂單關聯失敗:', ioError)
       }
+    } else if (orderItems.length > 0) {
+      logger.warn('無法取得 workspace_id，跳過建立發票-訂單關聯')
     }
 
     return successResponse({
