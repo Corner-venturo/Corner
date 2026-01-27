@@ -372,7 +372,7 @@ USING (user_id = auth.uid());
 | `suppliers` | 供應商 | 食宿交通 |
 | `attractions` | 景點 | 旅遊景點 |
 | `restaurants` | 餐廳 | 用餐地點 |
-| `luxury_hotels` | 飯店 | 住宿選擇 |
+| `hotels` | 飯店 | 住宿選擇 |
 
 ---
 

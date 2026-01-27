@@ -185,7 +185,7 @@ export function useHotelSelector({ isOpen, tourCountryName }: UseHotelSelectorPr
       setLoading(true)
       try {
         let query = supabase
-          .from('luxury_hotels')
+          .from('hotels')
           .select(`
             id, name, name_en, brand, country_id, region_id, city_id,
             star_rating, hotel_class, category, description,

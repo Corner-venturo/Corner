@@ -26,7 +26,7 @@ import { logger } from '@/lib/utils/logger'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 
@@ -319,9 +319,9 @@ export function TourItineraryDialog({
         />
       )}
 
-      {/* 時間軸行程表對話框 */}
+      {/* 行程表對話框 */}
       {tourProposalPackage && (
-        <TimelineItineraryDialog
+        <ItineraryDialog
           isOpen={timelineDialogOpen}
           onClose={() => setTimelineDialogOpen(false)}
           pkg={tourProposalPackage}

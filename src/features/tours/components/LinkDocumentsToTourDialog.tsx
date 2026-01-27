@@ -1,7 +1,7 @@
 /**
  * LinkDocumentsToTourDialog - 旅遊團文件管理對話框
  * 左邊：行程表（根據 proposal_package.itinerary_type 顯示對應類型）
- *   - timeline: 快速行程表（開啟 TimelineItineraryDialog）
+ *   - timeline: 快速行程表（開啟 ItineraryDialog）
  *   - simple: 網頁行程表（跳轉到行程編輯頁面）
  * 中間：團體報價單
  * 右邊：快速報價單
@@ -44,7 +44,7 @@ import { stripHtml } from '@/lib/utils/string-utils'
 import { supabase } from '@/lib/supabase/client'
 import { dynamicFrom } from '@/lib/supabase/typed-client'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
-import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
@@ -662,9 +662,9 @@ export function LinkDocumentsToTourDialog({
         </Dialog>
       )}
 
-      {/* 時間軸行程表對話框 */}
+      {/* 行程表對話框 */}
       {tourProposalPackage && (
-        <TimelineItineraryDialog
+        <ItineraryDialog
           isOpen={timelineDialogOpen}
           onClose={handleCloseTimelineDialog}
           pkg={tourProposalPackage}

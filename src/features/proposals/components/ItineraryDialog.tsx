@@ -1,5 +1,5 @@
 /**
- * TimelineItineraryDialog - 時間軸行程編輯器
+ * ItineraryDialog - 行程編輯器
  *
  * 分頁式的時間軸介面，用於編輯每日行程
  * - Tab 切換每日行程
@@ -60,7 +60,7 @@ import {
   createEmptyDay,
 } from '@/types/timeline-itinerary.types'
 
-interface TimelineItineraryDialogProps {
+interface ItineraryDialogProps {
   isOpen: boolean
   onClose: () => void
   pkg: ProposalPackage | null
@@ -76,12 +76,12 @@ interface EditingCell {
   field: EditableField
 }
 
-export function TimelineItineraryDialog({
+export function ItineraryDialog({
   isOpen,
   onClose,
   pkg,
   onSave,
-}: TimelineItineraryDialogProps) {
+}: ItineraryDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)

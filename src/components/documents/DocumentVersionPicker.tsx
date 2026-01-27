@@ -35,7 +35,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { TimelineItineraryPreview } from './TimelineItineraryPreview'
-import { TimelineItineraryDialog } from '@/features/proposals/components/TimelineItineraryDialog'
+import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 
@@ -873,9 +873,9 @@ export function DocumentVersionPicker({
         />
       )}
 
-      {/* 時間軸行程表對話框 */}
+      {/* 行程表對話框 */}
       {proposalPackage && (
-        <TimelineItineraryDialog
+        <ItineraryDialog
           isOpen={timelineDialogOpen}
           onClose={() => setTimelineDialogOpen(false)}
           pkg={proposalPackage}
