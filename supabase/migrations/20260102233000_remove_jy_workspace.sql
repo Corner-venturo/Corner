@@ -59,6 +59,7 @@ COMMIT;
 
 -- 還原 tours RLS 為正常模式
 DROP POLICY IF EXISTS "tours_select" ON public.tours;
+DROP POLICY IF EXISTS "tours_select" ON public.tours;
 CREATE POLICY "tours_select" ON public.tours FOR SELECT
 USING (
   is_super_admin()

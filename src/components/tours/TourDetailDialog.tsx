@@ -85,15 +85,16 @@ interface TourDetailDialogProps {
   onClose: () => void
   tourId: string | null
   onDataChange?: () => void
+  defaultTab?: string
 }
 
-export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: TourDetailDialogProps) {
+export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaultTab = 'members' }: TourDetailDialogProps) {
   const router = useRouter()
   const { tour, loading, actions } = useTourDetails(tourId || '')
   const { channels, createChannel, currentWorkspace } = useWorkspaceChannels()
   const { user } = useAuthStore()
 
-  const [activeTab, setActiveTab] = useState('members') // 預設顯示團員名單
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const [triggerPaymentAdd, setTriggerPaymentAdd] = useState(false)
   const [isCreatingChannel, setIsCreatingChannel] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
@@ -150,6 +151,12 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange }: Tour
     contact_person: string | null
   }>>([])
 
+  // 當對話框開啟或 defaultTab 改變時，更新 activeTab
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(defaultTab)
+    }
+  }, [isOpen, defaultTab])
 
   // 載入 PNR 開票期限 + 檢查票號狀態
   useEffect(() => {

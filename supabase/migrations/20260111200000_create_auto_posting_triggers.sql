@@ -414,12 +414,14 @@ $$;
 
 -- 收款單自動過帳 Trigger
 DROP TRIGGER IF EXISTS trigger_auto_post_receipt ON receipts;
+DROP TRIGGER IF EXISTS trigger_auto_post_receipt ON receipts;
 CREATE TRIGGER trigger_auto_post_receipt
   AFTER UPDATE ON receipts
   FOR EACH ROW
   EXECUTE FUNCTION auto_post_customer_receipt();
 
 -- 請款單自動過帳 Trigger
+DROP TRIGGER IF EXISTS trigger_auto_post_payment_request ON payment_requests;
 DROP TRIGGER IF EXISTS trigger_auto_post_payment_request ON payment_requests;
 CREATE TRIGGER trigger_auto_post_payment_request
   AFTER UPDATE ON payment_requests

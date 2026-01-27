@@ -35,6 +35,7 @@ DROP POLICY IF EXISTS "employees_delete" ON public.employees;
 
 -- SELECT: 只能看到自己 workspace 的員工，或是系統機器人
 -- 特例：super_admin 可以看到所有，機器人(BOT001)對所有人可見
+DROP POLICY IF EXISTS "employees_select" ON public.employees;
 CREATE POLICY "employees_select" ON public.employees FOR SELECT
 USING (
   is_super_admin()
@@ -46,6 +47,7 @@ USING (
 );
 
 -- INSERT: 只能新增到自己 workspace
+DROP POLICY IF EXISTS "employees_insert" ON public.employees;
 CREATE POLICY "employees_insert" ON public.employees FOR INSERT
 WITH CHECK (
   is_super_admin()
@@ -53,6 +55,7 @@ WITH CHECK (
 );
 
 -- UPDATE: 只能更新自己 workspace 的員工
+DROP POLICY IF EXISTS "employees_update" ON public.employees;
 CREATE POLICY "employees_update" ON public.employees FOR UPDATE
 USING (
   is_super_admin()
@@ -62,6 +65,7 @@ USING (
 );
 
 -- DELETE: 只能刪除自己 workspace 的員工
+DROP POLICY IF EXISTS "employees_delete" ON public.employees;
 CREATE POLICY "employees_delete" ON public.employees FOR DELETE
 USING (
   is_super_admin()

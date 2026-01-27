@@ -46,15 +46,19 @@ COMMENT ON COLUMN public.payroll_periods.paid_at IS '發放時間';
 ALTER TABLE public.payroll_periods ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "payroll_periods_select" ON public.payroll_periods;
 CREATE POLICY "payroll_periods_select" ON public.payroll_periods
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "payroll_periods_insert" ON public.payroll_periods;
 CREATE POLICY "payroll_periods_insert" ON public.payroll_periods
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "payroll_periods_update" ON public.payroll_periods;
 CREATE POLICY "payroll_periods_update" ON public.payroll_periods
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "payroll_periods_delete" ON public.payroll_periods;
 CREATE POLICY "payroll_periods_delete" ON public.payroll_periods
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -67,6 +71,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_payroll_periods_updated_at ON public.payroll_periods;
 CREATE TRIGGER trigger_payroll_periods_updated_at
   BEFORE UPDATE ON public.payroll_periods
   FOR EACH ROW

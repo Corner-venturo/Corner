@@ -44,16 +44,20 @@ CREATE INDEX IF NOT EXISTS idx_tour_leaders_name ON public.tour_leaders(name);
 ALTER TABLE public.tour_leaders ENABLE ROW LEVEL SECURITY;
 
 -- 所有認證用戶可讀
+DROP POLICY IF EXISTS "tour_leaders_select" ON public.tour_leaders;
 CREATE POLICY "tour_leaders_select" ON public.tour_leaders
   FOR SELECT TO authenticated USING (true);
 
 -- 所有認證用戶可寫
+DROP POLICY IF EXISTS "tour_leaders_insert" ON public.tour_leaders;
 CREATE POLICY "tour_leaders_insert" ON public.tour_leaders
   FOR INSERT TO authenticated WITH CHECK (true);
 
+DROP POLICY IF EXISTS "tour_leaders_update" ON public.tour_leaders;
 CREATE POLICY "tour_leaders_update" ON public.tour_leaders
   FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "tour_leaders_delete" ON public.tour_leaders;
 CREATE POLICY "tour_leaders_delete" ON public.tour_leaders
   FOR DELETE TO authenticated USING (true);
 

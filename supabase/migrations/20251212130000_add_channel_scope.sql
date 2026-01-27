@@ -19,6 +19,7 @@ COMMENT ON COLUMN public.channels.scope IS '
 
 -- 更新 RLS policy 讓全集團頻道可以被所有人看到
 DROP POLICY IF EXISTS "channels_select" ON public.channels;
+DROP POLICY IF EXISTS "channels_select" ON public.channels;
 CREATE POLICY "channels_select" ON public.channels FOR SELECT
 USING (
   -- 全集團頻道：所有人都可以看

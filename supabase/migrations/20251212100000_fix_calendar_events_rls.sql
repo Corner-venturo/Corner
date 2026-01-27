@@ -14,6 +14,7 @@ DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 
 -- 重新建立 SELECT policy（允許 NULL workspace_id）
+DROP POLICY IF EXISTS "calendar_events_select" ON public.calendar_events;
 CREATE POLICY "calendar_events_select" ON public.calendar_events FOR SELECT
 USING (
   -- 允許以下情況查看：
@@ -26,6 +27,7 @@ USING (
 );
 
 -- INSERT policy（新資料必須有 workspace_id）
+DROP POLICY IF EXISTS "calendar_events_insert" ON public.calendar_events;
 CREATE POLICY "calendar_events_insert" ON public.calendar_events FOR INSERT
 WITH CHECK (
   workspace_id = get_current_user_workspace()
@@ -33,6 +35,7 @@ WITH CHECK (
 );
 
 -- UPDATE policy（只能改自己建立的或超級管理員）
+DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 CREATE POLICY "calendar_events_update" ON public.calendar_events FOR UPDATE
 USING (
   created_by = auth.uid()
@@ -41,6 +44,7 @@ USING (
 );
 
 -- DELETE policy
+DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 CREATE POLICY "calendar_events_delete" ON public.calendar_events FOR DELETE
 USING (
   created_by = auth.uid()

@@ -179,6 +179,7 @@ DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 
 -- SELECT: 個人事項只有本人能看，公司事項同 workspace 能看
+DROP POLICY IF EXISTS "calendar_events_select" ON public.calendar_events;
 CREATE POLICY "calendar_events_select" ON public.calendar_events FOR SELECT
 USING (
   CASE
@@ -196,6 +197,7 @@ USING (
 );
 
 -- INSERT
+DROP POLICY IF EXISTS "calendar_events_insert" ON public.calendar_events;
 CREATE POLICY "calendar_events_insert" ON public.calendar_events FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -204,6 +206,7 @@ WITH CHECK (
 );
 
 -- UPDATE
+DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 CREATE POLICY "calendar_events_update" ON public.calendar_events FOR UPDATE
 USING (
   created_by = get_current_employee_id()
@@ -212,6 +215,7 @@ USING (
 );
 
 -- DELETE
+DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 CREATE POLICY "calendar_events_delete" ON public.calendar_events FOR DELETE
 USING (
   created_by = get_current_employee_id()

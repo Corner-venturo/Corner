@@ -106,14 +106,18 @@ ALTER TABLE public.fleet_drivers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fleet_vehicle_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fleet_schedules ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "fleet_vehicles_all" ON public.fleet_vehicles;
 CREATE POLICY "fleet_vehicles_all" ON public.fleet_vehicles FOR ALL
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "fleet_drivers_all" ON public.fleet_drivers;
 CREATE POLICY "fleet_drivers_all" ON public.fleet_drivers FOR ALL
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "fleet_logs_all" ON public.fleet_vehicle_logs;
 CREATE POLICY "fleet_logs_all" ON public.fleet_vehicle_logs FOR ALL
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "fleet_schedules_all" ON public.fleet_schedules;
 CREATE POLICY "fleet_schedules_all" ON public.fleet_schedules FOR ALL
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());

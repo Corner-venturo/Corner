@@ -45,15 +45,19 @@ COMMENT ON COLUMN public.attendance_records.leave_request_id IS '關聯的請假
 ALTER TABLE public.attendance_records ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "attendance_records_select" ON public.attendance_records;
 CREATE POLICY "attendance_records_select" ON public.attendance_records
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "attendance_records_insert" ON public.attendance_records;
 CREATE POLICY "attendance_records_insert" ON public.attendance_records
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "attendance_records_update" ON public.attendance_records;
 CREATE POLICY "attendance_records_update" ON public.attendance_records
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "attendance_records_delete" ON public.attendance_records;
 CREATE POLICY "attendance_records_delete" ON public.attendance_records
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -66,6 +70,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_attendance_records_updated_at ON public.attendance_records;
 CREATE TRIGGER trigger_attendance_records_updated_at
   BEFORE UPDATE ON public.attendance_records
   FOR EACH ROW
@@ -91,6 +96,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_calculate_work_hours ON public.attendance_records;
 CREATE TRIGGER trigger_calculate_work_hours
   BEFORE INSERT OR UPDATE ON public.attendance_records
   FOR EACH ROW

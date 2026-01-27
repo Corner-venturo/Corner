@@ -61,24 +61,28 @@ CREATE INDEX IF NOT EXISTS idx_pnrs_ticketing_deadline ON public.pnrs(ticketing_
 -- RLS
 ALTER TABLE public.pnrs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnrs_select" ON public.pnrs;
 CREATE POLICY "pnrs_select" ON public.pnrs FOR SELECT
 USING (
   workspace_id = get_current_user_workspace()
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnrs_insert" ON public.pnrs;
 CREATE POLICY "pnrs_insert" ON public.pnrs FOR INSERT
 WITH CHECK (
   workspace_id = get_current_user_workspace()
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnrs_update" ON public.pnrs;
 CREATE POLICY "pnrs_update" ON public.pnrs FOR UPDATE
 USING (
   workspace_id = get_current_user_workspace()
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnrs_delete" ON public.pnrs;
 CREATE POLICY "pnrs_delete" ON public.pnrs FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()
@@ -94,6 +98,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS pnrs_updated_at ON public.pnrs;
 DROP TRIGGER IF EXISTS pnrs_updated_at ON public.pnrs;
 CREATE TRIGGER pnrs_updated_at
   BEFORE UPDATE ON public.pnrs

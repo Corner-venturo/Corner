@@ -30,15 +30,19 @@ CREATE INDEX IF NOT EXISTS idx_tour_control_forms_workspace_id ON public.tour_co
 ALTER TABLE public.tour_control_forms ENABLE ROW LEVEL SECURITY;
 
 -- 建立 RLS 政策
+DROP POLICY IF EXISTS "tour_control_forms_select" ON public.tour_control_forms;
 CREATE POLICY "tour_control_forms_select" ON public.tour_control_forms FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "tour_control_forms_insert" ON public.tour_control_forms;
 CREATE POLICY "tour_control_forms_insert" ON public.tour_control_forms FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "tour_control_forms_update" ON public.tour_control_forms;
 CREATE POLICY "tour_control_forms_update" ON public.tour_control_forms FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "tour_control_forms_delete" ON public.tour_control_forms;
 CREATE POLICY "tour_control_forms_delete" ON public.tour_control_forms FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 

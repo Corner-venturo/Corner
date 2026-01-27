@@ -14,15 +14,18 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
--- Storage policies
+-- Storage policies（先刪除再建立）
+DROP POLICY IF EXISTS "tour_documents_bucket_select" ON storage.objects;
 CREATE POLICY "tour_documents_bucket_select"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'tour-documents');
 
+DROP POLICY IF EXISTS "tour_documents_bucket_insert" ON storage.objects;
 CREATE POLICY "tour_documents_bucket_insert"
 ON storage.objects FOR INSERT
 WITH CHECK (bucket_id = 'tour-documents');
 
+DROP POLICY IF EXISTS "tour_documents_bucket_delete" ON storage.objects;
 CREATE POLICY "tour_documents_bucket_delete"
 ON storage.objects FOR DELETE
 USING (bucket_id = 'tour-documents');

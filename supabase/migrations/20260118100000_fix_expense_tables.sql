@@ -106,6 +106,7 @@ $$ LANGUAGE plpgsql;
 
 -- 建立觸發器
 DROP TRIGGER IF EXISTS trigger_update_account_balance ON personal_expenses;
+DROP TRIGGER IF EXISTS trigger_update_account_balance ON personal_expenses;
 CREATE TRIGGER trigger_update_account_balance
   AFTER INSERT OR UPDATE OR DELETE ON personal_expenses
   FOR EACH ROW
@@ -166,6 +167,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 建立觸發器
+DROP TRIGGER IF EXISTS trigger_update_expense_streak ON personal_expenses;
 DROP TRIGGER IF EXISTS trigger_update_expense_streak ON personal_expenses;
 CREATE TRIGGER trigger_update_expense_streak
   AFTER INSERT ON personal_expenses

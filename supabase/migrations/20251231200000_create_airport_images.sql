@@ -37,15 +37,19 @@ COMMENT ON COLUMN public.airport_images.is_default IS '是否為該機場的預�
 ALTER TABLE public.airport_images ENABLE ROW LEVEL SECURITY;
 
 -- RLS 策略
+DROP POLICY IF EXISTS "airport_images_select" ON public.airport_images;
 CREATE POLICY "airport_images_select" ON public.airport_images FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "airport_images_insert" ON public.airport_images;
 CREATE POLICY "airport_images_insert" ON public.airport_images FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "airport_images_update" ON public.airport_images;
 CREATE POLICY "airport_images_update" ON public.airport_images FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "airport_images_delete" ON public.airport_images;
 CREATE POLICY "airport_images_delete" ON public.airport_images FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 

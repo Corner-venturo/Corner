@@ -305,6 +305,7 @@ DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 -- 1. workspace_id 為 NULL 的舊資料，所有人可看
 -- 2. 個人事項只有本人能看
 -- 3. 公司事項同 workspace 能看，或超級管理員可看
+DROP POLICY IF EXISTS "calendar_events_select" ON public.calendar_events;
 CREATE POLICY "calendar_events_select" ON public.calendar_events FOR SELECT
 USING (
   -- 舊資料（workspace_id 為 NULL）所有人可看
@@ -324,6 +325,7 @@ USING (
 );
 
 -- INSERT: 可以新增到自己的 workspace 或 NULL
+DROP POLICY IF EXISTS "calendar_events_insert" ON public.calendar_events;
 CREATE POLICY "calendar_events_insert" ON public.calendar_events FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -332,6 +334,7 @@ WITH CHECK (
 );
 
 -- UPDATE: 只有建立者或超級管理員能修改
+DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 CREATE POLICY "calendar_events_update" ON public.calendar_events FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -340,6 +343,7 @@ USING (
 );
 
 -- DELETE: 只有建立者或超級管理員能刪除
+DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 CREATE POLICY "calendar_events_delete" ON public.calendar_events FOR DELETE
 USING (
   workspace_id IS NULL

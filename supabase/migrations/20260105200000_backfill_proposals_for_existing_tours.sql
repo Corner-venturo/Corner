@@ -25,7 +25,10 @@ INSERT INTO public.proposals (
 )
 SELECT
   gen_random_uuid() as id,
-  'P' || LPAD(ROW_NUMBER() OVER (ORDER BY t.created_at)::text, 6, '0') as code,
+  'P' || LPAD((
+    COALESCE((SELECT MAX(NULLIF(regexp_replace(code, '[^0-9]', '', 'g'), '')::integer) FROM public.proposals), 0) +
+    ROW_NUMBER() OVER (ORDER BY t.created_at)
+  )::text, 6, '0') as code,
   COALESCE(c.name, t.name, '未知客戶') as customer_name,
   t.name as title,
   t.location as destination,
@@ -49,7 +52,7 @@ WHERE t.proposal_id IS NULL
   AND t.converted_from_proposal IS NOT TRUE
   AND t.workspace_id IS NOT NULL;
 
--- 2. 為每個新建的提案建立套件
+-- 2. 為每個新建的提案建立套件（跳過已有套件的提案）
 INSERT INTO public.proposal_packages (
   id,
   proposal_id,
@@ -72,7 +75,7 @@ SELECT
   gen_random_uuid() as id,
   p.id as proposal_id,
   '原始方案' as version_name,
-  1 as version_number,
+  COALESCE((SELECT MAX(version_number) FROM public.proposal_packages WHERE proposal_id = p.id), 0) + 1 as version_number,
   t.country_id,
   t.main_city_id,
   t.location as destination,
@@ -95,7 +98,10 @@ SELECT
   t.created_at as updated_at
 FROM public.proposals p
 JOIN public.tours t ON t.id = p.converted_tour_id
-WHERE p.status = 'converted';
+WHERE p.status = 'converted'
+  AND NOT EXISTS (
+    SELECT 1 FROM public.proposal_packages pp WHERE pp.proposal_id = p.id
+  );
 
 -- 3. 更新 tours 表，關聯到新建的 proposal 和 package
 UPDATE public.tours t

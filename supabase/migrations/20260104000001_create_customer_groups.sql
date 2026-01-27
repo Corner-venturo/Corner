@@ -37,20 +37,25 @@ ALTER TABLE public.customer_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customer_group_members ENABLE ROW LEVEL SECURITY;
 
 -- 5. 創建 RLS Policies for customer_groups
+DROP POLICY IF EXISTS "customer_groups_select" ON public.customer_groups;
 CREATE POLICY "customer_groups_select" ON public.customer_groups FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "customer_groups_insert" ON public.customer_groups;
 CREATE POLICY "customer_groups_insert" ON public.customer_groups FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "customer_groups_update" ON public.customer_groups;
 CREATE POLICY "customer_groups_update" ON public.customer_groups FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "customer_groups_delete" ON public.customer_groups;
 CREATE POLICY "customer_groups_delete" ON public.customer_groups FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- 6. 創建 RLS Policies for customer_group_members
 -- 通過 group_id 關聯到 customer_groups 來檢查 workspace
+DROP POLICY IF EXISTS "customer_group_members_select" ON public.customer_group_members;
 CREATE POLICY "customer_group_members_select" ON public.customer_group_members FOR SELECT
 USING (
   EXISTS (
@@ -60,6 +65,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "customer_group_members_insert" ON public.customer_group_members;
 CREATE POLICY "customer_group_members_insert" ON public.customer_group_members FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -69,6 +75,7 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "customer_group_members_update" ON public.customer_group_members;
 CREATE POLICY "customer_group_members_update" ON public.customer_group_members FOR UPDATE
 USING (
   EXISTS (
@@ -78,6 +85,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "customer_group_members_delete" ON public.customer_group_members;
 CREATE POLICY "customer_group_members_delete" ON public.customer_group_members FOR DELETE
 USING (
   EXISTS (

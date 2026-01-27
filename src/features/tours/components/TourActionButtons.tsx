@@ -18,6 +18,7 @@ import {
   ClipboardList,
   ClipboardEdit,
   Palette,
+  ListChecks,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tour, Quote, User } from '@/stores/types'
@@ -50,6 +51,8 @@ interface UseTourActionButtonsParams {
   onOpenArchiveDialog?: (tour: Tour) => void
   // 團控表對話框
   onOpenTourControlDialog?: (tour: Tour) => void
+  // 需求總覽對話框
+  onOpenRequirementsDialog?: (tour: Tour) => void
   // 提案點擊處理（查看版本）
   onProposalClick?: (proposal: Proposal) => void
   // 提案操作
@@ -75,6 +78,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
     onCloseTour,
     onOpenArchiveDialog,
     onOpenTourControlDialog,
+    onOpenRequirementsDialog,
     onProposalClick,
     onProposalEdit,
     onProposalArchive,
@@ -161,21 +165,6 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
 
       return (
         <div className="flex items-center gap-1">
-          {/* 結案（僅進行中狀態可見） */}
-          {tour.status === '進行中' && onCloseTour && (
-            <button
-              onClick={e => {
-                e.stopPropagation()
-                onCloseTour(tour)
-              }}
-              className="px-1.5 py-0.5 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
-              title="結案"
-            >
-              <FileCheck size={14} />
-              <span>結案</span>
-            </button>
-          )}
-
           {/* 編輯 */}
           <button
             onClick={e => {
@@ -253,6 +242,21 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>合約</span>
           </button>
 
+          {/* 需求總覽 */}
+          <button
+            onClick={e => {
+              e.stopPropagation()
+              if (onOpenRequirementsDialog) {
+                onOpenRequirementsDialog(tour)
+              }
+            }}
+            className="px-1.5 py-0.5 text-morandi-gold/80 hover:text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors flex items-center gap-0.5 text-xs"
+            title="需求總覽"
+          >
+            <ListChecks size={14} />
+            <span>需求</span>
+          </button>
+
           {/* 團控表 */}
           <button
             onClick={e => {
@@ -295,6 +299,21 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
             <span>{tour.archived ? '解封' : '封存'}</span>
           </button>
 
+          {/* 結案（僅進行中狀態可見） */}
+          {tour.status === '進行中' && onCloseTour && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onCloseTour(tour)
+              }}
+              className="px-1.5 py-0.5 text-morandi-green hover:text-morandi-green hover:bg-status-success-bg rounded transition-colors flex items-center gap-0.5 text-xs"
+              title="結案"
+            >
+              <FileCheck size={14} />
+              <span>結案</span>
+            </button>
+          )}
+
           {/* 刪除 */}
           <button
             onClick={e => {
@@ -324,6 +343,7 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
       onCloseTour,
       onOpenArchiveDialog,
       onOpenTourControlDialog,
+      onOpenRequirementsDialog,
       onProposalClick,
       onProposalEdit,
       onProposalArchive,

@@ -304,23 +304,27 @@ COMMENT ON COLUMN public.pnr_records.queue_count IS '待處理 Queue 數量';
 -- 票價歷史
 ALTER TABLE public.pnr_fare_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_fare_history_select" ON public.pnr_fare_history;
 CREATE POLICY "pnr_fare_history_select" ON public.pnr_fare_history
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_history_insert" ON public.pnr_fare_history;
 CREATE POLICY "pnr_fare_history_insert" ON public.pnr_fare_history
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_history_update" ON public.pnr_fare_history;
 CREATE POLICY "pnr_fare_history_update" ON public.pnr_fare_history
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_history_delete" ON public.pnr_fare_history;
 CREATE POLICY "pnr_fare_history_delete" ON public.pnr_fare_history
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -330,23 +334,27 @@ CREATE POLICY "pnr_fare_history_delete" ON public.pnr_fare_history
 -- 票價警報
 ALTER TABLE public.pnr_fare_alerts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_fare_alerts_select" ON public.pnr_fare_alerts;
 CREATE POLICY "pnr_fare_alerts_select" ON public.pnr_fare_alerts
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_alerts_insert" ON public.pnr_fare_alerts;
 CREATE POLICY "pnr_fare_alerts_insert" ON public.pnr_fare_alerts
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_alerts_update" ON public.pnr_fare_alerts;
 CREATE POLICY "pnr_fare_alerts_update" ON public.pnr_fare_alerts
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_fare_alerts_delete" ON public.pnr_fare_alerts;
 CREATE POLICY "pnr_fare_alerts_delete" ON public.pnr_fare_alerts
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -356,23 +364,27 @@ CREATE POLICY "pnr_fare_alerts_delete" ON public.pnr_fare_alerts
 -- 航班狀態歷史
 ALTER TABLE public.pnr_flight_status_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_flight_status_history_select" ON public.pnr_flight_status_history;
 CREATE POLICY "pnr_flight_status_history_select" ON public.pnr_flight_status_history
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_flight_status_history_insert" ON public.pnr_flight_status_history;
 CREATE POLICY "pnr_flight_status_history_insert" ON public.pnr_flight_status_history
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_flight_status_history_update" ON public.pnr_flight_status_history;
 CREATE POLICY "pnr_flight_status_history_update" ON public.pnr_flight_status_history
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_flight_status_history_delete" ON public.pnr_flight_status_history;
 CREATE POLICY "pnr_flight_status_history_delete" ON public.pnr_flight_status_history
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -382,23 +394,27 @@ CREATE POLICY "pnr_flight_status_history_delete" ON public.pnr_flight_status_his
 -- 航班訂閱
 ALTER TABLE public.flight_status_subscriptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "flight_status_subscriptions_select" ON public.flight_status_subscriptions;
 CREATE POLICY "flight_status_subscriptions_select" ON public.flight_status_subscriptions
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "flight_status_subscriptions_insert" ON public.flight_status_subscriptions;
 CREATE POLICY "flight_status_subscriptions_insert" ON public.flight_status_subscriptions
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "flight_status_subscriptions_update" ON public.flight_status_subscriptions;
 CREATE POLICY "flight_status_subscriptions_update" ON public.flight_status_subscriptions
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "flight_status_subscriptions_delete" ON public.flight_status_subscriptions;
 CREATE POLICY "flight_status_subscriptions_delete" ON public.flight_status_subscriptions
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -408,23 +424,27 @@ CREATE POLICY "flight_status_subscriptions_delete" ON public.flight_status_subsc
 -- Queue 項目
 ALTER TABLE public.pnr_queue_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_queue_items_select" ON public.pnr_queue_items;
 CREATE POLICY "pnr_queue_items_select" ON public.pnr_queue_items
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_queue_items_insert" ON public.pnr_queue_items;
 CREATE POLICY "pnr_queue_items_insert" ON public.pnr_queue_items
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_queue_items_update" ON public.pnr_queue_items;
 CREATE POLICY "pnr_queue_items_update" ON public.pnr_queue_items
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_queue_items_delete" ON public.pnr_queue_items;
 CREATE POLICY "pnr_queue_items_delete" ON public.pnr_queue_items
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -434,23 +454,27 @@ CREATE POLICY "pnr_queue_items_delete" ON public.pnr_queue_items
 -- 航變追蹤
 ALTER TABLE public.pnr_schedule_changes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_schedule_changes_select" ON public.pnr_schedule_changes;
 CREATE POLICY "pnr_schedule_changes_select" ON public.pnr_schedule_changes
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_schedule_changes_insert" ON public.pnr_schedule_changes;
 CREATE POLICY "pnr_schedule_changes_insert" ON public.pnr_schedule_changes
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_schedule_changes_update" ON public.pnr_schedule_changes;
 CREATE POLICY "pnr_schedule_changes_update" ON public.pnr_schedule_changes
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_schedule_changes_delete" ON public.pnr_schedule_changes;
 CREATE POLICY "pnr_schedule_changes_delete" ON public.pnr_schedule_changes
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()
@@ -460,23 +484,27 @@ CREATE POLICY "pnr_schedule_changes_delete" ON public.pnr_schedule_changes
 -- AI 查詢
 ALTER TABLE public.pnr_ai_queries ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pnr_ai_queries_select" ON public.pnr_ai_queries;
 CREATE POLICY "pnr_ai_queries_select" ON public.pnr_ai_queries
   FOR SELECT USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_ai_queries_insert" ON public.pnr_ai_queries;
 CREATE POLICY "pnr_ai_queries_insert" ON public.pnr_ai_queries
   FOR INSERT WITH CHECK (
     workspace_id = get_current_user_workspace()
   );
 
+DROP POLICY IF EXISTS "pnr_ai_queries_update" ON public.pnr_ai_queries;
 CREATE POLICY "pnr_ai_queries_update" ON public.pnr_ai_queries
   FOR UPDATE USING (
     workspace_id = get_current_user_workspace()
     OR is_super_admin()
   );
 
+DROP POLICY IF EXISTS "pnr_ai_queries_delete" ON public.pnr_ai_queries;
 CREATE POLICY "pnr_ai_queries_delete" ON public.pnr_ai_queries
   FOR DELETE USING (
     workspace_id = get_current_user_workspace()

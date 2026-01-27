@@ -40,15 +40,19 @@ CREATE INDEX IF NOT EXISTS idx_fleet_vehicles_status ON public.fleet_vehicles(st
 -- RLS
 ALTER TABLE public.fleet_vehicles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "fleet_vehicles_select" ON public.fleet_vehicles;
 CREATE POLICY "fleet_vehicles_select" ON public.fleet_vehicles
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "fleet_vehicles_insert" ON public.fleet_vehicles;
 CREATE POLICY "fleet_vehicles_insert" ON public.fleet_vehicles
   FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "fleet_vehicles_update" ON public.fleet_vehicles;
 CREATE POLICY "fleet_vehicles_update" ON public.fleet_vehicles
   FOR UPDATE USING (true);
 
+DROP POLICY IF EXISTS "fleet_vehicles_delete" ON public.fleet_vehicles;
 CREATE POLICY "fleet_vehicles_delete" ON public.fleet_vehicles
   FOR DELETE USING (true);
 
@@ -97,15 +101,19 @@ CREATE INDEX IF NOT EXISTS idx_fleet_schedules_status ON public.fleet_schedules(
 -- RLS
 ALTER TABLE public.fleet_schedules ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "fleet_schedules_select" ON public.fleet_schedules;
 CREATE POLICY "fleet_schedules_select" ON public.fleet_schedules
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "fleet_schedules_insert" ON public.fleet_schedules;
 CREATE POLICY "fleet_schedules_insert" ON public.fleet_schedules
   FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "fleet_schedules_update" ON public.fleet_schedules;
 CREATE POLICY "fleet_schedules_update" ON public.fleet_schedules
   FOR UPDATE USING (true);
 
+DROP POLICY IF EXISTS "fleet_schedules_delete" ON public.fleet_schedules;
 CREATE POLICY "fleet_schedules_delete" ON public.fleet_schedules
   FOR DELETE USING (true);
 
@@ -149,15 +157,19 @@ CREATE INDEX IF NOT EXISTS idx_leader_schedules_tour ON public.leader_schedules(
 -- RLS
 ALTER TABLE public.leader_schedules ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "leader_schedules_select" ON public.leader_schedules;
 CREATE POLICY "leader_schedules_select" ON public.leader_schedules
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "leader_schedules_insert" ON public.leader_schedules;
 CREATE POLICY "leader_schedules_insert" ON public.leader_schedules
   FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "leader_schedules_update" ON public.leader_schedules;
 CREATE POLICY "leader_schedules_update" ON public.leader_schedules
   FOR UPDATE USING (true);
 
+DROP POLICY IF EXISTS "leader_schedules_delete" ON public.leader_schedules;
 CREATE POLICY "leader_schedules_delete" ON public.leader_schedules
   FOR DELETE USING (true);
 
@@ -204,6 +216,7 @@ $$ LANGUAGE plpgsql;
 -- =====================================================
 -- 5. 車輛調度視圖（含車輛資訊）
 -- =====================================================
+DROP VIEW IF EXISTS public.fleet_schedules_with_vehicle;
 CREATE OR REPLACE VIEW public.fleet_schedules_with_vehicle AS
 SELECT
   s.*,
@@ -219,11 +232,11 @@ JOIN public.fleet_vehicles v ON v.id = s.vehicle_id;
 -- =====================================================
 -- 6. 領隊調度視圖（含領隊資訊）
 -- =====================================================
+DROP VIEW IF EXISTS public.leader_schedules_with_leader;
 CREATE OR REPLACE VIEW public.leader_schedules_with_leader AS
 SELECT
   s.*,
   l.name AS leader_name,
-  l.name_en AS leader_name_en,
   l.phone AS leader_phone,
   l.languages,
   l.specialties

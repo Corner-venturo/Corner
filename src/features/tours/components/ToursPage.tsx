@@ -29,6 +29,7 @@ import { TourItineraryDialog } from './TourItineraryDialog'
 import { ContractDialog } from '@/components/contracts/ContractDialog'
 import { TourClosingDialog } from './TourClosingDialog'
 import { TourControlDialogWrapper } from './TourControlDialogWrapper'
+import { TourRequirementsDialog } from './TourRequirementsDialog'
 import { ProposalsTableContent } from '@/features/proposals/components/ProposalsTableContent'
 import { convertToTour } from '@/services/proposal.service'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -55,6 +56,7 @@ export const ToursPage: React.FC = () => {
   const { user } = useAuthStore()
 
   const [tourControlDialogTour, setTourControlDialogTour] = useState<Tour | null>(null)
+  const [requirementsDialogTour, setRequirementsDialogTour] = useState<Tour | null>(null)
 
   // 🔧 TOUR-01 重構：使用 useProposalOperations hook 管理提案相關狀態和操作
   const proposalOps = useProposalOperations()
@@ -123,6 +125,7 @@ export const ToursPage: React.FC = () => {
     openContractDialog,
     closeContractDialog,
     detailDialogTourId,
+    detailDialogDefaultTab,
     openDetailDialog,
     closeDetailDialog,
     archiveDialogTour,
@@ -250,6 +253,9 @@ export const ToursPage: React.FC = () => {
     onOpenArchiveDialog: openArchiveDialog,
     onOpenTourControlDialog: (tour: Tour) => {
       setTourControlDialogTour(tour)
+    },
+    onOpenRequirementsDialog: (tour: Tour) => {
+      setRequirementsDialogTour(tour)
     },
     onProposalClick: handleProposalClick,
     onProposalEdit: handleEditProposal,
@@ -430,6 +436,7 @@ export const ToursPage: React.FC = () => {
         isOpen={!!detailDialogTourId}
         onClose={closeDetailDialog}
         tourId={detailDialogTourId}
+        defaultTab={detailDialogDefaultTab}
         onDataChange={() => {}}
       />
 
@@ -450,6 +457,13 @@ export const ToursPage: React.FC = () => {
           onClose={() => setTourControlDialogTour(null)}
         />
       )}
+
+      {/* 需求總表對話框 */}
+      <TourRequirementsDialog
+        open={!!requirementsDialogTour}
+        tour={requirementsDialogTour}
+        onClose={() => setRequirementsDialogTour(null)}
+      />
 
       {/* 🔧 TOUR-01: 提案對話框整合到 ProposalDialogsWrapper */}
       <ProposalDialogsWrapper {...proposalOps} onRefreshProposals={refreshProposals} />

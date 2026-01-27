@@ -26,24 +26,28 @@ DROP POLICY IF EXISTS "tours_insert" ON public.tours;
 DROP POLICY IF EXISTS "tours_update" ON public.tours;
 DROP POLICY IF EXISTS "tours_delete" ON public.tours;
 
+DROP POLICY IF EXISTS "tours_select" ON public.tours;
 CREATE POLICY "tours_select" ON public.tours FOR SELECT
 USING (
   (get_current_user_workspace() IS NOT NULL AND workspace_id = get_current_user_workspace())
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "tours_insert" ON public.tours;
 CREATE POLICY "tours_insert" ON public.tours FOR INSERT
 WITH CHECK (
   (get_current_user_workspace() IS NOT NULL AND workspace_id = get_current_user_workspace())
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "tours_update" ON public.tours;
 CREATE POLICY "tours_update" ON public.tours FOR UPDATE
 USING (
   (get_current_user_workspace() IS NOT NULL AND workspace_id = get_current_user_workspace())
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "tours_delete" ON public.tours;
 CREATE POLICY "tours_delete" ON public.tours FOR DELETE
 USING (
   (get_current_user_workspace() IS NOT NULL AND workspace_id = get_current_user_workspace())

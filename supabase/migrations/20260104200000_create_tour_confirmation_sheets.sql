@@ -159,6 +159,7 @@ $$ LANGUAGE plpgsql;
 
 -- 觸發器
 DROP TRIGGER IF EXISTS trigger_update_confirmation_totals ON public.tour_confirmation_items;
+DROP TRIGGER IF EXISTS trigger_update_confirmation_totals ON public.tour_confirmation_items;
 CREATE TRIGGER trigger_update_confirmation_totals
 AFTER INSERT OR UPDATE OR DELETE ON public.tour_confirmation_items
 FOR EACH ROW
@@ -186,6 +187,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 觸發器
+DROP TRIGGER IF EXISTS trigger_calculate_item_subtotal ON public.tour_confirmation_items;
 DROP TRIGGER IF EXISTS trigger_calculate_item_subtotal ON public.tour_confirmation_items;
 CREATE TRIGGER trigger_calculate_item_subtotal
 BEFORE INSERT OR UPDATE ON public.tour_confirmation_items

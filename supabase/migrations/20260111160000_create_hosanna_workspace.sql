@@ -9,6 +9,7 @@ VALUES (
   'vehicle_supplier',
   now(),
   now()
-);
+)
+ON CONFLICT (code) DO NOTHING;
 
 COMMIT;

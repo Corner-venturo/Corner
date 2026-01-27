@@ -11,11 +11,13 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- 公開讀取政策
+DROP POLICY IF EXISTS "city_backgrounds_public_read" ON storage.objects;
 CREATE POLICY "city_backgrounds_public_read" ON storage.objects
 FOR SELECT
 USING (bucket_id = 'city-backgrounds');
 
 -- 允許登入使用者上傳（RLS 檢查 auth）
+DROP POLICY IF EXISTS "city_backgrounds_upload" ON storage.objects;
 CREATE POLICY "city_backgrounds_upload" ON storage.objects
 FOR INSERT
 WITH CHECK (
@@ -24,6 +26,7 @@ WITH CHECK (
 );
 
 -- 允許登入使用者更新自己上傳的檔案
+DROP POLICY IF EXISTS "city_backgrounds_update" ON storage.objects;
 CREATE POLICY "city_backgrounds_update" ON storage.objects
 FOR UPDATE
 USING (
@@ -32,6 +35,7 @@ USING (
 );
 
 -- 允許登入使用者刪除
+DROP POLICY IF EXISTS "city_backgrounds_delete" ON storage.objects;
 CREATE POLICY "city_backgrounds_delete" ON storage.objects
 FOR DELETE
 USING (

@@ -6,6 +6,7 @@ BEGIN;
 DROP POLICY IF EXISTS "tours_select" ON public.tours;
 
 -- 非常寬鬆的 policy：所有登入用戶都能 SELECT
+DROP POLICY IF EXISTS "tours_select" ON public.tours;
 CREATE POLICY "tours_select" ON public.tours FOR SELECT
 USING (auth.uid() IS NOT NULL);
 

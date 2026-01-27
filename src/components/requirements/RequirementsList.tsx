@@ -25,6 +25,10 @@ import {
   FileText,
   Plus,
   Printer,
+  EyeOff,
+  Eye,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -73,6 +77,7 @@ interface TourRequest {
   note?: string | null
   status?: string | null
   quoted_cost?: number | null
+  hidden?: boolean | null
 }
 
 // 報價單項目
@@ -148,6 +153,10 @@ export function RequirementsList({
 
   // Dialog 狀態
   const [addManualDialogOpen, setAddManualDialogOpen] = useState(false)
+  const [addManualCategory, setAddManualCategory] = useState<string>('transport')
+
+  // 隱藏項目展開狀態（按分類）
+  const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set())
 
   // 判斷模式
   const mode = tourId ? 'tour' : 'proposal'
@@ -208,7 +217,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost')
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
           .eq('tour_id', tourId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -240,7 +249,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost')
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
           .eq('proposal_package_id', proposalPackageId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -455,6 +464,95 @@ export function RequirementsList({
   // ============================================
   // 動作
   // ============================================
+
+  // 隱藏/恢復需求（支援尚未建立需求單的項目）
+  const handleToggleHidden = useCallback(async (
+    existingRequestId: string | null,
+    hidden: boolean,
+    itemData?: {
+      category: string
+      supplierName: string
+      title: string
+      serviceDate: string | null
+      quantity: number
+      note?: string
+    }
+  ) => {
+    try {
+      if (existingRequestId) {
+        // 已有需求單，直接更新
+        const { error } = await supabase
+          .from('tour_requests')
+          .update({ hidden })
+          .eq('id', existingRequestId)
+
+        if (error) throw error
+
+        // 更新本地狀態
+        setExistingRequests(prev =>
+          prev.map(r => r.id === existingRequestId ? { ...r, hidden } : r)
+        )
+      } else if (itemData && user?.workspace_id) {
+        // 尚未建立需求單，創建一個並標記為隱藏
+        const code = `RQ${Date.now().toString().slice(-8)}`
+        const insertData = {
+          code,
+          workspace_id: user.workspace_id,
+          tour_id: tourId || null,
+          proposal_package_id: proposalPackageId || null,
+          tour_code: tour?.code || pkg?.version_name || null,
+          tour_name: tour?.name || pkg?.version_name || null,
+          category: itemData.category,
+          supplier_name: itemData.supplierName || null,
+          title: itemData.title,
+          service_date: itemData.serviceDate || null,
+          quantity: itemData.quantity,
+          note: itemData.note || null,
+          status: 'draft',
+          hidden: true,
+          created_by: user.id,
+          created_by_name: user.display_name || user.chinese_name || '',
+        }
+
+        const { data: newRequest, error } = await supabase
+          .from('tour_requests')
+          .insert(insertData)
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
+          .single()
+
+        if (error) throw error
+
+        // 添加到本地狀態
+        if (newRequest) {
+          setExistingRequests(prev => [...prev, newRequest as TourRequest])
+        }
+      }
+
+      toast({ title: hidden ? '已隱藏' : '已恢復顯示' })
+    } catch (error) {
+      logger.error('更新隱藏狀態失敗:', error)
+      toast({ title: '操作失敗', variant: 'destructive' })
+    }
+  }, [toast, user, tourId, proposalPackageId, tour, pkg])
+
+  // 切換分類隱藏項目的展開狀態
+  const toggleHiddenCategory = useCallback((category: string) => {
+    setExpandedHiddenCategories(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(category)) {
+        newSet.delete(category)
+      } else {
+        newSet.add(category)
+      }
+      return newSet
+    })
+  }, [])
+
+  // 開啟新增需求對話框（指定分類）
+  const openAddManualDialog = useCallback((category: string) => {
+    setAddManualCategory(category)
+    setAddManualDialogOpen(true)
+  }, [])
 
   // 確認需求
   const handleConfirmChanges = useCallback(async () => {
@@ -785,15 +883,6 @@ export function RequirementsList({
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               刷新
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setAddManualDialogOpen(true)}
-              className="gap-1"
-            >
-              <Plus size={14} />
-              新增需求
-            </Button>
             {(confirmedSnapshot.length === 0 || hasUnconfirmedChanges) && quoteItems.length > 0 && (
               <Button
                 size="sm"
@@ -841,7 +930,29 @@ export function RequirementsList({
                   const trackItems = changeTrackByCategory[cat.key]
                   if (trackItems.length === 0) return null
 
-                  const categoryTotal = trackItems.reduce((sum, ti) => {
+                  // 計算隱藏與可見項目
+                  const visibleItems: typeof trackItems = []
+                  const hiddenItems: typeof trackItems = []
+
+                  for (const trackItem of trackItems) {
+                    const itemData = trackItem.item
+                    const itemKey = 'supplierName' in itemData
+                      ? `${itemData.category}-${itemData.supplierName}-${itemData.title}-${itemData.serviceDate || ''}`
+                      : `${itemData.category}-${itemData.supplier_name}-${itemData.title}-${itemData.service_date || ''}`
+                    const existingRequest = existingRequests.find(r =>
+                      `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === itemKey
+                    )
+                    // 如果有對應的需求單且被隱藏，則放入隱藏區
+                    if (existingRequest?.hidden) {
+                      hiddenItems.push(trackItem)
+                    } else {
+                      visibleItems.push(trackItem)
+                    }
+                  }
+
+                  const isHiddenExpanded = expandedHiddenCategories.has(cat.key)
+
+                  const categoryTotal = visibleItems.reduce((sum, ti) => {
                     if (ti.type === 'cancelled') return sum
                     const itemData = ti.item
                     const key = 'supplierName' in itemData
@@ -853,137 +964,209 @@ export function RequirementsList({
                     return sum + (existing?.quoted_cost || 0)
                   }, 0)
 
+                  // 渲染單一項目的函數
+                  const renderItem = (trackItem: ChangeTrackItem, idx: number, isHidden: boolean) => {
+                    const isCancelled = trackItem.type === 'cancelled'
+                    const isNew = trackItem.type === 'new'
+                    const itemData = trackItem.item
+                    const supplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
+                    const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
+                    const title = itemData.title
+                    const note = itemData.note
+                    const quantity = 'quantity' in itemData ? itemData.quantity : 1
+
+                    const itemKey = `${cat.key}-${supplierName}-${title}-${serviceDate || ''}`
+                    const existingRequest = existingRequests.find(r =>
+                      `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === itemKey
+                    )
+
+                    let statusLabel = ''
+                    let statusClass = ''
+                    if (isCancelled) {
+                      statusLabel = '待取消'
+                      statusClass = 'bg-morandi-red/15 text-morandi-red'
+                    } else if (isNew) {
+                      statusLabel = '待作業'
+                      statusClass = 'bg-amber-100 text-amber-700'
+                    } else if (existingRequest) {
+                      const s = existingRequest.status
+                      if (s === 'sent' || s === 'pending') {
+                        statusLabel = '已發送'
+                        statusClass = 'bg-blue-100 text-blue-700'
+                      } else if (s === 'replied') {
+                        statusLabel = '已回覆'
+                        statusClass = 'bg-emerald-100 text-emerald-700'
+                      } else if (s === 'confirmed') {
+                        statusLabel = '已確認'
+                        statusClass = 'bg-morandi-green/20 text-morandi-green'
+                      } else if (s === 'cancelled') {
+                        statusLabel = '已取消'
+                        statusClass = 'bg-gray-100 text-gray-500'
+                      } else {
+                        statusLabel = '待作業'
+                        statusClass = 'bg-amber-100 text-amber-700'
+                      }
+                    } else {
+                      statusLabel = '待作業'
+                      statusClass = 'bg-amber-100 text-amber-700'
+                    }
+
+                    const quotedCost = existingRequest?.quoted_cost
+
+                    return (
+                      <tr
+                        key={`${cat.key}-${isHidden ? 'hidden' : 'visible'}-${idx}`}
+                        className={cn(
+                          'border-t border-border/50 hover:bg-morandi-container/20',
+                          isCancelled && 'bg-morandi-red/5',
+                          isHidden && 'bg-morandi-muted/5'
+                        )}
+                      >
+                        <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
+                          {formatDate(serviceDate)}
+                        </td>
+                        <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
+                          {supplierName || '-'}
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <div className={cn(isCancelled && 'line-through text-morandi-muted')}>
+                            <span>{title}</span>
+                            {note && (
+                              <div className="text-xs mt-0.5 text-morandi-secondary whitespace-pre-line">
+                                {note}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-medium text-morandi-primary">
+                          {quotedCost ? `$${quotedCost.toLocaleString()}` : '-'}
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <span className={cn('inline-flex items-center px-2 py-0.5 rounded text-xs font-medium', statusClass)}>
+                            {statusLabel}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {/* 隱藏/恢復按鈕 */}
+                            {!isCancelled && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleToggleHidden(
+                                  existingRequest?.id || null,
+                                  !isHidden,
+                                  !existingRequest ? {
+                                    category: cat.key,
+                                    supplierName: supplierName || '',
+                                    title,
+                                    serviceDate,
+                                    quantity,
+                                    note: note || undefined,
+                                  } : undefined
+                                )}
+                                className={cn(
+                                  'h-7 w-7 p-0',
+                                  isHidden
+                                    ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                                    : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
+                                )}
+                                title={isHidden ? '恢復顯示' : '隱藏'}
+                              >
+                                {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
+                              </Button>
+                            )}
+                            {/* 列印取消單按鈕 */}
+                            {isCancelled && supplierName && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const items = cancelledBySupplier.get(supplierName)
+                                  if (items) handlePrintCancellation(supplierName, items)
+                                }}
+                                className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
+                                title="列印取消單"
+                              >
+                                <Printer size={14} />
+                              </Button>
+                            )}
+                            {/* 產生需求單按鈕 */}
+                            {!isCancelled && supplierName && onOpenRequestDialog && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openRequestDialog(cat.key, supplierName)}
+                                className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
+                                title="產生需求單"
+                              >
+                                <FileText size={14} />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  }
+
                   return (
                     <React.Fragment key={cat.key}>
                       {/* 分類標題行 */}
                       <tr className="bg-morandi-container/30 border-t border-border">
                         <td colSpan={3} className="px-3 py-2">
-                          <span className="font-medium text-morandi-primary">{cat.label}</span>
-                          <span className="text-xs text-morandi-secondary ml-2">
-                            ({trackItems.filter(t => t.type !== 'cancelled').length} 項)
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-medium text-morandi-primary">{cat.label}</span>
+                            <span className="text-xs text-morandi-secondary">
+                              ({visibleItems.filter(t => t.type !== 'cancelled').length} 項)
+                            </span>
+                            {/* 已隱藏指示器 */}
+                            {hiddenItems.length > 0 && (
+                              <button
+                                onClick={() => toggleHiddenCategory(cat.key)}
+                                className="flex items-center gap-1 text-xs text-morandi-muted hover:text-morandi-secondary transition-colors"
+                              >
+                                {isHiddenExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                <EyeOff size={12} />
+                                <span>已隱藏({hiddenItems.length})</span>
+                              </button>
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 py-2 text-right font-medium text-morandi-primary">
                           {categoryTotal > 0 ? `$${categoryTotal.toLocaleString()}` : ''}
                         </td>
                         <td></td>
-                        <td></td>
+                        <td className="px-3 py-2 text-center">
+                          {/* 新增按鈕 */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openAddManualDialog(cat.key)}
+                            className="h-7 px-2 text-xs text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10 gap-1"
+                          >
+                            <Plus size={14} />
+                            新增
+                          </Button>
+                        </td>
                       </tr>
 
-                      {/* 項目 */}
-                      {trackItems.map((trackItem, idx) => {
-                        const isCancelled = trackItem.type === 'cancelled'
-                        const isNew = trackItem.type === 'new'
-                        const itemData = trackItem.item
-                        const supplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
-                        const serviceDate = 'serviceDate' in itemData ? itemData.serviceDate : itemData.service_date
-                        const title = itemData.title
-                        const note = itemData.note
+                      {/* 可見項目 */}
+                      {visibleItems.map((trackItem, idx) => renderItem(trackItem, idx, false))}
 
-                        const itemKey = `${cat.key}-${supplierName}-${title}-${serviceDate || ''}`
-                        const existingRequest = existingRequests.find(r =>
-                          `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === itemKey
-                        )
-
-                        let statusLabel = ''
-                        let statusClass = ''
-                        if (isCancelled) {
-                          statusLabel = '待取消'
-                          statusClass = 'bg-morandi-red/15 text-morandi-red'
-                        } else if (isNew) {
-                          statusLabel = '待作業'
-                          statusClass = 'bg-amber-100 text-amber-700'
-                        } else if (existingRequest) {
-                          const s = existingRequest.status
-                          if (s === 'sent' || s === 'pending') {
-                            statusLabel = '已發送'
-                            statusClass = 'bg-blue-100 text-blue-700'
-                          } else if (s === 'replied') {
-                            statusLabel = '已回覆'
-                            statusClass = 'bg-emerald-100 text-emerald-700'
-                          } else if (s === 'confirmed') {
-                            statusLabel = '已確認'
-                            statusClass = 'bg-morandi-green/20 text-morandi-green'
-                          } else if (s === 'cancelled') {
-                            statusLabel = '已取消'
-                            statusClass = 'bg-gray-100 text-gray-500'
-                          } else {
-                            statusLabel = '待作業'
-                            statusClass = 'bg-amber-100 text-amber-700'
-                          }
-                        } else {
-                          statusLabel = '待作業'
-                          statusClass = 'bg-amber-100 text-amber-700'
-                        }
-
-                        const quotedCost = existingRequest?.quoted_cost
-
-                        return (
-                          <tr
-                            key={`${cat.key}-${idx}`}
-                            className={cn(
-                              'border-t border-border/50 hover:bg-morandi-container/20',
-                              isCancelled && 'bg-morandi-red/5'
-                            )}
-                          >
-                            <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
-                              {formatDate(serviceDate)}
-                            </td>
-                            <td className={cn('px-3 py-2.5', isCancelled && 'line-through text-morandi-muted')}>
-                              {supplierName || '-'}
-                            </td>
-                            <td className="px-3 py-2.5">
-                              <div className={cn(isCancelled && 'line-through text-morandi-muted')}>
-                                <span>{title}</span>
-                                {note && (
-                                  <div className="text-xs mt-0.5 text-morandi-secondary whitespace-pre-line">
-                                    {note}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-3 py-2.5 text-right font-medium text-morandi-primary">
-                              {quotedCost ? `$${quotedCost.toLocaleString()}` : '-'}
-                            </td>
-                            <td className="px-3 py-2.5 text-center">
-                              <span className={cn('inline-flex items-center px-2 py-0.5 rounded text-xs font-medium', statusClass)}>
-                                {statusLabel}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2.5 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                {/* 列印取消單按鈕 */}
-                                {isCancelled && supplierName && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      const items = cancelledBySupplier.get(supplierName)
-                                      if (items) handlePrintCancellation(supplierName, items)
-                                    }}
-                                    className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
-                                    title="列印取消單"
-                                  >
-                                    <Printer size={14} />
-                                  </Button>
-                                )}
-                                {/* 產生需求單按鈕 */}
-                                {!isCancelled && supplierName && onOpenRequestDialog && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openRequestDialog(cat.key, supplierName)}
-                                    className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                    title="產生需求單"
-                                  >
-                                    <FileText size={14} />
-                                  </Button>
-                                )}
+                      {/* 隱藏項目（展開時顯示）*/}
+                      {isHiddenExpanded && hiddenItems.length > 0 && (
+                        <>
+                          <tr className="bg-morandi-muted/10 border-t border-dashed border-morandi-muted/30">
+                            <td colSpan={6} className="px-3 py-1.5 text-xs text-morandi-muted">
+                              <div className="flex items-center gap-1">
+                                <EyeOff size={12} />
+                                <span>已隱藏的項目</span>
                               </div>
                             </td>
                           </tr>
-                        )
-                      })}
+                          {hiddenItems.map((trackItem, idx) => renderItem(trackItem, idx, true))}
+                        </>
+                      )}
                     </React.Fragment>
                   )
                 })}
@@ -1016,6 +1199,7 @@ export function RequirementsList({
         tourCode={tour?.code || pkg?.version_name || ''}
         tourName={tour?.name || pkg?.version_name || ''}
         startDate={startDate}
+        defaultCategory={addManualCategory}
         onSuccess={() => loadData(false)}
       />
     </>

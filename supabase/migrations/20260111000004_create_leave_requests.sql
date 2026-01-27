@@ -53,19 +53,24 @@ COMMENT ON COLUMN public.leave_requests.reject_reason IS '駁回原因';
 ALTER TABLE public.leave_requests ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "leave_requests_select" ON public.leave_requests;
 CREATE POLICY "leave_requests_select" ON public.leave_requests
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_requests_insert" ON public.leave_requests;
 CREATE POLICY "leave_requests_insert" ON public.leave_requests
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "leave_requests_update" ON public.leave_requests;
 CREATE POLICY "leave_requests_update" ON public.leave_requests
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_requests_delete" ON public.leave_requests;
 CREATE POLICY "leave_requests_delete" ON public.leave_requests
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- 更新 updated_at 的觸發器
+DROP TRIGGER IF EXISTS trigger_leave_requests_updated_at ON public.leave_requests;
 CREATE TRIGGER trigger_leave_requests_updated_at
   BEFORE UPDATE ON public.leave_requests
   FOR EACH ROW
@@ -99,6 +104,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_leave_balance_on_approval ON public.leave_requests;
 CREATE TRIGGER trigger_leave_balance_on_approval
   AFTER UPDATE ON public.leave_requests
   FOR EACH ROW

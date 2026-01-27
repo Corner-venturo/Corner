@@ -6,9 +6,14 @@ ALTER TABLE public.employees
 ADD COLUMN IF NOT EXISTS employee_type TEXT DEFAULT 'human';
 
 -- 添加 CHECK 約束確保只能是 'human' 或 'bot'
-ALTER TABLE public.employees
-ADD CONSTRAINT employees_employee_type_check
-CHECK (employee_type IN ('human', 'bot'));
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'employees_employee_type_check') THEN
+    ALTER TABLE public.employees
+    ADD CONSTRAINT employees_employee_type_check
+    CHECK (employee_type IN ('human', 'bot'));
+  END IF;
+END $$;
 
 -- 添加註解
 COMMENT ON COLUMN public.employees.employee_type IS '員工類型：human（人類）或 bot（機器人）';

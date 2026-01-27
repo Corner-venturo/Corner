@@ -39,7 +39,8 @@ export interface UseToursDialogsReturn {
 
   // Detail Dialog
   detailDialogTourId: string | null
-  openDetailDialog: (tourId: string) => void
+  detailDialogDefaultTab: string
+  openDetailDialog: (tourId: string, defaultTab?: string) => void
   closeDetailDialog: () => void
 
   // Archive Dialog
@@ -89,6 +90,7 @@ export function useToursDialogs(): UseToursDialogsReturn {
 
   // Detail Dialog
   const [detailDialogTourId, setDetailDialogTourId] = useState<string | null>(null)
+  const [detailDialogDefaultTab, setDetailDialogDefaultTab] = useState<string>('members')
 
   // Archive Dialog
   const [archiveDialogTour, setArchiveDialogTour] = useState<Tour | null>(null)
@@ -133,8 +135,14 @@ export function useToursDialogs(): UseToursDialogsReturn {
     []
   )
 
-  const openDetailDialog = useCallback((tourId: string) => setDetailDialogTourId(tourId), [])
-  const closeDetailDialog = useCallback(() => setDetailDialogTourId(null), [])
+  const openDetailDialog = useCallback((tourId: string, defaultTab: string = 'members') => {
+    setDetailDialogTourId(tourId)
+    setDetailDialogDefaultTab(defaultTab)
+  }, [])
+  const closeDetailDialog = useCallback(() => {
+    setDetailDialogTourId(null)
+    setDetailDialogDefaultTab('members')
+  }, [])
 
   const openArchiveDialog = useCallback((tour: Tour) => setArchiveDialogTour(tour), [])
   const closeArchiveDialog = useCallback(() => setArchiveDialogTour(null), [])
@@ -179,6 +187,7 @@ export function useToursDialogs(): UseToursDialogsReturn {
     openContractDialog,
     closeContractDialog,
     detailDialogTourId,
+    detailDialogDefaultTab,
     openDetailDialog,
     closeDetailDialog,
     archiveDialogTour,

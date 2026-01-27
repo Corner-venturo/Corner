@@ -13,6 +13,9 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'employees' AND column_name = 'birthday'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'employees' AND column_name = 'birth_date'
   ) THEN
     ALTER TABLE employees RENAME COLUMN birthday TO birth_date;
     RAISE NOTICE 'Renamed employees.birthday → birth_date';
@@ -27,6 +30,9 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'customers' AND column_name = 'date_of_birth'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'customers' AND column_name = 'birth_date'
   ) THEN
     ALTER TABLE customers RENAME COLUMN date_of_birth TO birth_date;
     RAISE NOTICE 'Renamed customers.date_of_birth → birth_date';
@@ -41,6 +47,9 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'customers' AND column_name = 'passport_expiry_date'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'customers' AND column_name = 'passport_expiry'
   ) THEN
     ALTER TABLE customers RENAME COLUMN passport_expiry_date TO passport_expiry;
     RAISE NOTICE 'Renamed customers.passport_expiry_date → passport_expiry';
@@ -55,6 +64,9 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'customers' AND column_name = 'passport_romanization'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'customers' AND column_name = 'passport_name'
   ) THEN
     ALTER TABLE customers RENAME COLUMN passport_romanization TO passport_name;
     RAISE NOTICE 'Renamed customers.passport_romanization → passport_name';
@@ -69,6 +81,9 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'suppliers' AND column_name = 'name_en'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'suppliers' AND column_name = 'english_name'
   ) THEN
     ALTER TABLE suppliers RENAME COLUMN name_en TO english_name;
     RAISE NOTICE 'Renamed suppliers.name_en → english_name';
@@ -99,6 +114,9 @@ BEGIN
   ELSIF EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'suppliers' AND column_name = 'note'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'suppliers' AND column_name = 'notes'
   ) THEN
     -- 只有 note，改名為 notes
     ALTER TABLE suppliers RENAME COLUMN note TO notes;

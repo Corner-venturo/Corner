@@ -206,15 +206,19 @@ DROP POLICY IF EXISTS "proposals_insert" ON public.proposals;
 DROP POLICY IF EXISTS "proposals_update" ON public.proposals;
 DROP POLICY IF EXISTS "proposals_delete" ON public.proposals;
 
+DROP POLICY IF EXISTS "proposals_select" ON public.proposals;
 CREATE POLICY "proposals_select" ON public.proposals FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "proposals_insert" ON public.proposals;
 CREATE POLICY "proposals_insert" ON public.proposals FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "proposals_update" ON public.proposals;
 CREATE POLICY "proposals_update" ON public.proposals FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "proposals_delete" ON public.proposals;
 CREATE POLICY "proposals_delete" ON public.proposals FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -224,6 +228,7 @@ DROP POLICY IF EXISTS "proposal_packages_insert" ON public.proposal_packages;
 DROP POLICY IF EXISTS "proposal_packages_update" ON public.proposal_packages;
 DROP POLICY IF EXISTS "proposal_packages_delete" ON public.proposal_packages;
 
+DROP POLICY IF EXISTS "proposal_packages_select" ON public.proposal_packages;
 CREATE POLICY "proposal_packages_select" ON public.proposal_packages FOR SELECT
 USING (
   EXISTS (
@@ -233,6 +238,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "proposal_packages_insert" ON public.proposal_packages;
 CREATE POLICY "proposal_packages_insert" ON public.proposal_packages FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -242,6 +248,7 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "proposal_packages_update" ON public.proposal_packages;
 CREATE POLICY "proposal_packages_update" ON public.proposal_packages FOR UPDATE
 USING (
   EXISTS (
@@ -251,6 +258,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "proposal_packages_delete" ON public.proposal_packages;
 CREATE POLICY "proposal_packages_delete" ON public.proposal_packages FOR DELETE
 USING (
   EXISTS (

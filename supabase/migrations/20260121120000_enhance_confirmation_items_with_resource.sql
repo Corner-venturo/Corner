@@ -91,6 +91,7 @@ $$ LANGUAGE plpgsql;
 
 -- 建立觸發器
 DROP TRIGGER IF EXISTS trigger_sync_confirmation_from_request ON public.tour_requests;
+DROP TRIGGER IF EXISTS trigger_sync_confirmation_from_request ON public.tour_requests;
 CREATE TRIGGER trigger_sync_confirmation_from_request
 AFTER UPDATE ON public.tour_requests
 FOR EACH ROW

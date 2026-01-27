@@ -90,9 +90,11 @@ ALTER TABLE public.quote_confirmation_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "quote_confirmation_logs_select" ON public.quote_confirmation_logs;
 DROP POLICY IF EXISTS "quote_confirmation_logs_insert" ON public.quote_confirmation_logs;
 
+DROP POLICY IF EXISTS "quote_confirmation_logs_select" ON public.quote_confirmation_logs;
 CREATE POLICY "quote_confirmation_logs_select" ON public.quote_confirmation_logs FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "quote_confirmation_logs_insert" ON public.quote_confirmation_logs;
 CREATE POLICY "quote_confirmation_logs_insert" ON public.quote_confirmation_logs FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace() OR workspace_id IS NULL);
 

@@ -39,15 +39,19 @@ COMMENT ON COLUMN public.leave_balances.carry_over_days IS '前一年遞延天�
 ALTER TABLE public.leave_balances ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "leave_balances_select" ON public.leave_balances;
 CREATE POLICY "leave_balances_select" ON public.leave_balances
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_balances_insert" ON public.leave_balances;
 CREATE POLICY "leave_balances_insert" ON public.leave_balances
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "leave_balances_update" ON public.leave_balances;
 CREATE POLICY "leave_balances_update" ON public.leave_balances
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_balances_delete" ON public.leave_balances;
 CREATE POLICY "leave_balances_delete" ON public.leave_balances
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -60,6 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_leave_balances_updated_at ON public.leave_balances;
 CREATE TRIGGER trigger_leave_balances_updated_at
   BEFORE UPDATE ON public.leave_balances
   FOR EACH ROW

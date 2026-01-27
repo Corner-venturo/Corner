@@ -39,15 +39,19 @@ COMMENT ON COLUMN public.leave_types.sort_order IS '排序順序';
 ALTER TABLE public.leave_types ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "leave_types_select" ON public.leave_types;
 CREATE POLICY "leave_types_select" ON public.leave_types
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_types_insert" ON public.leave_types;
 CREATE POLICY "leave_types_insert" ON public.leave_types
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "leave_types_update" ON public.leave_types;
 CREATE POLICY "leave_types_update" ON public.leave_types
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leave_types_delete" ON public.leave_types;
 CREATE POLICY "leave_types_delete" ON public.leave_types
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 

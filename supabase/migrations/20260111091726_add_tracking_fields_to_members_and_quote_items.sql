@@ -72,6 +72,7 @@ END $$;
 DROP POLICY IF EXISTS "members_workspace_isolation" ON public.members;
 
 -- 創建新的 workspace 隔離 policy
+DROP POLICY IF EXISTS "members_workspace_isolation" ON public.members;
 CREATE POLICY "members_workspace_isolation" ON public.members
 FOR ALL
 USING (
@@ -94,6 +95,7 @@ END $$;
 
 DROP POLICY IF EXISTS "quote_items_workspace_isolation" ON public.quote_items;
 
+DROP POLICY IF EXISTS "quote_items_workspace_isolation" ON public.quote_items;
 CREATE POLICY "quote_items_workspace_isolation" ON public.quote_items
 FOR ALL
 USING (

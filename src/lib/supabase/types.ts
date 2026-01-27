@@ -13312,6 +13312,7 @@ export type Database = {
           final_cost: number | null
           google_maps_url: string | null
           handler_type: string
+          hidden: boolean | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -13376,6 +13377,7 @@ export type Database = {
           final_cost?: number | null
           google_maps_url?: string | null
           handler_type?: string
+          hidden?: boolean | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -13440,6 +13442,7 @@ export type Database = {
           final_cost?: number | null
           google_maps_url?: string | null
           handler_type?: string
+          hidden?: boolean | null
           id?: string
           latitude?: number | null
           longitude?: number | null

@@ -85,6 +85,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_ai_memories_updated_at ON ai_memories;
 CREATE TRIGGER trigger_ai_memories_updated_at
   BEFORE UPDATE ON ai_memories
   FOR EACH ROW
@@ -128,6 +129,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_conversations_created_at ON ai_conversations(c
 ALTER TABLE ai_conversations DISABLE ROW LEVEL SECURITY;
 
 -- 更新時間觸發器
+DROP TRIGGER IF EXISTS trigger_ai_conversations_updated_at ON ai_conversations;
 CREATE TRIGGER trigger_ai_conversations_updated_at
   BEFORE UPDATE ON ai_conversations
   FOR EACH ROW

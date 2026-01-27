@@ -93,15 +93,19 @@ COMMENT ON COLUMN public.payroll_records.deduction_details IS '扣款明細 JSON
 ALTER TABLE public.payroll_records ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "payroll_records_select" ON public.payroll_records;
 CREATE POLICY "payroll_records_select" ON public.payroll_records
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "payroll_records_insert" ON public.payroll_records;
 CREATE POLICY "payroll_records_insert" ON public.payroll_records
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "payroll_records_update" ON public.payroll_records;
 CREATE POLICY "payroll_records_update" ON public.payroll_records
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "payroll_records_delete" ON public.payroll_records;
 CREATE POLICY "payroll_records_delete" ON public.payroll_records
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -114,6 +118,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_payroll_records_updated_at ON public.payroll_records;
 CREATE TRIGGER trigger_payroll_records_updated_at
   BEFORE UPDATE ON public.payroll_records
   FOR EACH ROW
@@ -144,6 +149,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_calculate_payroll_totals ON public.payroll_records;
 CREATE TRIGGER trigger_calculate_payroll_totals
   BEFORE INSERT OR UPDATE ON public.payroll_records
   FOR EACH ROW

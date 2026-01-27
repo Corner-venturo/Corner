@@ -17,6 +17,7 @@ DROP POLICY IF EXISTS "employees_select" ON public.employees;
 -- 3. 同工作空間的員工
 -- 4. 其他工作空間的超級管理員（用於跨工作空間溝通）
 -- 5. 自己的記錄（用於登入同步）
+DROP POLICY IF EXISTS "employees_select" ON public.employees;
 CREATE POLICY "employees_select" ON public.employees FOR SELECT
 USING (
   is_super_admin()

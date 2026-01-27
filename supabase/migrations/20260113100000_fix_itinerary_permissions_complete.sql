@@ -103,6 +103,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ALTER TABLE public.itineraries ENABLE ROW LEVEL SECURITY;
 
 -- SELECT: 同 workspace 或 super_admin 可以讀取
+DROP POLICY IF EXISTS "itineraries_select" ON public.itineraries;
 CREATE POLICY "itineraries_select" ON public.itineraries FOR SELECT
 USING (
   workspace_id = get_current_user_workspace()
@@ -111,6 +112,7 @@ USING (
 );
 
 -- INSERT: 同 workspace 可以新增
+DROP POLICY IF EXISTS "itineraries_insert" ON public.itineraries;
 CREATE POLICY "itineraries_insert" ON public.itineraries FOR INSERT
 WITH CHECK (
   workspace_id = get_current_user_workspace()
@@ -118,6 +120,7 @@ WITH CHECK (
 );
 
 -- UPDATE: 同 workspace 或 super_admin 可以更新
+DROP POLICY IF EXISTS "itineraries_update" ON public.itineraries;
 CREATE POLICY "itineraries_update" ON public.itineraries FOR UPDATE
 USING (
   workspace_id = get_current_user_workspace()
@@ -126,6 +129,7 @@ USING (
 );
 
 -- DELETE: 同 workspace 或 super_admin 可以刪除
+DROP POLICY IF EXISTS "itineraries_delete" ON public.itineraries;
 CREATE POLICY "itineraries_delete" ON public.itineraries FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()
@@ -139,12 +143,14 @@ USING (
 
 ALTER TABLE public.itinerary_permissions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "itinerary_permissions_select" ON public.itinerary_permissions;
 CREATE POLICY "itinerary_permissions_select" ON public.itinerary_permissions FOR SELECT
 USING (
   auth.uid() = user_id
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "itinerary_permissions_all" ON public.itinerary_permissions;
 CREATE POLICY "itinerary_permissions_all" ON public.itinerary_permissions FOR ALL
 USING (is_super_admin())
 WITH CHECK (is_super_admin());
@@ -155,12 +161,14 @@ WITH CHECK (is_super_admin());
 
 ALTER TABLE public.tour_expenses ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "tour_expenses_select" ON public.tour_expenses;
 CREATE POLICY "tour_expenses_select" ON public.tour_expenses FOR SELECT
 USING (
   auth.uid() = leader_id
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "tour_expenses_all" ON public.tour_expenses;
 CREATE POLICY "tour_expenses_all" ON public.tour_expenses FOR ALL
 USING (is_super_admin())
 WITH CHECK (is_super_admin());

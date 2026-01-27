@@ -10,11 +10,13 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- 設定公開讀取權限
+DROP POLICY IF EXISTS "Public read access for brochure images" ON storage.objects;
 CREATE POLICY "Public read access for brochure images"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'brochure-images');
 
 -- 設定登入用戶上傳權限
+DROP POLICY IF EXISTS "Authenticated users can upload brochure images" ON storage.objects;
 CREATE POLICY "Authenticated users can upload brochure images"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -23,6 +25,7 @@ WITH CHECK (
 );
 
 -- 設定登入用戶刪除權限
+DROP POLICY IF EXISTS "Authenticated users can delete brochure images" ON storage.objects;
 CREATE POLICY "Authenticated users can delete brochure images"
 ON storage.objects FOR DELETE
 USING (

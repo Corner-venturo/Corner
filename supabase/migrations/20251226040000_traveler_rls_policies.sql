@@ -97,6 +97,7 @@ DROP POLICY IF EXISTS "traveler_profiles_update" ON traveler_profiles;
 DROP POLICY IF EXISTS "traveler_profiles_insert" ON traveler_profiles;
 
 -- 旅客只能看自己 + 員工可看全部（領隊查詢用）
+DROP POLICY IF EXISTS "traveler_profiles_select" ON traveler_profiles;
 CREATE POLICY "traveler_profiles_select" ON traveler_profiles FOR SELECT
 USING (
   id = auth.uid()
@@ -105,10 +106,12 @@ USING (
 );
 
 -- 只能修改自己
+DROP POLICY IF EXISTS "traveler_profiles_update" ON traveler_profiles;
 CREATE POLICY "traveler_profiles_update" ON traveler_profiles FOR UPDATE
 USING (id = auth.uid());
 
 -- 透過 trigger 自動建立，不需要手動 insert
+DROP POLICY IF EXISTS "traveler_profiles_insert" ON traveler_profiles;
 CREATE POLICY "traveler_profiles_insert" ON traveler_profiles FOR INSERT
 WITH CHECK (id = auth.uid());
 
@@ -122,6 +125,7 @@ DROP POLICY IF EXISTS "traveler_trips_update" ON traveler_trips;
 DROP POLICY IF EXISTS "traveler_trips_delete" ON traveler_trips;
 
 -- 自己的 + 被邀請的
+DROP POLICY IF EXISTS "traveler_trips_select" ON traveler_trips;
 CREATE POLICY "traveler_trips_select" ON traveler_trips FOR SELECT
 USING (
   created_by = auth.uid()
@@ -132,12 +136,15 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "traveler_trips_insert" ON traveler_trips;
 CREATE POLICY "traveler_trips_insert" ON traveler_trips FOR INSERT
 WITH CHECK (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "traveler_trips_update" ON traveler_trips;
 CREATE POLICY "traveler_trips_update" ON traveler_trips FOR UPDATE
 USING (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "traveler_trips_delete" ON traveler_trips;
 CREATE POLICY "traveler_trips_delete" ON traveler_trips FOR DELETE
 USING (created_by = auth.uid());
 
@@ -150,6 +157,7 @@ DROP POLICY IF EXISTS "traveler_trip_members_insert" ON traveler_trip_members;
 DROP POLICY IF EXISTS "traveler_trip_members_delete" ON traveler_trip_members;
 
 -- 只有行程擁有者和成員可看
+DROP POLICY IF EXISTS "traveler_trip_members_select" ON traveler_trip_members;
 CREATE POLICY "traveler_trip_members_select" ON traveler_trip_members FOR SELECT
 USING (
   user_id = auth.uid()
@@ -161,6 +169,7 @@ USING (
 );
 
 -- 行程擁有者可新增
+DROP POLICY IF EXISTS "traveler_trip_members_insert" ON traveler_trip_members;
 CREATE POLICY "traveler_trip_members_insert" ON traveler_trip_members FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -171,6 +180,7 @@ WITH CHECK (
 );
 
 -- 行程擁有者可刪除
+DROP POLICY IF EXISTS "traveler_trip_members_delete" ON traveler_trip_members;
 CREATE POLICY "traveler_trip_members_delete" ON traveler_trip_members FOR DELETE
 USING (
   EXISTS (
@@ -473,6 +483,7 @@ END $$;
 DROP POLICY IF EXISTS "traveler_tour_cache_select" ON traveler_tour_cache;
 
 -- 只能讀自己的快取 + 員工可全讀（管理用）
+DROP POLICY IF EXISTS "traveler_tour_cache_select" ON traveler_tour_cache;
 CREATE POLICY "traveler_tour_cache_select" ON traveler_tour_cache FOR SELECT
 USING (
   traveler_id = auth.uid()

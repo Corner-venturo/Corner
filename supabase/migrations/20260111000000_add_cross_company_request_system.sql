@@ -128,6 +128,7 @@ ALTER TABLE public.request_response_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.leader_availability ENABLE ROW LEVEL SECURITY;
 
 -- Request Responses: Viewable by sender workspace and responder workspace
+DROP POLICY IF EXISTS "request_responses_select" ON public.request_responses;
 CREATE POLICY "request_responses_select" ON public.request_responses FOR SELECT
 USING (
   responder_workspace_id = get_current_user_workspace()
@@ -139,16 +140,20 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "request_responses_insert" ON public.request_responses;
 CREATE POLICY "request_responses_insert" ON public.request_responses FOR INSERT
 WITH CHECK (responder_workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "request_responses_update" ON public.request_responses;
 CREATE POLICY "request_responses_update" ON public.request_responses FOR UPDATE
 USING (responder_workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "request_responses_delete" ON public.request_responses;
 CREATE POLICY "request_responses_delete" ON public.request_responses FOR DELETE
 USING (responder_workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- Request Response Items: Follow parent response access
+DROP POLICY IF EXISTS "request_response_items_select" ON public.request_response_items;
 CREATE POLICY "request_response_items_select" ON public.request_response_items FOR SELECT
 USING (
   EXISTS (
@@ -166,6 +171,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "request_response_items_insert" ON public.request_response_items;
 CREATE POLICY "request_response_items_insert" ON public.request_response_items FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -175,6 +181,7 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "request_response_items_update" ON public.request_response_items;
 CREATE POLICY "request_response_items_update" ON public.request_response_items FOR UPDATE
 USING (
   EXISTS (
@@ -185,6 +192,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "request_response_items_delete" ON public.request_response_items;
 CREATE POLICY "request_response_items_delete" ON public.request_response_items FOR DELETE
 USING (
   EXISTS (
@@ -196,15 +204,19 @@ USING (
 );
 
 -- Leader Availability: Workspace scoped
+DROP POLICY IF EXISTS "leader_availability_select" ON public.leader_availability;
 CREATE POLICY "leader_availability_select" ON public.leader_availability FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leader_availability_insert" ON public.leader_availability;
 CREATE POLICY "leader_availability_insert" ON public.leader_availability FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "leader_availability_update" ON public.leader_availability;
 CREATE POLICY "leader_availability_update" ON public.leader_availability FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "leader_availability_delete" ON public.leader_availability;
 CREATE POLICY "leader_availability_delete" ON public.leader_availability FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -219,11 +231,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_request_responses_updated_at ON public.request_responses;
+DROP TRIGGER IF EXISTS update_request_responses_updated_at ON public.request_responses;
 CREATE TRIGGER update_request_responses_updated_at
   BEFORE UPDATE ON public.request_responses
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_leader_availability_updated_at ON public.leader_availability;
+DROP TRIGGER IF EXISTS update_leader_availability_updated_at ON public.leader_availability;
 CREATE TRIGGER update_leader_availability_updated_at
   BEFORE UPDATE ON public.leader_availability
   FOR EACH ROW

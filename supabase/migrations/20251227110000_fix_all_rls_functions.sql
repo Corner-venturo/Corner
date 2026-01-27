@@ -123,6 +123,7 @@ ALTER TABLE public.calendar_events ENABLE ROW LEVEL SECURITY;
 -- 公司事項: 同 workspace 或 super_admin
 -- 舊資料: 所有人都能看
 -- 注意: created_by 存的是 employees.id，不是 auth.uid()
+DROP POLICY IF EXISTS "calendar_events_select" ON public.calendar_events;
 CREATE POLICY "calendar_events_select" ON public.calendar_events FOR SELECT
 USING (
   CASE
@@ -142,6 +143,7 @@ USING (
 );
 
 -- INSERT policy
+DROP POLICY IF EXISTS "calendar_events_insert" ON public.calendar_events;
 CREATE POLICY "calendar_events_insert" ON public.calendar_events FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -150,6 +152,7 @@ WITH CHECK (
 );
 
 -- UPDATE policy（created_by = employees.id）
+DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 CREATE POLICY "calendar_events_update" ON public.calendar_events FOR UPDATE
 USING (
   created_by = get_current_employee_id()
@@ -158,6 +161,7 @@ USING (
 );
 
 -- DELETE policy（created_by = employees.id）
+DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 CREATE POLICY "calendar_events_delete" ON public.calendar_events FOR DELETE
 USING (
   created_by = get_current_employee_id()

@@ -11,18 +11,22 @@ DROP POLICY IF EXISTS "vendor_costs_delete" ON public.vendor_costs;
 ALTER TABLE public.vendor_costs ENABLE ROW LEVEL SECURITY;
 
 -- 建立新的 policies - 允許所有已認證用戶讀寫
+DROP POLICY IF EXISTS "vendor_costs_select" ON public.vendor_costs;
 CREATE POLICY "vendor_costs_select" ON public.vendor_costs
   FOR SELECT TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "vendor_costs_insert" ON public.vendor_costs;
 CREATE POLICY "vendor_costs_insert" ON public.vendor_costs
   FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "vendor_costs_update" ON public.vendor_costs;
 CREATE POLICY "vendor_costs_update" ON public.vendor_costs
   FOR UPDATE TO authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "vendor_costs_delete" ON public.vendor_costs;
 CREATE POLICY "vendor_costs_delete" ON public.vendor_costs
   FOR DELETE TO authenticated
   USING (true);

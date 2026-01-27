@@ -6,12 +6,13 @@
 
 BEGIN;
 
--- 更新 William 的 supabase_user_id
+-- 更新 William 的 supabase_user_id（只在 auth user 存在時更新）
 -- Auth User ID: 099a709d-ba03-4bcf-afa9-d6c332d7c052
 UPDATE public.employees
 SET supabase_user_id = '099a709d-ba03-4bcf-afa9-d6c332d7c052'
 WHERE employee_number = 'E001'
-  AND display_name = 'William';
+  AND display_name = 'William'
+  AND EXISTS (SELECT 1 FROM auth.users WHERE id = '099a709d-ba03-4bcf-afa9-d6c332d7c052');
 
 COMMIT;
 

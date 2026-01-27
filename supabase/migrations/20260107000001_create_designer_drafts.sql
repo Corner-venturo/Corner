@@ -49,15 +49,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_designer_drafts_itinerary_unique ON public
 ALTER TABLE public.designer_drafts ENABLE ROW LEVEL SECURITY;
 
 -- RLS 策略
+DROP POLICY IF EXISTS "designer_drafts_select" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_select" ON public.designer_drafts FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "designer_drafts_insert" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_insert" ON public.designer_drafts FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "designer_drafts_update" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_update" ON public.designer_drafts FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "designer_drafts_delete" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_delete" ON public.designer_drafts FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
@@ -70,6 +74,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_designer_drafts_updated_at ON public.designer_drafts;
+DROP TRIGGER IF EXISTS trigger_designer_drafts_updated_at ON public.designer_drafts;
 CREATE TRIGGER trigger_designer_drafts_updated_at
 BEFORE UPDATE ON public.designer_drafts
 FOR EACH ROW

@@ -17,18 +17,22 @@ DROP POLICY IF EXISTS "receipt_orders_insert" ON public.receipt_orders;
 DROP POLICY IF EXISTS "receipt_orders_update" ON public.receipt_orders;
 DROP POLICY IF EXISTS "receipt_orders_delete" ON public.receipt_orders;
 
+DROP POLICY IF EXISTS "receipt_orders_select" ON public.receipt_orders;
 CREATE POLICY "receipt_orders_select" ON public.receipt_orders
   FOR SELECT TO authenticated
   USING (workspace_id IS NULL OR workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "receipt_orders_insert" ON public.receipt_orders;
 CREATE POLICY "receipt_orders_insert" ON public.receipt_orders
   FOR INSERT TO authenticated
   WITH CHECK (workspace_id IS NULL OR workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "receipt_orders_update" ON public.receipt_orders;
 CREATE POLICY "receipt_orders_update" ON public.receipt_orders
   FOR UPDATE TO authenticated
   USING (workspace_id IS NULL OR workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "receipt_orders_delete" ON public.receipt_orders;
 CREATE POLICY "receipt_orders_delete" ON public.receipt_orders
   FOR DELETE TO authenticated
   USING (workspace_id IS NULL OR workspace_id = get_current_user_workspace() OR is_super_admin());

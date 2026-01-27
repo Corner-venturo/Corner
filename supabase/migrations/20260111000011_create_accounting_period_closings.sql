@@ -39,15 +39,19 @@ COMMENT ON COLUMN public.accounting_period_closings.closed_at IS '結轉時間';
 ALTER TABLE public.accounting_period_closings ENABLE ROW LEVEL SECURITY;
 
 -- RLS 政策
+DROP POLICY IF EXISTS "accounting_period_closings_select" ON public.accounting_period_closings;
 CREATE POLICY "accounting_period_closings_select" ON public.accounting_period_closings
   FOR SELECT USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "accounting_period_closings_insert" ON public.accounting_period_closings;
 CREATE POLICY "accounting_period_closings_insert" ON public.accounting_period_closings
   FOR INSERT WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "accounting_period_closings_update" ON public.accounting_period_closings;
 CREATE POLICY "accounting_period_closings_update" ON public.accounting_period_closings
   FOR UPDATE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "accounting_period_closings_delete" ON public.accounting_period_closings;
 CREATE POLICY "accounting_period_closings_delete" ON public.accounting_period_closings
   FOR DELETE USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 

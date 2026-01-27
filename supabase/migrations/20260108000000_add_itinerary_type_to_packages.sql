@@ -13,9 +13,16 @@ ALTER TABLE public.proposal_packages
 ADD COLUMN IF NOT EXISTS timeline_data JSONB;
 
 -- 加入 check constraint 確保 itinerary_type 只能是指定值
-ALTER TABLE public.proposal_packages
-ADD CONSTRAINT proposal_packages_itinerary_type_check
-CHECK (itinerary_type IS NULL OR itinerary_type IN ('simple', 'timeline'));
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'proposal_packages_itinerary_type_check'
+  ) THEN
+    ALTER TABLE public.proposal_packages
+    ADD CONSTRAINT proposal_packages_itinerary_type_check
+    CHECK (itinerary_type IS NULL OR itinerary_type IN ('simple', 'timeline'));
+  END IF;
+END $$;
 
 -- 更新現有資料：如果有 itinerary_id，設定為 'simple'
 UPDATE public.proposal_packages

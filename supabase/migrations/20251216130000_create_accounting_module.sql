@@ -221,65 +221,80 @@ ALTER TABLE public.accounting_periods ENABLE ROW LEVEL SECURITY;
 
 -- chart_of_accounts policies
 DROP POLICY IF EXISTS "chart_of_accounts_select" ON public.chart_of_accounts;
+DROP POLICY IF EXISTS "chart_of_accounts_select" ON public.chart_of_accounts;
 CREATE POLICY "chart_of_accounts_select" ON public.chart_of_accounts FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "chart_of_accounts_insert" ON public.chart_of_accounts;
 DROP POLICY IF EXISTS "chart_of_accounts_insert" ON public.chart_of_accounts;
 CREATE POLICY "chart_of_accounts_insert" ON public.chart_of_accounts FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
 DROP POLICY IF EXISTS "chart_of_accounts_update" ON public.chart_of_accounts;
+DROP POLICY IF EXISTS "chart_of_accounts_update" ON public.chart_of_accounts;
 CREATE POLICY "chart_of_accounts_update" ON public.chart_of_accounts FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "chart_of_accounts_delete" ON public.chart_of_accounts;
 DROP POLICY IF EXISTS "chart_of_accounts_delete" ON public.chart_of_accounts;
 CREATE POLICY "chart_of_accounts_delete" ON public.chart_of_accounts FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- erp_bank_accounts policies
 DROP POLICY IF EXISTS "erp_bank_accounts_select" ON public.erp_bank_accounts;
+DROP POLICY IF EXISTS "erp_bank_accounts_select" ON public.erp_bank_accounts;
 CREATE POLICY "erp_bank_accounts_select" ON public.erp_bank_accounts FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "erp_bank_accounts_insert" ON public.erp_bank_accounts;
 DROP POLICY IF EXISTS "erp_bank_accounts_insert" ON public.erp_bank_accounts;
 CREATE POLICY "erp_bank_accounts_insert" ON public.erp_bank_accounts FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
 DROP POLICY IF EXISTS "erp_bank_accounts_update" ON public.erp_bank_accounts;
+DROP POLICY IF EXISTS "erp_bank_accounts_update" ON public.erp_bank_accounts;
 CREATE POLICY "erp_bank_accounts_update" ON public.erp_bank_accounts FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "erp_bank_accounts_delete" ON public.erp_bank_accounts;
 DROP POLICY IF EXISTS "erp_bank_accounts_delete" ON public.erp_bank_accounts;
 CREATE POLICY "erp_bank_accounts_delete" ON public.erp_bank_accounts FOR DELETE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- accounting_events policies
 DROP POLICY IF EXISTS "accounting_events_select" ON public.accounting_events;
+DROP POLICY IF EXISTS "accounting_events_select" ON public.accounting_events;
 CREATE POLICY "accounting_events_select" ON public.accounting_events FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 DROP POLICY IF EXISTS "accounting_events_insert" ON public.accounting_events;
+DROP POLICY IF EXISTS "accounting_events_insert" ON public.accounting_events;
 CREATE POLICY "accounting_events_insert" ON public.accounting_events FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "accounting_events_update" ON public.accounting_events;
 DROP POLICY IF EXISTS "accounting_events_update" ON public.accounting_events;
 CREATE POLICY "accounting_events_update" ON public.accounting_events FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- journal_vouchers policies
 DROP POLICY IF EXISTS "journal_vouchers_select" ON public.journal_vouchers;
+DROP POLICY IF EXISTS "journal_vouchers_select" ON public.journal_vouchers;
 CREATE POLICY "journal_vouchers_select" ON public.journal_vouchers FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "journal_vouchers_insert" ON public.journal_vouchers;
 DROP POLICY IF EXISTS "journal_vouchers_insert" ON public.journal_vouchers;
 CREATE POLICY "journal_vouchers_insert" ON public.journal_vouchers FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
 DROP POLICY IF EXISTS "journal_vouchers_update" ON public.journal_vouchers;
+DROP POLICY IF EXISTS "journal_vouchers_update" ON public.journal_vouchers;
 CREATE POLICY "journal_vouchers_update" ON public.journal_vouchers FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- journal_lines policies
+DROP POLICY IF EXISTS "journal_lines_select" ON public.journal_lines;
 DROP POLICY IF EXISTS "journal_lines_select" ON public.journal_lines;
 CREATE POLICY "journal_lines_select" ON public.journal_lines FOR SELECT
 USING (
@@ -290,6 +305,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "journal_lines_insert" ON public.journal_lines;
 DROP POLICY IF EXISTS "journal_lines_insert" ON public.journal_lines;
 CREATE POLICY "journal_lines_insert" ON public.journal_lines FOR INSERT
 WITH CHECK (
@@ -302,26 +318,32 @@ WITH CHECK (
 
 -- posting_rules policies
 DROP POLICY IF EXISTS "posting_rules_select" ON public.posting_rules;
+DROP POLICY IF EXISTS "posting_rules_select" ON public.posting_rules;
 CREATE POLICY "posting_rules_select" ON public.posting_rules FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 DROP POLICY IF EXISTS "posting_rules_insert" ON public.posting_rules;
+DROP POLICY IF EXISTS "posting_rules_insert" ON public.posting_rules;
 CREATE POLICY "posting_rules_insert" ON public.posting_rules FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "posting_rules_update" ON public.posting_rules;
 DROP POLICY IF EXISTS "posting_rules_update" ON public.posting_rules;
 CREATE POLICY "posting_rules_update" ON public.posting_rules FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 -- accounting_periods policies
 DROP POLICY IF EXISTS "accounting_periods_select" ON public.accounting_periods;
+DROP POLICY IF EXISTS "accounting_periods_select" ON public.accounting_periods;
 CREATE POLICY "accounting_periods_select" ON public.accounting_periods FOR SELECT
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
 DROP POLICY IF EXISTS "accounting_periods_insert" ON public.accounting_periods;
+DROP POLICY IF EXISTS "accounting_periods_insert" ON public.accounting_periods;
 CREATE POLICY "accounting_periods_insert" ON public.accounting_periods FOR INSERT
 WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "accounting_periods_update" ON public.accounting_periods;
 DROP POLICY IF EXISTS "accounting_periods_update" ON public.accounting_periods;
 CREATE POLICY "accounting_periods_update" ON public.accounting_periods FOR UPDATE
 USING (workspace_id = get_current_user_workspace() OR is_super_admin());

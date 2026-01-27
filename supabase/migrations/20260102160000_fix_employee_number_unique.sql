@@ -9,9 +9,16 @@ ALTER TABLE public.employees
 DROP CONSTRAINT IF EXISTS employees_employee_number_key;
 
 -- 2. 建立新的複合唯一約束（每個 workspace 內 employee_number 唯一）
-ALTER TABLE public.employees
-ADD CONSTRAINT employees_workspace_employee_number_unique
-UNIQUE (workspace_id, employee_number);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'employees_workspace_employee_number_unique'
+  ) THEN
+    ALTER TABLE public.employees
+    ADD CONSTRAINT employees_workspace_employee_number_unique
+    UNIQUE (workspace_id, employee_number);
+  END IF;
+END $$;
 
 -- 3. 更新 JY 的員工編號為 E001
 UPDATE public.employees

@@ -156,6 +156,7 @@ ALTER TABLE public.traveler_messages ENABLE ROW LEVEL SECURITY;
 
 -- conversations: 只有成員能看
 DROP POLICY IF EXISTS "traveler_conversations_select" ON public.traveler_conversations;
+DROP POLICY IF EXISTS "traveler_conversations_select" ON public.traveler_conversations;
 CREATE POLICY "traveler_conversations_select" ON public.traveler_conversations
 FOR SELECT USING (
   EXISTS (
@@ -167,9 +168,11 @@ FOR SELECT USING (
 );
 
 DROP POLICY IF EXISTS "traveler_conversations_insert" ON public.traveler_conversations;
+DROP POLICY IF EXISTS "traveler_conversations_insert" ON public.traveler_conversations;
 CREATE POLICY "traveler_conversations_insert" ON public.traveler_conversations
 FOR INSERT WITH CHECK (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "traveler_conversations_update" ON public.traveler_conversations;
 DROP POLICY IF EXISTS "traveler_conversations_update" ON public.traveler_conversations;
 CREATE POLICY "traveler_conversations_update" ON public.traveler_conversations
 FOR UPDATE USING (
@@ -184,6 +187,7 @@ FOR UPDATE USING (
 
 -- conversation_members: 成員能看自己所在的對話成員
 DROP POLICY IF EXISTS "traveler_conversation_members_select" ON public.traveler_conversation_members;
+DROP POLICY IF EXISTS "traveler_conversation_members_select" ON public.traveler_conversation_members;
 CREATE POLICY "traveler_conversation_members_select" ON public.traveler_conversation_members
 FOR SELECT USING (
   EXISTS (
@@ -194,6 +198,7 @@ FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "traveler_conversation_members_insert" ON public.traveler_conversation_members;
 DROP POLICY IF EXISTS "traveler_conversation_members_insert" ON public.traveler_conversation_members;
 CREATE POLICY "traveler_conversation_members_insert" ON public.traveler_conversation_members
 FOR INSERT WITH CHECK (
@@ -209,6 +214,7 @@ FOR INSERT WITH CHECK (
 );
 
 DROP POLICY IF EXISTS "traveler_conversation_members_update" ON public.traveler_conversation_members;
+DROP POLICY IF EXISTS "traveler_conversation_members_update" ON public.traveler_conversation_members;
 CREATE POLICY "traveler_conversation_members_update" ON public.traveler_conversation_members
 FOR UPDATE USING (
   user_id = auth.uid() OR
@@ -223,6 +229,7 @@ FOR UPDATE USING (
 
 -- messages: 成員能看對話內的訊息
 DROP POLICY IF EXISTS "traveler_messages_select" ON public.traveler_messages;
+DROP POLICY IF EXISTS "traveler_messages_select" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_select" ON public.traveler_messages
 FOR SELECT USING (
   EXISTS (
@@ -233,6 +240,7 @@ FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "traveler_messages_insert" ON public.traveler_messages;
 DROP POLICY IF EXISTS "traveler_messages_insert" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_insert" ON public.traveler_messages
 FOR INSERT WITH CHECK (
@@ -246,9 +254,11 @@ FOR INSERT WITH CHECK (
 );
 
 DROP POLICY IF EXISTS "traveler_messages_update" ON public.traveler_messages;
+DROP POLICY IF EXISTS "traveler_messages_update" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_update" ON public.traveler_messages
 FOR UPDATE USING (sender_id = auth.uid());
 
+DROP POLICY IF EXISTS "traveler_messages_delete" ON public.traveler_messages;
 DROP POLICY IF EXISTS "traveler_messages_delete" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_delete" ON public.traveler_messages
 FOR DELETE USING (sender_id = auth.uid());

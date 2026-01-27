@@ -330,6 +330,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 8.1 conversations: 員工可以看到自己工作空間的團對話
 DROP POLICY IF EXISTS "traveler_conversations_select" ON public.traveler_conversations;
+DROP POLICY IF EXISTS "traveler_conversations_select" ON public.traveler_conversations;
 CREATE POLICY "traveler_conversations_select" ON public.traveler_conversations
 FOR SELECT USING (
   -- 旅伴：是成員且對話已開啟
@@ -362,6 +363,7 @@ FOR SELECT USING (
 
 -- 8.2 conversation_members: 員工可以看到
 DROP POLICY IF EXISTS "traveler_conversation_members_select" ON public.traveler_conversation_members;
+DROP POLICY IF EXISTS "traveler_conversation_members_select" ON public.traveler_conversation_members;
 CREATE POLICY "traveler_conversation_members_select" ON public.traveler_conversation_members
 FOR SELECT USING (
   -- 旅伴：同對話的成員
@@ -392,6 +394,7 @@ FOR SELECT USING (
 
 -- 8.3 messages: 員工可以看到和發送
 DROP POLICY IF EXISTS "traveler_messages_select" ON public.traveler_messages;
+DROP POLICY IF EXISTS "traveler_messages_select" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_select" ON public.traveler_messages
 FOR SELECT USING (
   EXISTS (
@@ -413,6 +416,7 @@ FOR SELECT USING (
   )
 );
 
+DROP POLICY IF EXISTS "traveler_messages_insert" ON public.traveler_messages;
 DROP POLICY IF EXISTS "traveler_messages_insert" ON public.traveler_messages;
 CREATE POLICY "traveler_messages_insert" ON public.traveler_messages
 FOR INSERT WITH CHECK (

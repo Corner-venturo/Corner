@@ -19,15 +19,19 @@ CREATE INDEX IF NOT EXISTS idx_workout_templates_user_id ON public.timebox_worko
 ALTER TABLE public.timebox_workout_templates ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "workout_templates_select" ON public.timebox_workout_templates;
 CREATE POLICY "workout_templates_select" ON public.timebox_workout_templates
   FOR SELECT USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "workout_templates_insert" ON public.timebox_workout_templates;
 CREATE POLICY "workout_templates_insert" ON public.timebox_workout_templates
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "workout_templates_update" ON public.timebox_workout_templates;
 CREATE POLICY "workout_templates_update" ON public.timebox_workout_templates
   FOR UPDATE USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "workout_templates_delete" ON public.timebox_workout_templates;
 CREATE POLICY "workout_templates_delete" ON public.timebox_workout_templates
   FOR DELETE USING (user_id = auth.uid());
 

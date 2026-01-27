@@ -72,10 +72,15 @@ COMMENT ON COLUMN public.brochure_versions.data IS 'Fabric.js canvas JSON 資料
 COMMENT ON COLUMN public.brochure_versions.restored_from IS '如果是從舊版本恢復，記錄來源版本 ID';
 
 -- 添加外鍵 (brochure_documents.current_version_id)
-ALTER TABLE public.brochure_documents
-ADD CONSTRAINT fk_brochure_current_version
-FOREIGN KEY (current_version_id) REFERENCES public.brochure_versions(id)
-ON DELETE SET NULL;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_brochure_current_version') THEN
+    ALTER TABLE public.brochure_documents
+    ADD CONSTRAINT fk_brochure_current_version
+    FOREIGN KEY (current_version_id) REFERENCES public.brochure_versions(id)
+    ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- ============================================
 -- 3. 行程表文件表 (itinerary_documents)
@@ -137,10 +142,15 @@ CREATE INDEX IF NOT EXISTS idx_itinerary_versions_created_at ON public.itinerary
 COMMENT ON TABLE public.itinerary_versions IS '行程表版本歷史表';
 
 -- 添加外鍵 (itinerary_documents.current_version_id)
-ALTER TABLE public.itinerary_documents
-ADD CONSTRAINT fk_itinerary_current_version
-FOREIGN KEY (current_version_id) REFERENCES public.itinerary_versions(id)
-ON DELETE SET NULL;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_itinerary_current_version') THEN
+    ALTER TABLE public.itinerary_documents
+    ADD CONSTRAINT fk_itinerary_current_version
+    FOREIGN KEY (current_version_id) REFERENCES public.itinerary_versions(id)
+    ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- ============================================
 -- 5. 模板表 (design_templates)
@@ -203,12 +213,14 @@ $$ LANGUAGE plpgsql;
 
 -- 為手冊版本表創建 trigger
 DROP TRIGGER IF EXISTS trigger_brochure_version_number ON public.brochure_versions;
+DROP TRIGGER IF EXISTS trigger_brochure_version_number ON public.brochure_versions;
 CREATE TRIGGER trigger_brochure_version_number
 BEFORE INSERT ON public.brochure_versions
 FOR EACH ROW
 EXECUTE FUNCTION public.auto_increment_version_number();
 
 -- 為行程表版本表創建 trigger
+DROP TRIGGER IF EXISTS trigger_itinerary_version_number ON public.itinerary_versions;
 DROP TRIGGER IF EXISTS trigger_itinerary_version_number ON public.itinerary_versions;
 CREATE TRIGGER trigger_itinerary_version_number
 BEFORE INSERT ON public.itinerary_versions
@@ -228,17 +240,20 @@ $$ LANGUAGE plpgsql;
 
 -- 為文件表創建 trigger
 DROP TRIGGER IF EXISTS trigger_brochure_documents_updated_at ON public.brochure_documents;
+DROP TRIGGER IF EXISTS trigger_brochure_documents_updated_at ON public.brochure_documents;
 CREATE TRIGGER trigger_brochure_documents_updated_at
 BEFORE UPDATE ON public.brochure_documents
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
 
 DROP TRIGGER IF EXISTS trigger_itinerary_documents_updated_at ON public.itinerary_documents;
+DROP TRIGGER IF EXISTS trigger_itinerary_documents_updated_at ON public.itinerary_documents;
 CREATE TRIGGER trigger_itinerary_documents_updated_at
 BEFORE UPDATE ON public.itinerary_documents
 FOR EACH ROW
 EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trigger_design_templates_updated_at ON public.design_templates;
 DROP TRIGGER IF EXISTS trigger_design_templates_updated_at ON public.design_templates;
 CREATE TRIGGER trigger_design_templates_updated_at
 BEFORE UPDATE ON public.design_templates
@@ -257,19 +272,24 @@ ALTER TABLE public.itinerary_versions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.design_templates ENABLE ROW LEVEL SECURITY;
 
 -- brochure_documents policies
+DROP POLICY IF EXISTS "brochure_documents_select" ON public.brochure_documents;
 CREATE POLICY "brochure_documents_select" ON public.brochure_documents FOR SELECT
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "brochure_documents_insert" ON public.brochure_documents;
 CREATE POLICY "brochure_documents_insert" ON public.brochure_documents FOR INSERT
 WITH CHECK (workspace_id = public.get_current_user_workspace());
 
+DROP POLICY IF EXISTS "brochure_documents_update" ON public.brochure_documents;
 CREATE POLICY "brochure_documents_update" ON public.brochure_documents FOR UPDATE
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "brochure_documents_delete" ON public.brochure_documents;
 CREATE POLICY "brochure_documents_delete" ON public.brochure_documents FOR DELETE
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
 -- brochure_versions policies (透過 document_id 繼承權限)
+DROP POLICY IF EXISTS "brochure_versions_select" ON public.brochure_versions;
 CREATE POLICY "brochure_versions_select" ON public.brochure_versions FOR SELECT
 USING (
   EXISTS (
@@ -279,6 +299,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "brochure_versions_insert" ON public.brochure_versions;
 CREATE POLICY "brochure_versions_insert" ON public.brochure_versions FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -288,6 +309,7 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "brochure_versions_delete" ON public.brochure_versions;
 CREATE POLICY "brochure_versions_delete" ON public.brochure_versions FOR DELETE
 USING (
   EXISTS (
@@ -298,19 +320,24 @@ USING (
 );
 
 -- itinerary_documents policies
+DROP POLICY IF EXISTS "itinerary_documents_select" ON public.itinerary_documents;
 CREATE POLICY "itinerary_documents_select" ON public.itinerary_documents FOR SELECT
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "itinerary_documents_insert" ON public.itinerary_documents;
 CREATE POLICY "itinerary_documents_insert" ON public.itinerary_documents FOR INSERT
 WITH CHECK (workspace_id = public.get_current_user_workspace());
 
+DROP POLICY IF EXISTS "itinerary_documents_update" ON public.itinerary_documents;
 CREATE POLICY "itinerary_documents_update" ON public.itinerary_documents FOR UPDATE
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "itinerary_documents_delete" ON public.itinerary_documents;
 CREATE POLICY "itinerary_documents_delete" ON public.itinerary_documents FOR DELETE
 USING (workspace_id = public.get_current_user_workspace() OR public.is_super_admin());
 
 -- itinerary_versions policies
+DROP POLICY IF EXISTS "itinerary_versions_select" ON public.itinerary_versions;
 CREATE POLICY "itinerary_versions_select" ON public.itinerary_versions FOR SELECT
 USING (
   EXISTS (
@@ -320,6 +347,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "itinerary_versions_insert" ON public.itinerary_versions;
 CREATE POLICY "itinerary_versions_insert" ON public.itinerary_versions FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -329,6 +357,7 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "itinerary_versions_delete" ON public.itinerary_versions;
 CREATE POLICY "itinerary_versions_delete" ON public.itinerary_versions FOR DELETE
 USING (
   EXISTS (
@@ -339,6 +368,7 @@ USING (
 );
 
 -- design_templates policies (公開模板所有人可看，私人模板只有 workspace 內可看)
+DROP POLICY IF EXISTS "design_templates_select" ON public.design_templates;
 CREATE POLICY "design_templates_select" ON public.design_templates FOR SELECT
 USING (
   is_public = true
@@ -346,18 +376,21 @@ USING (
   OR public.is_super_admin()
 );
 
+DROP POLICY IF EXISTS "design_templates_insert" ON public.design_templates;
 CREATE POLICY "design_templates_insert" ON public.design_templates FOR INSERT
 WITH CHECK (
   workspace_id IS NULL -- 公開模板（需要特殊權限，這裡暫時允許）
   OR workspace_id = public.get_current_user_workspace()
 );
 
+DROP POLICY IF EXISTS "design_templates_update" ON public.design_templates;
 CREATE POLICY "design_templates_update" ON public.design_templates FOR UPDATE
 USING (
   workspace_id = public.get_current_user_workspace()
   OR public.is_super_admin()
 );
 
+DROP POLICY IF EXISTS "design_templates_delete" ON public.design_templates;
 CREATE POLICY "design_templates_delete" ON public.design_templates FOR DELETE
 USING (
   workspace_id = public.get_current_user_workspace()

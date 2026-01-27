@@ -205,6 +205,7 @@ ALTER TABLE public.pnr_ssr_elements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pnr_remarks ENABLE ROW LEVEL SECURITY;
 
 -- pnr_records policies
+DROP POLICY IF EXISTS "pnr_records_select" ON public.pnr_records;
 CREATE POLICY "pnr_records_select" ON public.pnr_records FOR SELECT
 USING (
   workspace_id IS NULL
@@ -212,6 +213,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnr_records_insert" ON public.pnr_records;
 CREATE POLICY "pnr_records_insert" ON public.pnr_records FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -219,6 +221,7 @@ WITH CHECK (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnr_records_update" ON public.pnr_records;
 CREATE POLICY "pnr_records_update" ON public.pnr_records FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -226,6 +229,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "pnr_records_delete" ON public.pnr_records;
 CREATE POLICY "pnr_records_delete" ON public.pnr_records FOR DELETE
 USING (
   workspace_id IS NULL
@@ -234,15 +238,19 @@ USING (
 );
 
 -- 子表格透過 pnr_id 關聯，使用簡單的 policies
+DROP POLICY IF EXISTS "pnr_passengers_all" ON public.pnr_passengers;
 CREATE POLICY "pnr_passengers_all" ON public.pnr_passengers FOR ALL
 USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "pnr_segments_all" ON public.pnr_segments;
 CREATE POLICY "pnr_segments_all" ON public.pnr_segments FOR ALL
 USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "pnr_ssr_elements_all" ON public.pnr_ssr_elements;
 CREATE POLICY "pnr_ssr_elements_all" ON public.pnr_ssr_elements FOR ALL
 USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "pnr_remarks_all" ON public.pnr_remarks;
 CREATE POLICY "pnr_remarks_all" ON public.pnr_remarks FOR ALL
 USING (true) WITH CHECK (true);
 

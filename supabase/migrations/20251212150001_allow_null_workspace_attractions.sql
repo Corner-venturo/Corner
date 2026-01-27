@@ -12,6 +12,7 @@ ALTER COLUMN workspace_id DROP NOT NULL;
 
 -- 更新 RLS policy 讓 workspace_id 為 NULL 的資料可以被所有人看到
 DROP POLICY IF EXISTS "attractions_select" ON public.attractions;
+DROP POLICY IF EXISTS "attractions_select" ON public.attractions;
 CREATE POLICY "attractions_select" ON public.attractions FOR SELECT
 USING (
   workspace_id IS NULL  -- 共享資料

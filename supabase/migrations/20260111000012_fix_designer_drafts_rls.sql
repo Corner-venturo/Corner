@@ -7,6 +7,7 @@ BEGIN;
 DROP POLICY IF EXISTS "designer_drafts_insert" ON public.designer_drafts;
 
 -- 建立新的 INSERT 政策（更寬鬆：允許已認證用戶插入自己 workspace 的資料）
+DROP POLICY IF EXISTS "designer_drafts_insert" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_insert" ON public.designer_drafts FOR INSERT
 WITH CHECK (
   -- 條件 1：workspace_id 匹配 get_current_user_workspace()
@@ -21,6 +22,7 @@ WITH CHECK (
 
 -- 也更新 SELECT 政策以允許用戶查看自己的草稿
 DROP POLICY IF EXISTS "designer_drafts_select" ON public.designer_drafts;
+DROP POLICY IF EXISTS "designer_drafts_select" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_select" ON public.designer_drafts FOR SELECT
 USING (
   workspace_id = get_current_user_workspace()
@@ -30,6 +32,7 @@ USING (
 
 -- 更新 UPDATE 政策
 DROP POLICY IF EXISTS "designer_drafts_update" ON public.designer_drafts;
+DROP POLICY IF EXISTS "designer_drafts_update" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_update" ON public.designer_drafts FOR UPDATE
 USING (
   workspace_id = get_current_user_workspace()
@@ -38,6 +41,7 @@ USING (
 );
 
 -- 更新 DELETE 政策
+DROP POLICY IF EXISTS "designer_drafts_delete" ON public.designer_drafts;
 DROP POLICY IF EXISTS "designer_drafts_delete" ON public.designer_drafts;
 CREATE POLICY "designer_drafts_delete" ON public.designer_drafts FOR DELETE
 USING (

@@ -59,6 +59,7 @@ interface AddManualRequestDialogProps {
   tourCode?: string
   tourName?: string
   startDate?: string | null
+  defaultCategory?: string
   onSuccess?: () => void
 }
 
@@ -70,6 +71,7 @@ export function AddManualRequestDialog({
   tourCode,
   tourName,
   startDate,
+  defaultCategory = 'transport',
   onSuccess,
 }: AddManualRequestDialogProps) {
   const { user } = useAuthStore()
@@ -78,7 +80,7 @@ export function AddManualRequestDialog({
 
   // 表單狀態
   const [formData, setFormData] = useState({
-    category: 'transport',
+    category: defaultCategory,
     supplierName: '',
     title: '',
     serviceDate: startDate || '',
@@ -106,10 +108,17 @@ export function AddManualRequestDialog({
     types: supplierType ? [supplierType] : ['vehicle_supplier', 'guide_supplier'],
   })
 
+  // 當對話框打開時，更新預設分類
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({ ...prev, category: defaultCategory }))
+    }
+  }, [isOpen, defaultCategory])
+
   // 重設表單
   const resetForm = useCallback(() => {
     setFormData({
-      category: 'transport',
+      category: defaultCategory,
       supplierName: '',
       title: '',
       serviceDate: startDate || '',
@@ -127,7 +136,7 @@ export function AddManualRequestDialog({
     setShowRestaurantSelector(false)
     setShowHotelSelector(false)
     setShowAttractionSelector(false)
-  }, [startDate])
+  }, [startDate, defaultCategory])
 
   // 處理餐廳選擇
   const handleRestaurantSelect = useCallback((restaurants: CombinedRestaurant[]) => {

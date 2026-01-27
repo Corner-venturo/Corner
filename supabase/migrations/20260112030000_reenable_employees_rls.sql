@@ -30,6 +30,7 @@ DROP POLICY IF EXISTS "employees_delete" ON public.employees;
 -- c) 同工作空間的員工
 -- d) 其他工作空間的超級管理員（用於跨工作空間溝通）
 -- e) 自己的記錄（用於登入同步，當 workspace 尚未設定時）
+DROP POLICY IF EXISTS "employees_select" ON public.employees;
 CREATE POLICY "employees_select" ON public.employees FOR SELECT
 USING (
   is_super_admin()
@@ -41,6 +42,7 @@ USING (
 );
 
 -- 5. INSERT policy：只能新增到自己 workspace
+DROP POLICY IF EXISTS "employees_insert" ON public.employees;
 CREATE POLICY "employees_insert" ON public.employees FOR INSERT
 WITH CHECK (
   is_super_admin()
@@ -48,6 +50,7 @@ WITH CHECK (
 );
 
 -- 6. UPDATE policy：只能更新自己 workspace 的員工
+DROP POLICY IF EXISTS "employees_update" ON public.employees;
 CREATE POLICY "employees_update" ON public.employees FOR UPDATE
 USING (
   is_super_admin()
@@ -56,6 +59,7 @@ USING (
 );
 
 -- 7. DELETE policy：只能刪除自己 workspace 的員工
+DROP POLICY IF EXISTS "employees_delete" ON public.employees;
 CREATE POLICY "employees_delete" ON public.employees FOR DELETE
 USING (
   is_super_admin()

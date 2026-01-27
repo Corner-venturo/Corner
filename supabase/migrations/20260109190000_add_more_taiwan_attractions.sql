@@ -54,7 +54,8 @@ BEGIN
   ('花蓮東大門夜市', 'Dongdamen Night Market', '花蓮最大夜市，原住民美食與在地小吃聚集地', taiwan_id, hualien_id, '夜市', '花蓮縣花蓮市中山路50號', 23.9757, 121.6070, 120, true, 37),
   ('瑞穗溫泉', 'Ruisui Hot Springs', '知名的碳酸鹽泉，有「生男之泉」美譽', taiwan_id, hualien_id, '溫泉', '花蓮縣瑞穗鄉溫泉路', 23.4975, 121.3736, 150, true, 38),
   ('雲山水', 'Yun Shan Shui', '夢幻湖景園區，落羽松與湖水倒影超美', taiwan_id, hualien_id, '自然', '花蓮縣壽豐鄉豐坪路二段2巷', 23.8894, 121.5203, 60, true, 39),
-  ('鯉魚潭', 'Liyu Lake', '花蓮最大的內陸湖泊，可划船與環湖步道', taiwan_id, hualien_id, '自然', '花蓮縣壽豐鄉池南村環潭北路100號', 23.9308, 121.5067, 90, true, 40);
+  ('鯉魚潭', 'Liyu Lake', '花蓮最大的內陸湖泊，可划船與環湖步道', taiwan_id, hualien_id, '自然', '花蓮縣壽豐鄉池南村環潭北路100號', 23.9308, 121.5067, 90, true, 40)
+  ON CONFLICT (name, city_id) DO NOTHING;
 
   -- ========== 台東景點 ==========
   INSERT INTO public.attractions (name, name_en, description, country_id, city_id, category, address, latitude, longitude, duration_minutes, is_active, display_order)
@@ -68,7 +69,8 @@ BEGIN
   ('台東森林公園', 'Taitung Forest Park', '琵琶湖、活水湖等，騎單車與散步的好去處', taiwan_id, taitung_id, '自然', '台東縣台東市華泰路300號', 22.7478, 121.1536, 120, true, 47),
   ('小野柳', 'Xiaoyeliu', '奇岩怪石的海岸地形，與野柳齊名', taiwan_id, taitung_id, '自然', '台東縣台東市松江路一段500號', 22.7989, 121.1833, 60, true, 48),
   ('初鹿牧場', 'Chulu Ranch', '台灣最大的坡地牧場，可與動物互動', taiwan_id, taitung_id, '體驗', '台東縣卑南鄉明峰村牧場1號', 22.8486, 121.0575, 120, true, 49),
-  ('加路蘭海岸', 'Jialulan Coast', '東海岸藝術裝置與漂流木藝術聚集地', taiwan_id, taitung_id, '藝術', '台東縣台東市富岡里加路蘭', 22.8108, 121.1933, 45, true, 50);
+  ('加路蘭海岸', 'Jialulan Coast', '東海岸藝術裝置與漂流木藝術聚集地', taiwan_id, taitung_id, '藝術', '台東縣台東市富岡里加路蘭', 22.8108, 121.1933, 45, true, 50)
+  ON CONFLICT (name, city_id) DO NOTHING;
 
   -- ========== 南投景點（日月潭等） ==========
   INSERT INTO public.attractions (name, name_en, description, country_id, city_id, category, address, latitude, longitude, duration_minutes, is_active, display_order)
@@ -82,7 +84,8 @@ BEGIN
   ('溪頭自然教育園區', 'Xitou Nature Education Area', '巨木參天的森林遊樂區，有大學池與神木', taiwan_id, nantou_id, '自然', '南投縣鹿谷鄉森林巷9號', 23.6714, 120.7975, 180, true, 57),
   ('妖怪村', 'Monster Village', '日式風格主題村落，各種妖怪造景與商店', taiwan_id, nantou_id, '體驗', '南投縣鹿谷鄉內湖村興產路2-3號', 23.6753, 120.7961, 120, true, 58),
   ('九族文化村', 'Formosan Aboriginal Culture Village', '原住民文化主題樂園，有刺激遊樂設施', taiwan_id, nantou_id, '體驗', '南投縣魚池鄉金天巷45號', 23.8642, 120.9489, 360, true, 59),
-  ('忘憂森林', 'Wangyou Forest', '枯木矗立於水中的夢幻秘境', taiwan_id, nantou_id, '自然', '南投縣竹山鎮溪山路', 23.5994, 120.7678, 120, true, 60);
+  ('忘憂森林', 'Wangyou Forest', '枯木矗立於水中的夢幻秘境', taiwan_id, nantou_id, '自然', '南投縣竹山鎮溪山路', 23.5994, 120.7678, 120, true, 60)
+  ON CONFLICT (name, city_id) DO NOTHING;
 
   RAISE NOTICE '已新增花蓮、台東、南投景點資料';
 END $$;

@@ -105,6 +105,7 @@ DROP POLICY IF EXISTS "countries_update" ON public.countries;
 DROP POLICY IF EXISTS "countries_delete" ON public.countries;
 
 -- 建立新的 policies
+DROP POLICY IF EXISTS "countries_select" ON public.countries;
 CREATE POLICY "countries_select" ON public.countries FOR SELECT
 USING (
   workspace_id IS NULL  -- 全域共用
@@ -112,6 +113,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "countries_insert" ON public.countries;
 CREATE POLICY "countries_insert" ON public.countries FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -119,6 +121,7 @@ WITH CHECK (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "countries_update" ON public.countries;
 CREATE POLICY "countries_update" ON public.countries FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -126,6 +129,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "countries_delete" ON public.countries;
 CREATE POLICY "countries_delete" ON public.countries FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()
@@ -140,6 +144,7 @@ DROP POLICY IF EXISTS "cities_insert" ON public.cities;
 DROP POLICY IF EXISTS "cities_update" ON public.cities;
 DROP POLICY IF EXISTS "cities_delete" ON public.cities;
 
+DROP POLICY IF EXISTS "cities_select" ON public.cities;
 CREATE POLICY "cities_select" ON public.cities FOR SELECT
 USING (
   workspace_id IS NULL
@@ -147,6 +152,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "cities_insert" ON public.cities;
 CREATE POLICY "cities_insert" ON public.cities FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -154,6 +160,7 @@ WITH CHECK (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "cities_update" ON public.cities;
 CREATE POLICY "cities_update" ON public.cities FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -161,6 +168,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "cities_delete" ON public.cities;
 CREATE POLICY "cities_delete" ON public.cities FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()
@@ -175,6 +183,7 @@ DROP POLICY IF EXISTS "regions_insert" ON public.regions;
 DROP POLICY IF EXISTS "regions_update" ON public.regions;
 DROP POLICY IF EXISTS "regions_delete" ON public.regions;
 
+DROP POLICY IF EXISTS "regions_select" ON public.regions;
 CREATE POLICY "regions_select" ON public.regions FOR SELECT
 USING (
   workspace_id IS NULL
@@ -182,6 +191,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "regions_insert" ON public.regions;
 CREATE POLICY "regions_insert" ON public.regions FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -189,6 +199,7 @@ WITH CHECK (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "regions_update" ON public.regions;
 CREATE POLICY "regions_update" ON public.regions FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -196,6 +207,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "regions_delete" ON public.regions;
 CREATE POLICY "regions_delete" ON public.regions FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()
@@ -210,6 +222,7 @@ DROP POLICY IF EXISTS "ref_airports_insert" ON public.ref_airports;
 DROP POLICY IF EXISTS "ref_airports_update" ON public.ref_airports;
 DROP POLICY IF EXISTS "ref_airports_delete" ON public.ref_airports;
 
+DROP POLICY IF EXISTS "ref_airports_select" ON public.ref_airports;
 CREATE POLICY "ref_airports_select" ON public.ref_airports FOR SELECT
 USING (
   workspace_id IS NULL  -- IATA 標準資料全域可見
@@ -217,6 +230,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "ref_airports_insert" ON public.ref_airports;
 CREATE POLICY "ref_airports_insert" ON public.ref_airports FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -224,6 +238,7 @@ WITH CHECK (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "ref_airports_update" ON public.ref_airports;
 CREATE POLICY "ref_airports_update" ON public.ref_airports FOR UPDATE
 USING (
   workspace_id IS NULL
@@ -231,6 +246,7 @@ USING (
   OR is_super_admin()
 );
 
+DROP POLICY IF EXISTS "ref_airports_delete" ON public.ref_airports;
 CREATE POLICY "ref_airports_delete" ON public.ref_airports FOR DELETE
 USING (
   workspace_id = get_current_user_workspace()

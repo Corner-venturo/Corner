@@ -42,15 +42,19 @@ COMMENT ON COLUMN public.tour_documents.file_name IS '原始檔案名稱';
 ALTER TABLE public.tour_documents ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "tour_documents_select" ON public.tour_documents;
 CREATE POLICY "tour_documents_select" ON public.tour_documents FOR SELECT
   USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "tour_documents_insert" ON public.tour_documents;
 CREATE POLICY "tour_documents_insert" ON public.tour_documents FOR INSERT
   WITH CHECK (workspace_id = get_current_user_workspace());
 
+DROP POLICY IF EXISTS "tour_documents_update" ON public.tour_documents;
 CREATE POLICY "tour_documents_update" ON public.tour_documents FOR UPDATE
   USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 
+DROP POLICY IF EXISTS "tour_documents_delete" ON public.tour_documents;
 CREATE POLICY "tour_documents_delete" ON public.tour_documents FOR DELETE
   USING (workspace_id = get_current_user_workspace() OR is_super_admin());
 

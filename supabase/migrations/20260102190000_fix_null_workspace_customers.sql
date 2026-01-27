@@ -10,10 +10,12 @@ DECLARE
   affected_count integer;
   total_affected integer := 0;
 BEGIN
-  SELECT id INTO tp_workspace_id FROM public.workspaces WHERE code = 'TP';
+  -- 嘗試找 TP 或 CORNER workspace
+  SELECT id INTO tp_workspace_id FROM public.workspaces WHERE code IN ('TP', 'CORNER', 'corner') LIMIT 1;
 
   IF tp_workspace_id IS NULL THEN
-    RAISE EXCEPTION 'TP workspace not found';
+    RAISE NOTICE 'No TP/CORNER workspace found, skipping null workspace fix';
+    RETURN;
   END IF;
 
   -- 顧客

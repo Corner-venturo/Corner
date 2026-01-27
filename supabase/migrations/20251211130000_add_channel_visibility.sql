@@ -70,6 +70,7 @@ DROP POLICY IF EXISTS "channel_members_delete" ON public.channel_members;
 -- ============================================
 
 -- Channels SELECT Policy
+DROP POLICY IF EXISTS "channels_select" ON public.channels;
 CREATE POLICY "channels_select" ON public.channels FOR SELECT
 USING (
   -- 情況 1: 我是成員 → 一定能看到
@@ -90,6 +91,7 @@ USING (
 );
 
 -- Channels INSERT Policy
+DROP POLICY IF EXISTS "channels_insert" ON public.channels;
 CREATE POLICY "channels_insert" ON public.channels FOR INSERT
 WITH CHECK (
   -- 一般員工：只能建立自己分公司的頻道（private/public）
@@ -104,6 +106,7 @@ WITH CHECK (
 );
 
 -- Channels UPDATE Policy
+DROP POLICY IF EXISTS "channels_update" ON public.channels;
 CREATE POLICY "channels_update" ON public.channels FOR UPDATE
 USING (
   -- 頻道建立者或超級管理員可以更新
@@ -111,6 +114,7 @@ USING (
 );
 
 -- Channels DELETE Policy
+DROP POLICY IF EXISTS "channels_delete" ON public.channels;
 CREATE POLICY "channels_delete" ON public.channels FOR DELETE
 USING (
   -- 頻道建立者或超級管理員可以刪除
@@ -122,6 +126,7 @@ USING (
 -- ============================================
 
 -- Channel Members SELECT Policy
+DROP POLICY IF EXISTS "channel_members_select" ON public.channel_members;
 CREATE POLICY "channel_members_select" ON public.channel_members FOR SELECT
 USING (
   -- 我是成員
@@ -139,6 +144,7 @@ USING (
 );
 
 -- Channel Members INSERT Policy（邀請成員）
+DROP POLICY IF EXISTS "channel_members_insert" ON public.channel_members;
 CREATE POLICY "channel_members_insert" ON public.channel_members FOR INSERT
 WITH CHECK (
   EXISTS (
@@ -158,6 +164,7 @@ WITH CHECK (
 );
 
 -- Channel Members DELETE Policy（移除成員）
+DROP POLICY IF EXISTS "channel_members_delete" ON public.channel_members;
 CREATE POLICY "channel_members_delete" ON public.channel_members FOR DELETE
 USING (
   -- 自己退出

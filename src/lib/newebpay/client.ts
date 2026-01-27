@@ -114,7 +114,7 @@ async function getNewebPayConfig(): Promise<NewebPayConfig> {
     merchantId: settings.merchantId as string,
     hashKey: settings.hashKey as string,
     hashIV: settings.hashIV as string,
-    isProduction: false, // 暫時強制使用測試環境避免 IP 限制
+    isProduction: settings.isProduction === true, // 依照設定決定環境
   }
 }
 

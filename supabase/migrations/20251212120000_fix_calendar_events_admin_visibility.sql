@@ -18,6 +18,7 @@ DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 --    - 同 workspace 的人能看
 --    - 超級管理員能看所有公司的
 -- 3. 舊資料 (workspace_id IS NULL): 所有人都能看
+DROP POLICY IF EXISTS "calendar_events_select" ON public.calendar_events;
 CREATE POLICY "calendar_events_select" ON public.calendar_events FOR SELECT
 USING (
   CASE
@@ -36,6 +37,7 @@ USING (
 );
 
 -- INSERT policy
+DROP POLICY IF EXISTS "calendar_events_insert" ON public.calendar_events;
 CREATE POLICY "calendar_events_insert" ON public.calendar_events FOR INSERT
 WITH CHECK (
   workspace_id IS NULL
@@ -43,6 +45,7 @@ WITH CHECK (
 );
 
 -- UPDATE policy: 只能改自己建立的或超級管理員（非個人事項）
+DROP POLICY IF EXISTS "calendar_events_update" ON public.calendar_events;
 CREATE POLICY "calendar_events_update" ON public.calendar_events FOR UPDATE
 USING (
   created_by = auth.uid()
@@ -51,6 +54,7 @@ USING (
 );
 
 -- DELETE policy: 只能刪自己建立的或超級管理員（非個人事項）
+DROP POLICY IF EXISTS "calendar_events_delete" ON public.calendar_events;
 CREATE POLICY "calendar_events_delete" ON public.calendar_events FOR DELETE
 USING (
   created_by = auth.uid()

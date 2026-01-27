@@ -18,6 +18,7 @@ DROP POLICY IF EXISTS "payment_request_items_delete" ON public.payment_request_i
 
 -- 3. 建立新的 RLS 政策（使用 helper functions）
 -- SELECT: 允許認證用戶查看自己 workspace 的資料
+DROP POLICY IF EXISTS "payment_request_items_select" ON public.payment_request_items;
 CREATE POLICY "payment_request_items_select" ON public.payment_request_items
   FOR SELECT
   TO authenticated
@@ -28,6 +29,7 @@ CREATE POLICY "payment_request_items_select" ON public.payment_request_items
   );
 
 -- INSERT: 允許認證用戶新增到自己的 workspace
+DROP POLICY IF EXISTS "payment_request_items_insert" ON public.payment_request_items;
 CREATE POLICY "payment_request_items_insert" ON public.payment_request_items
   FOR INSERT
   TO authenticated
@@ -38,6 +40,7 @@ CREATE POLICY "payment_request_items_insert" ON public.payment_request_items
   );
 
 -- UPDATE: 允許認證用戶更新自己 workspace 的資料
+DROP POLICY IF EXISTS "payment_request_items_update" ON public.payment_request_items;
 CREATE POLICY "payment_request_items_update" ON public.payment_request_items
   FOR UPDATE
   TO authenticated
@@ -48,6 +51,7 @@ CREATE POLICY "payment_request_items_update" ON public.payment_request_items
   );
 
 -- DELETE: 允許認證用戶刪除自己 workspace 的資料
+DROP POLICY IF EXISTS "payment_request_items_delete" ON public.payment_request_items;
 CREATE POLICY "payment_request_items_delete" ON public.payment_request_items
   FOR DELETE
   TO authenticated
