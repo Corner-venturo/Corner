@@ -167,6 +167,7 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
     isProduction: config.isProduction,
     postDataKeys: Object.keys(postData),
   })
+  logger.log('[NewebPay] URL Encoded Data (解密前):', urlEncodedData)
 
   // 發送請求
   const response = await fetch(`${baseUrl}${path}`, {
@@ -242,8 +243,18 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
   const itemPrices = params.items.map(item => item.item_price).join('|')
   const itemAmts = params.items.map(item => item.itemAmt).join('|')
 
+  // 驗證並清理統編（必須是 8 碼數字）
+  const cleanUBN = params.buyerInfo.buyerUBN?.trim()
+  const isValidUBN = cleanUBN && /^\d{8}$/.test(cleanUBN)
+
   // 判斷是 B2B 還是 B2C
-  const category = params.buyerInfo.buyerUBN ? 'B2B' : 'B2C'
+  const category = isValidUBN ? 'B2B' : 'B2C'
+  logger.log('[NewebPay] 發票類型判斷:', {
+    原始UBN: params.buyerInfo.buyerUBN,
+    清理後UBN: cleanUBN,
+    是否有效: isValidUBN,
+    類型: category
+  })
 
   // 判斷是即時開立還是預約開立
   // 比較日期（只比較年月日，忽略時間）
@@ -270,9 +281,9 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     ItemAmt: itemAmts,
   }
 
-  // B2B 必填統編
-  if (category === 'B2B' && params.buyerInfo.buyerUBN) {
-    postData.BuyerUBN = params.buyerInfo.buyerUBN
+  // B2B 必填統編（使用驗證過的 cleanUBN）
+  if (isValidUBN) {
+    postData.BuyerUBN = cleanUBN
   }
 
   // 選填欄位
@@ -289,7 +300,8 @@ export async function issueInvoice(params: IssueInvoiceParams): Promise<{
     logger.log('[NewebPay] 預約開立發票，預定日期:', params.invoiceDate)
   }
 
-  logger.log('[NewebPay] 開立收據 PostData:', postData)
+  logger.log('[NewebPay] 開立收據 PostData:', JSON.stringify(postData, null, 2))
+  logger.log('[NewebPay] buyerInfo 原始值:', JSON.stringify(params.buyerInfo, null, 2))
 
   try {
     const result = await sendRequest(API_PATHS.issue, postData)

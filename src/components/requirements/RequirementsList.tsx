@@ -41,6 +41,7 @@ import type { Json } from '@/lib/supabase/types'
 import { useToast } from '@/components/ui/use-toast'
 import { logger } from '@/lib/utils/logger'
 import { generateTourRequestCode } from '@/stores/utils/code-generator'
+import { getStatusConfig } from '@/lib/status-config'
 
 // ============================================
 // Types
@@ -78,6 +79,8 @@ interface TourRequest {
   status?: string | null
   quoted_cost?: number | null
   hidden?: boolean | null
+  resource_id?: string | null
+  resource_type?: string | null
 }
 
 // 報價單項目
@@ -217,7 +220,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
           .eq('tour_id', tourId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -249,7 +252,7 @@ export function RequirementsList({
         // 載入現有需求單
         const { data: requests } = await supabase
           .from('tour_requests')
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
           .eq('proposal_package_id', proposalPackageId)
           .order('created_at', { ascending: true })
         setExistingRequests((requests as TourRequest[]) || [])
@@ -476,6 +479,8 @@ export function RequirementsList({
       serviceDate: string | null
       quantity: number
       note?: string
+      resourceId?: string | null
+      resourceType?: string | null
     }
   ) => {
     try {
@@ -510,6 +515,8 @@ export function RequirementsList({
           note: itemData.note || null,
           status: 'draft',
           hidden: true,
+          resource_id: itemData.resourceId || null,
+          resource_type: itemData.resourceType || null,
           created_by: user.id,
           created_by_name: user.display_name || user.chinese_name || '',
         }
@@ -517,7 +524,7 @@ export function RequirementsList({
         const { data: newRequest, error } = await supabase
           .from('tour_requests')
           .insert(insertData)
-          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden')
+          .select('id, code, category, supplier_name, title, service_date, quantity, note, status, quoted_cost, hidden, resource_id, resource_type')
           .single()
 
         if (error) throw error
@@ -930,18 +937,38 @@ export function RequirementsList({
                   const trackItems = changeTrackByCategory[cat.key]
                   if (trackItems.length === 0) return null
 
+                  // 輔助函數：找匹配的需求單（優先用 resource_id，其次用 supplier_name）
+                  const findMatchingRequest = (itemData: ChangeTrackItem['item']) => {
+                    const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
+                    const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
+
+                    // 優先用 resource_id 匹配（更可靠）
+                    if (itemResourceId) {
+                      const byResourceId = existingRequests.find(r =>
+                        r.category === cat.key && r.resource_id === itemResourceId
+                      )
+                      if (byResourceId) return byResourceId
+                    }
+
+                    // 其次用 supplier_name 匹配
+                    return existingRequests.find(r =>
+                      r.category === cat.key && r.supplier_name === itemSupplierName
+                    )
+                  }
+
+                  // 輔助函數：取得供應商識別 key（優先 resource_id）
+                  const getSupplierKey = (itemData: ChangeTrackItem['item']) => {
+                    const itemResourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
+                    const itemSupplierName = 'supplierName' in itemData ? itemData.supplierName : itemData.supplier_name
+                    return itemResourceId || itemSupplierName || ''
+                  }
+
                   // 計算隱藏與可見項目
                   const visibleItems: typeof trackItems = []
                   const hiddenItems: typeof trackItems = []
 
                   for (const trackItem of trackItems) {
-                    const itemData = trackItem.item
-                    const itemKey = 'supplierName' in itemData
-                      ? `${itemData.category}-${itemData.supplierName}-${itemData.title}-${itemData.serviceDate || ''}`
-                      : `${itemData.category}-${itemData.supplier_name}-${itemData.title}-${itemData.service_date || ''}`
-                    const existingRequest = existingRequests.find(r =>
-                      `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === itemKey
-                    )
+                    const existingRequest = findMatchingRequest(trackItem.item)
                     // 如果有對應的需求單且被隱藏，則放入隱藏區
                     if (existingRequest?.hidden) {
                       hiddenItems.push(trackItem)
@@ -954,15 +981,12 @@ export function RequirementsList({
 
                   const categoryTotal = visibleItems.reduce((sum, ti) => {
                     if (ti.type === 'cancelled') return sum
-                    const itemData = ti.item
-                    const key = 'supplierName' in itemData
-                      ? `${itemData.category}-${itemData.supplierName}-${itemData.title}-${itemData.serviceDate || ''}`
-                      : `${itemData.category}-${itemData.supplier_name}-${itemData.title}-${itemData.service_date || ''}`
-                    const existing = existingRequests.find(r =>
-                      `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === key
-                    )
+                    const existing = findMatchingRequest(ti.item)
                     return sum + (existing?.quoted_cost || 0)
                   }, 0)
+
+                  // 追蹤已顯示操作按鈕的供應商（同一供應商只在第一行顯示按鈕）
+                  const renderedSuppliers = new Set<string>()
 
                   // 渲染單一項目的函數
                   const renderItem = (trackItem: ChangeTrackItem, idx: number, isHidden: boolean) => {
@@ -974,41 +998,34 @@ export function RequirementsList({
                     const title = itemData.title
                     const note = itemData.note
                     const quantity = 'quantity' in itemData ? itemData.quantity : 1
+                    const resourceId = 'resourceId' in itemData ? itemData.resourceId : undefined
 
-                    const itemKey = `${cat.key}-${supplierName}-${title}-${serviceDate || ''}`
-                    const existingRequest = existingRequests.find(r =>
-                      `${r.category}-${r.supplier_name}-${r.title}-${r.service_date || ''}` === itemKey
-                    )
+                    // 找匹配的需求單
+                    const existingRequest = findMatchingRequest(itemData)
 
+                    // 判斷是否為該供應商的第一行（只有第一行顯示操作按鈕）
+                    const supplierKey = getSupplierKey(itemData)
+                    const isFirstRowForSupplier = !renderedSuppliers.has(supplierKey)
+                    if (isFirstRowForSupplier) {
+                      renderedSuppliers.add(supplierKey)
+                    }
+
+                    // 使用統一狀態配置
                     let statusLabel = ''
                     let statusClass = ''
                     if (isCancelled) {
                       statusLabel = '待取消'
-                      statusClass = 'bg-morandi-red/15 text-morandi-red'
-                    } else if (isNew) {
+                      const config = getStatusConfig('tour_request', 'cancelled')
+                      statusClass = `${config.bgColor} ${config.color}`
+                    } else if (isNew || !existingRequest) {
                       statusLabel = '待作業'
-                      statusClass = 'bg-amber-100 text-amber-700'
-                    } else if (existingRequest) {
-                      const s = existingRequest.status
-                      if (s === 'sent' || s === 'pending') {
-                        statusLabel = '已發送'
-                        statusClass = 'bg-blue-100 text-blue-700'
-                      } else if (s === 'replied') {
-                        statusLabel = '已回覆'
-                        statusClass = 'bg-emerald-100 text-emerald-700'
-                      } else if (s === 'confirmed') {
-                        statusLabel = '已確認'
-                        statusClass = 'bg-morandi-green/20 text-morandi-green'
-                      } else if (s === 'cancelled') {
-                        statusLabel = '已取消'
-                        statusClass = 'bg-gray-100 text-gray-500'
-                      } else {
-                        statusLabel = '待作業'
-                        statusClass = 'bg-amber-100 text-amber-700'
-                      }
+                      const config = getStatusConfig('tour_request', 'pending')
+                      statusClass = `${config.bgColor} ${config.color}`
                     } else {
-                      statusLabel = '待作業'
-                      statusClass = 'bg-amber-100 text-amber-700'
+                      const s = existingRequest.status || 'pending'
+                      const config = getStatusConfig('tour_request', s)
+                      statusLabel = config.label
+                      statusClass = `${config.bgColor} ${config.color}`
                     }
 
                     const quotedCost = existingRequest?.quoted_cost
@@ -1047,63 +1064,68 @@ export function RequirementsList({
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            {/* 隱藏/恢復按鈕 */}
-                            {!isCancelled && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleToggleHidden(
-                                  existingRequest?.id || null,
-                                  !isHidden,
-                                  !existingRequest ? {
-                                    category: cat.key,
-                                    supplierName: supplierName || '',
-                                    title,
-                                    serviceDate,
-                                    quantity,
-                                    note: note || undefined,
-                                  } : undefined
-                                )}
-                                className={cn(
-                                  'h-7 w-7 p-0',
-                                  isHidden
-                                    ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
-                                    : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
-                                )}
-                                title={isHidden ? '恢復顯示' : '隱藏'}
-                              >
-                                {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
-                              </Button>
-                            )}
-                            {/* 列印取消單按鈕 */}
-                            {isCancelled && supplierName && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const items = cancelledBySupplier.get(supplierName)
-                                  if (items) handlePrintCancellation(supplierName, items)
-                                }}
-                                className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
-                                title="列印取消單"
-                              >
-                                <Printer size={14} />
-                              </Button>
-                            )}
-                            {/* 產生需求單按鈕 */}
-                            {!isCancelled && supplierName && onOpenRequestDialog && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openRequestDialog(cat.key, supplierName)}
-                                className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
-                                title="產生需求單"
-                              >
-                                <FileText size={14} />
-                              </Button>
-                            )}
-                          </div>
+                          {/* 只在該供應商的第一行顯示操作按鈕 */}
+                          {isFirstRowForSupplier && (
+                            <div className="flex items-center justify-center gap-1">
+                              {/* 隱藏/恢復按鈕 */}
+                              {!isCancelled && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleToggleHidden(
+                                    existingRequest?.id || null,
+                                    !isHidden,
+                                    !existingRequest ? {
+                                      category: cat.key,
+                                      supplierName: supplierName || '',
+                                      title,
+                                      serviceDate,
+                                      quantity,
+                                      note: note || undefined,
+                                      resourceId,
+                                      resourceType: cat.key === 'hotel' ? 'hotel' : cat.key === 'restaurant' ? 'restaurant' : cat.key === 'activity' ? 'attraction' : undefined,
+                                    } : undefined
+                                  )}
+                                  className={cn(
+                                    'h-7 w-7 p-0',
+                                    isHidden
+                                      ? 'text-morandi-secondary hover:text-morandi-primary hover:bg-morandi-container/50'
+                                      : 'text-morandi-muted hover:text-morandi-secondary hover:bg-morandi-container/30'
+                                  )}
+                                  title={isHidden ? '恢復顯示' : '隱藏'}
+                                >
+                                  {isHidden ? <Eye size={14} /> : <EyeOff size={14} />}
+                                </Button>
+                              )}
+                              {/* 列印取消單按鈕 */}
+                              {isCancelled && supplierName && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const items = cancelledBySupplier.get(supplierName)
+                                    if (items) handlePrintCancellation(supplierName, items)
+                                  }}
+                                  className="h-7 w-7 p-0 text-morandi-red hover:text-morandi-red/80 hover:bg-morandi-red/10"
+                                  title="列印取消單"
+                                >
+                                  <Printer size={14} />
+                                </Button>
+                              )}
+                              {/* 產生需求單按鈕 */}
+                              {!isCancelled && supplierName && onOpenRequestDialog && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openRequestDialog(cat.key, supplierName)}
+                                  className="h-7 w-7 p-0 text-morandi-gold hover:text-morandi-gold-hover hover:bg-morandi-gold/10"
+                                  title="產生需求單"
+                                >
+                                  <FileText size={14} />
+                                </Button>
+                              )}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     )
