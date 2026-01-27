@@ -30,9 +30,10 @@ function saveFilters(filters: { countryId: string; regionId: string; cityId: str
 interface UseHotelSelectorProps {
   isOpen: boolean
   tourCountryName?: string
+  tourCountryId?: string  // 可直接用 country_id，優先於 tourCountryName
 }
 
-export function useHotelSelector({ isOpen, tourCountryName }: UseHotelSelectorProps) {
+export function useHotelSelector({ isOpen, tourCountryName, tourCountryId }: UseHotelSelectorProps) {
   // 使用 ref 來追蹤是否已初始化
   const savedFilters = useRef(getSavedFilters())
 
@@ -75,7 +76,18 @@ export function useHotelSelector({ isOpen, tourCountryName }: UseHotelSelectorPr
       // 重新讀取 localStorage
       savedFilters.current = getSavedFilters()
 
-      if (tourCountryName) {
+      // 優先使用 tourCountryId（直接用 ID），其次用 tourCountryName（用名稱匹配）
+      if (tourCountryId) {
+        const matchedCountry = countries.find(c => c.id === tourCountryId)
+        if (matchedCountry && matchedCountry.id !== savedFilters.current.countryId) {
+          setSelectedCountryId(matchedCountry.id)
+          setSelectedRegionId('')
+          setSelectedCityId('')
+          setSelectedBrand('')
+          saveFilters({ countryId: matchedCountry.id, regionId: '', cityId: '', brand: '' })
+          return
+        }
+      } else if (tourCountryName) {
         const matchedCountry = countries.find(c => c.name === tourCountryName)
         if (matchedCountry && matchedCountry.id !== savedFilters.current.countryId) {
           setSelectedCountryId(matchedCountry.id)
@@ -94,7 +106,7 @@ export function useHotelSelector({ isOpen, tourCountryName }: UseHotelSelectorPr
         setSelectedBrand(savedFilters.current.brand)
       }
     }
-  }, [isOpen, tourCountryName, countries])
+  }, [isOpen, tourCountryName, tourCountryId, countries])
 
   // 國家變更
   const handleCountryChange = (countryId: string) => {

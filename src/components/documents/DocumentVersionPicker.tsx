@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Plus,
@@ -13,9 +13,6 @@ import {
   Copy,
   FilePlus,
   Trash2,
-  Clock,
-  Zap,
-  Edit2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CurrencyCell } from '@/components/table-cells'
@@ -23,21 +20,14 @@ import { useQuotes, createQuote, updateQuote, deleteQuote } from '@/data'
 import { generateCode } from '@/stores/utils/code-generator'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
-import type { TimelineItineraryData } from '@/types/timeline-itinerary.types'
-import type { ProposalPackage, Proposal } from '@/types/proposal.types'
 import { logger } from '@/lib/utils/logger'
 import { confirm } from '@/lib/ui/alert-dialog'
-import { supabase } from '@/lib/supabase/client'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { TimelineItineraryPreview } from './TimelineItineraryPreview'
-import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog'
-import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
-import { syncTimelineToQuote } from '@/lib/utils/itinerary-quote-sync'
 
 // 取得報價單顯示名稱
 function getQuoteDisplayName(quote: Quote): string {
@@ -89,139 +79,6 @@ export function DocumentVersionPicker({
   const [previewQuote, setPreviewQuote] = useState<Quote | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 行程表資料
-  const [timelineData, setTimelineData] = useState<TimelineItineraryData | null>(null)
-  const [loadingTimeline, setLoadingTimeline] = useState(false)
-  const [showItinerary, setShowItinerary] = useState(false)
-
-  // 行程表編輯對話框狀態
-  const [proposalPackage, setProposalPackage] = useState<ProposalPackage | null>(null)
-  const [itineraryType, setItineraryType] = useState<'simple' | 'timeline' | null>(null)
-  const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
-  const [packageItineraryDialogOpen, setPackageItineraryDialogOpen] = useState(false)
-
-  // 載入行程表資料（點擊按鈕後才載入）
-  const loadProposalPackageData = async () => {
-    // 檢查 tour 是否有 proposal_package_id（類型斷言處理）
-    const proposalPackageId = (tour as { proposal_package_id?: string | null }).proposal_package_id
-    if (!proposalPackageId) {
-      setTimelineData(null)
-      setProposalPackage(null)
-      setItineraryType(null)
-      return
-    }
-
-    setLoadingTimeline(true)
-    try {
-      const { data, error } = await supabase
-        .from('proposal_packages')
-        .select('*')
-        .eq('id', proposalPackageId)
-        .single()
-
-      if (error) {
-        logger.error('載入行程表資料失敗:', error)
-        setTimelineData(null)
-        setProposalPackage(null)
-        setItineraryType(null)
-      } else {
-        setProposalPackage(data as unknown as ProposalPackage)
-        setItineraryType(data?.itinerary_type as 'simple' | 'timeline' | null)
-        if (data?.itinerary_type === 'timeline' && data?.timeline_data) {
-          setTimelineData(data.timeline_data as unknown as TimelineItineraryData)
-        } else {
-          setTimelineData(null)
-        }
-      }
-    } catch (err) {
-      logger.error('載入行程表資料錯誤:', err)
-      setTimelineData(null)
-      setProposalPackage(null)
-      setItineraryType(null)
-    } finally {
-      setLoadingTimeline(false)
-    }
-  }
-
-  // 為 PackageItineraryDialog 建立模擬 Proposal 物件
-  const fakeProposal = useMemo((): Proposal => ({
-    id: tour.id,
-    code: tour.code || '',
-    title: tour.name,
-    status: 'converted' as const,
-    destination: tour.location || null,
-    country_id: tour.country_id || null,
-    main_city_id: tour.main_city_id || null,
-    expected_start_date: tour.departure_date || null,
-    expected_end_date: tour.return_date || null,
-    created_at: tour.created_at || new Date().toISOString(),
-    updated_at: tour.updated_at || new Date().toISOString(),
-    workspace_id: tour.workspace_id || '',
-  }), [tour])
-
-  // 儲存時間軸資料
-  const handleSaveTimeline = useCallback(async (data: TimelineItineraryData) => {
-    if (!proposalPackage) return
-
-    try {
-      const jsonData = JSON.parse(JSON.stringify(data))
-
-      const { error } = await supabase
-        .from('proposal_packages')
-        .update({
-          itinerary_type: 'timeline',
-          timeline_data: jsonData,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', proposalPackage.id)
-
-      if (error) throw error
-
-      if (proposalPackage.quote_id) {
-        await syncTimelineToQuote(proposalPackage.quote_id, data)
-      }
-
-      // 更新本地狀態
-      setTimelineData(data)
-      setItineraryType('timeline')
-    } catch (error) {
-      logger.error('儲存時間軸資料失敗:', error)
-      throw error
-    }
-  }, [proposalPackage])
-
-  // 點擊顯示行程表按鈕
-  const handleShowItinerary = () => {
-    setShowItinerary(true)
-    if (!proposalPackage && !loadingTimeline) {
-      loadProposalPackageData()
-    }
-  }
-
-  // 點擊編輯行程表按鈕
-  const handleEditItinerary = () => {
-    if (!proposalPackage) return
-
-    if (itineraryType === 'timeline') {
-      setTimelineDialogOpen(true)
-    } else {
-      // 預設打開快速行程表（包含 simple 或 null）
-      setPackageItineraryDialogOpen(true)
-    }
-  }
-
-  // 關閉對話框時重置狀態
-  useEffect(() => {
-    if (!isOpen) {
-      setShowItinerary(false)
-      setTimelineData(null)
-      setProposalPackage(null)
-      setItineraryType(null)
-    }
-  }, [isOpen])
-
-  // 注意：已移除 hasChildDialogOpen 模式，改用 Dialog level 系統處理多重遮罩
-
   // 編輯時自動聚焦
   useEffect(() => {
     if (editingId && inputRef.current) {
@@ -244,6 +101,9 @@ export function DocumentVersionPicker({
 
     if (!isLinked) return false
     if ((q as { _deleted?: boolean })._deleted) return false
+
+    // 快速報價單直接顯示（它們沒有 categories 結構）
+    if (q.quote_type === 'quick') return true
 
     // 有金額就顯示
     if (q.total_amount && q.total_amount > 0) return true
@@ -631,38 +491,24 @@ export function DocumentVersionPicker({
     )
   }
 
-  // 檢查是否有行程表資料
-  const hasItinerary = timelineData && timelineData.days && timelineData.days.length > 0
-  // 檢查 tour 是否有 proposal_package_id
-  const hasProposalPackage = !!(tour as { proposal_package_id?: string | null }).proposal_package_id
-
   return (
     <>
       {/* 主對話框：使用 level={2}（作為 TourDetailDialog 的子 Dialog） */}
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent level={2} className={cn(
-          'h-[70vh] max-h-[800px] flex flex-col overflow-hidden',
-          showItinerary ? 'max-w-[900px]' : 'max-w-[500px]'
-        )}>
+        <DialogContent level={2} className="h-[70vh] max-h-[800px] max-w-[500px] flex flex-col overflow-hidden">
           {/* 標題區 */}
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-morandi-gold" />
-              <span>報價與行程</span>
+              <span>報價單</span>
               <span className="text-sm text-morandi-secondary font-normal">- {tour.code}</span>
             </DialogTitle>
           </DialogHeader>
 
-          {/* 主要內容區 - 雙欄布局（當顯示行程表時） */}
-          <div className={cn(
-            'flex-1 overflow-hidden',
-            showItinerary && 'flex gap-4'
-          )}>
-            {/* 左側：報價單列表 */}
-            <div className={cn(
-              'flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full',
-              showItinerary ? 'w-1/2' : 'w-full'
-            )}>
+          {/* 主要內容區 */}
+          <div className="flex-1 overflow-hidden">
+            {/* 報價單列表 */}
+            <div className="flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full">
               <div className="flex-shrink-0 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Calculator className="w-4 h-4 text-morandi-primary" />
@@ -712,16 +558,6 @@ export function DocumentVersionPicker({
                   </button>
                 ) : (
                   <div className="flex gap-2">
-                    {/* 行程表按鈕（只在有 proposal_package 且未顯示行程時） */}
-                    {hasProposalPackage && !showItinerary && (
-                      <button
-                        onClick={handleShowItinerary}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-morandi-primary border border-border hover:bg-morandi-container/50 rounded-lg transition-colors"
-                      >
-                        <Clock size={16} />
-                        行程表
-                      </button>
-                    )}
                     <button
                       onClick={handleCreateStandard}
                       disabled={isCreatingStandard}
@@ -752,71 +588,6 @@ export function DocumentVersionPicker({
                 )}
               </div>
             </div>
-
-            {/* 右側：行程表預覽（點擊行程表按鈕後顯示） */}
-            {showItinerary && (
-              <div className="w-1/2 flex flex-col min-h-0 overflow-hidden border border-border rounded-lg h-full">
-                <div className="flex-shrink-0 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {itineraryType === 'timeline' ? (
-                        <Clock className="w-4 h-4 text-morandi-gold" />
-                      ) : (
-                        <Zap className="w-4 h-4 text-morandi-gold" />
-                      )}
-                      <span className="text-sm font-medium text-morandi-primary">
-                        {itineraryType === 'timeline' ? '時間軸行程表' : '快速行程表'}
-                      </span>
-                    </div>
-                    {proposalPackage && (
-                      <button
-                        onClick={handleEditItinerary}
-                        className="flex items-center gap-1 px-2 py-1 text-xs text-morandi-gold hover:bg-morandi-gold/10 rounded transition-colors"
-                      >
-                        <Edit2 size={12} />
-                        編輯
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-morandi-secondary mt-1">
-                    {itineraryType === 'timeline' ? '以時間軸方式編輯每日行程' : '完整行程編輯器，支援景點、餐食、住宿'}
-                  </p>
-                </div>
-
-                {/* 分割線留白 */}
-                <div className="mx-4">
-                  <div className="border-t border-border" />
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4">
-                  {loadingTimeline ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-5 h-5 animate-spin text-morandi-secondary" />
-                    </div>
-                  ) : itineraryType === 'timeline' && timelineData ? (
-                    <TimelineItineraryPreview
-                      data={timelineData}
-                      loading={false}
-                    />
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-morandi-secondary mb-4">
-                        {proposalPackage ? '尚未建立行程內容' : '無行程表資料'}
-                      </p>
-                      {proposalPackage && (
-                        <button
-                          onClick={handleEditItinerary}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"
-                        >
-                          <Edit2 size={14} />
-                          開始編輯
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -859,29 +630,6 @@ export function DocumentVersionPicker({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* 快速行程表對話框 */}
-      {proposalPackage && (
-        <PackageItineraryDialog
-          isOpen={packageItineraryDialogOpen}
-          onClose={() => setPackageItineraryDialogOpen(false)}
-          pkg={proposalPackage}
-          proposal={fakeProposal}
-          onItineraryCreated={() => {
-            loadProposalPackageData()
-          }}
-        />
-      )}
-
-      {/* 行程表對話框 */}
-      {proposalPackage && (
-        <ItineraryDialog
-          isOpen={timelineDialogOpen}
-          onClose={() => setTimelineDialogOpen(false)}
-          pkg={proposalPackage}
-          onSave={handleSaveTimeline}
-        />
-      )}
     </>
   )
 }

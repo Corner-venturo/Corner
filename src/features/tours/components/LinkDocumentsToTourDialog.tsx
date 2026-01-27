@@ -31,11 +31,12 @@ import {
   Loader2,
   ExternalLink,
   Unlink,
+  Trash2,
   Eye,
   Zap,
   Clock,
 } from 'lucide-react'
-import { useQuotes, useTours, useOrders, createQuote, updateQuote, invalidateQuotes, useProposalPackage } from '@/data'
+import { useQuotes, useTours, useOrders, createQuote, updateQuote, deleteQuote, invalidateQuotes, useProposalPackage } from '@/data'
 import { DEFAULT_CATEGORIES } from '@/features/quotes/constants'
 import type { Tour, Quote } from '@/stores/types'
 import type { ProposalPackage, TimelineItineraryData } from '@/types/proposal.types'
@@ -48,6 +49,40 @@ import { ItineraryDialog } from '@/features/proposals/components/ItineraryDialog
 import { PackageItineraryDialog } from '@/features/proposals/components/PackageItineraryDialog'
 import { toast } from 'sonner'
 import type { Proposal } from '@/types/proposal.types'
+
+/**
+ * 生成團號為基礎的報價單編號
+ * - 團體報價單: {團號}-Q{2位數} → DAD260213A-Q01
+ * - 快速報價單: {團號}-QQ{2位數} → DAD260213A-QQ01
+ */
+async function generateTourBasedQuoteCode(
+  tourId: string,
+  tourCode: string,
+  quoteType: 'standard' | 'quick'
+): Promise<string> {
+  const prefix = quoteType === 'quick' ? 'QQ' : 'Q'
+  const codePattern = `${tourCode}-${prefix}%`
+
+  // 查詢該團現有的同類型報價單編號
+  const { data: existingQuotes } = await supabase
+    .from('quotes')
+    .select('code')
+    .eq('tour_id', tourId)
+    .like('code', codePattern)
+    .order('code', { ascending: false })
+    .limit(1)
+
+  let nextNumber = 1
+  if (existingQuotes && existingQuotes.length > 0 && existingQuotes[0]?.code) {
+    // 從 "DAD260213A-Q01" 提取數字部分
+    const match = existingQuotes[0].code.match(/-(?:QQ|Q)(\d+)$/)
+    if (match) {
+      nextNumber = parseInt(match[1], 10) + 1
+    }
+  }
+
+  return `${tourCode}-${prefix}${String(nextNumber).padStart(2, '0')}`
+}
 
 interface LinkDocumentsToTourDialogProps {
   isOpen: boolean
@@ -78,6 +113,7 @@ export function LinkDocumentsToTourDialog({
   const [isCreatingStandardQuote, setIsCreatingStandardQuote] = useState(false)
   const [isCreatingQuickQuote, setIsCreatingQuickQuote] = useState(false)
   const [isUnlinkingQuote, setIsUnlinkingQuote] = useState(false)
+  const [isDeletingQuote, setIsDeletingQuote] = useState(false)
 
   // 行程表對話框狀態
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
@@ -156,7 +192,12 @@ export function LinkDocumentsToTourDialog({
   const handleCreateStandardQuote = async () => {
     try {
       setIsCreatingStandardQuote(true)
-      // 不傳入 code，讓 createEntityHook 自動從資料庫查詢生成（避免前端快取不完整導致 code 重複）
+
+      // 生成團號為基礎的編號: {團號}-Q{2位數}
+      const quoteCode = tour.code
+        ? await generateTourBasedQuoteCode(tour.id, tour.code, 'standard')
+        : undefined
+
       const newQuote = await createQuote({
         name: tour.name,
         quote_type: 'standard',
@@ -171,6 +212,8 @@ export function LinkDocumentsToTourDialog({
         issue_date: new Date().toISOString().split('T')[0],
         // 從訂單取得業務人員
         handler_name: tourSalesPerson || undefined,
+        // 使用團號為基礎的編號
+        ...(quoteCode ? { code: quoteCode } : {}),
       } as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
@@ -179,6 +222,7 @@ export function LinkDocumentsToTourDialog({
       }
     } catch (error) {
       logger.error('建立團體報價單失敗:', error)
+      toast.error('建立團體報價單失敗')
     } finally {
       setIsCreatingStandardQuote(false)
     }
@@ -188,7 +232,12 @@ export function LinkDocumentsToTourDialog({
   const handleCreateQuickQuote = async () => {
     try {
       setIsCreatingQuickQuote(true)
-      // 不傳入 code，讓 createEntityHook 自動從資料庫查詢生成（避免前端快取不完整導致 code 重複）
+
+      // 生成團號為基礎的編號: {團號}-QQ{2位數}
+      const quoteCode = tour.code
+        ? await generateTourBasedQuoteCode(tour.id, tour.code, 'quick')
+        : undefined
+
       const newQuote = await createQuote({
         name: tour.name,
         quote_type: 'quick',
@@ -202,6 +251,8 @@ export function LinkDocumentsToTourDialog({
         group_size: tour.max_participants || 20,
         // 從訂單取得業務人員
         handler_name: tourSalesPerson || undefined,
+        // 使用團號為基礎的編號
+        ...(quoteCode ? { code: quoteCode } : {}),
       } as Parameters<typeof createQuote>[0])
 
       logger.log('[handleCreateQuickQuote] 建立的報價單:', {
@@ -235,6 +286,21 @@ export function LinkDocumentsToTourDialog({
       logger.error('斷開連結失敗:', error)
     } finally {
       setIsUnlinkingQuote(false)
+    }
+  }
+
+  const handleDeleteQuote = async (e: React.MouseEvent, quote: Quote) => {
+    e.stopPropagation()
+    if (!confirm(`確定要刪除「${quote.name}」嗎？此操作無法復原。`)) return
+    try {
+      setIsDeletingQuote(true)
+      await deleteQuote(quote.id)
+      toast.success('報價單已刪除')
+    } catch (error) {
+      logger.error('刪除報價單失敗:', error)
+      toast.error('刪除報價單失敗')
+    } finally {
+      setIsDeletingQuote(false)
     }
   }
 
@@ -628,24 +694,30 @@ export function LinkDocumentsToTourDialog({
                           onClick={() => handleViewQuote(quote)}
                           className="flex-1 min-w-0 text-left"
                         >
-                          <div className="font-mono text-morandi-primary">{quote.code}</div>
-                          <div className="text-morandi-secondary truncate text-[10px]">
+                          <div className="text-morandi-primary truncate">
                             {stripHtml(quote.name) || '未命名'}
+                          </div>
+                          <div className="text-morandi-gold font-medium text-[10px]">
+                            {quote.total_amount
+                              ? `$${quote.total_amount.toLocaleString()}`
+                              : '尚未報價'}
                           </div>
                         </button>
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => handleViewQuote(quote)}
                             className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
+                            title="查看"
                           >
                             <ExternalLink className="w-3 h-3" />
                           </button>
                           <button
-                            onClick={(e) => handleUnlinkQuote(e, quote)}
-                            disabled={isUnlinkingQuote}
+                            onClick={(e) => handleDeleteQuote(e, quote)}
+                            disabled={isDeletingQuote}
                             className="p-1 text-morandi-red/60 hover:text-morandi-red rounded disabled:opacity-50"
+                            title="刪除"
                           >
-                            <Unlink className="w-3 h-3" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       </div>

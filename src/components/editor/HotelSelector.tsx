@@ -43,6 +43,7 @@ interface HotelSelectorProps {
   isOpen: boolean
   onClose: () => void
   tourCountryName?: string
+  tourCountryId?: string  // 可直接用 country_id，優先於 tourCountryName
   onSelect: (hotels: LuxuryHotel[]) => void
 }
 
@@ -50,6 +51,7 @@ export function HotelSelector({
   isOpen,
   onClose,
   tourCountryName = '',
+  tourCountryId,
   onSelect,
 }: HotelSelectorProps) {
   const {
@@ -85,7 +87,7 @@ export function HotelSelector({
     handleCityChange,
     handleBrandChange,
     resetState,
-  } = useHotelSelector({ isOpen, tourCountryName })
+  } = useHotelSelector({ isOpen, tourCountryName, tourCountryId })
 
   const handleConfirm = () => {
     const selected = filteredHotels.filter(h => selectedIds.has(h.id))
@@ -101,7 +103,7 @@ export function HotelSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent level={3} className="w-[800px] h-[700px] max-w-[90vw] max-h-[85vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-morandi-gold/10 to-transparent">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Building2 className="text-morandi-gold" size={22} />

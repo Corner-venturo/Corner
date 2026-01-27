@@ -39,6 +39,7 @@ import {
   Building2,
 } from 'lucide-react'
 import { AttractionSelector } from '@/components/editor/AttractionSelector'
+import { HotelSelector, type LuxuryHotel } from '@/components/editor/HotelSelector'
 
 // 預設顏色選項
 const COLOR_OPTIONS = [
@@ -90,6 +91,7 @@ export function ItineraryDialog({
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<number | null>(null)
   const [attractionSelectorOpen, setAttractionSelectorOpen] = useState(false)
+  const [hotelSelectorOpen, setHotelSelectorOpen] = useState(false)
   const [insertAtRowIndex, setInsertAtRowIndex] = useState<number | null>(null) // 插入到哪一行之後
   const [saving, setSaving] = useState(false)
 
@@ -261,6 +263,18 @@ export function ItineraryDialog({
     setAttractionSelectorOpen(false)
     setInsertAtRowIndex(null)
   }, [activeDayIndex, insertAtRowIndex])
+
+  // 從飯店庫選擇後更新住宿
+  const handleHotelSelect = useCallback((selectedHotels: LuxuryHotel[]) => {
+    if (selectedHotels.length === 0) return
+    const hotel = selectedHotels[0]
+    // 顯示飯店名稱，如有城市名稱則附加（幫助區分同名飯店）
+    const displayName = hotel.city_name
+      ? `${hotel.name}（${hotel.city_name}）`
+      : hotel.name
+    updateDayAccommodation(displayName)
+    setHotelSelectorOpen(false)
+  }, [updateDayAccommodation])
 
   // 刪除景點
   const removeAttraction = useCallback((attractionIndex: number) => {
@@ -935,6 +949,16 @@ export function ItineraryDialog({
                 placeholder="輸入飯店名稱..."
                 className="h-8 text-sm flex-1"
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setHotelSelectorOpen(true)}
+                className="h-8 px-2 gap-1 text-xs text-morandi-gold hover:text-morandi-gold-hover shrink-0"
+              >
+                <Database size={14} />
+                從飯店庫選擇
+              </Button>
             </div>
           </div>
         </div>
@@ -972,6 +996,14 @@ export function ItineraryDialog({
       }}
       onSelect={handleAttractionSelect}
       dayTitle={activeDay.title || ''}
+    />
+
+    {/* 飯店選擇器（level={3}） */}
+    <HotelSelector
+      isOpen={hotelSelectorOpen}
+      onClose={() => setHotelSelectorOpen(false)}
+      tourCountryId={pkg?.country_id || undefined}
+      onSelect={handleHotelSelect}
     />
     </>
   )
