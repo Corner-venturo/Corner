@@ -127,16 +127,25 @@ function getApiKey(): string | null {
 
 /**
  * 格式化時間為 HH:mm
+ * API 回傳的 local 時間已經是當地時間（如 "2025-12-09 14:35+09:00"）
+ * 直接提取 HH:mm，不做時區轉換
  */
 function formatTime(dateString: string | null | undefined): string {
   if (!dateString) return '--:--'
   try {
+    // AeroDataBox 格式: "2025-12-09 14:35+09:00" 或 ISO 格式
+    // 直接從字串中提取時間部分（當地時間）
+    const timeMatch = dateString.match(/(\d{2}):(\d{2})/)
+    if (timeMatch) {
+      return `${timeMatch[1]}:${timeMatch[2]}`
+    }
+    // fallback: 如果格式不符，嘗試解析
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return '--:--'
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'Asia/Taipei',
     })
   } catch {
     return '--:--'
