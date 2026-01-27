@@ -9,9 +9,15 @@
  * - Content-Type: application/x-www-form-urlencoded
  * - 編碼格式: UTF-8
  * - 欄位連接符號: &
+ *
+ * IP 白名單：
+ * - 藍新 API 需要 IP 白名單，Vercel 無固定 IP
+ * - 使用 Quotaguard Static proxy 取得固定 IP
+ * - 環境變數：QUOTAGUARD_STATIC_URL
  */
 
 import { aesEncrypt, aesDecrypt, generateTransactionNo, convertTaxType, formatInvoiceDate } from './crypto'
+import { ProxyAgent, fetch as undiciFetch } from 'undici'
 import { getSupabaseAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
@@ -169,17 +175,37 @@ async function sendRequest(path: string, postData: Record<string, unknown>): Pro
   })
   logger.log('[NewebPay] URL Encoded Data (解密前):', urlEncodedData)
 
-  // 發送請求
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      MerchantID_: config.merchantId,
-      PostData_: encryptedData,
-    }),
-  })
+  // 準備請求選項
+  const requestUrl = `${baseUrl}${path}`
+  const requestBody = new URLSearchParams({
+    MerchantID_: config.merchantId,
+    PostData_: encryptedData,
+  }).toString()
+  const requestHeaders = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+
+  // 檢查是否有 Quotaguard proxy 設定（用於 Vercel 等無固定 IP 的環境）
+  const proxyUrl = process.env.QUOTAGUARD_STATIC_URL
+
+  let response: Response
+  if (proxyUrl) {
+    logger.log('[NewebPay] 使用 Quotaguard proxy 發送請求')
+    const proxyAgent = new ProxyAgent(proxyUrl)
+    response = await undiciFetch(requestUrl, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: requestBody,
+      dispatcher: proxyAgent,
+    }) as unknown as Response
+  } else {
+    // 本地開發或有固定 IP 的環境直接發送
+    response = await fetch(requestUrl, {
+      method: 'POST',
+      headers: requestHeaders,
+      body: requestBody,
+    })
+  }
 
   if (!response.ok) {
     throw new Error(`API 請求失敗: ${response.status}`)
