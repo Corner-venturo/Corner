@@ -11,7 +11,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { CurrencyCell } from '@/components/table-cells'
 import { useTravelInvoiceStore, BuyerInfo, TravelInvoiceItem } from '@/stores/useTravelInvoiceStore'
 import { useAuthStore } from '@/stores'
-import { getSupabaseAdminClient } from '@/lib/supabase/admin'
+import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { logger } from '@/lib/utils/logger'
 
@@ -66,7 +66,6 @@ export function IssueInvoiceDialog({
   const loadInvoiceSummary = async () => {
     try {
       setLoadingSummary(true)
-      const supabase = getSupabaseAdminClient()
 
       const { data } = await supabase
         .from('orders_invoice_summary')
