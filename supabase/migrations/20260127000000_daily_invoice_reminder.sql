@@ -55,9 +55,9 @@ BEGIN
     FROM employees e
     WHERE e.status = 'active'
       AND (
-        e.roles @> '["accountant"]'::jsonb
-        OR e.roles @> '["admin"]'::jsonb
-        OR e.roles @> '["super_admin"]'::jsonb
+        'accountant' = ANY(e.roles)
+        OR 'admin' = ANY(e.roles)
+        OR 'super_admin' = ANY(e.roles)
       )
   LOOP
     -- 查找或建立 DM 頻道
@@ -91,7 +91,7 @@ BEGIN
     END IF;
 
     -- 發送訊息
-    INSERT INTO messages (channel_id, content, author_id, metadata)
+    INSERT INTO messages (channel_id, content, created_by, metadata)
     VALUES (
       v_channel_id,
       v_message,
