@@ -15,16 +15,18 @@ CREATE OR REPLACE FUNCTION send_daily_invoice_reminder()
 RETURNS integer AS $$
 DECLARE
   v_bot_id uuid := '00000000-0000-0000-0000-000000000001';
+  v_corner_workspace_id uuid := '8ef05a74-1f87-48ab-afd3-9bfeb423935d';
   v_channel_id uuid;
   v_employee record;
   v_sent_count integer := 0;
   v_message text;
   v_pending_count integer;
 BEGIN
-  -- 查詢待開發票數量
+  -- 查詢待開發票數量（只計算 Corner workspace）
   SELECT COUNT(*) INTO v_pending_count
   FROM orders o
-  WHERE o.paid_amount > 0
+  WHERE o.workspace_id = v_corner_workspace_id
+    AND o.paid_amount > 0
     AND o.paid_amount > COALESCE((
       SELECT SUM(io.amount)
       FROM invoice_orders io
@@ -49,11 +51,12 @@ BEGIN
     v_pending_count
   );
 
-  -- 發送給所有有會計權限的員工
+  -- 發送給 Corner workspace 有會計權限的員工
   FOR v_employee IN
     SELECT e.id, e.workspace_id
     FROM employees e
-    WHERE e.status = 'active'
+    WHERE e.workspace_id = v_corner_workspace_id
+      AND e.status = 'active'
       AND (
         'accountant' = ANY(e.roles)
         OR 'admin' = ANY(e.roles)
