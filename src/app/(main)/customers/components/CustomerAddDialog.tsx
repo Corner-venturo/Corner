@@ -9,7 +9,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Edit, Upload, FileImage, Trash2, Plus, X } from 'lucide-react'
+import { Edit, Upload, FileImage, Trash2, Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -45,17 +45,25 @@ const INITIAL_CUSTOMER: NewCustomerData = {
 interface CustomerAddDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  customers: Customer[]
   onAddCustomer: (data: NewCustomerData) => Promise<void>
-  onAddFromOcr: (customers: Partial<Customer>[]) => Promise<void>
+  updateCustomer: (id: string, data: Partial<Customer>) => Promise<void>
+  addCustomer: (data: Partial<Customer>) => Promise<Customer>
+  onComplete?: () => void | Promise<void>
 }
 
 export function CustomerAddDialog({
   open,
   onOpenChange,
+  customers,
   onAddCustomer,
-  onAddFromOcr,
+  updateCustomer,
+  addCustomer,
+  onComplete,
 }: CustomerAddDialogProps) {
   const [newCustomer, setNewCustomer] = useState<NewCustomerData>(INITIAL_CUSTOMER)
+  const [showTips, setShowTips] = useState(false)
+  const [showReminder, setShowReminder] = useState(false)
 
   // 使用 useDirtyState 追蹤表單變更
   const { isDirty, resetDirty, setOriginalData, checkDirty } = useDirtyState()
@@ -70,8 +78,11 @@ export function CustomerAddDialog({
 
   // 護照上傳 Hook
   const passportUpload = usePassportUpload({
-    onSuccess: async (customers) => {
-      await onAddFromOcr(customers)
+    customers,
+    updateCustomer,
+    addCustomer,
+    onComplete: async () => {
+      if (onComplete) await onComplete()
       handleClose()
     },
   })
@@ -227,33 +238,7 @@ export function CustomerAddDialog({
           </div>
           <p className="text-sm text-morandi-secondary">上傳護照圖片，自動辨識並建立顧客資料</p>
 
-          {/* 重要提醒 */}
-          <div className="bg-status-info-bg border border-status-info/30 rounded-lg p-3">
-            <h4 className="text-xs font-semibold text-morandi-primary mb-2">重要提醒</h4>
-            <ul className="text-xs text-morandi-secondary space-y-1">
-              <li>
-                OCR 辨識的資料會自動標記為<strong>「待驗證」</strong>
-              </li>
-              <li>
-                請務必<strong>人工檢查護照資訊</strong>
-              </li>
-              <li>支援所有國家護照（TWN、USA、JPN 等）</li>
-            </ul>
-          </div>
-
-          {/* 拍攝提示 */}
-          <div className="bg-status-warning-bg border border-status-warning/30 rounded-lg p-3">
-            <h4 className="text-xs font-semibold text-morandi-primary mb-2">拍攝建議</h4>
-            <ul className="text-xs text-morandi-secondary space-y-1">
-              <li>
-                確保護照<strong>最下方兩排文字</strong>清晰可見
-              </li>
-              <li>光線充足，避免反光或陰影</li>
-              <li>拍攝角度正面，避免傾斜</li>
-            </ul>
-          </div>
-
-          {/* 上傳區域 */}
+          {/* 上傳區域 - 固定在上方 */}
           <label
             htmlFor="passport-upload"
             className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-all ${
@@ -283,13 +268,27 @@ export function CustomerAddDialog({
             />
           </label>
 
+          {/* 辨識按鈕 - 固定在檔案列表上方 */}
+          {passportUpload.files.length > 0 && (
+            <Button
+              onClick={passportUpload.processFiles}
+              disabled={passportUpload.isUploading}
+              className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
+            >
+              <Upload size={16} />
+              {passportUpload.isUploading
+                ? '辨識中...'
+                : `辨識並建立 ${passportUpload.files.length} 位顧客`}
+            </Button>
+          )}
+
           {/* 已選檔案列表 */}
           {passportUpload.files.length > 0 && (
             <div className="space-y-2">
-              <div className="text-xs text-morandi-secondary mb-2">
+              <div className="text-xs text-morandi-secondary">
                 已選擇 {passportUpload.files.length} 個檔案：
               </div>
-              <div className="max-h-32 overflow-y-auto space-y-2">
+              <div className="max-h-40 overflow-y-auto space-y-2">
                 {passportUpload.files.map((file, index) => (
                   <div
                     key={index}
@@ -317,19 +316,54 @@ export function CustomerAddDialog({
                   </div>
                 ))}
               </div>
-
-              <Button
-                onClick={passportUpload.processFiles}
-                disabled={passportUpload.isUploading}
-                className="w-full bg-morandi-gold hover:bg-morandi-gold-hover text-white gap-2"
-              >
-                <Upload size={16} />
-                {passportUpload.isUploading
-                  ? '辨識中...'
-                  : `辨識並建立 ${passportUpload.files.length} 位顧客`}
-              </Button>
             </div>
           )}
+
+          {/* 重要提醒 - 可展開 */}
+          <div className="border border-status-info/30 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowReminder(!showReminder)}
+              className="w-full flex items-center justify-between p-2 bg-status-info-bg hover:bg-status-info-bg/80 transition-colors"
+            >
+              <span className="text-xs font-medium text-morandi-primary">重要提醒</span>
+              {showReminder ? (
+                <ChevronDown size={14} className="text-morandi-secondary" />
+              ) : (
+                <ChevronRight size={14} className="text-morandi-secondary" />
+              )}
+            </button>
+            {showReminder && (
+              <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
+                <li>OCR 辨識的資料會自動標記為<strong>「待驗證」</strong></li>
+                <li>請務必<strong>人工檢查護照資訊</strong></li>
+                <li>支援所有國家護照（TWN、USA、JPN 等）</li>
+              </ul>
+            )}
+          </div>
+
+          {/* 拍攝建議 - 可展開 */}
+          <div className="border border-status-warning/30 rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowTips(!showTips)}
+              className="w-full flex items-center justify-between p-2 bg-status-warning-bg hover:bg-status-warning-bg/80 transition-colors"
+            >
+              <span className="text-xs font-medium text-morandi-primary">拍攝建議</span>
+              {showTips ? (
+                <ChevronDown size={14} className="text-morandi-secondary" />
+              ) : (
+                <ChevronRight size={14} className="text-morandi-secondary" />
+              )}
+            </button>
+            {showTips && (
+              <ul className="text-xs text-morandi-secondary space-y-1 p-3 pt-2">
+                <li>確保護照<strong>最下方兩排文字</strong>清晰可見</li>
+                <li>光線充足，避免反光或陰影</li>
+                <li>拍攝角度正面，避免傾斜</li>
+              </ul>
+            )}
+          </div>
         </div>
       </div>
 

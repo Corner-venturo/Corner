@@ -1,0 +1,1 @@
+export { useOfficeDocument } from './useOfficeDocument'

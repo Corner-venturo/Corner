@@ -6,9 +6,9 @@
 import crypto from 'crypto'
 
 const config = {
-  merchantId: 'MS3814348716',
-  hashKey: 'nPWXLUG3fjrtqZ05BAMcmzbE1kVeNWLZ',
-  hashIV: 'PDCrxWEhXG0Se0PC',
+  merchantId: '83212711',  // 使用公司統一編號
+  hashKey: 'YsZf5WBrzAyKujdQX1qabToN60pkgGxl',
+  hashIV: 'P1KqUTm2Oh5SctBC',
 }
 
 // AES 加密
@@ -32,7 +32,7 @@ async function testConnection() {
     url: API_URL,
   })
 
-  // 組裝測試資料
+  // 組裝測試資料 - B2C（無統編）
   const testData = {
     Version: '1.1',
     TimeStamp: Math.floor(Date.now() / 1000),

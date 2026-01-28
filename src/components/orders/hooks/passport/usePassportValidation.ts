@@ -18,6 +18,7 @@ interface CustomerData {
   name?: string
   english_name?: string
   passport_name?: string
+  passport_name_print?: string
   passport_number?: string
   passport_expiry?: string | null
   national_id?: string
@@ -134,6 +135,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
         customer_id: null,
         chinese_name: cleanChineseName || '',
         passport_name: customerData.passport_name || customerData.english_name || '',
+        passport_name_print: customerData.passport_name_print || null,
         passport_number: passportNumber,
         passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,
@@ -209,6 +211,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
             english_name: customerData.english_name || null,
             passport_number: passportNumber || null,
             passport_name: customerData.passport_name || null,
+            passport_name_print: customerData.passport_name_print || null,
             passport_expiry: customerData.passport_expiry || null,
             passport_image_url: passportImageUrl || null,
             national_id: idNumber || null,
@@ -270,6 +273,7 @@ export function usePassportValidation(): UsePassportValidationReturn {
       // 更新成員資料（保留原有的 chinese_name，補上 OCR 辨識到的資料）
       const updateData: Record<string, unknown> = {
         passport_name: customerData.passport_name || customerData.english_name || '',
+        passport_name_print: customerData.passport_name_print || null,
         passport_number: passportNumber,
         passport_expiry: customerData.passport_expiry || null,
         birth_date: birthDate,

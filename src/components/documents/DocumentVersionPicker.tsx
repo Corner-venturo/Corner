@@ -189,7 +189,12 @@ export function DocumentVersionPicker({
   // 點擊項目跳轉
   const handleItemClick = (quote: Quote) => {
     onClose()
-    router.push(`/quotes/${quote.id}`)
+    // 根據報價單類型跳轉到對應路由
+    if (quote.quote_type === 'quick') {
+      router.push(`/quotes/quick/${quote.id}`)
+    } else {
+      router.push(`/quotes/${quote.id}`)
+    }
   }
 
   // 預覽報價單
@@ -619,7 +624,12 @@ export function DocumentVersionPicker({
                 if (previewQuote) {
                   onClose()
                   setPreviewQuote(null)
-                  router.push(`/quotes/${previewQuote.id}`)
+                  // 根據報價單類型跳轉到對應路由
+                  if (previewQuote.quote_type === 'quick') {
+                    router.push(`/quotes/quick/${previewQuote.id}`)
+                  } else {
+                    router.push(`/quotes/${previewQuote.id}`)
+                  }
                 }
               }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-morandi-gold hover:bg-morandi-gold-hover rounded-lg transition-colors"

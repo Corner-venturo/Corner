@@ -69,18 +69,6 @@ export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
             特殊團
           </label>
         </div>
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="enableCheckin"
-            checked={newTour.enable_checkin || false}
-            onChange={e => setNewTour(prev => ({ ...prev, enable_checkin: e.target.checked }))}
-            className="rounded"
-          />
-          <label htmlFor="enableCheckin" className="text-sm text-morandi-primary">
-            開啟報到功能
-          </label>
-        </div>
       </div>
     </div>
   )

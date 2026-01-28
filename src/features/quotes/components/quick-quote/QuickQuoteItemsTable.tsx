@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, GripVertical } from 'lucide-react'
 import { QuickQuoteItem } from '@/stores/types'
+import { evaluateExpression } from '@/components/widgets/calculator/calculatorUtils'
 import {
   DndContext,
   closestCenter,
@@ -45,6 +46,7 @@ interface SortableRowProps {
   handleCompositionStart: () => void
   handleCompositionEnd: (id: string, field: 'description' | 'notes', e: React.CompositionEvent<HTMLInputElement>) => void
   normalizeNumber: (val: string) => string
+  cleanExpressionInput: (val: string) => string
 }
 
 const SortableRow: React.FC<SortableRowProps> = ({
@@ -59,7 +61,19 @@ const SortableRow: React.FC<SortableRowProps> = ({
   handleCompositionStart,
   handleCompositionEnd,
   normalizeNumber,
+  cleanExpressionInput,
 }) => {
+  // 本地狀態：用於暫存計算式（如 "18000+45"）
+  const [costExpr, setCostExpr] = useState<string>(
+    item.cost === 0 || item.cost === undefined ? '' : String(item.cost)
+  )
+  const [unitPriceExpr, setUnitPriceExpr] = useState<string>(
+    item.unit_price === 0 ? '' : String(item.unit_price)
+  )
+  const [quantityExpr, setQuantityExpr] = useState<string>(
+    item.quantity === 0 ? '' : String(item.quantity)
+  )
+
   const {
     attributes,
     listeners,
@@ -72,6 +86,39 @@ const SortableRow: React.FC<SortableRowProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  }
+
+  // 處理計算式欄位的 Enter 或 blur - 計算並更新
+  const handleExpressionCommit = (
+    field: 'cost' | 'unit_price' | 'quantity',
+    expr: string,
+    setExpr: (val: string) => void
+  ) => {
+    const cleaned = cleanExpressionInput(expr)
+    if (!cleaned || cleaned === '-') {
+      onUpdateItem(item.id, field, 0)
+      setExpr('')
+      return
+    }
+
+    // 檢查是否包含運算符號（是計算式）
+    const hasOperator = /[+\-*/()]/.test(cleaned.replace(/^-/, '')) // 忽略開頭的負號
+
+    if (hasOperator) {
+      // 有運算符號，計算結果
+      const result = evaluateExpression(cleaned, NaN)
+      if (!isNaN(result)) {
+        onUpdateItem(item.id, field, result)
+        setExpr(String(result))
+      }
+    } else {
+      // 純數字
+      const num = parseFloat(cleaned)
+      if (!isNaN(num)) {
+        onUpdateItem(item.id, field, num)
+        setExpr(String(num))
+      }
+    }
   }
 
   return (
@@ -110,20 +157,21 @@ const SortableRow: React.FC<SortableRowProps> = ({
       <td className={cellClass}>
         <input
           type="text"
-          value={item.quantity === 0 ? '' : item.quantity}
+          value={quantityExpr}
           onChange={e => {
-            const val = normalizeNumber(e.target.value)
-            if (val === '' || val === '-') {
-              onUpdateItem(item.id, 'quantity', 0)
-            } else {
-              const num = parseFloat(val)
-              if (!isNaN(num)) {
-                onUpdateItem(item.id, 'quantity', num)
-              }
+            const cleaned = cleanExpressionInput(e.target.value)
+            setQuantityExpr(cleaned)
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleExpressionCommit('quantity', quantityExpr, setQuantityExpr)
+              e.currentTarget.blur()
             }
           }}
-          onKeyDown={handleKeyDown}
+          onBlur={() => handleExpressionCommit('quantity', quantityExpr, setQuantityExpr)}
           disabled={!isEditing}
+          placeholder="可輸入算式"
           className={`${inputClass} text-center`}
         />
       </td>
@@ -131,19 +179,20 @@ const SortableRow: React.FC<SortableRowProps> = ({
         <td className={cellClass}>
           <input
             type="text"
-            value={item.cost === 0 || item.cost === undefined ? '' : item.cost}
+            value={costExpr}
             onChange={e => {
-              const val = normalizeNumber(e.target.value)
-              if (val === '' || val === '-') {
-                onUpdateItem(item.id, 'cost', 0)
-              } else {
-                const num = parseFloat(val)
-                if (!isNaN(num)) {
-                  onUpdateItem(item.id, 'cost', num)
-                }
+              const cleaned = cleanExpressionInput(e.target.value)
+              setCostExpr(cleaned)
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleExpressionCommit('cost', costExpr, setCostExpr)
+                e.currentTarget.blur()
               }
             }}
-            onKeyDown={handleKeyDown}
+            onBlur={() => handleExpressionCommit('cost', costExpr, setCostExpr)}
+            placeholder="可輸入算式"
             className={`${inputClass} text-right`}
           />
         </td>
@@ -151,20 +200,21 @@ const SortableRow: React.FC<SortableRowProps> = ({
       <td className={cellClass}>
         <input
           type="text"
-          value={item.unit_price === 0 ? '' : item.unit_price}
+          value={unitPriceExpr}
           onChange={e => {
-            const val = normalizeNumber(e.target.value)
-            if (val === '' || val === '-') {
-              onUpdateItem(item.id, 'unit_price', 0)
-            } else {
-              const num = parseFloat(val)
-              if (!isNaN(num)) {
-                onUpdateItem(item.id, 'unit_price', num)
-              }
+            const cleaned = cleanExpressionInput(e.target.value)
+            setUnitPriceExpr(cleaned)
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleExpressionCommit('unit_price', unitPriceExpr, setUnitPriceExpr)
+              e.currentTarget.blur()
             }
           }}
-          onKeyDown={handleKeyDown}
+          onBlur={() => handleExpressionCommit('unit_price', unitPriceExpr, setUnitPriceExpr)}
           disabled={!isEditing}
+          placeholder="可輸入算式"
           className={`${inputClass} text-right`}
         />
       </td>
@@ -248,6 +298,45 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
       e.preventDefault()
       e.currentTarget.blur()
     }
+  }
+
+  /**
+   * 清理輸入：移除中文、轉換全形為半形
+   * 支援計算式輸入（如 18000+45）
+   */
+  const cleanExpressionInput = (text: string): string => {
+    let result = text
+
+    // 移除中文字符
+    result = result.replace(/[\u4e00-\u9fa5]/g, '')
+
+    // 轉換全形數字為半形 (０１２３４５６７８９)
+    result = result.replace(/[０１２３４５６７８９]/g, char =>
+      String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+    )
+
+    // 轉換全形符號為半形（直接用字元比對更可靠）
+    const fullToHalf: Record<string, string> = {
+      '＋': '+',
+      '－': '-',
+      '＊': '*',
+      '×': '*',
+      '／': '/',
+      '÷': '/',
+      '（': '(',
+      '）': ')',
+      '．': '.',
+      '。': '.',
+    }
+    result = result.split('').map(char => fullToHalf[char] || char).join('')
+
+    // 移除所有空白
+    result = result.replace(/\s/g, '')
+
+    // 只保留數字、運算符號、小數點、括號
+    result = result.replace(/[^0-9+\-*/.()]/g, '')
+
+    return result
   }
 
   const normalizeNumber = (val: string): string => {
@@ -339,6 +428,7 @@ export const QuickQuoteItemsTable: React.FC<QuickQuoteItemsTableProps> = ({
                     handleCompositionStart={handleCompositionStart}
                     handleCompositionEnd={handleCompositionEnd}
                     normalizeNumber={normalizeNumber}
+                    cleanExpressionInput={cleanExpressionInput}
                   />
                 ))}
               </SortableContext>

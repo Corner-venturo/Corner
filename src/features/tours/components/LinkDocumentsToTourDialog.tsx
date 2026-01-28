@@ -238,10 +238,10 @@ export function LinkDocumentsToTourDialog({
         ? await generateTourBasedQuoteCode(tour.id, tour.code, 'quick')
         : undefined
 
-      const newQuote = await createQuote({
+      const createData = {
         name: tour.name,
-        quote_type: 'quick',
-        status: 'draft',
+        quote_type: 'quick' as const,
+        status: 'draft' as const,
         tour_id: tour.id,
         // 客戶資訊：優先從訂單取得，否則用團名
         customer_name: firstTourOrder?.contact_person || tour.name,
@@ -253,17 +253,14 @@ export function LinkDocumentsToTourDialog({
         handler_name: tourSalesPerson || undefined,
         // 使用團號為基礎的編號
         ...(quoteCode ? { code: quoteCode } : {}),
-      } as Parameters<typeof createQuote>[0])
+      }
 
-      logger.log('[handleCreateQuickQuote] 建立的報價單:', {
-        id: newQuote?.id,
-        code: newQuote?.code,
-        quote_type: newQuote?.quote_type,
-      })
+      const newQuote = await createQuote(createData as Parameters<typeof createQuote>[0])
 
       if (newQuote?.id) {
         onClose()
-        router.push(`/quotes/${newQuote.id}`)
+        // 快速報價單使用專屬路由
+        router.push(`/quotes/quick/${newQuote.id}`)
       }
     } catch (error) {
       logger.error('建立快速報價單失敗:', error)
@@ -304,9 +301,14 @@ export function LinkDocumentsToTourDialog({
     }
   }
 
-  const handleViewQuote = (quote: Quote) => {
+  const handleViewQuote = (quote: Quote, isQuickQuote = false) => {
     onClose()
-    router.push(`/quotes/${quote.id}`)
+    // 根據類型跳轉到對應路由
+    if (isQuickQuote || quote.quote_type === 'quick') {
+      router.push(`/quotes/quick/${quote.id}`)
+    } else {
+      router.push(`/quotes/${quote.id}`)
+    }
   }
 
   // 為旅遊團建立或取得 proposal_package
@@ -691,7 +693,7 @@ export function LinkDocumentsToTourDialog({
                         className="flex items-center justify-between p-2 rounded-lg hover:bg-morandi-primary/5 text-xs"
                       >
                         <button
-                          onClick={() => handleViewQuote(quote)}
+                          onClick={() => handleViewQuote(quote, true)}
                           className="flex-1 min-w-0 text-left"
                         >
                           <div className="text-morandi-primary truncate">
@@ -705,7 +707,7 @@ export function LinkDocumentsToTourDialog({
                         </button>
                         <div className="flex items-center gap-1 shrink-0">
                           <button
-                            onClick={() => handleViewQuote(quote)}
+                            onClick={() => handleViewQuote(quote, true)}
                             className="p-1 text-morandi-secondary hover:text-morandi-primary rounded"
                             title="查看"
                           >

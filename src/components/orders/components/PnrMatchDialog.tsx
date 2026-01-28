@@ -101,7 +101,7 @@ export function PnrMatchDialog({
 
   /**
    * 從客戶資料庫搜尋符合護照拼音的客戶
-   * 對所有旅客都搜尋，這樣取消配對後也能選擇客戶
+   * 優化：只搜尋姓氏匹配的客戶，而不是載入全部
    */
   const searchCustomersForPassengers = useCallback(async (
     pnrNames: string[]
@@ -111,11 +111,26 @@ export function PnrMatchDialog({
     }
 
     try {
-      // 從客戶資料庫載入所有有護照拼音的客戶
+      // 提取所有旅客的姓氏
+      const surnames = [...new Set(pnrNames.map(name => {
+        const parts = splitPassportName(name)
+        return parts.surname
+      }).filter(Boolean))]
+
+      if (surnames.length === 0) {
+        return {}
+      }
+
+      // 只查詢姓氏匹配的客戶（使用 ilike 模糊查詢）
+      // 構建姓氏條件：passport_name like 'SURNAME/%' OR passport_name like 'SURNAME2/%' ...
+      const surnameConditions = surnames.map(s => `passport_name.ilike.${s}/%`).join(',')
+
       const { data: customers, error } = await supabase
         .from('customers')
         .select('id, name, passport_name, passport_number, passport_expiry, passport_image_url, national_id, birth_date, gender')
         .not('passport_name', 'is', null)
+        .or(surnameConditions)
+        .limit(200) // 限制結果數量
 
       if (error) throw error
 
@@ -185,10 +200,17 @@ export function PnrMatchDialog({
     const partialCount = memberResults.filter(r => r.match.confidence === 'partial').length
     const noneCount = memberResults.filter(r => r.match.confidence === 'none').length
 
-    // 對所有旅客搜尋客戶資料庫（這樣取消配對後也能選擇客戶）
-    setIsSearchingCustomers(true)
-    const customerSuggestions = await searchCustomersForPassengers(parsed.passengerNames)
-    setIsSearchingCustomers(false)
+    // 只對未完全配對的旅客搜尋客戶資料庫（優化效能）
+    const unmatchedNames = memberResults
+      .filter(r => r.match.confidence !== 'exact')
+      .map(r => r.pnrName)
+
+    let customerSuggestions: Record<string, SuggestedCustomer[]> = {}
+    if (unmatchedNames.length > 0) {
+      setIsSearchingCustomers(true)
+      customerSuggestions = await searchCustomersForPassengers(unmatchedNames)
+      setIsSearchingCustomers(false)
+    }
 
     // 組合配對結果
     const results: MatchResult[] = memberResults.map(({ pnrName, match }) => ({
@@ -479,6 +501,7 @@ export function PnrMatchDialog({
                 passenger_names: parsedPnr.passengerNames,
                 segments: segmentsData,
                 tour_id: tourId || null,
+                ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
               })
               .eq('id', existingPNR.id)
             logger.info(`PNR ${recordLocator} 已更新`)
@@ -494,6 +517,7 @@ export function PnrMatchDialog({
                 segments: segmentsData,
                 tour_id: tourId || null,
                 status: 'active',
+                ticketing_deadline: parsedPnr.ticketingDeadline?.toISOString() || null,
               })
             logger.info(`PNR ${recordLocator} 已建立`)
           }
@@ -581,9 +605,9 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
               className="min-h-[120px] font-mono text-xs"
             />
             <div className="flex gap-2">
-              <Button onClick={handleParse} disabled={!rawPnr.trim()}>
-                <RefreshCw size={16} className="mr-1" />
-                解析並配對
+              <Button onClick={handleParse} disabled={!rawPnr.trim() || isSearchingCustomers}>
+                <RefreshCw size={16} className={cn("mr-1", isSearchingCustomers && "animate-spin")} />
+                {isSearchingCustomers ? '搜尋客戶中...' : '解析並配對'}
               </Button>
               {parsedPnr && (
                 <span className="text-sm text-morandi-secondary self-center">
@@ -591,6 +615,13 @@ RP/TPEW123ML/TPEW123ML        AA/SU  16NOV25/1238Z   FUM2GY
                 </span>
               )}
             </div>
+            {/* 提示：無團員時會搜尋客戶資料庫 */}
+            {members.length === 0 && (
+              <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+                <AlertCircle size={12} className="inline mr-1" />
+                此團尚無團員名單，系統將從客戶資料庫搜尋相似護照拼音，供您選擇後建立成員。
+              </p>
+            )}
           </div>
 
           {/* 配對結果 */}

@@ -76,7 +76,7 @@ class BackToListController extends Disposable {
     this._menuManagerService.mergeMenu({
       [RibbonStartGroup.HISTORY]: {
         [BACK_TO_LIST_COMMAND_ID]: {
-          order: -1, // 放在 undo/redo 前面
+          order: -10, // 放在最前面
           menuItemFactory: BackToListMenuItemFactory,
         },
       },

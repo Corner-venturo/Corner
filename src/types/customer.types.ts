@@ -25,6 +25,7 @@ export interface Customer extends BaseEntity {
   national_id?: string | null // 身分證字號
   passport_number?: string | null // 護照號碼
   passport_name?: string | null // 護照姓名/拼音（標準欄位）
+  passport_name_print?: string | null // 護照姓名列印格式（行李吊牌用）
   passport_expiry?: string | null // 護照效期（標準欄位）
   passport_image_url?: string | null // 護照圖片
   birth_date?: string | null // 出生日期（標準欄位）
@@ -109,6 +110,7 @@ export interface CreateCustomerData {
   national_id?: string
   passport_number?: string
   passport_name?: string // 護照姓名（標準欄位）
+  passport_name_print?: string | null // 護照姓名列印格式（行李吊牌用）
   passport_expiry?: string // 護照效期（標準欄位）
   passport_image_url?: string | null
   birth_date?: string // 出生日期（標準欄位）
@@ -144,6 +146,7 @@ export interface UpdateCustomerData {
   national_id?: string | null
   passport_number?: string | null
   passport_name?: string | null // 護照姓名（標準欄位）
+  passport_name_print?: string | null // 護照姓名列印格式（行李吊牌用）
   passport_expiry?: string | null // 護照效期（標準欄位）
   passport_image_url?: string | null
   birth_date?: string | null // 出生日期（標準欄位）

@@ -159,7 +159,14 @@ export function ChatHeader({
                 {linkedQuotes.map(quote => (
                   <button
                     key={quote.id}
-                    onClick={() => router.push(`/quotes/${quote.id}`)}
+                    onClick={() => {
+                      // 根據報價單類型跳轉到對應路由
+                      if (quote.quote_type === 'quick') {
+                        router.push(`/quotes/quick/${quote.id}`)
+                      } else {
+                        router.push(`/quotes/${quote.id}`)
+                      }
+                    }}
                     className="w-full flex items-center justify-between p-2 rounded hover:bg-morandi-container/30 transition-colors text-left"
                   >
                     <div className="flex-1 min-w-0">

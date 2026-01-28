@@ -14,7 +14,6 @@ import { TourOverview } from '@/components/tours/tour-overview'
 import { TourOrders } from '@/components/tours/tour-orders'
 import { OrderMembersExpandable } from '@/components/orders/OrderMembersExpandable'
 import { PnrMatchDialog } from '@/components/orders/components/PnrMatchDialog'
-import { TourDocuments } from '@/components/tours/tour-documents'
 import { TourCloseDialog } from '@/components/tours/tour-close-dialog'
 import { TourConfirmationDialog } from '@/features/tours/components/TourConfirmationDialog'
 import { CreateChannelDialog } from '@/components/workspace/channel-sidebar/CreateChannelDialog'
@@ -48,10 +47,6 @@ const TourConfirmationSheet = dynamic(
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
-const TourControlSheet = dynamic(
-  () => import('@/components/tours/tour-control-sheet').then(m => m.TourControlSheet),
-  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
-)
 
 const TourCheckin = dynamic(
   () => import('@/components/tours/tour-checkin').then(m => m.TourCheckin),
@@ -60,6 +55,16 @@ const TourCheckin = dynamic(
 
 const TourRequirementsTab = dynamic(
   () => import('@/components/tours/tour-requirements-tab').then(m => m.TourRequirementsTab),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourFilesTab = dynamic(
+  () => import('@/components/tours/tour-files-tab').then(m => m.TourFilesTab),
+  { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
+)
+
+const TourDesignsTab = dynamic(
+  () => import('@/components/tours/tour-designs-tab').then(m => m.TourDesignsTab),
   { loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>, ssr: false }
 )
 
@@ -75,8 +80,9 @@ const tabs = [
   { value: 'orders', label: '訂單管理' },
   { value: 'requirements', label: '需求總覽' },
   { value: 'confirmation', label: '團確單' },
-  { value: 'control', label: '團控' },
   { value: 'checkin', label: '報到' },
+  { value: 'designs', label: '設計' },
+  { value: 'files', label: '檔案' },
   { value: 'overview', label: '總覽' },
 ]
 
@@ -427,12 +433,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
 
             {/* 成本支出 */}
             <TourCosts tour={tour} showSummary={false} />
-
-            {/* 文件確認 */}
-            <div>
-              <h3 className="text-sm font-medium text-morandi-secondary mb-3">文件確認</h3>
-              <TourDocuments tour={tour} showSummary={false} />
-            </div>
           </div>
         )
       case 'orders':
@@ -455,8 +455,6 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
         )
       case 'confirmation':
         return <TourConfirmationSheet tourId={tour.id} />
-      case 'control':
-        return <TourControlSheet tourId={tour.id} />
       case 'checkin':
         return <TourCheckin tour={tour} />
       case 'requirements':
@@ -475,6 +473,10 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
             }}
           />
         )
+      case 'files':
+        return <TourFilesTab tourId={tour.id} tourCode={tour.code || ''} />
+      case 'designs':
+        return <TourDesignsTab tourId={tour.id} proposalId={tour.proposal_id} />
       default:
         return <TourOverview tour={tour} />
     }

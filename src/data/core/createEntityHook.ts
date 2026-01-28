@@ -276,11 +276,16 @@ export function createEntityHook<T extends BaseEntity>(
         const selectFields = config.detail?.select || '*'
 
         // @ts-expect-error - Dynamic table factory: tableName is a runtime value
-        const { data, error } = await supabase.from(tableName).select(selectFields).eq('id', id).single()
+        const { data, error } = await supabase.from(tableName).select(selectFields).eq('id', id).maybeSingle()
 
         if (error) {
           logger.error(`[${tableName}] Detail fetch error:`, error.message)
           throw error
+        }
+
+        // maybeSingle() 返回 null 表示記錄不存在，這不是錯誤
+        if (!data) {
+          return null
         }
 
         return data as unknown as T

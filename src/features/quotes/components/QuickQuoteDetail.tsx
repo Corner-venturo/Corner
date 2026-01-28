@@ -87,7 +87,14 @@ export const QuickQuoteDetail: React.FC<QuickQuoteDetailProps> = ({ quote, onUpd
       <ResponsiveHeader
         title={`快速報價單 ${quote.code || ''}`}
         showBackButton={true}
-        onBack={() => router.push('/quotes')}
+        onBack={() => {
+          // 如果有關聯旅遊團，返回該旅遊團頁面
+          if (quote.tour_id) {
+            router.push(`/tours?highlight=${quote.tour_id}`)
+          } else {
+            router.push('/quotes')
+          }
+        }}
         actions={
           <div className="flex items-center gap-2">
             {viewModeToggle}

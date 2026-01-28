@@ -199,7 +199,12 @@ export function useTourActionButtons(params: UseTourActionButtonsParams) {
               if (onOpenQuoteDialog) {
                 onOpenQuoteDialog(tour)
               } else if (hasQuote) {
-                router.push(`/quotes/${tourQuote.id}`)
+                // 根據報價單類型跳轉到對應路由
+                if (tourQuote.quote_type === 'quick') {
+                  router.push(`/quotes/quick/${tourQuote.id}`)
+                } else {
+                  router.push(`/quotes/${tourQuote.id}`)
+                }
               } else {
                 router.push(`/quotes?tour_id=${tour.id}`)
               }

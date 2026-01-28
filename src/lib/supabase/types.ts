@@ -3240,6 +3240,7 @@ export type Database = {
           passport_expiry: string | null
           passport_image_url: string | null
           passport_name: string | null
+          passport_name_print: string | null
           passport_number: string | null
           phone: string | null
           referred_by: string | null
@@ -3286,6 +3287,7 @@ export type Database = {
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
+          passport_name_print?: string | null
           passport_number?: string | null
           phone?: string | null
           referred_by?: string | null
@@ -3332,6 +3334,7 @@ export type Database = {
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
+          passport_name_print?: string | null
           passport_number?: string | null
           phone?: string | null
           referred_by?: string | null
@@ -3723,6 +3726,302 @@ export type Database = {
           payment_request_id?: string
         }
         Relationships: []
+      }
+      email_accounts: {
+        Row: {
+          account_type: string
+          created_at: string
+          display_name: string | null
+          domain_verified: boolean | null
+          email_address: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          owner_id: string | null
+          settings: Json | null
+          signature_html: string | null
+          signature_text: string | null
+          updated_at: string
+          verified_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          account_type?: string
+          created_at?: string
+          display_name?: string | null
+          domain_verified?: boolean | null
+          email_address: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          owner_id?: string | null
+          settings?: Json | null
+          signature_html?: string | null
+          signature_text?: string | null
+          updated_at?: string
+          verified_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          display_name?: string | null
+          domain_verified?: boolean | null
+          email_address?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          owner_id?: string | null
+          settings?: Json | null
+          signature_html?: string | null
+          signature_text?: string | null
+          updated_at?: string
+          verified_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_accounts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_accounts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_attachments: {
+        Row: {
+          content_id: string | null
+          content_type: string | null
+          created_at: string
+          email_id: string
+          external_url: string | null
+          filename: string
+          id: string
+          is_inline: boolean | null
+          size_bytes: number | null
+          storage_path: string | null
+          workspace_id: string
+        }
+        Insert: {
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string
+          email_id: string
+          external_url?: string | null
+          filename: string
+          id?: string
+          is_inline?: boolean | null
+          size_bytes?: number | null
+          storage_path?: string | null
+          workspace_id: string
+        }
+        Update: {
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string
+          email_id?: string
+          external_url?: string | null
+          filename?: string
+          id?: string
+          is_inline?: boolean | null
+          size_bytes?: number | null
+          storage_path?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_attachments_email_id_fkey"
+            columns: ["email_id"]
+            isOneToOne: false
+            referencedRelation: "emails"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_attachments_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emails: {
+        Row: {
+          bcc_addresses: Json | null
+          body_html: string | null
+          body_text: string | null
+          cc_addresses: Json | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          direction: string
+          error_message: string | null
+          external_id: string | null
+          from_address: string
+          from_name: string | null
+          id: string
+          in_reply_to: string | null
+          is_archived: boolean
+          is_read: boolean
+          is_starred: boolean
+          is_trash: boolean
+          labels: string[] | null
+          message_id: string | null
+          notes: string | null
+          order_id: string | null
+          received_at: string | null
+          reply_to_address: string | null
+          retry_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          subject: string | null
+          supplier_id: string | null
+          thread_id: string | null
+          to_addresses: Json
+          tour_id: string | null
+          updated_at: string
+          updated_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          bcc_addresses?: Json | null
+          body_html?: string | null
+          body_text?: string | null
+          cc_addresses?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          direction: string
+          error_message?: string | null
+          external_id?: string | null
+          from_address: string
+          from_name?: string | null
+          id?: string
+          in_reply_to?: string | null
+          is_archived?: boolean
+          is_read?: boolean
+          is_starred?: boolean
+          is_trash?: boolean
+          labels?: string[] | null
+          message_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          received_at?: string | null
+          reply_to_address?: string | null
+          retry_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          supplier_id?: string | null
+          thread_id?: string | null
+          to_addresses?: Json
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          bcc_addresses?: Json | null
+          body_html?: string | null
+          body_text?: string | null
+          cc_addresses?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          direction?: string
+          error_message?: string | null
+          external_id?: string | null
+          from_address?: string
+          from_name?: string | null
+          id?: string
+          in_reply_to?: string | null
+          is_archived?: boolean
+          is_read?: boolean
+          is_starred?: boolean
+          is_trash?: boolean
+          labels?: string[] | null
+          message_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          received_at?: string | null
+          reply_to_address?: string | null
+          retry_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          supplier_id?: string | null
+          thread_id?: string | null
+          to_addresses?: Json
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emails_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "emails_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employees: {
         Row: {
@@ -4193,6 +4492,188 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      files: {
+        Row: {
+          category: Database["public"]["Enums"]["file_category"]
+          content_type: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          description: string | null
+          download_count: number | null
+          email_id: string | null
+          extension: string | null
+          filename: string
+          folder_id: string | null
+          id: string
+          is_archived: boolean
+          is_deleted: boolean
+          is_starred: boolean
+          last_accessed_at: string | null
+          notes: string | null
+          order_id: string | null
+          original_filename: string
+          previous_version_id: string | null
+          size_bytes: number | null
+          source: string | null
+          source_email_attachment_id: string | null
+          storage_bucket: string
+          storage_path: string
+          supplier_id: string | null
+          tags: string[] | null
+          thumbnail_path: string | null
+          tour_id: string | null
+          updated_at: string
+          updated_by: string | null
+          version: number | null
+          workspace_id: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["file_category"]
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          email_id?: string | null
+          extension?: string | null
+          filename: string
+          folder_id?: string | null
+          id?: string
+          is_archived?: boolean
+          is_deleted?: boolean
+          is_starred?: boolean
+          last_accessed_at?: string | null
+          notes?: string | null
+          order_id?: string | null
+          original_filename: string
+          previous_version_id?: string | null
+          size_bytes?: number | null
+          source?: string | null
+          source_email_attachment_id?: string | null
+          storage_bucket?: string
+          storage_path: string
+          supplier_id?: string | null
+          tags?: string[] | null
+          thumbnail_path?: string | null
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number | null
+          workspace_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["file_category"]
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          email_id?: string | null
+          extension?: string | null
+          filename?: string
+          folder_id?: string | null
+          id?: string
+          is_archived?: boolean
+          is_deleted?: boolean
+          is_starred?: boolean
+          last_accessed_at?: string | null
+          notes?: string | null
+          order_id?: string | null
+          original_filename?: string
+          previous_version_id?: string | null
+          size_bytes?: number | null
+          source?: string | null
+          source_email_attachment_id?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          supplier_id?: string | null
+          tags?: string[] | null
+          thumbnail_path?: string | null
+          tour_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_email_id_fkey"
+            columns: ["email_id"]
+            isOneToOne: false
+            referencedRelation: "emails"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_invoice_summary"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "files_previous_version_id_fkey"
+            columns: ["previous_version_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fitness_goals: {
         Row: {
@@ -4746,6 +5227,112 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      folders: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          default_category: Database["public"]["Enums"]["file_category"] | null
+          depth: number
+          folder_type: Database["public"]["Enums"]["folder_type"]
+          icon: string | null
+          id: string
+          is_system: boolean
+          name: string
+          parent_id: string | null
+          path: string
+          sort_order: number | null
+          supplier_id: string | null
+          tour_id: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          default_category?: Database["public"]["Enums"]["file_category"] | null
+          depth?: number
+          folder_type?: Database["public"]["Enums"]["folder_type"]
+          icon?: string | null
+          id?: string
+          is_system?: boolean
+          name: string
+          parent_id?: string | null
+          path: string
+          sort_order?: number | null
+          supplier_id?: string | null
+          tour_id?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          default_category?: Database["public"]["Enums"]["file_category"] | null
+          depth?: number
+          folder_type?: Database["public"]["Enums"]["folder_type"]
+          icon?: string | null
+          id?: string
+          is_system?: boolean
+          name?: string
+          parent_id?: string | null
+          path?: string
+          sort_order?: number | null
+          supplier_id?: string | null
+          tour_id?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       friends: {
         Row: {
@@ -7029,6 +7616,7 @@ export type Database = {
           data: Json
           id: string
           name: string
+          tour_id: string | null
           type: string
           updated_at: string
           updated_by: string | null
@@ -7040,6 +7628,7 @@ export type Database = {
           data?: Json
           id?: string
           name?: string
+          tour_id?: string | null
           type: string
           updated_at?: string
           updated_by?: string | null
@@ -7051,12 +7640,27 @@ export type Database = {
           data?: Json
           id?: string
           name?: string
+          tour_id?: string | null
           type?: string
           updated_at?: string
           updated_by?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "office_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "my_erp_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "office_documents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "office_documents_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -7100,6 +7704,7 @@ export type Database = {
           passport_expiry: string | null
           passport_image_url: string | null
           passport_name: string | null
+          passport_name_print: string | null
           passport_number: string | null
           pnr: string | null
           profit: number | null
@@ -7146,6 +7751,7 @@ export type Database = {
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
+          passport_name_print?: string | null
           passport_number?: string | null
           pnr?: string | null
           profit?: number | null
@@ -7192,6 +7798,7 @@ export type Database = {
           passport_expiry?: string | null
           passport_image_url?: string | null
           passport_name?: string | null
+          passport_name_print?: string | null
           passport_number?: string | null
           pnr?: string | null
           profit?: number | null
@@ -12927,6 +13534,47 @@ export type Database = {
           },
         ]
       }
+      tour_folder_templates: {
+        Row: {
+          created_at: string
+          default_category: Database["public"]["Enums"]["file_category"] | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          default_category?: Database["public"]["Enums"]["file_category"] | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          default_category?: Database["public"]["Enums"]["file_category"] | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_folder_templates_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_leaders: {
         Row: {
           address: string | null
@@ -17423,6 +18071,26 @@ export type Database = {
       calendar_visibility: "private" | "workspace" | "company_wide"
       channel_visibility: "private" | "public"
       confirmation_type: "accommodation" | "flight"
+      file_category:
+        | "contract"
+        | "quote"
+        | "itinerary"
+        | "passport"
+        | "visa"
+        | "ticket"
+        | "voucher"
+        | "invoice"
+        | "insurance"
+        | "photo"
+        | "email_attachment"
+        | "other"
+      folder_type:
+        | "root"
+        | "tour"
+        | "customer"
+        | "supplier"
+        | "template"
+        | "custom"
       subledger_type: "customer" | "supplier" | "bank" | "group" | "employee"
       task_priority: "low" | "normal" | "high" | "critical"
       task_status:
@@ -17572,6 +18240,28 @@ export const Constants = {
       calendar_visibility: ["private", "workspace", "company_wide"],
       channel_visibility: ["private", "public"],
       confirmation_type: ["accommodation", "flight"],
+      file_category: [
+        "contract",
+        "quote",
+        "itinerary",
+        "passport",
+        "visa",
+        "ticket",
+        "voucher",
+        "invoice",
+        "insurance",
+        "photo",
+        "email_attachment",
+        "other",
+      ],
+      folder_type: [
+        "root",
+        "tour",
+        "customer",
+        "supplier",
+        "template",
+        "custom",
+      ],
       subledger_type: ["customer", "supplier", "bank", "group", "employee"],
       task_priority: ["low", "normal", "high", "critical"],
       task_status: [

@@ -290,19 +290,6 @@ export default function CustomersPage() {
     } as CreateCustomerData)
   }, [addCustomer])
 
-  // 處理 OCR 新增
-  const handleAddFromOcr = useCallback(async (ocrCustomers: Partial<Customer>[]) => {
-    for (const ocrData of ocrCustomers) {
-      await (addCustomer as (data: CreateCustomerData) => Promise<Customer>)({
-        ...ocrData,
-        is_vip: false,
-        is_active: true,
-        total_spent: 0,
-        total_orders: 0,
-        verification_status: 'unverified',
-      } as CreateCustomerData)
-    }
-  }, [addCustomer])
 
   return (
     <div className="h-full flex flex-col">
@@ -418,8 +405,10 @@ export default function CustomersPage() {
       <CustomerAddDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+        customers={customers}
         onAddCustomer={handleAddCustomer}
-        onAddFromOcr={handleAddFromOcr}
+        updateCustomer={updateCustomer}
+        addCustomer={addCustomer as (data: Partial<Customer>) => Promise<Customer>}
       />
 
       {/* 驗證/編輯對話框 */}

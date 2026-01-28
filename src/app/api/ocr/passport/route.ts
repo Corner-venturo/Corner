@@ -361,6 +361,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
     english_name?: string
     passport_number?: string
     passport_name?: string
+    passport_name_print?: string  // 行李吊牌用（格式：姓, 名-名）
     national_id?: string
     birth_date?: string
     passport_expiry?: string
@@ -419,8 +420,10 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       const givenNamesWithDash = parts[1].replace(/</g, '-').replace(/-+$/, '').trim()
       const givenNamesClean = givenNamesWithDash.replace(/-/g, '')
 
-      // 護照拼音：姓/名，不含連字號（定位系統需要）
+      // 護照拼音：姓/名，不含連字號（PNR 配對用）
       customerData.passport_name = `${surname}/${givenNamesClean}`
+      // 護照拼音列印格式：姓, 名-名（行李吊牌用）
+      customerData.passport_name_print = `${surname}, ${givenNamesWithDash}`
       // 內部用：保留連字號以便計算字數
       ;(customerData as Record<string, unknown>)._romanization_with_dash = `${surname}/${givenNamesWithDash}`
       customerData.english_name = `${surname} ${givenNamesClean}`
@@ -429,6 +432,7 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
       // 只有姓氏
       const surname = parts[0].replace(/</g, '')
       customerData.passport_name = surname
+      customerData.passport_name_print = surname
       customerData.english_name = surname
       customerData.name = surname
     }
@@ -713,9 +717,13 @@ function parsePassportText(ocrSpaceText: string, googleVisionText: string | null
 
       const nameMatch = trimmed.match(/^([A-Z]{2,}),\s*([A-Z][A-Z-]+)$/i)
       if (nameMatch) {
-        englishName = `${nameMatch[1]} ${nameMatch[2]}`
+        const surname = nameMatch[1]
+        const givenNameWithDash = nameMatch[2]
+        const givenNameClean = givenNameWithDash.replace(/-/g, '')
+        englishName = `${surname} ${givenNameClean}`
         customerData.english_name = englishName
-        customerData.passport_name = `${nameMatch[1]}/${nameMatch[2]}`
+        customerData.passport_name = `${surname}/${givenNameClean}`
+        customerData.passport_name_print = `${surname}, ${givenNameWithDash}`
         break
       }
     }

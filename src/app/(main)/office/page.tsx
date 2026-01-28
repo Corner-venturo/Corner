@@ -1,65 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit2, Trash2, FileSpreadsheet, FileText, Presentation } from 'lucide-react'
 import { ListPageLayout } from '@/components/layout/list-page-layout'
 import { DateCell, ActionCell } from '@/components/table-cells'
 import { confirm } from '@/lib/ui/alert-dialog'
 import { NewDocumentDialog } from '@/features/office/components/NewDocumentDialog'
+import { useOfficeDocument } from '@/features/office/hooks/useOfficeDocument'
+import { useState } from 'react'
+import type { Database } from '@/lib/supabase/types'
 
-// 文件類型
+type OfficeDocument = Database['public']['Tables']['office_documents']['Row']
 type DocumentType = 'spreadsheet' | 'document' | 'slides'
 
-// 文件資料結構
-interface OfficeDocument {
-  id: string
-  name: string
-  type: DocumentType
-  created_by: string
-  created_at: string
-  updated_at: string
-}
-
-// 暫時用假資料（之後會改成從資料庫讀取）
-const mockDocuments: OfficeDocument[] = [
-  {
-    id: '1',
-    name: '團費試算表',
-    type: 'spreadsheet',
-    created_by: 'William',
-    created_at: '2026-01-19T10:00:00Z',
-    updated_at: '2026-01-19T10:00:00Z',
-  },
-  {
-    id: '2',
-    name: '清邁五日行程報價',
-    type: 'spreadsheet',
-    created_by: 'William',
-    created_at: '2026-01-18T14:30:00Z',
-    updated_at: '2026-01-19T08:00:00Z',
-  },
-  {
-    id: '3',
-    name: '供應商合約範本',
-    type: 'document',
-    created_by: 'Admin',
-    created_at: '2026-01-15T09:00:00Z',
-    updated_at: '2026-01-17T16:00:00Z',
-  },
-  // TODO: Univer Slides 功能尚未完整，暫時隱藏
-  // {
-  //   id: '4',
-  //   name: '公司介紹簡報',
-  //   type: 'slides',
-  //   created_by: 'Admin',
-  //   created_at: '2026-01-10T11:00:00Z',
-  //   updated_at: '2026-01-12T15:00:00Z',
-  // },
-]
-
 // 取得文件類型圖標
-function getDocTypeIcon(type: DocumentType) {
+function getDocTypeIcon(type: string) {
   switch (type) {
     case 'spreadsheet':
       return <FileSpreadsheet className="w-5 h-5 text-green-600" />
@@ -67,13 +23,26 @@ function getDocTypeIcon(type: DocumentType) {
       return <FileText className="w-5 h-5 text-blue-600" />
     case 'slides':
       return <Presentation className="w-5 h-5 text-orange-600" />
+    default:
+      return <FileText className="w-5 h-5 text-gray-600" />
   }
 }
 
 export default function OfficePage() {
   const router = useRouter()
-  const [documents, setDocuments] = useState<OfficeDocument[]>(mockDocuments)
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false)
+
+  const {
+    documents,
+    isLoading,
+    fetchDocuments,
+    deleteDocument,
+  } = useOfficeDocument()
+
+  // 載入文件列表
+  useEffect(() => {
+    fetchDocuments()
+  }, [fetchDocuments])
 
   const handleDelete = async (id: string) => {
     const confirmed = await confirm('確定要刪除此文件嗎？', {
@@ -81,7 +50,7 @@ export default function OfficePage() {
       type: 'warning',
     })
     if (confirmed) {
-      setDocuments(prev => prev.filter(doc => doc.id !== id))
+      await deleteDocument(id)
     }
   }
 
@@ -121,7 +90,7 @@ export default function OfficePage() {
       label: '作者',
       width: '120px',
       render: (_: unknown, row: OfficeDocument) => (
-        <span className="text-morandi-text-secondary">{row.created_by}</span>
+        <span className="text-morandi-text-secondary">{row.created_by || '-'}</span>
       ),
     },
     {
@@ -156,6 +125,7 @@ export default function OfficePage() {
         searchable
         searchPlaceholder="搜尋檔名..."
         searchFields={['name']}
+        loading={isLoading}
         headerActions={
           <button
             onClick={handleCreate}

@@ -23,7 +23,6 @@ import {
   LinkTourDialog,
   ImportMealsDialog,
   ImportActivitiesDialog,
-  QuickQuoteDetail,
   LocalPricingDialog,
 } from '@/features/quotes/components'
 import type { LocalTier } from '@/features/quotes/components/LocalPricingDialog'
@@ -482,20 +481,6 @@ export default function QuoteDetailPage() {
   // 最後的 null 檢查（理論上不應到達這裡）
   if (!quote) {
     return null
-  }
-
-  // DEBUG: 追蹤 quote_type 值
-  // eslint-disable-next-line no-console
-  console.log('[QuoteDetailPage] quote.quote_type:', quote.quote_type, 'quote.id:', quote.id)
-
-  // 快速報價單使用獨立的編輯器
-  if (quote.quote_type === 'quick') {
-    return (
-      <QuickQuoteDetail
-        quote={quote}
-        onUpdate={(data) => updateQuote(quote.id, data)}
-      />
-    )
   }
 
   return (
