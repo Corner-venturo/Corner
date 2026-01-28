@@ -206,7 +206,7 @@ export const useEmailStore = create<EmailStoreState>()(
           if (error) throw error
 
           set({
-            emails: (data || []) as Email[],
+            emails: (data || []) as unknown as Email[],
             total: count || 0,
             loading: false,
           })
@@ -241,7 +241,7 @@ export const useEmailStore = create<EmailStoreState>()(
 
           if (error) throw error
 
-          const email = data as Email
+          const email = data as unknown as Email
           set({ selectedEmail: email, loadingDetail: false })
 
           // 自動標記為已讀
@@ -576,25 +576,27 @@ export const useEmailStore = create<EmailStoreState>()(
           const supabase = createSupabaseBrowserClient()
           const { defaultAccount } = get()
 
+          const insertData = {
+            direction: 'outbound' as const,
+            status: 'draft' as const,
+            from_address: draft.from_address || defaultAccount?.email_address || '',
+            from_name: defaultAccount?.display_name,
+            to_addresses: draft.to || [],
+            cc_addresses: draft.cc || [],
+            bcc_addresses: draft.bcc || [],
+            subject: draft.subject,
+            body_html: draft.body_html,
+            body_text: draft.body_text,
+            customer_id: draft.customer_id,
+            supplier_id: draft.supplier_id,
+            tour_id: draft.tour_id,
+            order_id: draft.order_id,
+            labels: draft.labels || [],
+          }
           const { data, error } = await supabase
             .from('emails')
-            .insert({
-              direction: 'outbound',
-              status: 'draft',
-              from_address: draft.from_address || defaultAccount?.email_address || '',
-              from_name: defaultAccount?.display_name,
-              to_addresses: draft.to || [],
-              cc_addresses: draft.cc || [],
-              bcc_addresses: draft.bcc || [],
-              subject: draft.subject,
-              body_html: draft.body_html,
-              body_text: draft.body_text,
-              customer_id: draft.customer_id,
-              supplier_id: draft.supplier_id,
-              tour_id: draft.tour_id,
-              order_id: draft.order_id,
-              labels: draft.labels || [],
-            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .insert(insertData as any)
             .select()
             .single()
 

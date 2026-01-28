@@ -476,7 +476,8 @@ export function TourDetailDialog({ isOpen, onClose, tourId, onDataChange, defaul
       case 'files':
         return <TourFilesTab tourId={tour.id} tourCode={tour.code || ''} />
       case 'designs':
-        return <TourDesignsTab tourId={tour.id} proposalId={tour.proposal_id} />
+        // Tour 沒有 proposal_id，TourDesignsTab 會透過 proposal_package_id 查詢
+        return <TourDesignsTab tourId={tour.id} proposalId={undefined} />
       default:
         return <TourOverview tour={tour} />
     }

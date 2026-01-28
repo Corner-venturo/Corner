@@ -14,6 +14,7 @@ import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { confirm, alert } from '@/lib/ui/alert-dialog'
+import { syncPassportDataToMembers } from '@/lib/utils/sync-passport-image'
 import type { Customer } from '@/types/customer.types'
 
 // 常用簡體→繁體對照表（人名常用字）
@@ -493,6 +494,11 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
           })
           autoUpdateSuccessCount++
 
+          // 同步到訂單成員
+          await syncPassportDataToMembers(item.existingCustomer!.id, {
+            passport_image_url: item.imageUrl,
+          })
+
           // 刪除舊照片
           if (oldPassportUrl && oldPassportUrl.includes('passport-images')) {
             const match = oldPassportUrl.match(/passport-images\/(.+)$/)
@@ -514,7 +520,7 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
         try {
           const oldPassportUrl = item.existingCustomer?.passport_image_url
 
-          await updateCustomer(item.existingCustomer!.id, {
+          const updatedData = {
             passport_number: item.ocrData.passport_number || item.existingCustomer?.passport_number,
             passport_name: item.ocrData.passport_name || item.existingCustomer?.passport_name,
             passport_expiry: item.ocrData.passport_expiry || item.existingCustomer?.passport_expiry,
@@ -522,9 +528,16 @@ export function usePassportUpload(options: UsePassportUploadOptions) {
             national_id: item.ocrData.national_id || item.existingCustomer?.national_id,
             birth_date: item.ocrData.birth_date || item.existingCustomer?.birth_date,
             gender: item.normalizedGender || item.existingCustomer?.gender,
+          }
+
+          await updateCustomer(item.existingCustomer!.id, {
+            ...updatedData,
             verification_status: 'unverified',
           })
           confirmedUpdateSuccessCount++
+
+          // 同步到訂單成員
+          await syncPassportDataToMembers(item.existingCustomer!.id, updatedData)
 
           // 刪除舊照片
           if (oldPassportUrl && oldPassportUrl.includes('passport-images')) {

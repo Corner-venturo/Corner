@@ -20,9 +20,10 @@ export async function POST(request: NextRequest) {
   try {
     // 驗證登入
     const auth = await getServerAuth()
-    if (!auth?.workspaceId) {
-      return NextResponse.json({ error: '未授權' }, { status: 401 })
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error.error }, { status: 401 })
     }
+    const { workspaceId, user } = auth.data
 
     const body: SendEmailRequest = await request.json()
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
       const { data: defaultAccount } = await supabase
         .from('email_accounts')
         .select('email_address, display_name')
-        .eq('workspace_id', auth.workspaceId)
+        .eq('workspace_id', workspaceId)
         .eq('is_default', true)
         .single()
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     const { data: email, error: insertError } = await supabase
       .from('emails')
       .insert({
-        workspace_id: auth.workspaceId,
+        workspace_id: workspaceId,
         direction: 'outbound',
         status: body.scheduled_at ? 'queued' : 'sending',
         from_address: fromAddress,
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
         order_id: body.order_id,
         labels: body.labels || [],
         scheduled_at: body.scheduled_at,
-        created_by: auth.userId,
+        created_by: user.id,
       })
       .select()
       .single()

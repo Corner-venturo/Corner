@@ -68,11 +68,15 @@ export async function GET(request: NextRequest) {
     }
 
     // 處理 file_count
-    const result = folders?.map((folder) => ({
-      ...folder,
-      file_count: withFileCount && folder.files ? folder.files[0]?.count || 0 : undefined,
-      files: undefined,
-    }))
+    const result = folders?.map((folder) => {
+      const folderRecord = folder as unknown as Record<string, unknown>
+      const files = folderRecord.files as Array<{ count: number }> | undefined
+      return {
+        ...folderRecord,
+        file_count: withFileCount && files ? files[0]?.count || 0 : undefined,
+        files: undefined,
+      }
+    })
 
     return NextResponse.json({ folders: result })
   } catch (error) {

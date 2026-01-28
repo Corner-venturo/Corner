@@ -287,16 +287,33 @@ export const useFileSystemStore = create<FileSystemStoreState>()(
             }
           }
 
+          // 取得當前用戶的 workspace
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user) throw new Error('未登入')
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: member } = await (supabase as any)
+            .from('workspace_members')
+            .select('workspace_id')
+            .eq('user_id', user.id)
+            .single()
+
+          if (!member?.workspace_id) throw new Error('找不到工作區')
+
+          const insertData = {
+            workspace_id: member.workspace_id as string,
+            name: data.name,
+            parent_id: data.parentId || null,
+            tour_id: data.tourId || null,
+            path,
+            depth,
+            folder_type: 'custom' as const,
+            created_by: user.id,
+          }
           const { data: folder, error } = await supabase
             .from('folders')
-            .insert({
-              name: data.name,
-              parent_id: data.parentId || null,
-              tour_id: data.tourId || null,
-              path,
-              depth,
-              folder_type: 'custom',
-            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .insert(insertData as any)
             .select()
             .single()
 
