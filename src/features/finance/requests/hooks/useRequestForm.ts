@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo } from 'react'
-import { useTours, useOrders, useSuppliersSlim, useEmployeesSlim } from '@/data'
+import { useToursSlim, useOrders, useSuppliersSlim, useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
 export function useRequestForm() {
   // 使用 @/data 的 SWR hooks（和 usePaymentForm 一致）
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { items: orders } = useOrders()
   const { items: suppliers } = useSuppliersSlim()
   const { items: employees } = useEmployeesSlim()

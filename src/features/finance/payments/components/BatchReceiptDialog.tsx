@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useOrdersSlim, useTours, createReceipt, invalidateReceipts } from '@/data'
+import { useOrdersSlim, useToursSlim, createReceipt, invalidateReceipts } from '@/data'
 import { useAuthStore } from '@/stores'
 import { generateReceiptNumber } from '@/lib/utils/receipt-number-generator'
 import { logger } from '@/lib/utils/logger'
@@ -58,7 +58,7 @@ const paymentMethods = [
 
 export function BatchReceiptDialog({ open, onOpenChange }: BatchReceiptDialogProps) {
   const { items: orders } = useOrdersSlim()
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { user } = useAuthStore()
 
   const [receiptDate, setReceiptDate] = useState(getTodayString())

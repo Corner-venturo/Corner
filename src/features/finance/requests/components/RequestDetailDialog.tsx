@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Combobox } from '@/components/ui/combobox'
 import { Trash2, Plus, Pencil, X, Save, Layers } from 'lucide-react'
-import { useTours, useSuppliersSlim, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
+import { useToursSlim, useSuppliersSlim, usePaymentRequestItems, deletePaymentRequest as deletePaymentRequestApi } from '@/data'
 import { PaymentRequest, PaymentRequestItem } from '@/stores/types'
 import { DateCell, CurrencyCell } from '@/components/table-cells'
 import { statusLabels, statusColors, categoryOptions } from '../types'
@@ -31,7 +31,7 @@ interface RequestDetailDialogProps {
 
 export function RequestDetailDialog({ request, open, onOpenChange }: RequestDetailDialogProps) {
   const { items: requestItems, refresh: refreshRequestItems } = usePaymentRequestItems()
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { items: suppliers } = useSuppliersSlim()
 
   // 批次請款單狀態

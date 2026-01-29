@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useTours, useOrdersSlim } from '@/data'
+import { useToursSlim, useOrdersSlim } from '@/data'
 import type { StatConfig, StatType } from '../types'
 import type { Tour, Order } from '@/stores/types'
 import { CheckSquare, TrendingUp, Briefcase, Calendar } from 'lucide-react'
@@ -63,7 +63,7 @@ function sumOrderAmountByTourDateRange(
  * 由於 stats widget 預設未啟用，暫時保留現有實作。
  */
 export function useStatsData() {
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { items: orders } = useOrdersSlim()
 
   return useMemo(() => {

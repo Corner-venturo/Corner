@@ -5,12 +5,12 @@
 
 import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useCallback, useMemo } from 'react'
-import { useTours, useOrdersSlim } from '@/data'
+import { useToursSlim, useOrdersSlim } from '@/data'
 import type { PaymentFormData, PaymentItem } from '../types'
 import { RECEIPT_TYPES } from '../types'
 
 export function usePaymentForm() {
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { items: orders } = useOrdersSlim()
 
   // 基本表單資料

@@ -6,7 +6,7 @@ import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { generateTourCode } from '@/stores/utils/code-generator'
 import { getCurrentWorkspaceCode } from '@/lib/workspace-helpers'
-import { useTours } from '@/data'
+import { useToursSlim } from '@/data'
 import { CostCategory, ParticipantCounts, SellingPrices } from '../types'
 import type { Quote, Tour, QuoteVersion } from '@/stores/types'
 import type { CreateInput } from '@/stores/core/types'
@@ -39,7 +39,7 @@ export const useQuoteTour = ({
   sellingPrices,
 }: UseQuoteTourProps) => {
   // 使用 @/data hooks（SWR 自動載入）
-  const { items: existingTours } = useTours()
+  const { items: existingTours } = useToursSlim()
 
   // 開旅遊團
   const handleCreateTour = useCallback(async () => {

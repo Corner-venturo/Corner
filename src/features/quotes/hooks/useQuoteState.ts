@@ -2,7 +2,7 @@ import { getTodayString } from '@/lib/utils/format-date'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuotes } from './useQuotes'
-import { useTours, useItineraries, useOrdersSlim, createTour } from '@/data'
+import { useToursSlim, useItineraries, useOrdersSlim, createTour } from '@/data'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { CostCategory, ParticipantCounts, SellingPrices, costCategories, TierPricing, CostItem } from '../types'
 import { QuickQuoteItem } from '@/types/quote.types'
@@ -12,7 +12,7 @@ export const useQuoteState = () => {
   const params = useParams()
   const router = useRouter()
   const { quotes, updateQuote, loadQuotes } = useQuotes()
-  const { items: tours } = useTours()
+  const { items: tours } = useToursSlim()
   const { items: orders } = useOrdersSlim()
   const { workspaces, loadWorkspaces } = useWorkspaceChannels()
   const { items: itineraries } = useItineraries()
