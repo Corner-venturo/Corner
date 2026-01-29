@@ -3280,7 +3280,7 @@ export default function DesignerPage() {
                 dpi={300}
               >
                 <div
-                  className="bg-white shadow-xl rounded"
+                  className="bg-white shadow-lg rounded"
                   style={{
                     width: canvasWidth,
                     height: canvasHeight,

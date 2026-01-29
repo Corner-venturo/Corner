@@ -186,7 +186,7 @@ export function PropertiesPanel({
               </div>
             ) : (
               <div>
-                <Label className="text-xs text-morandi-secondary">文字內容</Label>
+                <Label className="text-xs text-morandi-primary">文字內容</Label>
                 <Input
                   value={(properties.text as string) || ''}
                   onChange={(e) => {
@@ -201,7 +201,7 @@ export function PropertiesPanel({
             <div>
               <div className="flex items-center gap-1 mb-2">
                 <Type size={12} className="text-morandi-secondary" />
-                <Label className="text-xs text-morandi-secondary">字級</Label>
+                <Label className="text-xs text-morandi-primary">字級</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Input
@@ -235,7 +235,7 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label className="text-xs text-morandi-secondary">字體</Label>
+              <Label className="text-xs text-morandi-primary">字體</Label>
               <FontPicker
                 fontFamily={(properties.fontFamily as string) || 'Noto Sans TC'}
                 fontSize={(properties.fontSize as number) || 24}
@@ -246,7 +246,7 @@ export function PropertiesPanel({
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="text-xs text-morandi-secondary">粗細</Label>
+                <Label className="text-xs text-morandi-primary">粗細</Label>
                 <FontWeightPicker
                   fontWeight={String(properties.fontWeight || 'normal')}
                   onChange={(weight) => updateProperty('fontWeight', weight)}
@@ -255,7 +255,7 @@ export function PropertiesPanel({
             </div>
 
             <div>
-              <Label className="text-xs text-morandi-secondary">對齊</Label>
+              <Label className="text-xs text-morandi-primary">對齊</Label>
               <TextAlignPicker
                 textAlign={(properties.textAlign as string) || 'left'}
                 onChange={(align) => updateProperty('textAlign', align)}
@@ -268,7 +268,7 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <Move size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-secondary">位置</Label>
+            <Label className="text-xs text-morandi-primary">位置</Label>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
@@ -297,7 +297,7 @@ export function PropertiesPanel({
           <div>
             <div className="flex items-center gap-1 mb-2">
               <Maximize2 size={12} className="text-morandi-secondary" />
-              <Label className="text-xs text-morandi-secondary">大小</Label>
+              <Label className="text-xs text-morandi-primary">大小</Label>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -334,7 +334,7 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <RotateCw size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-secondary">旋轉</Label>
+            <Label className="text-xs text-morandi-primary">旋轉</Label>
           </div>
           <div className="flex items-center gap-2">
             <Input
@@ -351,7 +351,7 @@ export function PropertiesPanel({
         <div>
           <div className="flex items-center gap-1 mb-2">
             <Palette size={12} className="text-morandi-secondary" />
-            <Label className="text-xs text-morandi-secondary">填充</Label>
+            <Label className="text-xs text-morandi-primary">填充</Label>
           </div>
           <div className="space-y-3">
             {/* 漸層/純色填充 */}
@@ -454,7 +454,7 @@ export function PropertiesPanel({
         {/* 透明度 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Label className="text-xs text-morandi-secondary">透明度</Label>
+            <Label className="text-xs text-morandi-primary">透明度</Label>
             <span className="text-xs text-morandi-muted">{String(properties.opacity || 100)}%</span>
           </div>
           <Slider
@@ -638,7 +638,7 @@ function MaskedImageAdjustment({ canvas, selectedObject, onUpdate }: MaskedImage
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <ImageIcon size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-secondary">調整遮罩內圖片</Label>
+          <Label className="text-xs text-morandi-primary">調整遮罩內圖片</Label>
         </div>
         <button
           onClick={handleReset}
@@ -830,7 +830,7 @@ function ImageFiltersSection({ canvas, selectedObject, onUpdate }: ImageFiltersS
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1">
           <Sparkles size={12} className="text-morandi-secondary" />
-          <Label className="text-xs text-morandi-secondary">濾鏡效果</Label>
+          <Label className="text-xs text-morandi-primary">濾鏡效果</Label>
         </div>
         <button
           onClick={handleReset}

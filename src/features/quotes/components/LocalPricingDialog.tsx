@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, MapPin, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, MapPin, AlertTriangle, X, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface LocalTier {
@@ -213,6 +213,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
 
             <DialogFooter>
               <Button variant="outline" onClick={handleClose}>
+                <X className="w-4 h-4 mr-2" />
                 取消
               </Button>
               <Button
@@ -220,6 +221,7 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
                 disabled={tiers.some(t => !t.participants || t.participants <= 0 || !t.unitPrice || t.unitPrice <= 0)}
               >
+                <Check className="w-4 h-4 mr-2" />
                 確認
               </Button>
             </DialogFooter>
@@ -244,12 +246,14 @@ export const LocalPricingDialog: React.FC<LocalPricingDialogProps> = ({
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowConfirmation(false)}>
+                <X className="w-4 h-4 mr-2" />
                 返回修改
               </Button>
               <Button
                 onClick={handleFinalConfirm}
                 className="bg-morandi-gold hover:bg-morandi-gold-hover text-white"
               >
+                <Check className="w-4 h-4 mr-2" />
                 確認更新
               </Button>
             </DialogFooter>

@@ -7,7 +7,6 @@ export function TourPreview({
   viewMode = 'desktop',
 }: {
   /** 🔧 技術債：同 TourPage.data，待統一類型 */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any
   viewMode?: 'desktop' | 'mobile'
 }) {

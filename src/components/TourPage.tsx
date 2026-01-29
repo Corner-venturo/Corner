@@ -43,7 +43,6 @@ interface TourPageProps {
    * 資料來源：編輯器產生的複合資料結構
    * 包含：coverStyle, dailyItinerary, features, hotels, leader, pricing 等
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any
   isPreview?: boolean
   viewMode?: 'desktop' | 'mobile'

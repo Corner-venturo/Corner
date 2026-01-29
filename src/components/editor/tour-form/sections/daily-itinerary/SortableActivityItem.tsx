@@ -206,7 +206,7 @@ export function SortableActivityItem({
               <div className="mt-2 p-3 bg-morandi-container/20 rounded-lg border border-morandi-container/50">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-morandi-secondary whitespace-nowrap">開始</label>
+                    <label className="text-xs text-morandi-primary whitespace-nowrap">開始</label>
                     <input
                       type="time"
                       value={activity.startTime ? `${activity.startTime.slice(0, 2)}:${activity.startTime.slice(2)}` : ''}
@@ -219,7 +219,7 @@ export function SortableActivityItem({
                   </div>
                   <span className="text-morandi-secondary">~</span>
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-morandi-secondary whitespace-nowrap">結束</label>
+                    <label className="text-xs text-morandi-primary whitespace-nowrap">結束</label>
                     <input
                       type="time"
                       value={activity.endTime ? `${activity.endTime.slice(0, 2)}:${activity.endTime.slice(2)}` : ''}

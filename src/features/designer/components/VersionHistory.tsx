@@ -42,7 +42,7 @@ export function VersionHistory({ onClose, onPreview }: VersionHistoryProps) {
   }
 
   return (
-    <div className="fixed right-0 top-0 bottom-0 w-80 bg-card border-l border-border shadow-xl z-40 flex flex-col">
+    <div className="fixed right-0 top-0 bottom-0 w-80 bg-card border-l border-border shadow-lg z-40 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">

@@ -110,7 +110,7 @@ export function ComposeDialog({ open, onClose }: ComposeDialogProps) {
         <div className="space-y-4">
           {/* 寄件人 */}
           <div>
-            <Label className="text-xs text-morandi-secondary">寄件人</Label>
+            <Label className="text-xs text-morandi-primary">寄件人</Label>
             <div className="mt-1 px-3 py-2 bg-morandi-container/30 rounded-lg text-sm">
               {defaultAccount?.display_name && (
                 <span className="mr-1">{defaultAccount.display_name}</span>
@@ -206,6 +206,7 @@ export function ComposeDialog({ open, onClose }: ComposeDialogProps) {
         {/* 底部按鈕 */}
         <div className="flex items-center justify-end gap-2 mt-4">
           <Button variant="ghost" onClick={onClose} disabled={sending}>
+            <X className="w-4 h-4 mr-2" />
             取消
           </Button>
           <Button

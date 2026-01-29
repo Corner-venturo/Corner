@@ -420,7 +420,7 @@ export function TemplateDataPanel({
                 <div className="p-2 pt-0 space-y-2 border-t border-border/30">
                   {/* 集合時間 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">集合時間</Label>
+                    <Label className="text-[10px] text-morandi-primary">集合時間</Label>
                     <Input
                       value={(templateData.meetingTime as string) || ''}
                       onChange={(e) => updateField('meetingTime', e.target.value)}
@@ -431,7 +431,7 @@ export function TemplateDataPanel({
 
                   {/* 集合地點 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">集合地點</Label>
+                    <Label className="text-[10px] text-morandi-primary">集合地點</Label>
                     <Input
                       value={(templateData.meetingPlace as string) || ''}
                       onChange={(e) => updateField('meetingPlace', e.target.value)}
@@ -442,7 +442,7 @@ export function TemplateDataPanel({
 
                   {/* 領隊姓名 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">領隊姓名</Label>
+                    <Label className="text-[10px] text-morandi-primary">領隊姓名</Label>
                     <Input
                       value={(templateData.leaderName as string) || ''}
                       onChange={(e) => updateField('leaderName', e.target.value)}
@@ -453,7 +453,7 @@ export function TemplateDataPanel({
 
                   {/* 領隊電話 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">領隊電話</Label>
+                    <Label className="text-[10px] text-morandi-primary">領隊電話</Label>
                     <Input
                       value={(templateData.leaderPhone as string) || ''}
                       onChange={(e) => updateField('leaderPhone', e.target.value)}
@@ -502,7 +502,7 @@ export function TemplateDataPanel({
                         <div className="p-2 pt-0 space-y-2 border-t border-border/30">
                           {/* 行程標題 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-secondary">行程標題</Label>
+                            <Label className="text-[10px] text-morandi-primary">行程標題</Label>
                             <Input
                               value={day.title || ''}
                               onChange={(e) => updateDailyItinerary(idx, 'title', e.target.value)}
@@ -513,7 +513,7 @@ export function TemplateDataPanel({
 
                           {/* 早餐 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-secondary flex items-center gap-1">
+                            <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
                               早餐
                             </Label>
@@ -544,7 +544,7 @@ export function TemplateDataPanel({
 
                           {/* 午餐 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-secondary flex items-center gap-1">
+                            <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
                               午餐
                             </Label>
@@ -575,7 +575,7 @@ export function TemplateDataPanel({
 
                           {/* 晚餐 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-secondary flex items-center gap-1">
+                            <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Utensils size={10} />
                               晚餐
                             </Label>
@@ -606,7 +606,7 @@ export function TemplateDataPanel({
 
                           {/* 住宿 */}
                           <div className="space-y-1">
-                            <Label className="text-[10px] text-morandi-secondary flex items-center gap-1">
+                            <Label className="text-[10px] text-morandi-primary flex items-center gap-1">
                               <Hotel size={10} />
                               住宿
                             </Label>
@@ -1519,7 +1519,7 @@ function HotelEditor({
                 <div className="px-2 pb-2 space-y-2 border-t border-border/30 pt-2">
                   {/* 中文名稱 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">飯店名稱（中文）</Label>
+                    <Label className="text-[10px] text-morandi-primary">飯店名稱（中文）</Label>
                     <Input
                       value={hotel.nameZh || ''}
                       onChange={(e) => updateHotelField(idx, 'nameZh', e.target.value)}
@@ -1530,7 +1530,7 @@ function HotelEditor({
 
                   {/* 英文名稱 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">飯店名稱（英文）</Label>
+                    <Label className="text-[10px] text-morandi-primary">飯店名稱（英文）</Label>
                     <Input
                       value={hotel.nameEn || ''}
                       onChange={(e) => updateHotelField(idx, 'nameEn', e.target.value)}
@@ -1541,7 +1541,7 @@ function HotelEditor({
 
                   {/* 地點 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">地點</Label>
+                    <Label className="text-[10px] text-morandi-primary">地點</Label>
                     <Input
                       value={hotel.location || ''}
                       onChange={(e) => updateHotelField(idx, 'location', e.target.value)}
@@ -1552,7 +1552,7 @@ function HotelEditor({
 
                   {/* 描述 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">飯店介紹</Label>
+                    <Label className="text-[10px] text-morandi-primary">飯店介紹</Label>
                     <Textarea
                       value={hotel.description || ''}
                       onChange={(e) => updateHotelField(idx, 'description', e.target.value)}
@@ -1563,7 +1563,7 @@ function HotelEditor({
 
                   {/* 設施標籤 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">設施標籤（逗號分隔）</Label>
+                    <Label className="text-[10px] text-morandi-primary">設施標籤（逗號分隔）</Label>
                     <Input
                       value={(hotel.tags || []).join(', ')}
                       onChange={(e) => updateHotelField(idx, 'tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
@@ -1574,7 +1574,7 @@ function HotelEditor({
 
                   {/* 飯店圖片 */}
                   <div className="space-y-1">
-                    <Label className="text-[10px] text-morandi-secondary">飯店圖片</Label>
+                    <Label className="text-[10px] text-morandi-primary">飯店圖片</Label>
                     <ImageUploader
                       value={hotel.image}
                       onChange={(url) => updateHotelField(idx, 'image', url || '')}
@@ -2228,7 +2228,7 @@ function VehicleEditor({
     <div className="space-y-4">
       {/* 排版設定 */}
       <div className="rounded border border-border/50 bg-morandi-container/10 p-2.5 space-y-2">
-        <Label className="text-xs text-morandi-secondary">排版設定</Label>
+        <Label className="text-xs text-morandi-primary">排版設定</Label>
         {/* 排版模式切換 */}
         <div className="flex gap-1">
           <button

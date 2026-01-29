@@ -2062,7 +2062,7 @@ export function PackageItineraryDialog({
           {/* 時間設定 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">第一天抵達時間</Label>
+              <Label className="text-xs text-morandi-primary">第一天抵達時間</Label>
               <Input
                 type="time"
                 value={aiArrivalTime}
@@ -2071,7 +2071,7 @@ export function PackageItineraryDialog({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-morandi-secondary">最後一天離開時間</Label>
+              <Label className="text-xs text-morandi-primary">最後一天離開時間</Label>
               <Input
                 type="time"
                 value={aiDepartureTime}
@@ -2083,7 +2083,7 @@ export function PackageItineraryDialog({
 
           {/* 行程風格選擇 */}
           <div className="space-y-2">
-            <Label className="text-xs text-morandi-secondary">行程風格</Label>
+            <Label className="text-xs text-morandi-primary">行程風格</Label>
             <div className="grid grid-cols-3 gap-2">
               {AI_THEMES.map((theme) => (
                 <button

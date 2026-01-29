@@ -45,7 +45,7 @@ export function LoadingOverlay({
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-card rounded-xl shadow-2xl border border-border p-8 w-[400px] max-w-[90vw]">
+      <div className="bg-card rounded-xl shadow-lg border border-border p-8 w-[400px] max-w-[90vw]">
         {/* Logo/Title */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-morandi-gold/10 mb-4">
