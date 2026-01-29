@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Tour } from '@/stores/types'
-import { useOrdersSlim, useMembers } from '@/data'
+import { useOrdersSlim, useMembersSlim } from '@/data'
 import { Plus, FileText, Package, RefreshCw, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ export function TourOperationsAddButton({
   setTourExtraFields,
 }: TourOperationsAddButtonProps) {
   const { items: orders } = useOrdersSlim()
-  const { items: members } = useMembers()
+  const { items: members } = useMembersSlim()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // Get all orders for this tour

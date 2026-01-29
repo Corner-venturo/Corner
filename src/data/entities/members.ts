@@ -24,7 +24,7 @@ export const memberEntity = createEntityHook<Member>('order_members', {
     },
   },
   slim: {
-    select: 'id,order_id,chinese_name,english_name,gender,passport_number,id_number',
+    select: 'id,order_id,chinese_name,english_name,name,name_en,gender,passport_number,passport_expiry,id_number,birthday,age,assigned_room',
   },
   detail: {
     select: '*',

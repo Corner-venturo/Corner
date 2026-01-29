@@ -3,7 +3,7 @@
 import { formatDate, toTaipeiDateString, toTaipeiTimeString } from '@/lib/utils/format-date'
 
 import { useMemo, useCallback } from 'react'
-import { useToursSlim, useMembers, useCustomersSlim, useEmployeesSlim } from '@/data'
+import { useToursSlim, useMembersSlim, useCustomersSlim, useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores'
 import { Tour } from '@/stores/types'
 import { FullCalendarEvent } from '../types'
@@ -46,7 +46,7 @@ export function useCalendarTransform(calendarEvents: CalendarEvent[]) {
   // P2 效能優化：移除 orders 完整載入
   // 改用 tour.current_participants denormalized 欄位計算團員數
   // members 保留用於生日事件（無 N+1 問題）
-  const { items: members } = useMembers()
+  const { items: members } = useMembersSlim()
   const { items: customers } = useCustomersSlim()
   const { items: employees } = useEmployeesSlim()
   const { user } = useAuthStore()
