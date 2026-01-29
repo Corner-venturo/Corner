@@ -146,9 +146,10 @@ export interface PaginatedResult<T> {
 }
 
 export interface DictionaryResult<T> {
-  dictionary: Record<string, Partial<T>>
+  /** ⚠️ 使用 Slim 資料，只包含 slim.select 指定的欄位 */
+  dictionary: Record<string, T>
   loading: boolean
-  get: (id: string) => Partial<T> | undefined
+  get: (id: string) => T | undefined
 }
 
 // ============================================

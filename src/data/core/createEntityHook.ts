@@ -222,13 +222,15 @@ export function createEntityHook<T extends BaseEntity>(
 
   // ============================================
   // useListSlim - 精簡列表 Hook
+  // ⚠️ 返回完整類型 T，但只 fetch slim.select 指定的欄位
+  // 開發者需自行確保只存取 slim 包含的欄位
   // ============================================
-  function useListSlim(options?: { enabled?: boolean }): ListResult<Partial<T>> {
+  function useListSlim(options?: { enabled?: boolean }): ListResult<T> {
     const { isReady, hasHydrated } = useAuth()
     const enabled = options?.enabled !== false // 預設為 true
     const swrKey = isReady && enabled ? cacheKeySlim : null
 
-    const { data, error, isLoading, mutate } = useSWR<Partial<T>[]>(
+    const { data, error, isLoading, mutate } = useSWR<T[]>(
       swrKey,
       async () => {
         const selectFields = config.slim?.select || 'id'
@@ -249,7 +251,8 @@ export function createEntityHook<T extends BaseEntity>(
           throw error
         }
 
-        return (data || []) as unknown as Partial<T>[]
+        // ⚠️ 強制轉型為 T[]，實際上只有 slim.select 的欄位有值
+        return (data || []) as unknown as T[]
       },
       swrConfig
     )
@@ -378,6 +381,7 @@ export function createEntityHook<T extends BaseEntity>(
 
   // ============================================
   // useDictionary - Dictionary Hook（O(1) 查詢）
+  // ⚠️ 使用 Slim 資料，只包含 slim.select 指定的欄位
   // ============================================
   function useDictionary(): DictionaryResult<T> {
     const { items, loading } = useListSlim()
@@ -387,7 +391,7 @@ export function createEntityHook<T extends BaseEntity>(
         acc[item.id] = item
       }
       return acc
-    }, {} as Record<string, Partial<T>>)
+    }, {} as Record<string, T>)
 
     return {
       dictionary,
