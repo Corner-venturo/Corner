@@ -51,8 +51,9 @@ export default function PublicViewClient({ id }: PublicViewClientProps) {
           throw new Error(errorData.error || '無法載入行程')
         }
 
-        const itineraryData = await response.json()
-        setData(itineraryData)
+        const result = await response.json()
+        // API 回傳格式為 {success: true, data: {...}}
+        setData(result.data || result)
       } catch (err) {
         logger.error('載入行程失敗:', err)
         setError(err instanceof Error ? err.message : '載入行程時發生錯誤')
