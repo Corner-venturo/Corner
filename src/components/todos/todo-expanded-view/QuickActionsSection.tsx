@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { Receipt, FileText, Plane, UserPlus } from 'lucide-react'
 import { QuickActionsSectionProps, QuickActionContentProps, QuickActionTabConfig } from './types'
@@ -63,7 +63,7 @@ export function QuickActionsSection({ activeTab, onTabChange }: QuickActionsSect
 }
 
 export function QuickActionContent({ activeTab, todo, onUpdate, onClose }: QuickActionContentProps) {
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { user: currentUser } = useAuthStore()
   const [shareData, setShareData] = React.useState({
     targetUserId: '',

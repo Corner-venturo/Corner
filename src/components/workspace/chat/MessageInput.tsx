@@ -11,7 +11,7 @@ import { validateFile } from './utils'
 import { alert } from '@/lib/ui/alert-dialog'
 import type { Channel } from '@/stores/workspace'
 import { logger } from '@/lib/utils/logger'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 
 // 系統機器人 ID
@@ -72,7 +72,7 @@ export function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messageInputRef = useRef<HTMLDivElement>(null)
   const quickMenuRef = useRef<HTMLDivElement>(null)
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { user } = useAuthStore()
 
   const isAnnouncementChannel = !!channel.is_announcement

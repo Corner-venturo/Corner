@@ -3,7 +3,7 @@
 import { forwardRef, useMemo, useRef, useEffect } from 'react'
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import type { Message, AdvanceList, SharedOrderList } from '@/stores/workspace-store'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { MessageItem } from './MessageItem'
 import { EmptyState } from './EmptyState'
 import { AdvanceListCard } from '../AdvanceListCard'
@@ -61,7 +61,7 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(function
   },
   ref
 ) {
-  const { items: employees = [] } = useEmployees()
+  const { items: employees = [] } = useEmployeesSlim()
 
   // 根據 created_by 查找員工名字
   const getEmployeeName = (userId: string) => {

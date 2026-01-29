@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useTodos, updateTodo, useEmployees } from '@/data'
+import { useTodos, updateTodo, useEmployeesSlim } from '@/data'
 import { useWorkspaceChat } from '@/stores/workspace-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { Send, CheckCircle2, AlertCircle, Search, X, Share2 } from 'lucide-react'
@@ -29,7 +29,7 @@ interface ShareTodoDialogProps {
 
 export function ShareTodoDialog({ channelId, onClose, onSuccess }: ShareTodoDialogProps) {
   const { items: todos } = useTodos()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { sendMessage } = useWorkspaceChat()
   const { user } = useAuthStore()
 

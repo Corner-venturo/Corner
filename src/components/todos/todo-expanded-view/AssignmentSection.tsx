@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { FileText, X, UserCheck } from 'lucide-react'
 import { AssignmentSectionProps } from './types'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { DatePicker } from '@/components/ui/date-picker'
 
 export function AssignmentSection({ todo, onUpdate, readOnly = false }: AssignmentSectionProps) {
   const router = useRouter()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { user } = useAuthStore()
   const [assigneeName, setAssigneeName] = useState<string>('')
 

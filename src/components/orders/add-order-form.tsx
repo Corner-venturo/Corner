@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Combobox } from '@/components/ui/combobox'
 import { useToursListSlim } from '@/hooks/useListSlim'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 
@@ -35,7 +35,7 @@ interface AddOrderFormProps {
 
 export function AddOrderForm({ tourId, onSubmit, onCancel, value, onChange }: AddOrderFormProps) {
   const { items: tours } = useToursListSlim()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
 
   // 判斷是否為嵌入模式
   const isEmbedded = !!onChange

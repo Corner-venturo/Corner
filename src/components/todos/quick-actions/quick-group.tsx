@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { SimpleDateInput } from '@/components/ui/simple-date-input'
 import { Combobox } from '@/components/ui/combobox'
 import { DestinationSelector } from '@/components/shared/destination-selector'
-import { createTour, createOrder, useCountries, useCities, updateCountry, updateCity, useEmployees } from '@/data'
+import { createTour, createOrder, useCountries, useCities, updateCountry, updateCity, useEmployeesSlim } from '@/data'
 import { useWorkspaceId } from '@/lib/workspace-context'
 import { alert } from '@/lib/ui/alert-dialog'
 
@@ -22,7 +22,7 @@ interface QuickGroupProps {
 export function QuickGroup({ onSubmit }: QuickGroupProps) {
   const { items: countries } = useCountries()
   const { items: cities } = useCities()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
 
   // Helper functions to increment usage count (replaces store methods)
   const incrementCountryUsage = async (countryName: string) => {
