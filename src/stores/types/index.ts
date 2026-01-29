@@ -89,7 +89,7 @@ export type {
 export { SYSTEM_PERMISSIONS, FEATURE_PERMISSIONS } from '@/lib/permissions'
 
 // Store 工具型別（重新導出）
-export type { CreateInput, UpdateInput } from './core/types'
+export type { CreateInput, UpdateInput } from '../core/types'
 
 // 提案相關型別
 export type {
@@ -106,6 +106,6 @@ export type {
   ConvertToTourResult,
   ProposalFilters,
   ProposalListItem,
-} from './proposal.types'
+} from '@/types/proposal.types'
 
-export { PROPOSAL_STATUS_CONFIG, ARCHIVE_REASON_CONFIG } from './proposal.types'
+export { PROPOSAL_STATUS_CONFIG, ARCHIVE_REASON_CONFIG } from '@/types/proposal.types'

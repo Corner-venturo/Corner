@@ -25,4 +25,4 @@ export * from './routes'
 export * from './timeouts'
 
 // Status Maps (existing)
-export * from '../../constants/status-maps'
+export * from './status-maps'
