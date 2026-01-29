@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import { Plus, Trash2, X, Check } from 'lucide-react'
 import { useWorkspaceWidgets } from '@/stores/workspace-store'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { Combobox } from '@/components/ui/combobox'
 import type { Employee } from '@/types/models.types'
 import { alert } from '@/lib/ui/alert-dialog'
@@ -39,7 +39,7 @@ export function ShareAdvanceDialog({
   onSuccess,
 }: ShareAdvanceDialogProps) {
   const { shareAdvanceList } = useWorkspaceWidgets()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
 
   const [rows, setRows] = useState<AdvanceRow[]>([
     { name: '', description: '', amount: '', advance_person: '' },

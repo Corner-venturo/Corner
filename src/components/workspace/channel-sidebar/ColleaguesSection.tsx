@@ -10,7 +10,7 @@ import { ChevronDown, ChevronRight, User, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 
 // 系統機器人的固定 ID
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -29,7 +29,7 @@ export function ColleaguesSection({
   selectedMemberId,
 }: ColleaguesSectionProps) {
   const { user } = useAuthStore()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   const [expandedOffices, setExpandedOffices] = useState<Record<string, boolean>>({})

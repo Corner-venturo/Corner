@@ -8,7 +8,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Bot, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 
 // VENTURO 機器人 ID（同時也是 Logan AI）
 export const SYSTEM_BOT_ID = '00000000-0000-0000-0000-000000000001'
@@ -22,7 +22,7 @@ export function BotSection({
   onSelectBot,
   selectedBotId,
 }: BotSectionProps) {
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const [aiAvailable, setAiAvailable] = useState(false)
 
   // 檢查 AI 是否可用

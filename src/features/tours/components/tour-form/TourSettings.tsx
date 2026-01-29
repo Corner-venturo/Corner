@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Combobox } from '@/components/ui/combobox'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import type { Employee } from '@/stores/types'
 import type { SyncableEntity } from '@/types'
 import type { NewTourData } from '../../types'
@@ -15,7 +15,7 @@ interface TourSettingsProps {
 }
 
 export function TourSettings({ newTour, setNewTour }: TourSettingsProps) {
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
 
   // 篩選團控人員（roles 包含 'controller'，排除機器人）
   const controllers = useMemo(() => {

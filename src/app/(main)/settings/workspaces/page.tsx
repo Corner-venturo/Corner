@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useWorkspaceChannels } from '@/stores/workspace'
 import { useAuthStore } from '@/stores'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -20,7 +20,7 @@ import { logger } from '@/lib/utils/logger'
  */
 export default function WorkspacesPage() {
   const { workspaces, loadWorkspaces, createWorkspace, updateWorkspace, createChannel } = useWorkspaceChannels()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { user } = useAuthStore()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newWorkspace, setNewWorkspace] = useState({

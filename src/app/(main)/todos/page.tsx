@@ -15,7 +15,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { useTodos } from '@/hooks/useTodos'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores/auth-store'
 import { alertError } from '@/lib/ui/alert-dialog'
 import { useRequireAuthSync } from '@/hooks/useRequireAuth'
@@ -556,7 +556,7 @@ function AddTodoForm({
   }) => void
   onCancel: () => void
 }) {
-  const { items: users, loading: isLoadingUsers } = useEmployees()
+  const { items: users, loading: isLoadingUsers } = useEmployeesSlim()
   const [formData, setFormData] = useState({
     title: '',
     priority: 3 as 1 | 2 | 3 | 4 | 5,

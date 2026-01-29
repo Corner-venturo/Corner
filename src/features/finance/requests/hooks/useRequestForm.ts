@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { useTours, useOrders, useSuppliers, useEmployees } from '@/data'
+import { useTours, useOrders, useSuppliers, useEmployeesSlim } from '@/data'
 import { useAuthStore } from '@/stores'
 import { RequestFormData, RequestItem } from '../types'
 
@@ -8,7 +8,7 @@ export function useRequestForm() {
   const { items: tours } = useTours()
   const { items: orders } = useOrders()
   const { items: suppliers } = useSuppliers()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
 
   // 獲取當前登入用戶
   const currentUser = useAuthStore(state => state.user)  

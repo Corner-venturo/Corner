@@ -7,7 +7,7 @@ import { Hash, Lock, Check, Globe, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth-store'
-import { useEmployees } from '@/data'
+import { useEmployeesSlim } from '@/data'
 
 interface CreateChannelDialogProps {
   isOpen: boolean
@@ -43,7 +43,7 @@ export function CreateChannelDialog({
   onCreate,
 }: CreateChannelDialogProps) {
   const { user } = useAuthStore()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // 檢查是否為超級管理員

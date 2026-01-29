@@ -8,7 +8,7 @@ import {
   useAuthStore,
   useWorkspaceStore,
 } from '@/stores'
-import { useToursForCalendar, useCustomers, useEmployees, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
+import { useToursForCalendar, useCustomers, useEmployeesSlim, useCalendarEvents as useCalendarEventList, invalidateCalendarEvents } from '@/data'
 import { supabase } from '@/lib/supabase/client'
 import { FullCalendarEvent } from '../types'
 import type { CalendarEvent } from '@/types/calendar.types'
@@ -47,7 +47,7 @@ export function useCalendarEvents() {
   const { settings } = useCalendarStore()
   const { items: calendarEvents } = useCalendarEventList()
   const { user } = useAuthStore()
-  const { items: employees } = useEmployees()
+  const { items: employees } = useEmployeesSlim()
   const { workspaces, loadWorkspaces } = useWorkspaceStore()
 
   // Workspace 篩選狀態（只有超級管理員能用）
